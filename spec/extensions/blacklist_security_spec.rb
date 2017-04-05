@@ -72,6 +72,7 @@ describe Sequel::Model, ".restricted_columns " do
   end
 
   it "should have allowed take precedence over restricted" do
+    @c.plugin :whitelist_security
     @c.set_allowed_columns :x, :y
     @c.set_restricted_columns :y, :z
     i = @c.new(:x => 1, :y => 2, :z => 3)

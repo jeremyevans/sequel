@@ -1038,7 +1038,7 @@ describe Sequel::Model, "#set" do
 
   it "should raise error if strict_param_setting is true and column is restricted" do
     @o1.strict_param_setting = true
-    @c.set_allowed_columns
+    @c.setter_methods.delete("x=")
     proc{@o1.set('x' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
   end
 
@@ -1277,17 +1277,19 @@ end
 
 describe Sequel::Model, "#(set|update)_(all|only)" do
   before do
-    @c = Class.new(Sequel::Model(:items)) do
-      set_primary_key :id
-      columns :x, :y, :z, :id
-      set_allowed_columns :x
+    deprecated do
+      @c = Class.new(Sequel::Model(:items)) do
+        set_primary_key :id
+        columns :x, :y, :z, :id
+        set_allowed_columns :x
+      end
     end
     @c.strict_param_setting = false
     @o1 = @c.new
     DB.reset
   end
 
-  it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
+  deprecated "should raise errors if not all hash fields can be set and strict_param_setting is true" do
     @c.strict_param_setting = true
 
     proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
@@ -1300,19 +1302,19 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     o.values.must_equal(:x => 1, :y => 2)
   end
 
-  it "#set_all should set all attributes including the primary key" do
+  deprecated "#set_all should set all attributes including the primary key" do
     @o1.set_all(:x => 1, :y => 2, :z=>3, :id=>4)
     @o1.values.must_equal(:id =>4, :x => 1, :y => 2, :z=>3)
   end
 
-  it "#set_all should set not set restricted fields" do
+  deprecated "#set_all should set not set restricted fields" do
     @o1.use_after_commit_rollback.must_be_nil
     @o1.set_all(:x => 1, :use_after_commit_rollback => true)
     @o1.use_after_commit_rollback.must_be_nil
     @o1.values.must_equal(:x => 1)
   end
 
-  it "#set_only should only set given attributes" do
+  deprecated "#set_only should only set given attributes" do
     @o1.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
     @o1.values.must_equal(:x => 1, :y => 2)
     @o1.set_only({:x => 4, :y => 5, :z=>6, :id=>7}, :x, :y)
@@ -1321,7 +1323,7 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     @o1.values.must_equal(:x => 9, :y => 8, :id=>7)
   end
 
-  it "#update_all should update all attributes" do
+  deprecated "#update_all should update all attributes" do
     @c.new.update_all(:x => 1)
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     @c.new.update_all(:y => 1)
@@ -1330,7 +1332,7 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     DB.sqls.must_equal ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
   end
 
-  it "#update_only should only update given attributes" do
+  deprecated "#update_only should only update given attributes" do
     @o1.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x])
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     @c.new.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x)

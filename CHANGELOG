@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Model.set_allowed_columns and Model#{set_all,set_only,update_all,update_only}, move to whitelist security plugin (jeremyevans)
+
 * Do not raise MassAssignmentRestriction when setting nested attributes and using the :fields option, only check for fields given (jeremyevans)
 
 * Do not add class methods for private methods definined in dataset_module (jeremyevans)

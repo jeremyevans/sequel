@@ -185,9 +185,9 @@ end
 describe "Sequel::Model.freeze" do
   it "should freeze the model class and not allow any changes" do
     model = Class.new(Sequel::Model(:items))
-    model.set_allowed_columns [:id]
     deprecated do
-    model.finder(:name=>:f_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
+      model.set_allowed_columns [:id]
+      model.finder(:name=>:f_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
     end
     model.freeze
     model.f_by_name(1)
@@ -203,6 +203,7 @@ describe "Sequel::Model.freeze" do
 
     proc{model.dataset_module{}}.must_raise RuntimeError, TypeError
     deprecated do
+      model.allowed_columns.frozen?.must_equal true
       proc{model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}}.must_raise RuntimeError, TypeError
     end
   end

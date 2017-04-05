@@ -64,7 +64,8 @@ module Sequel
     # Class instance variables that are inherited in subclasses.  If the value is <tt>:dup</tt>, dup is called
     # on the superclass's instance variable when creating the instance variable in the subclass.
     # If the value is +nil+, the superclass's instance variable is used directly in the subclass.
-    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup,
+    INHERITED_INSTANCE_VARIABLES = {
+      :@allowed_columns=>:dup, # SEQUEL5: Remove
       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
       :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
@@ -85,7 +86,7 @@ module Sequel
     # (i.e. it ends with =).
     SETTER_METHOD_REGEXP = /=\z/
 
-    @allowed_columns = nil
+    @allowed_columns = nil # SEQUEL5: Remove
     @cache_anonymous_models = true
     @db = nil
     @db_schema = nil

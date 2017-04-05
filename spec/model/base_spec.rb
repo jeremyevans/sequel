@@ -588,7 +588,7 @@ describe "Model.db=" do
   end
 end
 
-describe Sequel::Model, ".(allowed|restricted)_columns " do
+describe Sequel::Model, ".allowed_columns " do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z
@@ -598,7 +598,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     DB.reset
   end
   
-  it "should set the allowed columns correctly" do
+  deprecated "should set the allowed columns correctly" do
     @c.allowed_columns.must_be_nil
     @c.set_allowed_columns :x
     @c.allowed_columns.must_equal [:x]
@@ -606,7 +606,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     @c.allowed_columns.must_equal [:x, :y]
   end
 
-  it "should only set allowed columns by default" do
+  deprecated "should only set allowed columns by default" do
     @c.set_allowed_columns :x, :y
     i = @c.new(:x => 1, :y => 2, :z => 3)
     i.values.must_equal(:x => 1, :y => 2)
@@ -663,7 +663,6 @@ describe Sequel::Model, ".strict_param_setting" do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z, :id
-      set_allowed_columns :x, :y
     end
   end
   
@@ -672,21 +671,24 @@ describe Sequel::Model, ".strict_param_setting" do
   end
 
   it "should raise an error if a missing/restricted column/method is accessed" do
-    proc{@c.new(:z=>1)}.must_raise(Sequel::MassAssignmentRestriction)
-    proc{@c.create(:z=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{@c.new(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{@c.create(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     c = @c.new
-    proc{c.set(:z=>1)}.must_raise(Sequel::MassAssignmentRestriction)
-    proc{c.set_all(:use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
-    proc{c.set_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
-    proc{c.update(:z=>1)}.must_raise(Sequel::MassAssignmentRestriction)
-    proc{c.update_all(:use_after_commit_rollback=>false)}.must_raise(Sequel::MassAssignmentRestriction)
-    proc{c.update_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{c.set(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{c.update(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
+    deprecated do
+      @c.set_allowed_columns :x, :y
+      proc{c.set_all(:use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
+      proc{c.set_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+      proc{c.update_all(:use_after_commit_rollback=>false)}.must_raise(Sequel::MassAssignmentRestriction)
+      proc{c.update_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    end
   end
 
   it "should be disabled by strict_param_setting = false" do
     @c.strict_param_setting = false
     @c.strict_param_setting.must_equal false
-    @c.new(:z=>1)
+    @c.new(:a=>1)
   end
 end
 

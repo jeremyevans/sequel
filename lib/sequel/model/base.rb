@@ -12,7 +12,7 @@ module Sequel
     module ClassMethods
       # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
       # (default: not set, so all columns not otherwise restricted are allowed).
-      attr_reader :allowed_columns
+      attr_reader :allowed_columns # SEQUEL5: Remove
 
       # Whether to cache the anonymous models created by Sequel::Model().  This is
       # required for reloading them correctly (avoiding the superclass mismatch).  True
@@ -638,7 +638,7 @@ module Sequel
         @default_set_fields_options.freeze
         @finders.freeze # SEQUEL5: Remove
         @plugins.freeze
-        @allowed_columns.freeze if @allowed_columns
+        @allowed_columns.freeze if @allowed_columns  # SEQUEL5: Remove
 
         super
       end
@@ -829,6 +829,7 @@ module Sequel
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_allowed_columns(*cols)
+        Sequel::Deprecation.deprecate("Sequel::Model.set_allowed_columns", "Load the whitelist_security plugin into the model class")
         clear_setter_methods_cache
         @allowed_columns = cols
       end
@@ -1791,6 +1792,7 @@ module Sequel
       #   artist.set_all(:name=>'Jim')
       #   artist.name # => 'Jim'
       def set_all(hash)
+        Sequel::Deprecation.deprecate("Sequel::Model#set_all", "Switch to set or load the whitelist_security plugin into the model class")
         set_restricted(hash, :all)
       end
   
@@ -1861,6 +1863,7 @@ module Sequel
       #
       #   artist.set_only({:hometown=>'LA'}, :name) # Raise Error
       def set_only(hash, *only)
+        Sequel::Deprecation.deprecate("Sequel::Model#set_only", "Switch to set_fields with the :missing=>:skip option or load the whitelist_security plugin into the model class")
         set_restricted(hash, only.flatten)
       end
   
@@ -1907,6 +1910,7 @@ module Sequel
       #   Artist.set_allowed_columns(:num_albums)
       #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_all(hash)
+        Sequel::Deprecation.deprecate("Sequel::Model#update_all", "Switch to update or load the whitelist_security plugin into the model class")
         update_restricted(hash, :all)
       end
   
@@ -1932,6 +1936,7 @@ module Sequel
       #
       #   artist.update_only({:hometown=>'LA'}, :name) # Raise Error
       def update_only(hash, *only)
+        Sequel::Deprecation.deprecate("Sequel::Model#update_only", "Switch to update_fields with the :missing=>:skip option or load the whitelist_security plugin into the model class")
         update_restricted(hash, only.flatten)
       end
       
@@ -2419,7 +2424,7 @@ module Sequel
       # Array :: Only allow setting of columns in the given array.
       def setter_methods(type)
         if type == :default
-          if !@singleton_setter_added || model.allowed_columns
+          if !@singleton_setter_added || model.allowed_columns # SEQUEL5: Remove model.allowed_columns
             return model.setter_methods
           end
         end
