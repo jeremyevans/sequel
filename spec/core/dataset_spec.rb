@@ -3135,7 +3135,7 @@ describe "Dataset#columns" do
     @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
     @dataset.columns.must_equal [:a]
     @dataset.db.sqls.must_equal []
-    ds = @dataset.select{foo{}}
+    ds = @dataset.select{foo.function}
     ds.columns.must_equal [:b]
     @dataset.db.sqls.must_equal ['SELECT foo() FROM items LIMIT 1']
   end
@@ -4453,7 +4453,7 @@ describe "Sequel::Dataset#select_map" do
   it "should raise if multiple arguments and can't determine alias" do
     proc{@ds.select_map([Sequel.function(:a), :b])}.must_raise(Sequel::Error)
     proc{@ds.select_map(Sequel.function(:a)){b}}.must_raise(Sequel::Error)
-    proc{@ds.select_map{[a{}, b]}}.must_raise(Sequel::Error)
+    proc{@ds.select_map{[a.function, b]}}.must_raise(Sequel::Error)
   end
 
   with_symbol_splitting "should handle implicit aliases in arguments" do
@@ -4547,7 +4547,7 @@ describe "Sequel::Dataset#select_order_map" do
   it "should raise if multiple arguments and can't determine alias" do
     proc{@ds.select_order_map([Sequel.function(:a), :b])}.must_raise(Sequel::Error)
     proc{@ds.select_order_map(Sequel.function(:a)){b}}.must_raise(Sequel::Error)
-    proc{@ds.select_order_map{[a{}, b]}}.must_raise(Sequel::Error)
+    proc{@ds.select_order_map{[a.function, b]}}.must_raise(Sequel::Error)
   end
 
   with_symbol_splitting "should handle implicit aliases in arguments" do

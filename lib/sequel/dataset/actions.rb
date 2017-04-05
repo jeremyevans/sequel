@@ -104,7 +104,7 @@ module Sequel
     def count(arg=(no_arg=true), &block)
       if no_arg && !block
         cached_dataset(:_count_ds) do
-          aggregate_dataset.select{count{}.*.as(:count)}.single_value_ds
+          aggregate_dataset.select{count.function.*.as(:count)}.single_value_ds
         end.single_value!.to_i
       else
         if block

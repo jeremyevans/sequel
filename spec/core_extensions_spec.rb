@@ -26,6 +26,7 @@ if RUBY_VERSION < '1.9.0'
   Sequel.extension :ruby18_symbol_extensions
 end
 Sequel.extension :symbol_aref
+Sequel.extension :virtual_row_method_block
 
 require 'minitest/autorun'
 require 'minitest/hooks/default'
@@ -742,3 +743,90 @@ describe "symbol_aref extensions" do
     end
   end
 end
+
+describe Sequel::SQL::VirtualRow do
+  before do
+    @d = Sequel.mock[:items].with_quote_identifiers(true).with_extend do
+      def supports_window_functions?; true end
+      def l(*args, &block)
+        literal(filter_expr(*args, &block))
+      end
+    end
+  end
+
+  it "should treat methods without blocks normally" do
+    @d.l{column}.must_equal '"column"'
+    @d.l{foo(a)}.must_equal 'foo("a")'
+  end
+
+
+  it "should treat methods with a block and no arguments as a function call with no arguments" do
+    @d.l{version{}}.must_equal 'version()'
+  end
+
+  it "should treat methods with a block and a leading argument :* as a function call with the SQL wildcard" do
+    @d.l{count(:*){}}.must_equal 'count(*)'
+  end
+
+  it "should treat methods with a block and a leading argument :distinct as a function call with DISTINCT and the additional method arguments" do
+    @d.l{count(:distinct, column1){}}.must_equal 'count(DISTINCT "column1")'
+    @d.l{count(:distinct, column1, column2){}}.must_equal 'count(DISTINCT "column1", "column2")'
+  end
+
+  it "should raise an error if an unsupported argument is used with a block" do
+    proc{@d.where{count(:blah){}}}.must_raise(Sequel::Error)
+  end
+
+  it "should treat methods with a block and a leading argument :over as a window function call" do
+    @d.l{rank(:over){}}.must_equal 'rank() OVER ()'
+  end
+
+  it "should support :partition options for window function calls" do
+    @d.l{rank(:over, :partition=>column1){}}.must_equal 'rank() OVER (PARTITION BY "column1")'
+    @d.l{rank(:over, :partition=>[column1, column2]){}}.must_equal 'rank() OVER (PARTITION BY "column1", "column2")'
+  end
+
+  it "should support :args options for window function calls" do
+    @d.l{avg(:over, :args=>column1){}}.must_equal 'avg("column1") OVER ()'
+    @d.l{avg(:over, :args=>[column1, column2]){}}.must_equal 'avg("column1", "column2") OVER ()'
+  end
+
+  it "should support :order option for window function calls" do
+    @d.l{rank(:over, :order=>column1){}}.must_equal 'rank() OVER (ORDER BY "column1")'
+    @d.l{rank(:over, :order=>[column1, column2]){}}.must_equal 'rank() OVER (ORDER BY "column1", "column2")'
+  end
+
+  it "should support :window option for window function calls" do
+    @d.l{rank(:over, :window=>:win){}}.must_equal 'rank() OVER ("win")'
+  end
+
+  it "should support :*=>true option for window function calls" do
+    @d.l{count(:over, :* =>true){}}.must_equal 'count(*) OVER ()'
+  end
+
+  it "should support :frame=>:all option for window function calls" do
+    @d.l{rank(:over, :frame=>:all){}}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)'
+  end
+
+  it "should support :frame=>:rows option for window function calls" do
+    @d.l{rank(:over, :frame=>:rows){}}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should support :frame=>'some string' option for window function calls" do
+    @d.l{rank(:over, :frame=>'RANGE BETWEEN 3 PRECEDING AND CURRENT ROW'){}}.must_equal 'rank() OVER (RANGE BETWEEN 3 PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should raise an error if an invalid :frame option is used" do
+    proc{@d.l{rank(:over, :frame=>:blah){}}}.must_raise(Sequel::Error)
+  end
+
+  it "should support all these options together" do
+    @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.must_equal 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should raise an error if window functions are not supported" do
+    proc{@d.with_extend{def supports_window_functions?; false end}.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.must_raise(Sequel::Error)
+    proc{Sequel.mock.dataset.filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.must_raise(Sequel::Error)
+  end
+end
+

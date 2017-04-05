@@ -1930,39 +1930,49 @@ module Sequel
         Sequel::LiteralString.new(s)
       end
 
-      # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
-      # on arguments and whether a block is provided.  Does not currently call the block.
-      # See the class level documentation.
-      def method_missing(m, *args, &block)
-        if block
-          if args.empty?
-            Function.new(m)
-          else
-            case args.shift
-            when :*
-              Function.new(m, *args).*
-            when :distinct
-              Function.new(m, *args).distinct
-            when :over
-              opts = args.shift || OPTS
-              f = Function.new(m, *::Kernel.Array(opts[:args]))
-              f = f.* if opts[:*]
-              f.over(opts)
+      include(Module.new do
+        # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
+        # on arguments and whether a block is provided.  Does not currently call the block.
+        # See the class level documentation.
+        def method_missing(m, *args, &block)
+          if block
+            if args.empty?
+              Sequel::Deprecation.deprecate("Passing a block to a virtual row method to create a Sequel::SQL::Function", "Replace the block with a call to .function to create a function, or use the virtual_row_method_block extension")
+              Function.new(m)
             else
-              Kernel.raise(Error, 'unsupported VirtualRow method argument used with block')
+              case args.shift
+              when :*
+                Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :* argument to create a Sequel::SQL::Function", "Remove the :* argument and block and a call to .function.* to create a function(*) call, or use the virtual_row_method_block extension")
+                Function.new(m, *args).*
+              when :distinct
+                Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :distinct argument to create a Sequel::SQL::Function", "Remove the :distinct argument and block with a call to .function.distinct to create a function(DISTINCT ...) call, or use the virtual_row_method_block extension")
+                Function.new(m, *args).distinct
+              when :over
+                opts = args.shift || OPTS
+                f = Function.new(m, *::Kernel.Array(opts[:args]))
+                if opts[:*]
+                  Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :over argument and :* option to create a Sequel::SQL::WindowFunction", "Remove the :over argument, :* option and block with a call to .function.*.over with the options to create a function(*) OVER (...) call, or use the virtual_row_method_block extension")
+                  f = f.*
+                else
+                  Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :over argument to create a Sequel::SQL::WindowFunction", "Remove the :over argument and block with a call to .function.over with the options to create a function(...) OVER (...) call, or use the virtual_row_method_block extension")
+                end
+                f.over(opts)
+              else
+                Kernel.raise(Error, 'unsupported VirtualRow method argument used with block')
+              end
             end
-          end
-        elsif args.empty?
-          if Sequel.split_symbols?
-            table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
-            column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
+          elsif args.empty?
+            if Sequel.split_symbols?
+              table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
+              column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
+            else
+              Identifier.new(m)
+            end
           else
-            Identifier.new(m)
+            Function.new(m, *args)
           end
-        else
-          Function.new(m, *args)
         end
-      end
+      end)
 
       Sequel::VIRTUAL_ROW = new
     end

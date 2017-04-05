@@ -128,7 +128,7 @@ END
   end
 
   it "should handle SQL::Function with a window" do
-    dot(@ds.select{sum{}.over(:partition=>:a)}).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Function: sum\"];", "3 -> 4 [label=\"args\"];", "4 [label=\"Array\"];", "3 -> 5 [label=\"opts\"];", "5 [label=\"Hash\"];", "5 -> 6 [label=\"over\"];", "6 [label=\"Window\"];", "6 -> 7 [label=\"opts\"];", "7 [label=\"Hash\"];", "7 -> 8 [label=\"partition\"];", "8 [label=\":a\"];"]
+    dot(@ds.select(Sequel.function(:sum).over(:partition=>:a))).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Function: sum\"];", "3 -> 4 [label=\"args\"];", "4 [label=\"Array\"];", "3 -> 5 [label=\"opts\"];", "5 [label=\"Hash\"];", "5 -> 6 [label=\"over\"];", "6 [label=\"Window\"];", "6 -> 7 [label=\"opts\"];", "7 [label=\"Hash\"];", "7 -> 8 [label=\"partition\"];", "8 [label=\":a\"];"]
   end
 
   it "should handle SQL::PlaceholderLiteralString" do

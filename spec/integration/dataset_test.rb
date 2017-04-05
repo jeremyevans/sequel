@@ -866,9 +866,9 @@ if DB.dataset.supports_window_functions?
     end
       
     it "should give correct results for ranking window functions with orders" do
-      @ds.select(:id){rank{}.over(:partition=>:group_id, :order=>:id).as(:rank)}.all.
+      @ds.select(:id){rank.function.over(:partition=>:group_id, :order=>:id).as(:rank)}.all.
         must_equal [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>1, :id=>4}, {:rank=>2, :id=>5}, {:rank=>3, :id=>6}]
-      @ds.select(:id){rank{}.over(:order=>id).as(:rank)}.all.
+      @ds.select(:id){rank.function.over(:order=>id).as(:rank)}.all.
         must_equal [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>4, :id=>4}, {:rank=>5, :id=>5}, {:rank=>6, :id=>6}]
     end
       

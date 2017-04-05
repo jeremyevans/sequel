@@ -463,7 +463,7 @@ describe "A PostgreSQL dataset" do
   end if DB.server_version >= 90300
 
   it "should support ordered-set and hypothetical-set aggregate functions" do
-    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{mode{}.within_group(:a)}.must_equal 1
+    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{mode.function.within_group(:a)}.must_equal 1
   end if DB.server_version >= 90400
 
   it "should support filtered aggregate functions" do
