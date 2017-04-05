@@ -694,14 +694,12 @@ module Sequel
           v = fetch(:filter_limit_strategy, self[:eager_limit_strategy])
           if v || self[:limit] || !returns_array?
             case v ||= self[:model].default_eager_limit_strategy
-            when :union, :ruby
+            when true, :union, :ruby
               # Can't use a union or ruby-based strategy for filtering by associations, switch to default eager graph limit
               # strategy.
               true_eager_graph_limit_strategy
             when Symbol
               v
-            when true
-              true_eager_graph_limit_strategy
             end
           end
         end
