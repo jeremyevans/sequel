@@ -381,7 +381,7 @@ module Sequel
       #
       #   Sequel.case([[{:a=>[2,3]}, 1]], 0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
       #   Sequel.case({:a=>1}, 0, :b) # SQL: CASE b WHEN a THEN 1 ELSE 0 END
-      def case(*args) # core_sql ignore
+      def case(*args)
         SQL::CaseExpression.new(*args)
       end
 
@@ -614,7 +614,7 @@ module Sequel
       #
       #    DB[:items].select{|o| o.count(Sequel.lit('DISTINCT ?', :a))}.sql #=>
       #      "SELECT count(DISTINCT a) FROM items"
-      def lit(s, *args) # core_sql ignore
+      def lit(s, *args)
         if args.empty?
           if s.is_a?(LiteralString)
             s
