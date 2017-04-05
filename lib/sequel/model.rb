@@ -37,7 +37,9 @@ module Sequel
     
     # Boolean settings that can be modified at the global, class, or instance level.
     BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
-      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_after_commit_rollback, :use_transactions]
+      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions,
+      :use_after_commit_rollback # SEQUEL5: Remove
+      ]
 
     # Hooks that are called before an action.  Can return false to not do the action.  When
     # overriding these, it is recommended to call +super+ as the last line of your method,

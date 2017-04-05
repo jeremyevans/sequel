@@ -12,7 +12,7 @@ module Sequel
     module ClassMethods
       # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
       # (default: not set, so all columns not otherwise restricted are allowed).
-      attr_reader :allowed_columns # SEQUEL5: Remove
+      attr_reader :allowed_columns # SEQUEL5: Deprecate after release
 
       # Whether to cache the anonymous models created by Sequel::Model().  This is
       # required for reloading them correctly (avoiding the superclass mismatch).  True
@@ -794,6 +794,7 @@ module Sequel
       # exception:
       # :type :: Specifies the type of prepared statement to create
       def prepared_finder(meth=OPTS, opts=OPTS, &block)
+        # SEQUEL5: Remove
         if block
           raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
           meth = meth.merge(:prepare=>true)
@@ -1133,6 +1134,7 @@ module Sequel
       # that want to modify the methods used.
       def get_setter_methods
         if allowed_columns
+          # SEQUEL5: Remove allowed_columns handling
           allowed_columns.map{|x| "#{x}="}
         else
           meths = instance_methods.collect(&:to_s).grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
@@ -1998,8 +2000,6 @@ module Sequel
       # even if validation is skipped.  This is a private hook.  It exists so that
       # plugins can set values automatically before validation (as the values
       # need to be validated), but should be set even if validation is skipped.
-      # Unlike the regular before_validation hook, we do not skip the save/validation
-      # if this returns false.
       def _before_validation
       end
 
