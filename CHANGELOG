@@ -1,5 +1,7 @@
 === master
 
+* Don't quote function names that are SQL::Identifiers, unless SQL::Function#quoted is used (jeremyevans)
+
 * Deprecate splitting virtual row method names (jeremyevans)
 
 * Deprecate passing blocks to virtual row methods, move to virtual_row_method_block extension (jeremyevans)

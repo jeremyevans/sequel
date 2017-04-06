@@ -557,7 +557,7 @@ module Sequel
 
       case name
       when SQL::Identifier
-        if supports_quoted_function_names? && opts[:quoted] != false
+        if supports_quoted_function_names? && opts[:quoted]
           literal_append(sql, name)
         else
           sql << name.value.to_s

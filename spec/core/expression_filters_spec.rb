@@ -755,9 +755,9 @@ describe Sequel::SQL::VirtualRow do
     @d.l{Sequel.qualify(sch__sum, :x__y).function(c, 1)}.must_equal 'sch.sum.x.y("c", 1)'
   end
 
-  it "should handle quoted function names" do
+  it "should not quote function names created from identifiers by default" do
     @d = @d.with_extend{def supports_quoted_function_names?; true end}
-    @d.l{rank.function}.must_equal '"rank"()' 
+    @d.l{rank.function}.must_equal 'rank()' 
   end
 
   with_symbol_splitting "should handle quoted function names when using double underscores" do
@@ -767,13 +767,12 @@ describe Sequel::SQL::VirtualRow do
 
   it "should quote function names if a quoted function is used and database supports quoted function names" do
     @d = @d.with_extend{def supports_quoted_function_names?; true end}
-    @d.l{rank.function.quoted}.must_equal '"rank"()' 
+    @d.l{rank(1).quoted}.must_equal '"rank"(1)' 
     @d.l{sch__rank(1).quoted}.must_equal '"sch__rank"(1)' 
   end
 
-  it "should not quote function names if an unquoted function is used" do
+  it "should not quote function names created from qualified identifiers if an unquoted function is used" do
     @d = @d.with_extend{def supports_quoted_function_names?; true end}
-    @d.l{rank.function.unquoted}.must_equal 'rank()' 
     @d.l{sch[rank].function.unquoted}.must_equal 'sch.rank()' 
   end
 
