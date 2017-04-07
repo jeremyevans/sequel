@@ -1229,8 +1229,10 @@ module Sequel
     end
 
     def _filter(clause, *cond, &block)
+      # :nocov:
       Sequel::Deprecation.deprecate("Sequel::Dataset#_filter (private method)", "Switch to calling Sequel::Dataset#where/having directly")
       _filter_or_exclude(false, clause, *cond, &block)
+      # :nocov:
     end
 
     # The default :qualify option to use for join tables if one is not specified.

@@ -37,10 +37,12 @@ module Sequel
     end
 
     if RUBY_VERSION < '1.9'
+      # :nocov:
       def self.deprecate(_method, _instead=nil)
         # Sequel 5 will drop ruby 1.8 support completely, so it doesn't make sense to issue deprecation
         # warnings on ruby 1.8.
       end
+      # :nocov:
     else
       # Print the message and possibly backtrace to the output.
       def self.deprecate(method, instead=nil)

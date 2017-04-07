@@ -82,7 +82,9 @@ module Sequel
       when Array
         meth = " (method called: #{meth.first}, non-mutating replacement: #{meth.last})"
       when String
+        # :nocov:
         meth = " (method called: #{meth})"
+        # :nocov:
       end
       Sequel::Deprecation.deprecate("Dataset mutation is deprecated and will be removed in Sequel 5#{meth}")
     end
