@@ -768,6 +768,7 @@ describe Sequel::SQL::VirtualRow do
   it "should quote function names if a quoted function is used and database supports quoted function names" do
     @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{rank(1).quoted}.must_equal '"rank"(1)' 
+    @d.l{rank.function.quoted}.must_equal '"rank"()' 
     @d.l{sch__rank(1).quoted}.must_equal '"sch__rank"(1)' 
   end
 
