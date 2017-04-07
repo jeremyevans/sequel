@@ -211,8 +211,7 @@ module Sequel
     # to be the correct type, so that even if two separate Database objects are
     # using different adapters you can tell that they are using the same database
     # type.  Even better, you can tell that two Database objects that are using
-    # the same adapter are connecting to different database types (think JDBC or
-    # DataObjects).
+    # the same adapter are connecting to different database types.
     #
     #   Sequel.connect('jdbc:postgres://...').database_type # => :postgres
     def database_type
