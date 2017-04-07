@@ -1,5 +1,7 @@
 === master
 
+* Deprecate conversion of - to _ in adapter schemes (jeremyevans)
+
 * Don't quote function names that are SQL::Identifiers, unless SQL::Function#quoted is used (jeremyevans)
 
 * Deprecate splitting virtual row method names (jeremyevans)
