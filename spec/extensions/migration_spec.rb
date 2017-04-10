@@ -290,7 +290,8 @@ describe "Sequel::IntegerMigrator" do
   end
 
   it "should raise an error if there is an empty migration file" do
-    proc{Sequel::Migrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
+    err = proc{Sequel::Migrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
+    err.message.must_equal "Migration file not containing a single migration detected"
   end
 
   it "should raise an error if there is a migration file with multiple migrations" do
@@ -530,7 +531,8 @@ describe "Sequel::TimestampMigrator" do
   end
   
   it "should raise an error if there is an empty migration file" do
-    proc{Sequel::TimestampMigrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
+    err = proc{Sequel::TimestampMigrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
+    err.message.must_equal "Migration file not containing a single migration detected"
   end
 
   it "should raise an error if there is a migration file with multiple migrations" do
