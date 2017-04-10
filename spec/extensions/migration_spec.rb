@@ -290,8 +290,7 @@ describe "Sequel::IntegerMigrator" do
   end
 
   it "should raise an error if there is an empty migration file" do
-    err = proc{Sequel::Migrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
-    err.message.must_equal "Migration file \"spec/files/empty_migration/002_create_nodes.rb\" not containing a single migration detected"
+    proc{Sequel::Migrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
   end
 
   it "should raise an error if there is a migration file with multiple migrations" do
@@ -531,8 +530,7 @@ describe "Sequel::TimestampMigrator" do
   end
   
   it "should raise an error if there is an empty migration file" do
-    err = proc{Sequel::TimestampMigrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
-    err.message.must_equal "Migration file \"spec/files/empty_migration/002_create_nodes.rb\" not containing a single migration detected"
+    proc{Sequel::TimestampMigrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
   end
 
   it "should raise an error if there is a migration file with multiple migrations" do
