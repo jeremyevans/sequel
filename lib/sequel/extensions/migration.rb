@@ -482,7 +482,7 @@ module Sequel
     def load_migration_file(file)
       n = Migration.descendants.length
       load(file)
-      raise Error, "Migration file not containing a single migration detected" unless n + 1 == Migration.descendants.length
+      raise Error, "Migration file #{file.inspect} not containing a single migration detected" unless n + 1 == Migration.descendants.length
     end
 
     # Remove all migration classes.  Done by the migrator to ensure that
