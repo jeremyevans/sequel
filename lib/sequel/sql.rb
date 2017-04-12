@@ -59,7 +59,8 @@ module Sequel
       # Create a new SQLTime instance given an hour, minute, and second.
       def create(hour, minute, second, usec = 0)
         t = date
-        local(t.year, t.month, t.day, hour, minute, second, usec)
+        meth = Sequel.application_timezone == :utc ? :utc : :local
+        send(meth, t.year, t.month, t.day, hour, minute, second, usec)
       end
     end
 

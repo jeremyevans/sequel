@@ -1226,12 +1226,20 @@ describe "Sequel::SQLTime" do
     @db = Sequel.mock
   end
   after do
-    Sequel::SQLTime.date = nil
+    Sequel::application_timezone = Sequel::SQLTime.date = nil
   end
 
   it ".create should create from hour, minutes, seconds and optional microseconds" do
     @db.literal(Sequel::SQLTime.create(1, 2, 3)).must_equal "'01:02:03.000000'"
     @db.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500000'"
+  end
+
+  it ".create should use utc is that is the application_timezone setting" do
+    Sequel::SQLTime.create(1, 2, 3).utc?.must_equal false
+    Sequel::application_timezone = :local
+    Sequel::SQLTime.create(1, 2, 3).utc?.must_equal false
+    Sequel::application_timezone = :utc
+    Sequel::SQLTime.create(1, 2, 3).utc?.must_equal true
   end
 
   it ".create should use today's date by default" do

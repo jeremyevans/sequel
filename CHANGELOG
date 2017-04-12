@@ -1,5 +1,7 @@
 === master
 
+* Use utc timezone in Sequel::SQLTime.create if Sequel.application_timezone is :utc (jeremyevans) (#1336)
+
 * Include migration filename in message about migration file without a single migration (jmettraux) (#1334)
 
 * Deprecate conversion of - to _ in adapter schemes (jeremyevans)
