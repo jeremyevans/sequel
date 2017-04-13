@@ -76,6 +76,13 @@ describe "MSSQL" do
     pr = lambda{|x| [:hour, :min, :sec, :usec].map{|m| x.send(m)}}
     pr[v].must_equal(pr[t])
   end
+
+  it "should get datetimeoffset values as Time with fractional seconds" do
+    t = Time.local(2010, 11, 12, 10, 20, 30, 999000)
+    v = @db.get(Sequel.cast(t, 'datetimeoffset'))
+    pr = lambda{|x| [:year, :month, :day, :hour, :min, :sec, :usec].map{|m| x.send(m)}}
+    pr[v].must_equal(pr[t])
+  end
 end
 
 # This spec is currently disabled as the SQL Server 2008 R2 Express doesn't support
