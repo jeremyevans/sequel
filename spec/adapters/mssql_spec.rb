@@ -68,6 +68,14 @@ describe "MSSQL" do
   it "should should support OUTER APPLY" do
     @db[:test3].outer_apply(@db[:test4].where(Sequel[:test3][:v3]=>Sequel[:test4][:v4])).select_order_map([:v3, :v4]).must_equal [[1,1], [2, nil]]
   end
+  
+  it "should handle time values with fractional seconds" do
+    t = Sequel::SQLTime.create(10, 20, 30, 999900)
+    v = @db["SELECT CAST('10:20:30.9999' AS time(7))"].get
+    v = Sequel.string_to_time(v) if v.is_a?(String)
+    pr = lambda{|x| [:hour, :min, :sec, :usec].map{|m| x.send(m)}}
+    pr[v].must_equal(pr[t])
+  end
 end
 
 # This spec is currently disabled as the SQL Server 2008 R2 Express doesn't support

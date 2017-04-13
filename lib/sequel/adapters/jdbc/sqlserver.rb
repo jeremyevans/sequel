@@ -14,12 +14,29 @@ module Sequel
       end
     end
 
+    class TypeConvertor
+      def MSSQLRubyTime(r, i)
+        # MSSQL-Server TIME should be fetched as string to keep the precision intact, see:
+        # https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients
+        if v = r.getString(i)
+          Sequel.string_to_time("#{v}")
+        end
+      end
+    end
+
     # Database and Dataset instance methods for SQLServer specific
     # support via JDBC.
     module SQLServer
       # Database instance methods for SQLServer databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::JDBC::MSSQL::DatabaseMethods
+
+        def setup_type_convertor_map
+          super
+          map = @type_convertor_map
+          types = Java::JavaSQL::Types
+          map[types.const_get(:TIME)] = TypeConvertor::INSTANCE.method(:MSSQLRubyTime)
+        end
 
         # Work around a bug in SQL Server JDBC Driver 3.0, where the metadata
         # for the getColumns result set specifies an incorrect type for the
