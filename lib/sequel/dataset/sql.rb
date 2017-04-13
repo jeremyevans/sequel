@@ -1093,8 +1093,8 @@ module Sequel
 
     # Return the SQL timestamp fragment to use for the fractional time part.
     # Should start with the decimal point.  Uses 6 decimal places by default.
-    def format_timestamp_usec(usec)
-      unless (ts = timestamp_precision) == 6
+    def format_timestamp_usec(usec, ts=timestamp_precision)
+      unless ts == 6
         usec = usec/(10 ** (6 - ts))
       end
       sprintf(".%0#{ts}d", usec)
@@ -1293,7 +1293,7 @@ module Sequel
 
     # SQL fragment for Sequel::SQLTime, containing just the time part
     def literal_sqltime(v)
-      v.strftime("'%H:%M:%S#{format_timestamp_usec(v.usec) if supports_timestamp_usecs?}'")
+      v.strftime("'%H:%M:%S#{format_timestamp_usec(v.usec, sqltime_precision) if supports_timestamp_usecs?}'")
     end
 
     # Append literalization of Sequel::SQLTime to SQL string.
@@ -1549,6 +1549,12 @@ module Sequel
       String.new
     end
     
+    # The precision to use for SQLTime instances (time column values without dates).
+    # Defaults to timestamp_precision.
+    def sqltime_precision
+      timestamp_precision
+    end
+
     # SQL to use if this dataset uses static SQL.  Since static SQL
     # can be a PlaceholderLiteralString in addition to a String,
     # we literalize nonstrings.  If there is an append_sql for this

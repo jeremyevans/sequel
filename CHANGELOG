@@ -1,5 +1,7 @@
 === master
 
+* Add Dataset#sqltime_precision private method for adapters to use different precision for Sequel::SQLTime than Time and Date (jeremyevans)
+
 * Use utc timezone in Sequel::SQLTime.create if Sequel.application_timezone is :utc (jeremyevans) (#1336)
 
 * Include migration filename in message about migration file without a single migration (jmettraux) (#1334)

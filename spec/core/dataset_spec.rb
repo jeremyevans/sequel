@@ -1064,6 +1064,13 @@ describe "Dataset#literal" do
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500'"
   end
   
+  it "should literalize times properly for databases with different time and timestamp precision" do
+    @dataset = @dataset.with_extend{def timestamp_precision; 3 end; def sqltime_precision; 6 end}
+    @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500000'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500'"
+  end
+  
   it "should literalize Date properly" do
     d = Date.today
     s = d.strftime("'%Y-%m-%d'")
