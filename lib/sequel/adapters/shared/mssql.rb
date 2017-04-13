@@ -1132,7 +1132,15 @@ module Sequel
         end
       end
 
-      # MSSQL supports millisecond timestamp precision.
+      # MSSQL supports 100-nsec precision for time columns, but ruby by
+      # default only supports usec precision.
+      def sqltime_precision
+        6
+      end
+
+      # MSSQL supports millisecond timestamp precision for datetime columns.
+      # 100-nsec precision is supported for datetime2 columns, but Sequel does
+      # not know what the column type is when formatting values.
       def timestamp_precision
         3
       end

@@ -1,5 +1,9 @@
 === master
 
+* Fix conversion of some time values when using the jdbc/sqlserver adapter in some configurations (iaddict, jeremyevans) (#1337)
+
+* Use microsecond precision for time values on Microsoft SQL Server, instead of millisecond precision (jeremyevans)
+
 * Add Dataset#sqltime_precision private method for adapters to use different precision for Sequel::SQLTime than Time and Date (jeremyevans)
 
 * Use utc timezone in Sequel::SQLTime.create if Sequel.application_timezone is :utc (jeremyevans) (#1336)
