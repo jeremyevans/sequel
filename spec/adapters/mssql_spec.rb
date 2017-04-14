@@ -69,17 +69,22 @@ describe "MSSQL" do
     @db[:test3].outer_apply(@db[:test4].where(Sequel[:test3][:v3]=>Sequel[:test4][:v4])).select_order_map([:v3, :v4]).must_equal [[1,1], [2, nil]]
   end
 
-  it "should handle time values with fractional seconds" do
+  cspecify "should handle time values with fractional seconds", [:ado] do
+    # ado: Returns nil values
     t = Sequel::SQLTime.create(10, 20, 30, 999900)
-    v = @db.get(t)
+    v = @db.get(Sequel.cast(t, 'time'))
     v = Sequel.string_to_time(v) if v.is_a?(String)
     pr = lambda{|x| [:hour, :min, :sec, :usec].map{|m| x.send(m)}}
     pr[v].must_equal(pr[t])
   end
 
-  it "should get datetimeoffset values as Time with fractional seconds" do
+  cspecify "should get datetimeoffset values as Time with fractional seconds", [:odbc], [:ado], [:tinytds, proc{|db| TinyTds::VERSION < '0.9'}] do
+    # odbc: Returns string rounded to nearest second
+    # ado: Returns nil values
+    # tiny_tds < 0.9: Returns wrong value for hour
     t = Time.local(2010, 11, 12, 10, 20, 30, 999000)
     v = @db.get(Sequel.cast(t, 'datetimeoffset'))
+    v = Sequel.string_to_datetime(v) if v.is_a?(String)
     pr = lambda{|x| [:year, :month, :day, :hour, :min, :sec, :usec].map{|m| x.send(m)}}
     pr[v].must_equal(pr[t])
   end

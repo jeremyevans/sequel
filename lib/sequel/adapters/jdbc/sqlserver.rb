@@ -22,12 +22,6 @@ module Sequel
           Sequel.string_to_time("#{v}")
         end
       end
-
-      def MSSQLDateTimeOffset(r, i)
-        if v = r.getDateTimeOffset(i)
-          Sequel.database_to_application_timestamp("#{v}")
-        end
-      end
     end
 
     # Database and Dataset instance methods for SQLServer specific
@@ -40,10 +34,14 @@ module Sequel
         def setup_type_convertor_map
           super
           map = @type_convertor_map
-          types = Java::JavaSQL::Types
-          ms_types = Java::MicrosoftSql::Types
-          map[types.const_get(:TIME)] = TypeConvertor::INSTANCE.method(:MSSQLRubyTime)
-          map[ms_types.const_get(:DATETIMEOFFSET)] = TypeConvertor::INSTANCE.method(:MSSQLDateTimeOffset)
+          map[Java::JavaSQL::Types::TIME] = TypeConvertor::INSTANCE.method(:MSSQLRubyTime)
+          if defined?(Java::MicrosoftSql::Types::DATETIMEOFFSET)
+            map[Java::MicrosoftSql::Types::DATETIMEOFFSET] = lambda do |r, i|
+              if v = r.getDateTimeOffset(i)
+                to_application_timestamp(v.to_s)
+              end
+            end
+          end
         end
 
         # Work around a bug in SQL Server JDBC Driver 3.0, where the metadata
