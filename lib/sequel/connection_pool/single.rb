@@ -16,8 +16,8 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
 
   # Disconnect the connection from the database.
   def disconnect(opts=nil)
-    return unless @conn
-    disconnect_connection(@conn.first)
+    return unless c = @conn.first
+    disconnect_connection(c)
     @conn.clear
     nil
   end

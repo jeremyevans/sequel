@@ -761,11 +761,12 @@ describe "SingleConnectionPool" do
   it "should provide a #disconnect method" do
     conn = nil
     x = nil
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| conn = c}){1234}, ST_CONNECTION_POOL_DEFAULTS)
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| conn = c; c.must_be_kind_of(Integer)}){1234}, ST_CONNECTION_POOL_DEFAULTS)
     pool.hold{|c| x = c}
     x.must_equal 1234
     pool.disconnect
     conn.must_equal 1234
+    pool.disconnect
   end
 end
 
