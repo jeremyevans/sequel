@@ -12,6 +12,8 @@ module Sequel
     # in the extension).
     EXTENSIONS = {}
 
+    EMPTY_ARRAY = [].freeze
+
     # The dataset options that require the removal of cached columns
     # if changed.
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
@@ -258,7 +260,7 @@ module Sequel
         end
       end
       o = {:from=>source.empty? ? nil : source.freeze}
-      o[:with] = ((opts[:with] || []) + ctes).freeze if ctes
+      o[:with] = ((opts[:with] || EMPTY_ARRAY) + ctes).freeze if ctes
       o[:num_dataset_sources] = table_alias_num if table_alias_num > 0
       clone(o)
     end
@@ -592,13 +594,13 @@ module Sequel
           expr = SQL::BooleanExpression.from_value_pairs(expr)
         end
         if block
-          expr2 = yield(table_name, last_alias, @opts[:join] || [])
+          expr2 = yield(table_name, last_alias, @opts[:join] || EMPTY_ARRAY)
           expr = expr ? SQL::BooleanExpression.new(:AND, expr, expr2) : expr2
         end
         SQL::JoinOnClause.new(expr, type, table_expr)
       end
 
-      opts = {:join => ((@opts[:join] || []) + [join]).freeze}
+      opts = {:join => ((@opts[:join] || EMPTY_ARRAY) + [join]).freeze}
       opts[:last_joined_table] = table_name unless options[:reset_implicit_qualifier] == false
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
@@ -1047,7 +1049,7 @@ module Sequel
         s, ds = hoist_cte(dataset)
         s.with(name, ds, opts)
       else
-        clone(:with=>((@opts[:with]||[]) + [Hash[opts].merge!(:name=>name, :dataset=>dataset)]).freeze)
+        clone(:with=>((@opts[:with]||EMPTY_ARRAY) + [Hash[opts].merge!(:name=>name, :dataset=>dataset)]).freeze)
       end
     end
 
@@ -1076,7 +1078,7 @@ module Sequel
         s, ds = hoist_cte(recursive)
         s.with_recursive(name, nonrecursive, ds, opts)
       else
-        clone(:with=>((@opts[:with]||[]) + [Hash[opts].merge!(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))]).freeze)
+        clone(:with=>((@opts[:with]||EMPTY_ARRAY) + [Hash[opts].merge!(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))]).freeze)
       end
     end
     
@@ -1242,7 +1244,7 @@ module Sequel
     
     # SQL expression object based on the expr type.  See +where+.
     def filter_expr(expr = nil, &block)
-      expr = nil if expr == []
+      expr = nil if expr == EMPTY_ARRAY
 
       if block
         if expr
@@ -1298,7 +1300,7 @@ module Sequel
     # clause from the given dataset added to it, and the second a clone of
     # the given dataset with the WITH clause removed.
     def hoist_cte(ds)
-      [clone(:with => ((opts[:with] || []) + ds.opts[:with]).freeze), ds.clone(:with => nil)]
+      [clone(:with => ((opts[:with] || EMPTY_ARRAY) + ds.opts[:with]).freeze), ds.clone(:with => nil)]
     end
 
     # Whether CTEs need to be hoisted from the given ds into the current ds.
