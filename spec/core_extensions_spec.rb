@@ -6,7 +6,7 @@ if ENV['COVERAGE']
 end
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../lib/"))
   require 'sequel'
 end
 
