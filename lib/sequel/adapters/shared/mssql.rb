@@ -656,7 +656,7 @@ module Sequel
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = OPTS)
         terms = "\"#{terms.join('" OR "')}\"" if terms.is_a?(Array)
-        where("CONTAINS (?, ?)", cols, terms)
+        where(Sequel.lit("CONTAINS (?, ?)", cols, terms))
       end
 
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.

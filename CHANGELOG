@@ -1,5 +1,7 @@
 === master
 
+* Make Dataset#full_text_search work on Microsoft SQL Server when no_auto_literal_strings extension is used (jeremyevans)
+
 * Fix Database#disconnect when using the single connection pool without an active connection (jeremyevans) (#1339)
 
 * Handle conversion of datetimeoffset values when using the jdbc/sqlserver adapter in some configurations (iaddict, jeremyevans) (#1338)
