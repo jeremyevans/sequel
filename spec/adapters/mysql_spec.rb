@@ -354,7 +354,7 @@ describe "A MySQL database" do
 
   it "should handle qualified tables in #indexes" do
     DB.create_table!(:test_innodb){primary_key :id; String :name; index :name, :unique=>true, :name=>:test_innodb_name_idx}
-    DB.indexes(Sequel.qualify(DB.get{database{}}, :test_innodb)).must_equal(:test_innodb_name_idx=>{:unique=>true, :columns=>[:name]})
+    DB.indexes(Sequel.qualify(DB.get{database.function}, :test_innodb)).must_equal(:test_innodb_name_idx=>{:unique=>true, :columns=>[:name]})
   end
 end
 
