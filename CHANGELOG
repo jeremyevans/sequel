@@ -1,5 +1,15 @@
 === master
 
+* If passing an empty array or hash and a block to a filtering method, ignore the array or hash and just use the block (jeremyevans)
+
+* Deprecate ignoring explicit nil argument when there is no existing filter (jeremyevans)
+
+* Deprecate ignoring explicit nil argument to filtering methods when passing a block (jeremyevans)
+
+* Deprecate ignoring empty strings and other empty? arguments passed to the filtering methods without a block (jeremyevans)
+
+* Deprecate calling filtering methods without an argument or a block (jeremyevans)
+
 * Deprecate Sequel::VirtualRow#` to create literal SQL, use Sequel.lit instead (jeremyevans)
 
 * Add auto_literal_strings extensions for treating plain strings passed to filtering/update methods as literal SQL (jeremyevans)

@@ -351,14 +351,44 @@ describe "Dataset#where" do
     @d1 = @dataset.where(:region => 'Asia')
   end
   
-  it "should just clone if given an empty argument" do
+  if false # SEQUEL5: remove if
+  it "should just clone if given no arguments or block" do
+    proc{@dataset.where}.must_raise Sequel::Error
+  end
+  
+  it "should handle nil argument if block is given" do
+    @d1.where(nil){a}.sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND NULL AND a)"
+  end
+  
+  it "should handle nil argument if block has no existing filter" do
+    @dataset.where(nil).sql.must_equal "SELECT * FROM test WHERE NULL"
+  end
+  end
+  
+  it "should just clone if given an empty array or hash argument" do
     @dataset.where({}).sql.must_equal @dataset.sql
     @dataset.where([]).sql.must_equal @dataset.sql
-    @dataset.where('').sql.must_equal @dataset.sql
 
     @dataset.filter({}).sql.must_equal @dataset.sql
     @dataset.filter([]).sql.must_equal @dataset.sql
+  end
+
+  deprecated "should just clone if given an empty string argument" do
+    @dataset.where('').sql.must_equal @dataset.sql
     @dataset.filter('').sql.must_equal @dataset.sql
+  end
+  
+  deprecated "should just clone if given no arguments or block" do
+    @dataset.where.sql.must_equal @dataset.sql
+    @dataset.filter.sql.must_equal @dataset.sql
+  end
+  
+  deprecated "should ignore nil argument if block is given" do
+    @d1.where(nil){a}.sql.must_equal @d1.where(:a).sql
+  end
+  
+  deprecated "should ignore nil argument if block has no existing filter" do
+    @dataset.where(nil).sql.must_equal @dataset.sql
   end
   
   it "should work with hashes" do
@@ -855,9 +885,12 @@ describe "Dataset#having" do
     @grouped = @dataset.group(:region).select(:region, Sequel.function(:sum, :population), Sequel.function(:avg, :gdp))
   end
 
-  it "should just clone if given an empty argument" do
+  it "should just clone if given an empty array or hash argument" do
     @dataset.having({}).sql.must_equal @dataset.sql
     @dataset.having([]).sql.must_equal @dataset.sql
+  end
+
+  deprecated "should just clone if given an empty string argument" do
     @dataset.having('').sql.must_equal @dataset.sql
   end
   
