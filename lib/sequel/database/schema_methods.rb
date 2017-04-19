@@ -808,9 +808,16 @@ module Sequel
 
     # Proxy the filter_expr call to the dataset, used for creating constraints.
     def filter_expr(*args, &block)
-      if args.length == 1 && args.first.is_a?(Proc) && !block
-        block = args.first
-        args = nil
+      if args.length == 1
+        arg = args.first
+        if arg.is_a?(Proc) && !block
+          block = args.first
+          args = nil
+        elsif arg.is_a?(String)
+          args = [Sequel.lit(*args)]
+        elsif arg.is_a?(Array) && arg.first.is_a?(String)
+          args = [Sequel.lit(*arg)]
+        end
       end
       schema_utility_dataset.literal(schema_utility_dataset.send(:filter_expr, *args, &block))
     end

@@ -38,7 +38,7 @@ describe "no_auto_literal_strings extension" do
                             "SELECT * FROM t WHERE (a) LIMIT 1"]
   end
   
-  it "should handle literal strings in arrays in filter methods" do
+  deprecated "should handle literal strings in arrays in filter methods" do
     @ds.where([Sequel.lit("a")]).sql.must_equal 'SELECT * FROM t WHERE (a)'
   end
 

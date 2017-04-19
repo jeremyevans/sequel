@@ -880,8 +880,13 @@ describe "Model datasets #with_pk with #with_pk!" do
     DB.sqls.must_equal ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
   end
 
-  it "should not have #[] consider a string as a primary key lookup" do
+  deprecated "should not have #[] consider a string as a primary key lookup" do
     @ds['foo'].must_equal @c.load(:id=>1)
+    DB.sqls.must_equal ["SELECT * FROM a WHERE (foo) LIMIT 1"]
+  end
+
+  it "should not have #[] consider a literal string as a primary key lookup" do
+    @ds[Sequel.lit('foo')].must_equal @c.load(:id=>1)
     DB.sqls.must_equal ["SELECT * FROM a WHERE (foo) LIMIT 1"]
   end
 

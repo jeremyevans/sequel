@@ -31,11 +31,11 @@ describe "Sequel::Plugins::AssociationProxies" do
   
   it "should accept block to plugin to specify which methods to proxy to dataset" do
     Item.plugin :association_proxies do |opts|
-      opts[:method] == :where || opts[:arguments].length == 2 || opts[:block]
+      opts[:method] == :where || opts[:arguments].first.is_a?(Sequel::LiteralString) || opts[:block]
     end
     @i.associations.has_key?(:tags).must_equal false
     @t.where(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
-    @t.filter('a = ?', 1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.filter(Sequel.lit('a = 1')).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
     @t.filter{{:a=>1}}.sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
 
     @i.associations.has_key?(:tags).must_equal false

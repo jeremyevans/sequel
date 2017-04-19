@@ -611,8 +611,8 @@ module Sequel
       EQ_VALUES = '=VALUES('.freeze
       EQ = '='.freeze
       WITH_ROLLUP = ' WITH ROLLUP'.freeze
-      MATCH_AGAINST = ["(MATCH ".freeze, " AGAINST (".freeze, "))".freeze].freeze
-      MATCH_AGAINST_BOOLEAN = ["(MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE))".freeze].freeze
+      MATCH_AGAINST = ["MATCH ".freeze, " AGAINST (".freeze, ")".freeze].freeze
+      MATCH_AGAINST_BOOLEAN = ["MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE)".freeze].freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
       BACKSLASH_RE = /\\/.freeze

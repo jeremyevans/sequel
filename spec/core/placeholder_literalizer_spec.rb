@@ -53,8 +53,19 @@ describe "Dataset::PlaceholderLiteralizer" do
     loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
     loader.first(:id=>1).must_equal @h
     loader.first(Sequel.expr{a(b)}).must_equal @h
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1)", "SELECT * FROM items WHERE a(b)"]
+  end
+  
+  deprecated "should handle calls with a literal strings used as filter arguments" do
+    loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
     loader.first("a = 1").must_equal @h
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1)", "SELECT * FROM items WHERE a(b)", "SELECT * FROM items WHERE (a = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (a = 1)"]
+  end
+  
+  it "should handle calls with a literal strings used as filter arguments" do
+    loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
+    loader.first(Sequel.lit("a = 1")).must_equal @h
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (a = 1)"]
   end
   
   it "should handle calls with a placeholders used as right hand side of condition specifiers" do
@@ -72,11 +83,18 @@ describe "Dataset::PlaceholderLiteralizer" do
     @db.sqls.must_equal ["SELECT * FROM items WHERE ((a = 1) AND (b = 1))", "SELECT * FROM items WHERE ((a = 2) AND (b = 2))"]
   end
   
-  it "should handle calls with a placeholder used multiple times in different capacities" do
+  deprecated "should handle calls with a placeholder used multiple times in different capacities" do
     loader = @c.loader(@ds){|pl, ds| a = pl.arg; ds.where(a).where(:b=>a)}
     loader.first("a = 1").must_equal @h
     loader.first(["a = ?", 2]).must_equal @h
     @db.sqls.must_equal ["SELECT * FROM items WHERE ((a = 1) AND (b = 'a = 1'))", "SELECT * FROM items WHERE ((a = 2) AND (b IN ('a = ?', 2)))"]
+  end
+  
+  it "should handle calls with a placeholder used multiple times in different capacities" do
+    loader = @c.loader(@ds){|pl, ds| a = pl.arg; ds.select(a).where(:b=>a)}
+    loader.first("a").must_equal @h
+    loader.first(["a = ?", 2]).must_equal @h
+    @db.sqls.must_equal ["SELECT 'a' FROM items WHERE (b = 'a')", "SELECT ('a = ?', 2) FROM items WHERE (b IN ('a = ?', 2))"]
   end
   
   it "should handle calls with manually specified argument positions" do

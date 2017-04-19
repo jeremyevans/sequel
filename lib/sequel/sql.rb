@@ -1619,6 +1619,12 @@ module Sequel
         @str = str
         @args = args.is_a?(Array) && args.length == 1 && (v = args.at(0)).is_a?(Hash) ? v : args
         @parens = parens
+        freeze
+      end
+
+      # Return a copy of the that will be surrounded by parantheses.
+      def with_parens
+        @parens ? self : self.class.new(@str, @args, true)
       end
 
       to_s_method :placeholder_literal_string_sql

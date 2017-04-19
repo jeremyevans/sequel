@@ -1379,7 +1379,7 @@ module Sequel
           terms = Sequel.function(query_func, lang, phrase_terms)
         end
 
-        ds = where(Sequel.lit(["(", " @@ ", ")"], cols, terms))
+        ds = where(Sequel.lit(["", " @@ ", ""], cols, terms))
 
         if opts[:phrase]
           raise Error, "can't use :phrase with either :tsvector or :tsquery arguments to full_text_search together" if opts[:tsvector] || opts[:tsquery]

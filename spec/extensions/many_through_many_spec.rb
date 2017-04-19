@@ -349,7 +349,7 @@ describe Sequel::Model, "many_through_many" do
     n.tags_dataset.sql.must_equal 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((a = 32) AND (albums_artists.artist_id = 1234))'
     n.tags.must_equal [@c2.load(:id=>1)]
 
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>['a = ?', 42]
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>Sequel.lit('a = ?', 42)
     n = @c1.load(:id => 1234)
     n.tags_dataset.sql.must_equal 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((a = 42) AND (albums_artists.artist_id = 1234))'
     n.tags.must_equal [@c2.load(:id=>1)]
@@ -1477,7 +1477,7 @@ describe Sequel::Model, "one_through_many" do
     n.tag_dataset.sql.must_equal 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((a = 32) AND (albums_artists.artist_id = 1234)) LIMIT 1'
     n.tag.must_equal @c2.load(:id=>1)
 
-    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>['a = ?', 42]
+    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>Sequel.lit('a = ?', 42)
     n = @c1.load(:id => 1234)
     n.tag_dataset.sql.must_equal 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((a = 42) AND (albums_artists.artist_id = 1234)) LIMIT 1'
     n.tag.must_equal @c2.load(:id=>1)

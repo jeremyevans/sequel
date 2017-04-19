@@ -641,7 +641,7 @@ describe Sequel::Model, "#eager" do
     a.first.good_bands.must_equal [EagerBand.load(:id => 2)]
     DB.sqls.must_equal []
 
-    EagerBandMember.many_to_many :good_bands, :clone=>:bands, :conditions=>"x = 1"
+    EagerBandMember.many_to_many :good_bands, :clone=>:bands, :conditions=>Sequel.lit("x = 1")
     a = EagerBandMember.eager(:good_bands).all
     DB.sqls.must_equal ['SELECT * FROM members', 'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON (bm.band_id = bands.id) WHERE ((x = 1) AND (bm.member_id IN (5))) ORDER BY id']
   end
@@ -673,7 +673,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should cache the negative lookup when eagerly loading a *_to_many associations" do
-    a = EagerBand.eager(:albums).filter('id > 100').all
+    a = EagerBand.eager(:albums).where{id > 100}.all
     a.must_equal [EagerBand.load(:id => 101), EagerBand.load(:id =>102)]
     sqls = DB.sqls
     ['SELECT * FROM albums WHERE (albums.band_id IN (101, 102))', 'SELECT * FROM albums WHERE (albums.band_id IN (102, 101))'].must_include(sqls.delete_at(1))
@@ -1951,8 +1951,8 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_table_only_conditions=>{:active=>true}
     GraphAlbum.eager_graph(:active_genres).sql.must_equal "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.active IS TRUE) LEFT OUTER JOIN genres AS active_genres ON (active_genres.id = ag.genre_id)"
 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_only_conditions=>(Sequel.expr(:price) + 2 > 100), :graph_join_table_only_conditions=>"active"
-    GraphAlbum.eager_graph(:active_genres).sql.must_equal "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (active) LEFT OUTER JOIN genres AS active_genres ON ((price + 2) > 100)"
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_only_conditions=>(Sequel.expr(:price) + 2 > 100), :graph_join_table_only_conditions=>Sequel.identifier("active")
+    GraphAlbum.eager_graph(:active_genres).sql.must_equal "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON active LEFT OUTER JOIN genres AS active_genres ON ((price + 2) > 100)"
   end
 
   it "should create unique table aliases for all associations" do

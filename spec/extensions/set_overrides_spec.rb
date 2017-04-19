@@ -21,7 +21,7 @@ describe "Sequel::Dataset #set_defaults" do
     @ds.set_defaults(:x=>2).update_sql.must_equal "UPDATE items SET x = 2"
   end
 
-  it "should not affect String update arguments" do
+  deprecated "should not affect String update arguments" do
     @ds.update_sql('y = 2').must_equal "UPDATE items SET y = 2"
   end
 

@@ -2065,7 +2065,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :conditions => {:a=>32}
     @c2.new(:id => 1234).attributes_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234))'
 
-    @c2.many_to_many :attributes, :class => @c1, :conditions => ['a = ?', 32]
+    @c2.many_to_many :attributes, :class => @c1, :conditions => Sequel.lit('a = ?', 32)
     @c2.new(:id => 1234).attributes_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234))'
     @c2.new(:id => 1234).attributes.must_equal [@c1.load({})]
   end
@@ -2896,7 +2896,7 @@ describe Sequel::Model, "one_through_one" do
     @c2.one_through_one :attribute, :class => @c1, :conditions => {:a=>32}
     @c2.new(:id => 1234).attribute_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
 
-    @c2.one_through_one :attribute, :class => @c1, :conditions => ['a = ?', 32]
+    @c2.one_through_one :attribute, :class => @c1, :conditions => Sequel.lit('a = ?', 32)
     @c2.new(:id => 1234).attribute_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
     @c2.new(:id => 1234).attribute.must_equal @c1.load({})
   end

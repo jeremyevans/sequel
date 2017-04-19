@@ -80,7 +80,7 @@ END
   end
 
   it "should handle LiteralStrings" do
-    dot(@ds.filter('a')).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"Sequel.lit(\\\"(a)\\\")\"];"]
+    dot(@ds.filter(Sequel.lit('a'))).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"Sequel.lit(\\\"(a)\\\")\"];"]
   end
 
   it "should handle true, false, nil" do
@@ -132,7 +132,7 @@ END
   end
 
   it "should handle SQL::PlaceholderLiteralString" do
-    dot(@ds.where("?", true)).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"PlaceholderLiteralString: \\\"(?)\\\"\"];", "2 -> 3 [label=\"args\"];", "3 [label=\"Array\"];", "3 -> 4 [label=\"0\"];", "4 [label=\"true\"];"]
+    dot(@ds.where(Sequel.lit("?", true))).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"PlaceholderLiteralString: \\\"(?)\\\"\"];", "2 -> 3 [label=\"args\"];", "3 [label=\"Array\"];", "3 -> 4 [label=\"0\"];", "4 [label=\"true\"];"]
   end
 
   it "should handle JOIN ON" do

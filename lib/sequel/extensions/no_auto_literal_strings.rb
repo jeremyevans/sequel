@@ -82,3 +82,5 @@ module Sequel
     register_extension(:no_auto_literal_strings, NoAutoLiteralStrings)
   end
 end
+
+# SEQUEL5: Make extension empty
