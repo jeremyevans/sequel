@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::VirtualRow#` to create literal SQL, use Sequel.lit instead (jeremyevans)
+
 * Add auto_literal_strings extensions for treating plain strings passed to filtering/update methods as literal SQL (jeremyevans)
 
 * Deprecate automatically treating plain strings passed to filtering/update methods as literal SQL (jeremyevans)

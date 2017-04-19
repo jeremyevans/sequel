@@ -1934,6 +1934,7 @@ module Sequel
 
       # Return a literal string created with the given string.
       def `(s)
+        Sequel::Deprecation.deprecate("Using Sequel#VirtualRow#` to create a literal SQL fragment", "Use Sequel.lit instead")
         Sequel::LiteralString.new(s)
       end
 
