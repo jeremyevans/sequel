@@ -56,15 +56,20 @@ module Sequel
       
       # Dataset class for AS400 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        include EmulateOffsetWithRowNumber
-
         WILDCARD = Sequel::LiteralString.new('*').freeze
+        OFFSET = Dataset::OFFSET
+        ROWS = " ROWS".freeze
         FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
         FETCH_FIRST = " FETCH FIRST ".freeze
         ROWS_ONLY = " ROWS ONLY".freeze
         
         # Modify the sql to limit the number of rows returned
         def select_limit_sql(sql)
+          if o = @opts[:offset]
+            sql << OFFSET
+            literal_append(sql, o)
+            sql << ROWS
+          end
           if l = @opts[:limit]
             if l == 1
               sql << FETCH_FIRST_ROW_ONLY
