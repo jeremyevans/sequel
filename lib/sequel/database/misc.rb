@@ -151,6 +151,7 @@ module Sequel
       reset_default_dataset
       adapter_initialize
       if typecast_value_boolean(@opts.fetch(:identifier_mangling, true))
+        # SEQUEL5: Remove
         extension(:_deprecated_identifier_mangling)
       end
 
