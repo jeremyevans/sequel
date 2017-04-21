@@ -505,11 +505,13 @@ module Sequel
 
     # Used for checking/removing leading zeroes from strings so they don't get
     # interpreted as octal.
-    LEADING_ZERO_RE = /\A0+(\d)/.freeze
+    LEADING_ZERO_RE = /\A0+(\d)/
+    Sequel::Deprecation.deprecate_constant(self, :LEADING_ZERO_RE)
+
     if RUBY_VERSION >= '1.9'
       # Typecast the value to an Integer
       def typecast_value_integer(value)
-        (value.is_a?(String) && value =~ LEADING_ZERO_RE) ? Integer(value, 10) : Integer(value)
+        (value.is_a?(String) && value =~ /\A0+(\d)/) ? Integer(value, 10) : Integer(value)
       end
     else
     # :nocov:
