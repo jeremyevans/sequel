@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Dataset #set_defaults" do
   before do
-    @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides).set_defaults(:x=>1)
+    deprecated do
+      @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides).set_defaults(:x=>1)
+    end
   end
 
   it "should set the default values for inserts" do
@@ -37,7 +39,9 @@ end
 
 describe "Sequel::Dataset #set_overrides" do
   before do
-    @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides).set_overrides(:x=>1)
+    deprecated do
+      @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides).set_overrides(:x=>1)
+    end
   end
 
   it "should override the given values for inserts" do

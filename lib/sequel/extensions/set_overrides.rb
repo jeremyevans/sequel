@@ -18,6 +18,8 @@
 #
 # Related module: Sequel::SetOverrides
 
+Sequel::Deprecation.deprecate("The set_overrides extension", "Please consider maintaining it yourself as an external sequel extension if you want to continue using it")
+
 #
 module Sequel
   module SetOverrides

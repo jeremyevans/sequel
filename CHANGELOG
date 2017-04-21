@@ -1,5 +1,7 @@
 === master
 
+* Deprecate the set_overrides extension (jeremyevans)
+
 * If passing an empty array or hash and a block to a filtering method, ignore the array or hash and just use the block (jeremyevans)
 
 * Deprecate ignoring explicit nil argument when there is no existing filter (jeremyevans)
