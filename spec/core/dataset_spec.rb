@@ -720,9 +720,12 @@ describe "Dataset#or" do
     @dataset.or(:a => 1).sql.must_equal 'SELECT * FROM test'
   end
   
-  it "should just clone if given an empty argument" do
+  it "should just clone if given an empty array or hash argument" do
     @d1.or({}).sql.must_equal @d1.sql
     @d1.or([]).sql.must_equal @d1.sql
+  end
+
+  deprecated "should just clone if given an empty string argument" do
     @d1.or('').sql.must_equal @d1.sql
   end
   

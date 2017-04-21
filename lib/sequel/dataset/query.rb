@@ -174,7 +174,7 @@ module Sequel
     #   DB[:items].exclude(Sequel.~(:category=>nil) & {:category => 'software'})
     #   # SELECT * FROM items WHERE ((category IS NULL) OR (category != 'software'))
     def exclude(*cond, &block)
-      _filter_or_exclude(true, :where, *cond, &block)
+      add_filter(:where, cond, true, &block)
     end
 
     # Inverts the given conditions and adds them to the HAVING clause.
@@ -185,7 +185,7 @@ module Sequel
     # See documentation for exclude for how inversion is handled in regards
     # to SQL 3-valued boolean logic.
     def exclude_having(*cond, &block)
-      _filter_or_exclude(true, :having, *cond, &block)
+      add_filter(:having, cond, true, &block)
     end
 
     # Alias for exclude.
@@ -415,7 +415,7 @@ module Sequel
     #   DB[:items].group(:sum).having(:sum=>10)
     #   # SELECT * FROM items GROUP BY sum HAVING (sum = 10)
     def having(*cond, &block)
-      _filter_or_exclude(false, :having, *cond, &block)
+      add_filter(:having, cond, &block)
     end
     
     # Adds an INTERSECT clause using a second dataset object.
@@ -696,17 +696,17 @@ module Sequel
       clone(:offset => o)
     end
     
-    # Adds an alternate filter to an existing filter using OR. If no filter 
-    # exists an +Error+ is raised.
+    # Adds an alternate filter to an existing WHERE clause using OR.  If there 
+    # is no WHERE clause, then the default is WHERE true, and OR would be redundant,
+    # so return an unmodified clone of the dataset in that case.
     #
     #   DB[:items].where(:a).or(:b) # SELECT * FROM items WHERE a OR b
+    #   DB[:items].or(:b) # SELECT * FROM items
     def or(*cond, &block)
-      cond = cond.first if cond.size == 1
-      v = @opts[:where]
-      if v.nil? || (cond.respond_to?(:empty?) && cond.empty? && !block)
+      if @opts[:where].nil?
         clone
       else
-        clone(:where => SQL::BooleanExpression.new(:OR, v, filter_expr(cond, &block)))
+        add_filter(:where, cond, false, :OR, &block)
       end
     end
 
@@ -1032,7 +1032,7 @@ module Sequel
     #
     # See the {"Dataset Filtering" guide}[rdoc-ref:doc/dataset_filtering.rdoc] for more examples and details.
     def where(*cond, &block)
-      _filter_or_exclude(false, :where, *cond, &block)
+      add_filter(:where, cond, &block)
     end
     
     # Add a common table expression (CTE) with the given name and a dataset that defines the CTE.
@@ -1216,9 +1216,7 @@ module Sequel
       self
     end
 
-    # Internal filtering method so it works on either the WHERE or HAVING clauses, with or
-    # without inversion.
-    def _filter_or_exclude(invert, clause, *cond, &block)
+    def add_filter(clause, cond, invert=false, combine=:AND, &block)
       if cond == EMPTY_ARRAY && !block
         Sequel::Deprecation.deprecate("Passing no arguments and no block to a filtering method", "Include at least one argument or a block when calling a filtering method")
         #raise Error, "must provide an argument to a filtering method if not passing a block" # SEQUEL5
@@ -1251,17 +1249,21 @@ module Sequel
 
         cond = filter_expr(cond, &block)
         cond = SQL::BooleanExpression.invert(cond) if invert
-        cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
+        cond = SQL::BooleanExpression.new(combine, @opts[clause], cond) if @opts[clause]
         clone(clause => cond)
       end
     end
 
-    def _filter(clause, *cond, &block)
-      # :nocov:
-      Sequel::Deprecation.deprecate("Sequel::Dataset#_filter (private method)", "Switch to calling Sequel::Dataset#where/having directly")
-      _filter_or_exclude(false, clause, *cond, &block)
-      # :nocov:
+    # :nocov:
+    def _filter_or_exclude(invert, clause, *cond, &block)
+      Sequel::Deprecation.deprecate("Sequel::Dataset#_filter/_filter_or_exclude (private methods)", "Switch to calling a public dataset filtering method directly")
+      add_filter(clause, cond, invert, &block)
     end
+
+    def _filter(clause, *cond, &block)
+      _filter_or_exclude(false, clause, *cond, &block)
+    end
+    # :nocov:
 
     # The default :qualify option to use for join tables if one is not specified.
     def default_join_table_qualification
