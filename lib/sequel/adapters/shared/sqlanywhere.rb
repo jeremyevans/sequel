@@ -114,7 +114,7 @@ module Sequel
            si[:colnames].as(:columns),
            fks[:primary_tname].as(:table_name)]}.
          join(Sequel[:sys][:sysforeignkeys].as(:fks), :role => :role).
-         join(Sequel[:sys][:sysindexes].as(:si), [:iname=> Sequel[:fk][:role]], {:implicit_qualifier => :fk}).
+         join(Sequel[:sys][:sysindexes].as(:si), {:iname => Sequel[:fk][:role]}, {:implicit_qualifier => :fk}).
          where{{fks[:foreign_tname]=>im.call(table)}}.
          each do |r|
           unless r[:type].downcase == 'primary key'
