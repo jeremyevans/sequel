@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "error_sql extension" do
   before do
-    @db = Sequel.mock(:fetch=>proc{|sql| @db.log_yield(sql){raise StandardError}}).extension(:error_sql)
+    @db = Sequel.mock(:fetch=>proc{|sql| @db.log_connection_yield(sql, nil){raise StandardError}}).extension(:error_sql)
   end
 
   it "should have Sequel::DatabaseError#sql give the SQL causing the error" do

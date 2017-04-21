@@ -191,17 +191,17 @@ describe "Database#log_yield" do
     @db = Sequel::Database.new(:logger=>@o)
   end
 
-  it "should yield to the passed block" do
+  deprecated "should yield to the passed block" do
     a = nil
     @db.log_yield('blah'){a = 1}
     a.must_equal 1
   end
 
-  it "should raise an exception if a block is not passed" do
+  deprecated "should raise an exception if a block is not passed" do
     proc{@db.log_yield('blah')}.must_raise LocalJumpError
   end
 
-  it "should log message with duration at info level to all loggers" do
+  deprecated "should log message with duration at info level to all loggers" do
     @db.log_yield('blah'){}
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
@@ -209,7 +209,7 @@ describe "Database#log_yield" do
     @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
-  it "should respect sql_log_level setting" do
+  deprecated "should respect sql_log_level setting" do
     @db.sql_log_level = :debug
     @db.log_yield('blah'){}
     @o.logs.length.must_equal 1
@@ -218,7 +218,7 @@ describe "Database#log_yield" do
     @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
-  it "should log message with duration at warn level if duration greater than log_warn_duration" do
+  deprecated "should log message with duration at warn level if duration greater than log_warn_duration" do
     @db.log_warn_duration = 0
     @db.log_yield('blah'){}
     @o.logs.length.must_equal 1
@@ -227,7 +227,7 @@ describe "Database#log_yield" do
     @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
-  it "should log message with duration at info level if duration less than log_warn_duration" do
+  deprecated "should log message with duration at info level if duration less than log_warn_duration" do
     @db.log_warn_duration = 1000
     @db.log_yield('blah'){}
     @o.logs.length.must_equal 1
@@ -236,7 +236,7 @@ describe "Database#log_yield" do
     @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
-  it "should log message at error level if block raises an error" do
+  deprecated "should log message at error level if block raises an error" do
     @db.log_warn_duration = 0
     proc{@db.log_yield('blah'){raise Sequel::Error, 'adsf'}}.must_raise Sequel::Error
     @o.logs.length.must_equal 1
@@ -245,7 +245,7 @@ describe "Database#log_yield" do
     @o.logs.first.last.must_match(/\ASequel::Error: adsf: blah\z/)
   end
 
-  it "should include args with message if args passed" do
+  deprecated "should include args with message if args passed" do
     @db.log_yield('blah', [1, 2]){}
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
@@ -259,6 +259,7 @@ describe "Database#log_connection_yield" do
     @o = Object.new
     def @o.logs; @logs || []; end
     def @o.to_ary; [self]; end
+    def @o.warn(*args); (@logs ||= []) << [:warn] + args; end
     def @o.method_missing(*args); (@logs ||= []) << args; end
     @conn = Object.new
     @db = Sequel::Database.new(:logger=>@o)
@@ -280,6 +281,68 @@ describe "Database#log_connection_yield" do
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :info
     @o.logs.first.last.must_match(/\(conn: -?\d+\) some SQL\z/)
+  end
+
+  it "should yield to the passed block" do
+    a = nil
+    @db.log_connection_yield('blah', @conn){a = 1}
+    a.must_equal 1
+  end
+
+  it "should raise an exception if a block is not passed" do
+    proc{@db.log_connection_yield('blah', @conn)}.must_raise LocalJumpError
+  end
+
+  it "should log message with duration at info level to all loggers" do
+    @db.log_connection_yield('blah', @conn){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :info
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
+  end
+
+  it "should respect sql_log_level setting" do
+    @db.sql_log_level = :debug
+    @db.log_connection_yield('blah', @conn){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :debug
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
+  end
+
+  it "should log message with duration at warn level if duration greater than log_warn_duration" do
+    @db.log_warn_duration = 0
+    @db.log_connection_yield('blah', @conn){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :warn
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
+  end
+
+  it "should log message with duration at info level if duration less than log_warn_duration" do
+    @db.log_warn_duration = 1000
+    @db.log_connection_yield('blah', @conn){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :info
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
+  end
+
+  it "should log message at error level if block raises an error" do
+    @db.log_warn_duration = 0
+    proc{@db.log_connection_yield('blah', @conn){raise Sequel::Error, 'adsf'}}.must_raise Sequel::Error
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :error
+    @o.logs.first.last.must_match(/\ASequel::Error: adsf: blah\z/)
+  end
+
+  it "should include args with message if args passed" do
+    @db.log_connection_yield('blah', @conn, [1, 2]){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :info
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah; \[1, 2\]\z/)
   end
 end
 
