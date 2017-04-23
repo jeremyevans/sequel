@@ -122,7 +122,7 @@ module Sequel
     #               use a savepoint you must use this option.  If the surrounding transaction
     #               uses :auto_savepoint, you can set this to false to not use a savepoint.
     #               If the value given for this option is :only, it will only create a
-    #               savepoint if it is inside a transacation.
+    #               savepoint if it is inside a transaction.
     #
     # PostgreSQL specific options:
     #

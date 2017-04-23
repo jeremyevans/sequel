@@ -897,7 +897,7 @@ DatabaseTransactionSpecs = shared_description do
     tr.must_be :empty?
   end
 
-  it "should correctly handle nested transacation use with separate shards" do
+  it "should correctly handle nested transaction use with separate shards" do
     @db.transaction do |c1|
       @db.transaction(:server=>:test) do |c2|
         c1.wont_equal c2
