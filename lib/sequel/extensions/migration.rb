@@ -448,9 +448,9 @@ module Sequel
       @directory = directory
       @allow_missing_migration_files = opts[:allow_missing_migration_files]
       @files = get_migration_files
-      schema, table = @db.send(:schema_and_table, opts[:table]  || self.class.const_get(:DEFAULT_SCHEMA_TABLE))
+      schema, table = @db.send(:schema_and_table, opts[:table] || default_schema_table)
       @table = schema ? Sequel::SQL::QualifiedIdentifier.new(schema, table) : table
-      @column = opts[:column] || self.class.const_get(:DEFAULT_SCHEMA_COLUMN)
+      @column = opts[:column] || default_schema_column
       @ds = schema_dataset
       @use_transactions = opts[:use_transactions]
     end
@@ -507,6 +507,8 @@ module Sequel
   class IntegerMigrator < Migrator
     DEFAULT_SCHEMA_COLUMN = :version
     DEFAULT_SCHEMA_TABLE = :schema_info
+    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_COLUMN)
+    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_TABLE)
 
     Error = Migrator::Error
 
@@ -572,6 +574,16 @@ module Sequel
     # number is stored, 0 is returned.
     def current_migration_version
       ds.get(column) || 0
+    end
+
+    # The default column storing schema version.
+    def default_schema_column
+      :version
+    end
+
+    # The default table storing schema version.
+    def default_schema_table
+      :schema_info
     end
 
     # Returns any found migration files in the supplied directory.
@@ -656,6 +668,8 @@ module Sequel
   class TimestampMigrator < Migrator
     DEFAULT_SCHEMA_COLUMN = :filename
     DEFAULT_SCHEMA_TABLE = :schema_migrations
+    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_COLUMN)
+    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_TABLE)
     
     Error = Migrator::Error
 
@@ -699,7 +713,7 @@ module Sequel
     # Convert the schema_info table to the new schema_migrations table format,
     # using the version of the schema_info table and the current migration files.
     def convert_from_schema_info
-      v = db[IntegerMigrator::DEFAULT_SCHEMA_TABLE].get(IntegerMigrator::DEFAULT_SCHEMA_COLUMN)
+      v = db[:schema_info].get(:version)
       ds = db.from(table)
       files.each do |path|
         f = File.basename(path)
@@ -707,6 +721,16 @@ module Sequel
           ds.insert(column=>f)
         end
       end
+    end
+
+    # The default column storing migration filenames.
+    def default_schema_column
+      :filename
+    end
+
+    # The default table storing migration filenames.
+    def default_schema_table
+      :schema_migrations
     end
 
     # Returns filenames of all applied migrations

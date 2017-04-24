@@ -1,5 +1,7 @@
 === master
 
+* Deprecate {Integer,Timestamp}Migrator::DEFAULT_SCHEMA_{COLUMN,TABLE} (jeremyevans)
+
 * Deprecate Database#jdbc_* methods for jdbc/db2 adapter Database instances (jeremyevans)
 
 * Remove addition of Database#jdbc_* to JDBC::Database in jdbc/db2 adapter (jeremyevans)
