@@ -67,9 +67,9 @@ module Sequel
           auto_increment = row.delete(:is_autoincrement)
           row[:auto_increment] = auto_increment == 1 || auto_increment == true
           row[:primary_key] = row.delete(:pkey) == 'Y'
-          row[:allow_null] = row[:nulls_allowed].is_a?(Fixnum) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
+          row[:allow_null] = row[:nulls_allowed].is_a?(Integer) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
           row[:db_type] = row.delete(:domain_name)
-          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE and (row[:scale].is_a?(Fixnum) ? row[:scale] == 0 : !row[:scale])
+          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE and (row[:scale].is_a?(Integer) ? row[:scale] == 0 : !row[:scale])
             :integer
           else
             schema_column_type(row[:db_type])
