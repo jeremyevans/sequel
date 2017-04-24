@@ -5,19 +5,23 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 describe "An SQLite database" do
   before do
     @db = DB
+    deprecated do
     @fk = @db.foreign_keys
+    end
   end
   after do
     @db.drop_table?(:fk)
-    @db.auto_vacuum = :none
-    @db.run 'VACUUM'
-    @db.foreign_keys = @fk
-    @db.case_sensitive_like = true
+    deprecated do
+      @db.auto_vacuum = :none
+      @db.run 'VACUUM'
+      @db.foreign_keys = @fk
+      @db.case_sensitive_like = true
+    end
     @db.use_timestamp_timezones = false
     Sequel.datetime_class = Time
   end
 
-  it "should support getting setting pragma values" do
+  deprecated "should support getting setting pragma values" do
     @db.pragma_set(:auto_vacuum, '0')
     @db.run 'VACUUM'
     @db.pragma_get(:auto_vacuum).to_s.must_equal '0'
@@ -29,7 +33,7 @@ describe "An SQLite database" do
     @db.pragma_get(:auto_vacuum).to_s.must_equal '2'
   end
   
-  it "should support getting and setting the auto_vacuum pragma" do
+  deprecated "should support getting and setting the auto_vacuum pragma" do
     @db.auto_vacuum = :full
     @db.run 'VACUUM'
     @db.auto_vacuum.must_equal :full
@@ -40,12 +44,12 @@ describe "An SQLite database" do
     proc {@db.auto_vacuum = :invalid}.must_raise(Sequel::Error)
   end
   
-  it "should respect case sensitive like false" do
+  deprecated "should respect case sensitive like false" do
     @db.case_sensitive_like = false
     @db.get(Sequel.like('a', 'A')).to_s.must_equal '1'
   end
   
-  it "should respect case sensitive like true" do
+  deprecated "should respect case sensitive like true" do
     @db.case_sensitive_like = true
     @db.get(Sequel.like('a', 'A')).to_s.must_equal '0'
   end
@@ -63,13 +67,13 @@ describe "An SQLite database" do
     @db.sqlite_version.must_be_kind_of(Integer)
   end
   
-  it "should support setting and getting the foreign_keys pragma" do
+  deprecated "should support setting and getting the foreign_keys pragma" do
     (@db.sqlite_version >= 30619 ? [true, false] : [nil]).must_include(@db.foreign_keys)
     @db.foreign_keys = true
     @db.foreign_keys = false
   end
   
-  it "should enforce foreign key integrity if foreign_keys pragma is set" do
+  deprecated "should enforce foreign key integrity if foreign_keys pragma is set" do
     @db.foreign_keys = true
     @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
     @db[:fk].insert(1, nil)
@@ -78,7 +82,7 @@ describe "An SQLite database" do
     proc{@db[:fk].insert(4, 5)}.must_raise(Sequel::ForeignKeyConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
   end if DB.sqlite_version >= 30619
   
-  it "should not enforce foreign key integrity if foreign_keys pragma is unset" do
+  deprecated "should not enforce foreign key integrity if foreign_keys pragma is unset" do
     @db.foreign_keys = false
     @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
     @db[:fk].insert(1, 2)
@@ -104,7 +108,7 @@ describe "An SQLite database" do
     @db.tables.must_include(:fk)
   end
 
-  it "should support getting and setting the synchronous pragma" do
+  deprecated "should support getting and setting the synchronous pragma" do
     @db.synchronous = :off
     @db.synchronous.must_equal :off
     @db.synchronous = :normal
@@ -115,7 +119,7 @@ describe "An SQLite database" do
     proc {@db.synchronous = :invalid}.must_raise(Sequel::Error)
   end
   
-  it "should support getting and setting the temp_store pragma" do
+  deprecated "should support getting and setting the temp_store pragma" do
     @db.temp_store = :default
     @db.temp_store.must_equal :default
     @db.temp_store = :file
@@ -527,30 +531,28 @@ describe "A SQLite database" do
     @db[:test3].select(:id).all.must_equal [{:id => 1}, {:id => 3}]
   end
 
-  if DB.foreign_keys
-    it "should keep foreign keys when dropping a column" do
-      @db.create_table! :test do
-        primary_key :id
-        String :name
-        Integer :value
-      end
-      @db.create_table! :test3 do
-        String :name
-        Integer :value
-        foreign_key :test_id, :test, :on_delete => :set_null, :on_update => :cascade
-      end
-
-      @db[:test3].insert(:name => "abc", :test_id => @db[:test].insert(:name => "foo", :value => 3))
-      @db[:test3].insert(:name => "def", :test_id => @db[:test].insert(:name => "bar", :value => 4))
-
-      @db.drop_column :test3, :value
-
-      @db[:test].filter(:name => 'bar').delete
-      @db[:test3][:name => 'def'][:test_id].must_be_nil
-
-      @db[:test].filter(:name => 'foo').update(:id=>100)
-      @db[:test3][:name => 'abc'][:test_id].must_equal 100
+  it "should keep foreign keys when dropping a column" do
+    @db.create_table! :test do
+      primary_key :id
+      String :name
+      Integer :value
     end
+    @db.create_table! :test3 do
+      String :name
+      Integer :value
+      foreign_key :test_id, :test, :on_delete => :set_null, :on_update => :cascade
+    end
+
+    @db[:test3].insert(:name => "abc", :test_id => @db[:test].insert(:name => "foo", :value => 3))
+    @db[:test3].insert(:name => "def", :test_id => @db[:test].insert(:name => "bar", :value => 4))
+
+    @db.drop_column :test3, :value
+
+    @db[:test].filter(:name => 'bar').delete
+    @db[:test3][:name => 'def'][:test_id].must_be_nil
+
+    @db[:test].filter(:name => 'foo').update(:id=>100)
+    @db[:test3][:name => 'abc'][:test_id].must_equal 100
   end
 
   it "should support rename_column operations" do

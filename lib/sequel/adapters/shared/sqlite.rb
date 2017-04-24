@@ -127,6 +127,7 @@ module Sequel
 
       # Get the value of the given PRAGMA.
       def pragma_get(name)
+        Sequel::Deprecation.deprecate('Database#{pragma_get,auto_vacuum,case_sensitive_like,foreign_keys,synchronous,temp_store} on SQLite', "These methods may not be safe when using multiple connections, call fetch(#{"PRAGMA #{name}".inspect}).single_value if you really want to get the pragma value")
         self["PRAGMA #{name}"].single_value
       end
       
@@ -137,6 +138,7 @@ module Sequel
       # modifications should be done when the connection is created, using
       # an option provided when creating the Database object.
       def pragma_set(name, value)
+        Sequel::Deprecation.deprecate('Database#{pragma_set,auto_vacuum=,case_sensitive_like=,foreign_keys=,synchronous=,temp_store=} on SQLite', "These methods are not thread safe or safe when using multiple connections, pass the appropriate option when connecting to set the pragma correctly for all connections")
         execute_ddl("PRAGMA #{name} = #{value}")
       end
 
@@ -241,8 +243,8 @@ module Sequel
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
       def apply_alter_table(table, ops)
-        fks = foreign_keys
-        self.foreign_keys = false if fks
+        fks = fetch("PRAGMA foreign_keys")
+        run "PRAGMA foreign_keys = 0" if fks
         transaction do 
           if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint}
             # If you are just doing constraints, apply all of them at the same time,
@@ -255,7 +257,7 @@ module Sequel
           end
         end
       ensure
-        self.foreign_keys = true if fks
+        run "PRAGMA foreign_keys = 1" if fks
       end
 
       # SQLite supports limited table modification.  You can add a column
