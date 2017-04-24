@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Database::DatasetClass as a way for getting default dataset classes for datasets (jeremyevans)
+
 * Deprecate SQLite pragma getting and setting methods (jeremyevans)
 
 * Remove handling of EMULATED_FUNCTION_MAP from adapter dataset classes, overide Dataset#native_function_name instead (jeremyevans)

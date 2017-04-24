@@ -164,6 +164,10 @@ module Sequel
         end
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       def execute_prepared_statement(conn, type, name, opts)
         ps = prepared_statement(name)
         sql = ps.prepared_sql
@@ -325,6 +329,7 @@ module Sequel
       include DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
       

@@ -133,6 +133,10 @@ module Sequel
         raise LoadError, "Could not initialize SQLAnywhere DBCAPI library" if @api.sqlany_init == 0
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       def log_connection_execute(conn, sql)
         _execute(conn, nil, sql, OPTS)
       end
@@ -143,6 +147,7 @@ module Sequel
       include Sequel::SqlAnywhere::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # Yield all rows matching this dataset.  If the dataset is set to
       # split multiple statements, yield arrays of hashes one per statement

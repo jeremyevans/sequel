@@ -131,6 +131,10 @@ module Sequel
         end
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       TINYTDS_DISCONNECT_ERRORS = /\A(Attempt to initiate a new Adaptive Server operation with results pending|The request failed to run because the batch is aborted, this can be caused by abort signal sent from client|Adaptive Server connection timed out)/
       # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
@@ -180,6 +184,7 @@ module Sequel
       include Sequel::MSSQL::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
       # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper

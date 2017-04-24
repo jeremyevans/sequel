@@ -38,6 +38,7 @@ describe "A new Database" do
   it "should support :preconnect option to preconnect to database" do
     @db.pool.size.must_equal 0
     c = Class.new(Sequel::Database) do
+      def dataset_class_default; Sequel::Dataset end
       def connect(_)
         :connect
       end
@@ -349,6 +350,7 @@ end
 describe "Database#uri" do
   before do
     @c = Class.new(Sequel::Database) do
+      def dataset_class_default; Sequel::Dataset end
       set_adapter_scheme :mau
     end
     
@@ -373,6 +375,7 @@ describe "Database.adapter_scheme and #adapter_scheme" do
     Sequel::Database.adapter_scheme.must_be_nil
 
     @c = Class.new(Sequel::Database) do
+      def dataset_class_default; Sequel::Dataset end
       set_adapter_scheme :mau
     end
     

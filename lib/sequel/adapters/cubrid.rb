@@ -106,6 +106,10 @@ module Sequel
         log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       def database_error_classes
         [StandardError]
       end
@@ -129,6 +133,7 @@ module Sequel
       COLUMN_INFO_TYPE = "type_name".freeze
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
       def fetch_rows(sql)
         execute(sql) do |stmt|

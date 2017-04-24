@@ -121,6 +121,10 @@ module Sequel
         [::DataObjects::Error]
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Recognize DataObjects::ConnectionError instances as disconnect errors.
       def disconnect_error?(e, opts)
         super || (e.is_a?(::DataObjects::Error) && (e.is_a?(::DataObjects::ConnectionError) || e.message =~ DISCONNECT_ERROR_RE))
@@ -141,6 +145,7 @@ module Sequel
     # Dataset class for Sequel::DataObjects::Database objects.
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # Execute the SQL on the database and yield the rows as hashes
       # with symbol keys.

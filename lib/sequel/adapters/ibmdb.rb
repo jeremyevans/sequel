@@ -309,6 +309,10 @@ module Sequel
         exception.sqlstate
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Don't convert smallint to boolean for the metadata
       # dataset, since the DB2 metadata does not use
       # boolean columns, and some smallint columns are
@@ -357,6 +361,7 @@ module Sequel
       include Sequel::DB2::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       module CallableStatementMethods
         # Extend given dataset with this module so subselects inside subselects in

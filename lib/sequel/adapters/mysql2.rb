@@ -204,6 +204,10 @@ module Sequel
         exception.sql_state
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # If a connection object is available, try pinging it.  Otherwise, if the
       # error is a Mysql2::Error, check the SQL state and exception message for
       # disconnects.
@@ -236,6 +240,7 @@ module Sequel
       STREAMING_SUPPORTED = ::Mysql2::VERSION >= '0.3.12'
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       if NativePreparedStatements
         PreparedStatementMethods = prepared_statements_module(

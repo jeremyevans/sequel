@@ -116,6 +116,10 @@ module Sequel
         [::Swift::Error]
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Set the :db entry to the same as the :database entry, since
       # Swift uses :db.
       def server_opts(o)
@@ -133,6 +137,7 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # Set the columns and yield the hashes to the block.
       def fetch_rows(sql)

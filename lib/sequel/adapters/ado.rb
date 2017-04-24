@@ -201,6 +201,10 @@ module Sequel
         super
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # The ADO adapter's default provider doesn't support transactions, since it 
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.
@@ -227,8 +231,7 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
-
-
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       def fetch_rows(sql)
         execute(sql) do |recordset|

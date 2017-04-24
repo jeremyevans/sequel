@@ -80,6 +80,10 @@ module Sequel
         [::ODBC::Error]
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       def disconnect_error?(e, opts)
         super || (e.is_a?(::ODBC::Error) && DISCONNECT_ERRORS.match(e.message))
       end
@@ -92,6 +96,7 @@ module Sequel
       TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       def fetch_rows(sql)
         execute(sql) do |s|

@@ -273,6 +273,10 @@ module Sequel
         exception.sqlstate
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Raise a disconnect error if the exception message matches the list
       # of recognized exceptions.
       def disconnect_error?(e, opts)
@@ -299,6 +303,7 @@ module Sequel
       include Sequel::MySQL::PreparedStatements::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # Yield all rows matching this dataset.  If the dataset is set to
       # split multiple statements, yield arrays of hashes one per statement

@@ -578,6 +578,10 @@ module Sequel
         end
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Execute the prepared statement with the given name on an available
       # connection, using the given args.  If the connection has not prepared
       # a statement with the given name yet, prepare it.  If the connection
@@ -671,6 +675,7 @@ module Sequel
       include Sequel::Postgres::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       APOS = Sequel::Dataset::APOS
       DEFAULT_CURSOR_NAME = 'sequel_cursor'.freeze
       

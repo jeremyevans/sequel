@@ -296,6 +296,10 @@ module Sequel
         end
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       def quote_identifiers_default
         shared_adapter? ? super : false
       end
@@ -307,6 +311,7 @@ module Sequel
 
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # The autoid setting for this dataset, if it has been overridden
       def autoid

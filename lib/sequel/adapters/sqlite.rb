@@ -275,6 +275,10 @@ module Sequel
         [SQLite3::Exception, ArgumentError]
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Support SQLite exception codes if ruby-sqlite3 supports them.
       # This is disabled by default because ruby-sqlite3 doesn't currently
       # support them (returning nil), and even if it did, it doesn't support
@@ -289,6 +293,7 @@ module Sequel
       include ::Sequel::SQLite::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
       

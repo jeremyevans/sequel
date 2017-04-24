@@ -9,6 +9,7 @@ module Sequel
 
     # The default class to use for datasets
     DatasetClass = Sequel::Dataset
+    Sequel::Deprecation.deprecate_constant(self, :DatasetClass)
 
     # SEQUEL5: Remove
     @identifier_input_method = nil
@@ -98,7 +99,12 @@ module Sequel
     
     # The default dataset class to use for the database
     def dataset_class_default
-      self.class.const_get(:DatasetClass)
+      if self.class == Sequel::Database
+        Sequel::Dataset
+      else
+        Sequel::Deprecation.deprecate("Using self.class.const_get(:DatasetClass) to get the default dataset class", "Modify the database adapter to implement Database#dataset_class_default")
+        self.class.const_get(:DatasetClass)
+      end
     end
 
     # Reset the default dataset used by most Database methods that

@@ -145,6 +145,10 @@ module Sequel
         o
       end
       
+      def dataset_class_default
+        Dataset
+      end
+
       # Both main error classes that Amalgalite raises
       def database_error_classes
         [::Amalgalite::Error, ::Amalgalite::SQLite3::Error]
@@ -156,6 +160,7 @@ module Sequel
       include ::Sequel::SQLite::DatasetMethods
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)

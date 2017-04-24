@@ -402,6 +402,10 @@ module Sequel
         true
       end
 
+      def dataset_class_default
+        Dataset
+      end
+
       # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
       def disconnect_error?(exception, opts)
         cause = exception.respond_to?(:cause) ? exception.cause : exception
@@ -704,6 +708,7 @@ module Sequel
       include StoredProcedures
 
       Database::DatasetClass = self
+      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
       PreparedStatementMethods = prepared_statements_module(
         "sql = self; opts = Hash[opts]; opts[:arguments] = bind_arguments",
