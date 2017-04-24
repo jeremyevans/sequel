@@ -13,7 +13,8 @@ module Sequel
       include UnmodifiedIdentifiers::DatabaseMethods
 
       AUTOINCREMENT = 'AUTO_INCREMENT'.freeze
-      COLUMN_DEFINITION_ORDER = [:auto_increment, :default, :null, :unique, :primary_key, :references]
+      Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
+      COLUMN_DEFINITION_ORDER = [:auto_increment, :default, :null, :unique, :primary_key, :references]#.freeze # SEQUEL5
 
       def database_type
         :cubrid
@@ -115,7 +116,7 @@ module Sequel
       end
 
       def auto_increment_sql
-        AUTOINCREMENT
+        'AUTO_INCREMENT'
       end
 
       # CUBRID requires auto increment before primary key

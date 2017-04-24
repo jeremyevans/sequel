@@ -18,8 +18,10 @@ module Sequel
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
 
-      AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
+
+      AUTO_VACUUM = [:none, :full, :incremental].freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
       TABLES_FILTER = Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}
       TEMP_STORE = [:default, :file, :memory].freeze
@@ -28,7 +30,7 @@ module Sequel
         :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
         :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
         :exclusive => "BEGIN EXCLUSIVE TRANSACTION".freeze,
-        nil => Sequel::Database::SQL_BEGIN,
+        nil => "BEGIN".freeze
       }.freeze
 
       # Whether to use integers for booleans in the database.  SQLite recommends
@@ -114,7 +116,7 @@ module Sequel
         indexes = {}
         metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
           # :only_autocreated internal option can be used to get only autocreated indexes
-          next if (!!(r[:name] =~ PRIMARY_KEY_INDEX_RE) ^ !!opts[:only_autocreated])
+          next if (!!(r[:name] =~ /\Asqlite_autoindex_/) ^ !!opts[:only_autocreated])
           indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
         end
         indexes.each do |k, v|

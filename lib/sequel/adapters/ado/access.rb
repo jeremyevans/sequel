@@ -15,7 +15,7 @@ module Sequel
           :tables  => 20,
           :views   => 23,
           :foreign_keys => 27
-        }
+        }#.freeze # SEQUEL5
         
         attr_reader :type, :criteria
 
@@ -42,7 +42,8 @@ module Sequel
             131 => "DECIMAL",
             201 => "TEXT",
             205 => "IMAGE"
-          }
+          }#.freeze # SEQUEL5
+          #DATA_TYPE.each_value(&:freeze) # SEQUEL5
           
           def initialize(row)
             @row = row
@@ -90,7 +91,9 @@ module Sequel
         include Sequel::Database::SplitAlterTable
     
         DECIMAL_TYPE_RE = /decimal/io
+        Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
         LAST_INSERT_ID = "SELECT @@IDENTITY".freeze
+        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
 
         # Remove cached schema after altering a table, since otherwise it can be cached
         # incorrectly in the rename column case.
@@ -111,7 +114,8 @@ module Sequel
           synchronize(opts[:server]) do |conn|
             begin
               log_connection_yield(sql, conn){conn.Execute(sql)}
-              res = log_connection_yield(LAST_INSERT_ID, conn){conn.Execute(LAST_INSERT_ID)}
+              last_insert_sql = "SELECT @@IDENTITY"
+              res = log_connection_yield(last_insert_sql, conn){conn.Execute(last_insert_sql)}
               res.getRows.transpose.each{|r| return r.shift}
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)
@@ -240,7 +244,7 @@ module Sequel
                                 idx["COLUMN_NAME"] == row["COLUMN_NAME"] &&
                                 idx["PRIMARY_KEY"]
                               },
-              :type =>  if row.db_type =~ DECIMAL_TYPE_RE && row.scale == 0
+              :type =>  if row.db_type =~ /decimal/i && row.scale == 0
                           :integer
                         else
                           schema_column_type(row.db_type)

@@ -15,7 +15,9 @@ module Sequel
 
     module DatabaseMethods
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
       AUTOINCREMENT = ''.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
 
       attr_accessor :autosequence
 
@@ -174,7 +176,7 @@ module Sequel
       end
 
       def auto_increment_sql
-        AUTOINCREMENT
+        ''
       end
 
       def create_sequence_sql(name, opts=OPTS)
@@ -302,7 +304,7 @@ module Sequel
 
       # SQL fragment for showing a table is temporary
       def temporary_table_sql
-        TEMPORARY
+        'GLOBAL TEMPORARY '
       end
 
       # Oracle uses clob for text types.

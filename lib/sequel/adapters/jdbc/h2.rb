@@ -17,6 +17,7 @@ module Sequel
       # Instance methods for H2 Database objects accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
       
         # Commit an existing prepared transaction with the given transaction
         # identifier string.
@@ -150,7 +151,7 @@ module Sequel
         end
         
         def primary_key_index_re
-          PRIMARY_KEY_INDEX_RE
+          /\Aprimary_key/i
         end
 
         # H2 does not support named column constraints.

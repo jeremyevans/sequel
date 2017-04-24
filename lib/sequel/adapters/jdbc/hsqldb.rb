@@ -18,6 +18,7 @@ module Sequel
       # Instance methods for HSQLDB Database objects accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Asys_idx_sys_pk_/i.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
 
         include ::Sequel::JDBC::Transactions
 
@@ -112,7 +113,7 @@ module Sequel
         
         # Primary key indexes appear to start with sys_idx_sys_pk_ on HSQLDB
         def primary_key_index_re
-          PRIMARY_KEY_INDEX_RE
+          /\Asys_idx_sys_pk_/i
         end
 
         # If an :identity option is present in the column, add the necessary IDENTITY SQL.

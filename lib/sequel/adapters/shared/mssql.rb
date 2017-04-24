@@ -14,14 +14,26 @@ module Sequel
 
     module DatabaseMethods
       AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
       SERVER_VERSION_RE = /^(\d+)\.(\d+)\.(\d+)/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SERVER_VERSION_RE)
       SERVER_VERSION_SQL = "SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SERVER_VERSION_SQL)
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_BEGIN)
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_COMMIT)
       SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK)
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK_TO_SAVEPOINT)
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_SAVEPOINT)
       MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
+      Sequel::Deprecation.deprecate_constant(self, :MSSQL_DEFAULT_RE)
+      DECIMAL_TYPE_RE = /number|numeric|decimal/io
+      Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
+
       FOREIGN_KEY_ACTION_MAP = {0 => :no_action, 1 => :cascade, 2 => :set_null, 3 => :set_default}.freeze
 
       include Sequel::Database::SplitAlterTable
@@ -36,10 +48,6 @@ module Sequel
         @mssql_unicode_strings = v
         reset_default_dataset
       end
-
-      # The types to check for 0 scale to transform :decimal types
-      # to :integer.
-      DECIMAL_TYPE_RE = /number|numeric|decimal/io
 
       # Execute the given stored procedure with the given name.
       #
@@ -215,7 +223,7 @@ module Sequel
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
-          m = SERVER_VERSION_RE.match(fetch(SERVER_VERSION_SQL).single_value.to_s)
+          m = /^(\d+)\.(\d+)\.(\d+)/.match(fetch("SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)").single_value.to_s)
           @server_version = (m[1].to_i * 1000000) + (m[2].to_i * 10000) + m[3].to_i
         end
         @server_version
@@ -265,7 +273,7 @@ module Sequel
 
       # MSSQL uses the IDENTITY(1,1) column for autoincrementing columns.
       def auto_increment_sql
-        AUTO_INCREMENT
+        'IDENTITY(1,1)'
       end
       
       # MSSQL specific syntax for altering tables.
@@ -310,12 +318,12 @@ module Sequel
       
       # SQL to start a new savepoint
       def begin_savepoint_sql(depth)
-        SQL_SAVEPOINT % depth
+        "SAVE TRANSACTION autopoint_#{depth}"
       end
 
       # SQL to BEGIN a transaction.
       def begin_transaction_sql
-        SQL_BEGIN
+        "BEGIN TRANSACTION"
       end
 
       # MSSQL does not allow adding primary key constraints to NULLable columns.
@@ -325,7 +333,7 @@ module Sequel
 
       # Handle MSSQL specific default format.
       def column_schema_normalize_default(default, type)
-        if m = MSSQL_DEFAULT_RE.match(default)
+        if m = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/.match(default)
           default = m[1] || m[2]
         end
         super(default, type)
@@ -339,7 +347,7 @@ module Sequel
 
       # SQL to COMMIT a transaction.
       def commit_transaction_sql
-        SQL_COMMIT
+        "COMMIT TRANSACTION"
       end
         
       # MSSQL uses the name of the table to decide the difference between
@@ -418,12 +426,12 @@ module Sequel
       
       # SQL to rollback to a savepoint
       def rollback_savepoint_sql(depth)
-        SQL_ROLLBACK_TO_SAVEPOINT % depth
+        "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_#{depth}"
       end
       
       # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
-        SQL_ROLLBACK
+        "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION"
       end
       
       # The closest MSSQL equivalent of a boolean datatype is the bit type.
@@ -480,7 +488,7 @@ module Sequel
           end
           row[:allow_null] = row[:allow_null] == 'YES' ? true : false
           row[:default] = nil if blank_object?(row[:default])
-          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE && row[:scale] == 0
+          row[:type] = if row[:db_type] =~ /number|numeric|decimal/i && row[:scale] == 0
             :integer
           else
             schema_column_type(row[:db_type])

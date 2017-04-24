@@ -111,14 +111,17 @@ module Sequel
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
 
-      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
-      FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'.freeze=>:no_action, 'r'.freeze=>:restrict, 'c'.freeze=>:cascade, 'n'.freeze=>:set_null, 'd'.freeze=>:set_default}.freeze
+      Sequel::Deprecation.deprecate_constant(self, :RE_CURRVAL_ERROR)
       POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
+      Sequel::Deprecation.deprecate_constant(self, :POSTGRES_DEFAULT_RE)
       UNLOGGED = 'UNLOGGED '.freeze
-      ON_COMMIT = {
-        :drop => 'DROP', :delete_rows => 'DELETE ROWS', :preserve_rows => 'PRESERVE ROWS',
-      }.freeze
+      Sequel::Deprecation.deprecate_constant(self, :UNLOGGED)
+
+      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
+      FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'=>:no_action, 'r'=>:restrict, 'c'=>:cascade, 'n'=>:set_null, 'd'=>:set_default}.freeze
+      ON_COMMIT = {:drop => 'DROP', :delete_rows => 'DELETE ROWS', :preserve_rows => 'PRESERVE ROWS'}.freeze
+      #ON_COMMIT.each_value(&:freeze) # SEQUEL5
 
       # SQL fragment for custom sequences (ones not created by serial primary key),
       # Returning the schema and literal form of the sequence name, by parsing
@@ -698,7 +701,7 @@ module Sequel
 
       # Handle PostgreSQL specific default format.
       def column_schema_normalize_default(default, type)
-        if m = POSTGRES_DEFAULT_RE.match(default)
+        if m = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/.match(default)
           default = m[1] || m[2]
         end
         super(default, type)
@@ -900,7 +903,7 @@ module Sequel
           raise(Error, "can't provide both :foreign and :unlogged to create_table") if options[:unlogged]
           'FOREIGN '
         elsif options[:unlogged]
-          UNLOGGED
+          'UNLOGGED '
         end
 
         "CREATE #{prefix_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"

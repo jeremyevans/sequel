@@ -1,5 +1,7 @@
 === master
 
+* Deprecate many internal Database string/regexp constants in core and included adapters (jeremyevans)
+
 * Remove use of Fixnum in sqlanywhere shared adapter (jeremyevans)
 
 * Deprecate Sequel::Schema::Generator constant, use Sequel::Schema::CreateTableGenerator instead (jeremyevans)

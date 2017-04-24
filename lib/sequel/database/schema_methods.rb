@@ -8,25 +8,34 @@ module Sequel
     # ---------------------
 
     AUTOINCREMENT = 'AUTOINCREMENT'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
     COMMA_SEPARATOR = ', '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
     NOT_NULL = ' NOT NULL'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :NOT_NULL)
     NULL = ' NULL'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :NULL)
     PRIMARY_KEY = ' PRIMARY KEY'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY)
     TEMPORARY = 'TEMPORARY '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
     UNDERSCORE = '_'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE)
     UNIQUE = ' UNIQUE'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNIQUE)
     UNSIGNED = ' UNSIGNED'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNSIGNED)
 
     # The order of column modifiers to use when defining a column.
-    COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]
+    COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
 
     # The default options for join table columns.
-    DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}
+    DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}#.freeze # SEQUEL5
 
     # The alter table operations that are combinable.
     COMBINABLE_ALTER_TABLE_OPS = [:add_column, :drop_column, :rename_column,
       :set_column_type, :set_column_default, :set_column_null,
-      :add_constraint, :drop_constraint]
+      :add_constraint, :drop_constraint]#.freeze # SEQUEL5
 
     # Adds a column to the specified table. This method expects a column name,
     # a datatype and optionally a hash with additional constraints and options:
@@ -530,7 +539,7 @@ module Sequel
     # The SQL string specify the autoincrement property, generally used by
     # primary keys.
     def auto_increment_sql
-      AUTOINCREMENT
+      'AUTOINCREMENT'
     end
     
     # The order of the column definition, as an array of symbols.
@@ -572,9 +581,9 @@ module Sequel
 
       case null
       when false
-        sql << NOT_NULL
+        sql << ' NOT NULL'
       when true
-        sql << NULL
+        sql << ' NULL'
       end
     end
     
@@ -584,7 +593,7 @@ module Sequel
         if name = column[:primary_key_constraint_name]
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
-        sql << PRIMARY_KEY
+        sql << ' PRIMARY KEY'
       end
     end
     
@@ -604,13 +613,13 @@ module Sequel
         if name = column[:unique_constraint_name]
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
-        sql << UNIQUE
+        sql << ' UNIQUE'
       end
     end
     
     # SQL for all given columns, used inside a CREATE TABLE block.
     def column_list_sql(generator)
-      (generator.columns.map{|c| column_definition_sql(c)} + generator.constraints.map{|c| constraint_definition_sql(c)}).join(COMMA_SEPARATOR)
+      (generator.columns.map{|c| column_definition_sql(c)} + generator.constraints.map{|c| constraint_definition_sql(c)}).join(', ')
     end
 
     # SQL DDL fragment for column foreign key references (column constraints)
@@ -622,7 +631,7 @@ module Sequel
     def column_references_sql(column)
       sql = String.new
       sql << " REFERENCES #{quote_schema_table(column[:table])}"
-      sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
+      sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(', ')})" if column[:key]
       sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
       sql << " ON UPDATE #{on_update_clause(column[:on_update])}" if column[:on_update]
       constraint_deferrable_sql_append(sql, column[:deferrable])
@@ -781,7 +790,7 @@ module Sequel
     # for certain databases.
     def default_index_name(table_name, columns)
       schema, table = schema_and_table(table_name)
-      "#{"#{schema}_" if schema}#{table}_#{columns.map{|c| [String, Symbol].any?{|cl| c.is_a?(cl)} ? c : literal(c).gsub(/\W/, '_')}.join(UNDERSCORE)}_index"
+      "#{"#{schema}_" if schema}#{table}_#{columns.map{|c| [String, Symbol].any?{|cl| c.is_a?(cl)} ? c : literal(c).gsub(/\W/, '_')}.join('_')}_index"
     end
   
     # Get foreign key name for given table and columns.
@@ -917,7 +926,7 @@ module Sequel
 
     # SQL DDL fragment for temporary table
     def temporary_table_sql
-      self.class.const_get(:TEMPORARY)
+      'TEMPORARY '
     end
 
     # SQL fragment specifying the type of a given column.
@@ -1027,7 +1036,7 @@ module Sequel
       type = "double precision" if type.to_s == 'double'
       column[:size] ||= default_string_column_size if type.to_s == 'varchar'
       elements = column[:size] || column[:elements]
-      "#{type}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
+      "#{type}#{literal(Array(elements)) if elements}#{' UNSIGNED' if column[:unsigned]}"
     end
 
     # Whether clob should be used for String :text=>true columns.

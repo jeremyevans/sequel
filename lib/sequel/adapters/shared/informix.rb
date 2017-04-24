@@ -8,6 +8,7 @@ module Sequel
 
     module DatabaseMethods
       TEMPORARY = 'TEMP '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
 
       # Informix uses the :informix database type
       def database_type
@@ -24,7 +25,7 @@ module Sequel
 
       # SQL fragment for showing a table is temporary
       def temporary_table_sql
-        TEMPORARY
+        'TEMP '
       end
     end
     

@@ -8,7 +8,9 @@ module Sequel
 
     module DatabaseMethods
       AUTO_INCREMENT = ''.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
 
       def clear_primary_key(*tables)
         tables.each{|t| @primary_keys.delete(dataset.send(:input_identifier, t))}
@@ -54,6 +56,10 @@ module Sequel
 
       private
 
+      def temporary_table_sql
+        'GLOBAL TEMPORARY '
+      end
+
       # Use Firebird specific syntax for add column
       def alter_table_sql(table, op)
         case op[:op]
@@ -70,8 +76,8 @@ module Sequel
         end
       end
 
-      def auto_increment_sql()
-        AUTO_INCREMENT
+      def auto_increment_sql
+        ''
       end
       
       def create_sequence_sql(name, opts=OPTS)

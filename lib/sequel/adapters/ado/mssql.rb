@@ -12,6 +12,7 @@ module Sequel
         # Query to use to get the number of rows affected by an update or
         # delete query.
         ROWS_AFFECTED = "SELECT @@ROWCOUNT AS AffectedRows"
+        Sequel::Deprecation.deprecate_constant(self, :ROWS_AFFECTED)
         
         # Issue a separate query to get the rows modified.  ADO appears to
         # use pass by reference with an integer variable, which is obviously
@@ -21,7 +22,8 @@ module Sequel
           synchronize(opts[:server]) do |conn|
             begin
               log_connection_yield(sql, conn){conn.Execute(sql)}
-              res = log_connection_yield(ROWS_AFFECTED, conn){conn.Execute(ROWS_AFFECTED)}
+              rows_affected_sql = "SELECT @@ROWCOUNT AS AffectedRows"
+              res = log_connection_yield(rows_affected_sql, conn){conn.Execute(rows_affected_sql)}
               res.getRows.transpose.each{|r| return r.shift}
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)

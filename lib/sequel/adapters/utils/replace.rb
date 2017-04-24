@@ -4,7 +4,9 @@ module Sequel
   class Dataset
     module Replace
       INSERT = Dataset::INSERT
+      Sequel::Deprecation.deprecate_constant(self, :INSERT)
       REPLACE = 'REPLACE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :REPLACE)
 
       # Execute a REPLACE statement on the database (deletes any duplicate
       # rows before inserting).
@@ -31,7 +33,7 @@ module Sequel
 
       # If this is an replace instead of an insert, use replace instead
       def insert_insert_sql(sql)
-        sql << (@opts[:replace] ? REPLACE : INSERT)
+        sql << (@opts[:replace] ? 'REPLACE' : 'INSERT')
       end
     end
   end

@@ -19,12 +19,19 @@ module Sequel
       attr_writer :convert_smallint_to_bool
 
       AUTO_INCREMENT = 'IDENTITY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_BEGIN)
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_COMMIT)
       SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK)
       TEMPORARY = "GLOBAL TEMPORARY ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
       SMALLINT_RE = /smallint/i.freeze
-      DECIMAL_TYPE_RE = /numeric/io
+      Sequel::Deprecation.deprecate_constant(self, :SMALLINT_RE)
+      DECIMAL_TYPE_RE = /numeric/i
+      Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the SqlAnywhere module setting.
@@ -49,7 +56,7 @@ module Sequel
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
-        if convert_smallint_to_bool && db_type =~ SMALLINT_RE
+        if convert_smallint_to_bool && db_type =~ /smallint/i
           :boolean
         else
           super
@@ -69,7 +76,7 @@ module Sequel
           row[:primary_key] = row.delete(:pkey) == 'Y'
           row[:allow_null] = row[:nulls_allowed].is_a?(Integer) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
           row[:db_type] = row.delete(:domain_name)
-          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE and (row[:scale].is_a?(Integer) ? row[:scale] == 0 : !row[:scale])
+          row[:type] = if row[:db_type] =~ /numeric/i and (row[:scale].is_a?(Integer) ? row[:scale] == 0 : !row[:scale])
             :integer
           else
             schema_column_type(row[:db_type])
@@ -152,7 +159,7 @@ module Sequel
 
       # Sybase uses the IDENTITY column for autoincrementing columns.
       def auto_increment_sql
-        AUTO_INCREMENT
+        'IDENTITY'
       end
       
       # Sybase does not allow adding primary key constraints to NULLable columns.
@@ -162,22 +169,22 @@ module Sequel
 
       # SQL fragment for marking a table as temporary
       def temporary_table_sql
-        TEMPORARY
+        "GLOBAL TEMPORARY "
       end
 
       # SQL to BEGIN a transaction.
       def begin_transaction_sql
-        SQL_BEGIN
+        "BEGIN TRANSACTION"
       end
 
       # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
-        SQL_ROLLBACK
+        "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION"
       end
 
       # SQL to COMMIT a transaction.
       def commit_transaction_sql
-        SQL_COMMIT
+        "COMMIT TRANSACTION"
       end
 
       # Sybase has both datetime and timestamp classes, most people are going

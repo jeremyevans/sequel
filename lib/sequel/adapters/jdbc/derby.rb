@@ -18,6 +18,7 @@ module Sequel
       # Instance methods for Derby Database objects accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
 
         include ::Sequel::JDBC::Transactions
 
@@ -159,7 +160,7 @@ module Sequel
 
         # Primary key indexes appear to be named sqlNNNN on Derby
         def primary_key_index_re
-          PRIMARY_KEY_INDEX_RE
+          /\Asql\d+\z/i
         end
 
         # If an :identity option is present in the column, add the necessary IDENTITY SQL.

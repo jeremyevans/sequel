@@ -43,13 +43,14 @@ module Sequel
         include Sequel::JDBC::Transactions
 
         LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
 
         private
 
         # Get the last inserted id.
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
-            sql = LAST_INSERT_ID
+            sql = 'SELECT @@IDENTITY'
             rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
             rs.next
             rs.getLong(1)

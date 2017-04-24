@@ -15,8 +15,11 @@ module Sequel
 
     module DatabaseMethods
       AUTOINCREMENT = 'GENERATED ALWAYS AS IDENTITY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
       NOT_NULL      = ' NOT NULL'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NOT_NULL)
       NULL          = ''.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NULL)
 
       # DB2 always uses :db2 as it's database type
       def database_type
@@ -134,7 +137,7 @@ module Sequel
             [
             "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op.merge(:auto_increment=>false, :primary_key=>false, :default=>0, :null=>false))}",
             "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{literal(op[:name])} DROP DEFAULT",
-            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{literal(op[:name])} SET #{AUTOINCREMENT}"
+            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{literal(op[:name])} SET #{auto_increment_sql}"
             ]
           else
             "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
@@ -172,7 +175,7 @@ module Sequel
 
       # DB2 uses an identity column for autoincrement.
       def auto_increment_sql
-        AUTOINCREMENT
+        'GENERATED ALWAYS AS IDENTITY'
       end
 
       # DB2 does not allow adding primary key constraints to NULLable columns.

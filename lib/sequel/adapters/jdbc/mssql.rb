@@ -10,8 +10,11 @@ module Sequel
       # Database instance methods for MSSQL databases accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Apk__/i.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
         ATAT_IDENTITY = 'SELECT @@IDENTITY'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ATAT_IDENTITY)
         SCOPE_IDENTITY = 'SELECT SCOPE_IDENTITY()'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :SCOPE_IDENTITY)
         
         include Sequel::MSSQL::DatabaseMethods
         
@@ -20,7 +23,7 @@ module Sequel
         # Get the last inserted id using SCOPE_IDENTITY().
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
-            sql = opts[:prepared] ? ATAT_IDENTITY : SCOPE_IDENTITY
+            sql = opts[:prepared] ? 'SELECT @@IDENTITY' : 'SELECT SCOPE_IDENTITY()'
             rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
             rs.next
             rs.getLong(1)
@@ -29,7 +32,7 @@ module Sequel
         
         # Primary key indexes appear to start with pk__ on MSSQL
         def primary_key_index_re
-          PRIMARY_KEY_INDEX_RE
+          /\Apk__/i
         end
       end
     end

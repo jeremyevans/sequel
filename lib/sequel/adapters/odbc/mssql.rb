@@ -18,6 +18,7 @@ module Sequel
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
         LAST_INSERT_ID_SQL='SELECT SCOPE_IDENTITY()'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID_SQL)
         
         # Return the last inserted identity value.
         def execute_insert(sql, opts=OPTS)
@@ -25,7 +26,8 @@ module Sequel
             begin
               log_connection_yield(sql, conn){conn.do(sql)}
               begin
-                s = log_connection_yield(LAST_INSERT_ID_SQL, conn){conn.run(LAST_INSERT_ID_SQL)}
+                last_insert_id_sql = 'SELECT SCOPE_IDENTITY()'
+                s = log_connection_yield(last_insert_id_sql, conn){conn.run(last_insert_id_sql)}
                 if (rows = s.fetch_all) and (row = rows.first) and (v = row.first)
                   Integer(v)
                 end

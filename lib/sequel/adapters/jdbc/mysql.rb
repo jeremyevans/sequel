@@ -20,6 +20,7 @@ module Sequel
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
         LAST_INSERT_ID = 'SELECT LAST_INSERT_ID()'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
         
         private
         
@@ -57,7 +58,7 @@ module Sequel
             end
           else
             statement(conn) do |st|
-              rs = st.executeQuery(LAST_INSERT_ID)
+              rs = st.executeQuery('SELECT LAST_INSERT_ID()')
               rs.next
               rs.getLong(1)
             end

@@ -40,10 +40,14 @@ module Sequel
       include UnmodifiedIdentifiers::DatabaseMethods
 
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
-      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
-      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]
+      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
       PRIMARY = 'PRIMARY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PRIMARY)
       MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
+      Sequel::Deprecation.deprecate_constant(self, :MYSQL_TIMESTAMP_RE)
+
+      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}#.freeze # SEQUEL5
+      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
 
       include Sequel::Database::SplitAlterTable
       
@@ -121,7 +125,7 @@ module Sequel
 
         metadata_dataset.with_sql(sql).each do |r|
           name = r[:Key_name]
-          next if name == PRIMARY
+          next if name == 'PRIMARY'
           name = m.call(name)
           remove_indexes << name if r[:Sub_part] && ! opts[:partial]
           i = indexes[name] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
@@ -290,7 +294,7 @@ module Sequel
       # Handle MySQL specific default format.
       def column_schema_normalize_default(default, type)
         if column_schema_default_string_type?(type)
-          return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
+          return if [:date, :datetime, :time].include?(type) && /\ACURRENT_(?:DATE|TIMESTAMP)?\z/.match(default)
           default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
         end
         super(default, type)
@@ -327,7 +331,7 @@ module Sequel
       
       # Use MySQL specific AUTO_INCREMENT text.
       def auto_increment_sql
-        AUTO_INCREMENT
+        'AUTO_INCREMENT'
       end
       
       # MySQL needs to set transaction isolation before begining a transaction

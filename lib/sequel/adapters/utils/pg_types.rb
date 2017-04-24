@@ -5,28 +5,34 @@ module Sequel
     NAN             = 0.0/0.0
     PLUS_INFINITY   = 1.0/0.0
     MINUS_INFINITY  = -1.0/0.0
+
     NAN_STR             = 'NaN'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :NAN_STR)
     PLUS_INFINITY_STR   = 'Infinity'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :PLUS_INFINITY_STR)
     MINUS_INFINITY_STR  = '-Infinity'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :MINUS_INFINITY_STR)
     TRUE_STR = 't'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TRUE_STR)
     DASH_STR = '-'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DASH_STR)
     
     TYPE_TRANSLATOR = tt = Class.new do
-      def boolean(s) s == TRUE_STR end
+      def boolean(s) s == 't' end
       def integer(s) s.to_i end
       def float(s) 
         case s
-        when NAN_STR
+        when 'NaN'
           NAN
-        when PLUS_INFINITY_STR
+        when 'Infinity'
           PLUS_INFINITY
-        when MINUS_INFINITY_STR
+        when '-Infinity'
           MINUS_INFINITY
         else
           s.to_f 
         end
       end
-      def date(s) ::Date.new(*s.split(DASH_STR).map(&:to_i)) end
+      def date(s) ::Date.new(*s.split('-').map(&:to_i)) end
       def bytea(str)
         str = if str =~ /\A\\x/
           # PostgreSQL 9.0+ bytea hex format
@@ -44,7 +50,7 @@ module Sequel
     # Type OIDs for string types used by PostgreSQL.  These types don't
     # have conversion procs associated with them (since the data is
     # already in the form of a string).
-    STRING_TYPES = [18, 19, 25, 1042, 1043]
+    STRING_TYPES = [18, 19, 25, 1042, 1043]#.freeze # SEQUEL5
 
     # Hash with type name strings/symbols and callable values for converting PostgreSQL types.
     # Non-builtin types that don't have fixed numbers should use this to register

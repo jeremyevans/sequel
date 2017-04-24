@@ -34,6 +34,7 @@ module Sequel
       # Instance methods for Oracle Database objects accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Asys_/i.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
 
         include Sequel::Oracle::DatabaseMethods
         include Sequel::JDBC::Transactions
@@ -83,7 +84,7 @@ module Sequel
 
         # Primary key indexes appear to start with sys_ on Oracle
         def primary_key_index_re
-          PRIMARY_KEY_INDEX_RE
+          /\Asys_/i
         end
 
         def schema_parse_table(*)
