@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::Schema::Generator constant, use Sequel::Schema::CreateTableGenerator instead (jeremyevans)
+
 * Deprecate Database#log_yield (jeremyevans)
 
 * Deprecate the set_overrides extension (jeremyevans)

@@ -67,7 +67,7 @@ module Sequel
       attr_accessor :force_standard_strings
     end
 
-    class CreateTableGenerator < Sequel::Schema::Generator
+    class CreateTableGenerator < Sequel::Schema::CreateTableGenerator
       # Add an exclusion constraint when creating the table. Elements should be
       # an array of 2 element arrays, with the first element being the column or
       # expression the exclusion constraint is applied to, and the second element

@@ -60,12 +60,12 @@ describe Sequel::Model, "create_table and schema" do
   end
 
   it "should return the schema generator via schema" do
-    @model.schema.must_be_kind_of(Sequel::Schema::Generator)
+    @model.schema.must_be_kind_of(Sequel::Schema::CreateTableGenerator)
   end
 
   it "should use the superclasses schema if it exists" do
     @submodel = Class.new(@model)
-    @submodel.schema.must_be_kind_of(Sequel::Schema::Generator)
+    @submodel.schema.must_be_kind_of(Sequel::Schema::CreateTableGenerator)
   end
 
   it "should return nil if no schema is present" do

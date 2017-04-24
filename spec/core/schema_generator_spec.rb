@@ -1,8 +1,8 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-describe Sequel::Schema::Generator do
+describe Sequel::Schema::CreateTableGenerator do
   before do
-    @generator = Sequel::Schema::Generator.new(Sequel.mock) do
+    @generator = Sequel::Schema::CreateTableGenerator.new(Sequel.mock) do
       string :title
       column :body, :text
       foreign_key :parent_id
@@ -31,7 +31,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "should respect existing column order if primary_key :keep_order is used" do
-    generator = Sequel::Schema::Generator.new(Sequel.mock) do
+    generator = Sequel::Schema::CreateTableGenerator.new(Sequel.mock) do
       string :title
       primary_key :id, :keep_order=>true
     end
@@ -44,7 +44,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "should handle SQL::Identifier and SQL::QualifiedIdentifier as foreign_key arguments" do
-    generator = Sequel::Schema::Generator.new(Sequel.mock) do
+    generator = Sequel::Schema::CreateTableGenerator.new(Sequel.mock) do
       foreign_key :a_id, Sequel.identifier(:as)
       foreign_key :b_id, Sequel.qualify(:c, :b)
     end
@@ -182,9 +182,9 @@ describe Sequel::Schema::AlterTableGenerator do
   end
 end
 
-describe "Sequel::Schema::Generator generic type methods" do
+describe "Sequel::Schema::CreateTableGenerator generic type methods" do
   it "should store the type class in :type for each column" do
-    Sequel::Schema::Generator.new(Sequel.mock) do
+    Sequel::Schema::CreateTableGenerator.new(Sequel.mock) do
       String :a
       Integer :b
       Fixnum :c

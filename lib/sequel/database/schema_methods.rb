@@ -185,7 +185,7 @@ module Sequel
     #             that option names are unquoted, so you should not use untrusted
     #             keys.
     #
-    # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
+    # See <tt>Schema::CreateTableGenerator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)
       remove_cached_schema(name)
       options = {:generator=>options} if options.is_a?(Schema::CreateTableGenerator)

@@ -1,9 +1,9 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-describe "Sequel::Schema::Generator dump methods" do
+describe "Sequel::Schema::CreateTableGenerator dump methods" do
   before do
     @d = Sequel::Database.new.extension(:schema_dumper)
-    @g = Sequel::Schema::Generator
+    @g = Sequel::Schema::CreateTableGenerator
   end
 
   it "should allow the same table information to be converted to a string for evaling inside of another instance with the same result" do

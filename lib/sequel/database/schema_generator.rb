@@ -316,6 +316,7 @@ module Sequel
 
     # Alias of CreateTableGenerator for backwards compatibility.
     Generator = CreateTableGenerator
+    Sequel::Deprecation.deprecate_constant(self, :Generator)
   
     # Schema::AlterTableGenerator is an internal class that the user is not expected
     # to instantiate directly.  Instances are created by Database#alter_table.

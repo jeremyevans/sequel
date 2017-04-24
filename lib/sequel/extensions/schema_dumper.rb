@@ -163,7 +163,7 @@ END_MIG
       end
     end
 
-    # Recreate the column in the passed Schema::Generator from the given name and parsed database schema.
+    # Recreate the column in the passed Schema::CreateTableGenerator from the given name and parsed database schema.
     def recreate_column(name, schema, gen, options)
       if options[:single_pk] && schema_autoincrementing_primary_key?(schema)
         type_hash = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
@@ -242,7 +242,7 @@ END_MIG
       end
     end
 
-    # Return a Schema::Generator object that will recreate the
+    # Return a Schema::CreateTableGenerator object that will recreate the
     # table's schema.  Takes the same options as dump_schema_migration.
     def dump_table_generator(table, options=OPTS)
       s = schema(table, options).dup
@@ -304,7 +304,7 @@ END_MIG
       gen.dump_indexes(meth=>table, :ignore_errors=>!options[:same_db])
     end
 
-    # Convert the parsed index information into options to the Generators index method. 
+    # Convert the parsed index information into options to the CreateTableGenerator's index method. 
     def index_to_generator_opts(table, name, index_opts, options=OPTS)
       h = {}
       if options[:index_names] != false && default_index_name(table, index_opts[:columns]) != name.to_s
@@ -380,7 +380,7 @@ END_MIG
   end
 
   module Schema
-    class Generator
+    class CreateTableGenerator
       # Dump this generator's columns to a string that could be evaled inside
       # another instance to represent the same columns
       def dump_columns

@@ -59,7 +59,7 @@ module Sequel
           @schema || (superclass.schema unless superclass == Model)
         end
     
-        # Defines a table schema (see Schema::Generator for more information).
+        # Defines a table schema (see Schema::CreateTableGenerator for more information).
         #
         # This is only needed if you want to use the create_table/create_table! methods.
         # Will also set the dataset if you provide a name, as well as setting
