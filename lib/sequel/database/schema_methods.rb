@@ -25,12 +25,11 @@ module Sequel
     Sequel::Deprecation.deprecate_constant(self, :UNIQUE)
     UNSIGNED = ' UNSIGNED'.freeze
     Sequel::Deprecation.deprecate_constant(self, :UNSIGNED)
+    DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}
+    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_JOIN_TABLE_COLUMN_OPTIONS)
 
     # The order of column modifiers to use when defining a column.
     COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
-
-    # The default options for join table columns.
-    DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}#.freeze # SEQUEL5
 
     # The alter table operations that are combinable.
     COMBINABLE_ALTER_TABLE_OPS = [:add_column, :drop_column, :rename_column,
@@ -137,7 +136,7 @@ module Sequel
           unless v.is_a?(Hash)
             v = {:table=>v}
           end
-          v = DEFAULT_JOIN_TABLE_COLUMN_OPTIONS.merge(v)
+          v[:null] = false unless v.has_key?(:null)
           foreign_key(key, v)
         end
         primary_key(keys) unless options[:no_primary_key]
