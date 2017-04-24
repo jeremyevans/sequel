@@ -289,7 +289,6 @@ module Sequel
       PAREN_CLOSE = Dataset::PAREN_CLOSE
       PAREN_OPEN = Dataset::PAREN_OPEN
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
-      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       CAST_STRING_OPEN = "RTRIM(CHAR(".freeze
@@ -301,6 +300,9 @@ module Sequel
       HSTAR = "H*".freeze
       BLOB_OPEN = "BLOB(X'".freeze
       BLOB_CLOSE = "')".freeze
+
+      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
+      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql_append(sql, expr, type)
@@ -428,6 +430,15 @@ module Sequel
       # DB2 can insert multiple rows using a UNION
       def multi_insert_sql_strategy
         :union
+      end
+
+      # Emulate the char_length function with length
+      def native_function_name(emulated_function)
+        if emulated_function == :char_length
+          'length'
+        else
+          super
+        end
       end
 
       # DB2 does not require that ROW_NUMBER be ordered.

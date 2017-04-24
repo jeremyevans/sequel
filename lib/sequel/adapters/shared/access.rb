@@ -104,10 +104,12 @@ module Sequel
       TIME_FUNCTION = 'Time()'.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
 
-      EMULATED_FUNCTION_MAP = {:char_length=>:len}
       EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}
       COMMA = Dataset::COMMA
       DATEPART_OPEN = "datepart(".freeze
+
+      EMULATED_FUNCTION_MAP = {:char_length=>:len}
+      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       # Access doesn't support CASE, but it can be emulated with nested
       # IIF function calls.
@@ -250,6 +252,15 @@ module Sequel
       # Use 0 for false on MSSQL
       def literal_true
         BOOL_TRUE
+      end
+
+      # Emulate the char_length function with len
+      def native_function_name(emulated_function)
+        if emulated_function == :char_length
+          'len'
+        else
+          super
+        end
       end
 
       # Access requires parentheses when joining more than one table

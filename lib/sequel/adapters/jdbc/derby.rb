@@ -207,7 +207,9 @@ module Sequel
         BOOL_FALSE_OLD = '(1 = 0)'.freeze
         BOOL_TRUE = 'TRUE'.freeze
         BOOL_FALSE = 'FALSE'.freeze
+
         EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
+        Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
         # Derby doesn't support an expression between CASE and WHEN,
         # so remove 
@@ -310,6 +312,15 @@ module Sequel
         # Derby supports multiple rows in INSERT.
         def multi_insert_sql_strategy
           :values
+        end
+
+        # Emulate the char_length function with length
+        def native_function_name(emulated_function)
+          if emulated_function == :char_length
+            'length'
+          else
+            super
+          end
         end
 
         # Offset comes before limit in Derby

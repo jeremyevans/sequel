@@ -548,7 +548,6 @@ module Sequel
       include UnmodifiedIdentifiers::DatasetMethods
 
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
-      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}
       NOT_SPACE = Dataset::NOT_SPACE
       COMMA = Dataset::COMMA
@@ -574,6 +573,9 @@ module Sequel
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
+
+      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
+      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       def cast_sql_append(sql, expr, type)
         if type == Time or type == DateTime
@@ -811,6 +813,15 @@ module Sequel
       # starting in 3.7.11.  On older versions, fallback to using a UNION.
       def multi_insert_sql_strategy
         db.sqlite_version >= 30711 ? :values : :union
+      end
+
+      # Emulate the char_length function with length
+      def native_function_name(emulated_function)
+        if emulated_function == :char_length
+          'length'
+        else
+          super
+        end
       end
 
       # SQLite does not support FOR UPDATE, but silently ignore it

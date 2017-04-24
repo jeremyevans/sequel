@@ -243,6 +243,7 @@ module Sequel
 
     # Map of emulated function names to native function names.
     EMULATED_FUNCTION_MAP = {}
+    Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
     WILDCARD = LiteralString.new('*').freeze
     ALL = ' ALL'.freeze
@@ -1349,9 +1350,10 @@ module Sequel
       :separate
     end
 
+
     # Get the native function name given the emulated function name.
     def native_function_name(emulated_function)
-      self.class.const_get(:EMULATED_FUNCTION_MAP).fetch(emulated_function, emulated_function)
+      emulated_function
     end
 
     # Returns a qualified column name (including a table name) if the column
