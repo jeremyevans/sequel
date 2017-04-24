@@ -8,9 +8,11 @@ module Sequel
     # ---------------------
 
     STRING_DEFAULT_RE = /\A'(.*)'\z/
-    CURRENT_TIMESTAMP_RE = /now|today|CURRENT|getdate|\ADate\(\)\z/io
-    COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime]
-    COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]
+    Sequel::Deprecation.deprecate_constant(self, :STRING_DEFAULT_RE)
+    CURRENT_TIMESTAMP_RE = /now|today|CURRENT|getdate|\ADate\(\)\z/i
+    Sequel::Deprecation.deprecate_constant(self, :CURRENT_TIMESTAMP_RE)
+    COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime]#.freeze # SEQUEL5
+    COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]#.freeze # SEQUEL5
 
     # The prepared statement object hash for this database, keyed by name symbol
     attr_reader :prepared_statements
@@ -248,7 +250,7 @@ module Sequel
     # and return the normalized value.
     def column_schema_normalize_default(default, type)
       if column_schema_default_string_type?(type)
-        return unless m = STRING_DEFAULT_RE.match(default)
+        return unless m = /\A'(.*)'\z/.match(default)
         m[1].gsub("''", "'")
       else
         default
@@ -260,7 +262,7 @@ module Sequel
     def column_schema_to_ruby_default(default, type)
       return default unless default.is_a?(String)
       if COLUMN_SCHEMA_DATETIME_TYPES.include?(type)
-        if CURRENT_TIMESTAMP_RE.match(default)
+        if /now|today|CURRENT|getdate|\ADate\(\)\z/i.match(default)
           if type == :date
             return Sequel::CURRENT_DATE
           else
