@@ -1752,7 +1752,9 @@ describe "Dataset defaults and overrides" do
   before(:all) do
     @db = DB
     @db.create_table!(:a){Integer :a}
-    @ds = @db[:a].order(:a).extension(:set_overrides)
+    deprecated do
+      @ds = @db[:a].order(:a).extension(:set_overrides)
+    end
   end
   before do
     @ds.delete
