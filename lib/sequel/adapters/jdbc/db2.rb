@@ -8,7 +8,28 @@ module Sequel
   module JDBC
     Sequel.synchronize do
       DATABASE_SETUP[:db2] = proc do |db|
+        (class << db; self; end).class_eval do
+          alias jdbc_schema_parse_table schema_parse_table
+          alias jdbc_tables tables
+          alias jdbc_views views
+          alias jdbc_indexes indexes
+        end
         db.extend(Sequel::JDBC::DB2::DatabaseMethods)
+        (class << db; self; end).class_eval do
+          alias schema_parse_table jdbc_schema_parse_table
+          alias tables jdbc_tables
+          alias views jdbc_views
+          alias indexes jdbc_indexes
+          %w'schema_parse_table tables views indexes'.each do |s|
+            class_eval(<<-END, __FILE__, __LINE__+1)
+              def jdbc_#{s}(*a)
+                Sequel::Deprecation.deprecate("Database#jdbc_#{s} in the jdbc/db2 adapter", "Use Database\##{s} instead")
+                #{s}(*a)
+              end
+            END
+            # remove_method(:"jdbc_#{s}") # SEQUEL5
+          end
+        end
         db.dataset_class = Sequel::JDBC::DB2::Dataset
         com.ibm.db2.jcc.DB2Driver
       end
@@ -24,14 +45,6 @@ module Sequel
       end
     end
 
-    class Database
-      # Alias the generic JDBC versions so they can be called directly later
-      alias jdbc_schema_parse_table schema_parse_table
-      alias jdbc_tables tables
-      alias jdbc_views views
-      alias jdbc_indexes indexes
-    end
-    
     # Database and Dataset instance methods for DB2 specific
     # support via JDBC.
     module DB2
@@ -45,10 +58,6 @@ module Sequel
         IDENTITY_VAL_LOCAL = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1".freeze
         Sequel::Deprecation.deprecate_constant(self, :IDENTITY_VAL_LOCAL)
         
-        %w'schema_parse_table tables views indexes'.each do |s|
-          class_eval("def #{s}(*a) jdbc_#{s}(*a) end", __FILE__, __LINE__)
-        end
-
         private
 
         def set_ps_arg(cps, arg, i)

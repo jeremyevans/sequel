@@ -1,5 +1,9 @@
 === master
 
+* Deprecate Database#jdbc_* methods for jdbc/db2 adapter Database instances (jeremyevans)
+
+* Remove addition of Database#jdbc_* to JDBC::Database in jdbc/db2 adapter (jeremyevans)
+
 * Deprecate many internal Database string/regexp constants in core and included adapters (jeremyevans)
 
 * Remove use of Fixnum in sqlanywhere shared adapter (jeremyevans)
