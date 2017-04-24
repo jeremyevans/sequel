@@ -1600,7 +1600,9 @@ module Sequel
         end
       end
 
-      # Return a clone of the dataset with an addition named window that can be referenced in window functions.
+      # Return a clone of the dataset with an addition named window that can be
+      # referenced in window functions. See {SQL::Window} for a list of options
+      # that can be passed in.
       def window(name, opts)
         clone(:window=>(@opts[:window]||[]) + [[name, SQL::Window.new(opts)]])
       end

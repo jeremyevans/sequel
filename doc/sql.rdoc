@@ -239,8 +239,8 @@ If the database supports window functions, Sequel can handle them by calling the
   DB[:albums].select{function(:col1).over(:partition=>col2, :order=>col3)}
   # SELECT function(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM albums
 
-  DB[:albums].select{function(c1, c2).over(:partition=>[c3, c4], :order=>[c5, c6])}
-  # SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6) FROM albums
+  DB[:albums].select{function(c1, c2).over(:partition=>[c3, c4], :order=>[c5, c6.desc])}
+  # SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6 DESC) FROM albums
 
 === Schema Qualified Functions
 

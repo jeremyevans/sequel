@@ -1425,6 +1425,7 @@ module Sequel
       end
 
       # Return a new function with an OVER clause (making it a window function).
+      # See {SQL::Window} for the list of options +over+ can receive.
       #
       #   Sequel.function(:row_number).over(:partition=>:col) # row_number() OVER (PARTITION BY col)
       def over(window=OPTS)
@@ -1989,6 +1990,26 @@ module Sequel
     end
 
     # A +Window+ is part of a window function specifying the window over which a window function operates.
+    #
+    #   Sequel::SQL::Window.new(partition: :col1)
+    #   # (PARTITION BY col1)
+    #   Sequel::SQL::Window.new(partition: [:col2, :col3])
+    #   # (PARTITION BY col2, col3)
+    #
+    #   Sequel::SQL::Window.new(order: :col4)
+    #   # (ORDER BY col4)
+    #   Sequel::SQL::Window.new(order: [:col5, Sequel.desc(:col6)])
+    #   # (ORDER BY col5, col6 DESC)
+    #
+    #   Sequel::SQL::Window.new(partition: :col7, frame: :all)
+    #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: :rows)
+    #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: "RANGE CURRENT ROW")
+    #   # (PARTITION BY col7 RANGE CURRENT ROW)
+    #
+    #   Sequel::SQL::Window.new(window: :named_window) # you can create a named window with Dataset#window
+    #   # (named_window)
     class Window < Expression
       # The options for this window.  Options currently supported:
       # :frame :: if specified, should be :all, :rows, or a String that is used literally. :all always operates over all rows in the
