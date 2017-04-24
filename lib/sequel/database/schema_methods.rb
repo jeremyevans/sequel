@@ -543,7 +543,7 @@ module Sequel
     
     # The order of the column definition, as an array of symbols.
     def column_definition_order
-      self.class.const_get(:COLUMN_DEFINITION_ORDER)
+      COLUMN_DEFINITION_ORDER
     end
 
     # SQL DDL fragment containing the column creation SQL for the given column.
