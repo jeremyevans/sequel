@@ -33,7 +33,7 @@ module Sequel
     # the Database#dataset method return an instance of that subclass.
     def initialize(db)
       @db = db
-      @opts = {}
+      @opts = {} # OPTS # SEQUEL5
       @cache = {}
     end
 
@@ -54,6 +54,10 @@ module Sequel
       self == o
     end
 
+    # SEQUEL5: Remove other dup methods
+    # def dup
+    #   self
+    # end
     if TRUE_FREEZE
       # Similar to #clone, but returns an unfrozen clone if the receiver is frozen.
       def dup
@@ -96,12 +100,12 @@ module Sequel
     else
       # :nocov:
       def freeze # :nodoc:
-        @opts.freeze
+        @opts.freeze # SEQUEL5: remove
         self
       end
 
       def frozen?  # :nodoc:
-        @opts.frozen?
+        @opts.frozen? # SEQUEL5: true
       end
       # :nocov:
     end
@@ -299,7 +303,7 @@ module Sequel
     def cached_dataset(key)
       unless ds = cache_get(key)
         ds = yield
-        cache_set(key, ds) if frozen?
+        cache_set(key, ds) if frozen? # SEQUEL5: Remove if frozen?
       end
 
       ds

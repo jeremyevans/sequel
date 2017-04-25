@@ -93,7 +93,7 @@ module Sequel
         unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
           c.clear_columns_cache
         end
-        c.freeze if frozen?
+        c.freeze if frozen? # SEQUEL5: Remove if frozen?
         c
       end
     else
@@ -104,7 +104,7 @@ module Sequel
         unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
           c.clear_columns_cache
         end
-        c.freeze if frozen?
+        c.freeze if frozen? # SEQUEL5: c.opts.freeze
         c
       end
       # :nocov:
@@ -200,7 +200,7 @@ module Sequel
       def extension(*a)
         c = _clone(:freeze=>false)
         c.send(:_extension!, a)
-        c.freeze if frozen?
+        c.freeze if frozen? # SEQUEL5: Remove if frozen?
         c
       end
     else
@@ -768,7 +768,7 @@ module Sequel
     #   # SELECT i.* FROM items WHERE (i.id = 1)
     def qualify(table=first_source)
       o = @opts
-      return clone if o[:sql]
+      return clone if o[:sql] # SEQUEL5: return self
       h = {}
       (o.keys & QUALIFY_KEYS).each do |k|
         h[k] = qualified_expression(o[k], table)
@@ -1092,7 +1092,7 @@ module Sequel
         c = _clone(:freeze=>false)
         c.extend(*mods) unless mods.empty?
         c.extend(Module.new(&block)) if block
-        c.freeze if frozen?
+        c.freeze if frozen? # SEQUEL5: Remove if frozen?
         c
       end
     else
