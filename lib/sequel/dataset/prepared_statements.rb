@@ -92,6 +92,7 @@ module Sequel
       Dataset.def_deprecated_opts_setter(self, :log_sql, :prepared_type, :prepared_args, :orig_dataset, :prepared_modify_values)
 
       PLACEHOLDER_RE = /\A\$(.*)\z/
+      Sequel::Deprecation.deprecate_constant(self, :PLACEHOLDER_RE)
       
       # Whether to log the full SQL query.  By default, just the prepared statement
       # name is generally logged on adapters that support native prepared statements.
@@ -166,7 +167,7 @@ module Sequel
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
       def literal_symbol_append(sql, v)
-        if @opts[:bind_vars] and match = PLACEHOLDER_RE.match(v.to_s)
+        if @opts[:bind_vars] and match = /\A\$(.*)\z/.match(v.to_s)
           s = match[1].to_sym
           if prepared_arg?(s)
             literal_append(sql, prepared_arg(s))
