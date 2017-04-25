@@ -35,7 +35,21 @@ module Sequel
       class Dataset < Swift::Dataset
         include Sequel::MySQL::DatasetMethods
         APOS = Dataset::APOS
-        
+
+        def fetch_rows(sql)
+          super(sql) do |h|
+            converted_h = h.map do |k,v|
+              converted_v = if v.is_a?(DateTime)
+                              Sequel.database_to_application_timestamp(Sequel.send(:convert_input_datetime_no_offset, v, Sequel.database_timezone))
+                            else
+                              v
+                            end
+              [k, converted_v]
+            end
+            yield Hash[converted_h]
+          end
+        end
+
         private
         
         # Use Swift's escape method for quoting.
