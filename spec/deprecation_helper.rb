@@ -2,7 +2,7 @@ Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line 
 
 class Minitest::HooksSpec
   def self.deprecated(a, &block)
-    it(a) do
+    it("#{a} (deprecated)") do
       deprecated{instance_exec(&block)}
     end
   end
