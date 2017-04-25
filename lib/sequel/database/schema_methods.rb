@@ -783,9 +783,8 @@ module Sequel
 
     # Append the column list to the SQL, if a column list is given.
     def create_view_sql_append_columns(sql, columns)
-      sql = sql.dup
       if columns
-        sql << ' ('
+        sql += ' ('
         schema_utility_dataset.send(:identifier_list_append, sql, columns)
         sql << ')'
       end
