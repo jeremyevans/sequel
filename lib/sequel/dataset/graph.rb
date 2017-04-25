@@ -16,11 +16,16 @@ module Sequel
     #   DB[:table].add_graph_aliases(:some_alias=>[:table, :column])
     #   # SELECT ..., table.column AS some_alias
     def add_graph_aliases(graph_aliases)
-      unless (ga = opts[:graph_aliases]) || (opts[:graph] && (ga = opts[:graph][:column_aliases]))
+      graph = opts[:graph]
+      unless (ga = opts[:graph_aliases]) || (graph && (ga = graph[:column_aliases])) # SEQUEL5: Remove graph_aliases support
         raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      select_append(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases).freeze)
+      if opts[:graph_aliases]
+        select_append(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases).freeze) # SEQUEL5: Remove
+      else
+        select_append(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>Hash[ga].merge!(graph_aliases).freeze).freeze)
+      end
     end
 
     # Similar to Dataset#join_table, but uses unambiguous aliases for selected
@@ -114,7 +119,7 @@ module Sequel
       # Whether to include the table in the result set
       add_table = options[:select] == false ? false : true
       # Whether to add the columns to the list of column aliases
-      add_columns = !ds.opts.include?(:graph_aliases)
+      add_columns = !ds.opts.include?(:graph_aliases) # SEQUEL5: Remove graph_aliases support
 
       if graph = opts[:graph]
         graph = graph.dup
@@ -230,13 +235,18 @@ module Sequel
     #   # SELECT artists.name, albums.name AS album_name, 42 AS forty_two ...
     def set_graph_aliases(graph_aliases)
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      select(*columns).clone(:graph_aliases=>graph_aliases.freeze)
+      if graph = opts[:graph]
+        select(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>graph_aliases.freeze).freeze)
+      else
+        Sequel::Deprecation.deprecate("Calling Dataset#set_graph_aliases before Dataset#graph", "Call Dataset#set_graph_aliases after Dataset#graph now")
+        select(*columns).clone(:graph_aliases=>graph_aliases.freeze) # SEQUEL5: Remove
+      end
     end
 
     # Remove the splitting of results into subhashes, and all metadata
     # related to the current graph (if any).
     def ungraphed
-      clone(:graph=>nil, :graph_aliases=>nil)
+      clone(:graph=>nil, :graph_aliases=>nil) # SEQUEL5: Remove :graph_aliases
     end
 
     private

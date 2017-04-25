@@ -103,7 +103,9 @@ describe Sequel::Model, "class dataset methods"  do
     @c.select_order_map(:id).must_equal [1]
     @db.sqls.must_equal ["SELECT id FROM items ORDER BY id"]
     @c.server(:a).opts[:server].must_equal :a
-    @c.set_graph_aliases(:a=>:b).opts[:graph_aliases].must_equal(:a=>[:b, :a])
+    deprecated do
+      @c.set_graph_aliases(:a=>:b).opts[:graph_aliases].must_equal(:a=>[:b, :a])
+    end
     @c.single_record.must_equal @c.load(:id=>1)
     @db.sqls.must_equal ["SELECT * FROM items LIMIT 1"]
     @c.single_record!.must_equal @c.load(:id=>1)

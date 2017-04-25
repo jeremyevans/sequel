@@ -212,7 +212,7 @@ describe Sequel::Dataset, "graphing" do
       ds.sql.must_equal 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON ((lines.x = points.id) AND (lines.y = points.id))'
     end
 
-    it "should not add columns if graph is called after set_graph_aliases" do
+    deprecated "should not add columns if graph is called after set_graph_aliases" do
       ds = @ds1.set_graph_aliases([[:x,[:points, :x]], [:y,[:lines, :y]]])
       ds.sql.must_equal 'SELECT points.x, lines.y FROM points'
       ds = ds.graph(:lines, :x=>:id)
@@ -243,10 +243,19 @@ describe Sequel::Dataset, "graphing" do
   end
 
   describe "#set_graph_aliases" do
-    it "should not modify the current dataset's opts" do
+    deprecated "should not modify the current dataset's opts" do
       o1 = @ds1.opts
       o2 = o1.dup
       ds1 = @ds1.set_graph_aliases(:x=>[:graphs,:id])
+      @ds1.opts.must_equal o1
+      @ds1.opts.must_equal o2
+      ds1.opts.wont_equal o1
+    end
+
+    it "should not modify the current dataset's opts" do
+      o1 = @ds1.opts
+      o2 = o1.dup
+      ds1 = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:graphs,:id])
       @ds1.opts.must_equal o1
       @ds1.opts.must_equal o2
       ds1.opts.wont_equal o1
@@ -282,7 +291,7 @@ describe Sequel::Dataset, "graphing" do
       ].must_include(ds.sql)
     end
 
-    it "should only alias columns if necessary" do
+    deprecated "should only alias columns if necessary" do
       ds = @ds1.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
       ['SELECT points.x, lines.y FROM points',
       'SELECT lines.y, points.x FROM points'
@@ -293,11 +302,33 @@ describe Sequel::Dataset, "graphing" do
       'SELECT lines.y, points.x AS x1 FROM points'
       ].must_include(ds.sql)
     end
+
+    it "should only alias columns if necessary" do
+      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
+      ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+      'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+      ].must_include(ds.sql)
+
+      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x1=>[:points, :x], :y=>[:lines, :y])
+      ['SELECT points.x AS x1, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+      'SELECT lines.y, points.x AS x1 FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+      ].must_include(ds.sql)
+    end
   end
 
   describe "#add_graph_aliases" do
-    it "should not modify the current dataset's opts" do
+    deprecated "should not modify the current dataset's opts" do
       ds1 = @ds1.set_graph_aliases(:x=>[:graphs,:id])
+      o1 = ds1.opts
+      o2 = o1.dup
+      ds2 = ds1.add_graph_aliases(:y=>[:blah,:id])
+      ds1.opts.must_equal o1
+      ds1.opts.must_equal o2
+      ds2.opts.wont_equal o1
+    end
+
+    it "should not modify the current dataset's opts" do
+      ds1 = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:graphs,:id])
       o1 = ds1.opts
       o2 = o1.dup
       ds2 = ds1.add_graph_aliases(:y=>[:blah,:id])
