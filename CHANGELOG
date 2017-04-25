@@ -1,5 +1,7 @@
 === master
 
+* Don't swallow exception if there is an exception when rolling back a transaction when using :rollback=>:always option (jeremyevans)
+
 * Deprecate passing 2 arguments to Database#alter_table (jeremyevans)
 
 * Deprecate passing Schema::CreateTableGenerator instance as second argument to Database#create_table (jeremyevans)

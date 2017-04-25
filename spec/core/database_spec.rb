@@ -789,6 +789,18 @@ DatabaseTransactionSpecs = shared_description do
     @db.sqls.must_equal ['BEGIN']
   end
   
+  it "should raise original exception if there is an exception raised when rolling back when using :rollback=>:always" do
+    ec = Class.new(StandardError)
+    meta_def(@db, :database_error_classes){[ec]}
+    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
+    begin
+      @db.transaction(:rollback=>:always){}
+    rescue => e
+    end
+    e.must_be_kind_of(ec)
+    @db.sqls.must_equal ['BEGIN']
+  end
+  
   it "should issue ROLLBACK if Sequel::Rollback is called in the transaction" do
     @db.transaction do
       @db.drop_table(:a)

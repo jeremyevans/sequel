@@ -226,9 +226,10 @@ module Sequel
       rescue Exception => e
         begin
           rollback_transaction(conn, opts)
-        rescue Exception
+        rescue Exception => e3
         end
         transaction_error(e, :conn=>conn, :rollback=>rollback)
+        raise e3 if e3
         ret
       ensure
         begin
