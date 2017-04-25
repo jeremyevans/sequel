@@ -544,8 +544,6 @@ module Sequel
       end
 
       table_alias = options[:table_alias]
-      last_alias = options[:implicit_qualifier]
-      qualify_type = options[:qualify]
 
       if table.is_a?(SQL::AliasedExpression)
         table_expr = if table_alias
@@ -575,7 +573,8 @@ module Sequel
         raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block
         SQL::JoinUsingClause.new(expr, type, table_expr)
       else
-        last_alias ||= @opts[:last_joined_table] || first_source_alias
+        last_alias = options[:implicit_qualifier] || @opts[:last_joined_table] || first_source_alias
+        qualify_type = options[:qualify]
         if Sequel.condition_specifier?(expr)
           expr = expr.collect do |k, v|
             qualify_type = default_join_table_qualification if qualify_type.nil?
