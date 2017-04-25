@@ -9,6 +9,7 @@ module Sequel
     
     # All methods that should have a ! method added that modifies the receiver.
     MUTATION_METHODS = QUERY_METHODS - [:naked, :from_self]
+    Sequel::Deprecation.deprecate_constant(self, :MUTATION_METHODS)
     
     # Setup mutation (e.g. filter!) methods.  These operate the same as the
     # non-! methods, but replace the options of the current dataset with the
@@ -26,7 +27,7 @@ module Sequel
     end
     
     # Add the mutation methods via metaprogramming
-    def_mutation_method(*MUTATION_METHODS)
+    def_mutation_method(*(QUERY_METHODS - [:naked, :from_self]))
     
     # Like #extension, but modifies and returns the receiver instead of returning a modified clone.
     def extension!(*exts)
