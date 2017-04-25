@@ -652,7 +652,6 @@ module Sequel
 
     # Whether the given alter table operation is combinable.
     def combinable_alter_table_op?(op)
-      # Use a dynamic lookup for easier overriding in adapters
       COMBINABLE_ALTER_TABLE_OPS.include?(op[:op])
     end
 
