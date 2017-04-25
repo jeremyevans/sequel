@@ -222,7 +222,7 @@ module Sequel
         DEFAULT_FROM
       end
 
-      def insert_pk(*values)
+      def insert_pk
         pk = db.primary_key(opts[:from].first)
         pk ? Sequel::SQL::Identifier.new(pk) : NULL
       end

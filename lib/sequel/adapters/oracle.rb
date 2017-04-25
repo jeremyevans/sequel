@@ -13,23 +13,27 @@ module Sequel
       # ORA-01012: not logged on
       # ORA-03113: end-of-file on communication channel
       # ORA-03114: not connected to ORACLE
-      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
-      
+      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]
+
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
         :clob=>lambda(&:read)
       }
+
+      NULL = LiteralString.new('NULL').freeze
+      NULL_RETURNING = [NULL].freeze
+      NULL_RETURNING_BINDING = [[NULL, String].freeze].freeze
 
       # Hash of conversion procs for this database.
       attr_reader :conversion_procs
 
       def connect(server)
         opts = server_opts(server)
-        if opts[:database]
-          dbname = opts[:host] ? \
-            "//#{opts[:host]}#{":#{opts[:port]}" if opts[:port]}/#{opts[:database]}" : opts[:database]
+        if opts[:database] && opts[:host]
+          port = opts[:port] ? ":#{opts[:port]}" : ""
+          dbname = "//#{opts[:host]}#{port}/#{opts[:database]}"
         else
-          dbname = opts[:host]
+          dbname = opts[:database] || opts[:host]
         end
         conn = OCI8.new(opts[:user], opts[:password], dbname, opts[:privilege])
         if prefetch_rows = opts.fetch(:prefetch_rows, 100)
@@ -76,6 +80,44 @@ module Sequel
         super
       end
 
+      # Disables automatic use of INSERT ... RETURNING.  You can still use
+      # returning manually to force the use of RETURNING when inserting.
+      #
+      # This is designed for cases where INSERT RETURNING cannot be used,
+      # such as performing DML operations on views with INSTEAD OF triggers
+      #
+      # Note that when this method is used, insert will not return the
+      # primary key of the inserted row, you will have to get the primary
+      # key of the inserted row before inserting via nextval, or after
+      # inserting via currval or lastval (making sure to use the same
+      # database connection for currval or lastval).
+      def disable_insert_returning
+        clone(:disable_insert_returning=>true)
+      end
+
+      # Return primary key for the given table.
+      def primary_key(table)
+        quoted_table = quote_schema_table(table)
+        Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.key?(quoted_table)}
+        value, _ = schema(table).find { |_, c| c[:primary_key] }
+        Sequel.synchronize{@primary_keys[quoted_table] = value}
+      end
+
+      RETURNING_TYPES = {:string=>String, :integer=>Integer}.freeze
+      def returning_values(table, columns)
+        quoted_table = quote_schema_table(table)
+        Sequel.synchronize{return @returning_values[quoted_table][columns] if @returning_values[quoted_table].key?(columns)}
+        if columns == NULL_RETURNING
+          values = NULL_RETURNING_BINDING
+        else
+          col_names = columns.map(&:value)
+          values = schema(table).map do |(name, metadata)|
+            [name, RETURNING_TYPES[metadata[:type]]] if col_names.include?(name)
+          end.compact
+        end
+        Sequel.synchronize{@returning_values[quoted_table][columns] = values}
+      end
+
       private
 
       def _execute(type, sql, opts=OPTS, &block)
@@ -87,12 +129,17 @@ module Sequel
               args = cursor_bind_params(conn, r, args)
               nr = log_connection_yield(sql, conn, args){r.exec}
               r = nr unless block_given?
+            elsif opts[:returning]
+              args = opts[:returning].map {|(_, type)| [nil, type]}
+              r = conn.parse(sql)
+              args = cursor_bind_params(conn, r, args)
+              nr = log_connection_yield(sql, conn, args){r.exec}
             else
               r = log_connection_yield(sql, conn){conn.exec(sql)}
             end
             if block_given?
               yield(r)
-            elsif type == :insert
+            elsif type == :insert && !opts[:returning]
               last_insert_id(conn, opts)
             else
               r
@@ -110,6 +157,10 @@ module Sequel
         @autosequence = @opts[:autosequence]
         @primary_key_sequences = {}
         @conversion_procs = ORACLE_TYPES.dup
+        @primary_keys = {}
+        @returning_values = Hash.new {|h, k| h[k] = {}}
+
+        super
       end
 
       PS_TYPES = {'string'.freeze=>String, 'integer'.freeze=>Integer, 'float'.freeze=>Float,
@@ -131,6 +182,8 @@ module Sequel
           end
           if t = PS_TYPES[type]
             cursor.bind_param(i, arg, t)
+          elsif type
+            cursor.bind_param(i, arg, type)
           else
             cursor.bind_param(i, arg, arg.class)
           end
@@ -265,8 +318,10 @@ module Sequel
         schema ||= opts[:schema]
         schema_and_table = if ds = opts[:dataset]
           ds.literal(schema ? SQL::QualifiedIdentifier.new(schema, table) : SQL::Identifier.new(table))
+        elsif schema
+          "#{quote_identifier(schema)}.#{quote_identifier(table)}"
         else
-          "#{"#{quote_identifier(schema)}." if schema}#{quote_identifier(table)}"
+          quote_identifier(table)
         end
         table_schema = []
         m = output_identifier_meth(ds)
@@ -332,7 +387,10 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
-      
+      NULL = Database::NULL
+      DUMMY_RETURNING = Sequel.lit(' RETURNING NULL INTO :dummy').freeze
+      def_sql_method(self, :insert, %w'with insert into columns values returning')
+
       # Oracle already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
@@ -366,16 +424,20 @@ module Sequel
       PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 
       def fetch_rows(sql)
-        execute(sql) do |cursor|
-          cps = db.conversion_procs
-          cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
-          metadata = cursor.column_metadata
-          cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
-          self.columns = columns
-          while r = cursor.fetch
-            row = {}
-            r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}
-            yield row
+        execute(sql, opts) do |cursor|
+          if opts[:returning]
+            yield Hash[*opts[:returning].flat_map.with_index {|(name, _), idx| [name, cursor[idx+1]]}]
+          else
+            cps = db.conversion_procs
+            cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
+            metadata = cursor.column_metadata
+            cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
+            self.columns = columns
+            while r = cursor.fetch
+              row = {}
+              r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}
+              yield row
+            end
           end
         end
         self
@@ -387,6 +449,41 @@ module Sequel
       def requires_placeholder_type_specifiers?
         true
       end
+
+      # Oracle supports for all statements.
+      def supports_returning?(type)
+        true
+      end
+
+      # Insert given values into the database.
+      def insert(*values)
+        if @opts[:returning]
+          # Already know which columns to return, let the standard code handle it
+          super
+        elsif @opts[:sql] || @opts[:disable_insert_returning]
+          # Raw SQL used or RETURNING disabled, just use the default behavior
+          super
+        else
+          # Force the use of RETURNING with the primary key value,
+          # unless it has been disabled.
+          returning(insert_pk).insert(*values){|r| return r.values.first}
+        end
+      end
+
+      def insert_returning_sql(sql)
+        if opts[:returning]
+          if opts[:returning][0][0] == NULL
+            sql << DUMMY_RETURNING
+          else
+            sql << Dataset::RETURNING
+            column_list_append(sql, opts[:returning].map(&:first))
+            sql << Dataset::INTO
+            column_list_append(sql, opts[:returning].map {|(c, _)| Sequel.lit(":#{c}") })
+          end
+        end
+      end
+      alias delete_returning_sql insert_returning_sql
+      alias update_returning_sql insert_returning_sql
 
       private
 
@@ -402,6 +499,11 @@ module Sequel
         end
       end
 
+      def returning(*values)
+        raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
+        clone(:returning=>db.returning_values(opts[:from].first, values).freeze)
+      end
+
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
       end
@@ -412,6 +514,12 @@ module Sequel
 
       def prepared_statement_modules
         [PreparedStatementMethods]
+      end
+
+      # Return the primary key to use for RETURNING in an INSERT statement.
+      def insert_pk
+        pk = db.primary_key(opts[:from].first)
+        pk ? Sequel::SQL::Identifier.new(pk) : NULL
       end
     end
   end

@@ -1061,6 +1061,10 @@ module Sequel
         opts[:server] = @opts[:server] || (@opts[:lock] ? :default : :read_only)
         opts
       end
+      if @opts.key?(:returning)
+        opts = Hash[opts]
+        opts[:returning] = @opts[:returning]
+      end
       db.execute(sql, opts, &block)
     end
     
