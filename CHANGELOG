@@ -1,5 +1,9 @@
 === master
 
+* Deprecate passing 2 arguments to Database#alter_table (jeremyevans)
+
+* Deprecate passing Schema::CreateTableGenerator instance as second argument to Database#create_table (jeremyevans)
+
 * Deprecate Database::DatasetClass as a way for getting default dataset classes for datasets (jeremyevans)
 
 * Deprecate SQLite pragma getting and setting methods (jeremyevans)

@@ -83,8 +83,13 @@ module Sequel
     # available for index definition.
     #
     # See <tt>Schema::AlterTableGenerator</tt> and the {"Migrations and Schema Modification" guide}[rdoc-ref:doc/migration.rdoc].
-    def alter_table(name, generator=nil, &block)
-      generator ||= alter_table_generator(&block)
+    def alter_table(name, generator=(arg_not_given=true; nil), &block)
+      if generator
+        Sequel::Deprecation.deprecate("Passing a Sequel::Schema::AlterTableGenerator instance as the second argument to Sequel::Database#alter_table ", "Pass a block to Sequel::Database#alter_table instead")
+      else
+        Sequel::Deprecation.deprecate("Passing a second argument to Sequel::Database#alter_table :generator option", "Pass only a single argument to the method") unless arg_not_given
+        generator = alter_table_generator(&block)
+      end
       remove_cached_schema(name)
       apply_alter_table_generator(name, generator)
       nil
@@ -196,7 +201,10 @@ module Sequel
     # See <tt>Schema::CreateTableGenerator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)
       remove_cached_schema(name)
-      options = {:generator=>options} if options.is_a?(Schema::CreateTableGenerator)
+      if options.is_a?(Schema::CreateTableGenerator)
+        Sequel::Deprecation.deprecate("Passing a Sequel::Schema::CreateTableGenerator instance as the second argument to Sequel::Database#create_table", "Use the Sequel::Database#create_table :generator option instead")
+        options = {:generator=>options}
+      end
       if sql = options[:as]
         raise(Error, "can't provide both :as option and block to create_table") if block
         create_table_as(name, sql, options)
