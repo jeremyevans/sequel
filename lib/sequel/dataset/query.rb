@@ -1341,7 +1341,7 @@ module Sequel
     #   DB[:items].invert_order([Sequel.desc(:id)]]) #=> [Sequel.asc(:id)]
     #   DB[:items].invert_order([:category, Sequel.desc(:price)]) #=> [Sequel.desc(:category), Sequel.asc(:price)]
     def invert_order(order)
-      return nil unless order
+      return unless order
       order.map do |f|
         case f
         when SQL::OrderedExpression
