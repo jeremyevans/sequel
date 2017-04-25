@@ -10,20 +10,29 @@ module Sequel
     # ---------------------
 
     SQL_BEGIN = 'BEGIN'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_BEGIN)
     SQL_COMMIT = 'COMMIT'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_COMMIT)
     SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_RELEASE_SAVEPOINT)
     SQL_ROLLBACK = 'ROLLBACK'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK)
     SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TO SAVEPOINT autopoint_%d'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK_TO_SAVEPOINT)
     SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_SAVEPOINT)
     
     TRANSACTION_BEGIN = 'Transaction.begin'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_BEGIN)
     TRANSACTION_COMMIT = 'Transaction.commit'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_COMMIT)
     TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_ROLLBACK)
 
     TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ UNCOMMITTED'.freeze,
       :committed=>'READ COMMITTED'.freeze,
       :repeatable=>'REPEATABLE READ'.freeze,
-      :serializable=>'SERIALIZABLE'.freeze}
+      :serializable=>'SERIALIZABLE'.freeze}#.freeze # SEQUEL5
     
     # The default transaction isolation level for this database,
     # used for all future transactions.  For MSSQL, this should be set
@@ -292,7 +301,7 @@ module Sequel
 
     # SQL to start a new savepoint
     def begin_savepoint_sql(depth)
-      SQL_SAVEPOINT % depth
+      "SAVEPOINT autopoint_#{depth}"
     end
 
     # Start a new database connection on the given connection
@@ -316,7 +325,7 @@ module Sequel
     
     # SQL to BEGIN a transaction.
     def begin_transaction_sql
-      SQL_BEGIN
+      'BEGIN'
     end
 
     # Whether to commit the current transaction. Thread.current.status is
@@ -340,7 +349,7 @@ module Sequel
     
     # SQL to commit a savepoint
     def commit_savepoint_sql(depth)
-      SQL_RELEASE_SAVEPOINT % depth
+      "RELEASE SAVEPOINT autopoint_#{depth}"
     end
 
     # Commit the active transaction on the connection
@@ -355,7 +364,7 @@ module Sequel
 
     # SQL to COMMIT a transaction.
     def commit_transaction_sql
-      SQL_COMMIT
+      'COMMIT'
     end
     
     # Method called on the connection object to execute SQL on the database,
@@ -393,7 +402,7 @@ module Sequel
 
     # SQL to rollback to a savepoint
     def rollback_savepoint_sql(depth)
-      SQL_ROLLBACK_TO_SAVEPOINT % depth
+      "ROLLBACK TO SAVEPOINT autopoint_#{depth}"
     end
 
     # Rollback the active transaction on the connection
@@ -408,7 +417,7 @@ module Sequel
 
     # SQL to ROLLBACK a transaction.
     def rollback_transaction_sql
-      SQL_ROLLBACK
+      'ROLLBACK'
     end
     
     # Set the transaction isolation level on the given connection
