@@ -10,7 +10,9 @@ module Sequel
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     ARRAY_ACCESS_ERROR_MSG = 'You cannot call Dataset#[] with an integer or with no arguments.'.freeze
     ARG_BLOCK_ERROR_MSG = 'Must use either an argument or a block, not both'.freeze
+
     IMPORT_ERROR_MSG = 'Using Sequel::Dataset#import an empty column array is not allowed'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :IMPORT_ERROR_MSG)
     
     # The database related to this dataset.  This is the Database instance that
     # will execute all of this dataset's queries.

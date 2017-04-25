@@ -334,7 +334,7 @@ module Sequel
       return @db.transaction{insert(columns, values)} if values.is_a?(Dataset)
 
       return if values.empty?
-      raise(Error, IMPORT_ERROR_MSG) if columns.empty?
+      raise(Error, 'Using Sequel::Dataset#import with an empty column array is not allowed') if columns.empty?
       ds = opts[:server] ? server(opts[:server]) : self
       
       if slice_size = opts.fetch(:commit_every, opts.fetch(:slice, default_import_slice))
