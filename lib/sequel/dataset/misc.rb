@@ -8,9 +8,11 @@ module Sequel
     # ---------------------
     
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
+    Sequel::Deprecation.deprecate_constant(self, :NOTIMPL_MSG)
     ARRAY_ACCESS_ERROR_MSG = 'You cannot call Dataset#[] with an integer or with no arguments.'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :ARRAY_ACCESS_ERROR_MSG)
     ARG_BLOCK_ERROR_MSG = 'Must use either an argument or a block, not both'.freeze
-
+    Sequel::Deprecation.deprecate_constant(self, :ARG_BLOCK_ERROR_MSG)
     IMPORT_ERROR_MSG = 'Using Sequel::Dataset#import an empty column array is not allowed'.freeze
     Sequel::Deprecation.deprecate_constant(self, :IMPORT_ERROR_MSG)
     

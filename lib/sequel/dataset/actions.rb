@@ -34,7 +34,7 @@ module Sequel
     #   DB[:table][:id=>1] # SELECT * FROM table WHERE (id = 1) LIMIT 1
     #   # => {:id=1}
     def [](*conditions)
-      raise(Error, ARRAY_ACCESS_ERROR_MSG) if (conditions.length == 1 and conditions.first.is_a?(Integer)) or conditions.length == 0
+      raise(Error, 'You cannot call Dataset#[] with an integer or with no arguments') if (conditions.length == 1 and conditions.first.is_a?(Integer)) or conditions.length == 0
       first(*conditions)
     end
 
@@ -275,7 +275,7 @@ module Sequel
     def get(column=(no_arg=true; nil), &block)
       ds = naked
       if block
-        raise(Error, ARG_BLOCK_ERROR_MSG) unless no_arg
+        raise(Error, 'Must call Dataset#get with an argument or a block, not both') unless no_arg
         ds = ds.select(&block)
         column = ds.opts[:select]
         column = nil if column.is_a?(Array) && column.length < 2
@@ -452,7 +452,7 @@ module Sequel
     #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
     def map(column=nil, &block)
       if column
-        raise(Error, ARG_BLOCK_ERROR_MSG) if block
+        raise(Error, 'Must call Dataset#map with either an argument or a block, not both') if block
         return naked.map(column) if row_proc
         if column.is_a?(Array)
           super(){|r| r.values_at(*column)}
