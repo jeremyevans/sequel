@@ -618,10 +618,10 @@ module Sequel
         when :<<, :>>
           complex_expression_emulate_append(sql, op, args)
         when :extract
-          part = args.at(0)
+          part = args[0]
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
           if part == :second
-            expr = args.at(1)
+            expr = args[1]
             sql << DATEPART_SECOND_OPEN << format.to_s << COMMA
             literal_append(sql, expr)
             sql << DATEPART_SECOND_MIDDLE
@@ -629,7 +629,7 @@ module Sequel
             sql << DATEPART_SECOND_CLOSE
           else
             sql << DATEPART_OPEN << format.to_s << COMMA
-            literal_append(sql, args.at(1))
+            literal_append(sql, args[1])
             sql << PAREN_CLOSE
           end
         else

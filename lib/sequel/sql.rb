@@ -1111,7 +1111,7 @@ module Sequel
       def self.from_value_pairs(pairs, op=:AND, negate=false)
         pairs = pairs.map{|l,r| from_value_pair(l, r)}
         pairs.map!{|ce| invert(ce)} if negate
-        pairs.length == 1 ? pairs.at(0) : new(op, *pairs)
+        pairs.length == 1 ? pairs[0] : new(op, *pairs)
       end
 
       # Return a BooleanExpression based on the right side of the pair.
@@ -1618,7 +1618,7 @@ module Sequel
       # Create an object with the given string, placeholder arguments, and parens flag.
       def initialize(str, args, parens=false)
         @str = str
-        @args = args.is_a?(Array) && args.length == 1 && (v = args.at(0)).is_a?(Hash) ? v : args
+        @args = args.is_a?(Array) && args.length == 1 && (v = args[0]).is_a?(Hash) ? v : args
         @parens = parens
         freeze
       end
@@ -1768,7 +1768,7 @@ module Sequel
           r, rre, rci = like_element(ce)
           BooleanExpression.new(LIKE_MAP[[lre||rre, lci||rci]], l, r)
         end
-        ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
+        ces.length == 1 ? ces[0] : BooleanExpression.new(:OR, *ces)
       end
       
       # Returns a three element array, made up of:

@@ -134,15 +134,15 @@ module Sequel
           complex_expression_sql_append(sql, :'NOT LIKE', args)
         when :LIKE, :'NOT LIKE'
           sql << PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << SPACE << op.to_s << SPACE
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << PAREN_CLOSE
         when :'!='
           sql << PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << NOT_EQUAL
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << PAREN_CLOSE
         when :'%', :'||'
           sql << PAREN_OPEN
@@ -161,10 +161,10 @@ module Sequel
           literal_append(sql, args[1])
           sql << PAREN_CLOSE
         when :extract
-          part = args.at(0)
+          part = args[0]
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
           sql << DATEPART_OPEN << format.to_s << COMMA
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << PAREN_CLOSE
         else
           super

@@ -102,7 +102,7 @@ module Sequel
         execute(sql) do |s|
           i = -1
           cols = s.columns(true).map{|c| [output_identifier(c.name), c.type, i+=1]}
-          columns = cols.map{|c| c.at(0)}
+          columns = cols.map{|c| c[0]}
           self.columns = columns
           if rows = s.fetch_all
             rows.each do |row|

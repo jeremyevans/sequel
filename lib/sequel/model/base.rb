@@ -2503,7 +2503,7 @@ module Sequel
       #
       #   Artist.dataset[1] # SELECT * FROM artists WHERE (id = 1) LIMIT 1
       def [](*args)
-        if args.length == 1 && (i = args.at(0)) && i.is_a?(Integer)
+        if args.length == 1 && (i = args[0]) && i.is_a?(Integer)
           with_pk(i)
         else
           super
@@ -2545,7 +2545,7 @@ module Sequel
       #   Album.insert(Album.load(:name=>'A'))
       #   # INSERT INTO albums (name) VALUES ('A')
       def insert_sql(*values)
-        if values.size == 1 && (v = values.at(0)).is_a?(Sequel::Model) && !v.respond_to?(:sql_literal_append)
+        if values.size == 1 && (v = values[0]).is_a?(Sequel::Model) && !v.respond_to?(:sql_literal_append)
           Sequel::Deprecation.deprecate("Passing Sequel::Model instance argument to Sequel::Dataset#insert", "Pass model_instance.values or model_instance.to_hash as the argument instead")
           super(v.to_hash)
         else

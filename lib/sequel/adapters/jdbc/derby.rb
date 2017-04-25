@@ -244,8 +244,8 @@ module Sequel
             literal_append(sql, args[0])
             sql << "))"
           when :extract
-            sql << args.at(0).to_s << PAREN_OPEN
-            literal_append(sql, args.at(1))
+            sql << args[0].to_s << PAREN_OPEN
+            literal_append(sql, args[1])
             sql << PAREN_CLOSE
           else
             super

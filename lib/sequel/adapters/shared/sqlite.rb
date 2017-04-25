@@ -611,7 +611,7 @@ module Sequel
             sql << '1'
           else
             sql << '('
-            arg = args.at(0)
+            arg = args[0]
             if exp < 0
               invert = true
               exp = exp.abs
@@ -628,10 +628,10 @@ module Sequel
             end
           end
         when :extract
-          part = args.at(0)
+          part = args[0]
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
           sql << EXTRACT_OPEN << format << COMMA
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << EXTRACT_CLOSE << (part == :second ? NUMERIC : INTEGER) << PAREN_CLOSE
         else
           super

@@ -322,9 +322,9 @@ module Sequel
         when :'B~'
           literal_append(sql, SQL::Function.new(:BITNOT, *args))
         when :extract
-          sql << args.at(0).to_s
+          sql << args[0].to_s
           sql << PAREN_OPEN
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << PAREN_CLOSE
         else
           super

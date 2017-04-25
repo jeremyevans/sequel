@@ -30,7 +30,7 @@ module Sequel
       when 0
         return insert_sql({})
       when 1
-        case vals = values.at(0)
+        case vals = values[0]
         when Hash
           values = []
           vals.each do |k,v| 
@@ -41,7 +41,7 @@ module Sequel
           values = vals
         end
       when 2
-        if (v0 = values.at(0)).is_a?(Array) && ((v1 = values.at(1)).is_a?(Array) || v1.is_a?(Dataset) || v1.is_a?(LiteralString))
+        if (v0 = values[0]).is_a?(Array) && ((v1 = values[1]).is_a?(Array) || v1.is_a?(Dataset) || v1.is_a?(LiteralString))
           columns, values = v0, v1
           raise(Error, "Different number of values and columns given to insert_sql") if values.is_a?(Array) and columns.length != values.length
         end
@@ -426,21 +426,21 @@ module Sequel
     def complex_expression_sql_append(sql, op, args)
       case op
       when *IS_OPERATORS
-        r = args.at(1)
+        r = args[1]
         if r.nil? || supports_is_true?
           raise(InvalidOperation, 'Invalid argument used for IS operator') unless val = IS_LITERALS[r]
           sql << PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << SPACE << op.to_s << SPACE
           sql << val << PAREN_CLOSE
         elsif op == :IS
           complex_expression_sql_append(sql, :"=", args)
         else
-          complex_expression_sql_append(sql, :OR, [SQL::BooleanExpression.new(:"!=", *args), SQL::BooleanExpression.new(:IS, args.at(0), nil)])
+          complex_expression_sql_append(sql, :OR, [SQL::BooleanExpression.new(:"!=", *args), SQL::BooleanExpression.new(:IS, args[0], nil)])
         end
       when :IN, :"NOT IN"
-        cols = args.at(0)
-        vals = args.at(1)
+        cols = args[0]
+        vals = args[1]
         col_array = true if cols.is_a?(Array)
         if vals.is_a?(Array)
           val_array = true
@@ -483,9 +483,9 @@ module Sequel
         end
       when :LIKE, :'NOT LIKE'
         sql << PAREN_OPEN
-        literal_append(sql, args.at(0))
+        literal_append(sql, args[0])
         sql << SPACE << op.to_s << SPACE
-        literal_append(sql, args.at(1))
+        literal_append(sql, args[1])
         sql << ESCAPE
         literal_append(sql, BACKSLASH)
         sql << PAREN_CLOSE
@@ -498,9 +498,9 @@ module Sequel
           raise InvalidOperation, "Pattern matching via regular expressions is not supported on #{db.database_type}"
         end
         sql << PAREN_OPEN
-        literal_append(sql, args.at(0))
+        literal_append(sql, args[0])
         sql << SPACE << op.to_s << SPACE
-        literal_append(sql, args.at(1))
+        literal_append(sql, args[1])
         sql << PAREN_CLOSE
       when *N_ARITY_OPERATORS
         sql << PAREN_OPEN
@@ -514,15 +514,15 @@ module Sequel
         sql << PAREN_CLOSE
       when :NOT
         sql << NOT_SPACE
-        literal_append(sql, args.at(0))
+        literal_append(sql, args[0])
       when :NOOP
-        literal_append(sql, args.at(0))
+        literal_append(sql, args[0])
       when :'B~'
         sql << TILDE
-        literal_append(sql, args.at(0))
+        literal_append(sql, args[0])
       when :extract
-        sql << EXTRACT << args.at(0).to_s << FROM
-        literal_append(sql, args.at(1))
+        sql << EXTRACT << args[0].to_s << FROM
+        literal_append(sql, args[1])
         sql << PAREN_CLOSE
       else
         raise(InvalidOperation, "invalid operator #{op}")
@@ -965,9 +965,9 @@ module Sequel
     def complex_expression_arg_pairs(args)
       case args.length
       when 1
-        args.at(0)
+        args[0]
       when 2
-        yield args.at(0), args.at(1)
+        yield args[0], args[1]
       else
         args.inject{|m, a| yield(m, a)}
       end
@@ -996,7 +996,7 @@ module Sequel
         complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(f, a, b)}
       when :'B~'
         sql << BITCOMP_OPEN
-        literal_append(sql, args.at(0))
+        literal_append(sql, args[0])
         sql << BITCOMP_CLOSE
       end
     end

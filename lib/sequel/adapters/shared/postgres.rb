@@ -1303,9 +1303,9 @@ module Sequel
           end
         when :ILIKE, :'NOT ILIKE'
           sql << PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << SPACE << op.to_s << SPACE
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << ESCAPE
           literal_append(sql, BACKSLASH)
           sql << PAREN_CLOSE

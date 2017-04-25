@@ -355,11 +355,11 @@ module Sequel
           complex_expression_emulate_append(sql, op, args)
         when :LIKE, :"NOT LIKE"
           sql << Sequel::Dataset::PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << Sequel::Dataset::SPACE << (op == :LIKE ? REGEXP : NOT_REGEXP) << Sequel::Dataset::SPACE
           pattern = String.new
           last_c = ''
-          args.at(1).each_char do |c|
+          args[1].each_char do |c|
             if  c == '_' and not pattern.end_with?('\\') and last_c != '\\'
               pattern << '.'
             elsif c == '%' and not pattern.end_with?('\\') and last_c != '\\'
@@ -389,9 +389,9 @@ module Sequel
           super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
         when :extract
           sql << DATEPART + Sequel::Dataset::PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << ','
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           sql << Sequel::Dataset::PAREN_CLOSE
         else
           super

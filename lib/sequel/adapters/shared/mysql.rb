@@ -644,21 +644,21 @@ module Sequel
       def complex_expression_sql_append(sql, op, args)
         case op
         when :IN, :"NOT IN"
-          ds = args.at(1)
+          ds = args[1]
           if ds.is_a?(Sequel::Dataset) && ds.opts[:limit]
-            super(sql, op, [args.at(0), ds.from_self])
+            super(sql, op, [args[0], ds.from_self])
           else
             super
           end
         when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
           sql << PAREN_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << SPACE
           sql << 'NOT ' if [:'NOT LIKE', :'NOT ILIKE', :'!~', :'!~*'].include?(op)
           sql << ([:~, :'!~', :'~*', :'!~*'].include?(op) ? REGEXP : LIKE)
           sql << SPACE
           sql << BINARY if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           if [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'].include?(op)
             sql << ESCAPE
             literal_append(sql, BACKSLASH)
@@ -669,11 +669,11 @@ module Sequel
             sql << CONCAT
             array_sql_append(sql, args)
           else
-            literal_append(sql, args.at(0))
+            literal_append(sql, args[0])
           end
         when :'B~'
           sql << CAST_BITCOMP_OPEN
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << CAST_BITCOMP_CLOSE
         else
           super

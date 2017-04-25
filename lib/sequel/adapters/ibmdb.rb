@@ -408,7 +408,7 @@ module Sequel
             type = :blob if type == :clob && Sequel::DB2.use_clob_as_blob
             columns << [key, cps[type]]
           end
-          cols = columns.map{|c| c.at(0)}
+          cols = columns.map{|c| c[0]}
           self.columns = cols
 
           while res = stmt.fetch_array

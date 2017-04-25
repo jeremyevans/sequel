@@ -1289,7 +1289,7 @@ module Sequel
           SQL::BooleanExpression.from_value_pairs(expr)
         #else # SEQUEL5
         #  raise(Error, "Invalid filter expression: #{expr.inspect}") 
-        elsif (sexpr = expr.at(0)).is_a?(String)
+        elsif (sexpr = expr[0]).is_a?(String)
           Sequel::Deprecation.deprecate("Calling a dataset filtering method with multiple arguments or an array where the first argument/element is a string", "Use Sequel.lit(#{sexpr.inspect}#{", #{expr[1..-1].map(&:inspect).join(', ')}" if expr.length > 1}) to create an SQL fragment expression and pass that to the dataset filtering method, or use the auto_literal_strings extension")
           SQL::PlaceholderLiteralString.new(sexpr, expr[1..-1], true)
         else

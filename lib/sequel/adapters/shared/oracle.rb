@@ -356,9 +356,9 @@ module Sequel
             sql << 'NOT '
           end
           sql << 'REGEXP_LIKE('
-          literal_append(sql, args.at(0))
+          literal_append(sql, args[0])
           sql << ','
-          literal_append(sql, args.at(1))
+          literal_append(sql, args[1])
           if op == :'~*' || op == :'!~*'
             sql << ", 'i'"
           end

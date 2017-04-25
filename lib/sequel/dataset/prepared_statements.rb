@@ -213,7 +213,7 @@ module Sequel
         when :insert_pk
           fetch_rows(prepared_sql){|r| return r.values.first}
         when Array
-          case prepared_type.at(0)
+          case prepared_type[0]
           when :map, :to_hash, :to_hash_groups
             send(*prepared_type, &block) 
           end
