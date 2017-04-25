@@ -980,7 +980,8 @@ module Sequel
   
     # Returns an array of the first value in each row.
     def _select_map_single
-      map{|r| r.values.first}
+      k = nil
+      map{|r| r[k||=r.keys.first]}
     end
   
     # A dataset for returning single values from the current dataset.
