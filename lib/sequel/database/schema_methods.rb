@@ -822,6 +822,8 @@ module Sequel
     end
 
     # Proxy the filter_expr call to the dataset, used for creating constraints.
+    # Support passing Proc arguments as blocks, as well as treating plain strings
+    # as literal strings, so that previous migrations that used this API do not break.
     def filter_expr(*args, &block)
       if args.length == 1
         arg = args.first
