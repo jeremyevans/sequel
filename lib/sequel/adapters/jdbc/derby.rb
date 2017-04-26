@@ -191,23 +191,38 @@ module Sequel
       
       # Dataset class for Derby datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        PAREN_CLOSE = Dataset::PAREN_CLOSE
-        PAREN_OPEN = Dataset::PAREN_OPEN
-        OFFSET = Dataset::OFFSET
+        PAREN_CLOSE = ')'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+        PAREN_OPEN = '('.freeze
+        Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
+        OFFSET = " OFFSET ".freeze
+        Sequel::Deprecation.deprecate_constant(self, :OFFSET)
         CAST_STRING_OPEN = "RTRIM(".freeze
+        Sequel::Deprecation.deprecate_constant(self, :CAST_STRING_OPEN)
         BLOB_OPEN = "CAST(X'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :BLOB_OPEN)
         BLOB_CLOSE = "' AS BLOB)".freeze
+        Sequel::Deprecation.deprecate_constant(self, :BLOB_CLOSE)
         HSTAR = "H*".freeze
+        Sequel::Deprecation.deprecate_constant(self, :HSTAR)
         TIME_FORMAT = "'%H:%M:%S'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :TIME_FORMAT)
         DEFAULT_FROM = " FROM sysibm.sysdummy1".freeze
+        Sequel::Deprecation.deprecate_constant(self, :DEFAULT_FROM)
         ROWS = " ROWS".freeze
+        Sequel::Deprecation.deprecate_constant(self, :ROWS)
         FETCH_FIRST = " FETCH FIRST ".freeze
+        Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST)
         ROWS_ONLY = " ROWS ONLY".freeze
+        Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
         BOOL_TRUE_OLD = '(1 = 1)'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE_OLD)
         BOOL_FALSE_OLD = '(1 = 0)'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE_OLD)
         BOOL_TRUE = 'TRUE'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
         BOOL_FALSE = 'FALSE'.freeze
-
+        Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
         EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
         Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
@@ -223,9 +238,9 @@ module Sequel
         # a string and the ending whitespace is important.
         def cast_sql_append(sql, expr, type)
           if type == String
-            sql << CAST_STRING_OPEN
+            sql << "RTRIM("
             super
-            sql << PAREN_CLOSE
+            sql << ')'
           else
             super
           end
@@ -244,9 +259,9 @@ module Sequel
             literal_append(sql, args[0])
             sql << "))"
           when :extract
-            sql << args[0].to_s << PAREN_OPEN
+            sql << args[0].to_s << '('
             literal_append(sql, args[1])
-            sql << PAREN_CLOSE
+            sql << ')'
           else
             super
           end
@@ -270,12 +285,12 @@ module Sequel
         private
 
         def empty_from_sql
-          DEFAULT_FROM
+          " FROM sysibm.sysdummy1"
         end
 
         # Derby needs a hex string casted to BLOB for blobs.
         def literal_blob_append(sql, v)
-          sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE
+          sql << "CAST(X'" << v.unpack("H*").first << "' AS BLOB)"
         end
 
         # Derby needs the standard workaround to insert all default values into
@@ -288,24 +303,24 @@ module Sequel
         # Newer versions can use the FALSE literal, but the latest gem version cannot.
         def literal_false
           if db.svn_version >= 1040133
-            BOOL_FALSE
+            'FALSE'
           else
-            BOOL_FALSE_OLD
+            '(1 = 0)'
           end
         end
 
         # Derby handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
-          v.strftime(TIME_FORMAT)
+          v.strftime("'%H:%M:%S'")
         end
 
         # Derby uses an expression yielding true for true values.
         # Newer versions can use the TRUE literal, but the latest gem version cannot.
         def literal_true
           if db.svn_version >= 1040133
-            BOOL_TRUE
+            'TRUE'
           else
-            BOOL_TRUE_OLD
+            '(1 = 1)'
           end
         end
 
@@ -326,14 +341,14 @@ module Sequel
         # Offset comes before limit in Derby
         def select_limit_sql(sql)
           if o = @opts[:offset]
-            sql << OFFSET
+            sql << " OFFSET "
             literal_append(sql, o)
-            sql << ROWS
+            sql << " ROWS"
           end
           if l = @opts[:limit]
-            sql << FETCH_FIRST
+            sql << " FETCH FIRST "
             literal_append(sql, l)
-            sql << ROWS_ONLY
+            sql << " ROWS ONLY"
           end
         end
       end

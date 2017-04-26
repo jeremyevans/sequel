@@ -168,11 +168,16 @@ module Sequel
       
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        APOS = Dataset::APOS
-        HSTAR = "H*".freeze
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
+
+        APOS = "'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :APOS)
+        HSTAR = "H*".freeze
+        Sequel::Deprecation.deprecate_constant(self, :HSTAR)
         TIME_FORMAT = "'%H:%M:%S'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :TIME_FORMAT)
         ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
+        Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
 
         # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql_append(sql, op, args)
@@ -215,12 +220,12 @@ module Sequel
 
         # H2 expects hexadecimal strings for blob values
         def literal_blob_append(sql, v)
-          sql << APOS << v.unpack(HSTAR).first << APOS
+          sql << "'" << v.unpack("H*").first << "'"
         end
         
         # H2 handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
-          v.strftime(TIME_FORMAT)
+          v.strftime("'%H:%M:%S'")
         end
 
         # H2 supports multiple rows in INSERT.
@@ -229,7 +234,7 @@ module Sequel
         end
 
         def select_only_offset_sql(sql)
-          sql << ONLY_OFFSET
+          sql << " LIMIT -1 OFFSET "
           literal_append(sql, @opts[:offset])
         end
 

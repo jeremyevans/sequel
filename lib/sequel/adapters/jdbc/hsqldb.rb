@@ -147,13 +147,21 @@ module Sequel
       # Dataset class for HSQLDB datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         BOOL_TRUE = 'TRUE'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
         BOOL_FALSE = 'FALSE'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
         SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-        APOS = Dataset::APOS
+        Sequel::Deprecation.deprecate_constant(self, :SQL_WITH_RECURSIVE)
+        APOS = "'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :APOS)
         HSTAR = "H*".freeze
+        Sequel::Deprecation.deprecate_constant(self, :HSTAR)
         BLOB_OPEN = "X'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :BLOB_OPEN)
         DEFAULT_FROM = " FROM (VALUES (0))".freeze
+        Sequel::Deprecation.deprecate_constant(self, :DEFAULT_FROM)
         TIME_FORMAT = "'%H:%M:%S'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :TIME_FORMAT)
 
         # Handle HSQLDB specific case insensitive LIKE and bitwise operator support.
         def complex_expression_sql_append(sql, op, args)
@@ -199,27 +207,27 @@ module Sequel
         private
 
         def empty_from_sql
-          DEFAULT_FROM
+          " FROM (VALUES (0))"
         end
         
         # Use string in hex format for blob data.
         def literal_blob_append(sql, v)
-          sql << BLOB_OPEN << v.unpack(HSTAR).first << APOS
+          sql << "X'" << v.unpack("H*").first << "'"
         end
 
         # HSQLDB uses FALSE for false values.
         def literal_false
-          BOOL_FALSE
+          'FALSE'
         end
 
         # HSQLDB handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
-          v.strftime(TIME_FORMAT)
+          v.strftime("'%H:%M:%S'")
         end
 
         # HSQLDB uses TRUE for true values.
         def literal_true
-          BOOL_TRUE
+          'TRUE'
         end
 
         # HSQLDB supports multiple rows in INSERT.
@@ -229,7 +237,7 @@ module Sequel
 
         # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
         def select_with_sql_base
-          opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super
+          opts[:with].any?{|w| w[:recursive]} ? "WITH RECURSIVE " : super
         end
       end
     end

@@ -31,7 +31,9 @@ module Sequel
     
     module DatasetMethods
       FIRST = " FIRST ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :FIRST)
       SKIP = " SKIP ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SKIP)
 
       Dataset.def_sql_method(self, :select, %w'select limit distinct columns from join where having group compounds order')
 
@@ -48,11 +50,11 @@ module Sequel
 
       def select_limit_sql(sql)
         if o = @opts[:offset]
-          sql << SKIP
+          sql << " SKIP "
           literal_append(sql, o)
         end
         if l = @opts[:limit]
-          sql << FIRST
+          sql << " FIRST "
           literal_append(sql, l)
         end
       end

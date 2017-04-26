@@ -549,45 +549,65 @@ module Sequel
       include Dataset::Replace
       include UnmodifiedIdentifiers::DatasetMethods
 
-      CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
-      EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}
-      NOT_SPACE = Dataset::NOT_SPACE
-      COMMA = Dataset::COMMA
-      PAREN_CLOSE = Dataset::PAREN_CLOSE
-      AS = Dataset::AS
-      APOS = Dataset::APOS
+      CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}#.freeze # SEQUEL5
+      EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}#.freeze # SEQUEL5
+      #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
+
+      NOT_SPACE = 'NOT '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NOT_SPACE)
+      COMMA = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
+      PAREN_CLOSE = ')'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+      AS = ' AS '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AS)
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
       EXTRACT_OPEN = "CAST(strftime(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXTRACT_OPEN)
       EXTRACT_CLOSE = ') AS '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXTRACT_CLOSE)
       NUMERIC = 'NUMERIC'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NUMERIC)
       INTEGER = 'INTEGER'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :INTEGER)
       BACKTICK = '`'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKTICK)
       BACKTICK_RE = /`/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKTICK_RE)
       DOUBLE_BACKTICK = '``'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_BACKTICK)
       BLOB_START = "X'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BLOB_START)
       HSTAR = "H*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
       DATE_OPEN = "date(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATE_OPEN)
       DATETIME_OPEN = "datetime(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATETIME_OPEN)
       ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
       OR = " OR ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :OR)
       SELECT_VALUES = "VALUES ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SELECT_VALUES)
+      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
+      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
-      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
-      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
-
       def cast_sql_append(sql, expr, type)
         if type == Time or type == DateTime
-          sql << DATETIME_OPEN
+          sql << "datetime("
           literal_append(sql, expr)
-          sql << PAREN_CLOSE
+          sql << ')'
         elsif type == Date
-          sql << DATE_OPEN
+          sql << "date("
           literal_append(sql, expr)
-          sql << PAREN_CLOSE
+          sql << ')'
         else
           super
         end
@@ -598,7 +618,7 @@ module Sequel
       def complex_expression_sql_append(sql, op, args)
         case op
         when :"NOT LIKE", :"NOT ILIKE"
-          sql << NOT_SPACE
+          sql << 'NOT '
           complex_expression_sql_append(sql, (op == :"NOT ILIKE" ? :ILIKE : :LIKE), args)
         when :^
           complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.lit(["((~(", " & ", ")) & (", " | ", "))"], a, b, a, b)}
@@ -622,7 +642,7 @@ module Sequel
               sql << " * "
             end
             literal_append(sql, arg)
-            sql << PAREN_CLOSE
+            sql << ')'
             if invert
               sql << "))"
             end
@@ -630,9 +650,9 @@ module Sequel
         when :extract
           part = args[0]
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
-          sql << EXTRACT_OPEN << format << COMMA
+          sql << "CAST(strftime(" << format << ', '
           literal_append(sql, args[1])
-          sql << EXTRACT_CLOSE << (part == :second ? NUMERIC : INTEGER) << PAREN_CLOSE
+          sql << ') AS ' << (part == :second ? 'NUMERIC' : 'INTEGER') << ')'
         else
           super
         end
@@ -675,7 +695,7 @@ module Sequel
       
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
-        sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
+        sql << '`' << c.to_s.gsub('`', '``') << '`'
       end
       
       # When a qualified column is selected on SQLite and the qualifier
@@ -758,7 +778,7 @@ module Sequel
       def as_sql_append(sql, aliaz, column_aliases=nil)
         raise Error, "sqlite does not support derived column lists" if column_aliases
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
-        sql << AS
+        sql << ' AS '
         literal_append(sql, aliaz.to_s)
       end
 
@@ -786,19 +806,19 @@ module Sequel
 
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
-        columns.map{|i| quote_identifier(i)}.join(COMMA)
+        columns.map{|i| quote_identifier(i)}.join(', ')
       end
     
       # Add OR clauses to SQLite INSERT statements
       def insert_conflict_sql(sql)
         if resolution = @opts[:insert_conflict]
-          sql << OR << resolution.to_s.upcase
+          sql << " OR " << resolution.to_s.upcase
         end
       end
 
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
-        sql << BLOB_START << v.unpack(HSTAR).first << APOS
+        sql <<  "X'" << v.unpack("H*").first << "'"
       end
 
       # Respect the database integer_booleans setting, using 0 or 'f'.
@@ -834,13 +854,13 @@ module Sequel
       end
 
       def select_only_offset_sql(sql)
-        sql << ONLY_OFFSET
+        sql << " LIMIT -1 OFFSET "
         literal_append(sql, @opts[:offset])
       end
   
       # Support VALUES clause instead of the SELECT clause to return rows.
       def select_values_sql(sql)
-        sql << SELECT_VALUES
+        sql << "VALUES "
         expression_list_append(sql, opts[:values])
       end
 

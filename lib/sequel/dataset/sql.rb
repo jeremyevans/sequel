@@ -124,13 +124,13 @@ module Sequel
       when :union
         c = false
         sql = LiteralString.new
-        u = UNION_ALL_SELECT
+        u = ' UNION ALL SELECT '
         f = empty_from_sql
         values.each do |v|
           if c
             sql << u
           else
-            sql << SELECT << SPACE
+            sql << 'SELECT '
             c = true
           end
           expression_list_append(sql, v)
@@ -241,117 +241,211 @@ module Sequel
     def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order limit lock')
     def_sql_method(self, :update, %w'update table set where')
 
-    # Map of emulated function names to native function names.
+    WILDCARD = LiteralString.new('*').freeze
+    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, WILDCARD).as(:count)
+    DEFAULT = LiteralString.new('DEFAULT').freeze
+
+    EXISTS = ['EXISTS '.freeze].freeze
+    BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}#.freeze # SEQUEL5
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :offset, :compounds]#.freeze # SEQUEL5
+    IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
+    QUALIFY_KEYS = [:select, :where, :having, :order, :group]#.freeze # SEQUEL5
+
+    IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
+    LIKE_OPERATORS = ::Sequel::SQL::ComplexExpression::LIKE_OPERATORS
+    N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
+    TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
+    REGEXP_OPERATORS = ::Sequel::SQL::ComplexExpression::REGEXP_OPERATORS
+
     EMULATED_FUNCTION_MAP = {}
     Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
-    WILDCARD = LiteralString.new('*').freeze
     ALL = ' ALL'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :ALL)
     AND_SEPARATOR = " AND ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :AND_SEPARATOR)
     APOS = "'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :APOS)
     APOS_RE = /'/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
     ARRAY_EMPTY = '(NULL)'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :ARRAY_EMPTY)
     AS = ' AS '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :AS)
     ASC = ' ASC'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :ASC)
     BACKSLASH = "\\".freeze
+    Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
     BITCOMP_CLOSE = ") - 1)".freeze
+    Sequel::Deprecation.deprecate_constant(self, :BITCOMP_CLOSE)
     BITCOMP_OPEN = "((0 - ".freeze
-    BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
+    Sequel::Deprecation.deprecate_constant(self, :BITCOMP_OPEN)
     BOOL_FALSE = "'f'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
     BOOL_TRUE = "'t'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
     BRACKET_CLOSE =  ']'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :BRACKET_CLOSE)
     BRACKET_OPEN = '['.freeze
+    Sequel::Deprecation.deprecate_constant(self, :BRACKET_OPEN)
     CASE_ELSE = " ELSE ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :CASE_ELSE)
     CASE_END = " END)".freeze
+    Sequel::Deprecation.deprecate_constant(self, :CASE_END)
     CASE_OPEN = '(CASE'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CASE_OPEN)
     CASE_THEN = " THEN ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :CASE_THEN)
     CASE_WHEN = " WHEN ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :CASE_WHEN)
     CAST_OPEN = 'CAST('.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CAST_OPEN)
     COLON = ':'.freeze
-    COLUMN_REF_RE1 = Sequel::COLUMN_REF_RE1
-    COLUMN_REF_RE2 = Sequel::COLUMN_REF_RE2
-    COLUMN_REF_RE3 = Sequel::COLUMN_REF_RE3
+    Sequel::Deprecation.deprecate_constant(self, :COLON)
+    COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE1)
+    COLUMN_REF_RE2 = /\A((?:(?!___).)+)___(.+)\z/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE2)
+    COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE3)
     COMMA = ', '.freeze
-    COMMA_SEPARATOR = COMMA
+    Sequel::Deprecation.deprecate_constant(self, :COMMA)
+    COMMA_SEPARATOR = ', '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
     CONDITION_FALSE = '(1 = 0)'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CONDITION_FALSE)
     CONDITION_TRUE = '(1 = 1)'.freeze
-    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :offset, :compounds]
-    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, WILDCARD).as(:count)
+    Sequel::Deprecation.deprecate_constant(self, :CONDITION_TRUE)
     DATASET_ALIAS_BASE_NAME = 't'.freeze
-    DEFAULT = LiteralString.new('DEFAULT').freeze
-    DEFAULT_VALUES = " DEFAULT VALUES".freeze
-    DELETE = 'DELETE'.freeze
-    DESC = ' DESC'.freeze
-    DISTINCT = " DISTINCT".freeze
-    DOT = '.'.freeze
-    DOUBLE_APOS = "''".freeze
-    DOUBLE_QUOTE = '""'.freeze
-    EQUAL = ' = '.freeze
-    EMPTY_PARENS = '()'.freeze
-    ESCAPE = " ESCAPE ".freeze
-    EXTRACT = 'extract('.freeze
-    EXISTS = ['EXISTS '.freeze].freeze
-    FILTER = " FILTER (WHERE ".freeze
-    FOR_UPDATE = ' FOR UPDATE'.freeze
-    FORMAT_DATE = "'%Y-%m-%d'".freeze
-    FORMAT_DATE_STANDARD = "DATE '%Y-%m-%d'".freeze
-    FORMAT_OFFSET = "%+03i%02i".freeze
-    FORMAT_TIMESTAMP_RE = /%[Nz]/.freeze
-    FORMAT_USEC = '%N'.freeze
-    FRAME_ALL = "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING".freeze
-    FRAME_ROWS = "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW".freeze
-    FROM = ' FROM '.freeze
-    FUNCTION_DISTINCT = "DISTINCT ".freeze
-    GROUP_BY = " GROUP BY ".freeze
-    HAVING = " HAVING ".freeze
-    INSERT = "INSERT".freeze
-    INTO = " INTO ".freeze
-    IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
-    IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
-    LATERAL = 'LATERAL '.freeze
-    LIKE_OPERATORS = ::Sequel::SQL::ComplexExpression::LIKE_OPERATORS
-    LIMIT = " LIMIT ".freeze
-    N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
-    NOT_SPACE = 'NOT '.freeze
-    NULL = "NULL".freeze
-    NULLS_FIRST = " NULLS FIRST".freeze
-    NULLS_LAST = " NULLS LAST".freeze
-    OFFSET = " OFFSET ".freeze
-    ON = ' ON '.freeze
-    ON_PAREN = " ON (".freeze
-    ORDER_BY = " ORDER BY ".freeze
-    ORDER_BY_NS = "ORDER BY ".freeze
-    OVER = ' OVER '.freeze
-    PAREN_CLOSE = ')'.freeze
-    PAREN_OPEN = '('.freeze
-    PAREN_SPACE_OPEN = ' ('.freeze
-    PARTITION_BY = "PARTITION BY ".freeze
-    QUALIFY_KEYS = [:select, :where, :having, :order, :group]
-    QUESTION_MARK = '?'.freeze
-    QUESTION_MARK_RE = /\?/.freeze
-    QUOTE = '"'.freeze
-    QUOTE_RE = /"/.freeze
-    RETURNING = " RETURNING ".freeze
-    SELECT = 'SELECT'.freeze
-    SET = ' SET '.freeze
-    SPACE = ' '.freeze
-    SQL_WITH = "WITH ".freeze
-    SPACE_WITH = " WITH ".freeze
-    TILDE = '~'.freeze
-    TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
-    STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
-    TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
-    REGEXP_OPERATORS = ::Sequel::SQL::ComplexExpression::REGEXP_OPERATORS
-    UNDERSCORE = '_'.freeze
-    UPDATE = 'UPDATE'.freeze
-    USING = ' USING ('.freeze
-    UNION_ALL_SELECT = ' UNION ALL SELECT '.freeze
-    VALUES = " VALUES ".freeze
-    WHERE = " WHERE ".freeze
-    WITH_ORDINALITY = " WITH ORDINALITY".freeze
-    WITHIN_GROUP = " WITHIN GROUP (ORDER BY ".freeze
-
+    Sequel::Deprecation.deprecate_constant(self, :DATASET_ALIAS_BASE_NAME)
     DATETIME_SECFRACTION_ARG = RUBY_VERSION >= '1.9.0' ? 1000000 : 86400000000
+    Sequel::Deprecation.deprecate_constant(self, :DATETIME_SECFRACTION_ARG)
+    DEFAULT_VALUES = " DEFAULT VALUES".freeze
+    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_VALUES)
+    DELETE = 'DELETE'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DELETE)
+    DESC = ' DESC'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DESC)
+    DISTINCT = " DISTINCT".freeze
+    Sequel::Deprecation.deprecate_constant(self, :DISTINCT)
+    DOT = '.'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DOT)
+    DOUBLE_APOS = "''".freeze
+    Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
+    DOUBLE_QUOTE = '""'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DOUBLE_QUOTE)
+    EQUAL = ' = '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :EQUAL)
+    EMPTY_PARENS = '()'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :EMPTY_PARENS)
+    ESCAPE = " ESCAPE ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :ESCAPE)
+    EXTRACT = 'extract('.freeze
+    Sequel::Deprecation.deprecate_constant(self, :EXTRACT)
+    FILTER = " FILTER (WHERE ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FILTER)
+    FOR_UPDATE = ' FOR UPDATE'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :FOR_UPDATE)
+    FORMAT_DATE = "'%Y-%m-%d'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FORMAT_DATE)
+    FORMAT_DATE_STANDARD = "DATE '%Y-%m-%d'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FORMAT_DATE_STANDARD)
+    FORMAT_OFFSET = "%+03i%02i".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FORMAT_OFFSET)
+    FORMAT_TIMESTAMP_RE = /%[Nz]/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :FORMAT_TIMESTAMP_RE)
+    FORMAT_USEC = '%N'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :FORMAT_USEC)
+    FRAME_ALL = "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FRAME_ALL)
+    FRAME_ROWS = "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FRAME_ROWS)
+    FROM = ' FROM '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :FROM)
+    FUNCTION_DISTINCT = "DISTINCT ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :FUNCTION_DISTINCT)
+    GROUP_BY = " GROUP BY ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :GROUP_BY)
+    HAVING = " HAVING ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :HAVING)
+    INSERT = "INSERT".freeze
+    Sequel::Deprecation.deprecate_constant(self, :INSERT)
+    INTO = " INTO ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :INTO)
+    LATERAL = 'LATERAL '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :LATERAL)
+    LIMIT = " LIMIT ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :LIMIT)
+    NOT_SPACE = 'NOT '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :NOT_SPACE)
+    NULL = "NULL".freeze
+    Sequel::Deprecation.deprecate_constant(self, :NULL)
+    NULLS_FIRST = " NULLS FIRST".freeze
+    Sequel::Deprecation.deprecate_constant(self, :NULLS_FIRST)
+    NULLS_LAST = " NULLS LAST".freeze
+    Sequel::Deprecation.deprecate_constant(self, :NULLS_LAST)
+    OFFSET = " OFFSET ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :OFFSET)
+    ON = ' ON '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :ON)
+    ON_PAREN = " ON (".freeze
+    Sequel::Deprecation.deprecate_constant(self, :ON_PAREN)
+    ORDER_BY = " ORDER BY ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :ORDER_BY)
+    ORDER_BY_NS = "ORDER BY ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :ORDER_BY_NS)
+    OVER = ' OVER '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :OVER)
+    PAREN_CLOSE = ')'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+    PAREN_OPEN = '('.freeze
+    Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
+    PAREN_SPACE_OPEN = ' ('.freeze
+    Sequel::Deprecation.deprecate_constant(self, :PAREN_SPACE_OPEN)
+    PARTITION_BY = "PARTITION BY ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :PARTITION_BY)
+    QUESTION_MARK = '?'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :QUESTION_MARK)
+    QUESTION_MARK_RE = /\?/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :QUESTION_MARK_RE)
+    QUOTE = '"'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :QUOTE)
+    QUOTE_RE = /"/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :QUOTE_RE)
+    RETURNING = " RETURNING ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :RETURNING)
+    SELECT = 'SELECT'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SELECT)
+    SET = ' SET '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SET)
+    SPACE = ' '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SPACE)
+    SQL_WITH = "WITH ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :SQL_WITH)
+    SPACE_WITH = " WITH ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :SPACE_WITH)
+    TILDE = '~'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TILDE)
+    TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
+    STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N%z'".freeze
+    Sequel::Deprecation.deprecate_constant(self, :STANDARD_TIMESTAMP_FORMAT)
+    UNDERSCORE = '_'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE)
+    UPDATE = 'UPDATE'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UPDATE)
+    USING = ' USING ('.freeze
+    Sequel::Deprecation.deprecate_constant(self, :USING)
+    UNION_ALL_SELECT = ' UNION ALL SELECT '.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNION_ALL_SELECT)
+    VALUES = " VALUES ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :VALUES)
+    WHERE = " WHERE ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :WHERE)
+    WITH_ORDINALITY = " WITH ORDINALITY".freeze
+    Sequel::Deprecation.deprecate_constant(self, :WITH_ORDINALITY)
+    WITHIN_GROUP = " WITHIN GROUP (ORDER BY ".freeze
+    Sequel::Deprecation.deprecate_constant(self, :WITHIN_GROUP)
 
     [:literal, :quote_identifier, :quote_schema_table].each do |meth|
       class_eval(<<-END, __FILE__, __LINE__ + 1)
@@ -372,18 +466,18 @@ module Sequel
     # Append literalization of array to SQL string.
     def array_sql_append(sql, a)
       if a.empty?
-        sql << ARRAY_EMPTY
+        sql << '(NULL)'
       else
-        sql << PAREN_OPEN
+        sql << '('
         expression_list_append(sql, a)
-        sql << PAREN_CLOSE
+        sql << ')'
       end
     end
 
     # Append literalization of boolean constant to SQL string.
     def boolean_constant_sql_append(sql, constant)
       if (constant == true || constant == false) && !supports_where_true?
-        sql << (constant == true ? CONDITION_TRUE : CONDITION_FALSE)
+        sql << (constant == true ? '(1 = 1)' : '(1 = 0)')
       else
         literal_append(sql, constant)
       end
@@ -391,30 +485,30 @@ module Sequel
 
     # Append literalization of case expression to SQL string.
     def case_expression_sql_append(sql, ce)
-      sql << CASE_OPEN
+      sql << '(CASE'
       if ce.expression?
-        sql << SPACE
+        sql << ' '
         literal_append(sql, ce.expression)
       end
-      w = CASE_WHEN
-      t = CASE_THEN
+      w = " WHEN "
+      t = " THEN "
       ce.conditions.each do |c,r|
         sql << w
         literal_append(sql, c)
         sql << t
         literal_append(sql, r)
       end
-      sql << CASE_ELSE
+      sql << " ELSE "
       literal_append(sql, ce.default)
-      sql << CASE_END
+      sql << " END)"
     end
 
     # Append literalization of cast expression to SQL string.
     def cast_sql_append(sql, expr, type)
-      sql << CAST_OPEN
+      sql << 'CAST('
       literal_append(sql, expr)
-      sql << AS << db.cast_type_literal(type).to_s
-      sql << PAREN_CLOSE
+      sql << ' AS ' << db.cast_type_literal(type).to_s
+      sql << ')'
     end
 
     # Append literalization of column all selection to SQL string.
@@ -429,10 +523,10 @@ module Sequel
         r = args[1]
         if r.nil? || supports_is_true?
           raise(InvalidOperation, 'Invalid argument used for IS operator') unless val = IS_LITERALS[r]
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
-          sql << SPACE << op.to_s << SPACE
-          sql << val << PAREN_CLOSE
+          sql << ' ' << op.to_s << ' '
+          sql << val << ')'
         elsif op == :IS
           complex_expression_sql_append(sql, :"=", args)
         else
@@ -464,31 +558,31 @@ module Sequel
             # If the columns and values are both arrays, use array_sql instead of
             # literal so that if values is an array of two element arrays, it
             # will be treated as a value list instead of a condition specifier.
-            sql << PAREN_OPEN
+            sql << '('
             literal_append(sql, cols)
-            sql << SPACE << op.to_s << SPACE
+            sql << ' ' << op.to_s << ' '
             if val_array
               array_sql_append(sql, vals)
             else
               literal_append(sql, vals)
             end
-            sql << PAREN_CLOSE
+            sql << ')'
           end
         else
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, cols)
-          sql << SPACE << op.to_s << SPACE
+          sql << ' ' << op.to_s << ' '
           literal_append(sql, vals)
-          sql << PAREN_CLOSE
+          sql << ')'
         end
       when :LIKE, :'NOT LIKE'
-        sql << PAREN_OPEN
+        sql << '('
         literal_append(sql, args[0])
-        sql << SPACE << op.to_s << SPACE
+        sql << ' ' << op.to_s << ' '
         literal_append(sql, args[1])
-        sql << ESCAPE
-        literal_append(sql, BACKSLASH)
-        sql << PAREN_CLOSE
+        sql << " ESCAPE "
+        literal_append(sql, "\\")
+        sql << ')'
       when :ILIKE, :'NOT ILIKE'
         complex_expression_sql_append(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|v| Sequel.function(:UPPER, v)})
       when :**
@@ -497,13 +591,13 @@ module Sequel
         if REGEXP_OPERATORS.include?(op) && !supports_regexp?
           raise InvalidOperation, "Pattern matching via regular expressions is not supported on #{db.database_type}"
         end
-        sql << PAREN_OPEN
+        sql << '('
         literal_append(sql, args[0])
-        sql << SPACE << op.to_s << SPACE
+        sql << ' ' << op.to_s << ' '
         literal_append(sql, args[1])
-        sql << PAREN_CLOSE
+        sql << ')'
       when *N_ARITY_OPERATORS
-        sql << PAREN_OPEN
+        sql << '('
         c = false
         op_str = " #{op} "
         args.each do |a|
@@ -511,19 +605,19 @@ module Sequel
           literal_append(sql, a)
           c ||= true
         end
-        sql << PAREN_CLOSE
+        sql << ')'
       when :NOT
-        sql << NOT_SPACE
+        sql << 'NOT '
         literal_append(sql, args[0])
       when :NOOP
         literal_append(sql, args[0])
       when :'B~'
-        sql << TILDE
+        sql << '~'
         literal_append(sql, args[0])
       when :extract
-        sql << EXTRACT << args[0].to_s << FROM
+        sql << 'extract(' << args[0].to_s << ' FROM '
         literal_append(sql, args[1])
-        sql << PAREN_CLOSE
+        sql << ')'
       else
         raise(InvalidOperation, "invalid operator #{op}")
       end
@@ -563,7 +657,7 @@ module Sequel
         name = native_function_name(name) 
       end
 
-      sql << LATERAL if opts[:lateral]
+      sql << 'LATERAL ' if opts[:lateral]
 
       case name
       when SQL::Identifier
@@ -576,7 +670,7 @@ module Sequel
         if supports_quoted_function_names? && opts[:quoted] != false
           literal_append(sql, name)
         else
-          sql << split_qualifiers(name).join(DOT)
+          sql << split_qualifiers(name).join('.')
         end
       else
         if supports_quoted_function_names? && opts[:quoted]
@@ -586,38 +680,38 @@ module Sequel
         end
       end
 
-      sql << PAREN_OPEN
+      sql << '('
       if opts[:*]
-        sql << WILDCARD
+        sql << '*'
       else
-        sql << FUNCTION_DISTINCT if opts[:distinct]
+        sql << "DISTINCT " if opts[:distinct]
         expression_list_append(sql, f.args)
         if order = opts[:order]
-          sql << ORDER_BY
+          sql << " ORDER BY "
           expression_list_append(sql, order)
         end
       end
-      sql << PAREN_CLOSE
+      sql << ')'
 
       if group = opts[:within_group]
-        sql << WITHIN_GROUP
+        sql << " WITHIN GROUP (ORDER BY "
         expression_list_append(sql, group)
-        sql << PAREN_CLOSE
+        sql << ')'
       end
 
       if filter = opts[:filter]
-        sql << FILTER
+        sql << " FILTER (WHERE "
         literal_append(sql, filter_expr(filter, &opts[:filter_block]))
-        sql << PAREN_CLOSE
+        sql << ')'
       end
 
       if window = opts[:over]
-        sql << OVER
+        sql << ' OVER '
         window_sql_append(sql, window.opts)
       end
 
       if opts[:with_ordinality]
-        sql << WITH_ORDINALITY
+        sql << " WITH ORDINALITY"
       end
     end
 
@@ -626,7 +720,7 @@ module Sequel
       table = jc.table
       table_alias = jc.table_alias
       table_alias = nil if table == table_alias && !jc.column_aliases
-      sql << SPACE << join_type_sql(jc.join_type) << SPACE
+      sql << ' ' << join_type_sql(jc.join_type) << ' '
       identifier_append(sql, table)
       as_sql_append(sql, table_alias, jc.column_aliases) if table_alias
     end
@@ -634,33 +728,33 @@ module Sequel
     # Append literalization of JOIN ON clause to SQL string.
     def join_on_clause_sql_append(sql, jc)
       join_clause_sql_append(sql, jc)
-      sql << ON
+      sql << ' ON '
       literal_append(sql, filter_expr(jc.on))
     end
 
     # Append literalization of JOIN USING clause to SQL string.
     def join_using_clause_sql_append(sql, jc)
       join_clause_sql_append(sql, jc)
-      sql << USING
+      sql << ' USING ('
       column_list_append(sql, jc.using)
-      sql << PAREN_CLOSE
+      sql << ')'
     end
     
     # Append literalization of negative boolean constant to SQL string.
     def negative_boolean_constant_sql_append(sql, constant)
-      sql << NOT_SPACE
+      sql << 'NOT '
       boolean_constant_sql_append(sql, constant)
     end
 
     # Append literalization of ordered expression to SQL string.
     def ordered_expression_sql_append(sql, oe)
       literal_append(sql, oe.expression)
-      sql << (oe.descending ? DESC : ASC)
+      sql << (oe.descending ? ' DESC' : ' ASC')
       case oe.nulls
       when :first
-        sql << NULLS_FIRST
+        sql << " NULLS FIRST"
       when :last
-        sql << NULLS_LAST
+        sql << " NULLS LAST"
       end
     end
 
@@ -668,7 +762,7 @@ module Sequel
     def placeholder_literal_string_sql_append(sql, pls)
       args = pls.args
       str = pls.str
-      sql << PAREN_OPEN if pls.parens
+      sql << '(' if pls.parens
       if args.is_a?(Hash)
         if args.empty?
           sql << str
@@ -694,7 +788,7 @@ module Sequel
         i = -1
         match_len = args.length - 1
         loop do
-          previous, q, str = str.partition(QUESTION_MARK)
+          previous, q, str = str.partition('?')
           sql << previous
           literal_append(sql, args.at(i+=1)) unless q.empty?
           if str.empty?
@@ -705,7 +799,7 @@ module Sequel
           end
         end
       end
-      sql << PAREN_CLOSE if pls.parens
+      sql << ')' if pls.parens
     end
 
     # Append literalization of qualified identifier to SQL string.
@@ -713,7 +807,7 @@ module Sequel
     # column/qualified.  If 2 arguments are given, the 2nd should be an SQL::QualifiedIdentifier.
     def qualified_identifier_sql_append(sql, table, column=(c = table.column; table = table.table; c))
       identifier_append(sql, table)
-      sql << DOT
+      sql << '.'
       identifier_append(sql, column)
     end
 
@@ -740,7 +834,7 @@ module Sequel
       schema, table = schema_and_table(table)
       if schema
         quote_identifier_append(sql, schema)
-        sql << DOT
+        sql << '.'
       end
       quote_identifier_append(sql, table)
     end
@@ -750,7 +844,7 @@ module Sequel
     # should be overridden by subclasses to provide quoting not matching the
     # SQL standard, such as backtick (used by MySQL and SQLite).
     def quoted_identifier_append(sql, name)
-      sql << QUOTE << name.to_s.gsub(QUOTE_RE, DOUBLE_QUOTE) << QUOTE
+      sql << '"' << name.to_s.gsub('"', '""') << '"'
     end
 
     # Split the schema information from the table, returning two strings,
@@ -796,39 +890,39 @@ module Sequel
     # Append literalization of subscripts (SQL array accesses) to SQL string.
     def subscript_sql_append(sql, s)
       literal_append(sql, s.f)
-      sql << BRACKET_OPEN
+      sql << '['
       if s.sub.length == 1 && (range = s.sub.first).is_a?(Range)
         literal_append(sql, range.begin)
-        sql << COLON
+        sql << ':'
         e = range.end
         e -= 1 if range.exclude_end? && e.is_a?(Integer)
         literal_append(sql, e)
       else
         expression_list_append(sql, s.sub)
       end
-      sql << BRACKET_CLOSE
+      sql << ']'
     end
 
     # Append literalization of windows (for window functions) to SQL string.
     def window_sql_append(sql, opts)
       raise(Error, 'This dataset does not support window functions') unless supports_window_functions?
-      sql << PAREN_OPEN
+      sql << '('
       window, part, order, frame = opts.values_at(:window, :partition, :order, :frame)
       space = false
-      space_s = SPACE
+      space_s = ' '
       if window
         literal_append(sql, window)
         space = true
       end
       if part
         sql << space_s if space
-        sql << PARTITION_BY
+        sql << "PARTITION BY "
         expression_list_append(sql, Array(part))
         space = true
       end
       if order
         sql << space_s if space
-        sql << ORDER_BY_NS
+        sql << "ORDER BY "
         expression_list_append(sql, Array(order))
         space = true
       end
@@ -837,17 +931,17 @@ module Sequel
           # nothing
         when :all
           sql << space_s if space
-          sql << FRAME_ALL
+          sql << "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
         when :rows
           sql << space_s if space
-          sql << FRAME_ROWS
+          sql << "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"
         when String
           sql << space_s if space
           sql << frame
         else
           raise Error, "invalid window frame clause, should be :all, :rows, a string, or nil"
       end
-      sql << PAREN_CLOSE
+      sql << ')'
     end
 
     protected
@@ -911,13 +1005,13 @@ module Sequel
 
     # Append aliasing expression to SQL string.
     def as_sql_append(sql, aliaz, column_aliases=nil)
-      sql << AS
+      sql << ' AS '
       quote_identifier_append(sql, aliaz)
       if column_aliases
         raise Error, "#{db.database_type} does not support derived column lists" unless supports_derived_column_lists?
-        sql << PAREN_OPEN
+        sql << '('
         identifier_list_append(sql, column_aliases)
-        sql << PAREN_CLOSE
+        sql << ')'
       end
     end
     
@@ -952,7 +1046,7 @@ module Sequel
     # column names. If the array is empty, a wildcard (*) is returned.
     def column_list_append(sql, columns)
       if (columns.nil? || columns.empty?)
-        sql << WILDCARD
+        sql << '*'
       else
         expression_list_append(sql, columns)
       end
@@ -995,9 +1089,9 @@ module Sequel
         f = BITWISE_METHOD_MAP[op]
         complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(f, a, b)}
       when :'B~'
-        sql << BITCOMP_OPEN
+        sql << "((0 - "
         literal_append(sql, args[0])
-        sql << BITCOMP_CLOSE
+        sql << ") - 1)"
       end
     end
 
@@ -1008,21 +1102,21 @@ module Sequel
 
     # The alias to use for datasets, takes a number to make sure the name is unique.
     def dataset_alias(number)
-      :"#{DATASET_ALIAS_BASE_NAME}#{number}"
+      :"t#{number}"
     end
     
     # The strftime format to use when literalizing the time.
     def default_timestamp_format
-      requires_sql_standard_datetimes? ? STANDARD_TIMESTAMP_FORMAT : TIMESTAMP_FORMAT
+      requires_sql_standard_datetimes? ? "TIMESTAMP '%Y-%m-%d %H:%M:%S%N%z'" : "'%Y-%m-%d %H:%M:%S%N%z'"
     end
 
     def delete_delete_sql(sql)
-      sql << DELETE
+      sql << 'DELETE'
     end
 
     def delete_from_sql(sql)
       if f = @opts[:from]
-        sql << FROM
+        sql << ' FROM '
         source_list_append(sql, f)
       end
     end
@@ -1047,7 +1141,7 @@ module Sequel
     # Append literalization of array of expressions to SQL string.
     def expression_list_append(sql, columns)
       c = false
-      co = COMMA
+      co = ', '
       columns.each do |col|
         sql << co if c
         literal_append(sql, col)
@@ -1058,11 +1152,11 @@ module Sequel
     # Append literalization of array of grouping elements to SQL string.
     def grouping_element_list_append(sql, columns)
       c = false
-      co = COMMA
+      co = ', '
       columns.each do |col|
         sql << co if c
         if col.is_a?(Array) && col.empty?
-          sql << EMPTY_PARENS
+          sql << '()'
         else
           literal_append(sql, Array(col))
         end
@@ -1081,9 +1175,9 @@ module Sequel
     # of hours and minutes.
     def format_timestamp(v)
       v2 = db.from_application_timestamp(v)
-      fmt = default_timestamp_format.gsub(FORMAT_TIMESTAMP_RE) do |m|
-        if m == FORMAT_USEC
-          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(DATETIME_SECFRACTION_ARG) : v.usec) if supports_timestamp_usecs?
+      fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
+        if m == '%N'
+          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(RUBY_VERSION >= '1.9.0' ? 1000000 : 86400000000) : v.usec) if supports_timestamp_usecs?
         else
           if supports_timestamp_timezones?
             # Would like to just use %z format, but it doesn't appear to work on Windows
@@ -1098,7 +1192,7 @@ module Sequel
     
     # Return the SQL timestamp fragment to use for the timezone offset.
     def format_timestamp_offset(hour, minute)
-      sprintf(FORMAT_OFFSET, hour, minute)
+      sprintf("%+03i%02i", hour, minute)
     end
 
     # Return the SQL timestamp fragment to use for the fractional time part.
@@ -1130,7 +1224,7 @@ module Sequel
     # Append literalization of array of identifiers to SQL string.
     def identifier_list_append(sql, args)
       c = false
-      comma = COMMA
+      comma = ', '
       args.each do |a|
         sql << comma if c
         identifier_append(sql, a)
@@ -1144,7 +1238,7 @@ module Sequel
     end
 
     def insert_into_sql(sql)
-      sql << INTO
+      sql << " INTO "
       if (f = @opts[:from]) && f.length == 1
         identifier_append(sql, unaliased_identifier(f.first))
       else
@@ -1155,9 +1249,9 @@ module Sequel
     def insert_columns_sql(sql)
       columns = opts[:columns]
       if columns && !columns.empty?
-        sql << PAREN_SPACE_OPEN
+        sql << ' ('
         identifier_list_append(sql, columns)
-        sql << PAREN_CLOSE
+        sql << ')'
       end 
     end
 
@@ -1168,23 +1262,23 @@ module Sequel
     end
     
     def insert_insert_sql(sql)
-      sql << INSERT
+      sql << "INSERT"
     end
 
     def insert_values_sql(sql)
       case values = opts[:values]
       when Array
         if values.empty?
-          sql << DEFAULT_VALUES
+          sql << " DEFAULT VALUES"
         else
-          sql << VALUES
+          sql << " VALUES "
           literal_append(sql, values)
         end
       when Dataset
-        sql << SPACE
+        sql << ' '
         subselect_sql_append(sql, values)
       when LiteralString
-        sql << SPACE << values
+        sql << ' ' << values
       else
         raise Error, "Unsupported INSERT values type, should be an Array or Dataset: #{values.inspect}"
       end
@@ -1192,7 +1286,7 @@ module Sequel
 
     def insert_returning_sql(sql)
       if opts.has_key?(:returning)
-        sql << RETURNING
+        sql << " RETURNING "
         column_list_append(sql, Array(opts[:returning]))
       end
     end
@@ -1202,7 +1296,7 @@ module Sequel
     # SQL fragment specifying a JOIN type, converts underscores to
     # spaces and upcases.
     def join_type_sql(join_type)
-      "#{join_type.to_s.gsub(UNDERSCORE, SPACE).upcase} JOIN"
+      "#{join_type.to_s.gsub('_', ' ').upcase} JOIN"
     end
 
     # Append a literalization of the array to SQL string.
@@ -1228,18 +1322,18 @@ module Sequel
 
     # Append literalization of dataset to SQL string.  Does a subselect inside parantheses.
     def literal_dataset_append(sql, v)
-      sql << LATERAL if v.opts[:lateral]
-      sql << PAREN_OPEN
+      sql << 'LATERAL ' if v.opts[:lateral]
+      sql << '('
       subselect_sql_append(sql, v)
-      sql << PAREN_CLOSE
+      sql << ')'
     end
 
     # SQL fragment for Date, using the ISO8601 format.
     def literal_date(v)
       if requires_sql_standard_datetimes?
-        v.strftime(FORMAT_DATE_STANDARD)
+        v.strftime("DATE '%Y-%m-%d'")
       else
-        v.strftime(FORMAT_DATE)
+        v.strftime("'%Y-%m-%d'")
       end
     end
 
@@ -1260,7 +1354,7 @@ module Sequel
 
     # SQL fragment for false
     def literal_false
-      BOOL_FALSE
+      "'f'"
     end
 
     # SQL fragment for Float
@@ -1280,7 +1374,7 @@ module Sequel
 
     # SQL fragment for nil
     def literal_nil
-      NULL
+      "NULL"
     end
 
     # Append a literalization of the object to the given SQL string.
@@ -1313,7 +1407,7 @@ module Sequel
 
     # Append literalization of string to SQL string.
     def literal_string_append(sql, v)
-      sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
+      sql << "'" << v.gsub(/'/, "''") << "'"
     end
 
     # Append literalization of symbol to SQL string.
@@ -1321,7 +1415,7 @@ module Sequel
       c_table, column, c_alias = split_symbol(v)
       if c_table
         quote_identifier_append(sql, c_table)
-        sql << DOT
+        sql << '.'
       end
       quote_identifier_append(sql, column)
       as_sql_append(sql, c_alias) if c_alias
@@ -1339,7 +1433,7 @@ module Sequel
 
     # SQL fragment for true
     def literal_true
-      BOOL_TRUE
+      "'t'"
     end
 
     # What strategy to use for import/multi_insert.  While SQL-92 defaults
@@ -1383,17 +1477,17 @@ module Sequel
     end
 
     def select_columns_sql(sql)
-      sql << SPACE
+      sql << ' '
       column_list_append(sql, @opts[:select])
     end
 
     def select_distinct_sql(sql)
       if distinct = @opts[:distinct]
-        sql << DISTINCT
+        sql << " DISTINCT"
         unless distinct.empty?
-          sql << ON_PAREN
+          sql << " ON ("
           expression_list_append(sql, distinct)
-          sql << PAREN_CLOSE
+          sql << ')'
         end
       end
     end
@@ -1404,16 +1498,16 @@ module Sequel
     def select_compounds_sql(sql)
       return unless c = @opts[:compounds]
       c.each do |type, dataset, all|
-        sql << SPACE << type.to_s.upcase
-        sql << ALL if all
-        sql << SPACE
+        sql << ' ' << type.to_s.upcase
+        sql << ' ALL' if all
+        sql << ' '
         compound_dataset_sql_append(sql, dataset)
       end
     end
 
     def select_from_sql(sql)
       if f = @opts[:from]
-        sql << FROM
+        sql << ' FROM '
         source_list_append(sql, f)
       elsif f = empty_from_sql
         sql << f
@@ -1422,19 +1516,19 @@ module Sequel
 
     def select_group_sql(sql)
       if group = @opts[:group]
-        sql << GROUP_BY
+        sql << " GROUP BY "
         if go = @opts[:group_options]
           if go == :"grouping sets"
-            sql << go.to_s.upcase << PAREN_OPEN
+            sql << go.to_s.upcase << '('
             grouping_element_list_append(sql, group)
-            sql << PAREN_CLOSE
+            sql << ')'
           elsif uses_with_rollup?
             expression_list_append(sql, group)
-            sql << SPACE_WITH << go.to_s.upcase
+            sql << " WITH " << go.to_s.upcase
           else
-            sql << go.to_s.upcase << PAREN_OPEN
+            sql << go.to_s.upcase << '('
             expression_list_append(sql, group)
-            sql << PAREN_CLOSE
+            sql << ')'
           end
         else
           expression_list_append(sql, group)
@@ -1444,7 +1538,7 @@ module Sequel
 
     def select_having_sql(sql)
       if having = @opts[:having]
-        sql << HAVING
+        sql << " HAVING "
         literal_append(sql, having)
       end
     end
@@ -1457,10 +1551,10 @@ module Sequel
 
     def select_limit_sql(sql)
       if l = @opts[:limit]
-        sql << LIMIT
+        sql << " LIMIT "
         literal_append(sql, l)
         if o = @opts[:offset]
-          sql << OFFSET
+          sql << " OFFSET "
           literal_append(sql, o)
         end
       elsif @opts[:offset]
@@ -1471,9 +1565,9 @@ module Sequel
     def select_lock_sql(sql)
       case l = @opts[:lock]
       when :update
-        sql << FOR_UPDATE
+        sql << ' FOR UPDATE'
       when String
-        sql << SPACE << l
+        sql << ' ' << l
       end
     end
 
@@ -1481,13 +1575,13 @@ module Sequel
     # in the adapter, as many databases do not support just a plain offset with
     # no limit.
     def select_only_offset_sql(sql)
-      sql << OFFSET
+      sql << " OFFSET "
       literal_append(sql, @opts[:offset])
     end
   
     def select_order_sql(sql)
       if o = @opts[:order]
-        sql << ORDER_BY
+        sql << " ORDER BY "
         expression_list_append(sql, o)
       end
     end
@@ -1495,12 +1589,12 @@ module Sequel
     alias update_order_sql select_order_sql
 
     def select_select_sql(sql)
-      sql << SELECT
+      sql << 'SELECT'
     end
 
     def select_where_sql(sql)
       if w = @opts[:where]
-        sql << WHERE
+        sql << " WHERE "
         literal_append(sql, w)
       end
     end
@@ -1513,20 +1607,20 @@ module Sequel
       return if !ws || ws.empty?
       sql << select_with_sql_base
       c = false
-      comma = COMMA
+      comma = ', '
       ws.each do |w|
         sql << comma if c
         quote_identifier_append(sql, w[:name])
         if args = w[:args]
-         sql << PAREN_OPEN
+         sql << '('
          identifier_list_append(sql, args)
-         sql << PAREN_CLOSE
+         sql << ')'
         end
-        sql << AS
+        sql << ' AS '
         literal_dataset_append(sql, w[:dataset])
         c ||= true
       end
-      sql << SPACE
+      sql << ' '
     end
     alias delete_with_sql select_with_sql
     alias insert_with_sql select_with_sql
@@ -1534,7 +1628,7 @@ module Sequel
     
     # The base keyword to use for the SQL WITH clause
     def select_with_sql_base
-      SQL_WITH
+      "WITH "
     end
 
     # Whether the symbol cache should be skipped when literalizing the dataset
@@ -1597,13 +1691,13 @@ module Sequel
     end
 
     def update_table_sql(sql)
-      sql << SPACE
+      sql << ' '
       source_list_append(sql, @opts[:from])
       select_join_sql(sql) if supports_modifying_joins?
     end
 
     def update_set_sql(sql)
-      sql << SET
+      sql << ' SET '
       values = @opts[:values]
       if values.is_a?(Hash)
         update_sql_values_hash(sql, values)
@@ -1614,9 +1708,9 @@ module Sequel
 
     def update_sql_values_hash(sql, values)
       c = false
-      eq = EQUAL
+      eq = ' = '
       values.each do |k, v|
-        sql << COMMA if c
+        sql << ', ' if c
         if k.is_a?(String) && !k.is_a?(LiteralString)
           quote_identifier_append(sql, k)
         else
@@ -1629,7 +1723,7 @@ module Sequel
     end
 
     def update_update_sql(sql)
-      sql << UPDATE
+      sql << 'UPDATE'
     end
   end
 end

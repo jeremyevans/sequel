@@ -83,9 +83,11 @@ module Sequel
         CONVERSION_PROCS[i] = method
       end
     end
+    # CONVERSION_PROCS.freeze # SEQUEL5
 
     class Database < Sequel::Database
       DISCONNECT_ERROR_RE = /Communication link failure/
+      Sequel::Deprecation.deprecate_constant(self, :DISCONNECT_ERROR_RE)
 
       set_adapter_scheme :ado
 
@@ -221,7 +223,7 @@ module Sequel
       end
 
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::WIN32OLERuntimeError) && e.message =~ DISCONNECT_ERROR_RE)
+        super || (e.is_a?(::WIN32OLERuntimeError) && e.message =~ /Communication link failure/)
       end
 
       def rollback_transaction(conn, opts=OPTS)

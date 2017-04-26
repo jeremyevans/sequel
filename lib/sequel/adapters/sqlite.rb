@@ -74,6 +74,7 @@ module Sequel
     }.each do |k,v|
       k.each{|n| SQLITE_TYPES[n] = v}
     end
+    # SQLITE_TYPES.freeze # SEQUEL5
     
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
@@ -296,6 +297,7 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PREPARED_ARG_PLACEHOLDER)
       
       # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper
@@ -372,7 +374,7 @@ module Sequel
 
       # SQLite uses a : before the name of the argument as a placeholder.
       def prepared_arg_placeholder
-        PREPARED_ARG_PLACEHOLDER
+        ':'
       end
     end
   end

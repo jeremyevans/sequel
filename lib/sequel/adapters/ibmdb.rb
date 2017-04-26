@@ -26,7 +26,7 @@ module Sequel
       :blob => ::Sequel::SQL::Blob.method(:new),
       :time => ::Sequel.method(:string_to_time),
       :date => ::Sequel.method(:string_to_date)
-    }
+    }#.freeze # SEQUEL5
 
     # Wraps an underlying connection to DB2 using IBM_DB.
     class Connection
@@ -291,14 +291,14 @@ module Sequel
       # IBM_DB uses an autocommit setting instead of sending SQL queries.
       # So starting a transaction just turns autocommit off.
       def begin_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_BEGIN, conn){conn.autocommit = false}
+        log_connection_yield('Transaction.begin', conn){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
 
       # This commits transaction in progress on the
       # connection and sets autocommit back on.
       def commit_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
+        log_connection_yield('Transaction.commit', conn){conn.commit}
       end
     
       def database_error_classes
@@ -344,7 +344,7 @@ module Sequel
       # This rolls back the transaction in progress on the
       # connection and sets autocommit back on.
       def rollback_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
+        log_connection_yield('Transaction.rollback', conn){conn.rollback}
       end
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true

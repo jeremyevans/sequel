@@ -34,13 +34,15 @@ module Sequel
       # Dataset class for MySQL datasets accessed via Swift.
       class Dataset < Swift::Dataset
         include Sequel::MySQL::DatasetMethods
-        APOS = Dataset::APOS
+
+        APOS = "'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :APOS)
         
         private
         
         # Use Swift's escape method for quoting.
         def literal_string_append(sql, s)
-          sql << APOS << db.synchronize(@opts[:server]){|c| c.escape(s)} << APOS
+          sql << "'" << db.synchronize(@opts[:server]){|c| c.escape(s)} << "'"
         end
       end
     end

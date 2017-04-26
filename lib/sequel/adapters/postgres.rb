@@ -97,9 +97,12 @@ module Sequel
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
 
-    PG_TYPES[17] = Class.new do
+    TYPE_CONVERTOR = Class.new do
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
-    end.new.method(:bytea)
+    end.new
+
+    # SEQUEL5: Remove
+    PG_TYPES[17] = TYPE_CONVERTOR.method(:bytea)
 
     if Sequel::Postgres::USES_PG
       # Whether the given sequel_pg version integer is supported.
@@ -126,6 +129,7 @@ module Sequel
       if defined?(::PG::ConnectionBad)
         DISCONNECT_ERROR_CLASSES << ::PG::ConnectionBad
       end
+      #DISCONNECT_ERROR_CLASSES.freeze # SEQUEL5
       
       disconnect_errors = [
         'could not receive data from server',
@@ -542,6 +546,7 @@ module Sequel
       def adapter_initialize
         @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
         initialize_postgres_adapter
+        conversion_procs[17] = TYPE_CONVERTOR.method(:bytea)
         conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
         self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
@@ -676,8 +681,10 @@ module Sequel
 
       Database::DatasetClass = self
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-      APOS = Sequel::Dataset::APOS
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
       DEFAULT_CURSOR_NAME = 'sequel_cursor'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_CURSOR_NAME)
       
       # Yield all rows returned by executing the given SQL and converting
       # the types.
@@ -725,7 +732,7 @@ module Sequel
       #   DB[:huge_table].use_cursor(:rows_per_fetch=>1).each do |row|
       #     DB[:huge_table].where_current_of.update(:column=>ruby_method(row))
       #   end
-      def where_current_of(cursor_name=DEFAULT_CURSOR_NAME)
+      def where_current_of(cursor_name='sequel_cursor')
         clone(:where=>Sequel.lit(['CURRENT OF '], Sequel.identifier(cursor_name)))
       end
 
@@ -792,7 +799,7 @@ module Sequel
         server_opts = {:server=>@opts[:server] || :read_only}
         cursor = @opts[:cursor]
         hold = cursor[:hold]
-        cursor_name = quote_identifier(cursor[:cursor_name] || DEFAULT_CURSOR_NAME)
+        cursor_name = quote_identifier(cursor[:cursor_name] || 'sequel_cursor')
         rows_per_fetch = cursor[:rows_per_fetch].to_i
 
         db.send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 
@@ -840,12 +847,12 @@ module Sequel
       
       # Use the driver's escape_bytea
       def literal_blob_append(sql, v)
-        sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_bytea(v)} << APOS
+        sql << "'" << db.synchronize(@opts[:server]){|c| c.escape_bytea(v)} << "'"
       end
       
       # Use the driver's escape_string
       def literal_string_append(sql, v)
-        sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
+        sql << "'" << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << "'"
       end
       
       # For each row in the result set, yield a hash with column name symbol

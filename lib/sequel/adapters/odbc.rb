@@ -12,8 +12,11 @@ module Sequel
       set_adapter_scheme :odbc
 
       GUARDED_DRV_NAME = /^\{.+\}$/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :GUARDED_DRV_NAME)
       DRV_NAME_GUARDS = '{%s}'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DRV_NAME_GUARDS)
       DISCONNECT_ERRORS = /\A08S01/.freeze 
+      Sequel::Deprecation.deprecate_constant(self, :DISCONNECT_ERRORS)
 
       def connect(server)
         opts = server_opts(server)
@@ -23,8 +26,8 @@ module Sequel
           drv = ::ODBC::Driver.new
           drv.name = 'Sequel ODBC Driver130'
           opts.each do |param, value|
-            if :driver == param and not (value =~ GUARDED_DRV_NAME)
-              value = DRV_NAME_GUARDS % value
+            if :driver == param && value !~ /\A\{.+\}\z/
+              value = "{#{value}}"
             end
             drv.attrs[param.to_s.upcase] = value.to_s
           end
@@ -85,15 +88,19 @@ module Sequel
       end
 
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::ODBC::Error) && DISCONNECT_ERRORS.match(e.message))
+        super || (e.is_a?(::ODBC::Error) && /\A08S01/.match(e.message))
       end
     end
     
     class Dataset < Sequel::Dataset
       BOOL_TRUE = '1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
       BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ODBC_DATE_FORMAT)
       TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
 
       Database::DatasetClass = self
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
@@ -141,19 +148,19 @@ module Sequel
       end
       
       def default_timestamp_format
-        TIMESTAMP_FORMAT
+        "{ts '%Y-%m-%d %H:%M:%S'}"
       end
 
       def literal_date(v)
-        v.strftime(ODBC_DATE_FORMAT)
+        v.strftime("{d '%Y-%m-%d'}")
       end
       
       def literal_false
-        BOOL_FALSE
+        '0'
       end
       
       def literal_true
-        BOOL_TRUE
+        '1'
       end
     end
   end

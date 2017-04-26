@@ -3,7 +3,7 @@
 module Sequel
   class Dataset
     module Replace
-      INSERT = Dataset::INSERT
+      INSERT = 'INSERT'.freeze
       Sequel::Deprecation.deprecate_constant(self, :INSERT)
       REPLACE = 'REPLACE'.freeze
       Sequel::Deprecation.deprecate_constant(self, :REPLACE)

@@ -26,7 +26,9 @@
 #
 module Sequel
   module Sequel3DatasetMethods
-    COMMA = Dataset::COMMA
+    COMMA = ', '
+    Sequel::Deprecation.deprecate_constant(self, :COMMA)
+
     # Change the database for this dataset.
     def db=(v)
       raise_if_frozen!("db=")
@@ -119,8 +121,8 @@ module Sequel
       n = naked
       cols = n.columns
       csv = String.new
-      csv << "#{cols.join(COMMA)}\r\n" if include_column_titles
-      n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA)}\r\n"}
+      csv << "#{cols.join(', ')}\r\n" if include_column_titles
+      n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(', ')}\r\n"}
       csv
     end
   end

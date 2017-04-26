@@ -13,12 +13,12 @@ module Sequel
       # ORA-01012: not logged on
       # ORA-03113: end-of-file on communication channel
       # ORA-03114: not connected to ORACLE
-      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
+      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]#.freeze # SEQUEL5
       
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
         :clob=>lambda(&:read)
-      }
+      }#.freeze # SEQUEL5
 
       # Hash of conversion procs for this database.
       attr_reader :conversion_procs
@@ -220,12 +220,12 @@ module Sequel
       end
 
       def begin_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_BEGIN, conn){conn.autocommit = false}
+        log_connection_yield('Transaction.begin', conn){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
       
       def commit_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
+        log_connection_yield('Transaction.commit', conn){conn.commit}
       end
 
       def disconnect_error?(e, opts)
@@ -257,7 +257,7 @@ module Sequel
       end
       
       def rollback_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
+        log_connection_yield('Transaction.rollback', conn){conn.rollback}
       end
 
       def schema_parse_table(table, opts=OPTS)
@@ -332,6 +332,7 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PREPARED_ARG_PLACEHOLDER)
       
       # Oracle already supports named bind arguments, so use directly.
       module ArgumentMapper
@@ -403,7 +404,7 @@ module Sequel
       end
 
       def prepared_arg_placeholder
-        PREPARED_ARG_PLACEHOLDER
+        ':'
       end
 
       def bound_variable_modules

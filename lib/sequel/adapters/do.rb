@@ -33,6 +33,7 @@ module Sequel
     # use a pool size at least as large as the pool size being used by Sequel.
     class Database < Sequel::Database
       DISCONNECT_ERROR_RE = /terminating connection due to administrator command/
+      Sequel::Deprecation.deprecate_constant(self, :DISCONNECT_ERROR_RE)
 
       set_adapter_scheme :do
       
@@ -127,7 +128,7 @@ module Sequel
 
       # Recognize DataObjects::ConnectionError instances as disconnect errors.
       def disconnect_error?(e, opts)
-        super || (e.is_a?(::DataObjects::Error) && (e.is_a?(::DataObjects::ConnectionError) || e.message =~ DISCONNECT_ERROR_RE))
+        super || (e.is_a?(::DataObjects::Error) && (e.is_a?(::DataObjects::ConnectionError) || e.message =~ /terminating connection due to administrator command/))
       end
       
       # Execute SQL on the connection by creating a command first

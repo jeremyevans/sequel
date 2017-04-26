@@ -186,13 +186,14 @@ module Sequel
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
-        APOS = Dataset::APOS
+        APOS = "'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :APOS)
         
         private
         
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
-          sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
+          sql << "'" << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << "'"
         end
 
         # SQL fragment for Sequel::SQLTime, containing just the time part
@@ -202,7 +203,7 @@ module Sequel
 
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
-        PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]
+        PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]#.freeze # SEQUEL5
         HSTORE_TYPE = 'hstore'.freeze
 
         def type_convertor(map, meta, type, i)

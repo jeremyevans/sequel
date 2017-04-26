@@ -1568,8 +1568,10 @@ describe "Dataset string methods" do
     @db = DB
     csc = {}
     cic = {}
-    csc[:collate] = @db.dataset_class::CASE_SENSITIVE_COLLATION if defined? @db.dataset_class::CASE_SENSITIVE_COLLATION
-    cic[:collate] = @db.dataset_class::CASE_INSENSITIVE_COLLATION if defined? @db.dataset_class::CASE_INSENSITIVE_COLLATION
+    if @db.database_type == :mssql
+      csc[:collate] = 'Latin1_General_CS_AS'
+      cic[:collate] = 'Latin1_General_CI_AS'
+    end
     @db.create_table!(:a) do
       String :a, csc
       String :b, cic

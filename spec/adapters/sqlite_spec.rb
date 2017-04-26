@@ -692,7 +692,7 @@ describe "A SQLite database" do
       sqls.last.must_equal "BEGIN DEFERRED TRANSACTION"
     end
     @db.transaction do
-      sqls.last.must_equal Sequel::Database::SQL_BEGIN
+      sqls.last.must_equal 'BEGIN'
     end
 
     @db.transaction_mode.must_be_nil

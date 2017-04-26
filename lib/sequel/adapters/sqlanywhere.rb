@@ -37,12 +37,14 @@ module Sequel
     }.each do |k,v|
       k.each{|n| SQLANYWHERE_TYPES[n] = v}
     end
+    # SQLANYWHERE_TYPES.freeze # SEQUEL5
 
     # Database class for SQLAnywhere databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::SqlAnywhere::DatabaseMethods
 
       DEFAULT_CONFIG = { :user => 'dba', :password => 'sql' }
+      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_CONFIG)
 
       attr_accessor :api
 
@@ -106,6 +108,7 @@ module Sequel
       private
 
       LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
       def _execute(conn, type, sql, opts)
         unless rs = log_connection_yield(sql, conn){@api.sqlany_execute_direct(conn, sql)}
           result, errstr = @api.sqlany_error(conn)
@@ -118,7 +121,7 @@ module Sequel
         when :rows
           return @api.sqlany_affected_rows(rs)
         when :insert
-          _execute(conn, :select, LAST_INSERT_ID, opts){|r| return @api.sqlany_get_column(r, 0)[1] if r && @api.sqlany_fetch_next(r) == 1}
+          _execute(conn, :select, 'SELECT @@IDENTITY', opts){|r| return @api.sqlany_get_column(r, 0)[1] if r && @api.sqlany_fetch_next(r) == 1}
         end
       ensure
         @api.sqlany_commit(conn) unless in_transaction?

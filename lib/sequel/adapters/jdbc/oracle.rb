@@ -120,7 +120,7 @@ module Sequel
 
         NUMERIC_TYPE = Java::JavaSQL::Types::NUMERIC
         TIMESTAMP_TYPE = Java::JavaSQL::Types::TIMESTAMP
-        TIMESTAMPTZ_TYPES = [Java::oracle.jdbc.OracleTypes::TIMESTAMPTZ, Java::oracle.jdbc.OracleTypes::TIMESTAMPLTZ]
+        TIMESTAMPTZ_TYPES = [Java::oracle.jdbc.OracleTypes::TIMESTAMPTZ, Java::oracle.jdbc.OracleTypes::TIMESTAMPLTZ]#.freeze # SEQUEL5
 
         def type_convertor(map, meta, type, i)
           case type

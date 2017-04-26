@@ -136,9 +136,11 @@ module Sequel
       end
 
       TINYTDS_DISCONNECT_ERRORS = /\A(Attempt to initiate a new Adaptive Server operation with results pending|The request failed to run because the batch is aborted, this can be caused by abort signal sent from client|Adaptive Server connection timed out)/
+      Sequel::Deprecation.deprecate_constant(self, :TINYTDS_DISCONNECT_ERRORS)
+
       # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
-        super || (opts[:conn] && !opts[:conn].active?) || ((e.is_a?(::TinyTds::Error) && TINYTDS_DISCONNECT_ERRORS.match(e.message)))
+        super || (opts[:conn] && !opts[:conn].active?) || ((e.is_a?(::TinyTds::Error) && /\A(Attempt to initiate a new Adaptive Server operation with results pending|The request failed to run because the batch is aborted, this can be caused by abort signal sent from client|Adaptive Server connection timed out)/.match(e.message)))
       end
 
       # Dispose of any possible results of execution.
@@ -252,8 +254,8 @@ module Sequel
       
       # Properly escape the given string +v+.
       def literal_string_append(sql, v)
-        sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
-        sql << db.synchronize(@opts[:server]){|c| c.escape(v)}.gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
+        sql << (mssql_unicode_strings ? "N'" : "'")
+        sql << db.synchronize(@opts[:server]){|c| c.escape(v)}.gsub(/\\((?:\r\n)|\n)/, '\\\\\\\\\\1\\1') << "'"
       end
 
       def prepared_statement_modules

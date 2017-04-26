@@ -28,6 +28,7 @@ module Sequel
     }.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
+    # MYSQL_TYPES.freeze # SEQUEL5
 
     class << self
       # Whether to convert invalid date time values by default.
@@ -47,6 +48,7 @@ module Sequel
       # Regular expression used for getting accurate number of rows
       # matched by an update statement.
       AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AFFECTED_ROWS_RE)
       
       set_adapter_scheme :mysql
 
@@ -234,7 +236,7 @@ module Sequel
       # that may be inaccurate.
       def affected_rows(conn)
         s = conn.info
-        if s && s =~ AFFECTED_ROWS_RE
+        if s && s =~ /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/
           $1.to_i
         else
           conn.affected_rows

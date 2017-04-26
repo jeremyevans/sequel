@@ -11,13 +11,15 @@ module Sequel
        ::Cubrid::DATE => lambda{|t| Date.new(t.year, t.month, t.day)},
        ::Cubrid::TIME => lambda{|t| SQLTime.create(t.hour, t.min, t.sec)},
        21 => lambda(&:to_i)
-     }
+     }#.freeze # SEQUEL5
 
     class Database < Sequel::Database
       include Sequel::Cubrid::DatabaseMethods
 
       ROW_COUNT = "SELECT ROW_COUNT()".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROW_COUNT)
       LAST_INSERT_ID = "SELECT LAST_INSERT_ID()".freeze
+      Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
 
       set_adapter_scheme :cubrid
       
@@ -59,14 +61,14 @@ module Sequel
 
                 # Work around bugs by using the ROW_COUNT function.
                 begin
-                  r2 = conn.query(ROW_COUNT)
+                  r2 = conn.query("SELECT ROW_COUNT()")
                   r2.each{|a| return a.first.to_i}
                 ensure
                   r2.close if r2
                 end
               when :insert
                 begin
-                  r2 = conn.query(LAST_INSERT_ID)
+                  r2 = conn.query("SELECT LAST_INSERT_ID()")
                   r2.each{|a| return a.first.to_i}
                 ensure
                   r2.close if r2
@@ -99,11 +101,11 @@ module Sequel
       private
 
       def begin_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_BEGIN, conn){conn.auto_commit = false}
+        log_connection_yield("Transaction.begin", conn){conn.auto_commit = false}
       end
       
       def commit_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
+        log_connection_yield('Transaction.commit', conn){conn.commit}
       end
 
       def dataset_class_default
@@ -123,14 +125,16 @@ module Sequel
       # This doesn't actually work, as the cubrid ruby driver
       # does not implement transactions correctly.
       def rollback_transaction(conn, opts=OPTS)
-        log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
+        log_connection_yield('Transaction.rollback', conn){conn.rollback}
       end
     end
     
     class Dataset < Sequel::Dataset
       include Sequel::Cubrid::DatasetMethods
       COLUMN_INFO_NAME = "name".freeze
+      Sequel::Deprecation.deprecate_constant(self, :COLUMN_INFO_NAME)
       COLUMN_INFO_TYPE = "type_name".freeze
+      Sequel::Deprecation.deprecate_constant(self, :COLUMN_INFO_TYPE)
 
       Database::DatasetClass = self
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
@@ -138,7 +142,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |stmt|
           begin
-            cols = stmt.column_info.map{|c| [output_identifier(c[COLUMN_INFO_NAME]), CUBRID_TYPE_PROCS[c[COLUMN_INFO_TYPE]]]}
+            cols = stmt.column_info.map{|c| [output_identifier(c["name"]), CUBRID_TYPE_PROCS[c["type_name"]]]}
             self.columns = cols.map(&:first)
             stmt.each do |r|
               row = {}

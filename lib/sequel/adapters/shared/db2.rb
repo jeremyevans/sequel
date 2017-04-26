@@ -286,30 +286,43 @@ module Sequel
     module DatasetMethods
       include EmulateOffsetWithRowNumber
 
-      PAREN_CLOSE = Dataset::PAREN_CLOSE
-      PAREN_OPEN = Dataset::PAREN_OPEN
-      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}
-      BOOL_TRUE = '1'.freeze
-      BOOL_FALSE = '0'.freeze
-      CAST_STRING_OPEN = "RTRIM(CHAR(".freeze
-      CAST_STRING_CLOSE = "))".freeze
-      FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
-      FETCH_FIRST = " FETCH FIRST ".freeze
-      ROWS_ONLY = " ROWS ONLY".freeze
-      EMPTY_FROM_TABLE = ' FROM "SYSIBM"."SYSDUMMY1"'.freeze
-      HSTAR = "H*".freeze
-      BLOB_OPEN = "BLOB(X'".freeze
-      BLOB_CLOSE = "')".freeze
+      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}#.freeze # SEQUEL5
 
+      PAREN_CLOSE = ')'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+      PAREN_OPEN = '('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
+      BOOL_TRUE = '1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
+      BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
+      CAST_STRING_OPEN = "RTRIM(CHAR(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST_STRING_OPEN)
+      CAST_STRING_CLOSE = "))".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST_STRING_CLOSE)
+      FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
+      Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST_ROW_ONLY)
+      FETCH_FIRST = " FETCH FIRST ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST)
+      ROWS_ONLY = " ROWS ONLY".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
+      EMPTY_FROM_TABLE = ' FROM "SYSIBM"."SYSDUMMY1"'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_FROM_TABLE)
+      HSTAR = "H*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
+      BLOB_OPEN = "BLOB(X'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BLOB_OPEN)
+      BLOB_CLOSE = "')".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BLOB_CLOSE)
       EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
       Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql_append(sql, expr, type)
         if(type == String)
-          sql << CAST_STRING_OPEN
+          sql << "RTRIM(CHAR("
           literal_append(sql, expr)
-          sql << CAST_STRING_CLOSE
+          sql << "))"
         else
           super
         end
@@ -323,9 +336,9 @@ module Sequel
           literal_append(sql, SQL::Function.new(:BITNOT, *args))
         when :extract
           sql << args[0].to_s
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[1])
-          sql << PAREN_CLOSE
+          sql << ')'
         else
           super
         end
@@ -392,7 +405,7 @@ module Sequel
       private
 
       def empty_from_sql
-        EMPTY_FROM_TABLE
+        ' FROM "SYSIBM"."SYSDUMMY1"'
       end
 
       # Emulate offset with row number by default, and also when the limit_offset
@@ -410,12 +423,12 @@ module Sequel
 
       # Use 0 for false on DB2
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
       # Use 1 for true on DB2
       def literal_true
-        BOOL_TRUE
+        '1'
       end
 
       # DB2 uses a literal hexidecimal number for blob strings
@@ -423,7 +436,7 @@ module Sequel
         if ::Sequel::DB2.use_clob_as_blob
           super
         else
-          sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE
+          sql << "BLOB(X'" << v.unpack("H*").first << "')"
         end
       end
 
@@ -461,11 +474,11 @@ module Sequel
 
         if l = @opts[:limit]
           if l == 1
-            sql << FETCH_FIRST_ROW_ONLY
+            sql << " FETCH FIRST ROW ONLY"
           else
-            sql << FETCH_FIRST
+            sql << " FETCH FIRST "
             literal_append(sql, l)
-            sql << ROWS_ONLY
+            sql << " ROWS ONLY"
           end
         end
       end

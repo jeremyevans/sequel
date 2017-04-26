@@ -169,13 +169,16 @@ module Sequel
     module DatasetMethods
       include UnmodifiedIdentifiers::DatasetMethods
 
-      COMMA = Sequel::Dataset::COMMA
-      LIMIT = Sequel::Dataset::LIMIT
+      COMMA = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
+      LIMIT = " LIMIT ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :LIMIT)
       BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       BOOL_TRUE = '1'.freeze
-
-      # Hope you don't have more than 2**32 + offset rows in your dataset
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
       ONLY_OFFSET = ",4294967295".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
 
       def supports_join_using?
         false
@@ -199,11 +202,11 @@ module Sequel
       private
 
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
       def literal_true
-        BOOL_TRUE
+        '1'
       end
      
       # CUBRID supports multiple rows in INSERT.
@@ -218,14 +221,15 @@ module Sequel
         l = @opts[:limit]
         o = @opts[:offset]
         if l || o
-          sql << LIMIT
+          sql << " LIMIT "
           if o
             literal_append(sql, o)
             if l
-              sql << COMMA
+              sql << ', '
               literal_append(sql, l)
             else
-              sql << ONLY_OFFSET
+              # Hope you don't have more than 2**32 + offset rows in your dataset
+              sql << ",4294967295"
             end
           else
             literal_append(sql, l)

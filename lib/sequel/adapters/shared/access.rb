@@ -85,29 +85,47 @@ module Sequel
       include EmulateOffsetWithReverseAndCount
       include UnmodifiedIdentifiers::DatasetMethods
 
+      EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}#.freeze # SEQUEL5
+      #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
+      OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}#.freeze # SEQUEL5
+      CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}#.freeze # SEQUEL5
+
       DATE_FORMAT = '#%Y-%m-%d#'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATE_FORMAT)
       TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
       TOP = " TOP ".freeze
-      BRACKET_CLOSE = Dataset::BRACKET_CLOSE
-      BRACKET_OPEN = Dataset::BRACKET_OPEN
-      PAREN_CLOSE = Dataset::PAREN_CLOSE
-      PAREN_OPEN = Dataset::PAREN_OPEN
-      INTO = Dataset::INTO
-      FROM = Dataset::FROM
-      SPACE = Dataset::SPACE
+      Sequel::Deprecation.deprecate_constant(self, :TOP)
+      BRACKET_CLOSE =  ']'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BRACKET_CLOSE)
+      BRACKET_OPEN = '['.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BRACKET_OPEN)
+      COMMA = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
+      PAREN_CLOSE = ')'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+      PAREN_OPEN = '('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
+      INTO = " INTO ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :INTO)
+      FROM = ' FROM '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :FROM)
+      SPACE = ' '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SPACE)
       NOT_EQUAL = ' <> '.freeze
-      OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}
+      Sequel::Deprecation.deprecate_constant(self, :NOT_EQUAL)
       BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       BOOL_TRUE = '-1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
       DATE_FUNCTION = 'Date()'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATE_FUNCTION)
       NOW_FUNCTION = 'Now()'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NOW_FUNCTION)
       TIME_FUNCTION = 'Time()'.freeze
-      CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
-
-      EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}
-      COMMA = Dataset::COMMA
+      Sequel::Deprecation.deprecate_constant(self, :TIME_FUNCTION)
       DATEPART_OPEN = "datepart(".freeze
-
+      Sequel::Deprecation.deprecate_constant(self, :DATEPART_OPEN)
       EMULATED_FUNCTION_MAP = {:char_length=>:len}
       Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
@@ -121,9 +139,9 @@ module Sequel
       # type conversion
       def cast_sql_append(sql, expr, type)
         sql << CAST_TYPES.fetch(type, type).to_s
-        sql << PAREN_OPEN
+        sql << '('
         literal_append(sql, expr)
-        sql << PAREN_CLOSE
+        sql << ')'
       end
 
       def complex_expression_sql_append(sql, op, args)
@@ -133,19 +151,19 @@ module Sequel
         when :'NOT ILIKE'
           complex_expression_sql_append(sql, :'NOT LIKE', args)
         when :LIKE, :'NOT LIKE'
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
-          sql << SPACE << op.to_s << SPACE
+          sql << ' ' << op.to_s << ' '
           literal_append(sql, args[1])
-          sql << PAREN_CLOSE
+          sql << ')'
         when :'!='
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
-          sql << NOT_EQUAL
+          sql << ' <> '
           literal_append(sql, args[1])
-          sql << PAREN_CLOSE
+          sql << ')'
         when :'%', :'||'
-          sql << PAREN_OPEN
+          sql << '('
           c = false
           op_str = OPS[op]
           args.each do |a|
@@ -153,19 +171,19 @@ module Sequel
             literal_append(sql, a)
             c ||= true
           end
-          sql << PAREN_CLOSE
+          sql << ')'
         when :**
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
           sql << ' ^ '
           literal_append(sql, args[1])
-          sql << PAREN_CLOSE
+          sql << ')'
         when :extract
           part = args[0]
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
-          sql << DATEPART_OPEN << format.to_s << COMMA
+          sql << "datepart(" << format.to_s << ', '
           literal_append(sql, args[1])
-          sql << PAREN_CLOSE
+          sql << ')'
         else
           super
         end
@@ -175,11 +193,11 @@ module Sequel
       def constant_sql_append(sql, constant)
         case constant
         when :CURRENT_DATE
-          sql << DATE_FUNCTION
+          sql << 'Date()'
         when :CURRENT_TIMESTAMP
-          sql << NOW_FUNCTION
+          sql << 'Now()'
         when :CURRENT_TIME
-          sql << TIME_FUNCTION
+          sql << 'Time()'
         else
           super
         end
@@ -235,23 +253,23 @@ module Sequel
 
       # Access uses # to quote dates
       def literal_date(d)
-        d.strftime(DATE_FORMAT)
+        d.strftime('#%Y-%m-%d#')
       end
 
       # Access uses # to quote datetimes
       def literal_datetime(t)
-        t.strftime(TIMESTAMP_FORMAT)
+        t.strftime('#%Y-%m-%d %H:%M:%S#')
       end
       alias literal_time literal_datetime
 
       # Use 0 for false on MSSQL
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
-      # Use 0 for false on MSSQL
+      # Use -1 for true on MSSQL
       def literal_true
-        BOOL_TRUE
+        '-1'
       end
 
       # Emulate the char_length function with len
@@ -266,9 +284,9 @@ module Sequel
       # Access requires parentheses when joining more than one table
       def select_from_sql(sql)
         if f = @opts[:from]
-          sql << FROM
+          sql << ' FROM '
           if (j = @opts[:join]) && !j.empty?
-            sql << (PAREN_OPEN * j.length)
+            sql << ('(' * j.length)
           end
           source_list_append(sql, f)
         end
@@ -276,7 +294,7 @@ module Sequel
 
       def select_into_sql(sql)
         if i = @opts[:into]
-          sql << INTO
+          sql << " INTO "
           identifier_append(sql, i)
         end
       end
@@ -286,7 +304,7 @@ module Sequel
         if js = @opts[:join]
           js.each do |j|
             literal_append(sql, j)
-            sql << PAREN_CLOSE
+            sql << ')'
           end
         end
       end
@@ -294,14 +312,14 @@ module Sequel
       # Access uses TOP for limits
       def select_limit_sql(sql)
         if l = @opts[:limit]
-          sql << TOP
+          sql << " TOP "
           literal_append(sql, l)
         end
       end
 
       # Access uses [] for quoting identifiers
       def quoted_identifier_append(sql, v)
-        sql << BRACKET_OPEN << v.to_s << BRACKET_CLOSE
+        sql << '[' << v.to_s << ']'
       end
     end
   end

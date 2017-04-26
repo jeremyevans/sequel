@@ -274,26 +274,47 @@ module Sequel
 
     module DatasetMethods
       BOOL_TRUE = '1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
       BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       WILDCARD = LiteralString.new('%').freeze
+      Sequel::Deprecation.deprecate_constant(self, :WILDCARD)
       TOP = " TOP ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TOP)
       START_AT = " START AT ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :START_AT)
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SQL_WITH_RECURSIVE)
       DATE_FUNCTION = 'today()'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATE_FUNCTION)
       NOW_FUNCTION = 'now()'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NOW_FUNCTION)
       DATEPART = 'datepart'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATEPART)
       REGEXP = 'REGEXP'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :REGEXP)
       NOT_REGEXP = 'NOT REGEXP'.freeze
-      APOS = Dataset::APOS
-      APOS_RE = Dataset::APOS_RE
-      DOUBLE_APOS = Dataset::DOUBLE_APOS
+      Sequel::Deprecation.deprecate_constant(self, :NOT_REGEXP)
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
+      APOS_RE = /'/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
+      DOUBLE_APOS = "''".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
       BACKSLASH_RE = /\\/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_RE)
       QUAD_BACKSLASH = "\\\\\\\\".freeze
+      Sequel::Deprecation.deprecate_constant(self, :QUAD_BACKSLASH)
       BLOB_START = "0x".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BLOB_START)
       HSTAR = "H*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
       CROSS_APPLY = 'CROSS APPLY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CROSS_APPLY)
       OUTER_APPLY = 'OUTER APPLY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :OUTER_APPLY)
       ONLY_OFFSET = " TOP 2147483647".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
 
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
       Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having compounds order lock')
@@ -354,9 +375,9 @@ module Sequel
         when :<<, :>>
           complex_expression_emulate_append(sql, op, args)
         when :LIKE, :"NOT LIKE"
-          sql << Sequel::Dataset::PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
-          sql << Sequel::Dataset::SPACE << (op == :LIKE ? REGEXP : NOT_REGEXP) << Sequel::Dataset::SPACE
+          sql << (op == :LIKE ? ' REGEXP ' : ' NOT REGEXP ')
           pattern = String.new
           last_c = ''
           args[1].each_char do |c|
@@ -382,17 +403,17 @@ module Sequel
             end
           end
           literal_append(sql, pattern)
-          sql << Sequel::Dataset::ESCAPE
-          literal_append(sql, Sequel::Dataset::BACKSLASH)
-          sql << Sequel::Dataset::PAREN_CLOSE
+          sql << " ESCAPE "
+          literal_append(sql, "\\")
+          sql << ')'
         when :ILIKE, :"NOT ILIKE"
           super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args)
         when :extract
-          sql << DATEPART + Sequel::Dataset::PAREN_OPEN
+          sql << 'datepart('
           literal_append(sql, args[0])
           sql << ','
           literal_append(sql, args[1])
-          sql << Sequel::Dataset::PAREN_CLOSE
+          sql << ')'
         else
           super
         end
@@ -407,9 +428,9 @@ module Sequel
       def constant_sql_append(sql, constant)
         case constant
         when :CURRENT_DATE
-          sql << DATE_FUNCTION
+          sql << 'today()'
         when :CURRENT_TIMESTAMP, :CURRENT_TIME
-          sql << NOW_FUNCTION
+          sql << 'now()'
         else
           super
         end
@@ -424,17 +445,17 @@ module Sequel
 
       # Use 1 for true on Sybase
       def literal_true
-        BOOL_TRUE
+        '1'
       end
 
       # Use 0 for false on Sybase
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
       # SQL fragment for String.  Doubles \ and ' by default.
       def literal_string_append(sql, v)
-        sql << APOS << v.gsub(BACKSLASH_RE, QUAD_BACKSLASH).gsub(APOS_RE, DOUBLE_APOS) << APOS
+        sql << "'" << v.gsub("\\", "\\\\\\\\").gsub("'", "''") << "'"
       end
 
       # SqlAnywhere uses a preceding X for hex escaping strings
@@ -442,7 +463,7 @@ module Sequel
         if v.empty?
           literal_append(sql, "")
         else
-          sql << BLOB_START << v.unpack(HSTAR).first
+          sql << "0x" << v.unpack("H*").first
         end
       end
 
@@ -453,7 +474,7 @@ module Sequel
 
       def select_into_sql(sql)
         if i = @opts[:into]
-          sql << Sequel::Dataset::INTO
+          sql << " INTO "
           identifier_append(sql, i)
         end
       end
@@ -465,14 +486,14 @@ module Sequel
         o = @opts[:offset]
         if l || o
           if l
-            sql << TOP
+            sql << " TOP "
             literal_append(sql, l)
           else
-            sql << ONLY_OFFSET
+            sql << " TOP 2147483647"
           end
 
           if o 
-            sql << START_AT + "("
+            sql << " START AT ("
             literal_append(sql, o)
             sql << " + 1)"
           end
@@ -481,15 +502,15 @@ module Sequel
 
       # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
       def select_with_sql_base
-        opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super
+        opts[:with].any?{|w| w[:recursive]} ? "WITH RECURSIVE " : super
       end
 
       def join_type_sql(join_type)
         case join_type
         when :cross_apply
-          CROSS_APPLY
+          'CROSS APPLY'
         when :outer_apply
-          OUTER_APPLY
+          'OUTER APPLY'
         else
           super
         end

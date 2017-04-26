@@ -580,55 +580,98 @@ module Sequel
     # Dataset methods shared by datasets that use MySQL databases.
     module DatasetMethods
       BOOL_TRUE = '1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
       BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       COMMA_SEPARATOR = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
       FOR_SHARE = ' LOCK IN SHARE MODE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :FOR_SHARE)
       SQL_CALC_FOUND_ROWS = ' SQL_CALC_FOUND_ROWS'.freeze
-      APOS = Dataset::APOS
-      APOS_RE = Dataset::APOS_RE
-      DOUBLE_APOS = Dataset::DOUBLE_APOS
-      SPACE = Dataset::SPACE
-      PAREN_OPEN = Dataset::PAREN_OPEN
-      PAREN_CLOSE = Dataset::PAREN_CLOSE
-      NOT_SPACE = Dataset::NOT_SPACE
-      FROM = Dataset::FROM
-      COMMA = Dataset::COMMA
-      LIMIT = Dataset::LIMIT
-      GROUP_BY = Dataset::GROUP_BY
-      ESCAPE = Dataset::ESCAPE
-      BACKSLASH = Dataset::BACKSLASH
+      Sequel::Deprecation.deprecate_constant(self, :SQL_CALC_FOUND_ROWS)
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
+      APOS_RE = /'/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
+      DOUBLE_APOS = "''".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
+      SPACE = ' '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SPACE)
+      PAREN_CLOSE = ')'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+      PAREN_OPEN = '('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
+      NOT_SPACE = 'NOT '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NOT_SPACE)
+      FROM = ' FROM '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :FROM)
+      COMMA = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
+      LIMIT = " LIMIT ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :LIMIT)
+      GROUP_BY = " GROUP BY ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :GROUP_BY)
+      ESCAPE = " ESCAPE ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ESCAPE)
+      BACKSLASH = "\\".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
       REGEXP = 'REGEXP'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :REGEXP)
       LIKE = 'LIKE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :LIKE)
       BINARY = 'BINARY '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BINARY)
       CONCAT = "CONCAT".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CONCAT)
       CAST_BITCOMP_OPEN = "CAST(~".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST_BITCOMP_OPEN)
       CAST_BITCOMP_CLOSE = " AS SIGNED INTEGER)".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST_BITCOMP_CLOSE)
       STRAIGHT_JOIN = 'STRAIGHT_JOIN'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :STRAIGHT_JOIN)
       NATURAL_LEFT_JOIN = 'NATURAL LEFT JOIN'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NATURAL_LEFT_JOIN)
       BACKTICK = '`'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKTICK)
       BACKTICK_RE = /`/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKTICK_RE)
       DOUBLE_BACKTICK = '``'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_BACKTICK)
       EMPTY_COLUMNS = " ()".freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_COLUMNS)
       EMPTY_VALUES = " VALUES ()".freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_VALUES)
       IGNORE = " IGNORE".freeze
+      Sequel::Deprecation.deprecate_constant(self, :IGNORE)
       ON_DUPLICATE_KEY_UPDATE = " ON DUPLICATE KEY UPDATE ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ON_DUPLICATE_KEY_UPDATE)
       EQ_VALUES = '=VALUES('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EQ_VALUES)
       EQ = '='.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EQ)
       WITH_ROLLUP = ' WITH ROLLUP'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :WITH_ROLLUP)
+      EXPLAIN = 'EXPLAIN '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN)
+      EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN_EXTENDED)
+      BACKSLASH_RE = /\\/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_RE)
+      QUAD_BACKSLASH = "\\\\\\\\".freeze
+      Sequel::Deprecation.deprecate_constant(self, :QUAD_BACKSLASH)
+      BLOB_START = "0x".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BLOB_START)
+      EMPTY_BLOB = "''".freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_BLOB)
+      HSTAR = "H*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
+      CURRENT_TIMESTAMP_56 = 'CURRENT_TIMESTAMP(6)'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CURRENT_TIMESTAMP_56)
+      ONLY_OFFSET = ",18446744073709551615".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
+
       MATCH_AGAINST = ["MATCH ".freeze, " AGAINST (".freeze, ")".freeze].freeze
       MATCH_AGAINST_BOOLEAN = ["MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE)".freeze].freeze
-      EXPLAIN = 'EXPLAIN '.freeze
-      EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
-      BACKSLASH_RE = /\\/.freeze
-      QUAD_BACKSLASH = "\\\\\\\\".freeze
-      BLOB_START = "0x".freeze
-      EMPTY_BLOB = "''".freeze
-      HSTAR = "H*".freeze
-      CURRENT_TIMESTAMP_56 = 'CURRENT_TIMESTAMP(6)'.freeze
-
-      # Comes directly from MySQL's documentation, used for queries with limits without offsets
-      ONLY_OFFSET = ",18446744073709551615".freeze
-
       NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:insert_ignore, :update_ignore, :on_duplicate_key_update]).freeze
 
       Dataset.def_sql_method(self, :delete, %w'delete from where order limit')
@@ -651,30 +694,30 @@ module Sequel
             super
           end
         when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
-          sql << SPACE
+          sql << ' '
           sql << 'NOT ' if [:'NOT LIKE', :'NOT ILIKE', :'!~', :'!~*'].include?(op)
-          sql << ([:~, :'!~', :'~*', :'!~*'].include?(op) ? REGEXP : LIKE)
-          sql << SPACE
-          sql << BINARY if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)
+          sql << ([:~, :'!~', :'~*', :'!~*'].include?(op) ? 'REGEXP' : 'LIKE')
+          sql << ' '
+          sql << 'BINARY ' if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)
           literal_append(sql, args[1])
           if [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'].include?(op)
-            sql << ESCAPE
-            literal_append(sql, BACKSLASH)
+            sql << " ESCAPE "
+            literal_append(sql, "\\")
           end
-          sql << PAREN_CLOSE
+          sql << ')'
         when :'||'
           if args.length > 1
-            sql << CONCAT
+            sql << "CONCAT"
             array_sql_append(sql, args)
           else
             literal_append(sql, args[0])
           end
         when :'B~'
-          sql << CAST_BITCOMP_OPEN
+          sql << "CAST(~"
           literal_append(sql, args[0])
-          sql << CAST_BITCOMP_CLOSE
+          sql << " AS SIGNED INTEGER)"
         else
           super
         end
@@ -686,7 +729,7 @@ module Sequel
       # fractional seconds.
       def constant_sql_append(sql, constant)
         if constant == :CURRENT_TIMESTAMP && supports_timestamp_usecs?
-          sql << CURRENT_TIMESTAMP_56
+          sql << 'CURRENT_TIMESTAMP(6)'
         else
           super
         end
@@ -723,7 +766,7 @@ module Sequel
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
 
-        ds = db.send(:metadata_dataset).with_sql((opts[:extended] ? EXPLAIN_EXTENDED : EXPLAIN) + select_sql).naked
+        ds = db.send(:metadata_dataset).with_sql((opts[:extended] ? 'EXPLAIN EXTENDED ' : 'EXPLAIN ') + select_sql).naked
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end
@@ -757,9 +800,9 @@ module Sequel
       def join_type_sql(join_type)
         case join_type
         when :straight
-          STRAIGHT_JOIN
+          'STRAIGHT_JOIN'
         when :natural_inner
-          NATURAL_LEFT_JOIN
+          'NATURAL LEFT JOIN'
         else
           super
         end
@@ -812,7 +855,7 @@ module Sequel
 
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
-        sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
+        sql << '`' << c.to_s.gsub('`', '``') << '`'
       end
 
       # MySQL does not support derived column lists
@@ -885,10 +928,10 @@ module Sequel
       # from, but include the others for the purposes of selecting rows.
       def delete_from_sql(sql)
         if joined_dataset?
-          sql << SPACE
+          sql << ' '
           tables = @opts[:delete_from] || @opts[:from][0..0]
           source_list_append(sql, tables)
-          sql << FROM
+          sql << ' FROM '
           source_list_append(sql, @opts[:from])
           select_join_sql(sql)
         else
@@ -900,7 +943,7 @@ module Sequel
       def insert_columns_sql(sql)
         values = opts[:values]
         if values.is_a?(Array) && values.empty?
-          sql << EMPTY_COLUMNS
+          sql << " ()"
         else
           super
         end
@@ -908,12 +951,12 @@ module Sequel
 
       # MySQL supports INSERT IGNORE INTO
       def insert_ignore_sql(sql)
-        sql << IGNORE if opts[:insert_ignore]
+        sql << " IGNORE" if opts[:insert_ignore]
       end
 
       # MySQL supports UPDATE IGNORE
       def update_ignore_sql(sql)
-        sql << IGNORE if opts[:update_ignore]
+        sql << " IGNORE" if opts[:update_ignore]
       end
 
       # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE
@@ -928,11 +971,11 @@ module Sequel
             update_cols = update_cols[0..-2]
           end
 
-          sql << ON_DUPLICATE_KEY_UPDATE
+          sql << " ON DUPLICATE KEY UPDATE "
           c = false
-          co = COMMA
-          values = EQ_VALUES
-          endp = PAREN_CLOSE
+          co = ', '
+          values = '=VALUES('
+          endp = ')'
           update_cols.each do |col|
             sql << co if c
             quote_identifier_append(sql, col)
@@ -942,7 +985,7 @@ module Sequel
             c ||= true
           end
           if update_vals
-            eq = EQ
+            eq = '='
             update_vals.map do |col,v| 
               sql << co if c
               quote_identifier_append(sql, col)
@@ -958,7 +1001,7 @@ module Sequel
       def insert_values_sql(sql)
         values = opts[:values]
         if values.is_a?(Array) && values.empty?
-          sql << EMPTY_VALUES
+          sql << " VALUES ()"
         else
           super
         end
@@ -967,7 +1010,7 @@ module Sequel
       # MySQL allows a LIMIT in DELETE and UPDATE statements.
       def limit_sql(sql)
         if l = @opts[:limit]
-          sql << LIMIT
+          sql << " LIMIT "
           literal_append(sql, l)
         end
       end
@@ -977,15 +1020,15 @@ module Sequel
       # MySQL uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
         if v.empty?
-          sql << EMPTY_BLOB
+          sql << "''"
         else
-          sql << BLOB_START << v.unpack(HSTAR).first
+          sql << "0x" << v.unpack("H*").first
         end
       end
 
       # Use 0 for false on MySQL
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
       # Raise error for infinitate and NaN values
@@ -999,12 +1042,12 @@ module Sequel
 
       # SQL fragment for String.  Doubles \ and ' by default.
       def literal_string_append(sql, v)
-        sql << APOS << v.gsub(BACKSLASH_RE, QUAD_BACKSLASH).gsub(APOS_RE, DOUBLE_APOS) << APOS
+        sql << "'" << v.gsub("\\", "\\\\\\\\").gsub("'", "''") << "'"
       end
 
       # Use 1 for true on MySQL
       def literal_true
-        BOOL_TRUE
+        '1'
       end
       
       # MySQL supports multiple rows in INSERT.
@@ -1018,19 +1061,19 @@ module Sequel
       end
 
       def select_only_offset_sql(sql)
-        sql << LIMIT
+        sql << " LIMIT "
         literal_append(sql, @opts[:offset])
-        sql << ONLY_OFFSET
+        sql << ",18446744073709551615"
       end
   
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
-        @opts[:lock] == :share ? (sql << FOR_SHARE) : super
+        @opts[:lock] == :share ? (sql << ' LOCK IN SHARE MODE') : super
       end
 
       # MySQL specific SQL_CALC_FOUND_ROWS option
       def select_calc_found_rows_sql(sql)
-        sql << SQL_CALC_FOUND_ROWS if opts[:calc_found_rows]
+        sql << ' SQL_CALC_FOUND_ROWS' if opts[:calc_found_rows]
       end
 
       # MySQL uses WITH ROLLUP syntax.

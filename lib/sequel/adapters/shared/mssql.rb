@@ -537,54 +537,98 @@ module Sequel
       end)
       include EmulateOffsetWithRowNumber
 
-      BOOL_TRUE = '1'.freeze
-      BOOL_FALSE = '0'.freeze
-      COMMA_SEPARATOR = ', '.freeze
-      TABLE_HINT = " WITH (".freeze
-      READPAST = "READPAST".freeze
-      NOLOCK = 'NOLOCK'.freeze
-      UPDLOCK = 'UPDLOCK'.freeze
-      WILDCARD = LiteralString.new('*').freeze
-      CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
-      EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}
-      BRACKET_CLOSE = Dataset::BRACKET_CLOSE
-      BRACKET_OPEN = Dataset::BRACKET_OPEN
-      COMMA = Dataset::COMMA
-      PAREN_CLOSE = Dataset::PAREN_CLOSE
-      PAREN_SPACE_OPEN = Dataset::PAREN_SPACE_OPEN
-      SPACE = Dataset::SPACE
-      FROM = Dataset::FROM
-      APOS = Dataset::APOS
-      APOS_RE = Dataset::APOS_RE
-      DOUBLE_APOS = Dataset::DOUBLE_APOS
-      INTO = Dataset::INTO
-      DOUBLE_BRACKET_CLOSE = ']]'.freeze
-      DATEPART_SECOND_OPEN = "CAST((datepart(".freeze
-      DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
-      DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
-      DATEPART_OPEN = "datepart(".freeze
-      OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
-      HEX_START = '0x'.freeze
-      UNICODE_STRING_START = "N'".freeze
-      BACKSLASH_CRLF_RE = /\\((?:\r\n)|\n)/.freeze
-      BACKSLASH_CRLF_REPLACE = '\\\\\\\\\\1\\1'.freeze
-      TOP_PAREN = " TOP (".freeze
-      TOP = " TOP ".freeze
-      OUTPUT = " OUTPUT ".freeze
-      HSTAR = "H*".freeze
-      CASE_SENSITIVE_COLLATION = 'Latin1_General_CS_AS'.freeze
-      CASE_INSENSITIVE_COLLATION = 'Latin1_General_CI_AS'.freeze
-      DEFAULT_TIMESTAMP_FORMAT = "'%Y-%m-%dT%H:%M:%S%N%z'".freeze
-      FORMAT_DATE = "'%Y%m%d'".freeze
-      CROSS_APPLY = 'CROSS APPLY'.freeze
-      OUTER_APPLY = 'OUTER APPLY'.freeze
-      OFFSET = " OFFSET ".freeze
-      ROWS = " ROWS".freeze
-      ROWS_ONLY = " ROWS ONLY".freeze
-      FETCH_NEXT = " FETCH NEXT ".freeze
-
+      CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}#.freeze # SEQUEL5
+      EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}#.freeze # SEQUEL5
+      #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
       NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
       LIMIT_ALL = Object.new.freeze
+
+      BOOL_TRUE = '1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
+      BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
+      COMMA_SEPARATOR = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
+      TABLE_HINT = " WITH (".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TABLE_HINT)
+      READPAST = "READPAST".freeze
+      Sequel::Deprecation.deprecate_constant(self, :READPAST)
+      NOLOCK = 'NOLOCK'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NOLOCK)
+      UPDLOCK = 'UPDLOCK'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :UPDLOCK)
+      WILDCARD = LiteralString.new('*').freeze
+      Sequel::Deprecation.deprecate_constant(self, :WILDCARD)
+      BRACKET_CLOSE =  ']'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BRACKET_CLOSE)
+      BRACKET_OPEN = '['.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BRACKET_OPEN)
+      COMMA = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
+      PAREN_CLOSE = ')'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+      PAREN_SPACE_OPEN = ' ('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_SPACE_OPEN)
+      SPACE = ' '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SPACE)
+      FROM = ' FROM '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :FROM)
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
+      APOS_RE = /'/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
+      DOUBLE_APOS = "''".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
+      INTO = " INTO ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :INTO)
+      DOUBLE_BRACKET_CLOSE = ']]'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_BRACKET_CLOSE)
+      DATEPART_SECOND_OPEN = "CAST((datepart(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATEPART_SECOND_OPEN)
+      DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATEPART_SECOND_MIDDLE)
+      DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATEPART_SECOND_CLOSE)
+      DATEPART_OPEN = "datepart(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DATEPART_OPEN)
+      OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :OUTPUT_INSERTED)
+      HEX_START = '0x'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :HEX_START)
+      UNICODE_STRING_START = "N'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :UNICODE_STRING_START)
+      BACKSLASH_CRLF_RE = /\\((?:\r\n)|\n)/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_CRLF_RE)
+      BACKSLASH_CRLF_REPLACE = '\\\\\\\\\\1\\1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_CRLF_REPLACE)
+      TOP_PAREN = " TOP (".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TOP_PAREN)
+      TOP = " TOP ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TOP)
+      OUTPUT = " OUTPUT ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :OUTPUT)
+      HSTAR = "H*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
+      CASE_SENSITIVE_COLLATION = 'Latin1_General_CS_AS'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CASE_SENSITIVE_COLLATION)
+      CASE_INSENSITIVE_COLLATION = 'Latin1_General_CI_AS'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CASE_INSENSITIVE_COLLATION)
+      DEFAULT_TIMESTAMP_FORMAT = "'%Y-%m-%dT%H:%M:%S%N%z'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_TIMESTAMP_FORMAT)
+      FORMAT_DATE = "'%Y%m%d'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :FORMAT_DATE)
+      CROSS_APPLY = 'CROSS APPLY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CROSS_APPLY)
+      OUTER_APPLY = 'OUTER APPLY'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :OUTER_APPLY)
+      OFFSET = " OFFSET ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :OFFSET)
+      ROWS = " ROWS".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROWS)
+      ROWS_ONLY = " ROWS ONLY".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
+      FETCH_NEXT = " FETCH NEXT ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :FETCH_NEXT)
 
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')
@@ -612,9 +656,9 @@ module Sequel
         when :'||'
           super(sql, :+, args)
         when :LIKE, :"NOT LIKE"
-          super(sql, op, args.map{|a| Sequel.lit(["(", " COLLATE #{CASE_SENSITIVE_COLLATION})"], a)})
+          super(sql, op, args.map{|a| Sequel.lit(["(", " COLLATE Latin1_General_CS_AS)"], a)})
         when :ILIKE, :"NOT ILIKE"
-          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|a| Sequel.lit(["(", " COLLATE #{CASE_INSENSITIVE_COLLATION})"], a)})
+          super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|a| Sequel.lit(["(", " COLLATE Latin1_General_CI_AS)"], a)})
         when :<<, :>>
           complex_expression_emulate_append(sql, op, args)
         when :extract
@@ -622,15 +666,15 @@ module Sequel
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]
           if part == :second
             expr = args[1]
-            sql << DATEPART_SECOND_OPEN << format.to_s << COMMA
+            sql << "CAST((datepart(" << format.to_s << ', '
             literal_append(sql, expr)
-            sql << DATEPART_SECOND_MIDDLE
+            sql << ') + datepart(ns, '
             literal_append(sql, expr)
-            sql << DATEPART_SECOND_CLOSE
+            sql << ")/1000000000.0) AS double precision)"
           else
-            sql << DATEPART_OPEN << format.to_s << COMMA
+            sql << "datepart(" << format.to_s << ', '
             literal_append(sql, args[1])
-            sql << PAREN_CLOSE
+            sql << ')'
           end
         else
           super
@@ -722,7 +766,7 @@ module Sequel
 
       # MSSQL uses [] to quote identifiers.
       def quoted_identifier_append(sql, name)
-        sql << BRACKET_OPEN << name.to_s.gsub(/\]/, DOUBLE_BRACKET_CLOSE) << BRACKET_CLOSE
+        sql << '[' << name.to_s.gsub(/\]/, ']]') << ']'
       end
 
       # Emulate RETURNING using the output clause.  This only handles values that are simple column references.
@@ -903,12 +947,12 @@ module Sequel
       # since that is the format that is multilanguage and not
       # DATEFORMAT dependent.
       def default_timestamp_format
-        DEFAULT_TIMESTAMP_FORMAT
+        "'%Y-%m-%dT%H:%M:%S%N%z'"
       end
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
-        sql << FROM
+        sql << ' FROM '
         source_list_append(sql, @opts[:from][0..0])
       end
 
@@ -962,9 +1006,9 @@ module Sequel
       def join_type_sql(join_type)
         case join_type
         when :cross_apply
-          CROSS_APPLY
+          'CROSS APPLY'
         when :outer_apply
-          OUTER_APPLY
+          'OUTER APPLY'
         else
           super
         end
@@ -972,30 +1016,30 @@ module Sequel
 
       # MSSQL uses a literal hexidecimal number for blob strings
       def literal_blob_append(sql, v)
-        sql << HEX_START << v.unpack(HSTAR).first
+        sql << '0x' << v.unpack("H*").first
       end
       
       # Use YYYYmmdd format, since that's the only want that is
       # multilanguage and not DATEFORMAT dependent.
       def literal_date(v)
-        v.strftime(FORMAT_DATE)
+        v.strftime("'%Y%m%d'")
       end
 
       # Use 0 for false on MSSQL
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
       # Optionally use unicode string syntax for all strings. Don't double
       # backslashes.
       def literal_string_append(sql, v)
-        sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
-        sql << v.gsub(APOS_RE, DOUBLE_APOS).gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
+        sql << (mssql_unicode_strings ? "N'" : "'")
+        sql << v.gsub("'", "''").gsub(/\\((?:\r\n)|\n)/, '\\\\\\\\\\1\\1') << "'"
       end
       
       # Use 1 for true on MSSQL
       def literal_true
-        BOOL_TRUE
+        '1'
       end
       
       # MSSQL 2008+ supports multiple rows in the VALUES clause, older versions
@@ -1011,7 +1055,7 @@ module Sequel
 
       def select_into_sql(sql)
         if i = @opts[:into]
-          sql << INTO
+          sql << " INTO "
           identifier_append(sql, i)
         end
       end
@@ -1030,12 +1074,12 @@ module Sequel
           if l == LIMIT_ALL
             sql << " TOP (100) PERCENT"
           else
-            sql << TOP_PAREN
+            sql << " TOP ("
             literal_append(sql, l)
-            sql << PAREN_CLOSE
+            sql << ')'
           end
         else
-          sql << TOP
+          sql << " TOP "
           literal_append(sql, l)
         end
       end
@@ -1056,25 +1100,25 @@ module Sequel
         lock_hint = for_update || dirty
 
         if lock_hint || skip_locked
-          sql << TABLE_HINT
+          sql << " WITH ("
 
           if lock_hint
             sql << if for_update
-              UPDLOCK
+              'UPDLOCK'
             else
-              NOLOCK
+              'NOLOCK'
             end
           end
 
           if lock_hint && skip_locked
-            sql << COMMA_SEPARATOR
+            sql << ', '
           end
 
           if skip_locked
-            sql << READPAST
+            sql << "READPAST"
           end
 
-          sql << PAREN_CLOSE
+          sql << ')'
         else
           super
         end
@@ -1086,14 +1130,14 @@ module Sequel
         super
         if is_2012_or_later? && @opts[:order]
           if o = @opts[:offset]
-            sql << OFFSET
+            sql << " OFFSET "
             literal_append(sql, o)
-            sql << ROWS
+            sql << " ROWS"
 
             if l = @opts[:limit]
-              sql << FETCH_NEXT
+              sql << " FETCH NEXT "
               literal_append(sql, l)
-              sql << ROWS_ONLY
+              sql << " ROWS ONLY"
             end
           end
         end
@@ -1110,21 +1154,21 @@ module Sequel
       end
 
       def output_list_sql(sql, output)
-        sql << OUTPUT
+        sql << " OUTPUT "
         column_list_append(sql, output[:select_list])
         if into = output[:into]
-          sql << INTO
+          sql << " INTO "
           identifier_append(sql, into)
           if column_list = output[:column_list]
-            sql << PAREN_SPACE_OPEN
+            sql << ' ('
             source_list_append(sql, column_list)
-            sql << PAREN_CLOSE
+            sql << ')'
           end
         end
       end
 
       def output_returning_sql(sql, type, values)
-        sql << OUTPUT
+        sql << " OUTPUT "
         if values.empty?
           literal_append(sql, SQL::ColumnAll.new(type))
         else
@@ -1155,7 +1199,7 @@ module Sequel
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
-        sql << SPACE
+        sql << ' '
         source_list_append(sql, @opts[:from][0..0])
       end
 

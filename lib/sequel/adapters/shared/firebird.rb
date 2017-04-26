@@ -164,12 +164,18 @@ module Sequel
     end
 
     module DatasetMethods
-      BOOL_TRUE = '1'.freeze
-      BOOL_FALSE = '0'.freeze
       NULL = LiteralString.new('NULL').freeze
+
+      BOOL_TRUE = '1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
+      BOOL_FALSE = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       FIRST = " FIRST ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :FIRST)
       SKIP = " SKIP ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SKIP)
       DEFAULT_FROM = " FROM RDB$DATABASE"
+      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_FROM)
       
       Dataset.def_sql_method(self, :select, %w'with select distinct limit columns from join where group having compounds order')
       Dataset.def_sql_method(self, :insert, %w'insert into columns values returning')
@@ -219,7 +225,7 @@ module Sequel
       private
 
       def empty_from_sql
-        DEFAULT_FROM
+        " FROM RDB$DATABASE"
       end
 
       def insert_pk(*values)
@@ -228,11 +234,11 @@ module Sequel
       end
 
       def literal_false
-        BOOL_FALSE
+        '0'
       end
 
       def literal_true
-        BOOL_TRUE
+        '1'
       end
 
       # Firebird can insert multiple rows using a UNION
@@ -242,11 +248,11 @@ module Sequel
 
       def select_limit_sql(sql)
         if l = @opts[:limit]
-          sql << FIRST
+          sql << " FIRST "
           literal_append(sql, l)
         end
         if o = @opts[:offset]
-          sql << SKIP
+          sql << " SKIP "
           literal_append(sql, o)
         end
       end

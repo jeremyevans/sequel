@@ -798,11 +798,13 @@ module Sequel
       end
 
       EXCLUSION_CONSTRAINT_SQL_STATE = '23P01'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXCLUSION_CONSTRAINT_SQL_STATE)
       DEADLOCK_SQL_STATE = '40P01'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DEADLOCK_SQL_STATE)
       def database_specific_error_class_from_sqlstate(sqlstate)
-        if sqlstate == EXCLUSION_CONSTRAINT_SQL_STATE
+        if sqlstate == '23P01'
           ExclusionConstraintViolation
-        elsif sqlstate == DEADLOCK_SQL_STATE
+        elsif sqlstate == '40P01'
           SerializationFailure
         else
           super
@@ -1239,43 +1241,71 @@ module Sequel
       include UnmodifiedIdentifiers::DatasetMethods
 
       ACCESS_SHARE = 'ACCESS SHARE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ACCESS_SHARE)
       ACCESS_EXCLUSIVE = 'ACCESS EXCLUSIVE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ACCESS_EXCLUSIVE)
       BOOL_FALSE = 'false'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
       BOOL_TRUE = 'true'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
       COMMA_SEPARATOR = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
       EXCLUSIVE = 'EXCLUSIVE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXCLUSIVE)
       EXPLAIN = 'EXPLAIN '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN)
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN_ANALYZE)
       FOR_SHARE = ' FOR SHARE'.freeze
-      NULL = LiteralString.new('NULL').freeze
+      Sequel::Deprecation.deprecate_constant(self, :FOR_SHARE)
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
+      Sequel::Deprecation.deprecate_constant(self, :PG_TIMESTAMP_FORMAT)
       QUERY_PLAN = 'QUERY PLAN'.to_sym
+      Sequel::Deprecation.deprecate_constant(self, :QUERY_PLAN)
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROW_EXCLUSIVE)
       ROW_SHARE = 'ROW SHARE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROW_SHARE)
       SHARE = 'SHARE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SHARE)
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SHARE_ROW_EXCLUSIVE)
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SHARE_UPDATE_EXCLUSIVE)
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-      SPACE = Dataset::SPACE
-      FROM = Dataset::FROM
-      APOS = Dataset::APOS
-      APOS_RE = Dataset::APOS_RE
-      DOUBLE_APOS = Dataset::DOUBLE_APOS
-      PAREN_OPEN = Dataset::PAREN_OPEN
-      PAREN_CLOSE = Dataset::PAREN_CLOSE
-      COMMA = Dataset::COMMA
-      ESCAPE = Dataset::ESCAPE
-      BACKSLASH = Dataset::BACKSLASH
-      AS = Dataset::AS
+      Sequel::Deprecation.deprecate_constant(self, :SQL_WITH_RECURSIVE)
+      SPACE = ' '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SPACE)
+      FROM = ' FROM '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :FROM)
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
+      APOS_RE = /'/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
+      DOUBLE_APOS = "''".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
+      PAREN_CLOSE = ')'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
+      PAREN_OPEN = '('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
+      COMMA = ', '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
+      ESCAPE = " ESCAPE ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ESCAPE)
+      BACKSLASH = "\\".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
+      AS = ' AS '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :AS)
       XOR_OP = ' # '.freeze
       CRLF = "\r\n".freeze
       BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
       WINDOW = " WINDOW ".freeze
       SELECT_VALUES = "VALUES ".freeze
       EMPTY_STRING = ''.freeze
-      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
       SKIP_LOCKED = " SKIP LOCKED".freeze
 
+      NULL = LiteralString.new('NULL').freeze
+      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
       NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:cursor, :insert_conflict]).freeze
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
@@ -1294,7 +1324,7 @@ module Sequel
       def complex_expression_sql_append(sql, op, args)
         case op
         when :^
-          j = XOR_OP
+          j = ' # '
           c = false
           args.each do |a|
             sql << j if c
@@ -1302,13 +1332,13 @@ module Sequel
             c ||= true
           end
         when :ILIKE, :'NOT ILIKE'
-          sql << PAREN_OPEN
+          sql << '('
           literal_append(sql, args[0])
-          sql << SPACE << op.to_s << SPACE
+          sql << ' ' << op.to_s << ' '
           literal_append(sql, args[1])
-          sql << ESCAPE
-          literal_append(sql, BACKSLASH)
-          sql << PAREN_CLOSE
+          sql << " ESCAPE "
+          literal_append(sql, "\\")
+          sql << ')'
         else
           super
         end
@@ -1334,7 +1364,7 @@ module Sequel
 
       # Return the results of an EXPLAIN query as a string
       def explain(opts=OPTS)
-        with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join(CRLF)
+        with_sql((opts[:analyze] ? 'EXPLAIN ANALYZE ' : 'EXPLAIN ') + select_sql).map(:'QUERY PLAN').join("\r\n")
       end
 
       # Return a cloned dataset which will use FOR SHARE to lock returned rows.
@@ -1645,7 +1675,7 @@ module Sequel
 
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
-        sql << FROM
+        sql << ' FROM '
         source_list_append(sql, @opts[:from][0..0])
       end
 
@@ -1702,7 +1732,7 @@ module Sequel
         if(from = @opts[:from][1..-1]).empty?
           raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
         else
-          sql << SPACE << type.to_s << SPACE
+          sql << ' ' << type.to_s << ' '
           source_list_append(sql, from)
           select_join_sql(sql)
         end
@@ -1710,12 +1740,12 @@ module Sequel
 
       # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
       def literal_blob_append(sql, v)
-        sql << APOS << v.gsub(BLOB_RE){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"} << APOS
+        sql << "'" << v.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"} << "'"
       end
 
       # PostgreSQL uses FALSE for false values
       def literal_false
-        BOOL_FALSE
+        'false'
       end
       
       # PostgreSQL quotes NaN and Infinity.
@@ -1733,12 +1763,12 @@ module Sequel
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string_append(sql, v)
-        sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
+        sql << "'" << v.gsub("'", "''") << "'"
       end
 
       # PostgreSQL uses FALSE for false values
       def literal_true
-        BOOL_TRUE
+        'true'
       end
 
       # PostgreSQL supports multiple rows in INSERT.
@@ -1754,38 +1784,38 @@ module Sequel
       # PostgreSQL requires parentheses around compound datasets if they use
       # CTEs, and using them in other places doesn't hurt.
       def compound_dataset_sql_append(sql, ds)
-        sql << PAREN_OPEN
+        sql << '('
         super
-        sql << PAREN_CLOSE
+        sql << ')'
       end
 
       # Support FOR SHARE locking when using the :share lock style.
       # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
         if @opts[:lock] == :share
-          sql << FOR_SHARE
+          sql << ' FOR SHARE'
         else
           super
         end
 
         if @opts[:skip_locked]
-          sql << SKIP_LOCKED
+          sql << " SKIP LOCKED"
         end
       end
 
       # Support VALUES clause instead of the SELECT clause to return rows.
       def select_values_sql(sql)
-        sql << SELECT_VALUES
+        sql << "VALUES "
         expression_list_append(sql, opts[:values])
       end
 
       # SQL fragment for named window specifications
       def select_window_sql(sql)
         if ws = @opts[:window]
-          sql << WINDOW
+          sql << " WINDOW "
           c = false
-          co = COMMA
-          as = AS
+          co = ', '
+          as = ' AS '
           ws.map do |name, window|
             sql << co if c
             literal_append(sql, name)
@@ -1798,7 +1828,7 @@ module Sequel
 
       # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
       def select_with_sql_base
-        opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super
+        opts[:with].any?{|w| w[:recursive]} ? "WITH RECURSIVE " : super
       end
 
       # The version of the database server
@@ -1821,8 +1851,8 @@ module Sequel
 
       # Concatenate the expressions with a space in between
       def full_text_string_join(cols)
-        cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, EMPTY_STRING)}
-        cols = cols.zip([SPACE] * cols.length).flatten
+        cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}
+        cols = cols.zip([' '] * cols.length).flatten
         cols.pop
         SQL::StringExpression.new(:'||', *cols)
       end
@@ -1834,7 +1864,7 @@ module Sequel
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
-        sql << SPACE
+        sql << ' '
         source_list_append(sql, @opts[:from][0..0])
       end
     end

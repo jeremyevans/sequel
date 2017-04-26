@@ -28,6 +28,7 @@ module Sequel
     # The types to check for 0 scale to transform :decimal types
     # to :integer.
     DECIMAL_TYPE_RE = /number|numeric|decimal/io
+    Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
     
     # Contains procs keyed on subadapter type that extend the
     # given database object so it supports the correct database type.
@@ -653,7 +654,7 @@ module Sequel
             s[:auto_increment] = h[:is_autoincrement] == "YES"
           end
           s[:max_length] = s[:column_size] if s[:type] == :string
-          if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
+          if s[:db_type] =~ /number|numeric|decimal/i && s[:scale] == 0
             s[:type] = :integer
           end
           schema_column_set_db_type(s)

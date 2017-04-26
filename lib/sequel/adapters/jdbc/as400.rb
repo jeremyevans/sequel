@@ -23,8 +23,11 @@ module Sequel
         include Sequel::JDBC::Transactions
 
         TRANSACTION_BEGIN = 'Transaction.begin'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_BEGIN)
         TRANSACTION_COMMIT = 'Transaction.commit'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_COMMIT)
         TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_ROLLBACK)
         
         # AS400 uses the :as400 database type.
         def database_type
@@ -59,19 +62,23 @@ module Sequel
         include EmulateOffsetWithRowNumber
 
         WILDCARD = Sequel::LiteralString.new('*').freeze
+        Sequel::Deprecation.deprecate_constant(self, :WILDCARD)
         FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
+        Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST_ROW_ONLY)
         FETCH_FIRST = " FETCH FIRST ".freeze
+        Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST)
         ROWS_ONLY = " ROWS ONLY".freeze
+        Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
         
         # Modify the sql to limit the number of rows returned
         def select_limit_sql(sql)
           if l = @opts[:limit]
             if l == 1
-              sql << FETCH_FIRST_ROW_ONLY
+              sql << " FETCH FIRST ROW ONLY"
             elsif l > 1
-              sql << FETCH_FIRST
+              sql << " FETCH FIRST "
               literal_append(sql, l)
-              sql << ROWS_ONLY
+              sql << " ROWS ONLY"
             end
           end
         end

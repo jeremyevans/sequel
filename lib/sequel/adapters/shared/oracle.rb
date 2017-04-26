@@ -88,7 +88,7 @@ module Sequel
         false
       end
 
-      IGNORE_OWNERS = %w'APEX_040000 CTXSYS EXFSYS MDSYS OLAPSYS ORDDATA ORDSYS SYS SYSTEM XDB XDBMETADATA XDBPM XFILES WMSYS'
+      IGNORE_OWNERS = %w'APEX_040000 CTXSYS EXFSYS MDSYS OLAPSYS ORDDATA ORDSYS SYS SYSTEM XDB XDBMETADATA XDBPM XFILES WMSYS'#.freeze # SEQUEL5
 
       def tables(opts=OPTS)
         m = output_identifier_meth
@@ -253,7 +253,7 @@ module Sequel
       TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ COMMITTED'.freeze,
         :committed=>'READ COMMITTED'.freeze,
         :repeatable=>'SERIALIZABLE'.freeze,
-        :serializable=>'SERIALIZABLE'.freeze}
+        :serializable=>'SERIALIZABLE'.freeze}#.freeze # SEQUEL5
       # Oracle doesn't support READ UNCOMMITTED OR REPEATABLE READ transaction
       # isolation levels, so upgrade to the next highest level in those cases.
       def set_transaction_isolation_sql(level)
@@ -320,19 +320,32 @@ module Sequel
 
     module DatasetMethods
       ROW_NUMBER_EXPRESSION = LiteralString.new('ROWNUM').freeze
-      SPACE = Dataset::SPACE
-      APOS = Dataset::APOS
-      APOS_RE = Dataset::APOS_RE
-      DOUBLE_APOS = Dataset::DOUBLE_APOS
-      FROM = Dataset::FROM
-      TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
-      TIMESTAMP_OFFSET_FORMAT = "%+03i:%02i".freeze
-      BOOL_FALSE = "'N'".freeze
-      BOOL_TRUE = "'Y'".freeze
-      HSTAR = "H*".freeze
-      DUAL = ' FROM DUAL'.freeze
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
+
+      SPACE = ' '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :SPACE)
+      APOS = "'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS)
+      APOS_RE = /'/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
+      DOUBLE_APOS = "''".freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
+      FROM = ' FROM '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :FROM)
+      TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
+      TIMESTAMP_OFFSET_FORMAT = "%+03i:%02i".freeze
+      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_OFFSET_FORMAT)
+      BOOL_FALSE = "'N'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
+      BOOL_TRUE = "'Y'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
+      HSTAR = "H*".freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
+      DUAL = ' FROM DUAL'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DUAL)
       SKIP_LOCKED = " SKIP LOCKED".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
 
       include(Module.new do
         Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order lock')
@@ -532,17 +545,17 @@ module Sequel
       # the use of AS anywhere, so this disables it in all cases.
       def as_sql_append(sql, aliaz, column_aliases=nil)
         raise Error, "oracle does not support derived column lists" if column_aliases
-        sql << SPACE
+        sql << ' '
         quote_identifier_append(sql, aliaz)
       end
 
       # The strftime format to use when literalizing the time.
       def default_timestamp_format
-        TIMESTAMP_FORMAT
+        "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'"
       end
 
       def empty_from_sql
-        DUAL
+        ' FROM DUAL'
       end
 
       # There is no function on Microsoft SQL Server that does character length
@@ -577,7 +590,7 @@ module Sequel
 
       # Use a colon for the timestamp offset, since Oracle appears to require it.
       def format_timestamp_offset(hour, minute)
-        sprintf(TIMESTAMP_OFFSET_FORMAT, hour, minute)
+        sprintf("%+03i:%02i", hour, minute)
       end
 
       # Oracle doesn't support empty values when inserting.
@@ -587,22 +600,22 @@ module Sequel
 
       # Use string in hex format for blob data.
       def literal_blob_append(sql, v)
-        sql << APOS << v.unpack(HSTAR).first << APOS
+        sql << "'" << v.unpack("H*").first << "'"
       end
 
       # Oracle uses 'N' for false values.
       def literal_false
-        BOOL_FALSE
+        "'N'"
       end
 
       # Oracle uses the SQL standard of only doubling ' inside strings.
       def literal_string_append(sql, v)
-        sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
+        sql << "'" << v.gsub("'", "''") << "'"
       end
 
       # Oracle uses 'Y' for true values.
       def literal_true
-        BOOL_TRUE
+        "'Y'"
       end
 
       # Oracle can insert multiple rows using a UNION
@@ -615,7 +628,7 @@ module Sequel
         super
 
         if @opts[:skip_locked]
-          sql << SKIP_LOCKED
+          sql << " SKIP LOCKED"
         end
       end
 
