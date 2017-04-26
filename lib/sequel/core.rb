@@ -408,7 +408,7 @@ module Sequel
   # <tt>SQL::VirtualRow</tt> instance.
   #
   #   Sequel.virtual_row{a} # Sequel::SQL::Identifier.new(:a)
-  #   Sequel.virtual_row{|o| o.a{}} # Sequel::SQL::Function.new(:a)
+  #   Sequel.virtual_row{|o| o.a} # Sequel::SQL::Function.new(:a)
   def self.virtual_row(&block)
     vr = VIRTUAL_ROW
     case block.arity
