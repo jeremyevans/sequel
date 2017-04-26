@@ -10,7 +10,6 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   require 'sequel'
 end
 
-
 # SEQUEL5: Remove
 output = Sequel::Deprecation.output
 Sequel::Deprecation.output = nil
@@ -28,6 +27,7 @@ end
 Sequel.extension :symbol_aref
 Sequel.extension :virtual_row_method_block
 
+gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 
