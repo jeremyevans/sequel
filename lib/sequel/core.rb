@@ -228,9 +228,6 @@ module Sequel
     Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
   end
 
-  COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze
-  COLUMN_REF_RE2 = /\A((?:(?!___).)+)___(.+)\z/.freeze
-  COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
   SPLIT_SYMBOL_CACHE = {}
 
   # Splits the symbol into three parts, if symbol splitting is enabled.
@@ -244,17 +241,17 @@ module Sequel
     unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym]}
       if split = split_symbols?
         v = case s = sym.to_s
-        when COLUMN_REF_RE1
+        when /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/
           if split == :deprecated
             Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.qualify(#{$1.inspect}, #{$2.inspect}).as(#{$3.inspect})")
           end
           [$1.freeze, $2.freeze, $3.freeze].freeze
-        when COLUMN_REF_RE2
+        when /\A((?:(?!___).)+)___(.+)\z/
           if split == :deprecated
             Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.identifier(#{$1.inspect}).as(#{$2.inspect})")
           end
           [nil, $1.freeze, $2.freeze].freeze
-        when COLUMN_REF_RE3
+        when /\A((?:(?!__).)+)__(.+)\z/
           if split == :deprecated
             Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.qualify(#{$1.inspect}, #{$2.inspect})")
           end
@@ -461,4 +458,11 @@ module Sequel
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)
+
+  COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze
+  Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE1)
+  COLUMN_REF_RE2 = /\A((?:(?!___).)+)___(.+)\z/.freeze
+  Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE2)
+  COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
+  Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE3)
 end
