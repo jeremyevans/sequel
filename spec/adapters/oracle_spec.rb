@@ -63,15 +63,19 @@ describe "An Oracle database" do
       DB.view_exists?(:cats).must_equal false
       DB.create_view(:cats, DB[:categories])
       DB.view_exists?(:cats).must_equal true
-      om = DB.identifier_output_method
-      im = DB.identifier_input_method
-      DB.identifier_output_method = :reverse
-      DB.identifier_input_method = :reverse
-      DB.view_exists?(:STAC).must_equal true
-      DB.view_exists?(:cats).must_equal false
+      if IDENTIFIER_MANGLING && !DB.frozen?
+        om = DB.identifier_output_method
+        im = DB.identifier_input_method
+        DB.identifier_output_method = :reverse
+        DB.identifier_input_method = :reverse
+        DB.view_exists?(:STAC).must_equal true
+        DB.view_exists?(:cats).must_equal false
+      end
     ensure
-      DB.identifier_output_method = om
-      DB.identifier_input_method = im
+      if IDENTIFIER_MANGLING && !DB.frozen?
+        DB.identifier_output_method = om
+        DB.identifier_input_method = im
+      end
       DB.drop_view(:cats)
     end
   end
