@@ -5,7 +5,7 @@ module Sequel
     # The whitelist_security plugin contains whitelist-based support for
     # mass assignment, explicitly specifying which columns to allow mass assignment for,
     # disallowing mass assignment for columns not listed.  This exists mostly for backwards
-    # compatibility, it's best to set Sequel::Model#set_fields and Sequel::Model#update_fields
+    # compatibility, it's best to use Sequel::Model#set_fields and Sequel::Model#update_fields
     # to decide which fields to allow on a per-call basis.
     #
     # Usage:
