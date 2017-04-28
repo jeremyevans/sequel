@@ -2,6 +2,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 begin
   require 'active_support/duration'
+  begin
+    require 'active_support/gem_version'
+  rescue LoadError
+  end
 rescue LoadError => exc
   skip_warn "pg_interval plugin: can't load active_support/duration (#{exc.class}: #{exc})"
 else
@@ -21,8 +25,13 @@ describe "pg_interval extension" do
   end
 
   it "should literalize ActiveSupport::Duration instances with repeated parts correctly" do
-    @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 2], [:seconds, 1]])).must_equal "'3 seconds '::interval"
-    @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 2], [:seconds, 1], [:days, 1], [:days, 4]])).must_equal "'5 days 3 seconds '::interval"
+    if defined?(ActiveSupport::VERSION::STRING) && ActiveSupport::VERSION::STRING >= '5.1'
+      @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 2], [:seconds, 1]])).must_equal "'1 seconds '::interval"
+      @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 2], [:seconds, 1], [:days, 1], [:days, 4]])).must_equal "'4 days 1 seconds '::interval"
+    else
+      @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 2], [:seconds, 1]])).must_equal "'3 seconds '::interval"
+      @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 2], [:seconds, 1], [:days, 1], [:days, 4]])).must_equal "'5 days 3 seconds '::interval"
+    end
   end
 
   it "should not affect literalization of custom objects" do
