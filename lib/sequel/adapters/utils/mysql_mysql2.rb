@@ -13,6 +13,7 @@ module Sequel
         Can't connect to local MySQL server through socket
         MySQL server has gone away
         Lost connection to MySQL server during query
+        MySQL client is not connected
         This connection is still waiting for a result, try again once you have the result
         closed MySQL connection
         END

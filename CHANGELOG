@@ -1,5 +1,7 @@
 === master
 
+* Recognize additional disconnect error on MySQL (jeremyevans)
+
 * Deconstantize dataset SQL generation, speeding up ruby 2.3+, slowing down earlier versions (jeremyevans)
 
 * Deprecate calling Dataset#set_graph_aliases before Dataset#graph (jeremyevans)
