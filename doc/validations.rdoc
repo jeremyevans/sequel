@@ -496,7 +496,6 @@ This will make sure that all string columns in the model are validated to make s
 If you forget to call +super+, the validations that you defined in <tt>Sequel::Model</tt> will not be enforced.  It's a good idea to call super whenever you override one of <tt>Sequel::Model</tt>'s methods, unless you specifically do not want the default behavior.
 
 == <tt>Sequel::Model::Errors</tt>
-'
 As mentioned earlier, <tt>Sequel::Model::Errors</tt> is a subclass of Hash with a few special methods, the most common of which are described here:
 
 === +add+
@@ -513,7 +512,7 @@ As mentioned earlier, <tt>Sequel::Model::Errors</tt> is a subclass of Hash with 
 
 If you want to make some validations dependent upon the results of other validations, you may want to use +on+ inside your validates method:
 
-  validates_integer(:release_date) if errors.on(:record_date)
+  validates_integer(:release_date) unless errors.on(:record_date)
 
 Here, you don't care about validating the release date if there were validation errors for the record date.
 
