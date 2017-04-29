@@ -8,8 +8,13 @@
 #   Sequel.extension :core_extensions
 
 # This extension loads the core extensions.
-def Sequel.core_extensions?
-  true
+module Sequel
+  class << self
+    undef :core_extensions? if method_defined? :core_extensions?
+    def core_extensions?
+      true
+    end
+  end
 end
 
 Sequel.extension :symbol_as
