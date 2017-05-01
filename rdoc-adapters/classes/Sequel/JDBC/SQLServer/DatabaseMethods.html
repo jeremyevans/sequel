@@ -41,6 +41,13 @@
             href="../SQLServer.html">SQLServer</a> databases accessed via <a
             href="../../JDBC.html">JDBC</a>.</p>
           </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a href="#method-i-setup_type_convertor_map">setup_type_convertor_map</a></li>
+            </ol>
+          </div>
           <div id='context'>
             <div id='includes'>
               <h2>Included modules</h2>
@@ -56,6 +63,25 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-setup_type_convertor_map'>
+                <a name='method-i-setup_type_convertor_map'></a>
+                <div class='synopsis'>
+                  <span class='name'>setup_type_convertor_map</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-setup_type_convertor_map-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-setup_type_convertor_map-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">setup_type_convertor_map</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">map</span> = <span class="ruby-ivar">@type_convertor_map</span>&#x000A;  <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">TIME</span>] = <span class="ruby-constant">TypeConvertor</span><span class="ruby-operator">::</span><span class="ruby-constant">INSTANCE</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:MSSQLRubyTime</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">MicrosoftSql</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">DATETIMEOFFSET</span>)&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">MicrosoftSql</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">DATETIMEOFFSET</span>] = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getDateTimeOffset</span>(<span class="ruby-identifier">i</span>)&#x000A;        <span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_s</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

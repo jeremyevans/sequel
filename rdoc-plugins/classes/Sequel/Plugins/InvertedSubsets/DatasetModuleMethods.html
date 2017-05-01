@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::Plugins::InvertedSubsets::ClassMethods</title>
+    <title>Sequel::Plugins::InvertedSubsets::DatasetModuleMethods</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -25,7 +25,7 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::Plugins::InvertedSubsets::ClassMethods
+          Sequel::Plugins::InvertedSubsets::DatasetModuleMethods
         </h1>
         <ol class='paths'>
           <li>
@@ -40,7 +40,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a href="#method-i-subset">subset</a></li>
+              <li><a href="#method-i-where">where</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -48,10 +48,10 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-subset'>
-                <a name='method-i-subset'></a>
+              <div class='method public-instance' id='method-method-i-where'>
+                <a name='method-i-where'></a>
                 <div class='synopsis'>
-                  <span class='name'>subset</span>
+                  <span class='name'>where</span>
                   <span class='arguments'>(name, *args, &block)</span>
                 </div>
                 <div class='description'>
@@ -59,10 +59,10 @@
                   <p>Define a not_ prefixed subset which inverts the subset condition.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-subset-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-ivar">@inverted_subsets_name_block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">name</span>)){<span class="ruby-identifier">exclude</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-where-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">inverted_subset_name</span>(<span class="ruby-identifier">name</span>), <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

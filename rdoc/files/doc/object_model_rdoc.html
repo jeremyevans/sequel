@@ -611,21 +611,19 @@
             <p>These objects are usually not instantiated manually.  See the <a
             href="virtual_rows_rdoc.html">Virtual Row Guide</a> for details.</p>
             
-            <h3 id="label-Sequel-3A-3ASQL-3A-3AWindow"><a href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AWindow">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AWindow">Sequel::SQL::Window<span><a href="#label-Sequel-3A-3ASQL-3A-3AWindow">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p><a href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a>
-            objects represent the windows used by <a
+            <p>Sequel::SQL::Window objects represent the windows used by <a
             href="../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a>.
             They use a hash-based API, supporting the :frame, :order, :partition, and
             :window options:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (ORDER BY &quot;a&quot;)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (PARTITION BY &quot;a&quot;)</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">frame=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">all</span>)&#x000A;<span class="ruby-comment"># (PARTITION BY &quot;a&quot; ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)</span></pre>
             
-            <h3 id="label-Sequel-3A-3ASQL-3A-3AWrapper"><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AWrapper">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AWrapper">Sequel::SQL::Wrapper<span><a href="#label-Sequel-3A-3ASQL-3A-3AWrapper">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a>
-            objects wrap arbitrary objects so that they can be used in <a
-            href="../../classes/Sequel.html">Sequel</a> expressions:</p>
+            <p>Sequel::SQL::Wrapper objects wrap arbitrary objects so that they can be
+            used in <a href="../../classes/Sequel.html">Sequel</a> expressions:</p>
             
             <pre class="ruby"><span class="ruby-identifier">o</span> = <span class="ruby-constant">Object</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sql_literal</span>(<span class="ruby-identifier">ds</span>) <span class="ruby-string">&quot;foo&quot;</span> <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Wrapper</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">o</span>) <span class="ruby-comment"># foo</span></pre>
             
@@ -639,8 +637,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">o</span>]</pre>
             
-            <p>However, note that that does not necessarily return a <a
-            href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a>
+            <p>However, note that that does not necessarily return a Sequel::SQL::Wrapper
             object, it may return a different class of object, such as a <a
             href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a>
             subclass object.</p>

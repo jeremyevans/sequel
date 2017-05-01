@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::WhitelistSecurity::ClassMethods</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::WhitelistSecurity::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../../files/lib/sequel/plugins/whitelist_security_rb.html">lib/sequel/plugins/whitelist_security.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a href="#attribute-i-allowed_columns">allowed_columns</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
+              <li><a href="#method-i-set_allowed_columns">set_allowed_columns</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-allowed_columns'>allowed_columns</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Which columns should be the only columns allowed in a call to a mass
+                      assignment method (e.g. set) (default: not set, so all columns not
+                      otherwise restricted are allowed).</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze allowed columns when freezing model class.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@allowed_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_allowed_columns'>
+                <a name='method-i-set_allowed_columns'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_allowed_columns</span>
+                  <span class='arguments'>(*cols)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the columns to allow when using mass assignment (e.g.
+                  <code>set</code>).  Using this means that any columns not listed here will
+                  not be modified.  If you have any virtual setter methods (methods that end
+                  in =) that you want to be used during mass assignment, they need to be
+                  listed here as well (without the =).</p>
+                  
+                  <p>It may be better to use a method such as <code>set_only</code> or
+                  <code>set_fields</code> that lets you specify the allowed fields per call.</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">hometown</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>, :<span class="ruby-identifier">hometown=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>, :<span class="ruby-identifier">records_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_allowed_columns-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_allowed_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/whitelist_security.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_allowed_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">clear_setter_methods_cache</span>&#x000A;  <span class="ruby-ivar">@allowed_columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

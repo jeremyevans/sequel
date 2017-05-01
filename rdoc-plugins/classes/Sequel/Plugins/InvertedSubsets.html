@@ -54,53 +54,40 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a href="#method-c-configure">configure</a></li>
+              <li><a href="#method-c-apply">apply</a></li>
             </ol>
           </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a href="InvertedSubsets/DatasetModuleMethods.html">DatasetModuleMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
             <ol>
-              <li><a href="InvertedSubsets/ClassMethods.html">Sequel::Plugins::InvertedSubsets::ClassMethods</a></li>
+              <li><a href="InvertedSubsets/DatasetModuleMethods.html">Sequel::Plugins::InvertedSubsets::DatasetModuleMethods</a></li>
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DEFAULT_NAME_BLOCK</td>
-                    <td>=</td>
-                    <td class='context-item-value'>lambda{|name| "not_#{name}"}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Default naming for inverted subsets</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-configure'>
-                <a name='method-c-configure'></a>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
                 <div class='synopsis'>
-                  <span class='name'>configure</span>
-                  <span class='arguments'>(model, &block)</span>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(mod, &block)</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Store the supplied block for calling later when subsets are defined, or
-                  create a default one if we need to.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@inverted_subsets_name_block</span>, <span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_NAME_BLOCK</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;        <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:inverted_subset_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-identifier">private</span> <span class="ruby-value">:inverted_subset_name</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

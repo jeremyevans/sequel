@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::DefDatasetMethod::ClassMethods</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::DefDatasetMethod::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../../files/lib/sequel/plugins/def_dataset_method_rb.html">lib/sequel/plugins/def_dataset_method.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a href="#method-i-def_dataset_method">def_dataset_method</a></li>
+              <li><a href="#method-i-subset">subset</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-def_dataset_method'>
+                <a name='method-i-def_dataset_method'></a>
+                <div class='synopsis'>
+                  <span class='name'>def_dataset_method</span>
+                  <span class='arguments'>(*args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If a block is given, define a method on the dataset (if the model currently
+                  has an dataset)  with the given argument name using the given block.  Also
+                  define a class method on the model that calls the dataset method.  Stores
+                  the method name and block so that it can be reapplied if the model&#39;s
+                  dataset changes.</p>
+                  
+                  <p>If a block is not given, just define a class method on the model for each
+                  argument that calls the dataset method of the same argument name.</p>
+                  
+                  <p>Using dataset_module is recommended over using this method.  In addition to
+                  allowing more natural ruby syntax for defining methods manually, it also
+                  offers numerous helper methods that make defining common dataset methods
+                  more easily, as well as supporting dataset caching (assuming the arguments
+                  allow it).</p>
+                  
+                  <pre class="ruby"><span class="ruby-comment"># Add new dataset method and class method that calls it</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">def_dataset_method</span>(:<span class="ruby-identifier">by_name</span>){<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>)}&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">by_name</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">by_name</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>))&#x000A;&#x000A;<span class="ruby-comment"># Just add a class method that calls an existing dataset method</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">def_dataset_method</span>(:<span class="ruby-identifier">paginate</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">paginate</span>(<span class="ruby-value">2</span>, <span class="ruby-value">10</span>)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-def_dataset_method-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-def_dataset_method-source'><span class="ruby-comment"># File lib/sequel/plugins/def_dataset_method.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No arguments given&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Defining a dataset method using a block requires only one argument&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">dataset_module</span>{<span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span> <span class="ruby-identifier">def_model_dataset_method</span>(<span class="ruby-identifier">arg</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-subset'>
+                <a name='method-i-subset'></a>
+                <div class='synopsis'>
+                  <span class='name'>subset</span>
+                  <span class='arguments'>(*args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Sets up a dataset method that returns a filtered dataset. Sometimes thought
+                  of as a scope, and like most dataset methods, they can be chained. For
+                  example:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">Topic</span>.<span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">joes</span>, :<span class="ruby-identifier">username</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%joe%&#39;</span>))&#x000A;<span class="ruby-constant">Topic</span>.<span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">popular</span>){<span class="ruby-identifier">num_posts</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-constant">Topic</span>.<span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">recent</span>){<span class="ruby-identifier">created_on</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>}</pre>
+                  
+                  <p>Allows you to do:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">Topic</span>.<span class="ruby-identifier">joes</span>.<span class="ruby-identifier">recent</span>.<span class="ruby-identifier">popular</span></pre>
+                  
+                  <p>to get topics with a username that includes joe that have more than 100
+                  posts and were created less than 7 days ago.</p>
+                  
+                  <p>Both the args given and the block are passed to
+                  <code>Dataset#filter</code>.</p>
+                  
+                  <p>This method creates dataset methods that do not accept arguments.  To
+                  create dataset methods that accept arguments, you should use define a
+                  method directly inside a dataset_module block.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-subset-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/plugins/def_dataset_method.rb, line 82</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subset</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">dataset_module</span>{<span class="ruby-identifier">subset</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-01-25 18:19:06 -0800</span>
+          <span class='datetime'>2017-04-28 10:28:52 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -585,9 +585,9 @@
             
             <h2 id="label-Sequel-3A-3AModel-3A-3AErrors"><code>Sequel::Model::Errors</code><span><a href="#label-Sequel-3A-3AModel-3A-3AErrors">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p>&#39; As mentioned earlier, <code>Sequel::Model::Errors</code> is a
-            subclass of Hash with a few special methods, the most common of which are
-            described here:</p>
+            <p>As mentioned earlier, <code>Sequel::Model::Errors</code> is a subclass of
+            Hash with a few special methods, the most common of which are described
+            here:</p>
             
             <h3 id="label-add"><code>add</code><span><a href="#label-add">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -610,7 +610,7 @@
             validations, you may want to use <code>on</code> inside your validates
             method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">validates_integer</span>(:<span class="ruby-identifier">release_date</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">record_date</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_integer</span>(:<span class="ruby-identifier">release_date</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">record_date</span>)</pre>
             
             <p>Here, you don&#39;t care about validating the release date if there were
             validation errors for the record date.</p>

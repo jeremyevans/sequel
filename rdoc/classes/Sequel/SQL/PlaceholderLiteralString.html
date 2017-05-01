@@ -56,6 +56,7 @@
               <li><a href="#attribute-i-args">args</a></li>
               <li><a href="#attribute-i-parens">parens</a></li>
               <li><a href="#attribute-i-str">str</a></li>
+              <li><a href="#method-i-with_parens">with_parens</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -119,7 +120,25 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1614</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">str</span>, <span class="ruby-identifier">args</span>, <span class="ruby-identifier">parens</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-ivar">@str</span> = <span class="ruby-identifier">str</span>&#x000A;  <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>)).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-ivar">@parens</span> = <span class="ruby-identifier">parens</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1618</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">str</span>, <span class="ruby-identifier">args</span>, <span class="ruby-identifier">parens</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-ivar">@str</span> = <span class="ruby-identifier">str</span>&#x000A;  <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-ivar">@parens</span> = <span class="ruby-identifier">parens</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-with_parens'>
+                <a name='method-i-with_parens'></a>
+                <div class='synopsis'>
+                  <span class='name'>with_parens</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a copy of the that will be surrounded by parantheses.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_parens-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-with_parens-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1626</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_parens</span>&#x000A;  <span class="ruby-ivar">@parens</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@str</span>, <span class="ruby-ivar">@args</span>, <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

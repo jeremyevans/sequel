@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>auto_literal_strings.rb</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>auto_literal_strings.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/auto_literal_strings.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2017-04-19 16:07:09 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The auto_literal_strings extension treats string values passed as filter
+            arguments as SQL query fragments.  This is the behavior of previous
+            versions of <a href="../../../../classes/Sequel.html">Sequel</a>.  Using
+            this extension makes using raw SQL fragments easier, since you don&#39;t
+            need to wrap them with Sequel.lit, but also makes it easier to introduce
+            SQL injection vulnerabilities into the application. It is only recommended
+            to use this extension for backwards compatibility with previous versions of
+            <a href="../../../../classes/Sequel.html">Sequel</a>.</p>
+            
+            <p>With this extension, if a single string is given, it is used as an SQL
+            query fragment:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">auto_literal_strings</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;A&#39;&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (name &gt; &#39;A&#39;)</span></pre>
+            
+            <p>If additional arguments are given, they are used as placeholders:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-string">&quot;A&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (name &gt; &#39;A&#39;)</span></pre>
+            
+            <p>Named placeholders can also be used with a hash:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; :a&quot;</span>, :<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;A&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (name &gt; &#39;A&#39;)</span></pre>
+            
+            <p>This extension also allows the use of a plain string passed to
+            Dataset#update:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;column = column + 1&quot;</span>)&#x000A;<span class="ruby-comment"># UPDATE table SET column = column + 1</span></pre>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/Dataset/AutoLiteralStrings.html">Sequel::Dataset::AutoLiteralStrings</a></p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

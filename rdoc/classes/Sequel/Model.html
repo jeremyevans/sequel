@@ -152,7 +152,9 @@
                     <td>=</td>
                     <td class='context-item-value'>
                       [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
-                      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_after_commit_rollback, :use_transactions]
+                      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions,
+                      :use_after_commit_rollback # SEQUEL5: Remove
+                      ]
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
@@ -166,7 +168,7 @@
                     <td>=</td>
                     <td class='context-item-value'>
                       (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) -
-                      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
+                      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
@@ -195,14 +197,16 @@
                     <td class='context-item-name'>INHERITED_INSTANCE_VARIABLES</td>
                     <td>=</td>
                     <td class='context-item-value'>
-                      {:@allowed_columns=>:dup,
+                      {
+                      :@allowed_columns=>:dup, # SEQUEL5: Remove
                       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
                       :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil,
                       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
                       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
                       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
                       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
-                      :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
+                      :@fast_instance_delete_sql=>nil,
+                      :@finders=>:dup, :@finder_loaders=>:dup, # SEQUEL5: Remove
                       :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
                       :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}
                     </td>

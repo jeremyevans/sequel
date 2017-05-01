@@ -57,7 +57,6 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-subset">subset</a></li>
-              <li><a href="#method-i-where">where</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -79,7 +78,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-def_dataset_caching_method-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-def_dataset_caching_method-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">def_dataset_caching_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;      <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-identifier">name</span>){<span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">key</span> = <span class="ruby-value">:&quot;_#{meth}_#{name}_ds&quot;</span>&#x000A;      <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">do</span>&#x000A;        <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-identifier">key</span>){<span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-def_dataset_caching_method-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">def_dataset_caching_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;      <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>){<span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">key</span> = <span class="ruby-value">:&quot;_#{meth}_#{name}_ds&quot;</span>&#x000A;      <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">do</span>&#x000A;        <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-identifier">key</span>){<span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-new'>
@@ -108,30 +107,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Define a named filter for this dataset, see Model.subset for details.</p>
+                  <p>Alias for where.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-subset-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-where'>
-                <a name='method-i-where'></a>
-                <div class='synopsis'>
-                  <span class='name'>where</span>
-                  <span class='arguments'>(name, *args, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Alias for subset</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-where-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

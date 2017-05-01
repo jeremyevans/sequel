@@ -90,10 +90,6 @@
               <li><a href="#method-c-sequel_pg_version_supported-3F">sequel_pg_version_supported?</a></li>
               <li><a href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
             </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-bytea">bytea</a></li>
-            </ol>
           </div>
           <div id='context'>
           </div>
@@ -176,6 +172,13 @@
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PG_NAMED__TYPES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>PG_NAMED_TYPES</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>PG_TYPES</td>
                     <td>=</td>
                     <td class='context-item-value'>{} unless defined?(PG_TYPES)</td>
@@ -219,25 +222,36 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>TYPE_CONVERTOR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      Class.new do
+                      def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
+                      end.new
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>TYPE_TRANSLATOR</td>
                     <td>=</td>
                     <td class='context-item-value'>
                       tt = Class.new do
-                      def boolean(s) s == TRUE_STR end
+                      def boolean(s) s == 't' end
                       def integer(s) s.to_i end
                       def float(s) 
                       case s
-                      when NAN_STR
+                      when 'NaN'
                       NAN
-                      when PLUS_INFINITY_STR
+                      when 'Infinity'
                       PLUS_INFINITY
-                      when MINUS_INFINITY_STR
+                      when '-Infinity'
                       MINUS_INFINITY
                       else
                       s.to_f 
                       end
                       end
-                      def date(s) ::Date.new(*s.split(DASH_STR).map(&:to_i)) end
+                      def date(s) ::Date.new(*s.split('-').map(&:to_i)) end
                       def bytea(str)
                       str = if str =~ /\A\\x/
                       # PostgreSQL 9.0+ bytea hex format
@@ -346,24 +360,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-sequel_pg_version_supported-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-bytea'>
-                <a name='method-i-bytea'></a>
-                <div class='synopsis'>
-                  <span class='name'>bytea</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-bytea-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

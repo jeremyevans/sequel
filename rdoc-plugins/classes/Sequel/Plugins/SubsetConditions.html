@@ -46,15 +46,47 @@
             
             <pre class="ruby"><span class="ruby-comment"># Add subset_conditions in the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subset_conditions</span>&#x000A;&#x000A;<span class="ruby-comment"># This will now create a published_conditions method</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">subset</span> :<span class="ruby-identifier">published</span>, :<span class="ruby-identifier">published</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published_conditions</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS TRUE)</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published_conditions</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS NOT TRUE)</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published_conditions</span>, :<span class="ruby-identifier">ready=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))</span></pre>
           </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a href="#method-c-apply">apply</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a href="SubsetConditions/DatasetModuleMethods.html">DatasetModuleMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
             <ol>
-              <li><a href="SubsetConditions/ClassMethods.html">Sequel::Plugins::SubsetConditions::ClassMethods</a></li>
+              <li><a href="SubsetConditions/DatasetModuleMethods.html">Sequel::Plugins::SubsetConditions::DatasetModuleMethods</a></li>
             </ol>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(mod, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

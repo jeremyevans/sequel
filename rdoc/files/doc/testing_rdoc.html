@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-01-24 12:27:29 -0800</span>
+          <span class='datetime'>2017-04-03 17:39:05 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -228,6 +228,8 @@
             <p>Use the freeze_datasets extension when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_FREEZE_DATABASE </td><td>
             <p>Freeze the database before running the integration specs</p>
+            </td></tr><tr><td class='label'>SEQUEL_IDENTIFIER_MANGLING </td><td>
+            <p>Use the identifier_mangling extension when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_MODEL_PREPARED_STATEMENTS </td><td>
             <p>Use the <a href="prepared_statements_rdoc.html">prepared_statements</a> and
             prepared_statements_associations plugins when running the specs</p>
@@ -237,8 +239,6 @@
             <p>Don&#39;t cache association metadata when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_CHECK_SQLS </td><td>
             <p>Don&#39;t check for specific SQL syntax when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_NO_MANGLE </td><td>
-            <p>Don&#39;t use the identifier_mangling extension when runnsing the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_PENDING </td><td>
             <p>Don&#39;t skip any specs, try running all specs (note, can cause lockups
             for some adapters)</p>

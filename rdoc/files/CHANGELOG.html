@@ -29,12 +29,170 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-04-01 07:17:22 -0700</span>
+          <span class='datetime'>2017-05-01 07:24:50 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.46.0+-282017-05-01-29">4.46.0 (2017-05-01)<span><a href="#label-4.46.0+-282017-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Recognize additional disconnect error on MySQL (jeremyevans)</p>
+            </li><li>
+            <p>Deconstantize dataset SQL generation, speeding up ruby 2.3+, slowing down
+            earlier versions (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate calling Dataset#set_graph_aliases before Dataset#graph
+            (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t swallow exception if there is an exception when rolling back a
+            transaction when using :rollback=&gt;:always option (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate passing 2 arguments to Database#alter_table (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate passing Schema::CreateTableGenerator instance as second argument
+            to Database#create_table (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Database::DatasetClass as a way for getting default dataset
+            classes for datasets (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate SQLite pragma getting and setting methods (jeremyevans)</p>
+            </li><li>
+            <p>Remove handling of EMULATED_FUNCTION_MAP from adapter dataset classes,
+            overide Dataset#native_function_name instead (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate {Integer,Timestamp}Migrator::DEFAULT_SCHEMA_{COLUMN,TABLE}
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Database#jdbc_* methods for jdbc/db2 adapter Database instances
+            (jeremyevans)</p>
+            </li><li>
+            <p>Remove addition of Database#jdbc_* to JDBC::Database in jdbc/db2 adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate many internal Database and Dataset string/regexp constants in
+            core and included adapters (jeremyevans)</p>
+            </li><li>
+            <p>Remove use of Fixnum in sqlanywhere shared adapter (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate <a
+            href="../classes/Sequel/Schema/CreateTableGenerator.html">Sequel::Schema::Generator</a>
+            constant, use <a
+            href="../classes/Sequel/Schema/CreateTableGenerator.html">Sequel::Schema::CreateTableGenerator</a>
+            instead (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Database#log_yield (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate the set_overrides extension (jeremyevans)</p>
+            </li><li>
+            <p>If passing an empty array or hash and a block to a filtering method, ignore
+            the array or hash and just use the block (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate ignoring explicit nil argument when there is no existing filter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate ignoring explicit nil argument to filtering methods when passing
+            a block (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate ignoring empty strings and other empty? arguments passed to the
+            filtering methods without a block (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate calling filtering methods without an argument or a block
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::VirtualRow#` to create literal SQL, use Sequel.lit
+            instead (jeremyevans)</p>
+            </li><li>
+            <p>Add auto_literal_strings extensions for treating plain strings passed to
+            filtering/update methods as literal SQL (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate automatically treating plain strings passed to filtering/update
+            methods as literal SQL (jeremyevans)</p>
+            </li><li>
+            <p>Passing a PlaceholderLiteralString to a filtering method now uses
+            parentheses around the expression (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#full_text_search work on Microsoft SQL Server when
+            no_auto_literal_strings extension is used (jeremyevans)</p>
+            </li><li>
+            <p>Fix Database#disconnect when using the single connection pool without an
+            active connection (jeremyevans) (#1339)</p>
+            </li><li>
+            <p>Handle conversion of datetimeoffset values when using the jdbc/sqlserver
+            adapter in some configurations (iaddict, jeremyevans) (#1338)</p>
+            </li><li>
+            <p>Fix conversion of some time values when using the jdbc/sqlserver adapter in
+            some configurations (iaddict, jeremyevans) (#1337)</p>
+            </li><li>
+            <p>Use microsecond precision for time values on Microsoft SQL Server, instead
+            of millisecond precision (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#sqltime_precision private method for adapters to use different
+            precision for <a href="../classes/Sequel/SQLTime.html">Sequel::SQLTime</a>
+            than Time and Date (jeremyevans)</p>
+            </li><li>
+            <p>Use utc timezone in <a
+            href="../classes/Sequel/SQLTime.html#method-c-create">Sequel::SQLTime.create</a>
+            if Sequel.application_timezone is :utc (jeremyevans) (#1336)</p>
+            </li><li>
+            <p>Include migration filename in message about migration file without a single
+            migration (jmettraux) (#1334)</p>
+            </li><li>
+            <p>Deprecate conversion of - to _ in adapter schemes (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t quote function names that are SQL::Identifiers, unless
+            SQL::Function#quoted is used (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate splitting virtual row method names (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate passing blocks to virtual row methods, move to
+            virtual_row_method_block extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate <a
+            href="../classes/Sequel/SQL/Expression.html#method-i-sql_literal">Sequel::SQL::Expression#sql_literal</a>
+            and lit (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t issue deprecation warnings on ruby 1.8.7, as <a
+            href="../classes/Sequel.html">Sequel</a> 5 is dropping support for it
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::BasicObject#remove_methods! (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate sequel/no_core_ext file (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate model dataset insert_sql accepting model instances (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate model dataset join_table and graph accepting model classes
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support :alias option to class_table_inheritance plugin, wrapping subclass
+            datasets in a subquery to fix ambiguous column issues (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model.set_allowed_columns and
+            Model#{set_all,set_only,update_all,update_only}, move to whitelist security
+            plugin (jeremyevans)</p>
+            </li><li>
+            <p>Do not raise MassAssignmentRestriction when setting nested attributes and
+            using the :fields option, only check for fields given (jeremyevans)</p>
+            </li><li>
+            <p>Do not add class methods for private methods definined in dataset_module
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model.def_dataset_method and Model.subset, move to
+            def_dataset_method plugin (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model.finder and Model.prepared_finder, move to finder plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate calling Model.db= on a model with a dataset (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate splitting symbols to look for qualified/aliased identifiers (e.g.
+            :table__column) (jeremyevans)</p>
+            </li><li>
+            <p>Allow optimized lookups and deletes for models using SQL::Identifier and
+            SQL::QualifiedIdentifier values as the FROM table (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.45.0+-282017-04-01-29">4.45.0 (2017-04-01)<span><a href="#label-4.45.0+-282017-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -3305,7 +3463,8 @@
             QualifiedIdentifier (jeremyevans)</p>
             </li><li>
             <p>Sequel.expr(:symbol) now returns Identifier, QualifiedIdentifier, or
-            AliasedExpression instead of Wrapper (jeremyevans)</p>
+            AliasedExpression instead of <a href="../classes/Wrapper.html">Wrapper</a>
+            (jeremyevans)</p>
             </li><li>
             <p>Treat clob columns as string instead of blob on Derby (jeremyevans) (#509)</p>
             </li></ul>
@@ -3757,8 +3916,8 @@
             <p>Add pg_hstore_ops extension, for easily calling PostgreSQL hstore functions
             and operators (jeremyevans)</p>
             </li><li>
-            <p>Add <a href="../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a>
-            class for easier dealing with wrapper objects (jeremyevans)</p>
+            <p>Add Sequel::SQL::Wrapper class for easier dealing with wrapper objects
+            (jeremyevans)</p>
             </li><li>
             <p>Add pg_hstore extension, for dealing with the PostgreSQL hstore (key/value
             table) type (jeremyevans)</p>

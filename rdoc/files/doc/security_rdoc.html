@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-05 07:35:29 -0700</span>
+          <span class='datetime'>2017-04-05 14:25:55 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -78,6 +78,9 @@
             <p>Sequel::SQL::Expression.to_s_method (private)</p>
             </li><li>
             <p>Sequel::Plugins::HookClassMethods::ClassMethods#add_hook_type</p>
+            </li><li>
+            <p><a
+            href="../../classes/Sequel/Plugins.html#method-c-def_dataset_methods">Sequel::Plugins.def_dataset_methods</a></p>
             </li></ul>
             
             <p>As long as you don&#39;t call those with user input, you should not be
@@ -309,6 +312,14 @@
             href="../../classes/Sequel/Dataset.html#method-i-lock_style">Sequel::Dataset#lock_style</a>
             and Sequel::Model#lock! methods also treat an input string as SQL code.
             This method should not be called with user input.</p>
+            
+            <h4 id="label-SQL+Fragment+passed+to+Virtual+Row+-23-60+method">SQL Fragment passed to Virtual Row #` method<span><a href="#label-SQL+Fragment+passed+to+Virtual+Row+-23-60+method">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>Virtual row blocks currently support a #` method for using literal SQL:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%x`some SQL`</span>}</pre>
+            
+            <p>This method should not be called with user input.</p>
             
             <h4 id="label-SQL+Type+Names">SQL Type Names<span><a href="#label-SQL+Type+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

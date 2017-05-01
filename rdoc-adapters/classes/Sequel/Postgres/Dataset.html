@@ -79,7 +79,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>APOS</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::Dataset::APOS</td>
+                    <td class='context-item-value'>"'".freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -129,7 +129,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-bound_variable_modules-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-bound_variable_modules-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 767</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_modules</span>&#x000A;  [<span class="ruby-constant">BindArgumentMethods</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-bound_variable_modules-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 779</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_modules</span>&#x000A;  [<span class="ruby-constant">BindArgumentMethods</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -147,7 +147,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 678</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">cursor_fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:cursor</span>]&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">res</span><span class="ruby-operator">|</span> <span class="ruby-identifier">yield_hash_rows</span>(<span class="ruby-identifier">res</span>, <span class="ruby-identifier">fetch_rows_set_cols</span>(<span class="ruby-identifier">res</span>)){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 690</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">cursor_fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:cursor</span>]&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">res</span><span class="ruby-operator">|</span> <span class="ruby-identifier">yield_hash_rows</span>(<span class="ruby-identifier">res</span>, <span class="ruby-identifier">fetch_rows_set_cols</span>(<span class="ruby-identifier">res</span>)){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-paged_each'>
@@ -164,7 +164,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-paged_each-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 684</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">use_cursor</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 696</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">use_cursor</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepared_arg_placeholder'>
@@ -182,7 +182,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepared_arg_placeholder-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prepared_arg_placeholder-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 777</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepared_arg_placeholder</span>&#x000A;  <span class="ruby-constant">PREPARED_ARG_PLACEHOLDER</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prepared_arg_placeholder-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 789</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepared_arg_placeholder</span>&#x000A;  <span class="ruby-constant">PREPARED_ARG_PLACEHOLDER</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepared_statement_modules'>
@@ -198,7 +198,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepared_statement_modules-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prepared_statement_modules-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 771</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepared_statement_modules</span>&#x000A;  [<span class="ruby-constant">PreparedStatementMethods</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prepared_statement_modules-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 783</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepared_statement_modules</span>&#x000A;  [<span class="ruby-constant">PreparedStatementMethods</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-use_cursor'>
@@ -236,14 +236,14 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-use_cursor-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-use_cursor-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 710</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_cursor</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:cursor=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-value">:rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-use_cursor-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 722</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_cursor</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:cursor=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-value">:rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-where_current_of'>
                 <a name='method-i-where_current_of'></a>
                 <div class='synopsis'>
                   <span class='name'>where_current_of</span>
-                  <span class='arguments'>(cursor_name=DEFAULT_CURSOR_NAME)</span>
+                  <span class='arguments'>(cursor_name='sequel_cursor')</span>
                 </div>
                 <div class='description'>
                   
@@ -258,7 +258,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-where_current_of-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-where_current_of-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 722</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where_current_of</span>(<span class="ruby-identifier">cursor_name</span>=<span class="ruby-constant">DEFAULT_CURSOR_NAME</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:where=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;CURRENT OF &#39;</span>], <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">cursor_name</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-where_current_of-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 734</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where_current_of</span>(<span class="ruby-identifier">cursor_name</span>=<span class="ruby-string">&#39;sequel_cursor&#39;</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:where=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;CURRENT OF &#39;</span>], <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">cursor_name</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
