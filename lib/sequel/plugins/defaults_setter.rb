@@ -36,6 +36,8 @@ module Sequel
         
         Plugins.after_set_dataset(self, :set_default_values)
 
+        Plugins.inherited_instance_variables(self, :@default_values=>:dup)
+
         # Freeze default values when freezing model class
         def freeze
           @default_values.freeze
@@ -48,7 +50,7 @@ module Sequel
         def set_default_values
           h = {}
           @db_schema.each{|k, v| h[k] = convert_default_value(v[:ruby_default]) unless v[:ruby_default].nil?} if @db_schema
-          @default_values = h
+          @default_values = h.merge!(@default_values || {})
         end
 
         # Handle the CURRENT_DATE and CURRENT_TIMESTAMP values specially by returning an appropriate Date or

@@ -72,6 +72,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
 
   it "should contain the default values in default_values" do
     @pr.call(2).default_values.must_equal(:a=>2)
+    @c.default_values.clear
     @pr.call(nil).default_values.must_equal({})
   end
 
@@ -91,6 +92,19 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @pr.call(2)
     @c.default_values[:a] = proc{nil}
     @c.new.a.must_be_nil
+  end
+
+  it "should work in subclasses" do
+    @pr.call(2)
+    @c.default_values[:a] = proc{1}
+    c = Class.new(@c)
+
+    @c.new.a.must_equal 1
+    c.new.a.must_equal 1
+
+    c.default_values[:a] = proc{2}
+    @c.new.a.must_equal 1
+    c.new.a.must_equal 2
   end
 
   it "should work correctly on a model without a dataset" do
