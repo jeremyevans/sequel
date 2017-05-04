@@ -295,8 +295,9 @@ module Sequel
               ds = ds.select(*self.columns.map{|cc| Sequel.qualify(cti_table_name, Sequel.identifier(cc))})
             end
             cols = columns - [pk]
-            unless (cols & ds.columns).empty?
-              Sequel::Deprecation.deprecate('Using class_table_inheritance with duplicate column names in subclass tables (other than the primary key column)', 'Make sure all tables used have unique column names, or implement support for handling duplicate column names in the class_table_inheritance plugin')
+            dup_cols = cols & ds.columns
+            unless dup_cols.empty?
+              Sequel::Deprecation.deprecate("Using class_table_inheritance with duplicate column names (#{n} => #{dup_cols}) in subclass tables (other than the primary key column)', 'Make sure all tables used have unique column names, or implement support for handling duplicate column names in the class_table_inheritance plugin")
             end
             sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)
