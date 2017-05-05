@@ -168,6 +168,8 @@ describe "PostgreSQL views" do
     @db[:items_view].select_order_map(:number).must_equal [10, 20]
     @db.refresh_view(:items_view)
     @db[:items_view].select_order_map(:number).must_equal [10, 15, 20]
+    @db.views.must_equal []
+    @db.views(@opts).must_equal [:items_view]
   end if DB.server_version >= 90300
 
   it "should support refreshing materialized views concurrently" do

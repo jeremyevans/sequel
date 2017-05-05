@@ -614,12 +614,14 @@ module Sequel
       # Array of symbols specifying view names in the current database.
       #
       # Options:
+      # :materialized :: Return materialized views
       # :qualify :: Return the views as Sequel::SQL::QualifiedIdentifier instances,
       #             using the schema the view is located in as the qualifier.
       # :schema :: The schema to search
       # :server :: The server to use
       def views(opts=OPTS)
-        pg_class_relname('v', opts)
+        relkind = opts[:materialized] ? 'm' : 'v'
+        pg_class_relname(relkind, opts)
       end
 
       private
