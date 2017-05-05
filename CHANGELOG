@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :materialized option to Database#views on PostgreSQL to return materialized views (Blargel) (#1348)
+
 * Make defaults_setter plugin inherit custom default values when subclassing (jeremyevans)
 
 === 4.46.0 (2017-05-01)
