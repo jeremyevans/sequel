@@ -93,7 +93,7 @@ module Sequel
     def initialize(table, unused=nil)
       if unused
         # :nocov:
-        Sequel::Deprecation.deprecate("Passing two arguments to Sequel::Qualifier.new", 'Pass only the second arguument specifying the table used for qualification')
+        Sequel::Deprecation.deprecate("Passing two arguments to Sequel::Qualifier.new", 'Pass only the second argument specifying the table used for qualification')
         @table = unused
         # :nocov:
       else
