@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.default_association_type_options for changing default association options per association type (jeremyevans)
+
 * Add :materialized option to Database#views on PostgreSQL to return materialized views (Blargel) (#1348)
 
 * Make defaults_setter plugin inherit custom default values when subclassing (jeremyevans)

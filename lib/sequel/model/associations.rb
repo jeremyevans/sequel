@@ -15,6 +15,7 @@ module Sequel
           @autoreloading_associations = {}
           @cache_associations = true
           @default_association_options = {}
+          @default_association_type_options = {}
           @dataset_module_class = DatasetModule
         end
       end
@@ -1526,8 +1527,14 @@ module Sequel
         # the previous class.
         attr_accessor :cache_associations
 
-        # The default options to use for all associations.
+        # The default options to use for all associations.  This hash is merged into the association reflection hash for
+        # all association reflections.
         attr_accessor :default_association_options
+
+        # The default options to use for all associations of a given type.  This is a hash keyed by association type
+        # symbol.  If there is a value for the association type symbol key, the resulting hash will be merged into the
+        # association reflection hash for all association reflections of that type.
+        attr_accessor :default_association_type_options
 
         # The default :eager_limit_strategy option to use for limited or offset associations (default: true, causing Sequel
         # to use what it considers the most appropriate strategy).
@@ -1768,7 +1775,14 @@ module Sequel
             orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
           end
 
-          opts = default_association_options.merge(orig_opts).merge(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
+          opts = Hash[default_association_options]
+          if type_options = default_association_type_options[type]
+            opts.merge!(type_options)
+          end
+          opts.merge!(orig_opts)
+          opts.merge!(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
+
+          opts
           opts[:block] = block if block
           if !opts.has_key?(:instance_specific) && (block || orig_opts[:block] || orig_opts[:dataset])
             # It's possible the association is instance specific, in that it depends on
@@ -1832,6 +1846,8 @@ module Sequel
           @association_reflections.freeze.each_value(&:freeze)
           @autoreloading_associations.freeze.each_value(&:freeze)
           @default_association_options.freeze
+          @default_association_type_options.freeze
+          @default_association_type_options.each_value(&:freeze)
 
           super
         end
@@ -1869,7 +1885,7 @@ module Sequel
           associate(:one_to_one, name, opts, &block)
         end
 
-        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_association_options=>:dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
+        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_association_options=>:dup, :@default_association_type_options=>:hash_dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
         Plugins.def_dataset_methods(self, [:eager, :eager_graph, :eager_graph_with_options, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         
         private
