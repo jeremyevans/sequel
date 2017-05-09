@@ -21,7 +21,7 @@ module Sequel
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
       case schema[:db_type].downcase
-      when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/o
+      when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?(?:\snot\snull)?\z/o
         if !$1 && $2 && $2.to_i >= 10 && $3
           # Unsigned integer type with 10 digits can potentially contain values which
           # don't fit signed integer type, so use bigint type in target database.
@@ -29,36 +29,40 @@ module Sequel
         else
           {:type=>Integer}
         end
-      when /\Atinyint(?:\((\d+)\))?(?: unsigned)?\z/o
+      when /\Atinyint(?:\((\d+)\))?(?: unsigned)?(?:\snot\snull)?\z/o
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
-      when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
+      when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?(?:\snot\snull)?\z/o
         {:type=>:Bignum}
-      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/o
+      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)(?:\snot\snull)?\z/o
         {:type=>Float}
       when 'boolean', 'bit', 'bool'
         {:type=>TrueClass}
-      when /\A(?:(?:tiny|medium|long|n)?text|clob)\z/o
+      when /\A(?:boolean|bit|bool)(?:\snot\snull)?\z/o
+        {:type=>TrueClass}
+      when /\A(?:(?:tiny|medium|long|n)?text|clob)(?:\snot\snull)?\z/o
         {:type=>String, :text=>true}
       when 'date'
         {:type=>Date}
-      when /\A(?:small)?datetime\z/o
+      when /\A(?:date)(?:\snot\snull)?\z/o
+        {:type=>Date}
+      when /\A(?:small)?datetime(?:\snot\snull)?\z/o
         {:type=>DateTime}
-      when /\Atimestamp(?:\((\d+)\))?(?: with(?:out)? time zone)?\z/o
+      when /\Atimestamp(?:\((\d+)\))?(?: with(?:out)? time zone)?(?:\snot\snull)?\z/o
         {:type=>DateTime, :size=>($1.to_i if $1)}
-      when /\Atime(?: with(?:out)? time zone)?\z/o
+      when /\Atime(?: with(?:out)? time zone)?(?:\snot\snull)?\z/o
         {:type=>Time, :only_time=>true}
-      when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
+      when /\An?char(?:acter)?(?:\((\d+)\))?(?:\snot\snull)?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:n?varchar|character varying|bpchar|string)(?:\((\d+)\))?\z/o
+      when /\A(?:n?varchar|character varying|bpchar|string)(?:\((\d+)\))?(?:\snot\snull)?\z/o
         {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money\z/o
         {:type=>BigDecimal, :size=>[19,2]}
-      when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?\z/o
+      when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?(?:\snot\snull)?\z/
         s = [($1.to_i if $1), ($2.to_i if $2)].compact
         {:type=>BigDecimal, :size=>(s.empty? ? nil : s)}
-      when /\A(?:bytea|(?:tiny|medium|long)?blob|(?:var)?binary)(?:\((\d+)\))?\z/o
+      when /\A(?:bytea|(?:tiny|medium|long)?blob|(?:var)?binary)(?:\((\d+)\))?(?:\snot\snull)?\z/o
         {:type=>File, :size=>($1.to_i if $1)}
-      when /\A(?:year|(?:int )?identity)\z/o
+      when /\A(?:year|(?:int )?identity)(?:\snot\snull)?\z/o
         {:type=>Integer}
       else
         {:type=>String}
