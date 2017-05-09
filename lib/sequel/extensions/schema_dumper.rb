@@ -53,7 +53,7 @@ module Sequel
         {:type=>Time, :only_time=>true}
       when /\An?char(?:acter)?(?:\((\d+)\))?(?:\snot\snull)?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:n?varchar|character varying|bpchar|string)(?:\((\d+)\))?(?:\snot\snull)?\z/o
+      when /\A(?:n?varchar|n?varchar2|character varying|bpchar|string)(?:\((\d+)\))?(?:\snot\snull)?\z/o
         {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money(?:\snot\snull)\z/o
         {:type=>BigDecimal, :size=>[19,2]}
