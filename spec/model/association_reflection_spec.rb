@@ -586,6 +586,48 @@ describe Sequel::Model::Associations::AssociationReflection, "with default assoc
     r[:foo].must_equal 3
     r[:bar].must_equal 2
   end
+
+  it "should have default_association_type_options take precedence over default_association_options" do
+    @c.default_association_options = {:foo=>2, :bar=>3}
+    @c.default_association_type_options[:many_to_one] = {:foo=>1, :bar=>2}
+    @c.many_to_one :c, :class=>@c, :foo=>3
+    r = @c.association_reflection(:c)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+  end
+
+  it "should use default_association_type_options as defaults" do
+    @c.default_association_type_options[:many_to_one] = {:foo=>1, :bar=>2}
+    @c.many_to_one :c, :class=>@c, :foo=>3
+    r = @c.association_reflection(:c)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+
+    @c.one_to_many :cs, :class=>@c, :foo=>3
+    r = @c.association_reflection(:cs)
+    r[:foo].must_equal 3
+    r[:bar].must_be_nil
+  end
+
+  it "should inherit default_association_type_options" do
+    @c.default_association_type_options[:many_to_one] = {:foo=>1, :bar=>2}
+    c = Class.new(@c)
+    c.many_to_one :c, :class=>c, :foo=>3
+    r = c.association_reflection(:c)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+
+    @c.default_association_type_options[:many_to_one][:bar] = 4
+    c.many_to_one :d, :class=>c, :foo=>3
+    r = c.association_reflection(:d)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+
+    c.one_to_many :ds, :class=>c, :foo=>3
+    r = c.association_reflection(:ds)
+    r[:foo].must_equal 3
+    r[:bar].must_be_nil
+  end
 end
 
 describe "Sequel::Model.freeze" do
