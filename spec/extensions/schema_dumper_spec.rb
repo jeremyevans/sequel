@@ -802,6 +802,21 @@ end
 END_MIG
   end
 
+  it "should convert oracle special types to ruby types" do
+    types = ['number(38,0) not null', 'date not null', 'varchar2(4 byte) not null']
+    @d.meta_def(:schema) do |t, *o|
+      i = 0
+      types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>false}]}
+    end
+    @d.dump_table_schema(:x).must_equal((<<END_MIG).chomp)
+create_table(:x) do
+  BigDecimal :c1, :size=>[38, 0], :null=>false
+  Date :c2, :null=>false
+  String :c3, :null=>false
+end
+END_MIG
+  end
+
   it "should force specify :null option for MySQL timestamp columns when using :same_db" do
     @d.meta_def(:database_type){:mysql}
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'timestamp', :primary_key=>true, :allow_null=>true}]]}
