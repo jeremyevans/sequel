@@ -22,7 +22,7 @@ module Sequel
     def column_schema_to_ruby_type(schema)
       type = schema[:db_type].downcase
       if :db_type == :oracle
-        type = type.sub(/\snot\snull\z/, '')
+        type = type.sub(/ not null\z/, '')
       end
       case type
       when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/o
@@ -53,7 +53,7 @@ module Sequel
         {:type=>Time, :only_time=>true}
       when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:n?varchar(2)?|character varying|bpchar|string)(?:\((\d+)\))?\z/o
+      when /\A(?:n?varchar2?|character varying|bpchar|string)(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money\z/o
         {:type=>BigDecimal, :size=>[19,2]}

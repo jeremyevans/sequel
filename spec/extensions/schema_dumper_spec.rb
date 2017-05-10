@@ -803,6 +803,7 @@ END_MIG
   end
 
   it "should convert oracle special types to ruby types" do
+    @d.meta_def(:database_type){:oracle}
     types = ['number(38,0) not null', 'date not null', 'varchar2(4 byte) not null']
     @d.meta_def(:schema) do |t, *o|
       i = 0
