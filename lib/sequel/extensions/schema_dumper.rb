@@ -21,7 +21,7 @@ module Sequel
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
       type = schema[:db_type].downcase
-      if schema[:db_type].downcase =~ /\snot\snull\z/
+      if :db_type == :oracle
         type = type.sub(/\snot\snull\z/, '')
       end
       case type
@@ -53,7 +53,7 @@ module Sequel
         {:type=>Time, :only_time=>true}
       when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:n?varchar|n?varchar2|character varying|bpchar|string)(?:\((\d+)\))?\z/o
+      when /\A(?:n?varchar(2)?|character varying|bpchar|string)(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money\z/o
         {:type=>BigDecimal, :size=>[19,2]}
