@@ -21,7 +21,7 @@ module Sequel
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
       type = schema[:db_type].downcase
-      if :db_type == :oracle
+      if :database_type == :oracle
         type = type.sub(/ not null\z/, '')
       end
       case type
