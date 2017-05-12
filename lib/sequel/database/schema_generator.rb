@@ -126,6 +126,8 @@ module Sequel
       #            creating a unique index on the column.
       # :unique_constraint_name :: The name to give the unique key constraint
       def column(name, type, opts = OPTS)
+        raise ArgumentError, "opts was expected to be a Hash, not a #{opts.class.name} with " \
+                             "value #{opts.inspect}" unless opts.is_a?(Hash)        
         columns << {:name => name, :type => type}.merge!(opts)
         if index_opts = opts[:index]
           index(name, index_opts.is_a?(Hash) ? index_opts : {})
