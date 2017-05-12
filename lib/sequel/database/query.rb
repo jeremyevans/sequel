@@ -198,7 +198,7 @@ module Sequel
       ds = from(name)
       transaction(:savepoint=>:only){_table_exists?(ds)}
       true
-    rescue DatabaseError
+    rescue DatabaseError, PG::UndefinedTable
       false
     end
 
