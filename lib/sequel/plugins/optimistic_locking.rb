@@ -21,8 +21,8 @@ module Sequel
     # This plugin relies on the instance_filters plugin.
     module OptimisticLocking
       # Exception class raised when trying to update or destroy a stale object.
-      Error = Sequel::NoExistingObject
-      
+      class Error < Sequel::NoExistingObject; end
+
       # Load the instance_filters plugin into the model.
       def self.apply(model, opts=OPTS)
         model.plugin :instance_filters
