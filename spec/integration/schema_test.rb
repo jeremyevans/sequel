@@ -25,7 +25,7 @@ describe "Database schema parser" do
       begin
         DB.schema(:items, :reload=>true).must_be_kind_of(Array)
         DB.schema(:items, :reload=>true).first.first.must_equal :number
-      ensure 
+      ensure
       end
     end
 
@@ -42,7 +42,7 @@ describe "Database schema parser" do
       begin
         DB.schema(ds, :reload=>true).must_be_kind_of(Array)
         DB.schema(ds, :reload=>true).first.first.must_equal :number
-      ensure 
+      ensure
         DB.identifier_output_method = :reverse
         DB.identifier_input_method = :reverse
         DB.drop_table(:items)
@@ -207,7 +207,7 @@ describe "Database index parsing" do
     DB.drop_index(:items, [:n, :a])
     f.call.must_equal({})
   end
-  
+
   it "should not include a primary key index" do
     DB.create_table!(:items){primary_key :n}
     DB.indexes(:items).must_equal({})
@@ -294,6 +294,16 @@ describe "Database schema modifiers" do
     @db.drop_table(:items2) rescue nil
   end
 
+  it "should not log errors when querying for non-existing tables" do
+    @db.logger = Class.new do
+      def error(s)
+        raise "Method should not log errors. Error logged was #{s}"
+      end
+    end.new
+
+    @db.table_exists?(:non_existent_table).must_equal false
+  end
+
   it "should create tables correctly" do
     @db.create_table!(:items){Integer :number}
     @db.table_exists?(:items).must_equal true
@@ -301,7 +311,7 @@ describe "Database schema modifiers" do
     @ds.insert([10])
     @ds.columns!.must_equal [:number]
   end
-  
+
   it "should create tables from select statements correctly" do
     @db.create_table!(:items){Integer :number}
     @ds.insert([10])
@@ -310,7 +320,7 @@ describe "Database schema modifiers" do
     @db[:items2].columns.must_equal [:number]
     @db[:items2].all.must_equal [{:number=>10}]
   end
-  
+
   it "should not raise an error if table doesn't exist when using drop_table :if_exists" do
     @db.drop_table(:items, :if_exists=>true)
   end if DB.supports_drop_table_if_exists?
@@ -380,13 +390,13 @@ describe "Database schema modifiers" do
       @db[:items_view].map(:number).must_equal [2]
     end
   end
-  
+
   it "should handle create table in a rolled back transaction" do
     @db.drop_table?(:items)
     @db.transaction(:rollback=>:always){@db.create_table(:items){Integer :number}}
     @db.table_exists?(:items).must_equal false
   end if DB.supports_transactional_ddl?
-  
+
   describe "join tables" do
     after do
       @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs) if @db.table_exists?(:cats_dogs)
@@ -434,7 +444,7 @@ describe "Database schema modifiers" do
     @ds.insert([10])
     @ds.columns!.must_equal [:number]
   end
-  
+
   it "should allow creating indexes with tables" do
     @db.create_table!(:items){Integer :number; index :number}
     @db.table_exists?(:items).must_equal true
@@ -466,7 +476,7 @@ describe "Database schema modifiers" do
   end
 
   it "should handle foreign keys correctly when creating tables" do
-    @db.create_table!(:items) do 
+    @db.create_table!(:items) do
       primary_key :id
       foreign_key :item_id, :items
       unique [:item_id, :id]
