@@ -20,7 +20,11 @@ module Sequel
     # be :type.  The other options added should modify that type (e.g. :size).  If a
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
-      case schema[:db_type].downcase
+      type = schema[:db_type].downcase
+      if :database_type == :oracle
+        type = type.sub(/ not null\z/, '')
+      end
+      case type
       when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/o
         if !$1 && $2 && $2.to_i >= 10 && $3
           # Unsigned integer type with 10 digits can potentially contain values which
@@ -49,7 +53,7 @@ module Sequel
         {:type=>Time, :only_time=>true}
       when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:n?varchar|character varying|bpchar|string)(?:\((\d+)\))?\z/o
+      when /\A(?:n?varchar2?|character varying|bpchar|string)(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money\z/o
         {:type=>BigDecimal, :size=>[19,2]}
