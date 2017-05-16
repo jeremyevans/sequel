@@ -14,7 +14,7 @@ Issue Guidelines
 3) Issues are generally closed as soon as the problem is considered
    fixed.  However, discussion can still happen after the issue is
    closed, and the issue will be reopened if additional evidence is
-   providing showing the issue still exists.
+   provided showing the issue still exists.
 
 Pull Request Guidelines
 -----------------------
@@ -44,7 +44,7 @@ Pull Request Guidelines
 
 7) Please do not submit pull requests for code that is not ready to
    be merged.  Pull requests should not be used to "start a
-   convervation" about a possible code change.  If the pull
+   conversation" about a possible code change.  If the pull
    request requires a conversation, that conversation should take
    place on the sequel-talk Google Group or IRC.
 
