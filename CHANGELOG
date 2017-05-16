@@ -1,5 +1,7 @@
 === HEAD
 
+* Make schema_dumper extension handle Oracle 11g XE inclusion of not null in the db_type (StevenCregan, jeremyevans) (#1351)
+
 * Add Model.default_association_type_options for changing default association options per association type (jeremyevans)
 
 * Add :materialized option to Database#views on PostgreSQL to return materialized views (Blargel) (#1348)
