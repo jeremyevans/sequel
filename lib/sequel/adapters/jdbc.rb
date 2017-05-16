@@ -208,7 +208,12 @@ module Sequel
           get_connection_from_jndi
         else
           args = [uri(opts)]
-          args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
+          if opts[:user]
+            args.push(opts[:user])
+            if opts[:password]
+              args.push(opts[:password])
+            end
+          end
           begin
             JavaSQL::DriverManager.setLoginTimeout(opts[:login_timeout]) if opts[:login_timeout]
             raise StandardError, "skipping regular connection" if opts[:jdbc_properties]
@@ -218,9 +223,13 @@ module Sequel
             # If the DriverManager can't get the connection - use the connect
             # method of the driver. (This happens under Tomcat for instance)
             props = java.util.Properties.new
-            if opts && opts[:user] && opts[:password]
-              props.setProperty("user", opts[:user])
-              props.setProperty("password", opts[:password])
+            if opts
+              if opts[:user]
+                props.setProperty("user", opts[:user])
+                if opts[:password]
+                  props.setProperty("password", opts[:password])
+                end
+              end
             end
             opts[:jdbc_properties].each{|k,v| props.setProperty(k.to_s, v)} if opts[:jdbc_properties]
             begin
