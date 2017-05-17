@@ -16,7 +16,7 @@
 #   end
 #   DB[:a].all # Uses default
 #
-# You can even nest calls to with_server:
+# You can nest calls to with_server:
 #
 #   DB.with_server(:shard1) do
 #     DB[:a].all # Uses shard1
@@ -37,6 +37,19 @@
 #     DB[:a].server(nil).all # Uses shard1
 #     DB[:a].server(:default).all # Uses shard1
 #     DB[:a].server(:read_only).all # Uses shard1
+#   end
+#
+# If you pass two separate shards to with_server, the second shard will
+# be used instead of the :read_only shard, and the first shard will be
+# used instead of the :default shard:
+#
+#   DB.with_server(:shard1, :shard2) do
+#     DB[:a].all # Uses shard2
+#     DB[:a].delete # Uses shard1
+#     DB[:a].server(:shard3).all # Uses shard3
+#     DB[:a].server(:shard3).delete # Uses shard3
+#     DB[:a].server(:default).all # Uses shard1
+#     DB[:a].server(:read_only).delete # Uses shard2
 #   end
 #
 # Related modules: Sequel::ServerBlock, Sequel::UnthreadedServerBlock,
@@ -60,17 +73,17 @@ module Sequel
     end
 
     # Delegate to the connection pool
-    def with_server(server, &block)
-      pool.with_server(server, &block)
+    def with_server(default_server, read_only_server=default_server, &block)
+      pool.with_server(default_server, read_only_server, &block)
     end
   end
 
   # Adds with_server support for the sharded single connection pool.
   module UnthreadedServerBlock
     # Set a default server/shard to use inside the block.
-    def with_server(server)
+    def with_server(default_server, read_only_server=default_server)
       begin
-        set_default_server(server)
+        set_default_server(default_server, read_only_server)
         yield
       ensure
         clear_default_server
@@ -80,8 +93,8 @@ module Sequel
     private
 
     # Make the given server the new default server.
-    def set_default_server(server)
-      @default_servers << server
+    def set_default_server(default_server, read_only_server=default_server)
+      @default_servers << [default_server, read_only_server]
     end
 
     # Remove the current default server, restoring the
@@ -96,8 +109,10 @@ module Sequel
         super
       else
         case server
-        when :default, nil, :read_only
-          @default_servers.last
+        when :default, nil
+          @default_servers[-1][0]
+        when :read_only
+          @default_servers[-1][1]
         else
           super
         end
@@ -109,9 +124,9 @@ module Sequel
   module ThreadedServerBlock
     # Set a default server/shard to use inside the block for the current
     # thread.
-    def with_server(server)
+    def with_server(default_server, read_only_server=default_server)
       begin
-        set_default_server(server)
+        set_default_server(default_server, read_only_server)
         yield
       ensure
         clear_default_server
@@ -121,8 +136,8 @@ module Sequel
     private
 
     # Make the given server the new default server for the current thread.
-    def set_default_server(server)
-      sync{(@default_servers[Thread.current] ||= [])} << server
+    def set_default_server(default_server, read_only_server=default_server)
+      sync{(@default_servers[Thread.current] ||= [])} << [default_server, read_only_server]
     end
 
     # Remove the current default server for the current thread, restoring the
@@ -141,8 +156,10 @@ module Sequel
         super
       else
         case server
-        when :default, nil, :read_only
-          a.last
+        when :default, nil
+          a[-1][0]
+        when :read_only
+          a[-1][1]
         else
           super
         end

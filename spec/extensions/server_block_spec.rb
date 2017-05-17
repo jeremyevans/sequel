@@ -8,6 +8,13 @@ with_server_specs = shared_description do
     @db.sqls.must_equal ["SELECT * FROM t -- b"]
   end
 
+  it "should set the default server to use in the block" do
+    @db.with_server(:a, :b){@db[:t].all}
+    @db.sqls.must_equal ["SELECT * FROM t -- b"]
+    @db.with_server(:a, :b){@db[:t].insert}
+    @db.sqls.must_equal ["INSERT INTO t DEFAULT VALUES -- a"]
+  end
+
   it "should have no affect after the block" do
     @db.with_server(:a){@db[:t].all}
     @db.sqls.must_equal ["SELECT * FROM t -- a"]

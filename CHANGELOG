@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#with_server in the server_block extension accept a second argument for a different read_only shard (jeremyevans) (#1355)
+
 * Make schema_dumper extension handle Oracle 11g XE inclusion of not null in the db_type (StevenCregan, jeremyevans) (#1351)
 
 * Add Model.default_association_type_options for changing default association options per association type (jeremyevans)
