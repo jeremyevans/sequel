@@ -206,6 +206,11 @@ module Sequel
       @pool.add_servers(servers.keys)
     end
 
+    # Returns :default_model_settings specified in database.yml
+    def default_model_settings
+      @opts[:default_model_settings]
+    end
+
     # The database type for this database object, the same as the adapter scheme
     # by default.  Should be overridden in adapters (especially shared adapters)
     # to be the correct type, so that even if two separate Database objects are
