@@ -75,11 +75,27 @@ describe Sequel::Model, "tree plugin" do
     @db.sqls.must_equal ["SELECT * FROM nodes WHERE id = 1",
       "SELECT * FROM nodes WHERE id = 5"]
   end
+  
+  it "should have self_and_ancestors return current node and it ancestors" do
+    @ds._fetch = [[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]]
+    @o.self_and_ancestors.should == [@c.load(:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4), @c.load(:id=>1, :parent_id=>5, :name=>'r'), @c.load(:id=>5, :parent_id=>nil, :name=>'r2')]
+    @db.sqls.should == ["SELECT * FROM nodes WHERE id = 1",
+      "SELECT * FROM nodes WHERE id = 5"]
+  end
 
   it "should have descendants return the descendants of the current node" do
     @c.dataset = @c.dataset.with_fetch([[{:id=>3, :parent_id=>2, :name=>'r'}, {:id=>4, :parent_id=>2, :name=>'r2'}], [{:id=>5, :parent_id=>4, :name=>'r3'}], []])
     @o.descendants.must_equal [@c.load(:id=>3, :parent_id=>2, :name=>'r'), @c.load(:id=>4, :parent_id=>2, :name=>'r2'), @c.load(:id=>5, :parent_id=>4, :name=>'r3')] 
     @db.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.parent_id = 2)",
+      "SELECT * FROM nodes WHERE (nodes.parent_id = 3)",
+      "SELECT * FROM nodes WHERE (nodes.parent_id = 5)",
+      "SELECT * FROM nodes WHERE (nodes.parent_id = 4)"]
+  end
+
+  it "should have self_and_descendants return current node and it descendants" do
+    @ds._fetch = [[{:id=>3, :parent_id=>2, :name=>'r'}, {:id=>4, :parent_id=>2, :name=>'r2'}], [{:id=>5, :parent_id=>4, :name=>'r3'}], []]
+    @o.self_and_descendants.should == [@c.load(:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4), @c.load(:id=>3, :parent_id=>2, :name=>'r'), @c.load(:id=>4, :parent_id=>2, :name=>'r2'), @c.load(:id=>5, :parent_id=>4, :name=>'r3')] 
+    @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.parent_id = 2)",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 3)",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 5)",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 4)"]
