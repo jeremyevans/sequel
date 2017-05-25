@@ -981,13 +981,20 @@ module Sequel
       private
       
       # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
-      def check_non_connection_error
+      def check_non_connection_error(do_raise=require_valid_table)
         begin
           db.transaction(:savepoint=>:only){yield}
         rescue Sequel::DatabaseConnectionError
           raise
         rescue Sequel::Error
-          raise if require_valid_table
+          case do_raise
+          when nil
+            Sequel::Deprecation.deprecate("Setting a model class dataset to an invalid dataset", "Either use a valid dataset or set require_valid_table = false for the model class")
+          when false
+            # nothing
+          else
+            raise
+          end
         end
       end
 
@@ -1097,7 +1104,7 @@ module Sequel
         schema_hash = {}
         ds_opts = dataset.opts
         get_columns = proc{check_non_connection_error{columns} || []}
-        schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
+        schema_array = check_non_connection_error(false){db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
 

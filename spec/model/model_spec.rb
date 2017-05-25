@@ -1114,7 +1114,43 @@ describe "Model.db_schema" do
     @c.db_schema.must_equal(:x=>{:type=>:integer}, :z=>{}, :y=>{:type=>:string})
   end
 
-  it "should fallback to fetching records if schema raises an error" do
+  deprecated "should not raise error if setting dataset where getting schema and columns raises an error" do
+    def @db.schema(table, opts={})
+      raise Sequel::Error
+    end
+    @c.dataset = @dataset.join(:x, :id).from_self.columns(:id, :x)
+    @c.db_schema.must_equal(:x=>{}, :id=>{})
+  end
+  
+  it "should not raise error if setting dataset where getting schema and columns raises an error and require_valid_table is false" do
+    @c.require_valid_table = false
+    def @db.schema(table, opts={})
+      raise Sequel::Error
+    end
+    @c.dataset = @dataset.join(:x, :id).from_self.columns(:id, :x)
+    @c.db_schema.must_equal(:x=>{}, :id=>{})
+  end
+  
+  it "should raise error if setting dataset where getting schema and columns raises an error and require_valid_table is true" do
+    @c.require_valid_table = true
+    def @db.schema(table, opts={})
+      raise Sequel::Error
+    end
+    @c.dataset = @dataset.join(:x, :id).from_self.columns(:id, :x)
+    @c.db_schema.must_equal(:x=>{}, :id=>{})
+  end
+  
+  it "should use dataset columns if getting schema raises an error and require_valid_table is false" do
+    @c.require_valid_table = false
+    def @db.schema(table, opts={})
+      raise Sequel::Error
+    end
+    @c.dataset = @dataset.join(:x, :id).from_self.columns(:id, :x)
+    @c.db_schema.must_equal(:x=>{}, :id=>{})
+  end
+  
+  it "should use dataset columns if getting schema raises an error and require_valid_table is true" do
+    @c.require_valid_table = true
     def @db.schema(table, opts={})
       raise Sequel::Error
     end
