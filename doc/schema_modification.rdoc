@@ -50,7 +50,7 @@ convert to database types:
 
 Note that in addition to the ruby class name, Sequel also pays attention to the column options when
 determining which database type to use.  Also note that for boolean columns, you can use either
-TrueClass or FalseClass, they are treated the same way (ruby doesn't have a Boolean class).
+TrueClass or FalseClass, they are treated the same way (ruby doesn't have a Boolean class). Also note that whether you specify DateTime or Time types, the value will be loaded from the database as a Time object.
 
 Also note that this conversion is only done if you use a supported ruby class name.  In all other
 cases, Sequel uses the type specified verbatim:
