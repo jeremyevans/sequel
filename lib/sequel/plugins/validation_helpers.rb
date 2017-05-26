@@ -2,8 +2,8 @@
 
 module Sequel
   module Plugins
-    # The validation_helpers plugin contains instance method equivalents for most of the legacy
-    # class-level validations.  The names and APIs are different, though. Example:
+    # The validation_helpers plugin contains validate_* methods designed to be called inside Model#validate
+    # to perform validations:
     #
     #   Sequel::Model.plugin :validation_helpers
     #   class Album < Sequel::Model
