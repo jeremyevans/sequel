@@ -70,7 +70,7 @@ module Sequel
     #
     # Then you can do:
     #
-    #   artist.update(params[:artist])
+    #   artist.update_fields(params[:artist], [:name, :albums_artists])
     #
     # To save changes to the artist, create the first album and associate it to the artist,
     # and update the other existing associated album.
