@@ -1937,7 +1937,6 @@ describe "Caching plugins" do
   end
   before do
     @Album = Class.new(Sequel::Model(@db[:albums]))
-    @Album.plugin :many_to_one_pk_lookup
   end
   after(:all) do
     @db.drop_table?(:albums, :artists)

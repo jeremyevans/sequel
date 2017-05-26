@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate association_autoreloading and many_to_one_pk_lookup plugins, which were made the default model behavior in Sequel 4 (jeremyevans)
+
 * Deprecate setting invalid datasets for models unless required_valid_table = false (jeremyevans)
 
 * Make Model.require_valid_table = true not raise for datasets where Database#schema raises an error but Dataset#columns works (jeremyevans)
