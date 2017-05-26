@@ -7,11 +7,11 @@ module Sequel
     # when you call an accessor.
     #
     # This plugin works by keeping the serialized value in the values, and
-    # adding a @deserialized_values hash.  The reader method for serialized columns
-    # will check the @deserialized_values for the value, return it if present,
-    # or deserialized the entry in @values and return it.  The writer method will
-    # set the @deserialized_values entry.  This plugin adds a before_save hook
-    # that serializes all @deserialized_values to @values.
+    # adding a deserialized_values hash.  The reader method for serialized columns
+    # will check the deserialized_values for the value, return it if present,
+    # or deserialized the entry in values and return it.  The writer method will
+    # set the deserialized_values entry.  This plugin adds a before_save hook
+    # that serializes all deserialized_values to values.
     #
     # You can specify the serialization format as a pair of serializer/deserializer
     # callable objects.  You can also specify the serialization format as a single
