@@ -381,20 +381,20 @@ Sequel doesn't come with generators that create migrations for you.  However, cr
 is as simple as creating a file with the appropriate filename in your migrations directory that
 contains a <tt>Sequel.migration</tt> call.  The minimal do-nothing migration is:
 
-  Sequel.migration{}
+  Sequel.migration {}
 
 However, the migrations you write should contain an +up+ block that does something, and a +down+ block that
 reverses the changes made by the +up+ block:
 
   Sequel.migration do
-    up{}
-    down{}
+    up {}
+    down {}
   end
 
 or they should use the reversible migrations feature with a +change+ block:
 
   Sequel.migration do
-    change{}
+    change {}
   end
 
 == What to put in your migration's +down+ block
