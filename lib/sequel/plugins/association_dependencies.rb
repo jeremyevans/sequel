@@ -6,9 +6,9 @@ module Sequel
     # for destroying, deleting, or nullifying associated model objects.  The following
     # association types support the following dependency actions:
     # 
-    # * :many_to_many - :nullify (removes all related entries in join table)
-    # * :many_to_one - :delete, :destroy
-    # * :one_to_many, one_to_one - :delete, :destroy, :nullify (sets foreign key to NULL for all associated objects)
+    # :many_to_many :: :nullify (removes all related entries in join table)
+    # :many_to_one :: :delete, :destroy
+    # :one_to_many, one_to_one :: :delete, :destroy, :nullify (sets foreign key to NULL for all associated objects)
     #
     # This plugin works directly with the association datasets and does not use any cached association values.
     # The :delete action will delete all associated objects from the database in a single SQL call.
