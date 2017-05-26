@@ -12,26 +12,6 @@ module Sequel
     # level (where level 1 is children, level 2 is children and grandchildren
     # etc.) in a single query.
     #
-    # = Background
-    # 
-    # There are two types of common models for storing tree structured data
-    # in an SQL database, the adjacency list model and the nested set model.
-    # Before recursive common table expressions (or similar capabilities such
-    # as CONNECT BY for Oracle), the nested set model was the only easy way
-    # to retrieve all ancestors and descendants in a single query.  However,
-    # it has significant performance corner cases.
-    #
-    # On PostgreSQL 8.4, with a significant number of rows, the nested set
-    # model is almost 500 times slower than using a recursive common table
-    # expression with the adjacency list model to get all descendants, and
-    # almost 24,000 times slower to get all descendants to a given level.
-    #
-    # Considering that the nested set model requires more difficult management
-    # than the adjacency list model, it's almost always better to use the
-    # adjacency list model if your database supports common table expressions.
-    # See http://explainextended.com/2009/09/24/adjacency-list-vs-nested-sets-postgresql/
-    # for detailed analysis.
-    #
     # = Usage
     #
     # The rcte_tree plugin adds four associations to the model: parent, children, ancestors, and
