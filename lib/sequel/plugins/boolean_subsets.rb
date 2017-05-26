@@ -48,7 +48,7 @@ module Sequel
 
         # Add subset methods for all of the boolean columns in this model.
         def create_boolean_subsets
-          if cs = check_non_connection_error{columns}
+          if cs = check_non_connection_error(false){columns}
             cs = cs.select{|c| db_schema[c][:type] == :boolean}.map{|c| boolean_subset_args(c)}
             dataset_module do
               cs.each{|c| where(*c)}

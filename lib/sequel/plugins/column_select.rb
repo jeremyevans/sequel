@@ -43,13 +43,13 @@ module Sequel
           ds = super
           if !ds.opts[:select] && (from = ds.opts[:from]) && from.length == 1 && !ds.opts[:join]
             if db.supports_schema_parsing?
-              cols = check_non_connection_error{db.schema(ds)}
+              cols = check_non_connection_error(false){db.schema(ds)}
               if cols
                 cols = cols.map{|c, _| c}
               end
             end
 
-            if cols ||= check_non_connection_error{ds.columns}
+            if cols ||= check_non_connection_error(false){ds.columns}
               ds = ds.select(*cols.map{|c| Sequel.qualify(ds.first_source, Sequel.identifier(c))})
             end
           end
