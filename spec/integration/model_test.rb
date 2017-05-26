@@ -49,8 +49,28 @@ describe "Sequel::Model basic support" do
     Item.all.must_equal [Item.load(:id=>1, :name=>'J')]
   end
 
-  it "should not raise an error if the implied database table doesn't exist " do
+  deprecated "should not raise an error if the implied database table doesn't exist" do
     class ::Item::Thing < Sequel::Model(@db)
+      set_dataset :items
+    end
+    Item.create(:name=>'J')
+    Item::Thing.first.must_equal Item::Thing.load(:id=>1, :name=>'J')
+  end
+
+  it "should raise an error if the implied database table doesn't exist if require_valid_table is true" do
+    proc do
+      c = Sequel::Model(@db)
+      c.require_valid_table = true
+      class ::Item::Thing < c
+        set_dataset :items
+      end
+    end.must_raise Sequel::Error
+  end
+
+  it "should not raise an error if the implied database table doesn't exist if require_valid_table is false" do
+    c = Sequel::Model(@db)
+    c.require_valid_table = false
+    class ::Item::Thing < c
       set_dataset :items
     end
     Item.create(:name=>'J')
@@ -219,13 +239,42 @@ describe "Sequel::Model basic support" do
 end
 
 describe "Sequel::Model with no existing table" do 
-  it "should not raise an error when setting the dataset" do
+  deprecated "should not raise an error when setting the dataset" do
     db = DB
     db.drop_table?(:items)
-    class ::Item < Sequel::Model(db); end; Object.send(:remove_const, :Item)
-    c = Class.new(Sequel::Model); c.set_dataset(db[:items])
+    c = Class.new(Sequel::Model)
+    c.set_dataset(db[:items])
     db.transaction do
       c = Class.new(Sequel::Model(db[:items]))
+      db.get(Sequel.cast(1, Integer)).must_equal 1
+    end
+  end
+
+  it "should not raise an error when setting the dataset when require_valid_table is true" do
+    db = DB
+    db.drop_table?(:items)
+    c1 = Sequel::Model(db);
+    c = Class.new(Sequel::Model)
+    c.require_valid_table = true
+    proc{c.set_dataset(db[:items])}.must_raise Sequel::Error
+    db.transaction do
+      c = Class.new(Sequel::Model)
+      c.require_valid_table = true
+      proc{c.dataset = db[:items]}.must_raise Sequel::Error
+      db.get(Sequel.cast(1, Integer)).must_equal 1
+    end
+  end
+
+  it "should not raise an error when setting the dataset when require_valid_table is false" do
+    db = DB
+    db.drop_table?(:items)
+    c = Class.new(Sequel::Model)
+    c.require_valid_table = false
+    c.set_dataset(db[:items])
+    db.transaction do
+      c = Class.new(Sequel::Model)
+      c.require_valid_table = false
+      c.dataset = db[:items]
       db.get(Sequel.cast(1, Integer)).must_equal 1
     end
   end
