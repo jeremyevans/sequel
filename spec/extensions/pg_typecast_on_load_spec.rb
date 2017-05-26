@@ -7,28 +7,30 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
       [[:id, {}], [:b, {:type=>:boolean, :oid=>16}], [:y, {:type=>:integer, :oid=>20}]]
     end
     @c = Class.new(Sequel::Model(@db[:items]))
-    @c.plugin :pg_typecast_on_load, :b, :y
+    deprecated do
+      @c.plugin :pg_typecast_on_load, :b, :y
+    end
   end 
 
-  it "should call the database conversion proc for all given columns" do
+  deprecated "should call the database conversion proc for all given columns" do
     @c.first.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  it "should call the database conversion proc with value when reloading the object, for all given columns" do
+  deprecated "should call the database conversion proc with value when reloading the object, for all given columns" do
     @c.first.refresh.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  it "should not fail if schema oid does not have a related conversion proc" do
+  deprecated "should not fail if schema oid does not have a related conversion proc" do
     @c.db_schema[:b][:oid] = 0
     @c.first.refresh.values.must_equal(:id=>1, :b=>"t", :y=>0)
   end
 
-  it "should call the database conversion proc with value when automatically reloading the object on creation via insert_select" do
+  deprecated "should call the database conversion proc with value when automatically reloading the object on creation via insert_select" do
     @c.dataset = @c.dataset.with_extend{def insert_select(h) insert(h); first end}
     @c.create.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  it "should allowing setting columns separately via add_pg_typecast_on_load_columns" do
+  deprecated "should allowing setting columns separately via add_pg_typecast_on_load_columns" do
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.plugin :pg_typecast_on_load
     @c.first.values.must_equal(:id=>1, :b=>"t", :y=>"0")
@@ -38,7 +40,7 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
     @c.first.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  it "should work with subclasses" do
+  deprecated "should work with subclasses" do
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.plugin :pg_typecast_on_load
     @c.first.values.must_equal(:id=>1, :b=>"t", :y=>"0")
@@ -57,11 +59,11 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
     c1.first.values.must_equal(:id=>1, :b=>"t", :y=>0)
   end
 
-  it "should not mark the object as modified" do
+  deprecated "should not mark the object as modified" do
     @c.first.modified?.must_equal false
   end
 
-  it "should freeze pg_typecast_on_load_columns" do
+  deprecated "should freeze pg_typecast_on_load_columns" do
     @c.freeze
     @c.pg_typecast_on_load_columns.frozen?.must_equal true
   end

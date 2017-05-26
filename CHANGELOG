@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate pg_typecast_on_load plugin, only useful on deprecated do and switch adapters (jeremyevans)
+
 * Deprecate association_autoreloading and many_to_one_pk_lookup plugins, which were made the default model behavior in Sequel 4 (jeremyevans)
 
 * Deprecate setting invalid datasets for models unless required_valid_table = false (jeremyevans)

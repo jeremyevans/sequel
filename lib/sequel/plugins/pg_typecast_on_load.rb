@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The pg_typecast_on_load plugin", "This plugin is only useful on the deprecated do and switch adapters")
+
 module Sequel
   module Plugins
     # The PgTypecastOnLoad plugin exists because when you connect to PostgreSQL
