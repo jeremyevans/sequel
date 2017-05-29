@@ -51,6 +51,8 @@ module Sequel
 
       # Execute the given stored procedure with the given name.
       #
+      # This method returns a single hash. See call_mssql_sproc.
+      #
       # Options:
       # :args :: Arguments to stored procedure.  For named arguments, this should be a
       #          hash keyed by argument named.  For unnamed arguments, this should be an
@@ -77,6 +79,33 @@ module Sequel
       #       'output_arg_name' => [:output, 'int', 'varname']
       #     })
       def call_mssql_sproc(name, opts=OPTS)
+        mssql_sproc_ds(name, opts).first
+      end
+
+      # Execute the given stored procedure with the given name.
+      #
+      # Options:
+      # :args :: Arguments to stored procedure.  For named arguments, this should be a
+      #          hash keyed by argument named.  For unnamed arguments, this should be an
+      #          array.  Output parameters to the function are specified using :output.
+      #          You can also name output parameters and provide a type by using an
+      #          array containing :output, the type name, and the parameter name.
+      # :server :: The server/shard on which to execute the procedure.
+      #
+      # This method returns a Dataset.
+      #
+      # Examples:
+      #
+      #     DB.mssql_sproc_ds(:SequelTest, {:args => ['input arg', :output]})
+      #     DB.mssql_sproc_ds(:SequelTest, {:args => ['input arg', [:output, 'int', 'varname']]})
+      #
+      #     named params:
+      #     DB.mssql_sproc_ds(:SequelTest, :args => {
+      #       'input_arg1_name' => 'input arg1 value',
+      #       'input_arg2_name' => 'input arg2 value',
+      #       'output_arg_name' => [:output, 'int', 'varname']
+      #     })
+      def mssql_sproc_ds(name, opts=OPTS)
         args = opts[:args] || []
         names = ['@RC AS RESULT', '@@ROWCOUNT AS NUMROWS']
         declarations = ['@RC int']
@@ -125,7 +154,7 @@ module Sequel
 
         ds = dataset.with_sql(sql)
         ds = ds.server(opts[:server]) if opts[:server]
-        ds.first
+        ds
       end
 
       # Microsoft SQL Server uses the :mssql type.
