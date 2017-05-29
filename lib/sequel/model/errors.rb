@@ -7,11 +7,16 @@ module Sequel
     class Errors < ::Hash
       ATTRIBUTE_JOINER = ' and '.freeze
 
-      # Adds an error for the given attribute.
-      #
+      # Adds an error for the given attribute. If a block is given, only adds the error if the block returns false,
+      # and there are no other errors already associated with the attribute.
       #   errors.add(:name, 'is not valid') if name == 'invalid'
       def add(att, msg)
-        fetch(att){self[att] = []} << msg
+        att_errors = fetch(att){self[att] = []}
+        if block_given?
+          att_errors << msg if self[att].empty? && !yield
+        else
+          att_errors << msg
+        end
       end
 
       # Return the total number of error messages.
