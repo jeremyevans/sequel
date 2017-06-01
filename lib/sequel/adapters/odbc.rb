@@ -105,13 +105,17 @@ module Sequel
       Database::DatasetClass = self
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
+      def paged_each(opts=OPTS, &block)
+        clone({:rows_per_fetch=>1000}.merge!(opts)).each(&block)
+      end
+
       def fetch_rows(sql)
         execute(sql) do |s|
           i = -1
           cols = s.columns(true).map{|c| [output_identifier(c.name), c.type, i+=1]}
           columns = cols.map{|c| c[0]}
           self.columns = columns
-          if rows = s.fetch_all
+          fetch_raw_rows(s) do |rows|
             rows.each do |row|
               hash = {}
               cols.each{|n,t,j| hash[n] = convert_odbc_value(row[j], t)}
@@ -123,6 +127,16 @@ module Sequel
       end
       
       private
+
+      def fetch_raw_rows(statement)
+        if opts[:rows_per_fetch]
+          while rows = statement.fetch_many(opts[:rows_per_fetch])
+            yield rows
+          end
+        else
+          yield statement.fetch_all
+        end
+      end
 
       def convert_odbc_value(v, t)
         # When fetching a result set, the Ruby ODBC driver converts all ODBC 
