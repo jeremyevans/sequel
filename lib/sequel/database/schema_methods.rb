@@ -943,6 +943,13 @@ module Sequel
         type_literal_generic(column)
       when :Bignum
         type_literal_generic_bignum_symbol(column)
+      when :Boolean
+        meth = "type_literal_specific_boolean"
+        if respond_to?(meth, true)
+          send(meth, column)
+        else
+          type_literal_specific(column)
+        end
       else
         type_literal_specific(column)
       end
