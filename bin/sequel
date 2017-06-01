@@ -18,6 +18,26 @@ load_dirs = []
 exclusive_options = []
 loggers = []
 
+# To use in option -T
+condition_separator = '|'
+only_selected_tables = false
+selected_tables = Array.new
+selected_tables_data = Array.new
+table_separator = ','
+
+class SelectedTable
+  def initialize(name, where)
+    @name     = name
+    @where    = where
+  end
+  def name
+    @name
+  end
+  def where
+    @where
+  end
+end
+
 options = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
   opts.define_head "Usage: sequel [options] <uri|path> [file]"
@@ -104,6 +124,23 @@ options = OptionParser.new do |opts|
     backtrace = true
   end
   
+  opts.on("-T", "--tables TABLES", "copy only selected tables one database to another") do |v|
+    only_selected_tables = true
+    input_data = v.split(table_separator)
+    input_data.each do |table|
+      tmp_var = table.split(condition_separator)
+      if tmp_var == table
+        #hasnt a condition
+        selected_tables.push(table)
+        selected_tables_data.push(SelectedTable.new(table,""))
+      else
+        #has a condition
+        selected_tables.push(tmp_var[0])
+        selected_tables_data.push(SelectedTable.new(tmp_var[0],tmp_var[1]))
+      end
+    end
+  end
+
   opts.on_tail("-v", "--version", "Show version") do
     show_version = true
   end
@@ -199,13 +236,28 @@ begin
     DB.transaction do
       TO_DB.transaction do
         DB.tables.each do |table|
+
+          where_condition = String.new
+          if only_selected_tables
+            if selected_tables.include?("#{table}") == false
+              puts "Skiping table #{table}"
+              next
+            else
+              selected_tables_data.each do |tableobj|
+                if tableobj.name == "#{table}"
+                  where_condition = tableobj.where
+                end
+              end
+            end
+          end
+
           puts "Begin copying records for table: #{table}"
           time = Time.now
           to_ds = TO_DB.from(table)
           j = 0
-          DB.from(table).each do |record|
+          DB.from(table).where(where_condition).each do |record|
             if Time.now - time > 5
-              puts "Status: #{j} records copied" 
+              puts "Status: #{j} records copied"
               time = Time.now
             end
             to_ds.insert(record)
