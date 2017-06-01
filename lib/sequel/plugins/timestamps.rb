@@ -93,7 +93,8 @@ module Sequel
         def set_create_timestamp(time=nil)
           field = model.create_timestamp_field
           meth = :"#{field}="
-          set_column_value(meth, time||=model.dataset.current_datetime) if respond_to?(field) && respond_to?(meth) && (model.create_timestamp_overwrite? || get_column_value(field).nil?)
+          time ||= model.dataset.current_datetime
+          set_column_value(meth, time) if respond_to?(field) && respond_to?(meth) && (model.create_timestamp_overwrite? || get_column_value(field).nil?)
           set_update_timestamp(time) if model.set_update_timestamp_on_create?
         end
         
