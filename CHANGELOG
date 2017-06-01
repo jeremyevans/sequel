@@ -1,6 +1,6 @@
-=== HEAD
+=== 4.47.0 (2017-06-01)
 
-* Deprecate pg_typecast_on_load plugin, only useful on deprecated do and switch adapters (jeremyevans)
+* Deprecate pg_typecast_on_load plugin, only useful on deprecated do and swift adapters (jeremyevans)
 
 * Deprecate association_autoreloading and many_to_one_pk_lookup plugins, which were made the default model behavior in Sequel 4 (jeremyevans)
 
