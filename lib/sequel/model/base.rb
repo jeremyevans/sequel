@@ -1380,6 +1380,7 @@ module Sequel
       #     a.name = 'Bob'
       #   end
       def initialize(values = {})
+        @singleton_setter_added = false
         @values = {}
         @new = true
         @modified = true
