@@ -373,11 +373,16 @@ module Sequel
           prok.call(self)
         else
           @opts[:driver]
-        end        
+        end
 
+        initialize_subadapter
         setup_type_convertor_map
+        super
       end
-      
+
+      def initialize_subadapter
+      end
+
       # Yield the native prepared statements hash for the given connection
       # to the block in a thread-safe manner.
       def cps_sync(conn, &block)
