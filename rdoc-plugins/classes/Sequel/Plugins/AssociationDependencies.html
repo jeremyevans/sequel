@@ -41,14 +41,14 @@
             plugin allows you do easily set up before and/or after destroy hooks for
             destroying, deleting, or nullifying associated model objects.  The
             following association types support the following dependency actions:</p>
-            <ul><li>
-            <p>:many_to_many - :nullify (removes all related entries in join table)</p>
-            </li><li>
-            <p>:many_to_one - :delete, :destroy</p>
-            </li><li>
-            <p>:one_to_many, one_to_one - :delete, :destroy, :nullify (sets foreign key to
-            NULL for all associated objects)</p>
-            </li></ul>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:many_to_many </td><td>
+            <p>:nullify (removes all related entries in join table)</p>
+            </td></tr><tr><td class='label'>:many_to_one </td><td>
+            <p>:delete, :destroy</p>
+            </td></tr><tr><td class='label'>:one_to_many, one_to_one </td><td>
+            <p>:delete, :destroy, :nullify (sets foreign key to NULL for all associated
+            objects)</p>
+            </td></tr></tbody></table>
             
             <p>This plugin works directly with the association datasets and does not use
             any cached association values. The :delete action will delete all

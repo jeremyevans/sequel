@@ -1126,7 +1126,9 @@
                   <p>Array of symbols specifying view names in the current database.</p>
                   
                   <p>Options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:qualify </td><td>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:materialized </td><td>
+                  <p>Return materialized views</p>
+                  </td></tr><tr><td class='label'>:qualify </td><td>
                   <p>Return the views as Sequel::SQL::QualifiedIdentifier instances, using the
                   schema the view is located in as the qualifier.</p>
                   </td></tr><tr><td class='label'>:schema </td><td>
@@ -1139,7 +1141,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-views-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 620</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-string">&#39;v&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 621</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">relkind</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:materialized</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;m&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;v&#39;</span>&#x000A;  <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-identifier">relkind</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

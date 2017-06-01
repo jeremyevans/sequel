@@ -37,9 +37,8 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The validation_helpers plugin contains instance method equivalents for most
-            of the legacy class-level validations.  The names and APIs are different,
-            though. Example:</p>
+            <p>The validation_helpers plugin contains validate_* methods designed to be
+            called inside Model#validate to perform validations:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_helpers</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">num_tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             

@@ -29,12 +29,43 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-05-01 07:24:50 -0700</span>
+          <span class='datetime'>2017-06-01 08:42:54 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.47.0+-282017-06-01-29">4.47.0 (2017-06-01)<span><a href="#label-4.47.0+-282017-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Deprecate pg_typecast_on_load plugin, only useful on deprecated do and
+            swift adapters (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate association_autoreloading and many_to_one_pk_lookup plugins,
+            which were made the default model behavior in <a
+            href="../classes/Sequel.html">Sequel</a> 4 (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate setting invalid datasets for models unless required_valid_table =
+            false (jeremyevans)</p>
+            </li><li>
+            <p>Make Model.require_valid_table = true not raise for datasets where
+            Database#schema raises an error but Dataset#columns works (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#with_server in the server_block extension accept a second
+            argument for a different read_only shard (jeremyevans) (#1355)</p>
+            </li><li>
+            <p>Make schema_dumper extension handle Oracle 11g XE inclusion of not null in
+            the db_type (StevenCregan, jeremyevans) (#1351)</p>
+            </li><li>
+            <p>Add Model.default_association_type_options for changing default association
+            options per association type (jeremyevans)</p>
+            </li><li>
+            <p>Add :materialized option to Database#views on PostgreSQL to return
+            materialized views (Blargel) (#1348)</p>
+            </li><li>
+            <p>Make defaults_setter plugin inherit custom default values when subclassing
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.46.0+-282017-05-01-29">4.46.0 (2017-05-01)<span><a href="#label-4.46.0+-282017-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

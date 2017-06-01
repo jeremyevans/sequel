@@ -109,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-apply_eager_graph_limit_strategy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-apply_eager_graph_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 963</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">apply_eager_graph_limit_strategy</span>(<span class="ruby-identifier">strategy</span>, <span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">strategy</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:correlated_subquery</span>&#x000A;    <span class="ruby-identifier">apply_correlated_subquery_limit_strategy</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-apply_eager_graph_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 964</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">apply_eager_graph_limit_strategy</span>(<span class="ruby-identifier">strategy</span>, <span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">strategy</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:correlated_subquery</span>&#x000A;    <span class="ruby-identifier">apply_correlated_subquery_limit_strategy</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-associated_object_keys'>
@@ -126,7 +126,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-associated_object_keys-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-associated_object_keys-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 973</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associated_object_keys</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:keys</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-associated_object_keys-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 974</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associated_object_keys</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:keys</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-can_have_associated_objects-3F'>
@@ -144,7 +144,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-can_have_associated_objects-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-can_have_associated_objects-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 979</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_have_associated_objects?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_keys</span>].<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">k</span>).<span class="ruby-identifier">nil?</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-can_have_associated_objects-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 980</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_have_associated_objects?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_keys</span>].<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">k</span>).<span class="ruby-identifier">nil?</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-cloneable-3F'>
@@ -161,7 +161,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cloneable-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cloneable-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 984</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">ref</span>)&#x000A;  <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:one_to_many</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:one_to_one</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cloneable-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 985</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">ref</span>)&#x000A;  <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:one_to_many</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:one_to_one</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-default_key'>
@@ -179,7 +179,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-default_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 990</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_key</span>&#x000A;  <span class="ruby-value">:&quot;#{underscore(demodulize(self[:model].name))}_id&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-default_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 991</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_key</span>&#x000A;  <span class="ruby-value">:&quot;#{underscore(demodulize(self[:model].name))}_id&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-finalize_settings'>
@@ -195,7 +195,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-finalize_settings-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-finalize_settings-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 997</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">finalize_settings</span>&#x000A;  <span class="ruby-constant">FINALIZE_SETTINGS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-finalize_settings-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 998</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">finalize_settings</span>&#x000A;  <span class="ruby-constant">FINALIZE_SETTINGS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-handle_silent_modification_failure-3F'>
@@ -213,7 +213,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-handle_silent_modification_failure-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-handle_silent_modification_failure-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1002</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_silent_modification_failure?</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:raise_on_save_failure</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-handle_silent_modification_failure-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1003</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_silent_modification_failure?</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:raise_on_save_failure</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-predicate_key'>
@@ -231,7 +231,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-predicate_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-predicate_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1007</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:predicate_key</span>){<span class="ruby-identifier">qualify_assoc</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:key</span>])}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-predicate_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1008</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:predicate_key</span>){<span class="ruby-identifier">qualify_assoc</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:key</span>])}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-primary_key'>
@@ -249,7 +249,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1013</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_key</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1014</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_key</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-qualified_primary_key'>
@@ -268,7 +268,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualified_primary_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-qualified_primary_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1018</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualified_primary_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:qualified_primary_key</span>){<span class="ruby-identifier">qualify_cur</span>(<span class="ruby-identifier">primary_key</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-qualified_primary_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1019</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualified_primary_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:qualified_primary_key</span>){<span class="ruby-identifier">qualify_cur</span>(<span class="ruby-identifier">primary_key</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-reciprocal_array-3F'>
@@ -286,7 +286,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-reciprocal_array-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-reciprocal_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1024</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-reciprocal_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1025</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-remove_before_destroy-3F'>
@@ -304,7 +304,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-remove_before_destroy-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-remove_before_destroy-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1029</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_before_destroy?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-remove_before_destroy-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1030</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_before_destroy?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-remove_should_check_existing-3F'>
@@ -322,7 +322,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-remove_should_check_existing-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-remove_should_check_existing-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1034</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_should_check_existing?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-remove_should_check_existing-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1035</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_should_check_existing?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_reciprocal_to_self-3F'>
@@ -340,7 +340,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_reciprocal_to_self-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_reciprocal_to_self-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1039</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_reciprocal_to_self?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_reciprocal_to_self-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1040</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_reciprocal_to_self?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

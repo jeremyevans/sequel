@@ -57,7 +57,7 @@
                 <a name='method-i-with_server'></a>
                 <div class='synopsis'>
                   <span class='name'>with_server</span>
-                  <span class='arguments'>(server)</span>
+                  <span class='arguments'>(default_server, read_only_server=default_server)</span>
                 </div>
                 <div class='description'>
                   
@@ -67,7 +67,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_server-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_server-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">set_default_server</span>(<span class="ruby-identifier">server</span>)&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">clear_default_server</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_server-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">set_default_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>)&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">clear_default_server</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

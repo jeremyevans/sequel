@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.47.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.47.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.47.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2017-06-01 08:42:54 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Setting an invalid dataset for a model is now deprecated. Historically, <a
+            href="../../../classes/Sequel.html">Sequel</a> has swallowed exceptions for
+            this to keep backwards compatibility, but it generally just results in code
+            breaking later.  To allow invalid datasets to be used:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">require_valid_table</span> = <span class="ruby-keyword">false</span></pre>
+            </li><li>
+            <p>The association_autoreloading and many_to_one_pk_lookup plugins are now
+            deprecated.  They were moved from plugins to standard model behavior in <a
+            href="../../../classes/Sequel.html">Sequel</a> 4.0, and have been no-ops
+            since.</p>
+            </li><li>
+            <p>The pg_typecast_on_load plugin is now deprecated.  It is only useful on the
+            already deprecated do and swift adapters.</p>
+            </li></ul>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Database#with_server in the server_block extension now accepts an optional
+            second argument for the read only server to use.  This allows for
+            overriding the default server while providing a separate default for read
+            only queries:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">server1</span>, :<span class="ruby-identifier">server1ro</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span>       <span class="ruby-comment"># Uses server1ro</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># Uses server1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>Model.default_association_type_options has been added, allowing the ability
+            to set default options per association type.  This can be used to make some
+            association types read_only by default:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">opts</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_type_options</span>&#x000A;<span class="ruby-identifier">opts</span>[:<span class="ruby-identifier">one_to_many</span>] = <span class="ruby-identifier">opts</span>[:<span class="ruby-identifier">many_to_many</span>] = {:<span class="ruby-identifier">read_only=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}</pre>
+            </li><li>
+            <p>Database#views on PostgreSQL now accepts a :materialized option to return
+            materialized views instead of regular views.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Setting Sequel::Model.require_valid_table = true no longer raises an
+            exception when using a valid dataset that selects from a subquery or table
+            returning function or uses a join.</p>
+            </li><li>
+            <p>The defaults_setter plugin now inherits any custom default values when
+            subclassing.</p>
+            </li><li>
+            <p>The schema_dumper extension now handles Oracle 11g XE behavior of appending
+            not null to the database type.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>External callers of Database#check_non_connection_error (private method)
+            should update their code to call it with a true or false argument
+            specifying whether to raise an error for exceptions that are not connection
+            errors.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
