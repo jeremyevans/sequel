@@ -102,6 +102,9 @@ module Sequel
       #              static data that you do not want to modify
       # :timeout :: how long to wait for the database to be available if it
       #             is locked, given in milliseconds (default is 5000)
+      # :extensions :: filename or array of filenames of SQLITE3 extension 
+      #                files (shared objects) to load
+      # 
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
@@ -110,6 +113,16 @@ module Sequel
         db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
         db.busy_timeout(opts.fetch(:timeout, 5000))
         
+        if opts.has_key?(:extensions)
+          ext = opts[:extensions]
+          ext = [ ext ] if ext.kind_of?(String) 
+          db.enable_load_extension(1)
+          ext.each do |file|
+            log_connection_yield(file, db) { db.load_extension(file) }
+          end
+          db.enable_load_extension(0)
+        end
+
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
         
         class << db
