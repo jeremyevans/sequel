@@ -3,6 +3,10 @@
 *.swp
 /coverage
 /rdoc
+/doc/**/*.html
+/doc/css
+/doc/js
+/.yardoc
 /sequel-*.gem
 /spec/bin-sequel-*
 /spec/spec_config.rb
