@@ -456,6 +456,14 @@ describe "DB#create_table" do
     @db.sqls.must_equal ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id) WHERE (id > 1)"]
   end
 
+  it "should accept timestamps method and add respective columns" do
+    @db.create_table(:cats) do
+      integer :id
+      timestamps
+    end
+    @db.sqls.must_equal ["CREATE TABLE cats (id integer, created_at timestamp NOT NULL, updated_at timestamp NOT NULL)"]
+  end
+
   it "should raise an error if partial indexes are not supported" do
     proc do 
       @db.create_table(:cats) do

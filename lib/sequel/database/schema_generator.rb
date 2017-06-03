@@ -288,6 +288,12 @@ module Sequel
         index(columns, opts.merge(:type => :spatial))
       end
 
+      # Add fields for timestamp (:created_at, :updated_at as DateTime)
+      def timestamps
+        column(:created_at, DateTime, null: false)
+        column(:updated_at, DateTime, null: false)
+      end
+
       # Add a unique constraint on the given columns to the DDL.
       #
       #   unique(:name) # UNIQUE (name)
