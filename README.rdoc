@@ -46,7 +46,10 @@ If you have any comments or suggestions please post to the Google group.
   
   DB = Sequel.sqlite # memory database, requires sqlite3
   
-  DB.create_table :items do
+  # DB.create_table creates the table if it doesn't exist
+  # DB.create_table! removes the table and creates it (empty)
+  # DB.create_table? creates the table only if it doesn't exist
+  DB.create_table? :items do
     primary_key :id
     String :name
     Float :price
