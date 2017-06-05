@@ -206,6 +206,7 @@ END_MIG
         end
         col_opts.delete(:default) if col_opts[:default].nil?
         col_opts[:null] = false if schema[:allow_null] == false
+        col_opts[:collate] = schema[:collate] if schema[:collate]
         if table = schema[:table]
           [:key, :on_delete, :on_update, :deferrable].each{|f| col_opts[f] = schema[f] if schema[f]}
           col_opts[:type] = type unless type == Integer || type == 'integer'

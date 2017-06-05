@@ -490,6 +490,11 @@ module Sequel
         im = input_identifier_meth(opts[:dataset])
         table = SQL::Identifier.new(im.call(table_name))
         table = SQL::QualifiedIdentifier.new(im.call(opts[:schema]), table) if opts[:schema]
+
+        database = metadata_dataset.db.opts[:database]
+        collation_sql = "SELECT COLUMN_NAME, COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA = ? and TABLE_NAME = ?"
+        collations = metadata_dataset.with_sql(collation_sql, database, table_name).to_hash(:COLUMN_NAME, :COLLATION_NAME)
+
         metadata_dataset.with_sql("DESCRIBE ?", table).map do |row|
           extra = row.delete(:Extra)
           if row[:primary_key] = row.delete(:Key) == 'PRI'
@@ -499,6 +504,7 @@ module Sequel
           row[:default] = row.delete(:Default)
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
+          row[:collate] = collations[row[:Field]]
           [m.call(row.delete(:Field)), row]
         end
       end
