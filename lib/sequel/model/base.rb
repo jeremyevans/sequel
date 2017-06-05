@@ -248,6 +248,7 @@ module Sequel
       def call(values)
         o = allocate
         o.instance_variable_set(:@values, values)
+        o.instance_variable_set(:@fetched, true)
         o
       end
       
@@ -1679,7 +1680,18 @@ module Sequel
       def new?
         defined?(@new) ? @new : (@new = false)
       end
-      
+
+      # Returns true if the current (maybe saved) instance was just created, as opposed to having been
+      # originally fetched from the database
+      #
+      #   artist = Artist.new.save
+      #   artist.was_new? # => true
+      #
+      #   Artist[1].was_new? # => false
+      def was_new?
+        !@fetched
+      end
+
       # Returns the primary key value identifying the model instance.
       # Raises an +Error+ if this model does not have a primary key.
       # If the model has a composite primary key, returns an array of values.
