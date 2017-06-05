@@ -316,7 +316,7 @@ module Sequel
 
       # Disconnect given connection
       def disconnect_connection(conn)
-        conn.finish
+        conn&.finish
       rescue PGError, IOError
         nil
       end
