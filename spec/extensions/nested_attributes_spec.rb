@@ -414,6 +414,90 @@ describe "NestedAttributes plugin" do
     check_sql_array("UPDATE artists SET name = 'Ar' WHERE (id = 10)", ["DELETE FROM concerts WHERE ((tour = 'To') AND (date = '2004-04-05'))", "DELETE FROM concerts WHERE ((date = '2004-04-05') AND (tour = 'To'))"])
   end
 
+  it "should support creating many_to_one objects with find flag set to true" do
+    @Album.nested_attributes :artist, :find=>true
+    al = @Album.new(:name=>'Al')
+    al.set(:artist_attributes=>{:name=>'Ar'})
+    @db.sqls.must_equal ["SELECT * FROM artists WHERE (name = 'Ar') LIMIT 1"]
+    al.save
+    @db.sqls.must_equal ["INSERT INTO artists (name) VALUES ('Ar')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"]
+  end
+
+  it "should support finding many_to_one objects with find flag set to true" do
+    @Artist.dataset._fetch = {:id=>1, :name=>'Ar'}
+    @Album.nested_attributes :artist, :find=>true
+    ar = @Artist.load(:id=>1, :name=>'Ar')
+    al = @Album.new(:name=>'Al')
+    al.set(:artist_attributes=>{:name=>'Ar'})
+    @db.sqls.must_equal ["SELECT * FROM artists WHERE (name = 'Ar') LIMIT 1"]
+    al.save
+    @db.sqls.must_equal ["INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"]
+    al.artist.must_equal ar
+  end
+
+  it "should support creating one_to_one objects with find flag set to true" do
+    @Artist.nested_attributes :first_album, :find=>true
+    ar = @Artist.new(:name=>'Ar')
+    ar.set(:first_album_attributes=>{:name=>'Al2'})
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (name = 'Al2') LIMIT 1"]
+    ar.save
+    @db.sqls.must_equal ["INSERT INTO artists (name) VALUES ('Ar')", "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)", "INSERT INTO albums (name, artist_id) VALUES ('Al2', 1)"]
+  end
+
+  it "should support finding one_to_one objects with find flag set to true" do
+    @Album.dataset._fetch = {:id=>1, :name=>'Al2'}
+    @Artist.nested_attributes :first_album, :find=>true
+    al = @Album.load(:id=>1, :name=>'Al2')
+    ar = @Artist.new(:name=>'Ar')
+    ar.set(:first_album_attributes=>{:name=>'Al2'})
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (name = 'Al2') LIMIT 1"]
+    ar.save
+    @db.sqls.must_equal ["INSERT INTO artists (name) VALUES ('Ar')", "UPDATE albums SET artist_id = NULL WHERE ((artist_id = 1) AND (id != 1))", "UPDATE albums SET name = 'Al2', artist_id = 1 WHERE (id = 1)"]
+    ar.first_album.id.must_equal al.id
+  end
+
+  it "should support creating one_to_many objects with find flag set to true" do
+    @Artist.nested_attributes :albums, :find=>true
+    ar = @Artist.new(:name=>'Ar')
+    ar.set(:albums_attributes=>[{:name=>'Al'}])
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (name = 'Al') LIMIT 1"]
+    ar.save
+    @db.sqls.must_equal ["INSERT INTO artists (name) VALUES ('Ar')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"]
+  end
+
+  it "should support finding one_to_many objects with find flag set to true" do
+    @Album.dataset._fetch = {:id=>1, :name=>'Al'}
+    @Artist.nested_attributes :albums, :find=>true
+    al = @Album.load(:id=>1, :name=>'Al')
+    ar = @Artist.new(:name=>'Ar')
+    ar.set(:albums_attributes=>[{:name=>'Al'}, {:name=>'Al2'}])
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (name = 'Al') LIMIT 1", "SELECT * FROM albums WHERE (name = 'Al2') LIMIT 1"]
+    ar.save
+    $my_debug = false
+    @db.sqls.must_equal ["INSERT INTO artists (name) VALUES ('Ar')", "UPDATE albums SET name = 'Al', artist_id = 1 WHERE (id = 1)", "INSERT INTO albums (name, artist_id) VALUES ('Al2', 1)"]
+  end
+
+  it "should support creating many_to_many objects with find flag set to true" do
+    @Album.nested_attributes :tags, :find=>true
+    al = @Album.new(:name=>'Al')
+    al.set(:tags_attributes=>[{:name=>'T'}, {:name=>'T2'}])
+    @db.sqls.must_equal ["SELECT * FROM tags WHERE (name = 'T') LIMIT 1", "SELECT * FROM tags WHERE (name = 'T2') LIMIT 1"]
+    al.save
+    @db.sqls.must_equal ["INSERT INTO albums (name) VALUES ('Al')", "INSERT INTO tags (name) VALUES ('T')", "INSERT INTO at (album_id, tag_id) VALUES (1, 2)", "INSERT INTO tags (name) VALUES ('T2')", "INSERT INTO at (album_id, tag_id) VALUES (1, 4)"]
+  end
+
+  it "should support finding many_to_many objects with find flag set to true" do
+    @Tag.dataset._fetch = {:id=>1, :name=>'T'}
+    @Album.nested_attributes :tags, :find=>true
+    t = @Tag.load(:id=>1, :name=>'T')
+    al = @Album.new(:name=>'Al2')
+    al.set(:tags_attributes=>[{:name=>'T'}, {:name=>'T2'}])
+    @db.sqls.must_equal ["SELECT * FROM tags WHERE (name = 'T') LIMIT 1", "SELECT * FROM tags WHERE (name = 'T2') LIMIT 1"]
+    al.save
+    @db.sqls.must_equal ["INSERT INTO albums (name) VALUES ('Al2')", "INSERT INTO at (album_id, tag_id) VALUES (1, 1)", "INSERT INTO tags (name) VALUES ('T2')", "INSERT INTO at (album_id, tag_id) VALUES (1, 3)"]
+    al.tags.must_include t
+  end
+
   it "should support both string and symbol keys in nested attribute hashes" do
     a = @Album.load(:id=>10, :name=>'Al')
     t = @Tag.load(:id=>20, :name=>'T')
