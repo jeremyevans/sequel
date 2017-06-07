@@ -1252,6 +1252,9 @@ module Sequel
         if sql = @fast_pk_lookup_sql
           sql = sql.dup
           ds = dataset
+          if db_schema[primary_key][:type] == :blob
+            pk = SQL::Blob.new(pk)
+          end
           ds.literal_append(sql, pk)
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
