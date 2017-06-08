@@ -668,6 +668,32 @@ describe "class_table_inheritance plugin with :alias option" do
       "INSERT INTO executives (id) VALUES (1)"]
   end
 
+  it "should sets the model class name for the key when creating new subclass records" do
+    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo}, :alias=>:employees)
+    Object.send(:remove_const, :Ceo)
+    Object.send(:remove_const, :Executive)
+    Object.send(:remove_const, :Manager)
+    class ::Manager < Employee; end 
+    class ::Executive < Manager; end 
+    class ::Ceo < Executive; end 
+    Ceo.create
+    @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('3')",
+      "INSERT INTO managers (id) VALUES (1)",
+      "INSERT INTO executives (id) VALUES (1)"]
+  end
+
+  it "should sets the model class name for the key when creating new subclass records" do
+    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo}, :alias=>:employees)
+    Object.send(:remove_const, :Ceo)
+    Object.send(:remove_const, :Executive)
+    Object.send(:remove_const, :Manager)
+    class ::Manager < Employee; end 
+    class ::Executive < Employee; end 
+    class ::Ceo < Employee; end 
+    Ceo.create
+    @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('3')"]
+  end
+
   it "should ignore existing cti_key value when creating new records" do
     Employee.create(:kind=>'Manager')
     @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]

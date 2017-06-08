@@ -1,3 +1,7 @@
+=== master
+
+* Fix incorrect SQL used for inserting into a CTI subclass sharing the primary table when using the :alias option (jeremyevans)
+
 === 4.47.0 (2017-06-01)
 
 * Deprecate pg_typecast_on_load plugin, only useful on deprecated do and swift adapters (jeremyevans)

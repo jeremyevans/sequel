@@ -395,7 +395,7 @@ module Sequel
         # Insert rows into all backing tables, using the columns
         # in each table.
         def _insert
-          return super if model.cti_tables.length == 1
+          return super if model.cti_models[0] == model
           model.cti_models.each do |m|
             v = {}
             m.cti_table_columns.each{|c| v[c] = @values[c] if @values.include?(c)}
