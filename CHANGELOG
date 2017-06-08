@@ -1,5 +1,7 @@
 === master
 
+* Make pg_hstore extension reset hstore conversion proc when running Database#reset_conversion_procs (jeremyevans)
+
 * Fix incorrect SQL used for inserting into a CTI subclass sharing the primary table when using the :alias option (jeremyevans)
 
 === 4.47.0 (2017-06-01)

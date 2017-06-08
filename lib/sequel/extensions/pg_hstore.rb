@@ -160,6 +160,12 @@ module Sequel
 
         private
 
+        def reset_conversion_procs
+          procs = super
+          add_named_conversion_proc(:hstore, &HStore.method(:parse))
+          procs 
+        end
+
         # Recognize the hstore database type.
         def schema_column_type(db_type)
           db_type == 'hstore' ? :hstore : super
