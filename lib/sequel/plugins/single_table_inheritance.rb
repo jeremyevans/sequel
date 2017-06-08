@@ -239,6 +239,15 @@ module Sequel
       end
 
       module InstanceMethods
+        # convert to another type
+        def becomes(klass)
+          klass.call(@values)
+        end
+
+        def reload
+          _no_subclass_ds { super }
+        end
+
         private
 
         # Set the sti_key column based on the sti_key_map.
@@ -247,6 +256,42 @@ module Sequel
             set_column_value("#{model.sti_key}=", model.sti_key_chooser.call(self))
           end
           super
+        end
+
+        def _save_update_all_columns_hash
+          v = super
+          # update the sti key to reflect the class
+          v[model.sti_key] = model.sti_key_map[self.class]
+          v
+        end
+
+        def _update_dataset
+          return super unless _converted?
+          _no_subclass_ds { super }
+        end
+
+        def _no_subclass_ds
+          model.instance_variable_set(:@this, nil)
+          @this = nil
+          begin
+            original_ds = model.instance_variable_get(:@dataset)
+            model.set_dataset(model.sti_dataset, inherited: true)
+            yield
+          ensure
+            model.set_dataset(original_ds, inherited: true)
+          end
+        end
+
+        def _save(opts)
+          ret = super
+          return ret unless _converted?
+          set_column_value("#{model.sti_key}=", model.sti_key_chooser.call(self))
+          ret
+        end
+
+        # if the sti key and class is consistent
+        def _converted?
+          Array(values[model.sti_key]) != model.sti_key_chooser.call(self)
         end
       end
     end
