@@ -1195,6 +1195,7 @@ describe "AssociationPks plugin" do
     class ::Album < Sequel::Model
       plugin :association_pks
       many_to_many :tags, :order=>:id, :delay_pks=>false
+      many_to_many :uat_tags, :order=>Sequel[:tags][:id], :delay_pks=>false, :class=>:Tag, :right_key=>:tag_id, :association_pks_use_associated_table=>true
     end 
     class ::Tag < Sequel::Model
     end 
@@ -1260,6 +1261,10 @@ describe "AssociationPks plugin" do
     Album.order(:id).all.map{|a| a.tag_pks.sort}.must_equal [[@t1, @t2, @t3], [@t2], []]
   end
 
+  it "should return correct associated pks for many_to_many associations using :association_pks_use_associated_table" do
+    Album.order(:id).all.map{|a| a.uat_tag_pks.sort}.must_equal [[@t1, @t2, @t3], [@t2], []]
+  end
+
   it "should return correct associated right-side cpks for one_to_many associations" do
     Album.one_to_many :vocalists, :order=>:first
     Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [], []]
@@ -1267,6 +1272,11 @@ describe "AssociationPks plugin" do
 
   it "should return correct associated right-side cpks for many_to_many associations" do
     Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [@v2], []]
+  end
+
+  it "should return correct associated right-side cpks for many_to_many associations when using :association_pks_use_associated_table" do
+    Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>Sequel[:vocalists][:first], :association_pks_use_associated_table=>true
     Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [@v2], []]
   end
 
@@ -1280,6 +1290,11 @@ describe "AssociationPks plugin" do
     Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.must_equal [[@i1, @i2, @i3], [@i2], []]
   end
 
+  it "should return correct associated pks for left-side cpks for many_to_many associations when using :association_pks_use_associated_table" do
+    Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id, :association_pks_use_associated_table=>true
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.must_equal [[@i1, @i2, @i3], [@i2], []]
+  end
+
   it "should return correct associated right-side cpks for left-side cpks for one_to_many associations" do
     Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week
     Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [], []]
@@ -1287,6 +1302,11 @@ describe "AssociationPks plugin" do
 
   it "should return correct associated right-side cpks for left-side cpks for many_to_many associations" do
     Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [@h2], []]
+  end
+
+  it "should return correct associated right-side cpks for left-side cpks for many_to_many associations when using :association_pks_use_associated_table" do
+    Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>Sequel[:vocalists_hits][:week], :association_pks_use_associated_table=>true
     Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [@h2], []]
   end
 

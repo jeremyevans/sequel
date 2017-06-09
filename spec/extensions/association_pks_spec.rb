@@ -8,7 +8,8 @@ describe "Sequel::Plugins::AssociationPks" do
         {:id=>$1.to_i}
       when "SELECT id FROM albums WHERE (albums.artist_id = 1)"
         [{:id=>1}, {:id=>2}, {:id=>3}]
-      when /SELECT tag_id FROM albums_tags WHERE \(album_id = (\d)\)/
+      when /SELECT tag_id FROM albums_tags WHERE \(album_id = (\d)\)/,
+           /SELECT tags.id FROM tags INNER JOIN albums_tags ON \(albums_tags.tag_id = tags.id\) WHERE \(albums_tags.album_id = (\d)\)/
         a = []
         a << {:tag_id=>1} if $1 == '1'
         a << {:tag_id=>2} if $1 != '3'
@@ -32,7 +33,8 @@ describe "Sequel::Plugins::AssociationPks" do
         a
       when "SELECT year, week FROM hits WHERE ((hits.first = 'F1') AND (hits.last = 'L1'))"
         [{:year=>1997, :week=>1}, {:year=>1997, :week=>2}]
-      when /SELECT year, week FROM vocalists_hits WHERE \(\((?:first|last) = '?[FL1](\d)/
+      when /SELECT year, week FROM vocalists_hits WHERE \(\((?:first|last) = '?[FL1](\d)/,
+           /SELECT hits.year, hits.week FROM hits INNER JOIN vocalists_hits ON \(\(vocalists_hits.(?:year|week) = hits.(?:year|week)\) AND \(vocalists_hits.(?:year|week) = hits.(?:year|week)\)\) WHERE \(\(vocalists_hits.(?:first|last) = '?[FL1](\d)/
         a = []
         a << {:year=>1997, :week=>1} if $1 == "1"
         a << {:year=>1997, :week=>2} if $1 != "3"
@@ -64,13 +66,28 @@ describe "Sequel::Plugins::AssociationPks" do
 
   it "should return correct associated pks for one_to_many associations" do
     @Artist.load(:id=>1).album_pks.must_equal [1,2,3]
+    @db.sqls.must_equal ["SELECT id FROM albums WHERE (albums.artist_id = 1)"]
     @Artist.load(:id=>2).album_pks.must_equal []
+    @db.sqls.must_equal ["SELECT id FROM albums WHERE (albums.artist_id = 2)"]
   end
 
   it "should return correct associated pks for many_to_many associations" do
     @Album.load(:id=>1).tag_pks.must_equal [1, 2]
+    @db.sqls.must_equal ["SELECT tag_id FROM albums_tags WHERE (album_id = 1)"]
     @Album.load(:id=>2).tag_pks.must_equal [2, 3]
+    @db.sqls.must_equal ["SELECT tag_id FROM albums_tags WHERE (album_id = 2)"]
     @Album.load(:id=>3).tag_pks.must_equal []
+    @db.sqls.must_equal ["SELECT tag_id FROM albums_tags WHERE (album_id = 3)"]
+  end
+
+  it "should return correct associated pks for many_to_many associations using :association_pks_use_associated_table" do
+    @Album.many_to_many :tags, :class=>@Tag, :join_table=>:albums_tags, :left_key=>:album_id, :delay_pks=>false, :association_pks_use_associated_table=>true
+    @Album.load(:id=>1).tag_pks.must_equal [1, 2]
+    @db.sqls.must_equal ["SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1)"]
+    @Album.load(:id=>2).tag_pks.must_equal [2, 3]
+    @db.sqls.must_equal ["SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 2)"]
+    @Album.load(:id=>3).tag_pks.must_equal []
+    @db.sqls.must_equal ["SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 3)"]
   end
 
   deprecated "should set associated pks correctly for a one_to_many association when :delay_pks is not set" do
@@ -171,14 +188,29 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should return correct right-side associated cpks for left-side cpks for one_to_many associations" do
     @Vocalist.one_to_many :hits, :class=>@Hit, :key=>[:first, :last]
     @Vocalist.load(:first=>'F1', :last=>'L1').hit_pks.must_equal [[1997, 1], [1997, 2]]
+    @db.sqls.must_equal ["SELECT year, week FROM hits WHERE ((hits.first = 'F1') AND (hits.last = 'L1'))"]
     @Vocalist.load(:first=>'F2', :last=>'L2').hit_pks.must_equal []
+    @db.sqls.must_equal ["SELECT year, week FROM hits WHERE ((hits.first = 'F2') AND (hits.last = 'L2'))"]
   end
 
   it "should return correct right-side associated cpks for left-side cpks for many_to_many associations" do
     @Vocalist.many_to_many :hits, :class=>@Hit, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week]
     @Vocalist.load(:first=>'F1', :last=>'L1').hit_pks.must_equal [[1997, 1], [1997, 2]]
+    @db.sqls.must_equal ["SELECT year, week FROM vocalists_hits WHERE ((first = 'F1') AND (last = 'L1'))"]
     @Vocalist.load(:first=>'F2', :last=>'L2').hit_pks.must_equal [[1997, 2], [1997, 3]]
+    @db.sqls.must_equal ["SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"]
     @Vocalist.load(:first=>'F3', :last=>'L3').hit_pks.must_equal []
+    @db.sqls.must_equal ["SELECT year, week FROM vocalists_hits WHERE ((first = 'F3') AND (last = 'L3'))"]
+  end
+
+  it "should return correct right-side associated cpks for left-side cpks for many_to_many associations when using :association_pks_use_associated_table" do
+    @Vocalist.many_to_many :hits, :class=>@Hit, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :association_pks_use_associated_table=>true
+    @Vocalist.load(:first=>'F1', :last=>'L1').hit_pks.must_equal [[1997, 1], [1997, 2]]
+    @db.sqls.must_equal ["SELECT hits.year, hits.week FROM hits INNER JOIN vocalists_hits ON ((vocalists_hits.year = hits.year) AND (vocalists_hits.week = hits.week)) WHERE ((vocalists_hits.first = 'F1') AND (vocalists_hits.last = 'L1'))"]
+    @Vocalist.load(:first=>'F2', :last=>'L2').hit_pks.must_equal [[1997, 2], [1997, 3]]
+    @db.sqls.must_equal ["SELECT hits.year, hits.week FROM hits INNER JOIN vocalists_hits ON ((vocalists_hits.year = hits.year) AND (vocalists_hits.week = hits.week)) WHERE ((vocalists_hits.first = 'F2') AND (vocalists_hits.last = 'L2'))"]
+    @Vocalist.load(:first=>'F3', :last=>'L3').hit_pks.must_equal []
+    @db.sqls.must_equal ["SELECT hits.year, hits.week FROM hits INNER JOIN vocalists_hits ON ((vocalists_hits.year = hits.year) AND (vocalists_hits.week = hits.week)) WHERE ((vocalists_hits.first = 'F3') AND (vocalists_hits.last = 'L3'))"]
   end
 
   it "should set associated right-side cpks correctly for left-side cpks for a one_to_many association" do

@@ -41,6 +41,17 @@ module Sequel
     # If set to :remove, the setter will treat the nil as an empty array, removing
     # the association all currently associated values.
     #
+    # For many_to_many associations, association_pks assumes the related pks can be
+    # accessed directly from the join table.  This works in most cases, but in cases
+    # where the :right_primary_key association option is used to specify a different
+    # primary key in the associated table, association_pks will return the value of
+    # the association primary keys (foreign key values to associated table in the join
+    # table), not the associated model primary keys.  If you would like to use the
+    # associated model primary keys, you need to use the
+    # :association_pks_use_associated_table association option. If the
+    # :association_pks_use_associated_table association option is used, no setter
+    # method will be added.
+    #
     # Usage:
     #
     #   # Make all model subclass *_to_many associations have association_pks
@@ -57,7 +68,7 @@ module Sequel
         # Define a association_pks method using the block for the association reflection 
         def def_association_pks_methods(opts)
           association_module_def(:"#{singularize(opts[:name])}_pks", opts){_association_pks_getter(opts)}
-          association_module_def(:"#{singularize(opts[:name])}_pks=", opts){|pks| _association_pks_setter(opts, pks)} unless opts[:read_only]
+          association_module_def(:"#{singularize(opts[:name])}_pks=", opts){|pks| _association_pks_setter(opts, pks)} if opts[:pks_setter]
         end
 
         # Add a getter that checks the join table for matching records and
@@ -73,7 +84,19 @@ module Sequel
           clpk = lpk.is_a?(Array)
           crk = rk.is_a?(Array)
 
-          opts[:pks_getter] = if clpk
+          opts[:pks_getter] = if join_associated_table = opts[:association_pks_use_associated_table]
+            tname = opts[:join_table]
+            lambda do
+              if clpk
+                h = {}
+                lk.zip(lpk).each{|k, pk| h[Sequel.qualify(tname, k)] = get_column_value(pk)}
+              else
+                 h = {Sequel.qualify(tname, lk)=>get_column_value(lpk)}
+              end
+              rpk = opts.associated_class.primary_key
+              opts.associated_dataset.naked.where(h).select_map(Sequel.send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
+            end
+          elsif clpk
             lambda do
               h = {}
               lk.zip(lpk).each{|k, pk| h[k] = get_column_value(pk)}
@@ -85,25 +108,27 @@ module Sequel
             end
           end
 
-          opts[:pks_setter] = lambda do |pks|
-            if pks.empty?
-              send(opts.remove_all_method)
-            else
-              checked_transaction do
-                if clpk
-                  lpkv = lpk.map{|k| get_column_value(k)}
-                  cond = lk.zip(lpkv)
-                else
-                  lpkv = get_column_value(lpk)
-                  cond = {lk=>lpkv}
+          if !opts[:read_only] && !join_associated_table
+            opts[:pks_setter] = lambda do |pks|
+              if pks.empty?
+                send(opts.remove_all_method)
+              else
+                checked_transaction do
+                  if clpk
+                    lpkv = lpk.map{|k| get_column_value(k)}
+                    cond = lk.zip(lpkv)
+                  else
+                    lpkv = get_column_value(lpk)
+                    cond = {lk=>lpkv}
+                  end
+                  ds = _join_table_dataset(opts).where(cond)
+                  ds.exclude(rk=>pks).delete
+                  pks -= ds.select_map(rk)
+                  lpkv = Array(lpkv)
+                  key_array = crk ? pks.map{|pk| lpkv + pk} : pks.map{|pk| lpkv + [pk]}
+                  key_columns = Array(lk) + Array(rk)
+                  ds.import(key_columns, key_array)
                 end
-                ds = _join_table_dataset(opts).where(cond)
-                ds.exclude(rk=>pks).delete
-                pks -= ds.select_map(rk)
-                lpkv = Array(lpkv)
-                key_array = crk ? pks.map{|pk| lpkv + pk} : pks.map{|pk| lpkv + [pk]}
-                key_columns = Array(lk) + Array(rk)
-                ds.import(key_columns, key_array)
               end
             end
           end
@@ -124,29 +149,31 @@ module Sequel
             send(opts.dataset_method).select_map(opts.associated_class.primary_key)
           end
 
-          opts[:pks_setter] = lambda do |pks|
-            if pks.empty?
-              send(opts.remove_all_method)
-            else
-              primary_key = opts.associated_class.primary_key
-              pkh = {primary_key=>pks}
-
-              if key.is_a?(Array)
-                h = {}
-                nh = {}
-                key.zip(pk).each do|k, v|
-                  h[k] = v
-                  nh[k] = nil
-                end
+          unless opts[:read_only]
+            opts[:pks_setter] = lambda do |pks|
+              if pks.empty?
+                send(opts.remove_all_method)
               else
-                h = {key=>pk}
-                nh = {key=>nil}
-              end
+                primary_key = opts.associated_class.primary_key
+                pkh = {primary_key=>pks}
 
-              checked_transaction do
-                ds = send(opts.dataset_method)
-                ds.unfiltered.where(pkh).update(h)
-                ds.exclude(pkh).update(nh)
+                if key.is_a?(Array)
+                  h = {}
+                  nh = {}
+                  key.zip(pk).each do|k, v|
+                    h[k] = v
+                    nh[k] = nil
+                  end
+                else
+                  h = {key=>pk}
+                  nh = {key=>nil}
+                end
+
+                checked_transaction do
+                  ds = send(opts.dataset_method)
+                  ds.unfiltered.where(pkh).update(h)
+                  ds.exclude(pkh).update(nh)
+                end
               end
             end
           end
