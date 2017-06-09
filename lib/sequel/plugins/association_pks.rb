@@ -87,20 +87,20 @@ module Sequel
           opts[:pks_getter] = if join_associated_table = opts[:association_pks_use_associated_table]
             tname = opts[:join_table]
             lambda do
-              if clpk
-                h = {}
-                lk.zip(lpk).each{|k, pk| h[Sequel.qualify(tname, k)] = get_column_value(pk)}
+              cond = if clpk
+                lk.zip(lpk).map{|k, pk| [Sequel.qualify(tname, k), get_column_value(pk)]}
               else
-                 h = {Sequel.qualify(tname, lk)=>get_column_value(lpk)}
+                {Sequel.qualify(tname, lk) => get_column_value(lpk)}
               end
               rpk = opts.associated_class.primary_key
-              opts.associated_dataset.naked.where(h).select_map(Sequel.send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
+              opts.associated_dataset.
+                naked.where(cond).
+                select_map(Sequel.send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
             end
           elsif clpk
             lambda do
-              h = {}
-              lk.zip(lpk).each{|k, pk| h[k] = get_column_value(pk)}
-              _join_table_dataset(opts).where(h).select_map(rk)
+              cond = lk.zip(lpk).map{|k, pk| [k, get_column_value(pk)]}
+              _join_table_dataset(opts).where(cond).select_map(rk)
             end
           else
             lambda do
