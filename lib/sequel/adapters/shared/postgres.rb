@@ -46,7 +46,7 @@ module Sequel
     end
 
     # Array of exceptions that need to be converted.  JDBC
-    # uses NativeExceptions, the native adapter uses PGError.
+    # uses NativeExceptions, the native adapter uses PG::Error.
     CONVERTED_EXCEPTIONS = []
 
     @client_min_messages = :warning

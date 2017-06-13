@@ -6,16 +6,16 @@ begin
   require 'pg' 
 
   # Work around postgres-pr 0.7.0+ which ships with a pg.rb file
-  raise LoadError unless defined?(PGconn::CONNECTION_OK)
+  raise LoadError unless defined?(PG::Connection::CONNECTION_OK)
 
   Sequel::Postgres::USES_PG = true
 rescue LoadError => e 
   Sequel::Postgres::USES_PG = false
   begin
     require 'postgres'
-    # Attempt to get uniform behavior for the PGconn object no matter
+    # Attempt to get uniform behavior for the PG::Connection object no matter
     # if pg, postgres, or postgres-pr is used.
-    class PGconn
+    class PG::Connection
       unless method_defined?(:escape_string)
         if self.respond_to?(:escape)
           # If there is no escape_string instance method, but there is an
@@ -81,7 +81,7 @@ rescue LoadError => e
         end
       end
     end
-    class PGresult 
+    class PG::Result
       alias_method :nfields, :num_fields unless method_defined?(:nfields) 
       alias_method :ntuples, :num_tuples unless method_defined?(:ntuples) 
       alias_method :ftype, :type unless method_defined?(:ftype) 
@@ -95,7 +95,7 @@ end
 
 module Sequel
   module Postgres
-    CONVERTED_EXCEPTIONS << PGError
+    CONVERTED_EXCEPTIONS << PG::Error
 
     TYPE_CONVERTOR = Class.new do
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
@@ -120,9 +120,9 @@ module Sequel
       attr_accessor :use_iso_date_format
     end
 
-    # PGconn subclass for connection specific methods used with the
+    # PG::Connection subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
-    class Adapter < ::PGconn
+    class Adapter < ::PG::Connection
       # The underlying exception classes to reraise as disconnect errors
       # instead of regular database errors.
       DISCONNECT_ERROR_CLASSES = [IOError, Errno::EPIPE, Errno::ECONNRESET]
@@ -151,7 +151,7 @@ module Sequel
       attr_reader(:prepared_statements) if USES_PG
       
       # Raise a Sequel::DatabaseDisconnectError if a one of the disconnect
-      # error classes is raised, or a PGError is raised and the connection
+      # error classes is raised, or a PG::Error is raised and the connection
       # status cannot be determined or it is not OK.
       def check_disconnect_errors
         begin
@@ -159,11 +159,11 @@ module Sequel
         rescue *DISCONNECT_ERROR_CLASSES => e
           disconnect = true
           raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
-        rescue PGError => e
+        rescue PG::Error => e
           disconnect = false
           begin
             s = status
-          rescue PGError
+          rescue PG::Error
             disconnect = true
           end
           status_ok = (s == Adapter::CONNECTION_OK)
@@ -317,13 +317,13 @@ module Sequel
       # Disconnect given connection
       def disconnect_connection(conn)
         conn.finish
-      rescue PGError, IOError
+      rescue PG::Error, IOError
         nil
       end
 
       if USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
-        # Return a hash of information about the related PGError (or Sequel::DatabaseError that
-        # wraps a PGError), with the following entries:
+        # Return a hash of information about the related PG::Error (or Sequel::DatabaseError that
+        # wraps a PG::Error), with the following entries:
         #
         # :schema :: The schema name related to the error
         # :table :: The table name related to the error
@@ -568,7 +568,7 @@ module Sequel
       end
 
       def database_error_classes
-        [PGError]
+        [PG::Error]
       end
 
       def disconnect_error?(exception, opts)
@@ -579,7 +579,7 @@ module Sequel
 
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
-          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+          result.error_field(::PG::Result::PG_DIAG_SQLSTATE)
         end
       end
 
