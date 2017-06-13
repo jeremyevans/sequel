@@ -305,7 +305,7 @@ The following additional options are supported:
                     if using the pg library).
 :driver_options :: A hash of options to pass to the underlying driver (only respected if using the pg library)
 :encoding :: Set the client_encoding to the given string
-:notice_receiver :: A proc that be called with the PGresult objects that have notice or warning messages.
+:notice_receiver :: A proc that be called with the PG::Result objects that have notice or warning messages.
                     The default notice receiver just prints the messages to stderr, but this can be used
                     to handle notice/warning messages differently.  Only respected if using the pg library).
 :sslmode :: Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL (only
