@@ -22,6 +22,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call(:all, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:first, :n=>10).must_equal(:id=>1, :numb=>10)
     @ds.filter(:numb=>:$n).call([:map, :numb], :n=>10).must_equal [10]
+    @ds.filter(:numb=>:$n).call([:as_hash, :id, :numb], :n=>10).must_equal(1=>10)
     @ds.filter(:numb=>:$n).call([:to_hash, :id, :numb], :n=>10).must_equal(1=>10)
     @ds.filter(:numb=>:$n).call([:to_hash_groups, :id, :numb], :n=>10).must_equal(1=>[10])
   end
@@ -161,6 +162,8 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:select_n, :n=>10).must_equal(:id=>1, :numb=>10)
     @ds.filter(:numb=>:$n).prepare([:map, :numb], :select_n)
     @db.call(:select_n, :n=>10).must_equal [10]
+    @ds.filter(:numb=>:$n).prepare([:as_hash, :id, :numb], :select_n)
+    @db.call(:select_n, :n=>10).must_equal(1=>10)
     @ds.filter(:numb=>:$n).prepare([:to_hash, :id, :numb], :select_n)
     @db.call(:select_n, :n=>10).must_equal(1=>10)
   end

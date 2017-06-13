@@ -1212,17 +1212,18 @@ describe "Sequel::Dataset convenience methods" do
     @ds.map([:a, :b]).must_equal [[1, 2], [5, 6]]
   end
   
-  it "should have working #to_hash" do
+  it "should have working #as_hash" do
     @ds.to_hash(:a).must_equal(1=>{:a=>1, :b=>2, :c=>3, :d=>4}, 5=>{:a=>5, :b=>6, :c=>7, :d=>8})
-    @ds.to_hash(:b).must_equal(2=>{:a=>1, :b=>2, :c=>3, :d=>4}, 6=>{:a=>5, :b=>6, :c=>7, :d=>8})
-    @ds.to_hash([:a, :b]).must_equal([1, 2]=>{:a=>1, :b=>2, :c=>3, :d=>4}, [5, 6]=>{:a=>5, :b=>6, :c=>7, :d=>8})
+    @ds.as_hash(:a).must_equal(1=>{:a=>1, :b=>2, :c=>3, :d=>4}, 5=>{:a=>5, :b=>6, :c=>7, :d=>8})
+    @ds.as_hash(:b).must_equal(2=>{:a=>1, :b=>2, :c=>3, :d=>4}, 6=>{:a=>5, :b=>6, :c=>7, :d=>8})
+    @ds.as_hash([:a, :b]).must_equal([1, 2]=>{:a=>1, :b=>2, :c=>3, :d=>4}, [5, 6]=>{:a=>5, :b=>6, :c=>7, :d=>8})
 
-    @ds.to_hash(:a, :b).must_equal(1=>2, 5=>6)
-    @ds.to_hash([:a, :c], :b).must_equal([1, 3]=>2, [5, 7]=>6)
-    @ds.to_hash(:a, [:b, :c]).must_equal(1=>[2, 3], 5=>[6, 7])
-    @ds.to_hash([:a, :c], [:b, :d]).must_equal([1, 3]=>[2, 4], [5, 7]=>[6, 8])
+    @ds.as_hash(:a, :b).must_equal(1=>2, 5=>6)
+    @ds.as_hash([:a, :c], :b).must_equal([1, 3]=>2, [5, 7]=>6)
+    @ds.as_hash(:a, [:b, :c]).must_equal(1=>[2, 3], 5=>[6, 7])
+    @ds.as_hash([:a, :c], [:b, :d]).must_equal([1, 3]=>[2, 4], [5, 7]=>[6, 8])
 
-    @ds.to_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
+    @ds.as_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
   it "should have working #to_hash_groups" do

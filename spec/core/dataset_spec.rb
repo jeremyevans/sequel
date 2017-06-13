@@ -1976,46 +1976,51 @@ describe "Dataset#map" do
   end
 end
 
-describe "Dataset#to_hash" do
+describe "Dataset#as_hash" do
   before do
     @d = Sequel.mock(:fetch=>[{:a => 1, :b => 2}, {:a => 3, :b => 4}, {:a => 5, :b => 6}])[:items]
   end
   
   it "should provide a hash with the first column as key and the second as value" do
+    @d.as_hash(:a, :b).must_equal(1 => 2, 3 => 4, 5 => 6)
+    @d.as_hash(:b, :a).must_equal(2 => 1, 4 => 3, 6 => 5)
+  end
+  
+  it "should be aliased as #to_hash" do
     @d.to_hash(:a, :b).must_equal(1 => 2, 3 => 4, 5 => 6)
     @d.to_hash(:b, :a).must_equal(2 => 1, 4 => 3, 6 => 5)
   end
   
   it "should provide a hash with the first column as key and the entire hash as value if the value column is blank or nil" do
-    @d.to_hash(:a).must_equal(1 => {:a => 1, :b => 2}, 3 => {:a => 3, :b => 4}, 5 => {:a => 5, :b => 6})
-    @d.to_hash(:b).must_equal(2 => {:a => 1, :b => 2}, 4 => {:a => 3, :b => 4}, 6 => {:a => 5, :b => 6})
+    @d.as_hash(:a).must_equal(1 => {:a => 1, :b => 2}, 3 => {:a => 3, :b => 4}, 5 => {:a => 5, :b => 6})
+    @d.as_hash(:b).must_equal(2 => {:a => 1, :b => 2}, 4 => {:a => 3, :b => 4}, 6 => {:a => 5, :b => 6})
   end
 
   it "should accept an optional :hash parameter into which entries can be merged" do
-    @d.to_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
+    @d.as_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
   it "should support using an array of columns as either the key or the value" do
-    @d.to_hash([:a, :b], :b).must_equal([1, 2] => 2, [3, 4] => 4, [5, 6] => 6)
-    @d.to_hash(:b, [:a, :b]).must_equal(2 => [1, 2], 4 => [3, 4], 6 => [5, 6])
-    @d.to_hash([:b, :a], [:a, :b]).must_equal([2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6])
-    @d.to_hash([:a, :b]).must_equal([1, 2] => {:a => 1, :b => 2}, [3, 4] => {:a => 3, :b => 4}, [5, 6] => {:a => 5, :b => 6})
+    @d.as_hash([:a, :b], :b).must_equal([1, 2] => 2, [3, 4] => 4, [5, 6] => 6)
+    @d.as_hash(:b, [:a, :b]).must_equal(2 => [1, 2], 4 => [3, 4], 6 => [5, 6])
+    @d.as_hash([:b, :a], [:a, :b]).must_equal([2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6])
+    @d.as_hash([:a, :b]).must_equal([1, 2] => {:a => 1, :b => 2}, [3, 4] => {:a => 3, :b => 4}, [5, 6] => {:a => 5, :b => 6})
   end
 
   it "should not call the row_proc if two arguments are given" do
     @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
-    @d.to_hash(:a, :b).must_equal(1 => 2, 3 => 4, 5 => 6)
-    @d.to_hash(:b, :a).must_equal(2 => 1, 4 => 3, 6 => 5)
-    @d.to_hash([:a, :b], :b).must_equal([1, 2] => 2, [3, 4] => 4, [5, 6] => 6)
-    @d.to_hash(:b, [:a, :b]).must_equal(2 => [1, 2], 4 => [3, 4], 6 => [5, 6])
-    @d.to_hash([:b, :a], [:a, :b]).must_equal([2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6])
+    @d.as_hash(:a, :b).must_equal(1 => 2, 3 => 4, 5 => 6)
+    @d.as_hash(:b, :a).must_equal(2 => 1, 4 => 3, 6 => 5)
+    @d.as_hash([:a, :b], :b).must_equal([1, 2] => 2, [3, 4] => 4, [5, 6] => 6)
+    @d.as_hash(:b, [:a, :b]).must_equal(2 => [1, 2], 4 => [3, 4], 6 => [5, 6])
+    @d.as_hash([:b, :a], [:a, :b]).must_equal([2, 1] => [1, 2], [4, 3] => [3, 4], [6, 5] => [5, 6])
   end
 
   it "should call the row_proc if only a single argument is given" do
     @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
-    @d.to_hash(:a).must_equal(2 => {:a => 2, :b => 4}, 6 => {:a => 6, :b => 8}, 10 => {:a => 10, :b => 12})
-    @d.to_hash(:b).must_equal(4 => {:a => 2, :b => 4}, 8 => {:a => 6, :b => 8}, 12 => {:a => 10, :b => 12})
-    @d.to_hash([:a, :b]).must_equal([2, 4] => {:a => 2, :b => 4}, [6, 8] => {:a => 6, :b => 8}, [10, 12] => {:a => 10, :b => 12})
+    @d.as_hash(:a).must_equal(2 => {:a => 2, :b => 4}, 6 => {:a => 6, :b => 8}, 10 => {:a => 10, :b => 12})
+    @d.as_hash(:b).must_equal(4 => {:a => 2, :b => 4}, 8 => {:a => 6, :b => 8}, 12 => {:a => 10, :b => 12})
+    @d.as_hash([:a, :b]).must_equal([2, 4] => {:a => 2, :b => 4}, [6, 8] => {:a => 6, :b => 8}, [10, 12] => {:a => 10, :b => 12})
   end
 
   it "should handle a single composite key when using a row_proc" do
@@ -2026,7 +2031,7 @@ describe "Dataset#to_hash" do
       def h; @h; end
       def ==(o) @h == o.h; end
     end
-    @d.with_row_proc(c).to_hash([:a, :b]).must_equal([1, 2] => c.call(:a => 1, :b => 2), [3, 4] => c.call(:a => 3, :b => 4), [5, 6] => c.call(:a => 5, :b => 6))
+    @d.with_row_proc(c).as_hash([:a, :b]).must_equal([1, 2] => c.call(:a => 1, :b => 2), [3, 4] => c.call(:a => 3, :b => 4), [5, 6] => c.call(:a => 5, :b => 6))
   end
 end
 
@@ -3911,6 +3916,7 @@ describe "Dataset prepared statements and bound variables " do
     @ds.filter(:num=>:$n).bind({:n=>1}.freeze).call(:each)
     @ds.filter(:num=>:$n).call(:select, :n=>1)
     @ds.filter(:num=>:$n).call([:map, :a], :n=>1)
+    @ds.filter(:num=>:$n).call([:as_hash, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call([:to_hash, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call([:to_hash_groups, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call(:first, :n=>1)
@@ -3920,6 +3926,7 @@ describe "Dataset prepared statements and bound variables " do
     @ds.call(:insert_pk, {:n=>1}, :num=>:$n)
     @ds.call(:insert_select, {:n=>1}, :num=>:$n)
     @db.sqls.must_equal [
+      'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
@@ -3938,6 +3945,7 @@ describe "Dataset prepared statements and bound variables " do
     pss << @ds.filter(:num=>:$n).prepare(:each, :en)
     pss << @ds.filter(:num=>:$n).prepare(:select, :sn)
     pss << @ds.filter(:num=>:$n).prepare([:map, :a], :sm)
+    pss << @ds.filter(:num=>:$n).prepare([:as_hash, :a, :b], :ah)
     pss << @ds.filter(:num=>:$n).prepare([:to_hash, :a, :b], :sh)
     pss << @ds.filter(:num=>:$n).prepare([:to_hash_groups, :a, :b], :shg)
     pss << @ds.filter(:num=>:$n).prepare(:first, :fn)
@@ -3945,11 +3953,12 @@ describe "Dataset prepared statements and bound variables " do
     pss << @ds.filter(:num=>:$n).prepare(:update, :un, :num=>:$n2)
     pss << @ds.prepare(:insert, :in, :num=>:$n)
     pss << @ds.prepare(:insert_select, :ins, :num=>:$n)
-    @db.prepared_statements.keys.sort_by{|k| k.to_s}.must_equal [:dn, :en, :fn, :in, :ins, :sh, :shg, :sm, :sn, :un]
-    [:en, :sn, :sm, :sh, :shg, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].must_equal pss[i]}
+    @db.prepared_statements.keys.sort_by{|k| k.to_s}.must_equal [:ah, :dn, :en, :fn, :in, :ins, :sh, :shg, :sm, :sn, :un]
+    [:en, :sn, :sm, :ah, :sh, :shg, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].must_equal pss[i]}
     @db.call(:en, :n=>1){}
     @db.call(:sn, :n=>1)
     @db.call(:sm, :n=>1)
+    @db.call(:ah, :n=>1)
     @db.call(:sh, :n=>1)
     @db.call(:shg, :n=>1)
     @db.call(:fn, :n=>1)
@@ -3958,6 +3967,7 @@ describe "Dataset prepared statements and bound variables " do
     @db.call(:in, :n=>1)
     @db.call(:ins, :n=>1)
     @db.sqls.must_equal [
+      'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',

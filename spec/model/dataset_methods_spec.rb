@@ -38,7 +38,7 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
   end
 end
 
-describe Sequel::Model::DatasetMethods, "#to_hash"  do
+describe Sequel::Model::DatasetMethods, "#as_hash"  do
   before do
     @c = Class.new(Sequel::Model(:items)) do
       set_primary_key :name
@@ -47,6 +47,15 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
   end
 
   it "should result in a hash with primary key value keys and model object values" do
+    @d = @d.with_fetch([{:name=>1}, {:name=>2}])
+    h = @d.as_hash
+    h.must_be_kind_of(Hash)
+    a = h.to_a
+    a.collect{|x| x[1].class}.must_equal [@c, @c]
+    a.sort_by{|x| x[0]}.collect{|x| [x[0], x[1].values]}.must_equal [[1, {:name=>1}], [2, {:name=>2}]]
+  end
+
+  it "should be aliased as to_hash" do
     @d = @d.with_fetch([{:name=>1}, {:name=>2}])
     h = @d.to_hash
     h.must_be_kind_of(Hash)
@@ -57,7 +66,7 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
 
   it "should result in a hash with given value keys and model object values" do
     @d = @d.with_fetch([{:name=>1, :number=>3}, {:name=>2, :number=>4}])
-    h = @d.to_hash(:number)
+    h = @d.as_hash(:number)
     h.must_be_kind_of(Hash)
     a = h.to_a
     a.collect{|x| x[1].class}.must_equal [@c, @c]
@@ -66,7 +75,7 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
 
   it "should raise an error if the class doesn't have a primary key" do
     @c.no_primary_key
-    proc{@d.to_hash}.must_raise(Sequel::Error)
+    proc{@d.as_hash}.must_raise(Sequel::Error)
   end
 end
 

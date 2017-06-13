@@ -2815,7 +2815,7 @@ END
 
         # If the dataset is being eagerly loaded, default to calling all
         # instead of each.
-        def to_hash(key_column=nil, value_column=nil, opts=OPTS)
+        def as_hash(key_column=nil, value_column=nil, opts=OPTS)
           if (@opts[:eager_graph] || @opts[:eager]) && !opts.has_key?(:all)
             opts = Hash[opts]
             opts[:all] = true

@@ -287,7 +287,7 @@ module Sequel
         defaults = begin
           metadata_dataset.from(:all_tab_cols).
             where(:table_name=>im.call(table)).
-            to_hash(:column_name, :data_default)
+            as_hash(:column_name, :data_default)
         rescue DatabaseError
           {}
         end

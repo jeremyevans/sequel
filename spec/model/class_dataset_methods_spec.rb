@@ -116,6 +116,8 @@ describe Sequel::Model, "class dataset methods"  do
     @db.sqls.must_equal ["SELECT * FROM items"]
     @c.sum(:id).must_equal 1
     @db.sqls.must_equal ["SELECT sum(id) AS sum FROM items LIMIT 1"]
+    @c.as_hash(:id, :id).must_equal(1=>1)
+    @db.sqls.must_equal ["SELECT * FROM items"]
     @c.to_hash(:id, :id).must_equal(1=>1)
     @db.sqls.must_equal ["SELECT * FROM items"]
     @c.to_hash_groups(:id, :id).must_equal(1=>[1])

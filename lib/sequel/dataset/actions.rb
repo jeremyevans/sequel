@@ -11,7 +11,7 @@ module Sequel
     
     # Action methods defined by Sequel that execute code on the database.
     ACTION_METHODS = (<<-METHS).split.map(&:to_sym).freeze
-      << [] all avg count columns columns! delete each
+      << [] all as_hash avg count columns columns! delete each
       empty? fetch_rows first first! get import insert interval last
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
       single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
@@ -639,8 +639,8 @@ module Sequel
     end
     
     # Returns a hash with key_column values as keys and value_column values as
-    # values.  Similar to to_hash, but only selects the columns given.  Like
-    # to_hash, it accepts an optional :hash parameter, into which entries will
+    # values.  Similar to as_hash, but only selects the columns given.  Like
+    # as_hash, it accepts an optional :hash parameter, into which entries will
     # be merged. 
     #
     #   DB[:table].select_hash(:id, :name) # SELECT id, name FROM table
@@ -656,7 +656,7 @@ module Sequel
     # that Sequel can determine.  Usually you can do this by calling the #as method
     # on the expression and providing an alias.
     def select_hash(key_column, value_column, opts = OPTS)
-      _select_hash(:to_hash, key_column, value_column, opts)
+      _select_hash(:as_hash, key_column, value_column, opts)
     end
     
     # Returns a hash with key_column values as keys and an array of value_column values.
@@ -786,19 +786,19 @@ module Sequel
     # will overwrite the value of the previous row(s). If the value_column
     # is not given or nil, uses the entire hash as the value.
     #
-    #   DB[:table].to_hash(:id, :name) # SELECT * FROM table
+    #   DB[:table].as_hash(:id, :name) # SELECT * FROM table
     #   # {1=>'Jim', 2=>'Bob', ...}
     #
-    #   DB[:table].to_hash(:id) # SELECT * FROM table
+    #   DB[:table].as_hash(:id) # SELECT * FROM table
     #   # {1=>{:id=>1, :name=>'Jim'}, 2=>{:id=>2, :name=>'Bob'}, ...}
     #
     # You can also provide an array of column names for either the key_column,
     # the value column, or both:
     #
-    #   DB[:table].to_hash([:id, :foo], [:name, :bar]) # SELECT * FROM table
+    #   DB[:table].as_hash([:id, :foo], [:name, :bar]) # SELECT * FROM table
     #   # {[1, 3]=>['Jim', 'bo'], [2, 4]=>['Bob', 'be'], ...}
     #
-    #   DB[:table].to_hash([:id, :name]) # SELECT * FROM table
+    #   DB[:table].as_hash([:id, :name]) # SELECT * FROM table
     #   # {[1, 'Jim']=>{:id=>1, :name=>'Jim'}, [2, 'Bob']=>{:id=>2, :name=>'Bob'}, ...}
     #
     # Options:
@@ -806,11 +806,11 @@ module Sequel
     # :hash :: The object into which the values will be placed.  If this is not
     #          given, an empty hash is used.  This can be used to use a hash with
     #          a default value or default proc.
-    def to_hash(key_column, value_column = nil, opts = OPTS)
+    def as_hash(key_column, value_column = nil, opts = OPTS)
       h = opts[:hash] || {}
       meth = opts[:all] ? :all : :each
       if value_column
-        return naked.to_hash(key_column, value_column, opts) if row_proc
+        return naked.as_hash(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
             send(meth){|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
@@ -830,6 +830,11 @@ module Sequel
         send(meth){|r| h[r[key_column]] = r}
       end
       h
+    end
+
+    # Alias of as_hash for backwards compatibility.
+    def to_hash(*a)
+      as_hash(*a)
     end
 
     # Returns a hash with one column used as key and the values being an

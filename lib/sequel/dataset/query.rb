@@ -1137,7 +1137,9 @@ module Sequel
     # * single_record (if only one record could be returned)
     # * single_value (if only one record could be returned, and a single column is selected)
     # * map
+    # * as_hash
     # * to_hash
+    # * to_hash_groups
     # * delete (if a DELETE statement)
     # * update (if an UPDATE statement, with no arguments)
     # * insert (if an INSERT statement, with no arguments)

@@ -2607,21 +2607,26 @@ module Sequel
         end
       end
 
-      # This allows you to call +to_hash+ without any arguments, which will
+      # This allows you to call +as_hash+ without any arguments, which will
       # result in a hash with the primary key value being the key and the
       # model object being the value.
       #
-      #   Artist.dataset.to_hash # SELECT * FROM artists
+      #   Artist.dataset.as_hash # SELECT * FROM artists
       #   # => {1=>#<Artist {:id=>1, ...}>,
       #   #     2=>#<Artist {:id=>2, ...}>,
       #   #     ...}
-      def to_hash(key_column=nil, value_column=nil, opts=OPTS)
+      def as_hash(key_column=nil, value_column=nil, opts=OPTS)
         if key_column
           super
         else
           raise(Sequel::Error, "No primary key for model") unless model && (pk = model.primary_key)
           super(pk, value_column, opts) 
         end
+      end
+
+      # Alias of as_hash for backwards compatibility.
+      def to_hash(*a)
+        as_hash(*a)
       end
 
       # Return an array of all rows matching the given filter condition, also
