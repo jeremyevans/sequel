@@ -26,6 +26,7 @@ module Sequel
     # * Model.each
     # * Model.count (without an argument or block)
     # * Model.map
+    # * Model.as_hash
     # * Model.to_hash
     # * Model.to_hash_groups
     #
@@ -127,41 +128,46 @@ module Sequel
         Plugins.inherited_instance_variables(self, :@static_cache_frozen=>nil)
 
         # Use the cache instead of a query to get the results.
-        def to_hash(key_column = nil, value_column = nil)
-        if key_column.nil? && value_column.nil?
-          if @static_cache_frozen
-            return Hash[cache]
-          else
-            key_column = primary_key
+        def as_hash(key_column = nil, value_column = nil, opts = OPTS)
+          if key_column.nil? && value_column.nil?
+            if @static_cache_frozen && !opts[:hash]
+              return Hash[cache]
+            else
+              key_column = primary_key
+            end
           end
+
+          h = opts[:hash] || {}
+          if value_column
+            if value_column.is_a?(Array)
+              if key_column.is_a?(Array)
+                @all.each{|r| h[r.values.values_at(*key_column)] = r.values.values_at(*value_column)}
+              else
+                @all.each{|r| h[r[key_column]] = r.values.values_at(*value_column)}
+              end
+            else
+              if key_column.is_a?(Array)
+                @all.each{|r| h[r.values.values_at(*key_column)] = r[value_column]}
+              else
+                @all.each{|r| h[r[key_column]] = r[value_column]}
+              end
+            end
+          elsif key_column.is_a?(Array)
+            @all.each{|r| h[r.values.values_at(*key_column)] = static_cache_object(r)}
+          else
+            @all.each{|r| h[r[key_column]] = static_cache_object(r)}
+          end
+          h
         end
 
-        h = {}
-        if value_column
-          if value_column.is_a?(Array)
-            if key_column.is_a?(Array)
-              @all.each{|r| h[r.values.values_at(*key_column)] = r.values.values_at(*value_column)}
-            else
-              @all.each{|r| h[r[key_column]] = r.values.values_at(*value_column)}
-            end
-          else
-            if key_column.is_a?(Array)
-              @all.each{|r| h[r.values.values_at(*key_column)] = r[value_column]}
-            else
-              @all.each{|r| h[r[key_column]] = r[value_column]}
-            end
-          end
-        elsif key_column.is_a?(Array)
-          @all.each{|r| h[r.values.values_at(*key_column)] = static_cache_object(r)}
-        else
-          @all.each{|r| h[r[key_column]] = static_cache_object(r)}
-        end
-        h
+        # Alias of as_hash for backwards compatibility.
+        def to_hash(*a)
+          as_hash(*a)
         end
 
         # Use the cache instead of a query to get the results
-        def to_hash_groups(key_column, value_column = nil)
-          h = {}
+        def to_hash_groups(key_column, value_column = nil, opts = OPTS)
+          h = opts[:hash] || {}
           if value_column
             if value_column.is_a?(Array)
               if key_column.is_a?(Array)

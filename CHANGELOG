@@ -1,5 +1,7 @@
 === master
 
+* Make #to_hash and #to_hash_groups handle options in the static_cache plugin, and add rename #to_hash to #as_hash (jeremyevans)
+
 * Rename Dataset#to_hash to #as_hash, and add #to_hash as an alias, to allow undefing #to_hash to fix ruby calling it implicitly (jeremyevans) (#1375)
 
 * Handle PG* constants deprecated in pg 0.21.0 in the postgres adapter (jeremyevans) (#1377, #1378)

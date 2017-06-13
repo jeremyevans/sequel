@@ -113,35 +113,58 @@ describe "Sequel::Plugins::StaticCache" do
       @c.all.must_equal [@c1, @c2]
     end
 
-    it "should have to_hash without arguments run without a query" do
+    it "should have as_hash/to_hash without arguments run without a query" do
       a = @c.to_hash
       a.must_equal(1=>@c1, 2=>@c2)
       a[1].must_equal @c1
       a[2].must_equal @c2
+
+      a = @c.as_hash
+      a.must_equal(1=>@c1, 2=>@c2)
+      a[1].must_equal @c1
+      a[2].must_equal @c2
       @db.sqls.must_equal []
     end
 
-    it "should have to_hash with arguments return results without a query" do
-      a = @c.to_hash(:id)
+    it "should have as_hash handle :hash option" do
+      h = {}
+      a = @c.as_hash(nil, nil, :hash=>h)
+      a.must_be_same_as h
       a.must_equal(1=>@c1, 2=>@c2)
       a[1].must_equal @c1
       a[2].must_equal @c2
 
-      a = @c.to_hash([:id])
-      a.must_equal([1]=>@c1, [2]=>@c2)
-      a[[1]].must_equal @c1
-      a[[2]].must_equal @c2
-
-      @c.to_hash(:id, :id).must_equal(1=>1, 2=>2)
-      @c.to_hash([:id], :id).must_equal([1]=>1, [2]=>2)
-      @c.to_hash(:id, [:id]).must_equal(1=>[1], 2=>[2])
-      @c.to_hash([:id], [:id]).must_equal([1]=>[1], [2]=>[2])
+      h = {}
+      a = @c.as_hash(:id, nil, :hash=>h)
+      a.must_be_same_as h
+      a.must_equal(1=>@c1, 2=>@c2)
+      a[1].must_equal @c1
+      a[2].must_equal @c2
 
       @db.sqls.must_equal []
     end
 
-    it "should have to_hash not return a frozen object" do
-      @c.to_hash.frozen?.must_equal false
+    it "should have as_hash with arguments return results without a query" do
+      a = @c.as_hash(:id)
+      a.must_equal(1=>@c1, 2=>@c2)
+      a[1].must_equal @c1
+      a[2].must_equal @c2
+
+      a = @c.as_hash([:id])
+      a.must_equal([1]=>@c1, [2]=>@c2)
+      a[[1]].must_equal @c1
+      a[[2]].must_equal @c2
+
+      @c.as_hash(:id, :id).must_equal(1=>1, 2=>2)
+      @c.as_hash([:id], :id).must_equal([1]=>1, [2]=>2)
+      @c.as_hash(:id, [:id]).must_equal(1=>[1], 2=>[2])
+      @c.as_hash([:id], [:id]).must_equal([1]=>[1], [2]=>[2])
+
+      @db.sqls.must_equal []
+    end
+
+    it "should have as_hash not return a frozen object" do
+      @c.as_hash.frozen?.must_equal false
     end
 
     it "should have to_hash_groups without arguments return the cached objects without a query" do
@@ -163,10 +186,38 @@ describe "Sequel::Plugins::StaticCache" do
       @db.sqls.must_equal []
     end
 
+    it "should have to_hash_groups handle :hash option" do
+      h = {}
+      a = @c.to_hash_groups(:id, nil, :hash=>h)
+      a.must_be_same_as h
+      a.must_equal(1=>[@c1], 2=>[@c2])
+      a[1].first.must_equal @c1
+      a[2].first.must_equal @c2
+    end
+
+    it "should have as_hash_groups without arguments return the cached objects without a query" do
+      a = @c.to_hash_groups(:id)
+      a.must_equal(1=>[@c1], 2=>[@c2])
+      a[1].first.must_equal @c1
+      a[2].first.must_equal @c2
+
+      a = @c.to_hash_groups([:id])
+      a.must_equal([1]=>[@c1], [2]=>[@c2])
+      a[[1]].first.must_equal @c1
+      a[[2]].first.must_equal @c2
+
+      @c.to_hash_groups(:id, :id).must_equal(1=>[1], 2=>[2])
+      @c.to_hash_groups([:id], :id).must_equal([1]=>[1], [2]=>[2])
+      @c.to_hash_groups(:id, [:id]).must_equal(1=>[[1]], 2=>[[2]])
+      @c.to_hash_groups([:id], [:id]).must_equal([1]=>[[1]], [2]=>[[2]])
+
+      @db.sqls.must_equal []
+    end
+
     it "subclasses should work correctly" do
       c = Class.new(@c)
       c.all.must_equal [c.load(:id=>1), c.load(:id=>2)]
-      c.to_hash.must_equal(1=>c.load(:id=>1), 2=>c.load(:id=>2))
+      c.as_hash.must_equal(1=>c.load(:id=>1), 2=>c.load(:id=>2))
       @db.sqls.must_equal ['SELECT * FROM t']
     end
 
@@ -174,8 +225,8 @@ describe "Sequel::Plugins::StaticCache" do
       ds = @c.dataset.from(:t2).columns(:id).with_fetch(:id=>3)
       @c.dataset = ds
       @c.all.must_equal [@c.load(:id=>3)]
-      @c.to_hash.must_equal(3=>@c.load(:id=>3))
-      @c.to_hash[3].must_equal @c.all.first
+      @c.as_hash.must_equal(3=>@c.load(:id=>3))
+      @c.as_hash[3].must_equal @c.all.first
       @db.sqls.must_equal ['SELECT * FROM t2']
     end
   end
@@ -238,18 +289,18 @@ describe "Sequel::Plugins::StaticCache" do
       a.last.must_be_same_as(@c2)
     end
 
-    it "should have to_hash without arguments use cached instances" do
-      a = @c.to_hash
+    it "should have as_hash without arguments use cached instances" do
+      a = @c.as_hash
       a[1].must_be_same_as(@c1)
       a[2].must_be_same_as(@c2)
     end
 
-    it "should have to_hash with arguments return cached instances" do
-      a = @c.to_hash(:id)
+    it "should have as_hash with arguments return cached instances" do
+      a = @c.as_hash(:id)
       a[1].must_be_same_as(@c1)
       a[2].must_be_same_as(@c2)
 
-      a = @c.to_hash([:id])
+      a = @c.as_hash([:id])
       a[[1]].must_be_same_as(@c1)
       a[[2]].must_be_same_as(@c2)
     end
@@ -313,16 +364,16 @@ describe "Sequel::Plugins::StaticCache" do
       @c.map.all?{|o| !o.frozen?}.must_equal true
     end
 
-    it "none of values in the hash returned by to_hash without an argument should be frozen" do
-      @c.to_hash.values.all?{|o| !o.frozen?}.must_equal true
+    it "none of values in the hash returned by as_hash without an argument should be frozen" do
+      @c.as_hash.values.all?{|o| !o.frozen?}.must_equal true
     end
 
-    it "none of values in the hash returned by to_hash with a single argument should be frozen" do
-      @c.to_hash(:id).values.all?{|o| !o.frozen?}.must_equal true
+    it "none of values in the hash returned by as_hash with a single argument should be frozen" do
+      @c.as_hash(:id).values.all?{|o| !o.frozen?}.must_equal true
     end
 
-    it "none of values in the hash returned by to_hash with a single array argument should be frozen" do
-      @c.to_hash([:id, :id]).values.all?{|o| !o.frozen?}.must_equal true
+    it "none of values in the hash returned by as_hash with a single array argument should be frozen" do
+      @c.as_hash([:id, :id]).values.all?{|o| !o.frozen?}.must_equal true
     end
 
     it "none of values in the hash returned by to_hash_groups with a single argument should be frozen" do
