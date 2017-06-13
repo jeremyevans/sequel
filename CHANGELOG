@@ -1,5 +1,7 @@
 === master
 
+* Handle PG* constants deprecated in pg 0.21.0 in the postgres adapter (jeremyevans) (#1377, #1378)
+
 * Support :association_pks_use_associated_table association option in association_pks plugin (jeremyevans)
 
 * Make pg_hstore extension reset hstore conversion proc when running Database#reset_conversion_procs (jeremyevans)

@@ -5,8 +5,14 @@ Sequel.require 'adapters/shared/postgres'
 begin 
   require 'pg' 
 
+  Sequel::Postgres::PGError = PG::Error if defined?(PG::Error)
+  Sequel::Postgres::PGconn = PG::Connection if defined?(PG::Connection)
+  Sequel::Postgres::PGresult = PG::Result if defined?(PG::Result)
+
   # Work around postgres-pr 0.7.0+ which ships with a pg.rb file
-  raise LoadError unless defined?(PGconn::CONNECTION_OK)
+  unless defined?(PG::Connection)
+    raise LoadError unless defined?(PGconn::CONNECTION_OK)
+  end
 
   Sequel::Postgres::USES_PG = true
 rescue LoadError => e 
@@ -122,7 +128,7 @@ module Sequel
 
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
-    class Adapter < ::PGconn
+    class Adapter < PGconn
       # The underlying exception classes to reraise as disconnect errors
       # instead of regular database errors.
       DISCONNECT_ERROR_CLASSES = [IOError, Errno::EPIPE, Errno::ECONNRESET]
@@ -579,7 +585,7 @@ module Sequel
 
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
-          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+          result.error_field(PGresult::PG_DIAG_SQLSTATE)
         end
       end
 
