@@ -1,5 +1,7 @@
 === master
 
+* Deprecate cti_base_model, cti_key, and cti_model_map class methods in class_table_inheritance plugin (jeremyevans)
+
 * Make Model.skip_auto_validations(:not_null) in the auto_validations plugin skip not null checks for columns with default values (jeremyevans)
 
 * Make Database#copy_into in jdbc/postgresql adapter respect :server option (jeremyevans)

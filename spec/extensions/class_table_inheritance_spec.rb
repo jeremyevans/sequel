@@ -572,8 +572,12 @@ describe "class_table_inheritance plugin with :alias option" do
     @db.sqls.must_equal ["SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS employees WHERE (id = 1) LIMIT 1"]
   end
 
-  it "#cti_base_model should be the model that loaded the plugin" do
+  deprecated "#cti_base_model should be the model that loaded the plugin" do
     Executive.cti_base_model.must_equal Employee
+  end
+
+  it "#cti_models.first should be the model that loaded the plugin" do
+    Executive.cti_models.first.must_equal Employee
   end
 
   it "#cti_columns should be a mapping of table names to columns" do
@@ -1095,8 +1099,12 @@ describe "class_table_inheritance plugin with :alias option" do
     @db.sqls.must_equal ["SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS employees WHERE (id = 1) LIMIT 1"]
   end
 
-  it "#cti_base_model should be the model that loaded the plugin" do
+  deprecated "#cti_base_model should be the model that loaded the plugin" do
     Executive.cti_base_model.must_equal Employee
+  end
+
+  it "#cti_models.first should be the model that loaded the plugin" do
+    Executive.cti_models.first.must_equal Employee
   end
 
   it "#cti_columns should be a mapping of table names to columns" do

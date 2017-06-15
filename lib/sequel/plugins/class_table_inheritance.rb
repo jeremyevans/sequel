@@ -203,7 +203,7 @@ module Sequel
           @cti_instance_dataset = @instance_dataset
           @cti_table_columns = columns
           @cti_table_map = opts[:table_map] || {}
-          @cti_alias = opts[:alias]
+          @cti_alias = opts[:alias] # || table_name # SEQUEL5
         end
       end
 
@@ -216,6 +216,7 @@ module Sequel
         # This is the only model in the hierarchy that loads the
         # class_table_inheritance plugin. For backwards compatibility.
         def cti_base_model
+          Sequel::Deprecation.deprecate("#{self}.cti_base_model", "Use #{self}.cti_models.first instead")
           @cti_models.first
         end
 
@@ -228,12 +229,12 @@ module Sequel
         attr_reader :cti_instance_dataset
 
         # An array of table symbols that back this model.  The first is
-        # cti_base_model table symbol, and the last is the current model
+        # table symbol for the base model, and the last is the current model
         # table symbol.
         attr_reader :cti_tables
 
         # A hash with class name symbol keys and table name symbol values.
-        # Specified with the :table_map option to the plugin, and used if
+        # Specified with the :table_map option to the plugin, and should be used if
         # the implicit naming is incorrect.
         attr_reader :cti_table_map
 
@@ -247,10 +248,16 @@ module Sequel
         end
 
         # Alias to sti_key, for backwards compatibility.
-        def cti_key; sti_key; end
+        def cti_key
+          Sequel::Deprecation.deprecate("#{self}.cti_key", "Use #{self}.sti_key instead")
+          sti_key
+        end
 
         # Alias to sti_model_map, for backwards compatibility.
-        def cti_model_map; sti_model_map; end
+        def cti_model_map
+          Sequel::Deprecation.deprecate("#{self}.cti_model_map", "Use #{self}.sti_model_map instead")
+          sti_model_map
+        end
 
         # Freeze CTI information when freezing model class.
         def freeze
@@ -297,19 +304,20 @@ module Sequel
             cols = columns - [pk]
             dup_cols = cols & ds.columns
             unless dup_cols.empty?
+              # raise Error, "class_table_inheritance with duplicate column names (other than the primary key column) is not supported, make sure tables have unique column names"
               Sequel::Deprecation.deprecate("Using class_table_inheritance with duplicate column names (#{n} => #{dup_cols}) in subclass tables (other than the primary key column)', 'Make sure all tables used have unique column names, or implement support for handling duplicate column names in the class_table_inheritance plugin")
             end
             sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)
 
-            if @cti_alias
+            if @cti_alias # SEQUEL5: remove if
               ds = ds.from_self(:alias=>@cti_alias)
             end
 
             set_dataset(ds)
             set_columns(self.columns)
             @dataset = @dataset.with_row_proc(lambda{|r| subclass.sti_load(r)})
-            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>@cti_alias||table)}
+            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>@cti_alias||table)} # SEQUEL5: remove ||table
 
             @cti_models += [self]
             @cti_tables += [table]
@@ -325,7 +333,7 @@ module Sequel
         # The table name for the current model class's main table.
         def table_name
           if cti_tables
-            if @cti_alias
+            if @cti_alias # SEQUEL5: remove if
               @cti_alias
             else
               cti_tables.last
@@ -340,6 +348,7 @@ module Sequel
           cti_tables ? cti_tables.last : dataset.first_source_alias
         end
 
+        # The model class for the given key value.
         def sti_class_from_key(key)
           sti_class(sti_model_map[key])
         end
@@ -350,7 +359,7 @@ module Sequel
         # when setting subclass dataset.
         def sti_subclass_dataset(key)
           ds = super
-          if @cti_alias
+          if @cti_alias # SEQUEL5: remove if
             ds = ds.from_self(:alias=>@cti_alias)
           end
           ds
