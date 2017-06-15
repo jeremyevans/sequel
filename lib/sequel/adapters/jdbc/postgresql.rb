@@ -61,7 +61,7 @@ module Sequel
             raise Error, "Must provide either a :data option or a block to copy_into"
           end
 
-          synchronize(opts) do |conn|
+          synchronize(opts[:server]) do |conn|
             begin
               copy_manager = org.postgresql.copy.CopyManager.new(conn)
               copier = copy_manager.copy_in(copy_into_sql(table, opts))
