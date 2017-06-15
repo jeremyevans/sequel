@@ -140,9 +140,13 @@ module Sequel
         # Skip automatic validations for the given validation type (:not_null, :types, :unique).
         # If :all is given as the type, skip all auto validations.
         def skip_auto_validations(type)
-          if type == :all
+          case type
+          when :all
             [:not_null, :types, :unique, :max_length].each{|v| skip_auto_validations(v)}
-          elsif type == :types
+          when :not_null
+            auto_validate_not_null_columns.clear
+            auto_validate_explicit_not_null_columns.clear
+          when :types
             @auto_validate_types = false
           else
             send("auto_validate_#{type}_columns").clear

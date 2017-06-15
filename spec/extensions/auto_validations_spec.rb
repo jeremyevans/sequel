@@ -98,6 +98,8 @@ describe "Sequel::Plugins::AutoValidations" do
     @m = @c.new
     @c.skip_auto_validations(:not_null)
     @m.valid?.must_equal true
+    @m.nnd = nil
+    @m.valid?.must_equal true
 
     @m.set(:d=>'/', :num=>'a', :name=>'1')
     @m.valid?.must_equal false

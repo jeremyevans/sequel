@@ -1,5 +1,7 @@
 === master
 
+* Make Model.skip_auto_validations(:not_null) in the auto_validations plugin skip not null checks for columns with default values (jeremyevans)
+
 * Make Database#copy_into in jdbc/postgresql adapter respect :server option (jeremyevans)
 
 * Make #to_hash and #to_hash_groups handle options in the static_cache plugin, and add rename #to_hash to #as_hash (jeremyevans)
