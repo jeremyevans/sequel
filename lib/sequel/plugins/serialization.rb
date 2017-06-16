@@ -97,16 +97,9 @@ module Sequel
       end
       register_format(:marshal, lambda{|v| [Marshal.dump(v)].pack('m')},
         lambda do |v|
-          begin
-            Marshal.load(v.unpack('m')[0])
-          rescue => e
-            begin
-              # Backwards compatibility for unpacked marshal output.
-              Marshal.load(v)
-            rescue
-              raise e
-            end
-          end
+          # Handle unpacked marshalled data for backwards compat
+          v = v.unpack('m')[0] unless v[0..1] == "\x04\x08"
+          Marshal.load(v)
         end)
       register_format(:yaml, lambda(&:to_yaml), lambda{|v| YAML.load(v)})
       register_format(:json, lambda{|v| Sequel.object_to_json(v)}, lambda{|v| Sequel.parse_json(v)})
