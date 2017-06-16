@@ -14,11 +14,11 @@ module Sequel
     #
     # Usage:
     #
-    #   # Force all strings to be UTF8 encoded in a all model subclasses
+    #   # Force all strings to be UTF-8 encoded in a all model subclasses
     #   # (called before loading subclasses)
     #   Sequel::Model.plugin :force_encoding, 'UTF-8'
     #
-    #   # Force the encoding for the Album model to UTF8
+    #   # Force the encoding for the Album model to UTF-8
     #   Album.plugin :force_encoding
     #   Album.forced_encoding = 'UTF-8'
     module ForceEncoding
