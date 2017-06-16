@@ -225,6 +225,7 @@ module Sequel
           case type
           when :insert, :insert_select, :update
             true
+          # SEQUEL5: Remove :delete/:refresh
           when :delete
             return true unless model.fast_instance_delete_sql
 
