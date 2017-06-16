@@ -462,7 +462,7 @@ describe "NestedAttributes plugin" do
     ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])
   end
   
-  it "should not raise an Error if an unmatched primary key is given, if the :strict=>false option is used" do
+  deprecated "should not raise an Error if an unmatched primary key is given, if the :strict=>false option is used" do
     @Artist.nested_attributes :albums, :strict=>false
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -492,8 +492,19 @@ describe "NestedAttributes plugin" do
     ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])
   end
 
-  it "should not raise an Error if an unmatched composite primary key is given, if the :strict=>false option is used" do
+  deprecated "should not raise an Error if an unmatched composite primary key is given, if the :strict=>false option is used" do
     @Artist.nested_attributes :concerts, :strict=>false
+    ar = @Artist.load(:id=>10, :name=>'Ar')
+    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
+    ar.associations[:concerts] = [co]
+    ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-06', :_delete=>'t'}])
+    @db.sqls.must_equal []
+    ar.save
+    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 10)"]
+  end
+
+  it "should not raise an Error if an unmatched composite primary key is given, if the :unmatched_pk=>:ignore option is used" do
+    @Artist.nested_attributes :concerts, :unmatched_pk=>:ignore
     ar = @Artist.load(:id=>10, :name=>'Ar')
     co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
     ar.associations[:concerts] = [co]
@@ -604,7 +615,7 @@ describe "NestedAttributes plugin" do
   end
 
   it "should return objects created/modified in the internal methods" do
-    @Album.nested_attributes :tags, :remove=>true, :strict=>false
+    @Album.nested_attributes :tags, :remove=>true, :unmatched_pk=>:ignore
     objs = []
     @Album.class_eval do
       define_method(:nested_attributes_create){|*a| objs << [super(*a), :create]}
