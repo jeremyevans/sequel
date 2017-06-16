@@ -62,6 +62,11 @@ module Sequel
     #
     #   Album.to_json(:array=>[Album[1], Album[2]])
     #
+    # All to_json methods take blocks, and if a block is given, it will yield
+    # the array or hash before serialization, and will serialize the value
+    # the block returns.  This allows you to customize the resulting JSON format
+    # on a per-call basis.
+    #
     # In addition to creating JSON, this plugin also enables Sequel::Model
     # classes to create instances directly from JSON using the from_json class
     # method:
@@ -358,6 +363,7 @@ module Sequel
             h = {root => h}
           end
 
+          h = yield h if block_given?
           Sequel.object_to_json(h, *a)
         end
       end
@@ -370,6 +376,8 @@ module Sequel
         #
         # :array :: An array of instances.  If this is not provided,
         #           calls #all on the receiver to get the array.
+        # :instance_block :: A block to pass to #to_json for each
+        #                    value in the dataset (or :array option).
         # :root :: If set to :collection, wraps the collection
         #          in a root object using the pluralized, underscored model
         #          name as the key.  If set to :instance, only wraps
@@ -405,16 +413,15 @@ module Sequel
             else
               all
             end
-            array.map{|obj| Literal.new(Sequel.object_to_json(obj, opts))}
+            array.map{|obj| Literal.new(Sequel.object_to_json(obj, opts, &opts[:instance_block]))}
            else
             all
           end
 
-          if collection_root
-            Sequel.object_to_json({collection_root => res}, *a)
-          else
-            Sequel.object_to_json(res, *a)
-          end
+          res = {collection_root => res} if collection_root
+          res = yield res if block_given?
+
+          Sequel.object_to_json(res, *a)
         end
       end
     end

@@ -1,5 +1,11 @@
 === master
 
+* Make to_json class/dataset method in json_serializer plugin accept :instance_block option to pass block to Model#to_json (jeremyevans)
+
+* Make to_json methods in json_serializer plugin accept blocks that are used to transform values before serializing to JSON (jeremyevans)
+
+* Make Sequel.object_to_json pass block to #to_json (jeremyevans)
+
 * Deprecate identifier_columns plugin, not needed with Sequel.split_symbols = false (jeremyevans)
 
 * Make reloading column_conflicts plugin not remove existing conflict markings (jeremyevans)

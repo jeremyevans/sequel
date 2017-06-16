@@ -65,6 +65,12 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.from_json(@album.to_json(:include=>:artist), :associations=>:artist).artist.must_equal @artist
   end
 
+  it "should have #to_json support blocks for transformations" do
+    values = {}
+    @artist.values.each{|k,v| values[k.to_s] = v}
+    Sequel.parse_json(@artist.to_json{|h| {'data'=>h}}).must_equal({'data'=>values})
+  end
+
   it "should raise an error if attempting to parse json when providing array to non-array association or vice-versa" do
     proc{Artist.from_json('{"albums":{"id":1,"name":"RF","artist_id":2},"id":2,"name":"YJM"}', :associations=>:albums)}.must_raise(Sequel::Error)
     proc{Album.from_json('{"artist":[{"id":2,"name":"YJM"}],"id":1,"name":"RF","artist_id":2}', :associations=>:artist)}.must_raise(Sequel::Error)
@@ -184,6 +190,18 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should have dataset to_json method work with naked datasets" do
     ds = Album.dataset.naked.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
     Sequel.parse_json(ds.to_json).must_equal [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]
+  end
+
+  it "should have class and dataset to_json method accept blocks for transformations" do
+    Album.dataset = Album.dataset.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
+    Sequel.parse_json(Album.to_json{|h| {'data'=>h}}).must_equal('data'=>[@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}])
+    Sequel.parse_json(Album.dataset.to_json{|h| {'data'=>h}}).must_equal('data'=>[@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}])
+  end
+
+  it "should have class and dataset to_json method support :instance_block option for instance_transformations" do
+    Album.dataset = Album.dataset.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
+    Sequel.parse_json(Album.to_json(:instance_block=>lambda{|h| {'data'=>h}})).must_equal [{'data'=>@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}}]
+    Sequel.parse_json(Album.dataset.to_json(:instance_block=>lambda{|h| {'data'=>h}})).must_equal [{'data'=>@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}}]
   end
 
   it "should have dataset to_json method respect :array option for the array to use" do

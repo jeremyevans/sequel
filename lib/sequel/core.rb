@@ -188,8 +188,8 @@ module Sequel
 
   # Convert given object to json and return the result.
   # This can be overridden to use an alternative json implementation.
-  def self.object_to_json(obj, *args)
-    obj.to_json(*args)
+  def self.object_to_json(obj, *args, &block)
+    obj.to_json(*args, &block)
   end
 
   # Parse the string as JSON and return the result.
