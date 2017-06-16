@@ -1912,7 +1912,7 @@ module Sequel
         # Adds the association method to the association methods module.
         def def_association_method(opts)
           association_module_def(opts.association_method, opts) do |*dynamic_opts, &block|
-            Sequel::Deprecation.deprecate("Passing multiple arguments to ##{opts.association_method}", "Additional arguments are currently ignored.") if dynamic_opts.length > 1
+            Sequel::Deprecation.deprecate("Passing multiple arguments to ##{opts.association_method}", "Additional arguments are currently ignored") if dynamic_opts.length > 1
             load_associated_objects(opts, dynamic_opts.length == 0 ? OPTS : dynamic_opts[0], &block)
           end
         end

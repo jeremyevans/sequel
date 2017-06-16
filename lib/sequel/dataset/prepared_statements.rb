@@ -41,7 +41,7 @@ module Sequel
       meths.each do |meth|
         mod.send(:define_method, :"#{meth}=") do |v|
           # :nocov:
-          Sequel::Deprecation.deprecate("Dataset##{meth}=", "The API has changed, and this value should now be passed in as an option via Dataset#clone.")
+          Sequel::Deprecation.deprecate("Dataset##{meth}=", "The API has changed, and this value should now be passed in as an option via Dataset#clone")
           @opts[meth] = v
           # :nocov:
         end
@@ -341,7 +341,7 @@ module Sequel
       else
         # :nocov:
         # SEQUEL5: Add coverage
-        Sequel::Deprecation.deprecate("Dataset#prepare will change to requiring a name argument in Sequel 5, please update your code.") unless name
+        Sequel::Deprecation.deprecate("Dataset#prepare will change to requiring a name argument in Sequel 5, please update your code") unless name
         # :nocov:
       end
 

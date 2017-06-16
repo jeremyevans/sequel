@@ -197,7 +197,7 @@ module Sequel
     #   DB.add_servers(:f=>{:host=>"hash_host_f"})
     def add_servers(servers)
       unless h = @opts[:servers]
-        Sequel::Deprecation.deprecate("Calling Database#add_servers on a database that does not use sharding", "This method should only be called if the database supports sharding.")
+        Sequel::Deprecation.deprecate("Calling Database#add_servers on a database that does not use sharding", "This method should only be called if the database supports sharding")
         # raise Error, "cannot call Database#add_servers on a Database instance that does not use a sharded connection pool" # SEQUEL5
         return
       end
@@ -262,7 +262,7 @@ module Sequel
     #   DB.remove_servers(:f1, :f2)
     def remove_servers(*servers)
       unless h = @opts[:servers]
-        Sequel::Deprecation.deprecate("Calling Database#add_servers on a database that does not use sharding", "This method should only be called if the database supports sharding.")
+        Sequel::Deprecation.deprecate("Calling Database#add_servers on a database that does not use sharding", "This method should only be called if the database supports sharding")
         # raise Error, "cannot call Database#remove_servers on a Database instance that does not use a sharded connection pool" # SEQUEL5
         return
       end

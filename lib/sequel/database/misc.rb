@@ -31,7 +31,7 @@ module Sequel
     module ResetIdentifierMangling
       def self.extended(obj)
         # :nocov:
-        Sequel::Deprecation.deprecate("Sequel::Database::ResetIdentifierMangling is no longer needed and will be removed in Sequel 5.  Please update your adapter.")
+        Sequel::Deprecation.deprecate("Sequel::Database::ResetIdentifierMangling is no longer needed and will be removed in Sequel 5.  Please update your adapter")
         obj.send(:reset_identifier_mangling) if obj.respond_to?(:reset_identifier_mangling)
         # :nocov:
       end

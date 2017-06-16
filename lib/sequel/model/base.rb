@@ -215,12 +215,12 @@ module Sequel
       end
   
       def initialize_copy(_)
-        Sequel::Deprecation.deprecate("Model.clone", "Create a subclass of the model instead of cloning it.")
+        Sequel::Deprecation.deprecate("Model.clone", "Create a subclass of the model instead of cloning it")
         # raise(Error, "cannot dup/clone a Sequel::Model class") # SEQUEL5
         super
       end
       def dup
-        Sequel::Deprecation.deprecate("Model.dup", "Create a subclass of the model instead of duping it.")
+        Sequel::Deprecation.deprecate("Model.dup", "Create a subclass of the model instead of duping it")
         # raise(Error, "cannot dup/clone a Sequel::Model class") # SEQUEL5
         super
       end
@@ -2146,7 +2146,7 @@ module Sequel
         sh = {:server=>this_server}
         uacr = use_after_commit_rollback
         if uacr.nil? ? (method(:after_rollback).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_rollback", "Instead, call db.after_rollback in Model#before_save.")
+          Sequel::Deprecation.deprecate("Model#after_rollback", "Instead, call db.after_rollback in Model#before_save")
           db.after_rollback(sh){after_rollback}
         end
         pk = nil
@@ -2213,7 +2213,7 @@ module Sequel
         raise_hook_failure(:around_save) unless called_save
         _after_save(pk) # SEQUEL5: Remove
         if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_commit", "Instead, call db.after_commit in Model#after_save.")
+          Sequel::Deprecation.deprecate("Model#after_commit", "Instead, call db.after_commit in Model#after_save")
           db.after_commit(sh){after_commit}
         end
         self

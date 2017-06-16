@@ -101,7 +101,7 @@ module Sequel
         def def_association_method(opts)
           if opts.returns_array?
             association_module_def(opts.association_method, opts) do |*dynamic_opts, &block|
-              Sequel::Deprecation.deprecate("Passing multiple arguments to ##{opts.association_method}", "Additional arguments are currently ignored.") if dynamic_opts.length > 1
+              Sequel::Deprecation.deprecate("Passing multiple arguments to ##{opts.association_method}", "Additional arguments are currently ignored") if dynamic_opts.length > 1
               AssociationProxy.new(self, opts, dynamic_opts.length == 0 ? OPTS : dynamic_opts[0], &block)
             end
           else
