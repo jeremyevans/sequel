@@ -39,7 +39,7 @@ module Sequel
         end
 
         # Call #all instead of #each if eager loading,
-        # uless #each is being called by #all.
+        # unless #each is being called by #all.
         def each(&block)
           if use_eager_all?
             all(&block)
