@@ -1,5 +1,7 @@
 === master
 
+* Make pg_array_associations model plugin load pg_array extension into database (jeremyevans)
+
 * Remove support for :strict option in nested_attributes plugin, use :unmatched_pk option instead (jeremyevans)
 
 * Make to_json class/dataset method in json_serializer plugin accept :instance_block option to pass block to Model#to_json (jeremyevans)

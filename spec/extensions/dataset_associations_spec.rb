@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::DatasetAssociations" do
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock(:host=>'postgres')
     @db.extend_datasets do
       def supports_window_functions?; true; end
       def supports_distinct_on?; true; end
@@ -142,7 +142,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds = @Tag.artists
     ds.must_be_kind_of(Sequel::Dataset)
     ds.model.must_equal @Artist
-    ds.sql.must_equal "SELECT * FROM artists WHERE coalesce((tag_ids && (SELECT array_agg(tags.id) FROM tags)), 'f')"
+    ds.sql.must_equal "SELECT * FROM artists WHERE coalesce((tag_ids && (SELECT array_agg(tags.id) FROM tags)), false)"
   end
 
   it "should have an associated method that takes an association symbol" do

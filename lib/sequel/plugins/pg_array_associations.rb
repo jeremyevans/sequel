@@ -297,6 +297,11 @@ module Sequel
         end
       end
 
+      # Add the pg_array extension to the database
+      def self.apply(model)
+        model.db.extension(:pg_array)
+      end
+
       module ClassMethods
         # Create a many_to_pg_array association, for the case where the associated
         # table contains the array with foreign keys pointing to the current table.
