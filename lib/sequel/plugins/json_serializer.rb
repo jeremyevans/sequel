@@ -126,9 +126,9 @@ module Sequel
     module JsonSerializer
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values.
-      def self.configure(model, opts={})
+      def self.configure(model, opts=OPTS)
         model.instance_eval do
-          @json_serializer_opts = (@json_serializer_opts || {}).merge(opts)
+          @json_serializer_opts = (@json_serializer_opts || OPTS).merge(opts)
         end
       end
       
@@ -222,10 +222,10 @@ module Sequel
           if assocs = opts[:associations]
             assocs = case assocs
             when Symbol
-              {assocs=>{}}
+              {assocs=>OPTS}
             when Array
               assocs_tmp = {}
-              assocs.each{|v| assocs_tmp[v] = {}}
+              assocs.each{|v| assocs_tmp[v] = OPTS}
               assocs_tmp
             when Hash
               assocs
