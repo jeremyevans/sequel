@@ -2,10 +2,10 @@
 
 module Sequel
   module Plugins
-    # Sequel's built-in hook class methods plugin is designed for backwards
+    # Sequel's built-in hook_class_methods plugin is designed for backwards
     # compatibility.  Its use is not encouraged, it is recommended to use
-    # instance methods and super instead of this plugin.  What this plugin
-    # allows you to do is, for example:
+    # instance methods and super instead of this plugin.  This plugin allows
+    # calling class methods with blocks to define hooks:
     #
     #   # Block only, can cause duplicate hooks if code is reloaded
     #   before_save{self.created_at = Time.now}
@@ -15,17 +15,14 @@ module Sequel
     #   before_save(:set_created_at)
     #
     # Pretty much anything you can do with a hook class method, you can also
-    # do with an instance method instead:
+    # do with an instance method instead (making sure to call super), which is
+    # the recommended way to add hooks in Sequel:
     #
     #    def before_save
-    #      return false if super == false
+    #      super
     #      self.created_at = Time.now
     #    end
     #
-    # Note that returning false in any before hook block will skip further
-    # before hooks and abort the action.  So if a before_save hook block returns
-    # false, future before_save hook blocks are not called, and the save is aborted.
-    # 
     # Usage:
     #
     #   # Allow use of hook class methods in all model subclasses (called before loading subclasses)
@@ -141,6 +138,7 @@ module Sequel
       end
 
       module InstanceMethods
+        # SEQUEL5: Make :before_save, :before_destroy, :after_save, :after_destroy hooks use metaprogramming instead of specific definitions
         (Model::BEFORE_HOOKS - [:before_save, :before_destroy]).each do |h|
           class_eval(<<-END, __FILE__, __LINE__+1)
             def #{h}
