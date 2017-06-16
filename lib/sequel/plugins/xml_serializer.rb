@@ -158,7 +158,7 @@ module Sequel
             opts[:builder]
           else
             builder_opts = if opts[:builder_opts]
-              opts[:builder_opts]
+              Hash[opts[:builder_opts]]
             else
               {}
             end
@@ -234,10 +234,10 @@ module Sequel
           if assocs = opts[:associations]
             assocs = case assocs
             when Symbol
-              {assocs=>{}}
+              {assocs=>OPTS}
             when Array
               assocs_tmp = {}
-              assocs.each{|v| assocs_tmp[v] = {}}
+              assocs.each{|v| assocs_tmp[v] = OPTS}
               assocs_tmp
             when Hash
               assocs
@@ -347,7 +347,7 @@ module Sequel
             cols.each do |c|
               attrs = {}
               if types
-                attrs[:type] = db_schema.fetch(c, {})[:type]
+                attrs[:type] = db_schema.fetch(c, OPTS)[:type]
               end
               v = vals[c]
               if v.nil?
