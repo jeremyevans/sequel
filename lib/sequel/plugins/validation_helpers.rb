@@ -19,9 +19,7 @@ module Sequel
     # atts :: Single attribute symbol or an array of attribute symbols specifying the
     #         attribute(s) to validate.
     # Options:
-    # :allow_blank :: Whether to skip the validation if the value is blank.  You should
-    #                 make sure all objects respond to blank if you use this option, which you can do by:
-    #                     Sequel.extension :blank
+    # :allow_blank :: Whether to skip the validation if the value is blank.
     # :allow_missing :: Whether to skip the validation if the attribute isn't a key in the
     #                   values hash.  This is different from allow_nil, because Sequel only sends the attributes
     #                   in the values when doing an insert or update.  If the attribute is not present, Sequel
@@ -284,7 +282,7 @@ module Sequel
             next if am && !values.has_key?(a)
             v = from_values ? values[a] : get_column_value(a)
             next if an && v.nil?
-            next if ab && v.respond_to?(:blank?) && v.blank?
+            next if ab && model.db.send(:blank_object?, v)
             if message = yield(a, v, m)
               errors.add(a, message)
             end

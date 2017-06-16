@@ -18,6 +18,12 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.wont_be :valid?
     @m.value = '1_1'
     @m.must_be :valid?
+    o = String.new
+    class << o
+      undef_method :blank?
+    end
+    @m.value = o
+    @m.must_be :valid?
     o = Object.new
     @m.value = o
     @m.wont_be :valid?

@@ -1,5 +1,7 @@
 === master
 
+* Make validation_helpers plugin :allow_blank option work correctly when the blank extension is not loaded (jeremyevans)
+
 * Make validation_class_methods plugin no longer require the blank extension (jeremyevans)
 
 * Clear cached associations when touching associations in the touch plugin (jeremyevans)
