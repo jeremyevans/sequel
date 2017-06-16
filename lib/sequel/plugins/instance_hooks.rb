@@ -9,8 +9,7 @@ module Sequel
     # All of the standard hooks are supported.
     # Instance level before hooks are executed in reverse order of addition before
     # calling super.  Instance level after hooks are executed in order of addition
-    # after calling super.  If any of the instance level before hook blocks return
-    # false, no more instance level before hooks are called and false is returned.
+    # after calling super.
     #
     # Instance level hooks for before and after are cleared after all related
     # after level instance hooks have run.  This means that if you add a before_create
@@ -65,6 +64,7 @@ module Sequel
         def after_destroy
           super
           return unless @instance_hooks
+          # SEQUEL5: Remove commit/rollback
           if ad = @instance_hooks[:after_destroy_commit]
             db.after_commit{ad.each(&:call)}
           end
@@ -86,6 +86,7 @@ module Sequel
         def after_save
           super
           return unless @instance_hooks
+          # SEQUEL5: Remove commit/rollback
           if (ac = @instance_hooks[:after_commit])
             db.after_commit{ac.each(&:call)}
           end
@@ -101,18 +102,22 @@ module Sequel
         # Run before_destroy instance hooks.
         def before_destroy
           return super unless @instance_hooks
+          # SEQUEL5: Remove commit/rollback
           if adr = @instance_hooks[:after_destroy_rollback]
             db.after_rollback{adr.each(&:call)}
           end
+          # SEQUEL5: No false checking
           run_before_instance_hooks(:before_destroy) == false ? false : super
         end
 
         # Run before_save instance hooks.
         def before_save
           return super unless @instance_hooks
+          # SEQUEL5: Remove commit/rollback
           if ar = @instance_hooks[:after_rollback]
             db.after_rollback{ar.each(&:call)}
           end
+          # SEQUEL5: No false checking
           run_before_instance_hooks(:before_save) == false ? false : super
         end
         
