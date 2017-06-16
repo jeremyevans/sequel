@@ -1,5 +1,7 @@
 === master
 
+* Make validation_class_methods plugin no longer require the blank extension (jeremyevans)
+
 * Clear cached associations when touching associations in the touch plugin (jeremyevans)
 
 * Make pg_array_associations model plugin load pg_array extension into database (jeremyevans)

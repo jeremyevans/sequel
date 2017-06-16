@@ -1,8 +1,6 @@
 # frozen-string-literal: true
 
 module Sequel
-  extension :blank
-
   module Plugins
     # Sequel's built-in validation_class_methods plugin adds backwards compatibility
     # for the legacy class-level validation methods (e.g. validates_presence_of :column).
@@ -11,7 +9,7 @@ module Sequel
     # as it is less complex and more flexible.  However, this plugin provides reflection
     # support, since it is class-level, while the instance-level validation_helpers
     # plugin does not.
-    # 
+    #
     # Usage:
     #
     #   # Add the validation class methods to all model subclasses (called before loading subclasses)
@@ -194,11 +192,12 @@ module Sequel
         # :tag :: The tag to use for this validation.
         def validates_each(*atts, &block)
           opts = extract_options!(atts)
+          blank_meth = db.method(:blank_object?).to_proc
           blk = if (i = opts[:if]) || (am = opts[:allow_missing]) || (an = opts[:allow_nil]) || (ab = opts[:allow_blank])
             proc do |o,a,v|
               next if i && !validation_if_proc(o, i)
               next if an && Array(v).all?(&:nil?)
-              next if ab && Array(v).all?(&:blank?)
+              next if ab && Array(v).all?(&blank_meth)
               next if am && Array(a).all?{|x| !o.values.has_key?(x)}
               block.call(o,a,v)
             end
@@ -317,7 +316,7 @@ module Sequel
           reflect_validation(:presence, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors.add(a, opts[:message]) if v.blank? && v != false
+            o.errors.add(a, opts[:message]) if db.send(:blank_object?, v) && v != false
           end
         end
         
