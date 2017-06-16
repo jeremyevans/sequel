@@ -29,11 +29,16 @@ module Sequel
     #   # Make the Album class handle column conflicts automatically
     #   Album.plugin :column_conflicts
     module ColumnConflicts
-      # Check for column conflicts on the current model if the model has a dataset.
-      def self.configure(model)
+      def self.apply(model)
         model.instance_eval do
           @get_column_conflicts = {}
           @set_column_conflicts = {}
+        end
+      end
+
+      # Check for column conflicts on the current model if the model has a dataset.
+      def self.configure(model)
+        model.instance_eval do
           check_column_conflicts if @dataset
         end
       end
