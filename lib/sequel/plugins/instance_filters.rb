@@ -7,7 +7,9 @@ module Sequel
     # where you would normally have to drop down to the dataset level
     # to get the necessary control, because you only want to delete or
     # update the rows in certain cases based on the current status of
-    # the row in the database.
+    # the row in the database.  The main purpose of this plugin is to
+    # avoid race conditions by relying on the atomic properties of database
+    # transactions.
     # 
     #   class Item < Sequel::Model
     #     plugin :instance_filters
