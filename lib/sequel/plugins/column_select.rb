@@ -41,7 +41,7 @@ module Sequel
         # qualifying them with table's name.
         def convert_input_dataset(ds)
           ds = super
-          if !ds.opts[:select] && (from = ds.opts[:from]) && from.length == 1 && !ds.opts[:join]
+          if !ds.opts[:select] && (from = ds.opts[:from]) && from.length == 1 && !ds.opts[:join] # SEQUE5: just !ds.opts[:select]
             if db.supports_schema_parsing?
               cols = check_non_connection_error(false){db.schema(ds)}
               if cols
