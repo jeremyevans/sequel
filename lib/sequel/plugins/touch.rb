@@ -136,10 +136,11 @@ module Sequel
               # Can't update all values at once, so update each instance individually.
               # Instead if doing a simple save, update via the instance's dataset,
               # to avoid going into an infinite loop in some cases.
-              send(r[:name]).each{|x| x.this.update(column=>touch_association_value)}
+              send(assoc).each{|x| x.this.update(column=>touch_association_value)}
             else
               # Update all values at once for performance reasons.
               ds.update(column=>touch_association_value)
+              associations.delete(assoc)
             end
           end
         end

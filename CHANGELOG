@@ -1,5 +1,7 @@
 === master
 
+* Clear cached associations when touching associations in the touch plugin (jeremyevans)
+
 * Make pg_array_associations model plugin load pg_array extension into database (jeremyevans)
 
 * Remove support for :strict option in nested_attributes plugin, use :unmatched_pk option instead (jeremyevans)

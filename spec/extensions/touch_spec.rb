@@ -67,6 +67,15 @@ describe "Touch plugin" do
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
   end
 
+  it "should clear associations after touching them  :associations option" do
+    @Artist.plugin :touch, :associations=>:albums
+    @a.associations[:albums] = [@Album.call(:id=>1)]
+    @a.touch
+    @a.associations[:albums].must_be_nil
+    DB.sqls.must_equal ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
+      "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (albums.artist_id = 1)"]
+  end
+
   it "should be able to give an array to the :associations option specifying multiple associations" do
     @Album.plugin :touch, :associations=>[:artist, :followup_albums]
     @Album.load(:id=>4, :artist_id=>1).touch
