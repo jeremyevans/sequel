@@ -95,7 +95,7 @@ module Sequel
                 end
               end
               km.each do |k,v|
-                h[k.to_s] = [ ] unless h.key?(k.to_s)
+                h[k.to_s] = [] unless h.key?(k.to_s)
                 h[k.to_s].push( *Array(v) )
               end
               h
@@ -111,7 +111,7 @@ module Sequel
               end
             end
             sti_model_map.each do |k,v|
-              h[v.to_s] = [ ] unless h.key?(v.to_s)
+              h[v.to_s] = [] unless h.key?(v.to_s)
               h[v.to_s] << k
             end
             h
