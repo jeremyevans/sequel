@@ -17,6 +17,9 @@ module Sequel
     # Note that for this plugin to work correctly, the column values must
     # correctly implement the #hash method, returning the same value if
     # the object is equal, and a different value if the object is not equal.
+    # As this solely uses hash values to check for modification, there may
+    # be cases where a modification is made and the hash value is the same,
+    # resulting in a false negative.
     #
     # Note that this plugin causes a performance hit for all retrieved
     # objects, so it shouldn't be used in cases where performance is a
