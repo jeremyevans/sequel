@@ -76,9 +76,9 @@ module Sequel
 
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values
-      def self.configure(model, opts = {})
+      def self.configure(model, opts = OPTS)
         model.instance_eval do
-          @csv_serializer_opts = (@csv_serializer_opts || {}).merge(opts)
+          @csv_serializer_opts = (@csv_serializer_opts || OPTS).merge(opts)
         end
       end
 
@@ -87,7 +87,7 @@ module Sequel
         attr_reader :csv_serializer_opts
 
         # Attempt to parse an array of instances from the given CSV string
-        def array_from_csv(csv, opts = {})
+        def array_from_csv(csv, opts = OPTS)
           CSV.parse(csv, process_csv_serializer_opts(opts)).map do |row|
             row = row.to_hash
             row.delete(nil)
@@ -105,13 +105,13 @@ module Sequel
         end
 
         # Attempt to parse a single instance from the given CSV string
-        def from_csv(csv, opts = {})
+        def from_csv(csv, opts = OPTS)
           new.from_csv(csv, opts)
         end
 
         # Convert the options hash to one that can be passed to CSV.
         def process_csv_serializer_opts(opts)
-          opts = (csv_serializer_opts || {}).merge(opts)
+          opts = (csv_serializer_opts || OPTS).merge(opts)
           opts_cols = opts.delete(:columns)
           opts_include = opts.delete(:include)
           opts_except = opts.delete(:except)
@@ -136,7 +136,7 @@ module Sequel
         #
         # :headers :: The headers to use for the CSV line. Use nil for a header
         #             to specify the column should be ignored.
-        def from_csv(csv, opts = {})
+        def from_csv(csv, opts = OPTS)
           row = CSV.parse_line(csv, model.process_csv_serializer_opts(opts)).to_hash
           row.delete(nil)
           set(row)
@@ -151,7 +151,7 @@ module Sequel
         #          output, ignoring all other columns
         # :include :: Symbol or Array of Symbols specifying non-column
         #             attributes to include in the CSV output.
-        def to_csv(opts = {})
+        def to_csv(opts = OPTS)
           opts = model.process_csv_serializer_opts(opts)
 
           CSV.generate(opts) do |csv|
@@ -168,7 +168,7 @@ module Sequel
         #
         # :array :: An array of instances.  If this is not provided, calls #all
         #           on the receiver to get the array.
-        def to_csv(opts = {})
+        def to_csv(opts = OPTS)
           opts = model.process_csv_serializer_opts({:columns=>columns}.merge!(opts))
           items = opts.delete(:array) || self
 
