@@ -1,5 +1,7 @@
 === master
 
+* Deprecate identifier_columns plugin, not needed with Sequel.split_symbols = false (jeremyevans)
+
 * Make reloading column_conflicts plugin not remove existing conflict markings (jeremyevans)
 
 * Deprecate cti_base_model, cti_key, and cti_model_map class methods in class_table_inheritance plugin (jeremyevans)

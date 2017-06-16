@@ -6,7 +6,9 @@ describe "identifier_columns plugin" do
     @c = Class.new(Sequel::Model(@db[:test]))
     @ds = @c.dataset
     @c.columns :id, :a__b
-    @c.plugin :identifier_columns
+    deprecated do
+      @c.plugin :identifier_columns
+    end
     @db.sqls
   end
 

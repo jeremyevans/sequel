@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The identifier_columns plugin", "Set Sequel.split_symbols = false instead")
+
 module Sequel
   module Plugins
     # The identifier_columns plugin makes Sequel automatically
