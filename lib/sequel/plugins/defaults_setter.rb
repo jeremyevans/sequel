@@ -13,6 +13,16 @@ module Sequel
     #   album = Album.new(:a=>1, :b=>3)
     #   album.a # => 1
     #   album.b # => 3
+    #
+    # You can manually set default values as well:
+    #
+    #   Album.default_values[:a] = 4
+    #   Album.new.a # => 4
+    #
+    # You can also provide procs to set default values:
+    #
+    #   Album.default_values[:a] = lambda{Date.today}
+    #   Album.new.a # => Date.today
     # 
     # Usage:
     #
