@@ -1007,6 +1007,7 @@ module Sequel
           ds = db.from(ds)
         when Dataset
           if ds.joined_dataset?
+            # raise Error, "Using a joined dataset as a model dataset is not support, use from_self on the dataset to wrap it in a subquery" # SEQUEL5
             Sequel::Deprecation.deprecate("Using a joined dataset as a Sequel::Model dataset", respond_to?(:cti_base_model) ? "Use the class_table_inheritance plugin :alias option in #{cti_base_model.inspect}" : "Call from_self on the dataset to wrap it in a subquery")
           end
 
@@ -1256,6 +1257,7 @@ module Sequel
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
         elsif dataset.joined_dataset?
+          # SEQUEL5: Remove as joined model datasets are not allowed
           dataset.first(qualified_primary_key_hash(pk))
         else
           dataset.first(primary_key_hash(pk))
@@ -1902,6 +1904,7 @@ module Sequel
         raise Error, "No dataset for model #{model}" unless ds = model.instance_dataset
 
         cond = if ds.joined_dataset?
+          # SEQUEL5: Remove as joined model datasets are now allowed
           qualified_pk_hash
         else
           pk_hash
