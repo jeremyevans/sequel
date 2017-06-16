@@ -92,9 +92,8 @@ module Sequel
         # the attribute for just the current object.  Return the value of
         # the attribute for the current object.
         def lazy_attribute_lookup(a, opts=OPTS)
-          unless table = opts[:table]
-            table = model.table_name
-          end
+          table = opts[:table] || model.table_name
+          selection = Sequel.qualify(table, a)
 
           if base_ds = opts[:dataset]
             ds = base_ds.where(qualified_pk_hash(table))
@@ -103,10 +102,8 @@ module Sequel
             ds = this
           end
 
-          selection = Sequel.qualify(table, a)
-
           if frozen?
-            return ds.dup.get(selection)
+            return ds.get(selection)
           end
 
           if retrieved_with
@@ -115,7 +112,11 @@ module Sequel
             id_map = {}
             retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}
             predicate_key = composite_pk ? primary_key.map{|k| Sequel.qualify(table, k)} : Sequel.qualify(table, primary_key)
-            base_ds.select(*(Array(primary_key).map{|k| Sequel.qualify(table, k)} + [selection])).where(predicate_key=>id_map.keys).naked.each do |row|
+            base_ds.
+             select(*(Array(primary_key).map{|k| Sequel.qualify(table, k)} + [selection])).
+             where(predicate_key=>id_map.keys).
+             naked.
+             each do |row|
               obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
               if obj && !obj.values.has_key?(a)
                 obj.values[a] = row[a]
