@@ -57,11 +57,12 @@ module Sequel
         # Check all entries in the values hash.  If any of the keys are not columns,
         # move the entry into the noncolumn_values hash.
         def split_noncolumn_values
-          @values.keys.each do |k|
-            unless columns.include?(k)
-              (@noncolumn_values ||= {})[k] = @values.delete(k)
-            end
-          end
+          cols = (@values.keys - columns)
+          return self if cols.empty?
+
+          nc = @noncolumn_values ||= {}
+          vals = @values
+          cols.each{|k| nc[k] = vals.delete(k)}
           self
         end
       end
