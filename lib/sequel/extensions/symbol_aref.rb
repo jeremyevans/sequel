@@ -18,10 +18,6 @@
 # If you are using Ruby 2+, and you would like to use refinements, there
 # is a refinement version of this in the symbol_aref_refinement extension.
 #
-# If you are using the ruby18_symbol_extensions, and would like symbol_aref
-# to take affect, load the symbol_aref extension after the
-# ruby18_symbol_extensions.
-#
 # Related module: Sequel::SymbolAref
 
 if RUBY_VERSION >= '2.0'
