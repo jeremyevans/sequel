@@ -29,9 +29,9 @@ module Sequel
         super
       end
     end
-    # SEQUEL5: Make this an empty module, since it will be the default behavior
   end
 
   Database.register_extension(:from_block, Database::FromBlock)
 end
 
+# Sequel::Database.register_extension(:from_block){} # SEQUEL5

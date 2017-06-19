@@ -62,6 +62,7 @@ module Sequel
         Sequel::Deprecation.deprecate("Sequel::Database#from with a block", "Use .from(*args).where(&block) instead")
         @default_dataset.from(*args).where(&block)
       #SEQUEL5
+      #  @default_dataset.from(*args, &block)
       #elsif args.length == 1 && (table = args[0]).is_a?(Symbol)
       #  @default_dataset.send(:cached_dataset, :"_from_#{table}_ds"){@default_dataset.from(table)}
       else
