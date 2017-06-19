@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "filter_having extension" do
   before do
-    @ds = Sequel.mock[:t].extension(:filter_having)
+    deprecated do
+      @ds = Sequel.mock[:t].extension(:filter_having)
+    end
     @dsh = @ds.having(:a)
   end
 

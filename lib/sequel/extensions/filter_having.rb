@@ -18,6 +18,8 @@
 #
 # Related module: Sequel::FilterHaving
 
+Sequel::Deprecation.deprecate("The filter_having extension", "It only existed for backwards compatibility with Sequel 3")
+
 #
 module Sequel
   module FilterHaving
