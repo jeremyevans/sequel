@@ -35,7 +35,7 @@
 
 module Sequel
   module DuplicateColumnsHandler
-    CALLER_ARGS = RUBY_VERSION >= '2.0' ? [0,1] : [0]
+    CALLER_ARGS = (RUBY_VERSION >= '2.0' ? [0,1] : [0]).freeze
 
     # Customize handling of duplicate columns for this dataset.
     def on_duplicate_columns(handler = (raise Error, "Must provide either an argument or a block to on_duplicate_columns" unless block_given?; nil), &block)
