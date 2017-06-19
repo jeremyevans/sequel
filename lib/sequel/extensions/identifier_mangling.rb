@@ -34,13 +34,6 @@
 #
 #   DB.extension :identifier_mangling
 #
-# Historically, Sequel supported these methods by default on
-# Databases and Datasets.  Sequel 4 will continue to support
-# the methods for backwards compatibility, by loading this
-# extension automatically for databases unless the
-# <tt>:identifier_mangling=>false</tt> Database option is
-# used.
-#
 # Related modules: Sequel::IdentifierMangling::DatabaseMethods,
 # Sequel::IdentifierMangling::DatasetMethods
 
