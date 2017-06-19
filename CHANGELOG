@@ -1,5 +1,7 @@
 === master
 
+* Deprecate empty_array_ignore_nulls extension (jeremyevans)
+
 * Deprecate Array#sql_array in the core_extensions extension (jeremyevans)
 
 * Make validation_helpers plugin :allow_blank option work correctly when the blank extension is not loaded (jeremyevans)
