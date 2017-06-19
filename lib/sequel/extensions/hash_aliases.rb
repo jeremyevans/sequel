@@ -18,6 +18,8 @@
 #
 # Related module: Sequel::HashAliases
 
+Sequel::Deprecation.deprecate("The hash_aliases extension", "It only existed for backwards compatibility with Sequel 3")
+
 #
 module Sequel
   module HashAliases

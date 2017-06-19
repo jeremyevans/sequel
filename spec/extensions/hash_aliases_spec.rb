@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "hash_aliases extension" do
   before do
-    @ds = Sequel.mock.dataset.extension(:hash_aliases)
+    deprecated do
+      @ds = Sequel.mock.dataset.extension(:hash_aliases)
+    end
   end
 
   it "should make from treat hash arguments as alias specifiers" do
