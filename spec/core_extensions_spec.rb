@@ -316,13 +316,17 @@ describe "Array#sql_value_list and #sql_array" do
   it "should treat the array as an SQL value list instead of conditions when used as a placeholder value" do
     @d.filter(Sequel.lit("(a, b) IN ?", [[:x, 1], [:y, 2]])).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x = 1) AND (y = 2)))'
     @d.filter(Sequel.lit("(a, b) IN ?", [[:x, 1], [:y, 2]].sql_value_list)).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
-    @d.filter(Sequel.lit("(a, b) IN ?", [[:x, 1], [:y, 2]].sql_array)).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+    deprecated do
+      @d.filter(Sequel.lit("(a, b) IN ?", [[:x, 1], [:y, 2]].sql_array)).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+    end
   end
 
   it "should be no difference when used as a hash value" do
     @d.filter([:a, :b]=>[[:x, 1], [:y, 2]]).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
     @d.filter([:a, :b]=>[[:x, 1], [:y, 2]].sql_value_list).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
-    @d.filter([:a, :b]=>[[:x, 1], [:y, 2]].sql_array).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+    deprecated do
+      @d.filter([:a, :b]=>[[:x, 1], [:y, 2]].sql_array).sql.must_equal 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+    end
   end
 end
 
