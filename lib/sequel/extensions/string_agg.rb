@@ -53,7 +53,6 @@
 # * DB2 9.7+ (except distinct)
 # * MySQL
 # * HSQLDB
-# * CUBRID
 # * H2
 #
 # Related module: Sequel::SQL::StringAgg
