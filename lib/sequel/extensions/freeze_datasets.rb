@@ -67,3 +67,5 @@ module Sequel
     register_extension(:freeze_datasets, FreezeDatasets)
   end
 end
+
+# Sequel::Database.register_extension(:freeze_datasets){} # SEQUEL5

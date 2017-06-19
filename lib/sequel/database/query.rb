@@ -310,6 +310,9 @@ module Sequel
 
     # Remove the cached schema for the given schema name
     def remove_cached_schema(table)
+      #SEQUEL5
+      #cache = @default_dataset.send(:cache)
+      #Sequel.synchronize{cache.clear}
       k = quote_schema_table(table)
       Sequel.synchronize{@schemas.delete(k)}
     end

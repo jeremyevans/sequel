@@ -35,6 +35,7 @@ module Sequel
       @db = db
       @opts = {} # OPTS # SEQUEL5
       @cache = {}
+      # freeze # SEQUEL5
     end
 
     # Define a hash value such that datasets with the same class, DB, and opts

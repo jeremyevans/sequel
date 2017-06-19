@@ -58,12 +58,14 @@ module Sequel
     #   DB.from(:items) # SELECT * FROM items
     #   DB.from(:items){id > 2} # SELECT * FROM items WHERE (id > 2)
     def from(*args, &block)
-      ds = @default_dataset.from(*args)
       if block
         Sequel::Deprecation.deprecate("Sequel::Database#from with a block", "Use .from(*args).where(&block) instead")
-        ds.where(&block)
+        @default_dataset.from(*args).where(&block)
+      #SEQUEL5
+      #elsif args.length == 1 && (table = args[0]).is_a?(Symbol)
+      #  @default_dataset.send(:cached_dataset, :"_from_#{table}_ds"){@default_dataset.from(table)}
       else
-        ds
+        @default_dataset.from(*args)
       end
     end
     
