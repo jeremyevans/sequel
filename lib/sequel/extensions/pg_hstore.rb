@@ -49,18 +49,18 @@
 #
 # * \[\]
 # * \[\]=
-# * assoc (ruby 1.9 only)
+# * assoc
 # * delete
 # * fetch
 # * has_key?
 # * has_value?
 # * include?
-# * key (ruby 1.9 only)
+# * key
 # * key?
 # * member?
 # * merge
 # * merge!
-# * rassoc (ruby 1.9 only)
+# * rassoc
 # * replace
 # * store
 # * update
@@ -70,10 +70,7 @@
 #
 #   DB[:table].insert(:column=>Sequel.hstore('foo'=>'bar'))
 #
-# If you would like to use hstore columns in your model objects, you
-# probably want to modify the schema parsing/typecasting so that it
-# recognizes and correctly handles the hstore columns, which you can
-# do by:
+# To use this extension, first load it into your Sequel::Database instance:
 #
 #   DB.extension :pg_hstore
 #
@@ -95,12 +92,19 @@ module Sequel
       # Parser for PostgreSQL hstore output format.
       class Parser < StringScanner
         QUOTE_RE = /"/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :QUOTE_RE)
         KV_SEP_RE = /"\s*=>\s*/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :KV_SEP_RE)
         NULL_RE = /NULL/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :NULL_RE)
         SEP_RE = /,\s*/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :SEP_RE)
         QUOTED_RE = /(\\"|[^"])*/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :QUOTED_RE)
         REPLACE_RE = /\\(.)/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)
         REPLACE_WITH = '\1'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :REPLACE_WITH)
 
         # Parse the output format that PostgreSQL uses for hstore
         # columns.  Note that this does not attempt to parse all
@@ -114,17 +118,17 @@ module Sequel
           return @result if @result
           hash = {}
           while !eos?
-            skip(QUOTE_RE)
+            skip(/"/)
             k = parse_quoted
-            skip(KV_SEP_RE)
-            if skip(QUOTE_RE)
+            skip(/"\s*=>\s*/)
+            if skip(/"/)
               v = parse_quoted
-              skip(QUOTE_RE)
+              skip(/"/)
             else
-              scan(NULL_RE)
+              scan(/NULL/)
               v = nil
             end
-            skip(SEP_RE)
+            skip(/,\s*/)
             hash[k] = v
           end
           @result = hash
@@ -134,7 +138,7 @@ module Sequel
 
         # Parse and unescape a quoted key/value.
         def parse_quoted
-          scan(QUOTED_RE).gsub(REPLACE_RE, REPLACE_WITH)
+          scan(/(\\"|[^"])*/).gsub(/\\(.)/, '\1')
         end
       end
 
@@ -195,12 +199,19 @@ module Sequel
       DEFAULT_PROC = lambda{|h, k| h[k.to_s] unless k.is_a?(String)}
 
       QUOTE = '"'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :QUOTE)
       COMMA = ",".freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
       KV_SEP = "=>".freeze
+      Sequel::Deprecation.deprecate_constant(self, :KV_SEP)
       NULL = "NULL".freeze
+      Sequel::Deprecation.deprecate_constant(self, :NULL)
       ESCAPE_RE = /("|\\)/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
       ESCAPE_REPLACE = '\\\\\1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACE)
       HSTORE_CAST = '::hstore'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :HSTORE_CAST)
 
       if RUBY_VERSION >= '1.9'
         # Undef 1.9 marshal_{dump,load} methods in the delegate class,
@@ -265,7 +276,7 @@ module Sequel
       # Append a literalize version of the hstore to the sql.
       def sql_literal_append(ds, sql)
         ds.literal_append(sql, unquoted_literal)
-        sql << HSTORE_CAST
+        sql << '::hstore'
       end
 
       # Return a string containing the unquoted, unstring-escaped
@@ -274,10 +285,10 @@ module Sequel
       def unquoted_literal
         str = String.new
         comma = false
-        commas = COMMA
-        quote = QUOTE
-        kv_sep = KV_SEP
-        null = NULL
+        commas = ","
+        quote = '"'
+        kv_sep = "=>"
+        null = "NULL"
         each do |k, v|
           str << commas if comma
           str << quote << escape_value(k) << quote
@@ -310,7 +321,7 @@ module Sequel
       # Escape key/value strings when literalizing to
       # correctly handle backslash and quote characters.
       def escape_value(k)
-        k.to_s.gsub(ESCAPE_RE, ESCAPE_REPLACE)
+        k.to_s.gsub(/("|\\)/, '\\\\\1')
       end
     end
   end
