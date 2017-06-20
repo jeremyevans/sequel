@@ -9,6 +9,8 @@
 #
 # Related module: Sequel::Metaprogramming
 
+Sequel::Deprecation.deprecate("The meta_def extension", "Replace meta_def usage with define_singleton_method")
+
 #
 module Sequel
   # Contains meta_def method for adding methods to objects via blocks.

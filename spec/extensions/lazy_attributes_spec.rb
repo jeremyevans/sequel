@@ -5,13 +5,13 @@ describe "Sequel::Plugins::LazyAttributes" do
   before do
     @db = Sequel.mock
     def @db.supports_schema_parsing?() true end
-    @db.meta_def(:schema){|*a| [[:id, {:type=>:integer}], [:name,{:type=>:string}]]}
+    def @db.schema(*a) [[:id, {:type=>:integer}], [:name,{:type=>:string}]] end
     class ::LazyAttributesModel < Sequel::Model(@db[:la])
       plugin :lazy_attributes
       set_columns([:id, :name])
-      meta_def(:columns){[:id, :name]}
+      def self.columns; [:id, :name] end
       lazy_attributes :name
-      meta_def(:columns){[:id]}
+      def self.columns; [:id] end
       set_dataset dataset.with_fetch(proc do |sql|
         if sql !~ /WHERE/
           if sql =~ /name/

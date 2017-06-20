@@ -104,7 +104,7 @@ connection_validator_specs = shared_description do
     end
 
     it "should handle case where determining validity requires a connection" do
-      @db.meta_def(:valid_connection?){|c| synchronize{}; true}
+      def @db.valid_connection?(c) synchronize{}; true end
       @db.pool.connection_validation_timeout = -1
       c1 = @db.synchronize{|c| c}
       @db.synchronize{|c| c}.must_be_same_as(c1)

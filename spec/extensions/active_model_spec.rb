@@ -59,7 +59,7 @@ describe "ActiveModel plugin" do
     @c.freeze
     @o.id2 = 2
     @o.to_param.must_equal '2-1'
-    @o.meta_def(:to_param_joiner){'|'}
+    def @o.to_param_joiner; '|' end
     @o.to_param.must_equal '2|1'
     @o.destroy
     @o.to_param.must_be_nil

@@ -48,7 +48,7 @@ describe "string_agg extension" do
   it "should correctly literalize on MySQL, H2, HSQLDB" do
     [:mysql, :h2, :hsqldb].each do |type|
       db = dbf.call(type)
-      db.meta_def(:database_type){type}
+      meta_def(db, :database_type){type}
       ds = db.dataset.with_quote_identifiers(false).with_extend{def input_identifier(v) v.to_s end}
       ds.literal(@sa1).upcase.must_equal "GROUP_CONCAT(C SEPARATOR ',')"
       ds.literal(@sa2).upcase.must_equal "GROUP_CONCAT(C SEPARATOR '-')"

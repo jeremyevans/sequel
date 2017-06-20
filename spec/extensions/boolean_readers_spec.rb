@@ -86,7 +86,7 @@ describe Sequel::Model, "BooleanReaders plugin" do
   end
 
   it "should handle cases where getting the columns raises an error" do
-    @c.meta_def(:columns){raise Sequel::Error}
+    def @c.columns; raise Sequel::Error end
     @c.plugin(:boolean_readers)
     proc{@c.new.b?}.must_raise(NoMethodError)
   end

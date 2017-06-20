@@ -14,9 +14,9 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Album = Class.new(@Base)
     @Tag = Class.new(@Base)
 
-    @Artist.meta_def(:name){'Artist'}
-    @Album.meta_def(:name){'Album'}
-    @Tag.meta_def(:name){'Tag'}
+    def @Artist.name; 'Artist' end
+    def @Album.name; 'Album' end
+    def @Tag.name; 'Tag' end
 
     @Artist.dataset = @db[:artists]
     @Album.dataset = @db[:albums]
@@ -261,9 +261,9 @@ describe "Sequel::Plugins::DatasetAssociations with composite keys" do
     @Album = Class.new(@Base)
     @Tag = Class.new(@Base)
 
-    @Artist.meta_def(:name){'Artist'}
-    @Album.meta_def(:name){'Album'}
-    @Tag.meta_def(:name){'Tag'}
+    def @Artist.name; 'Artist' end
+    def @Album.name; 'Album' end
+    def @Tag.name; 'Tag' end
 
     @Artist.dataset = @db[:artists]
     @Album.dataset = @db[:albums]

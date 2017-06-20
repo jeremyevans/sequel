@@ -429,13 +429,13 @@ describe "Sequel::IntegerMigrator" do
   end
 
   it "should use transactions by default if the database supports transactional ddl" do
-    @db.meta_def(:supports_transactional_ddl?){true}
+    def @db.supports_transactional_ddl?; true end
     Sequel::Migrator.apply(@db, "spec/files/transaction_unspecified_migrations")
     @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
   end
 
   it "should respect transaction use on a per migration basis" do
-    @db.meta_def(:supports_transactional_ddl?){true}
+    def @db.supports_transactional_ddl?; true end
     Sequel::Migrator.apply(@db, "spec/files/transaction_specified_migrations")
     @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
   end
@@ -753,7 +753,7 @@ describe "Sequel::TimestampMigrator" do
   end
 
   it "should use transactions by default if database supports transactional ddl" do
-    @db.meta_def(:supports_transactional_ddl?){true}
+    def @db.supports_transactional_ddl?; true end
     Sequel::TimestampMigrator.apply(@db, "spec/files/transaction_unspecified_migrations")
     @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
   end

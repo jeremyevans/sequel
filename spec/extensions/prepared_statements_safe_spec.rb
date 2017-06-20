@@ -53,7 +53,7 @@ describe "prepared_statements_safe plugin" do
     c = Class.new(Sequel::Model)
     c.plugin :prepared_statements_safe
     c1 = Class.new(c)
-    c1.meta_def(:get_db_schema){@db_schema = {:i=>{:default=>'f(x)'}, :name=>{:ruby_default=>'foo'}, :id=>{:primary_key=>true}}}
+    def c1.get_db_schema; @db_schema = {:i=>{:default=>'f(x)'}, :name=>{:ruby_default=>'foo'}, :id=>{:primary_key=>true}} end
     c1.set_dataset(:people)
     c1.prepared_statements_column_defaults.must_equal(:name=>'foo')
     Class.new(c1).prepared_statements_column_defaults.must_equal(:name=>'foo')

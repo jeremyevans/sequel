@@ -254,17 +254,17 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.must_be :valid?
     @m.value = '123'
     @m.must_be :valid?
-    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
+    def @m.db_schema; {:value=>{:type=>:integer}} end
     @m.wont_be :valid?
     @m.errors.full_messages.must_equal ['value is not a valid integer']
 
     @c.set_validations{validates_schema_types(:value)}
-    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
+    def @m.db_schema; {:value=>{:type=>:integer}} end
     @m.wont_be :valid?
     @m.errors.full_messages.must_equal ['value is not a valid integer']
 
     @c.set_validations{validates_schema_types(:value, :message=>'is bad')}
-    @m.meta_def(:db_schema){{:value=>{:type=>:integer}}}
+    def @m.db_schema; {:value=>{:type=>:integer}} end
     @m.wont_be :valid?
     @m.errors.full_messages.must_equal ['value is bad']
   end

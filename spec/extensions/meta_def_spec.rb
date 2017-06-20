@@ -1,6 +1,15 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Metaprogramming" do
+  before do
+    deprecated do
+      Sequel.extension :meta_def
+    end
+  end
+  after do
+    Sequel::Metaprogramming.send(:remove_method, :meta_def)
+  end
+
   it "should add meta_def method to Database, Dataset, and Model classes and instances" do
     Sequel::Database.meta_def(:foo){1}
     Sequel::Database.foo.must_equal 1
