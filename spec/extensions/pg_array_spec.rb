@@ -375,7 +375,6 @@ describe "pg_array extension" do
 
   it "should set appropriate timestamp conversion procs when adding conversion procs" do
     @db.fetch = [[{:oid=>2222, :typname=>'foo'}], [{:oid=>2222, :typarray=>2223, :typname=>'foo'}]]
-    @db.reset_conversion_procs
     @db.add_named_conversion_proc(:foo){|v| v*2}
     procs = @db.conversion_procs
     procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
@@ -389,7 +388,7 @@ describe "pg_array extension" do
     begin
       Sequel::Postgres::PG_NAMED_TYPES[:foo] = proc{|v| v*2}
       @db.fetch = [[{:oid=>2222, :typname=>'foo'}], [{:oid=>2222, :typarray=>2223, :typname=>'foo'}]]
-      @db.reset_conversion_procs
+      deprecated{@db.reset_conversion_procs}
       procs = @db.conversion_procs
       procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
       procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]

@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Database#reset_conversion_procs on PostgreSQL (jeremyevans)
+
 * Deprecate meta_def extension (jeremyevans)
 
 * Make class_table_inheritance plugin with :alias option not use subquery for datasets that don't join (jeremyevans)

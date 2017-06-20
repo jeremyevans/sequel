@@ -511,8 +511,7 @@ module Sequel
           nil
         end
 
-        # When reseting conversion procs, reregister all the row types so that
-        # the system tables are introspected again, picking up database changes.
+        # SEQUEL5: Remove
         def reset_conversion_procs
           procs = super
 

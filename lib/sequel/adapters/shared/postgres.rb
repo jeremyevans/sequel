@@ -481,6 +481,7 @@ module Sequel
       # Reset the database's conversion procs, requires a server query if there
       # any named types.
       def reset_conversion_procs
+        Sequel::Deprecation.deprecate('Database#reset_conversion_procs', 'There should no longer be a need to reset conversion procs')
         @conversion_procs = get_conversion_procs
         conversion_procs_updated
         @conversion_procs
@@ -1056,8 +1057,8 @@ module Sequel
         @primary_keys = {}
         @primary_key_sequences = {}
         @supported_types = {}
-        @conversion_procs = PG_TYPES.dup
-        reset_conversion_procs
+        @conversion_procs = get_conversion_procs
+        conversion_procs_updated
       end
 
       # Backbone of the tables and views support.

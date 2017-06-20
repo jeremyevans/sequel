@@ -135,7 +135,7 @@ describe "pg_row extension" do
     p.column_converters.must_equal [Array]
   end
 
-  it "should reload registered row types when reseting conversion procs" do
+  deprecated "should reload registered row types when reseting conversion procs" do
     db = Sequel.mock(:host=>'postgres')
     db.extend_datasets{def quote_identifiers?; false end}
     db.extension(:pg_row)

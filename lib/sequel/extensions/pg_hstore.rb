@@ -160,6 +160,7 @@ module Sequel
 
         private
 
+        # SEQUEL5: Remove
         def reset_conversion_procs
           procs = super
           add_named_conversion_proc(:hstore, &HStore.method(:parse))

@@ -265,14 +265,14 @@ describe "pg_range extension" do
     end
   end
 
-  it "should set appropriate timestamp range conversion procs when resetting conversion procs" do
+  deprecated "should set appropriate timestamp range conversion procs when resetting conversion procs" do
     @db.reset_conversion_procs
     procs = @db.conversion_procs
     procs[3908].call('[2011-10-20 11:12:13,2011-10-20 11:12:14]').must_be :==, (Time.local(2011, 10, 20, 11, 12, 13)..(Time.local(2011, 10, 20, 11, 12, 14)))
     procs[3910].call('[2011-10-20 11:12:13,2011-10-20 11:12:14]').must_be :==, (Time.local(2011, 10, 20, 11, 12, 13)..(Time.local(2011, 10, 20, 11, 12, 14)))
   end
 
-  it "should set appropriate timestamp range array conversion procs when resetting conversion procs" do
+  deprecated "should set appropriate timestamp range array conversion procs when resetting conversion procs" do
     @db.reset_conversion_procs
     procs = @db.conversion_procs
     procs[3909].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').must_be :==, [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]

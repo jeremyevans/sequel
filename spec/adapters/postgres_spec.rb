@@ -4,6 +4,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 uses_pg = Sequel::Postgres::USES_PG if DB.adapter_scheme == :postgres
 uses_pg_or_jdbc = uses_pg || DB.adapter_scheme == :jdbc
+# SEQUEL5: Remove native handling
 
 def DB.sqls
   (@sqls ||= [])
@@ -3487,16 +3488,18 @@ describe 'PostgreSQL row-valued/composite types' do
       Integer :id
       column :employees, 'person[]'
     end
+    oids = @db.conversion_procs.keys
     @db.register_row_type(:address)
     @db.register_row_type(Sequel.qualify(:public, :person))
     @db.register_row_type(Sequel[:public][:company])
+    @new_oids = @db.conversion_procs.keys - oids
 
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after(:all) do
-    @db.drop_table?(:company, :person, :address)
+    @new_oids.each{|oid| @db.conversion_procs.delete(oid)}
     @db.row_types.clear
-    @db.reset_conversion_procs if @native
+    @db.drop_table?(:company, :person, :address)
   end
   after do
     [:company, :person, :address].each{|t| @db[t].delete}
