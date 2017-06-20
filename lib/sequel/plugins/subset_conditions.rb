@@ -13,7 +13,9 @@ module Sequel
     #   Album.plugin :subset_conditions
     #
     #   # This will now create a published_conditions method
-    #   Album.subset :published, :published => true
+    #   Album.dataset_module do
+    #     subset :published, :published => true
+    #   end
     #
     #   Album.where(Album.published_conditions).sql
     #   # SELECT * FROM albums WHERE (published IS TRUE)
