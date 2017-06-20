@@ -83,4 +83,4 @@ module Sequel
   end
 end
 
-# SEQUEL5: Make extension empty
+# Sequel::Dataset.register_extension(:no_auto_literal_strings){} # SEQUEL5
