@@ -335,19 +335,19 @@ module Sequel
   #
   # For example, to migrate the database to the latest version:
   #
-  #   Sequel::Migrator.apply(DB, '.')
+  #   Sequel::Migrator.run(DB, '.')
   #
   # For example, to migrate the database all the way down:
   #
-  #   Sequel::Migrator.apply(DB, '.', 0)
+  #   Sequel::Migrator.run(DB, '.', :target=>0)
   #
   # For example, to migrate the database to version 4:
   #
-  #   Sequel::Migrator.apply(DB, '.', 4)
+  #   Sequel::Migrator.run(DB, '.', :target=>4)
   #
   # To migrate the database from version 1 to version 5:
   #
-  #   Sequel::Migrator.apply(DB, '.', 5, 1)
+  #   Sequel::Migrator.run(DB, '.', :target=>5, :current=>1)
   #
   # Part of the +migration+ extension.
   class Migrator
@@ -634,7 +634,7 @@ module Sequel
       ds
     end
     
-    # Sets the current migration  version stored in the database.
+    # Sets the current migration version stored in the database.
     def set_migration_version(version)
       ds.update(column=>version)
     end
