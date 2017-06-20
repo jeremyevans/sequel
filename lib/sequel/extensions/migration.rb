@@ -490,7 +490,7 @@ module Sequel
     def remove_migration_classes
       # Remove class definitions
       Migration.descendants.each do |c|
-        Object.send(:remove_const, c.to_s) rescue nil
+        Object.send(:remove_const, c.name) if c.is_a?(Class) && !c.name.to_s.empty? && Object.const_defined?(c.name)
       end
       Migration.descendants.clear # remove any defined migration classes
     end
