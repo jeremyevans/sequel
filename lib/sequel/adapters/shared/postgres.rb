@@ -790,9 +790,9 @@ module Sequel
         h
       end
 
-      # Copy the conversion procs related to the given oids from PG_TYPES into
-      # the conversion procs for this instance.
+      # SEQUEL5: Remove
       def copy_conversion_procs(oids)
+        Sequel::Deprecation.deprecate("Database#copy_conversion_procs", "There is no reason to use this anymore, as PG_TYPES will be frozen in Sequel 5")
         procs = conversion_procs
         oids.each do |oid|
           procs[oid] = PG_TYPES[oid]

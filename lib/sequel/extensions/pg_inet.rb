@@ -41,7 +41,12 @@ module Sequel
       def self.extended(db)
         db.instance_eval do
           extend_datasets(InetDatasetMethods)
-          copy_conversion_procs([869, 650, 1041, 651, 1040])
+          conversion_procs[869] = conversion_procs[650] = IPAddr.method(:new)
+          if respond_to?(:register_array_type)
+            register_array_type('inet', :oid=>1041, :scalar_oid=>869)
+            register_array_type('cidr', :oid=>651, :scalar_oid=>650)
+            register_array_type('macaddr', :oid=>1040)
+          end
           @schema_type_classes[:ipaddr] = IPAddr
         end
       end
@@ -106,11 +111,16 @@ module Sequel
       end
     end
 
-    PG_TYPES[869] = PG_TYPES[650] = IPAddr.method(:new)
+    # SEQUEL5: Remove
+    meth = IPAddr.method(:new)
+    PG_TYPES[869] = PG_TYPES[650] = lambda do |s|
+      Sequel::Deprecation.deprecate("Conversion proc for inet/cidr added globally by pg_inet extension", "Load the pg_inet extension into the Database instance")
+      IPAddr.new(s)
+    end
     if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('inet', :oid=>1041, :scalar_oid=>869)
-      PGArray.register('cidr', :oid=>651, :scalar_oid=>650)
-      PGArray.register('macaddr', :oid=>1040)
+      PGArray.register('inet', :oid=>1041, :scalar_oid=>869, :skip_deprecation_warning=>true)
+      PGArray.register('cidr', :oid=>651, :scalar_oid=>650, :skip_deprecation_warning=>true)
+      PGArray.register('macaddr', :oid=>1040, :skip_deprecation_warning=>true)
     end
   end
 

@@ -124,7 +124,10 @@ module Sequel
       def self.extended(db)
         db.instance_eval do
           extend_datasets(IntervalDatasetMethods)
-          copy_conversion_procs([1186, 1187])
+          conversion_procs[1186] = Postgres::IntervalDatabaseMethods::PARSER
+          if respond_to?(:register_array_type)
+            register_array_type('interval', :oid=>1187, :scalar_oid=>1186)
+          end
           @schema_type_classes[:interval] = ActiveSupport::Duration
         end
       end
@@ -188,9 +191,13 @@ module Sequel
       end
     end
 
-    PG_TYPES[1186] = Postgres::IntervalDatabaseMethods::PARSER
+    # SEQUEL5: Remove
+    PG_TYPES[1186] = lambda do |s|
+      Sequel::Deprecation.deprecate("Conversion proc for interval added globally by pg_interval extension", "Load the pg_interval extension into the Database instance")
+      Postgres::IntervalDatabaseMethods::PARSER.call(s)
+    end
     if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('interval', :oid=>1187, :scalar_oid=>1186)
+      PGArray.register('interval', :oid=>1187, :scalar_oid=>1186, :skip_deprecation_warning=>true)
     end
   end
 

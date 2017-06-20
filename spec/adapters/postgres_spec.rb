@@ -1782,7 +1782,7 @@ if DB.adapter_scheme == :postgres
     before(:all) do
       deprecated do
         @db = DB
-        @old_cp = @db.conversion_procs[1013]
+        @cp = @db.conversion_procs.dup
         @db.conversion_procs.delete(1013)
         Sequel::Postgres::PG_NAMED_TYPES[:oidvector] = lambda{|v| v.reverse}
         @db.reset_conversion_procs
@@ -1792,8 +1792,7 @@ if DB.adapter_scheme == :postgres
     after(:all) do
       deprecated do
         Sequel::Postgres::PG_NAMED_TYPES.delete(:oidvector)
-        @db.conversion_procs.delete(30)
-        @db.conversion_procs[1013] = @old_cp
+        @db.conversion_procs.replace(@cp)
         @db.drop_table?(:foo)
         @db.drop_enum(:foo_enum) rescue nil
       end

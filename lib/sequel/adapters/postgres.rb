@@ -107,9 +107,6 @@ module Sequel
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
     end.new
 
-    # SEQUEL5: Remove
-    PG_TYPES[17] = TYPE_CONVERTOR.method(:bytea)
-
     if Sequel::Postgres::USES_PG
       # Whether the given sequel_pg version integer is supported.
       def self.sequel_pg_version_supported?(version)

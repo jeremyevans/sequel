@@ -9,7 +9,7 @@ describe "pg_row extension" do
     @db.sqls
   end
 
-  it "should parse record objects as arrays" do
+  deprecated "should parse record objects as arrays" do
     a = Sequel::Postgres::PG_TYPES[2249].call("(a,b,c)")
     a.class.must_equal(@m::ArrayRow)
     a.to_a.must_be_kind_of(Array)
@@ -19,8 +19,18 @@ describe "pg_row extension" do
     @db.literal(a).must_equal "ROW('a', 'b', 'c')"
   end
 
+  it "should parse record objects as arrays" do
+    a = @db.conversion_procs[2249].call("(a,b,c)")
+    a.class.must_equal(@m::ArrayRow)
+    a.to_a.must_be_kind_of(Array)
+    a[0].must_equal 'a'
+    a.must_equal %w'a b c'
+    a.db_type.must_be_nil
+    @db.literal(a).must_equal "ROW('a', 'b', 'c')"
+  end
+
   it "should parse arrays of record objects as arrays of arrays" do
-    as = Sequel::Postgres::PG_TYPES[2287].call('{"(a,b,c)","(d,e,f)"}')
+    as = @db.conversion_procs[2287].call('{"(a,b,c)","(d,e,f)"}')
     as.must_equal [%w'a b c', %w'd e f']
     as.each do |a|
       a.class.must_equal(@m::ArrayRow)

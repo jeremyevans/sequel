@@ -52,8 +52,7 @@
 #
 # This extension makes it easy to add support for other range types.  In
 # general, you just need to make sure that the subtype is handled and has the
-# appropriate converter installed in Sequel::Postgres::PG_TYPES or the Database
-# instance's conversion_procs usingthe appropriate type OID.  For user defined
+# appropriate converter installed.  For user defined
 # types, you can do this via:
 #
 #   DB.conversion_procs[subtype_oid] = lambda{|string| }
@@ -65,18 +64,6 @@
 # supported):
 #
 #   DB.register_range_type('timerange')
-#
-# You can also register range types on a global basis using
-# Sequel::Postgres::PGRange.register.  In this case, you'll have
-# to specify the type oids:
-#
-#   Sequel::Postgres::PG_TYPES[1234] = lambda{|string| }
-#   Sequel::Postgres::PGRange.register('foo', :oid=>4321, :subtype_oid=>1234)
-#
-# Both Sequel::Postgres::PGRange::DatabaseMethods#register_range_type
-# and Sequel::Postgres::PGRange.register support many options to
-# customize the range type handling.  See the Sequel::Postgres::PGRange.register
-# method documentation.
 #
 # This extension integrates with the pg_array extension.  If you plan
 # to use arrays of range types, load the pg_array extension before the
@@ -109,28 +96,9 @@ module Sequel
       ESCAPE_REPLACE = '\\\\\1'.freeze
       CAST = '::'.freeze
 
-      # Registers a range type that the extension should handle.  Makes a Database instance that
-      # has been extended with DatabaseMethods recognize the range type given and set up the
-      # appropriate typecasting.  Also sets up automatic typecasting for the native postgres
-      # adapter, so that on retrieval, the values are automatically converted to PGRange instances.
-      # The db_type argument should be the name of the range type. Accepts the following options:
-      #
-      # :converter :: A callable object (e.g. Proc), that is called with the start or end of the range
-      #               (usually a string), and should return the appropriate typecasted object.
-      # :oid :: The PostgreSQL OID for the range type.  This is used by the Sequel postgres adapter
-      #         to set up automatic type conversion on retrieval from the database.
-      # :subtype_oid :: Should be the PostgreSQL OID for the range's subtype. If given,
-      #                 automatically sets the :converter option by looking for scalar conversion
-      #                 proc.
-      # :type_procs :: A hash mapping oids to conversion procs, used for setting the default :converter
-      #                for :subtype_oid.  Defaults to the global Sequel::Postgres::PG_TYPES.
-      # :typecast_method_map :: The map in which to place the database type string to type symbol mapping.
-      #                         Defaults to RANGE_TYPES.
-      # :typecast_methods_module :: If given, a module object to add the typecasting method to.  Defaults
-      #                             to DatabaseMethods.
-      #
-      # If a block is given, it is treated as the :converter option.
+      # SEQUEL5: Remove
       def self.register(db_type, opts=OPTS, &block)
+        Sequel::Deprecation.deprecate("Sequel::Postgres::PGRange.register", "Use Database#register_range_type on a Database instance using the pg_range extension") unless opts[:skip_deprecation_warning]
         db_type = db_type.to_s.dup.freeze
 
         type_procs = opts[:type_procs] || PG_TYPES
@@ -155,14 +123,19 @@ module Sequel
         define_range_typecast_method(mod, db_type, parser)
 
         if oid = opts[:oid]
+          if opts[:skip_deprecation_warning]
+            def parser.call(s)
+              Sequel::Deprecation.deprecate("Conversion proc for #{db_type} added globally by pg_range extension", "Load the pg_range extension into the Database instance")
+              super
+            end
+          end
           type_procs[oid] = parser
         end
 
         nil
       end
 
-      # Define a private range typecasting method for the given type that uses
-      # the parser argument to do the type conversion.
+      # SEQUEL5: Remove
       def self.define_range_typecast_method(mod, type, parser)
         mod.class_eval do
           meth = :"typecast_value_#{type}"
@@ -241,7 +214,20 @@ module Sequel
           db.instance_eval do
             @pg_range_schema_types ||= {}
             extend_datasets(DatasetMethods)
-            copy_conversion_procs([3904, 3906, 3912, 3926, 3905, 3907, 3913, 3927])
+            register_range_type('int4range', :oid=>3904, :subtype_oid=>23)
+            register_range_type('numrange', :oid=>3906, :subtype_oid=>1700)
+            register_range_type('tsrange', :oid=>3908, :subtype_oid=>1114)
+            register_range_type('tstzrange', :oid=>3910, :subtype_oid=>1184)
+            register_range_type('daterange', :oid=>3912, :subtype_oid=>1082)
+            register_range_type('int8range', :oid=>3926, :subtype_oid=>20)
+            if respond_to?(:register_array_type)
+              register_array_type('int4range', :oid=>3905, :scalar_oid=>3904, :scalar_typecast=>:int4range)
+              register_array_type('numrange', :oid=>3907, :scalar_oid=>3906, :scalar_typecast=>:numrange)
+              register_array_type('tsrange', :oid=>3909, :scalar_oid=>3908, :scalar_typecast=>:tsrange)
+              register_array_type('tstzrange', :oid=>3911, :scalar_oid=>3910, :scalar_typecast=>:tstzrange)
+              register_array_type('daterange', :oid=>3913, :scalar_oid=>3912, :scalar_typecast=>:daterange)
+              register_array_type('int8range', :oid=>3927, :scalar_oid=>3926, :scalar_typecast=>:int8range)
+            end
             [:int4range, :numrange, :tsrange, :tstzrange, :daterange, :int8range].each do |v|
               @schema_type_classes[v] = PGRange
             end
@@ -276,18 +262,58 @@ module Sequel
         end
 
         # Register a database specific range type.  This can be used to support
-        # different range types per Database.  Use of this method does not
-        # affect global state, unlike PGRange.register.  See PGRange.register for
-        # possible options.
+        # different range types per Database.  Options:
+        #
+        # :converter :: A callable object (e.g. Proc), that is called with the start or end of the range
+        #               (usually a string), and should return the appropriate typecasted object.
+        # :oid :: The PostgreSQL OID for the range type.  This is used by the Sequel postgres adapter
+        #         to set up automatic type conversion on retrieval from the database.
+        # :subtype_oid :: Should be the PostgreSQL OID for the range's subtype. If given,
+        #                 automatically sets the :converter option by looking for scalar conversion
+        #                 proc.
+        #
+        # If a block is given, it is treated as the :converter option.
         def register_range_type(db_type, opts=OPTS, &block)
-          opts = {:type_procs=>conversion_procs, :typecast_method_map=>@pg_range_schema_types, :typecast_methods_module=>(class << self; self; end)}.merge!(opts)
-          unless (opts.has_key?(:subtype_oid) || block) && opts.has_key?(:oid)
-            range_oid, subtype_oid = from(:pg_range).join(:pg_type, :oid=>:rngtypid).where(:typname=>db_type.to_s).get([:rngtypid, :rngsubtype])
-            opts[:subtype_oid] = subtype_oid unless opts.has_key?(:subtype_oid) || block
-            opts[:oid] = range_oid unless opts.has_key?(:oid)
+          oid = opts[:oid]
+          soid = opts[:subtype_oid]
+
+          if has_converter = opts.has_key?(:converter)
+            raise Error, "can't provide both a block and :converter option to register_range_type" if block
+            converter = opts[:converter]
+          else
+            has_converter = true if block
+            converter = block
           end
 
-          PGRange.register(db_type, opts, &block)
+          unless (soid || has_converter) && oid
+            range_oid, subtype_oid = from(:pg_range).join(:pg_type, :oid=>:rngtypid).where(:typname=>db_type.to_s).get([:rngtypid, :rngsubtype])
+            soid ||= subtype_oid unless has_converter
+            oid ||= range_oid
+          end
+
+          db_type = db_type.to_s.dup.freeze
+
+          if converter = opts[:converter]
+            raise Error, "can't provide both a block and :converter option to register" if block
+          else
+            converter = block
+          end
+
+          if soid
+            raise Error, "can't provide both a converter and :subtype_oid option to register" if has_converter 
+            raise Error, "no conversion proc for :subtype_oid=>#{soid.inspect} in conversion_procs" unless converter = conversion_procs[soid]
+          end
+
+          parser = conversion_procs[oid] = Parser.new(db_type, converter)
+
+          @pg_range_schema_types[db_type] = db_type.to_sym
+
+          (class << self; self end).class_eval do
+            meth = :"typecast_value_#{db_type}"
+            define_method(meth){|v| typecast_value_pg_range(v, parser)}
+            private meth
+          end
+
           @schema_type_classes[:"#{opts[:type_symbol] || db_type}"] = PGRange
           conversion_procs_updated
         end
@@ -570,19 +596,20 @@ module Sequel
       end
     end
 
-    PGRange.register('int4range', :oid=>3904, :subtype_oid=>23)
-    PGRange.register('numrange', :oid=>3906, :subtype_oid=>1700)
-    PGRange.register('tsrange', :oid=>3908, :subtype_oid=>1114)
-    PGRange.register('tstzrange', :oid=>3910, :subtype_oid=>1184)
-    PGRange.register('daterange', :oid=>3912, :subtype_oid=>1082)
-    PGRange.register('int8range', :oid=>3926, :subtype_oid=>20)
+    # SEQUEL5: Remove
+    PGRange.register('int4range', :oid=>3904, :subtype_oid=>23, :skip_deprecation_warning=>true)
+    PGRange.register('numrange', :oid=>3906, :subtype_oid=>1700, :skip_deprecation_warning=>true)
+    PGRange.register('tsrange', :oid=>3908, :subtype_oid=>1114, :skip_deprecation_warning=>true)
+    PGRange.register('tstzrange', :oid=>3910, :subtype_oid=>1184, :skip_deprecation_warning=>true)
+    PGRange.register('daterange', :oid=>3912, :subtype_oid=>1082, :skip_deprecation_warning=>true)
+    PGRange.register('int8range', :oid=>3926, :subtype_oid=>20, :skip_deprecation_warning=>true)
     if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('int4range', :oid=>3905, :scalar_oid=>3904, :scalar_typecast=>:int4range)
-      PGArray.register('numrange', :oid=>3907, :scalar_oid=>3906, :scalar_typecast=>:numrange)
-      PGArray.register('tsrange', :oid=>3909, :scalar_oid=>3908, :scalar_typecast=>:tsrange)
-      PGArray.register('tstzrange', :oid=>3911, :scalar_oid=>3910, :scalar_typecast=>:tstzrange)
-      PGArray.register('daterange', :oid=>3913, :scalar_oid=>3912, :scalar_typecast=>:daterange)
-      PGArray.register('int8range', :oid=>3927, :scalar_oid=>3926, :scalar_typecast=>:int8range)
+      PGArray.register('int4range', :oid=>3905, :scalar_oid=>3904, :scalar_typecast=>:int4range, :skip_deprecation_warning=>true)
+      PGArray.register('numrange', :oid=>3907, :scalar_oid=>3906, :scalar_typecast=>:numrange, :skip_deprecation_warning=>true)
+      PGArray.register('tsrange', :oid=>3909, :scalar_oid=>3908, :scalar_typecast=>:tsrange, :skip_deprecation_warning=>true)
+      PGArray.register('tstzrange', :oid=>3911, :scalar_oid=>3910, :scalar_typecast=>:tstzrange, :skip_deprecation_warning=>true)
+      PGArray.register('daterange', :oid=>3913, :scalar_oid=>3912, :scalar_typecast=>:daterange, :skip_deprecation_warning=>true)
+      PGArray.register('int8range', :oid=>3927, :scalar_oid=>3926, :scalar_typecast=>:int8range, :skip_deprecation_warning=>true)
     end
   end
 

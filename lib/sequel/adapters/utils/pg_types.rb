@@ -74,5 +74,6 @@ module Sequel
     }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
     end
+    # PG_TYPES.freeze # SEQUEL5
   end
 end 

@@ -1,5 +1,13 @@
 === master
 
+* Deprecate global conversion procs added by pg_* extensions, when extension isn't loaded into Database instance (jeremyevans)
+
+* Deprecate Sequel::Postgres::PGRange.register in the pg_range extension (jeremyevans)
+
+* Deprecate Sequel::Postgres::PGArray.register in the pg_array extension (jeremyevans)
+
+* Deprecate Database#copy_conversion_procs (private method) on PostgreSQL (jeremyevans)
+
 * Deprecate Database#reset_conversion_procs on PostgreSQL (jeremyevans)
 
 * Deprecate meta_def extension (jeremyevans)

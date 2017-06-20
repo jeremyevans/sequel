@@ -135,7 +135,12 @@ module Sequel
     module JSONDatabaseMethods
       def self.extended(db)
         db.instance_eval do
-          copy_conversion_procs([114, 199, 3802, 3807])
+          conversion_procs[114] = JSONDatabaseMethods.method(:db_parse_json)
+          conversion_procs[3802] = JSONDatabaseMethods.method(:db_parse_jsonb)
+          if respond_to?(:register_array_type)
+            register_array_type('json', :oid=>199, :scalar_oid=>114)
+            register_array_type('jsonb', :oid=>3807, :scalar_oid=>3802)
+          end
           @schema_type_classes[:json] = [JSONHash, JSONArray]
           @schema_type_classes[:jsonb] = [JSONBHash, JSONBArray]
         end
@@ -257,11 +262,18 @@ module Sequel
       end
     end
 
-    PG_TYPES[114] = JSONDatabaseMethods.method(:db_parse_json)
-    PG_TYPES[3802] = JSONDatabaseMethods.method(:db_parse_jsonb)
+    # SEQUEL5: Remove
+    PG_TYPES[114] = lambda do |s|
+      Sequel::Deprecation.deprecate("Conversion proc for json added globally by pg_json extension", "Load the pg_json extension into the Database instance")
+      JSONDatabaseMethods.db_parse_json(s)
+    end
+    PG_TYPES[3802] = lambda do |s|
+      Sequel::Deprecation.deprecate("Conversion proc for jsonb added globally by pg_json extension", "Load the pg_json extension into the Database instance")
+      JSONDatabaseMethods.db_parse_jsonb(s)
+    end
     if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('json', :oid=>199, :scalar_oid=>114)
-      PGArray.register('jsonb', :oid=>3807, :scalar_oid=>3802)
+      PGArray.register('json', :oid=>199, :scalar_oid=>114, :skip_deprecation_warning=>true)
+      PGArray.register('jsonb', :oid=>3807, :scalar_oid=>3802, :skip_deprecation_warning=>true)
     end
   end
 

@@ -384,17 +384,14 @@ module Sequel
 
         # Do some setup for the data structures the module uses.
         def self.extended(db)
-          # Return right away if row_types has already been set. This
-          # makes things not break if a user extends the database with
-          # this module more than once (since extended is called every
-          # time).
-          return if db.row_types
-
           db.instance_eval do
             @row_types = {}
             @row_schema_types = {}
             extend(@row_type_method_module = Module.new)
-            copy_conversion_procs([2249, 2287])
+            conversion_procs[2249] = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
+            if respond_to?(:register_array_type)
+              register_array_type('record', :oid=>2287, :scalar_oid=>2249)
+            end
           end
         end
 
@@ -487,13 +484,13 @@ module Sequel
           parser = Parser.new(parser_opts)
           @conversion_procs[parser.oid] = parser
 
-          if defined?(PGArray) && PGArray.respond_to?(:register) && array_oid && array_oid > 0
+          if respond_to?(:register_array_type) && array_oid && array_oid > 0
             array_type_name = if type_schema
               "#{type_schema}.#{type_name}"
             else
               type_name
             end
-            PGArray.register(array_type_name, :oid=>array_oid, :converter=>parser, :type_procs=>@conversion_procs, :scalar_typecast=>schema_type_symbol)
+            register_array_type(array_type_name, :oid=>array_oid, :converter=>parser, :scalar_typecast=>schema_type_symbol)
           end
 
           @row_types[literal(db_type)] = opts.merge(:parser=>parser, :type=>db_type)
@@ -577,10 +574,14 @@ module Sequel
       end
     end
 
-    # Register the default anonymous record type
-    PG_TYPES[2249] = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
+    # SEQUEL5: Remove
+    parser = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
+    PG_TYPES[2249] = lambda do |s|
+      Sequel::Deprecation.deprecate("Conversion proc for record added globally by pg_row extension", "Load the pg_row extension into the Database instance")
+      parser.call(s)
+    end
     if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('record', :oid=>2287, :scalar_oid=>2249)
+      PGArray.register('record', :oid=>2287, :scalar_oid=>2249, :skip_deprecation_warning=>true)
     end
   end
 

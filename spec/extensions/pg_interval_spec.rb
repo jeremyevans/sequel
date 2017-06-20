@@ -34,6 +34,26 @@ describe "pg_interval extension" do
     end
   end
 
+  deprecated "should set up conversion procs correctly" do
+    cp = Sequel::Postgres::PG_TYPES
+    cp[1186].call("1 sec").must_equal ActiveSupport::Duration.new(1, [[:seconds, 1]])
+  end
+
+  deprecated "should set up conversion procs for arrays correctly" do
+    cp = Sequel::Postgres::PG_TYPES
+    cp[1187].call("{1 sec}").must_equal [ActiveSupport::Duration.new(1, [[:seconds, 1]])]
+  end
+
+  it "should set up conversion procs correctly" do
+    cp = @db.conversion_procs
+    cp[1186].call("1 sec").must_equal ActiveSupport::Duration.new(1, [[:seconds, 1]])
+  end
+
+  it "should set up conversion procs for arrays correctly" do
+    cp = @db.conversion_procs
+    cp[1187].call("{1 sec}").must_equal [ActiveSupport::Duration.new(1, [[:seconds, 1]])]
+  end
+
   it "should not affect literalization of custom objects" do
     o = Object.new
     def o.sql_literal(ds) 'v' end
