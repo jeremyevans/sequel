@@ -106,8 +106,7 @@ module Sequel
       QUOTE = '"'.freeze
       Sequel::Deprecation.deprecate_constant(self, :QUOTE)
 
-      # Global hash of database array type name strings to symbols (e.g. 'double precision' => :float),
-      # used by the schema parsing for array types registered globally.
+      # SEQUEL5: Remove
       ARRAY_TYPES = {}
 
       # SEQUEL5: Remove
@@ -306,7 +305,7 @@ module Sequel
           conversion_procs_updated
         end
 
-        # Return PGArray if this type matches any supported array type.
+        # SEQUEL5: Remove
         def schema_type_class(type)
           super || (ARRAY_TYPES.each_value{|v| return PGArray if type == v}; nil)
         end
@@ -356,7 +355,7 @@ module Sequel
         # array schema types to get the type symbol for the given database type
         # string.
         def pg_array_schema_type(type)
-          @pg_array_schema_types[type] || ARRAY_TYPES[type]
+          @pg_array_schema_types[type] || ARRAY_TYPES[type] # SEQUEL5: Remove || ARRAY_TYPES[type] 
         end
 
         # Make the column type detection handle registered array types.
