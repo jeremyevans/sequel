@@ -698,6 +698,13 @@ describe "class_table_inheritance plugin with :alias option" do
     @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('3')"]
   end
 
+  it "should not use a subquery for a class that doesn't join to a separate table" do
+    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo}, :alias=>:employees)
+    Object.send(:remove_const, :Ceo)
+    class ::Ceo < Employee; end 
+    Ceo.dataset.sql.must_equal 'SELECT * FROM employees WHERE (employees.kind IN (3))'
+  end
+
   it "should ignore existing cti_key value when creating new records" do
     Employee.create(:kind=>'Manager')
     @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]

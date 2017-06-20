@@ -359,7 +359,7 @@ module Sequel
         # when setting subclass dataset.
         def sti_subclass_dataset(key)
           ds = super
-          if @cti_alias # SEQUEL5: remove if
+          if @cti_alias && cti_models[0] != self # SEQUEL5: remove @cti_alias
             ds = ds.from_self(:alias=>@cti_alias)
           end
           ds

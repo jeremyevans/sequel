@@ -1,5 +1,7 @@
 === master
 
+* Make class_table_inheritance plugin with :alias option not use subquery for datasets that don't join (jeremyevans)
+
 * Deprecate hash_aliases extension (jeremyevans)
 
 * Deprecate filter_having extension (jeremyevans)
