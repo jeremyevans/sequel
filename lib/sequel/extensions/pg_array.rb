@@ -94,18 +94,31 @@ module Sequel
       include Sequel::SQL::AliasMethods
 
       ARRAY = "ARRAY".freeze
+      Sequel::Deprecation.deprecate_constant(self, :ARRAY)
       DOUBLE_COLON = '::'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_COLON)
       EMPTY_ARRAY = "'{}'".freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_ARRAY)
       EMPTY_BRACKET = '[]'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_BRACKET)
       OPEN_BRACKET = '['.freeze
+      Sequel::Deprecation.deprecate_constant(self, :OPEN_BRACKET)
       CLOSE_BRACKET = ']'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_BRACKET)
       COMMA = ','.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
       BACKSLASH = '\\'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
       EMPTY_STRING = ''.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
       OPEN_BRACE = '{'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :OPEN_BRACE)
       CLOSE_BRACE = '}'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_BRACE)
       NULL = 'NULL'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :NULL)
       QUOTE = '"'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :QUOTE)
 
       # Global hash of database array type name strings to symbols (e.g. 'double precision' => :float),
       # used by the schema parsing for array types registered globally.
@@ -189,9 +202,14 @@ module Sequel
 
       module DatabaseMethods
         APOS = "'".freeze
+        Sequel::Deprecation.deprecate_constant(self, :APOS)
         DOUBLE_APOS = "''".freeze
+        Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
         ESCAPE_RE = /("|\\)/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACEMENT)
+
         BLOB_RANGE = 1...-1
 
         # Create the local hash of database type strings to schema type symbols,
@@ -254,13 +272,13 @@ module Sequel
         def bound_variable_array(a)
           case a
           when Array
-            "{#{a.map{|i| bound_variable_array(i)}.join(COMMA)}}"
+            "{#{a.map{|i| bound_variable_array(i)}.join(',')}}"
           when Sequel::SQL::Blob
-            "\"#{literal(a)[BLOB_RANGE].gsub(DOUBLE_APOS, APOS).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)}\""
+            "\"#{literal(a)[BLOB_RANGE].gsub("''", "'").gsub(/("|\\)/, '\\\\\1')}\""
           when Sequel::LiteralString
             a
           when String
-            "\"#{a.gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)}\""
+            "\"#{a.gsub(/("|\\)/, '\\\\\1')}\""
           else
             literal(a)
           end
@@ -346,9 +364,13 @@ module Sequel
       # accept, and it will not raise an error for all forms of invalid input.
       class Parser < StringScanner
         UNQUOTED_RE = /[{}",]|[^{}",]+/
+        Sequel::Deprecation.deprecate_constant(self, :UNQUOTED_RE)
         QUOTED_RE = /["\\]|[^"\\]+/
+        Sequel::Deprecation.deprecate_constant(self, :QUOTED_RE)
         NULL_RE = /NULL",/
+        Sequel::Deprecation.deprecate_constant(self, :NULL_RE)
         OPEN_RE = /((\[\d+:\d+\])+=)?\{/
+        Sequel::Deprecation.deprecate_constant(self, :OPEN_RE)
 
         # Set the source for the input, and any converter callable
         # to call with objects to be created.  For nested parsers
@@ -366,7 +388,7 @@ module Sequel
         def new_entry(include_empty=false)
           if !@recorded.empty? || include_empty
             entry = @recorded
-            if entry == NULL && !include_empty
+            if entry == 'NULL' && !include_empty
               entry = nil
             elsif @converter
               entry = @converter.call(entry)
@@ -380,36 +402,36 @@ module Sequel
         # of parsed (and potentially converted) objects.
         def parse
           raise Sequel::Error, "invalid array, empty string" if eos?
-          raise Sequel::Error, "invalid array, doesn't start with {" unless scan(OPEN_RE)
+          raise Sequel::Error, "invalid array, doesn't start with {" unless scan(/((\[\d+:\d+\])+=)?\{/)
 
           while !eos?
-            char = scan(UNQUOTED_RE)
-            if char == COMMA
+            char = scan(/[{}",]|[^{}",]+/)
+            if char == ','
               # Comma outside quoted string indicates end of current entry
               new_entry
-            elsif char == QUOTE
+            elsif char == '"'
               raise Sequel::Error, "invalid array, opening quote with existing recorded data" unless @recorded.empty?
               while true
-                char = scan(QUOTED_RE)
-                if char == BACKSLASH
+                char = scan(/["\\]|[^"\\]+/)
+                if char == '\\'
                   @recorded << getch
-                elsif char == QUOTE
+                elsif char == '"'
                   n = peek(1)
-                  raise Sequel::Error, "invalid array, closing quote not followed by comma or closing brace" unless n == COMMA || n == CLOSE_BRACE
+                  raise Sequel::Error, "invalid array, closing quote not followed by comma or closing brace" unless n == ',' || n == '}'
                   break
                 else
                   @recorded << char
                 end
               end
               new_entry(true)
-            elsif char == OPEN_BRACE
+            elsif char == '{'
               raise Sequel::Error, "invalid array, opening brace with existing recorded data" unless @recorded.empty?
 
               # Start of new array, add it to the stack
               new = []
               @stack.last << new
               @stack << new
-            elsif char == CLOSE_BRACE
+            elsif char == '}'
               # End of current array, add current entry to the current array
               new_entry
 
@@ -483,13 +505,13 @@ module Sequel
       def sql_literal_append(ds, sql)
         at = array_type
         if empty? && at
-          sql << EMPTY_ARRAY
+          sql << "'{}'"
         else
-          sql << ARRAY
+          sql << "ARRAY"
           _literal_append(sql, ds, to_a)
         end
         if at
-          sql << DOUBLE_COLON << at.to_s << EMPTY_BRACKET
+          sql << '::' << at.to_s << '[]'
         end
       end
 
@@ -499,9 +521,9 @@ module Sequel
       # arrays, surrounding each with [] and interspersing
       # entries with ,.
       def _literal_append(sql, ds, array)
-        sql << OPEN_BRACKET
+        sql << '['
         comma = false
-        commas = COMMA
+        commas = ','
         array.each do |i|
           sql << commas if comma
           if i.is_a?(Array)
@@ -511,7 +533,7 @@ module Sequel
           end
           comma = true
         end
-        sql << CLOSE_BRACKET
+        sql << ']'
       end
 
       # Register all array types that this extension handles by default.
