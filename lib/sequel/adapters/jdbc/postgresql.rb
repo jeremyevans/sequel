@@ -73,7 +73,7 @@ module Sequel
                 data.each { |d| copier.writeToCopy(d.to_java_bytes, 0, d.length) }
               end
             rescue Exception => e
-              copier.cancelCopy
+              copier.cancelCopy if copier
               raise
             ensure
               unless e
