@@ -458,11 +458,11 @@ END_MIG
 
       # Dump this generator's indexes to a string that could be evaled inside
       # another instance to represent the same indexes. Options:
-      # * :add_index - Use add_index instead of index, so the methods
-      #   can be called outside of a generator but inside a migration.
-      #   The value of this option should be the table name to use.
-      # * :drop_index - Same as add_index, but create drop_index statements.
-      # * :ignore_errors - Add the ignore_errors option to the outputted indexes
+      # :add_index :: Use add_index instead of index, so the methods
+      #               can be called outside of a generator but inside a migration.
+      #               The value of this option should be the table name to use.
+      # :drop_index :: Same as add_index, but create drop_index statements.
+      # :ignore_errors :: Add the ignore_errors option to the outputted indexes
       def dump_indexes(options=OPTS)
         is = indexes.map do |c|
           c = c.dup
