@@ -52,7 +52,7 @@ module Sequel
         @autoid = case v
         when Integer
           i = v - 1
-          proc{Sequel.synchronize{i+=1}}
+          proc{@mutex.synchronize{i+=1}}
         else
           v
         end
@@ -128,9 +128,11 @@ module Sequel
       # Return all stored SQL queries, and clear the cache
       # of SQL queries.
       def sqls
-        s = @sqls.dup
-        @sqls.clear
-        s
+        @mutex.synchronize do
+          s = @sqls.dup
+          @sqls.clear
+          s
+        end
       end
 
       # Enable use of savepoints.
@@ -140,21 +142,12 @@ module Sequel
 
       private
 
-      def _autoid(sql, v, ds=nil)
-        if ds
-          ds.send(:cache_set, :_autoid, ds.autoid + 1) if ds.autoid.is_a?(Integer)
-          v
-        else
-          _nextres(v, sql, nil)
-        end
-      end
-
       def _execute(c, sql, opts=OPTS, &block)
         sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server.is_a?(Symbol) ? c.server : c.server.inspect}" if c.server != :default
         log_connection_yield(sql, c){} unless opts[:log] == false
-        @sqls << sql 
+        @mutex.synchronize{@sqls << sql}
 
         ds = opts[:dataset]
         begin
@@ -165,8 +158,15 @@ module Sequel
             if meth == :numrows
               _numrows(sql, (ds.numrows if ds) || @numrows)
             else
-              v = ds.autoid if ds
-              _autoid(sql, v || @autoid, (ds if v))
+              if ds
+                @mutex.synchronize do
+                  v = ds.autoid
+                  if v.is_a?(Integer)
+                    ds.send(:cache_set, :_autoid, v + 1)
+                  end
+                  v
+                end
+              end || _nextres(@autoid, sql, nil)
             end
           end
         rescue => e
@@ -182,7 +182,7 @@ module Sequel
           if f.all?{|h| h.is_a?(Hash)}
             f.each{|h| yield h.dup}
           else
-            _fetch(sql, f.shift, &block)
+            _fetch(sql, @mutex.synchronize{f.shift}, &block)
           end
         when Proc
           h = f.call(sql)
@@ -209,7 +209,7 @@ module Sequel
         when Integer
           v
         when Array
-          v.empty? ? default : _nextres(v.shift, sql, default)
+          v.empty? ? default : _nextres(@mutex.synchronize{v.shift}, sql, default)
         when Proc
           v.call(sql)
         when Class
@@ -239,6 +239,7 @@ module Sequel
       # :sqls :: The array to store the SQL queries in.
       def adapter_initialize
         opts = @opts
+        @mutex = Mutex.new
         @sqls = opts[:sqls] || []
         @shared_adapter = false
 
@@ -284,7 +285,7 @@ module Sequel
             if cs.all?{|c| c.is_a?(Symbol)}
               ds.columns(*cs)
             else
-              columns(ds, sql, cs.shift)
+              columns(ds, sql, @mutex.synchronize{cs.shift})
             end
           end
         when Proc

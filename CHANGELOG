@@ -1,5 +1,7 @@
 === master
 
+* Make mock adapter thread safe (jeremyevans)
+
 * Deprecate Sequel::JDBC::Dataset#convert_types accessor (jeremyevans)
 
 * Add Sequel::JDBC::Dataset#with_convert_types (jeremyevans)
