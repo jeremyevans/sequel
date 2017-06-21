@@ -40,10 +40,7 @@
 # If you specify the range database type, Sequel will automatically cast
 # the value to that type when literalizing.
 #
-# If you would like to use range columns in your model objects, you
-# probably want to modify the schema parsing/typecasting so that it
-# recognizes and correctly handles the range type columns, which you can
-# do by:
+# To use this extension, load it into the Database instance:
 #
 #   DB.extension :pg_range
 #
@@ -80,21 +77,31 @@ module Sequel
     class PGRange
       include Sequel::SQL::AliasMethods
 
-      # Map of string database type names to type symbols (e.g. 'int4range' => :int4range),
-      # used in the schema parsing.
+      # SEQUEL5: Remove
       RANGE_TYPES = {}
 
       EMPTY = 'empty'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY)
       EMPTY_STRING = ''.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
       COMMA = ','.freeze
+      Sequel::Deprecation.deprecate_constant(self, :COMMA)
       QUOTED_EMPTY_STRING = '""'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :QUOTED_EMPTY_STRING)
       OPEN_PAREN = "(".freeze
+      Sequel::Deprecation.deprecate_constant(self, :OPEN_PAREN)
       CLOSE_PAREN = ")".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_PAREN)
       OPEN_BRACKET = "[".freeze
+      Sequel::Deprecation.deprecate_constant(self, :OPEN_BRACKET)
       CLOSE_BRACKET = "]".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_BRACKET)
       ESCAPE_RE = /("|,|\\|\[|\]|\(|\))/.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
       ESCAPE_REPLACE = '\\\\\1'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACE)
       CAST = '::'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST)
 
       # SEQUEL5: Remove
       def self.register(db_type, opts=OPTS, &block)
@@ -147,12 +154,12 @@ module Sequel
 
       # Creates callable objects that convert strings into PGRange instances.
       class Parser
-        # Regexp that parses the full range of PostgreSQL range type output,
-        # except for empty ranges.
         PARSER = /\A(\[|\()("((?:\\"|[^"])*)"|[^"]*),("((?:\\"|[^"])*)"|[^"]*)(\]|\))\z/o
-
+        Sequel::Deprecation.deprecate_constant(self, :PARSER)
         REPLACE_RE = /\\(.)/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)
         REPLACE_WITH = '\1'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :REPLACE_WITH)
 
         # The database range type for this parser (e.g. 'int4range'),
         # automatically setting the db_type for the returned PGRange instances.
@@ -170,11 +177,11 @@ module Sequel
 
         # Parse the range type input string into a PGRange value.
         def call(string)
-          if string == EMPTY
+          if string == 'empty'
             return PGRange.empty(db_type)
           end
 
-          raise(InvalidValue, "invalid or unhandled range format: #{string.inspect}") unless matches = PARSER.match(string)
+          raise(InvalidValue, "invalid or unhandled range format: #{string.inspect}") unless matches = /\A(\[|\()("((?:\\"|[^"])*)"|[^"]*),("((?:\\"|[^"])*)"|[^"]*)(\]|\))\z/.match(string)
 
           exclude_begin = matches[1] == '('
           exclude_end = matches[6] == ')'
@@ -188,12 +195,12 @@ module Sequel
           # to always use the quoted output form when characters need to be escaped, so
           # there isn't a need to unescape unquoted output.
           if beg = matches[3]
-            beg.gsub!(REPLACE_RE, REPLACE_WITH)
+            beg.gsub!(/\\(.)/, '\1')
           else
             beg = matches[2] unless matches[2].empty?
           end
           if en = matches[5]
-            en.gsub!(REPLACE_RE, REPLACE_WITH)
+            en.gsub!(/\\(.)/, '\1')
           else
             en = matches[4] unless matches[4].empty?
           end
@@ -348,7 +355,7 @@ module Sequel
 
         # Recognize the registered database range types.
         def schema_column_type(db_type)
-          if type = @pg_range_schema_types[db_type] || RANGE_TYPES[db_type]
+          if type = @pg_range_schema_types[db_type] || RANGE_TYPES[db_type] # SEQUEL5: Remove || RANGE_TYPES[db_type]
             type
           else
             super
@@ -516,17 +523,17 @@ module Sequel
       # Append a literalize version of the receiver to the sql.
       def sql_literal_append(ds, sql)
         if (s = @db_type) && !empty?
-          sql << s.to_s << OPEN_PAREN
+          sql << s.to_s << "("
           ds.literal_append(sql, self.begin)
-          sql << COMMA
+          sql << ','
           ds.literal_append(sql, self.end)
-          sql << COMMA
-          ds.literal_append(sql, "#{exclude_begin? ? OPEN_PAREN : OPEN_BRACKET}#{exclude_end? ? CLOSE_PAREN : CLOSE_BRACKET}")
-          sql << CLOSE_PAREN
+          sql << ','
+          ds.literal_append(sql, "#{exclude_begin? ? "(" : "["}#{exclude_end? ? ")" : "]"}")
+          sql << ")"
         else
           ds.literal_append(sql, unquoted_literal(ds))
           if s
-            sql << CAST << s.to_s
+            sql << '::' << s.to_s
           end
         end
       end
@@ -562,9 +569,9 @@ module Sequel
       # Separated out for use by the bound argument code.
       def unquoted_literal(ds)
         if empty?
-          EMPTY
+          'empty'
         else
-          "#{exclude_begin? ? OPEN_PAREN : OPEN_BRACKET}#{escape_value(self.begin, ds)},#{escape_value(self.end, ds)}#{exclude_end? ? CLOSE_PAREN : CLOSE_BRACKET}"
+          "#{exclude_begin? ? "(" : "["}#{escape_value(self.begin, ds)},#{escape_value(self.end, ds)}#{exclude_end? ? ")" : "]"}"
         end
       end
 
@@ -575,7 +582,7 @@ module Sequel
       def escape_value(k, ds)
         case k
         when nil
-          EMPTY_STRING
+          ''
         when Date, Time
           ds.literal(k)[1...-1]
         when Integer, Float
@@ -586,12 +593,12 @@ module Sequel
           k
         when String
           if k.empty?
-            QUOTED_EMPTY_STRING
+            '""'
           else
-            k.gsub(ESCAPE_RE, ESCAPE_REPLACE)
+            k.gsub(/("|,|\\|\[|\]|\(|\))/, '\\\\\1')
           end
         else
-          ds.literal(k).gsub(ESCAPE_RE, ESCAPE_REPLACE)
+          ds.literal(k).gsub(/("|,|\\|\[|\]|\(|\))/, '\\\\\1')
         end
       end
     end
