@@ -22,3 +22,5 @@ class Symbol
     Sequel::SQL::Function.new(self, *args)
   end
 end
+
+# SEQUEL5: Remove extension
