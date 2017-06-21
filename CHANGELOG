@@ -1,5 +1,7 @@
 === master
 
+* Deprecate using subtype conversion procs added after registering composite type in the pg_row extension (jeremyevans)
+
 * Don't try canceling copy in Database#copy_into if copier is not created yet (aakashAu) (#1384)
 
 * Deprecate global conversion procs added by pg_* extensions, when extension isn't loaded into Database instance (jeremyevans)

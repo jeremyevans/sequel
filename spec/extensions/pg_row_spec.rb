@@ -302,7 +302,7 @@ describe "pg_row extension" do
     @db.typecast_value(:pg_row_foo, 'bar'=>'1', 'baz'=>'b').must_equal(:bar=>1, :baz=>'bb')
   end
 
-  it "should handle conversion procs that aren't added until later" do
+  deprecated "should handle conversion procs that aren't added until later" do
     @db.conversion_procs[5] = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     c = proc{|h| [h]}

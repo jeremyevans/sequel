@@ -18,11 +18,14 @@
 # for HashRow and ArrayRow using the standard Sequel literalization callbacks, so
 # they work with on all adapters.
 #
-# The first thing you are going to want to do is to load the extension into
-# your Database object.  Make sure you load the :pg_array extension first
-# if you plan to use composite types in bound variables:
+# To use this extension, first load it into the Database instance:
+#
+#   DB.extension :pg_row
+#
+# If you plan to use arrays of composite types, make sure you load the
+# pg_array extension first:
 # 
-#   DB.extension(:pg_array, :pg_row)
+#   DB.extension :pg_array, :pg_row
 #
 # You can create an anonymous row type by calling the Sequel.pg_row with
 # an array:
@@ -91,7 +94,9 @@ module Sequel
   module Postgres
     module PGRow
       ROW = 'ROW'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROW)
       CAST = '::'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST)
 
       # Class for row-valued/composite types that are treated as arrays. By default,
       # this is only used for generic PostgreSQL record types, as registered
@@ -130,10 +135,10 @@ module Sequel
 
         # Append SQL fragment related to this object to the sql.
         def sql_literal_append(ds, sql)
-          sql << ROW
+          sql << 'ROW'
           ds.literal_append(sql, to_a)
           if db_type
-            sql << CAST
+            sql << '::'
             ds.quote_schema_table_append(sql, db_type)
           end
         end
@@ -202,16 +207,16 @@ module Sequel
         # Append SQL fragment related to this object to the sql.
         def sql_literal_append(ds, sql)
           check_columns!
-          sql << ROW
+          sql << 'ROW'
           ds.literal_append(sql, values_at(*columns))
           if db_type
-            sql << CAST
+            sql << '::'
             ds.quote_schema_table_append(sql, db_type)
           end
         end
       end
 
-      ROW_TYPE_CLASSES = [HashRow, ArrayRow]
+      ROW_TYPE_CLASSES = [HashRow, ArrayRow]#.freeze # SEQUEL5
 
       # This parser-like class splits the PostgreSQL
       # row-valued/composite type output string format
@@ -221,32 +226,41 @@ module Sequel
       # PostgreSQL uses.
       class Splitter < StringScanner
         OPEN_PAREN = /\(/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :OPEN_PAREN)
         CLOSE_PAREN = /\)/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :CLOSE_PAREN)
         UNQUOTED_RE = /[^,)]*/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :UNQUOTED_RE)
         SEP_RE = /[,)]/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :SEP_RE)
         QUOTE_RE = /"/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :QUOTE_RE)
         QUOTE_SEP_RE = /"[,)]/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :QUOTE_SEP_RE)
         QUOTED_RE = /(\\.|""|[^"])*/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :QUOTED_RE)
         REPLACE_RE = /\\(.)|"(")/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)
         REPLACE_WITH = '\1\2'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :REPLACE_WITH)
 
         # Split the stored string into an array of strings, handling
         # the different types of quoting.
         def parse
           return @result if @result
           values = []
-          skip(OPEN_PAREN)
-          if skip(CLOSE_PAREN)
+          skip(/\(/)
+          if skip(/\)/)
             values << nil
           else
             until eos?
-              if skip(QUOTE_RE)
-                values << scan(QUOTED_RE).gsub(REPLACE_RE, REPLACE_WITH)
-                skip(QUOTE_SEP_RE)
+              if skip(/"/)
+                values << scan(/(\\.|""|[^"])*/).gsub(/\\(.)|"(")/, '\1\2')
+                skip(/"[,)]/)
               else
-                v = scan(UNQUOTED_RE)
+                v = scan(/[^,)]*/)
                 values << (v unless v.empty?)
-                skip(SEP_RE)
+                skip(/[,)]/)
               end
             end
           end
@@ -374,8 +388,11 @@ module Sequel
 
       module DatabaseMethods
         ESCAPE_RE = /("|\\)/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACEMENT)
         COMMA = ','.freeze
+        Sequel::Deprecation.deprecate_constant(self, :COMMA)
 
         # A hash mapping row type keys (usually symbols), to option
         # hashes.  At the least, the values will contain the :parser
@@ -399,10 +416,10 @@ module Sequel
         def bound_variable_arg(arg, conn)
           case arg
           when ArrayRow
-            "(#{arg.map{|v| bound_variable_array(v) if v}.join(COMMA)})"
+            "(#{arg.map{|v| bound_variable_array(v) if v}.join(',')})"
           when HashRow
             arg.check_columns!
-            "(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(COMMA)})"
+            "(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(',')})"
           else
             super
           end
@@ -415,6 +432,8 @@ module Sequel
           @row_type_method_module.freeze
           super
         end
+
+        STRING_TYPES = [18, 19, 25, 1042, 1043].freeze
 
         # Register a new row type for the Database instance. db_type should be the type
         # symbol.  This parses the PostgreSQL system tables to get information the
@@ -468,12 +487,22 @@ module Sequel
 
           # Using the conversion_procs, lookup converters for each member of the composite type
           parser_opts[:column_converters] = parser_opts[:column_oids].map do |oid|
+            # procs[oid] # SEQUEL5
+
+            # SEQUEL5: Remove
             if pr = procs[oid]
               pr
-            elsif !Sequel::Postgres::STRING_TYPES.include?(oid)
+            elsif !STRING_TYPES.include?(oid)
               # It's not a string type, and it's possible a conversion proc for this
               # oid will be added later, so do a runtime check for it.
-              lambda{|s| (pr = procs[oid]) ? pr.call(s) : s}
+              lambda do |s|
+                if (pr = procs[oid])
+                  Sequel::Deprecation.deprecate("Calling conversion proc for subtype (oid: #{oid}) of composite type (oid: #{parser_opts[:oid]}) not added until after composite type registration", "Register subtype conversion procs before registering composite type")
+                  pr.call(s)
+                else
+                  s
+                end
+              end
             end
           end
 
@@ -554,10 +583,10 @@ module Sequel
         def bound_variable_array(arg)
           case arg
           when ArrayRow
-            "\"(#{arg.map{|v| bound_variable_array(v) if v}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
+            "\"(#{arg.map{|v| bound_variable_array(v) if v}.join(',').gsub(/("|\\)/, '\\\\\1')})\""
           when HashRow
             arg.check_columns!
-            "\"(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
+            "\"(#{arg.values_at(*arg.columns).map{|v| bound_variable_array(v) if v}.join(',').gsub(/("|\\)/, '\\\\\1')})\""
           else
             super
           end
