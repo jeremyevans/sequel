@@ -18,7 +18,7 @@ module Sequel
         closed MySQL connection
         END
         # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
-        MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/o
+        MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/
        
         # Support stored procedures on MySQL
         def call_sproc(name, opts=OPTS, &block)

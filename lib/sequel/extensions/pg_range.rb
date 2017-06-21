@@ -154,7 +154,7 @@ module Sequel
 
       # Creates callable objects that convert strings into PGRange instances.
       class Parser
-        PARSER = /\A(\[|\()("((?:\\"|[^"])*)"|[^"]*),("((?:\\"|[^"])*)"|[^"]*)(\]|\))\z/o
+        PARSER = /\A(\[|\()("((?:\\"|[^"])*)"|[^"]*),("((?:\\"|[^"])*)"|[^"]*)(\]|\))\z/
         Sequel::Deprecation.deprecate_constant(self, :PARSER)
         REPLACE_RE = /\\(.)/.freeze
         Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)

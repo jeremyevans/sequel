@@ -25,7 +25,7 @@ module Sequel
         type = type.sub(/ not null\z/, '')
       end
       case type
-      when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/o
+      when /\A(medium|small)?int(?:eger)?(?:\((\d+)\))?( unsigned)?\z/
         if !$1 && $2 && $2.to_i >= 10 && $3
           # Unsigned integer type with 10 digits can potentially contain values which
           # don't fit signed integer type, so use bigint type in target database.
@@ -33,36 +33,36 @@ module Sequel
         else
           {:type=>Integer}
         end
-      when /\Atinyint(?:\((\d+)\))?(?: unsigned)?\z/o
+      when /\Atinyint(?:\((\d+)\))?(?: unsigned)?\z/
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
-      when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
+      when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/
         {:type=>:Bignum}
-      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/o
+      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/
         {:type=>Float}
       when 'boolean', 'bit', 'bool'
         {:type=>TrueClass}
-      when /\A(?:(?:tiny|medium|long|n)?text|clob)\z/o
+      when /\A(?:(?:tiny|medium|long|n)?text|clob)\z/
         {:type=>String, :text=>true}
       when 'date'
         {:type=>Date}
-      when /\A(?:small)?datetime\z/o
+      when /\A(?:small)?datetime\z/
         {:type=>DateTime}
-      when /\Atimestamp(?:\((\d+)\))?(?: with(?:out)? time zone)?\z/o
+      when /\Atimestamp(?:\((\d+)\))?(?: with(?:out)? time zone)?\z/
         {:type=>DateTime, :size=>($1.to_i if $1)}
-      when /\Atime(?: with(?:out)? time zone)?\z/o
+      when /\Atime(?: with(?:out)? time zone)?\z/
         {:type=>Time, :only_time=>true}
-      when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
+      when /\An?char(?:acter)?(?:\((\d+)\))?\z/
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:n?varchar2?|character varying|bpchar|string)(?:\((\d+)\))?\z/o
+      when /\A(?:n?varchar2?|character varying|bpchar|string)(?:\((\d+)\))?\z/
         {:type=>String, :size=>($1.to_i if $1)}
-      when /\A(?:small)?money\z/o
+      when /\A(?:small)?money\z/
         {:type=>BigDecimal, :size=>[19,2]}
-      when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?\z/o
+      when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?\z/
         s = [($1.to_i if $1), ($2.to_i if $2)].compact
         {:type=>BigDecimal, :size=>(s.empty? ? nil : s)}
-      when /\A(?:bytea|(?:tiny|medium|long)?blob|(?:var)?binary)(?:\((\d+)\))?\z/o
+      when /\A(?:bytea|(?:tiny|medium|long)?blob|(?:var)?binary)(?:\((\d+)\))?\z/
         {:type=>File, :size=>($1.to_i if $1)}
-      when /\A(?:year|(?:int )?identity)\z/o
+      when /\A(?:year|(?:int )?identity)\z/
         {:type=>Integer}
       else
         {:type=>String}
@@ -81,7 +81,7 @@ module Sequel
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.sort_by(&:to_s).map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by(&:to_s).map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/, '    ')}
   end
 end
 END_MIG
@@ -99,7 +99,7 @@ END_MIG
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.sort_by(&:to_s).map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by(&:to_s).map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/, '    ')}
   end
 end
 END_MIG
@@ -133,13 +133,13 @@ END_MIG
         # alter_table/add_foreign_key.  Note that skipped foreign keys
         # probably result in a broken down migration.
         sfka = sfk.sort_by{|table, fks| table.to_s}.map{|table, fks| dump_add_fk_constraints(table, fks.values)}
-        sfka.join("\n\n").gsub(/^/o, '    ') unless sfka.empty?
+        sfka.join("\n\n").gsub(/^/, '    ') unless sfka.empty?
       end
 
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.map{|t| dump_table_schema(t, options)}.join("\n\n").gsub(/^/o, '    ')}#{"\n    \n" if skipped_fks}#{skipped_fks}
+#{ts.map{|t| dump_table_schema(t, options)}.join("\n\n").gsub(/^/, '    ')}#{"\n    \n" if skipped_fks}#{skipped_fks}
   end
 end
 END_MIG
@@ -150,7 +150,7 @@ END_MIG
     def dump_table_schema(table, options=OPTS)
       gen = dump_table_generator(table, options)
       commands = [gen.dump_columns, gen.dump_constraints, gen.dump_indexes].reject{|x| x == ''}.join("\n\n")
-      "create_table(#{table.inspect}#{', :ignore_index_errors=>true' if !options[:same_db] && options[:indexes] != false && !gen.indexes.empty?}) do\n#{commands.gsub(/^/o, '  ')}\nend"
+      "create_table(#{table.inspect}#{', :ignore_index_errors=>true' if !options[:same_db] && options[:indexes] != false && !gen.indexes.empty?}) do\n#{commands.gsub(/^/, '  ')}\nend"
     end
 
     private

@@ -49,7 +49,7 @@ module Sequel
       case conn_string
       when String
         # SEQUEL5: Remove do
-        if match = /\A(jdbc|do):/o.match(conn_string)
+        if match = /\A(jdbc|do):/.match(conn_string)
           c = adapter_class(match[1].to_sym)
           opts = opts.merge(:orig_opts=>opts.dup)
           opts = {:uri=>conn_string}.merge!(opts)
