@@ -10,10 +10,7 @@
 # ActiveSupport::Duration that use the standard Sequel literalization
 # callbacks, so they work on all adapters.
 #
-# If you would like to use interval columns in your model objects, you
-# probably want to modify the typecasting so that it
-# recognizes and correctly handles the interval columns, which you can
-# do by:
+# To use this extension, load it into the Database instance:
 #
 #   DB.extension :pg_interval
 #
@@ -42,6 +39,7 @@ module Sequel
   module Postgres
     module IntervalDatabaseMethods
       EMPTY_INTERVAL = '0'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_INTERVAL)
       DURATION_UNITS = [:years, :months, :weeks, :days, :hours, :minutes, :seconds].freeze
 
       # Return an unquoted string version of the duration object suitable for
@@ -58,7 +56,7 @@ module Sequel
         end
 
         if s.empty?
-          EMPTY_INTERVAL
+          '0'
         else
           s
         end
@@ -67,11 +65,12 @@ module Sequel
       # Creates callable objects that convert strings into ActiveSupport::Duration instances.
       class Parser
         # Regexp that parses the full range of PostgreSQL interval type output.
-        PARSER = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/o
+        PARSER = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/
+        Sequel::Deprecation.deprecate_constant(self, :PARSER)
 
         # Parse the interval input string into an ActiveSupport::Duration instance.
         def call(string)
-          raise(InvalidValue, "invalid or unhandled interval format: #{string.inspect}") unless matches = PARSER.match(string)
+          raise(InvalidValue, "invalid or unhandled interval format: #{string.inspect}") unless matches = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/.match(string)
 
           value = 0
           parts = []
@@ -177,6 +176,7 @@ module Sequel
 
     module IntervalDatasetMethods
       CAST_INTERVAL = '::interval'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST_INTERVAL)
 
       # Handle literalization of ActiveSupport::Duration objects, treating them as
       # PostgreSQL intervals.
@@ -184,7 +184,7 @@ module Sequel
         case v
         when ActiveSupport::Duration
           literal_append(sql, IntervalDatabaseMethods.literal_duration(v))
-          sql << CAST_INTERVAL
+          sql << '::interval'
         else
           super
         end
