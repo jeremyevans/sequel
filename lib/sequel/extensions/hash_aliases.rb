@@ -18,7 +18,7 @@
 #
 # Related module: Sequel::HashAliases
 
-Sequel::Deprecation.deprecate("The hash_aliases extension", "It only existed for backwards compatibility with Sequel 3")
+Sequel::Deprecation.deprecate("The hash_aliases extension", "Please consider maintaining it yourself as an external gem if you want to continue using it")
 
 #
 module Sequel

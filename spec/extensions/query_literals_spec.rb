@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "query_literals extension" do
   before do
-    @ds = Sequel.mock.dataset.from(:t).extension(:query_literals)
+    deprecated do
+      @ds = Sequel.mock.dataset.from(:t).extension(:query_literals)
+    end
   end
 
   it "should not use special support if given a block" do

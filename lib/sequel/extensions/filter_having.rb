@@ -18,7 +18,7 @@
 #
 # Related module: Sequel::FilterHaving
 
-Sequel::Deprecation.deprecate("The filter_having extension", "It only existed for backwards compatibility with Sequel 3")
+Sequel::Deprecation.deprecate("The filter_having extension", "Please consider maintaining it yourself as an external gem if you want to continue using it")
 
 #
 module Sequel

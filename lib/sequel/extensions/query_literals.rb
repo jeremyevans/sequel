@@ -35,6 +35,8 @@
 #
 # Related module: Sequel::QueryLiterals
 
+Sequel::Deprecation.deprecate("The query_literals extension", "Please consider maintaining it yourself as an external gem if you want to continue using it")
+
 #
 module Sequel
   # The QueryLiterals module can be used to make select, group, and
