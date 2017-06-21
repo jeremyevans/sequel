@@ -674,7 +674,7 @@ module Sequel
       # Called before loading subadapter-specific code, necessary so that subadapter initialization code
       # that runs queries works correctly.  This cannot be overriding in subadapters,
       def setup_type_convertor_map_early
-        @type_convertor_map = TypeConvertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>timestamp_convertor)
+        @type_convertor_map = TypeConvertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>method(:timestamp_convert))
         @basic_type_convertor_map = TypeConvertor::BASIC_MAP.dup
       end
 
@@ -688,14 +688,18 @@ module Sequel
         stmt.close if stmt
       end
 
-      # A conversion proc for timestamp columns.  This is used to make sure timestamps are converted using the
+      # A conversion method for timestamp columns.  This is used to make sure timestamps are converted using the
       # correct timezone.
-      def timestamp_convertor
-        lambda do |r, i|
-          if v = r.getTimestamp(i)
-            to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
-          end
+      def timestamp_convert(r, i)
+        if v = r.getTimestamp(i)
+          to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
         end
+      end
+
+      # SEQUEL5: Remove
+      def timestamp_convertor
+        Sequel::Deprecation.deprecate("Sequel::JDBC::Database#timestamp_convertor", "Use method(:timestamp_convert) instead")
+        method(:timestamp_convert)
       end
     end
     
