@@ -743,9 +743,14 @@ module Sequel
       end
       
       # Whether to convert some Java types to ruby types when retrieving rows.
-      # Uses the database's setting by default, can be set to false to roughly
-      # double performance when fetching rows.
-      attr_accessor :convert_types
+      def convert_types
+        Sequel::Deprecation.deprecate("Sequel::JDBC::Dataset#convert_types", "The private #convert_types? method returns whether to convert types for this dataset")
+        @opts[:convert_types]
+      end
+      def convert_types=(v)
+        Sequel::Deprecation.deprecate("Sequel::JDBC::Dataset#convert_types=", "Switch to using #with_convert_types, which returns a modified copy")
+        @opts[:convert_types] = v
+      end
 
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
@@ -753,16 +758,21 @@ module Sequel
         self
       end
       
-      # Set the fetch size on JDBC ResultSets created from this dataset.
+      # Set the fetch size on JDBC ResultSets created from the returned dataset.
       def with_fetch_size(size)
         clone(:fetch_size=>size)
+      end
+
+      # Set whether to convert Java types to ruby types in the returned dataset.
+      def with_convert_types(v)
+        clone(:convert_types=>v)
       end
       
       private
 
       # Whether we should convert Java types to ruby types for this dataset.
       def convert_types?
-        ct = @convert_types
+        ct = @opts[:convert_types]
         ct.nil? ? db.convert_types : ct
       end
 

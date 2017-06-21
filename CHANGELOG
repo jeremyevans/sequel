@@ -1,5 +1,9 @@
 === master
 
+* Deprecate Sequel::JDBC::Dataset#convert_types accessor (jeremyevans)
+
+* Add Sequel::JDBC::Dataset#with_convert_types (jeremyevans)
+
 * Deprecate Sequel::IBMDB::Dataset#convert_smallint_to_bool= method (jeremyevans)
 
 * Deprecate Sequel::IBMDB.convert_smallint_to_bool accessor (jeremyevans)
