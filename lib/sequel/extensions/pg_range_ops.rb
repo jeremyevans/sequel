@@ -75,13 +75,14 @@ module Sequel
         :starts_after => ["(".freeze, " &> ".freeze, ")".freeze].freeze,
         :adjacent_to => ["(".freeze, " -|- ".freeze, ")".freeze].freeze,
         :overlaps => ["(".freeze, " && ".freeze, ")".freeze].freeze,
-      }
+      }#.freeze # SEQUEL5
       FUNCTIONS = %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'
+      Sequel::Deprecation.deprecate_constant(self, :FUNCTIONS)
 
-      FUNCTIONS.each do |f|
+      %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'.each do |f|
         class_eval("def #{f}; function(:#{f}) end", __FILE__, __LINE__)
       end
-      OPERATORS.keys.each do |f|
+      OPERATORS.each_key do |f|
         class_eval("def #{f}(v); operator(:#{f}, v) end", __FILE__, __LINE__)
       end
 
