@@ -182,12 +182,9 @@ module Sequel
             if block_given?
               yield log_connection_yield(sql, conn){cps.executeQuery}
             else
-              case opts[:type]
-              when :insert
-                log_connection_yield(sql, conn){cps.executeUpdate}
+              log_connection_yield(sql, conn){cps.executeUpdate}
+              if opts[:type] == :insert
                 last_insert_id(conn, opts)
-              else
-                log_connection_yield(sql, conn){cps.executeUpdate}
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
