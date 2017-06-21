@@ -16,7 +16,7 @@ module Sequel
       def boolean(s) s.to_i != 0 end
       def integer(s) s.to_i end
       def float(s) s.to_f end
-    end.new
+    end.new#.freeze # SEQUEL5
 
     # Hash with integer keys and callable values for converting MySQL types.
     MYSQL_TYPES = {}
@@ -30,14 +30,18 @@ module Sequel
     end
     # MYSQL_TYPES.freeze # SEQUEL5
 
+    # SEQUEL5: Remove
+    @convert_invalid_date_time = false
     class << self
-      # Whether to convert invalid date time values by default.
-      #
-      # Only applies to Sequel::Database instances created after this
-      # has been set.
-      attr_accessor :convert_invalid_date_time
+      def convert_invalid_date_time
+        Sequel::Deprecation.deprecate("Sequel::MySQL.convert_invalid_date_time", "Call this method on the Database instance")
+        @convert_invalid_date_time
+      end
+      def convert_invalid_date_time=(v)
+        Sequel::Deprecation.deprecate("Sequel::MySQL.convert_invalid_date_time=", "Call this method on the Database instance")
+        @convert_invalid_date_time = v
+      end
     end
-    self.convert_invalid_date_time = false
 
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
@@ -54,7 +58,7 @@ module Sequel
 
       # Hash of conversion procs for the current database
       attr_reader :conversion_procs
-      #
+
       # Whether to convert tinyint columns to bool for the current database
       attr_reader :convert_tinyint_to_bool
 
@@ -227,8 +231,8 @@ module Sequel
       
       def adapter_initialize
         @conversion_procs = MYSQL_TYPES.dup
-        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
-        self.convert_invalid_date_time = Sequel::MySQL.convert_invalid_date_time
+        self.convert_tinyint_to_bool = Sequel::MySQL.instance_variable_get(:@convert_tinyint_to_bool) # true # SEQUEL5
+        self.convert_invalid_date_time = Sequel::MySQL.instance_variable_get(:@convert_invalid_date_time) # false # SEQUEL5
       end
 
       # Try to get an accurate number of rows matched using the query
@@ -316,8 +320,7 @@ module Sequel
           cps = db.conversion_procs
           cols = r.fetch_fields.map do |f| 
             # Pretend tinyint is another integer type if its length is not 1, to
-            # avoid casting to boolean if Sequel::MySQL.convert_tinyint_to_bool
-            # is set.
+            # avoid casting to boolean if convert_tinyint_to_bool is set.
             type_proc = f.type == 1 && cast_tinyint_integer?(f) ? cps[2] : cps[f.type]
             [output_identifier(f.name), type_proc, i+=1]
           end

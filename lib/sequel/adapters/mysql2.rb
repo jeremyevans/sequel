@@ -171,7 +171,7 @@ module Sequel
 
       # Set the convert_tinyint_to_bool setting based on the default value.
       def adapter_initialize
-        self.convert_tinyint_to_bool = Sequel::MySQL.convert_tinyint_to_bool
+        self.convert_tinyint_to_bool = Sequel::MySQL.instance_variable_get(:@convert_tinyint_to_bool) # true # SEQUEL5
       end
 
       if NativePreparedStatements

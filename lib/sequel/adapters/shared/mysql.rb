@@ -13,25 +13,45 @@ module Sequel
     end
 
     @convert_tinyint_to_bool = true
-
+    @default_charset = nil
+    @default_collate = nil
+    @default_engine = nil
     class << self
-      # Sequel converts the column type tinyint(1) to a boolean by default when
-      # using the native MySQL or Mysql2 adapter.  You can turn off the conversion by setting
-      # this to false. This setting is ignored when connecting to MySQL via the do or jdbc
-      # adapters, both of which automatically do the conversion.
-      attr_accessor :convert_tinyint_to_bool
+      def convert_tinyint_to_bool
+        Sequel::Deprecation.deprecate("Sequel::MySQL.convert_tinyint_to_bool", "Call this method on the Database instance")
+        @convert_tinyint_to_bool
+      end
+      def convert_tinyint_to_bool=(v)
+        Sequel::Deprecation.deprecate("Sequel::MySQL.convert_tinyint_to_bool=", "Call this method on the Database instance")
+        @convert_tinyint_to_bool = v
+      end
 
-      # Set the default charset used for CREATE TABLE.  You can pass the
-      # :charset option to create_table to override this setting.
-      attr_accessor :default_charset
+      def default_charset
+        Sequel::Deprecation.deprecate("Sequel::MySQL.default_charset", "Call this method on the Database instance")
+        @default_charset
+      end
+      def default_charset=(v)
+        Sequel::Deprecation.deprecate("Sequel::MySQL.default_charset=", "Call this method on the Database instance")
+        @default_charset = v
+      end
 
-      # Set the default collation used for CREATE TABLE.  You can pass the
-      # :collate option to create_table to override this setting.
-      attr_accessor :default_collate
+      def default_collate
+        Sequel::Deprecation.deprecate("Sequel::MySQL.default_collate", "Call this method on the Database instance")
+        @default_collate
+      end
+      def default_collate=(v)
+        Sequel::Deprecation.deprecate("Sequel::MySQL.default_collate=", "Call this method on the Database instance")
+        @default_collate = v
+      end
 
-      # Set the default engine used for CREATE TABLE.  You can pass the
-      # :engine option to create_table to override this setting.
-      attr_accessor :default_engine
+      def default_engine
+        Sequel::Deprecation.deprecate("Sequel::MySQL.default_engine", "Call this method on the Database instance")
+        @default_engine
+      end
+      def default_engine=(v)
+        Sequel::Deprecation.deprecate("Sequel::MySQL.default_engine=", "Call this method on the Database instance")
+        @default_engine = v
+      end
     end
 
     # Methods shared by Database instances that connect to MySQL,
@@ -51,6 +71,35 @@ module Sequel
 
       include Sequel::Database::SplitAlterTable
       
+      # Set the default charset used for CREATE TABLE.  You can pass the
+      # :charset option to create_table to override this setting.
+      #attr_accessor :default_charset # SEQUEL5
+
+      # Set the default collation used for CREATE TABLE.  You can pass the
+      # :collate option to create_table to override this setting.
+      #attr_accessor :default_collate # SEQUEL5
+
+      # Set the default engine used for CREATE TABLE.  You can pass the
+      # :engine option to create_table to override this setting.
+      #attr_accessor :default_engine # SEQUEL5
+
+      # SEQUEL5: Remove
+      attr_writer :default_charset
+      def default_charset
+        v = @default_charset
+        v.nil? ? Sequel::MySQL.instance_variable_get(:@default_charset) : v
+      end
+      attr_writer :default_collate
+      def default_collate
+        v = @default_collate
+        v.nil? ? Sequel::MySQL.instance_variable_get(:@default_collate) : v
+      end
+      attr_writer :default_engine
+      def default_engine
+        v = @default_engine
+        v.nil? ? Sequel::MySQL.instance_variable_get(:@default_engine) : v
+      end
+
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
       # database type.
       def cast_type_literal(type)
@@ -375,9 +424,9 @@ module Sequel
 
       # Use MySQL specific syntax for engine type and character encoding
       def create_table_sql(name, generator, options = OPTS)
-        engine = options.fetch(:engine, Sequel::MySQL.default_engine)
-        charset = options.fetch(:charset, Sequel::MySQL.default_charset)
-        collate = options.fetch(:collate, Sequel::MySQL.default_collate)
+        engine = options.fetch(:engine, default_engine)
+        charset = options.fetch(:charset, default_charset)
+        collate = options.fetch(:collate, default_collate)
         generator.constraints.sort_by{|c| (c[:type] == :primary_key) ? -1 : 1}
 
         # Proc for figuring out the primary key for a given table.

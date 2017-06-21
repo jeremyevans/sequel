@@ -1,5 +1,13 @@
 === master
 
+* Deprecate Sequel::MySQL.convert_invalid_date_time accessor (jeremyevans)
+
+* Deprecate Sequel::MySQL.convert_tinyint_to_bool accessor (jeremyevans)
+
+* Deprecate Sequel::MySQL.default_{charset,collate,engine} accessors (jeremyevans)
+
+* Add Database#default_{charset,collate,engine} accessors on MySQL (jeremyevans)
+
 * Make mock adapter thread safe (jeremyevans)
 
 * Deprecate Sequel::JDBC::Dataset#convert_types accessor (jeremyevans)
