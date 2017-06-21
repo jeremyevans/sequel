@@ -27,7 +27,7 @@
 #
 # or just into Object if you want it available everywhere:
 #
-#   Object.send(:include, Sequel::SQL)
+#   Object.send(:include, Sequel::S)
 #
 # If you are using Ruby 2+, and you would like to use refinements, you
 # can use Sequel::S as a refinement, in which case the private #S method
