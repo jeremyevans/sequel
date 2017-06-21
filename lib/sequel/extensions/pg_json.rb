@@ -38,10 +38,7 @@
 #   DB[:table].insert(:column=>Sequel.pg_json([1, 2, 3]))
 #   DB[:table].insert(:column=>Sequel.pg_json({'a'=>1, 'b'=>2}))
 #
-# If you would like to use PostgreSQL json columns in your model
-# objects, you probably want to modify the schema parsing/typecasting
-# so that it recognizes and correctly handles the json type, which
-# you can do by:
+# To use this extension, please load it into the Database instance:
 #
 #   DB.extension :pg_json
 #
@@ -70,7 +67,9 @@ Sequel.require 'adapters/utils/pg_types'
 module Sequel
   module Postgres
     CAST_JSON = '::json'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CAST_JSON)
     CAST_JSONB = '::jsonb'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CAST_JSONB)
 
     # Class representing PostgreSQL JSON/JSONB column array values.
     class JSONArrayBase < DelegateClass(Array)
@@ -88,7 +87,7 @@ module Sequel
       # Cast as json
       def sql_literal_append(ds, sql)
         super
-        sql << CAST_JSON
+        sql << '::json'
       end
     end
 
@@ -96,7 +95,7 @@ module Sequel
       # Cast as jsonb
       def sql_literal_append(ds, sql)
         super
-        sql << CAST_JSONB
+        sql << '::jsonb'
       end
     end
 
@@ -119,7 +118,7 @@ module Sequel
       # Cast as json
       def sql_literal_append(ds, sql)
         super
-        sql << CAST_JSON
+        sql << '::json'
       end
     end
 
@@ -127,7 +126,7 @@ module Sequel
       # Cast as jsonb
       def sql_literal_append(ds, sql)
         super
-        sql << CAST_JSONB
+        sql << '::jsonb'
       end
     end
 
