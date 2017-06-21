@@ -299,7 +299,7 @@ module Sequel
       end
 
       def adapter_initialize
-        #@convert_smallint_to_bool = opts.fetch(:convert_smallint_to_bool, true) # SEQUEL5
+        #@convert_smallint_to_bool = typecast_value_boolean(opts.fetch(:convert_smallint_to_bool, true)) # SEQUEL5
         @conversion_procs = DB2_TYPES.dup
         @conversion_procs[:timestamp] = method(:to_application_timestamp)
       end
