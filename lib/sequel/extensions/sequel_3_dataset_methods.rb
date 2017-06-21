@@ -23,6 +23,8 @@
 #
 # Related module: Sequel::Sequel3DatasetMethods
 
+Sequel::Deprecation.deprecate("The sequel_3_dataset_methods extension", "Please consider maintaining it yourself as an external gem if you want to continue using it")
+
 #
 module Sequel
   module Sequel3DatasetMethods

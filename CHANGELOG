@@ -1,5 +1,7 @@
 === master
 
+* Deprecate sequel_3_dataset_methods extension (jeremyevans)
+
 * Deprecate query_literals extension (jeremyevans)
 
 * Deprecate using subtype conversion procs added after registering composite type in the pg_row extension (jeremyevans)

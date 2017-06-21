@@ -49,7 +49,7 @@ describe "Simple Dataset operations" do
     @ds.filter(:id=>2).first[:number].must_equal 20
   end
 
-  it "should have insert_multiple return primary key values" do
+  deprecated "should have insert_multiple return primary key values" do
     @ds.extension(:sequel_3_dataset_methods).insert_multiple([{:number=>20}, {:number=>30}]).must_equal [2, 3]
     @ds.filter(:id=>2).get(:number).must_equal 20
     @ds.filter(:id=>3).get(:number).must_equal 30
@@ -1055,7 +1055,7 @@ describe "Sequel::Dataset convenience methods" do
     @db.drop_table?(:a)
   end
   
-  it "#[]= should update matching rows" do
+  deprecated "#[]= should update matching rows" do
     @ds.insert(20, 10)
     @ds.extension(:sequel_3_dataset_methods)[:a=>20] = {:b=>30}
     @ds.all.must_equal [{:a=>20, :b=>30}]

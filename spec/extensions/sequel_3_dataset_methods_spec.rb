@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Dataset#to_csv" do
   before do
-    @ds = Sequel.mock(:fetch=>[{:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}, {:a=>7, :b=>8, :c=>9}])[:items].columns(:a, :b, :c).extension(:sequel_3_dataset_methods)
+    deprecated do
+      @ds = Sequel.mock(:fetch=>[{:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}, {:a=>7, :b=>8, :c=>9}])[:items].columns(:a, :b, :c).extension(:sequel_3_dataset_methods)
+    end
   end
   
   it "should format a CSV representation of the records" do
@@ -15,7 +17,7 @@ describe "Dataset#to_csv" do
 end
 
 describe "Dataset#[]=" do
-  it "should perform an update on the specified filter" do
+  deprecated "should perform an update on the specified filter" do
     db = Sequel.mock
     ds = db[:items].extension(:sequel_3_dataset_methods)
     ds[:a => 1] = {:x => 3}
@@ -26,7 +28,9 @@ end
 describe "Dataset#insert_multiple" do
   before do
     @db = Sequel.mock(:autoid=>2)
-    @ds = @db[:items].extension(:sequel_3_dataset_methods)
+    deprecated do
+      @ds = @db[:items].extension(:sequel_3_dataset_methods)
+    end
   end
   
   it "should insert all items in the supplied array" do
@@ -92,7 +96,7 @@ unless Sequel.mock.dataset.frozen?
 end
 
 describe "Dataset#set" do
-  it "should act as alias to #update" do
+  deprecated "should act as alias to #update" do
     db = Sequel.mock
     ds = db[:items].extension(:sequel_3_dataset_methods)
     ds.set({:x => 3})
@@ -101,13 +105,13 @@ describe "Dataset#set" do
 end
 
 describe "Sequel::Dataset#qualify_to_first_source" do
-  it "should qualify to the first source" do
+  deprecated "should qualify to the first source" do
     Sequel.mock.dataset.extension(:sequel_3_dataset_methods).from(:t).filter{a<b}.qualify_to_first_source.sql.must_equal 'SELECT t.* FROM t WHERE (t.a < t.b)'
   end
 end
 
 describe "Sequel::Dataset#qualify_to" do
-  it "should qualify to the given table" do
+  deprecated "should qualify to the given table" do
     Sequel.mock.dataset.extension(:sequel_3_dataset_methods).from(:t).filter{a<b}.qualify_to(:e).sql.must_equal 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
 end
