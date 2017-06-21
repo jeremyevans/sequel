@@ -70,7 +70,7 @@
 #
 # By casting the expression, you can get a composite type returned:
 #
-#   DB[:a].select(a.splat).first # SELECT (a.*)::a FROM a
+#   DB[:a].select(a.splat(:a)).first # SELECT (a.*)::a FROM a
 #   # => {:a=>"(1,2)"} # or {:a=>{:a=>1, :b=>2}} if the "a" type has been registered
 #                      # with the pg_row extension
 #
@@ -89,14 +89,20 @@ module Sequel
     # This class represents a composite type expression reference.
     class PGRowOp < SQL::PlaceholderLiteralString
       OPEN = '('.freeze
+      Sequel::Deprecation.deprecate_constant(self, :OPEN)
       CLOSE_DOT = ').'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_DOT)
       CLOSE_STAR = '.*)'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_STAR)
       CLOSE_STAR_CAST = '.*)::'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CLOSE_STAR_CAST)
       EMPTY = "".freeze
-      ROW = [OPEN, CLOSE_STAR].freeze
-      ROW_CAST = [OPEN, CLOSE_STAR_CAST].freeze
-      QUALIFY = [OPEN, CLOSE_DOT].freeze
-      WRAP = [EMPTY].freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY)
+
+      ROW = ['(', '.*)'].freeze.each(&:freeze)
+      ROW_CAST = ['(', '.*)::'].freeze.each(&:freeze)
+      QUALIFY = ['(', ').'].freeze.each(&:freeze)
+      WRAP = [""].freeze.each(&:freeze)
 
       # Wrap the expression in a PGRowOp, without changing the
       # SQL it would use.
