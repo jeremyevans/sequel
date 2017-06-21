@@ -3,7 +3,7 @@
 # The pg_json_ops extension adds support to Sequel's DSL to make
 # it easier to call PostgreSQL JSON functions and operators (added
 # first in PostgreSQL 9.3).  It also supports the JSONB functions
-# and operators added in PostgreSQL 9.4).
+# and operators added in PostgreSQL 9.4.
 #
 # To load the extension:
 #
@@ -22,7 +22,7 @@
 #  jb = Sequel.pg_jsonb(:jsonb_column)
 #
 # Also, on most Sequel expression objects, you can call the pg_json
-# or pg_jsonb # method:
+# or pg_jsonb method:
 #
 #   j = Sequel[:json_column].pg_json
 #   jb = Sequel[:jsonb_column].pg_jsonb
