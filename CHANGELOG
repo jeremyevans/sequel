@@ -1,5 +1,11 @@
 === master
 
+* Deprecate Sequel::IBMDB::Dataset#convert_smallint_to_bool= method (jeremyevans)
+
+* Deprecate Sequel::IBMDB.convert_smallint_to_bool accessor (jeremyevans)
+
+* Add Sequel::IBMDB::Database#convert_smallint_to_bool accessor (jeremyevans)
+
 * Deprecate sequel_3_dataset_methods extension (jeremyevans)
 
 * Deprecate query_literals extension (jeremyevans)

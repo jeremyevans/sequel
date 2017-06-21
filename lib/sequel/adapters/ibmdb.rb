@@ -6,12 +6,17 @@ Sequel.require 'adapters/shared/db2'
 module Sequel
 
   module IBMDB
+    # SEQUEL5: Remove
     @convert_smallint_to_bool = true
-
     class << self
-      # Whether to convert smallint values to bool, true by default.
-      # Can also be overridden per dataset.
-      attr_accessor :convert_smallint_to_bool
+      def convert_smallint_to_bool
+        Sequel::Deprecation.deprecate("Sequel::IBMDB.convert_smallint_to_bool", "Call this method on the Database instance")
+        @convert_smallint_to_bool
+      end
+      def convert_smallint_to_bool=(v)
+        Sequel::Deprecation.deprecate("Sequel::IBMDB.convert_smallint_to_bool=", "Call this method on the Database instance")
+        @convert_smallint_to_bool = v
+      end
     end
 
     tt = Class.new do
@@ -187,6 +192,16 @@ module Sequel
 
       # Hash of connection procs for converting
       attr_reader :conversion_procs
+
+      # Whether to convert smallint values to bool for this Database instance
+      #attr_accessor :convert_smallint_to_bool # SEQUEL5
+
+      # SEQUEL5: Remove
+      attr_writer :convert_smallint_to_bool
+      def convert_smallint_to_bool
+        v = @convert_smallint_to_bool
+        v.nil? ? Sequel::IBMDB.instance_variable_get(:@convert_smallint_to_bool) : v
+      end
     
       # Create a new connection object for the given server.
       def connect(server)
@@ -284,6 +299,7 @@ module Sequel
       end
 
       def adapter_initialize
+        #@convert_smallint_to_bool = opts.fetch(:convert_smallint_to_bool, true) # SEQUEL5
         @conversion_procs = DB2_TYPES.dup
         @conversion_procs[:timestamp] = method(:to_application_timestamp)
       end
@@ -349,7 +365,7 @@ module Sequel
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
-        if Sequel::IBMDB.convert_smallint_to_bool && db_type =~ /smallint/i 
+        if convert_smallint_to_bool && db_type =~ /smallint/i 
           :boolean
         else
           super
@@ -379,13 +395,14 @@ module Sequel
 
       # Override the default IBMDB.convert_smallint_to_bool setting for this dataset.
       def convert_smallint_to_bool=(v)
+        Sequel::Deprecation.deprecate("Sequel::IBMDB::Dataset#convert_smallint_to_bool=", "Call with_convert_smallint_to_bool instead, which returns a modified copy instead of modifying the object")
         @opts[:convert_smallint_to_bool] = v
       end
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the IBMDB module setting.
       def convert_smallint_to_bool
-        opts.has_key?(:convert_smallint_to_bool) ? opts[:convert_smallint_to_bool] : IBMDB.convert_smallint_to_bool
+        opts.has_key?(:convert_smallint_to_bool) ? opts[:convert_smallint_to_bool] : db.convert_smallint_to_bool
       end
 
       # Return a cloned dataset with the convert_smallint_to_bool option set.
