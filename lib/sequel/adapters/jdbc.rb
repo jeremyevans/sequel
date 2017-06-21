@@ -149,9 +149,6 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :jdbc
       
-      # The type of database we are connecting to
-      attr_reader :database_type
-      
       # The Java database driver we are using (should be a Java class)
       attr_reader :driver
       
