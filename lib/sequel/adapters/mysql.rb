@@ -292,7 +292,7 @@ module Sequel
       # The database name when using the native adapter is always stored in
       # the :database option.
       def database_name
-        Sequel::Deprecation.deprecate("Database#database_name", "Instead, use .get{DATABASE{}}")
+        Sequel::Deprecation.deprecate("Database#database_name", "Instead, use .get(Sequel.function(:DATABASE))")
         @opts[:database]
       end
       
