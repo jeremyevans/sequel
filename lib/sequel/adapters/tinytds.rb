@@ -188,14 +188,11 @@ module Sequel
       Database::DatasetClass = self
       Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
       
-      # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
         
         protected
         
-        # Return a hash with the same values as the given hash,
-        # but with the keys converted to strings.
         def map_to_prepared_args(hash)
           args = {}
           hash.each{|k,v| args[k.to_s.gsub('.', '__')] = v}
@@ -204,8 +201,6 @@ module Sequel
         
         private
         
-        # SQLite uses a : before the name of the argument for named
-        # arguments.
         def prepared_arg(k)
           LiteralString.new("@#{k.to_s.gsub('.', '__')}")
         end
