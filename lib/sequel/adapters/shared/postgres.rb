@@ -4,22 +4,14 @@ Sequel.require %w'pg_types unmodified_identifiers', 'adapters/utils'
 
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
-  # for Sequel.  There are a few module level accessors that are added via
-  # metaprogramming.  These are:
+  # for Sequel.  All adapters that connect to PostgreSQL support the following options:
   #
-  # client_min_messages :: Change the minimum level of messages that PostgreSQL will send to the
-  #                        the client.  The PostgreSQL default is NOTICE, the Sequel default is
-  #                        WARNING.  Set to nil to not change the server default. Overridable on
-  #                        a per instance basis via the :client_min_messages option.
-  # force_standard_strings :: Set to false to not force the use of standard strings.  Overridable
-  #                           on a per instance basis via the :force_standard_strings option.
-  #
-  # It is not recommened you use these module-level accessors.  Instead,
-  # use the database option to make the setting per-Database.
-  #
-  # All adapters that connect to PostgreSQL support the following option in
-  # addition to those mentioned above:
-  #
+  # :client_min_messages :: Change the minimum level of messages that PostgreSQL will send to the
+  #                         the client.  The PostgreSQL default is NOTICE, the Sequel default is
+  #                         WARNING.  Set to nil to not change the server default. Overridable on
+  #                         a per instance basis via the :client_min_messages option.
+  # :force_standard_strings :: Set to false to not force the use of standard strings.  Overridable
+  #                            on a per instance basis via the :force_standard_strings option.
   # :search_path :: Set the schema search_path for this Database's connections.
   #                 Allows to to set which schemas do not need explicit
   #                 qualification, and in which order to check the schemas when
@@ -45,27 +37,30 @@ module Sequel
       end
     end
 
-    # Array of exceptions that need to be converted.  JDBC
-    # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
     Sequel::Deprecation.deprecate_constant(self, :CONVERTED_EXCEPTIONS)
 
+    # SEQUEL5: Remove
     @client_min_messages = :warning
     @force_standard_strings = true
-
     class << self
-      # By default, Sequel sets the minimum level of log messages sent to the client
-      # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
-      # of mostly useless messages when running migrations, such as a couple of lines
-      # for every serial primary key field.
-      attr_accessor :client_min_messages
+      def client_min_messages
+        Sequel::Deprecation.deprecate("Sequel::Postgres.client_min_messages", "Use the :client_min_messages Database option instead")
+        @client_min_messages
+      end
+      def client_min_messages=(v)
+        Sequel::Deprecation.deprecate("Sequel::Postgres.client_min_messages=", "Use the :client_min_messages Database option instead")
+        @client_min_messages = v
+      end
 
-      # By default, Sequel forces the use of standard strings, so that
-      # '\\' is interpreted as \\ and not \.  While PostgreSQL <9.1 defaults
-      # to interpreting plain strings, newer versions use standard strings by
-      # default.  Sequel assumes that SQL standard strings will be used.  Setting
-      # this to false means Sequel will use the database's default.
-      attr_accessor :force_standard_strings
+      def force_standard_strings
+        Sequel::Deprecation.deprecate("Sequel::Postgres.force_standard_strings", "Use the :force_standard_strings Database option instead")
+        @force_standard_strings
+      end
+      def force_standard_strings=(v)
+        Sequel::Deprecation.deprecate("Sequel::Postgres.force_standard_strings=", "Use the :force_standard_strings Database option instead")
+        @force_standard_strings = v
+      end
     end
 
     class CreateTableGenerator < Sequel::Schema::CreateTableGenerator
@@ -732,9 +727,10 @@ module Sequel
       def connection_configuration_sqls
         sqls = []
 
-        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.force_standard_strings))
+        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.instance_variable_get(:@force_standard_strings))) # , true)) # SEQUEL5
 
-        if (cmm = @opts.fetch(:client_min_messages, Postgres.client_min_messages)) && !cmm.to_s.empty?
+        cmm = @opts.fetch(:client_min_messages, Postgres.instance_variable_get(:@client_min_messages)) # , :warning) # SEQUEL5
+        if cmm && !cmm.to_s.empty?
           cmm = cmm.to_s.upcase.strip
           unless VALID_CLIENT_MIN_MESSAGES.include?(cmm)
             raise Error, "Unsupported client_min_messages setting: #{cmm}"

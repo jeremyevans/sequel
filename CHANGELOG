@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::Postgres.client_min_messages and force_standard_strings accessors (jeremyevans)
+
 * Deprecate Sequel::Postgres.use_iso_date_format accessor (jeremyevans)
 
 * Do not allow connection in postgres adapter if postgres-pr driver is used and force_standard_strings is false (jeremyevans)

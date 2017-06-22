@@ -229,7 +229,7 @@ module Sequel
             conn.set_notice_receiver(&receiver)
           end
         else
-          unless typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.force_standard_strings)) # , true)) # SEQUEL5
+          unless typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.instance_variable_get(:@force_standard_strings))) # , true)) # SEQUEL5
             raise Error, "Cannot create connection using postgres-pr unless force_standard_strings is set"
           end
 
