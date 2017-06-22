@@ -13,19 +13,13 @@ module Sequel
       end
     end
 
-    class TypeConvertor
-      # Return PostgreSQL array types as ruby Arrays instead of
-      # JDBC PostgreSQL driver-specific array type. Only used if the
-      # database does not have a conversion proc for the type.
+    # SEQUEL5: Remove
+    class Type_Convertor
       def RubyPGArray(r, i)
         if v = r.getArray(i)
           v.array.to_ary
         end
       end 
-
-      # Return PostgreSQL hstore types as ruby Hashes instead of
-      # Java HashMaps.  Only used if the database does not have a
-      # conversion proc for the type.
       def RubyPGHstore(r, i)
         if v = r.getObject(i)
           v.to_hash
@@ -36,6 +30,24 @@ module Sequel
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via JDBC.
     module Postgres
+      # Return PostgreSQL array types as ruby Arrays instead of
+      # JDBC PostgreSQL driver-specific array type. Only used if the
+      # database does not have a conversion proc for the type.
+      def self.RubyPGArray(r, i)
+        if v = r.getArray(i)
+          v.array.to_ary
+        end
+      end 
+
+      # Return PostgreSQL hstore types as ruby Hashes instead of
+      # Java HashMaps.  Only used if the database does not have a
+      # conversion proc for the type.
+      def self.RubyPGHstore(r, i)
+        if v = r.getObject(i)
+          v.to_hash
+        end
+      end 
+
       # Methods to add to Database instances that access PostgreSQL via
       # JDBC.
       module DatabaseMethods
@@ -185,8 +197,6 @@ module Sequel
         def setup_type_convertor_map
           super
           @oid_convertor_map = {}
-          @type_convertor_map[:RubyPGArray] = TypeConvertor::INSTANCE.method(:RubyPGArray)
-          @type_convertor_map[:RubyPGHstore] = TypeConvertor::INSTANCE.method(:RubyPGHstore)
         end
       end
       
@@ -210,8 +220,10 @@ module Sequel
 
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
+        ARRAY_METHOD = Postgres.method(:RubyPGArray)
         PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]#.freeze # SEQUEL5
         HSTORE_TYPE = 'hstore'.freeze
+        HSTORE_METHOD = Postgres.method(:RubyPGHstore)
 
         def type_convertor(map, meta, type, i)
           case type
@@ -220,11 +232,11 @@ module Sequel
             if pr = db.oid_convertor_proc(oid)
               pr
             elsif type == ARRAY_TYPE
-              map[:RubyPGArray]
+              ARRAY_METHOD
             elsif oid == 2950 # UUID
               map[STRING_TYPE]
             elsif meta.getPGType(i) == HSTORE_TYPE
-              map[:RubyPGHstore]
+              HSTORE_METHOD
             else
               super
             end

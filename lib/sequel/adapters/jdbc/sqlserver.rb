@@ -14,10 +14,9 @@ module Sequel
       end
     end
 
-    class TypeConvertor
+    # SEQUEL5: Remove
+    class Type_Convertor
       def MSSQLRubyTime(r, i)
-        # MSSQL-Server TIME should be fetched as string to keep the precision intact, see:
-        # https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients
         if v = r.getString(i)
           Sequel.string_to_time("#{v}")
         end
@@ -27,6 +26,14 @@ module Sequel
     # Database and Dataset instance methods for SQLServer specific
     # support via JDBC.
     module SQLServer
+      def self.MSSQLRubyTime(r, i)
+        # MSSQL-Server TIME should be fetched as string to keep the precision intact, see:
+        # https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients
+        if v = r.getString(i)
+          Sequel.string_to_time("#{v}")
+        end
+      end
+
       # Database instance methods for SQLServer databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::JDBC::MSSQL::DatabaseMethods
@@ -34,7 +41,7 @@ module Sequel
         def setup_type_convertor_map
           super
           map = @type_convertor_map
-          map[Java::JavaSQL::Types::TIME] = TypeConvertor::INSTANCE.method(:MSSQLRubyTime)
+          map[Java::JavaSQL::Types::TIME] = SQLServer.method(:MSSQLRubyTime)
           if defined?(Java::MicrosoftSql::Types::DATETIMEOFFSET)
             map[Java::MicrosoftSql::Types::DATETIMEOFFSET] = lambda do |r, i|
               if v = r.getDateTimeOffset(i)

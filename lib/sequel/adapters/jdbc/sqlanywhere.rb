@@ -28,7 +28,8 @@ module Sequel
       end
     end
 
-    class TypeConvertor
+    # SEQUEL5: Remove
+    class Type_Convertor
       def SqlAnywhereBoolean(r, i)
         if v = Short(r, i)
           v != 0
@@ -37,6 +38,11 @@ module Sequel
     end
 
     module SqlAnywhere
+      def self.SqlAnywhereBoolean(r, i)
+        v = r.getShort(i)
+        v != 0 unless r.wasNull
+      end
+
       # Database instance methods for Sybase databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::SqlAnywhere::DatabaseMethods
@@ -56,11 +62,6 @@ module Sequel
             rs.getLong(1)
           end
         end
-
-        def setup_type_convertor_map
-          super
-          @type_convertor_map[:SqlAnywhereBoolean] = TypeConvertor::INSTANCE.method(:SqlAnywhereBoolean)
-        end
       end
 
       #Dataset class for Sybase datasets accessed via JDBC.
@@ -70,10 +71,11 @@ module Sequel
         private
 
         SMALLINT_TYPE = Java::JavaSQL::Types::SMALLINT
+        BOOLEAN_METHOD = SqlAnywhere.method(:SqlAnywhereBoolean)
 
         def type_convertor(map, meta, type, i)
           if convert_smallint_to_bool && type == SMALLINT_TYPE
-            map[:SqlAnywhereBoolean]
+            BOOLEAN_METHOD
           else
             super
           end

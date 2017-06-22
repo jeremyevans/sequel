@@ -36,7 +36,7 @@ module Sequel
     end
 
     # SEQUEL5: Remove
-    class TypeConvertor
+    class Type_Convertor
       def DB2Clob(r, i)
         if v = r.getClob(i)
           v = v.getSubString(1, v.length)
@@ -45,7 +45,6 @@ module Sequel
         end
       end
     end
-    Sequel::Deprecation.deprecate_constant(self, :TypeConvertor)
 
     # Database and Dataset instance methods for DB2 specific
     # support via JDBC.

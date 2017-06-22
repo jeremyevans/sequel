@@ -14,7 +14,8 @@ module Sequel
       end
     end
 
-    class TypeConvertor
+    # SEQUEL5: Remove
+    class Type_Convertor
       JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
 
       def OracleDecimal(r, i)
@@ -31,6 +32,19 @@ module Sequel
 
     # Database and Dataset support for Oracle databases accessed via JDBC.
     module Oracle
+      JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
+
+      def self.OracleDecimal(r, i)
+        if v = r.getBigDecimal(i)
+          i = v.long_value
+          if v == JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i)
+            i
+          else
+            BigDecimal.new(v.to_string)
+          end
+        end
+      end 
+
       # Instance methods for Oracle Database objects accessed via JDBC.
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Asys_/i.freeze
@@ -110,7 +124,7 @@ module Sequel
 
         def setup_type_convertor_map
           super
-          @type_convertor_map[:OracleDecimal] = TypeConvertor::INSTANCE.method(:OracleDecimal)
+          @type_convertor_map[:OracleDecimal] = Oracle.method(:OracleDecimal)
         end
       end
       

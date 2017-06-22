@@ -1,5 +1,7 @@
 === master
 
+* Deprecate external modification of Sequel::JDBC::TypeConvertor (jeremyevans)
+
 * Deprecate Sequel::DB2.use_clob_as_blob accessor (jeremyevans)
 
 * Add Database#use_clob_as_blob accessor on DB2 (jeremyevans)
