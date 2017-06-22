@@ -39,17 +39,21 @@ module Sequel
       end
     end
 
+    # SEQUEL5: Remove
     @use_iso_date_format = true
-
     class << self
-      # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
-      # the date in a known format that Sequel can parse faster.  This can be turned off
-      # if you require a date style other than ISO.
-      attr_accessor :use_iso_date_format
+      def use_iso_date_format
+        Sequel::Deprecation.deprecate("Sequel::Postgres.use_iso_date_format", "Use the :use_iso_date_format Database option instead")
+        @use_iso_date_format
+      end
+      def use_iso_date_format=(v)
+        Sequel::Deprecation.deprecate("Sequel::Postgres.use_iso_date_format=", "Use the :use_iso_date_format Database option instead")
+        @use_iso_date_format = v
+      end
     end
 
     # PGconn subclass for connection specific methods used with the
-    # pg, postgres, or postgres-pr driver.
+    # pg or postgres-pr driver.
     class Adapter < PGconn
       # The underlying exception classes to reraise as disconnect errors
       # instead of regular database errors.
@@ -515,7 +519,7 @@ module Sequel
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
       def adapter_initialize
-        @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
+        @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.instance_variable_get(:@use_iso_date_format))) # , true)) # SEQUEL5
         initialize_postgres_adapter
         conversion_procs[17] = method(:unescape_bytea) if USES_PG
         conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
