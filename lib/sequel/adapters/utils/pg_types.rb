@@ -45,7 +45,7 @@ module Sequel
         end
         ::Sequel::SQL::Blob.new(str)
       end
-    end.new
+    end.new#.freeze # SEQUEL5
 
     # Type OIDs for string types used by PostgreSQL.  These types don't
     # have conversion procs associated with them (since the data is

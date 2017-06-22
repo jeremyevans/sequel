@@ -7,9 +7,9 @@ module Sequel
   # Top level module for holding all SQLite-related modules and classes
   # for Sequel.
   module SQLite
-    TYPE_TRANSLATOR = tt = Class.new do
-      FALSE_VALUES = (%w'0 false f no n' + [0]).freeze
+    FALSE_VALUES = (%w'0 false f no n' + [0]).freeze
 
+    tt = Class.new do
       def blob(s)
         Sequel::SQL::Blob.new(s.to_s)
       end
@@ -58,8 +58,10 @@ module Sequel
           raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
         end
       end
-
     end.new
+
+    TYPE_TRANSLATOR = tt
+    Sequel::Deprecation.deprecate_constant(self, :TYPE_TRANSLATOR)
 
     # Hash with string keys and callable values for converting SQLite types.
     SQLITE_TYPES = {}
