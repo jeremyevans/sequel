@@ -365,8 +365,12 @@ module Sequel
                 b << buf while buf = conn.get_copy_data
                 b
               end
+            rescue => e
+              raise_error(e, :disconnect=>true)
             ensure
-              raise DatabaseDisconnectError, "disconnecting as a partial COPY may leave the connection in an unusable state" if buf
+              if buf && !e
+                raise DatabaseDisconnectError, "disconnecting as a partial COPY may leave the connection in an unusable state"
+              end
             end
           end 
         end

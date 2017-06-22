@@ -1961,6 +1961,18 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
       buf.must_equal ["1,2\n"]
       @db[:test_copy].select_order_map(:x).must_equal [1, 3]
     end
+
+    it "should not swallow error raised by block" do
+      begin
+        @db.copy_table(:test_copy){|b| raise ArgumentError, "foo"}
+      rescue => e
+      end
+
+      e.must_be_kind_of Sequel::DatabaseDisconnectError
+      e.wrapped_exception.must_be_kind_of ArgumentError
+      e.message.must_include "foo"
+    end
+
   end
 end
 

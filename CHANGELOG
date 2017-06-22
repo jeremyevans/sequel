@@ -1,5 +1,7 @@
 === master
 
+* Do not swallow original exception if exception is raised inside Database#copy_table on PostgreSQL (jeremyevans)
+
 * Deprecate Sequel::Postgres.client_min_messages and force_standard_strings accessors (jeremyevans)
 
 * Deprecate Sequel::Postgres.use_iso_date_format accessor (jeremyevans)
