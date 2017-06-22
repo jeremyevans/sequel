@@ -112,9 +112,9 @@ module Sequel
         @conversion_procs = ORACLE_TYPES.dup
       end
 
-      PS_TYPES = {'string'.freeze=>String, 'integer'.freeze=>Integer, 'float'.freeze=>Float,
-        'decimal'.freeze=>Float, 'date'.freeze=>Time, 'datetime'.freeze=>Time,
-        'time'.freeze=>Time, 'boolean'.freeze=>String, 'blob'.freeze=>OCI8::BLOB}
+      PS_TYPES = {'string'=>String, 'integer'=>Integer, 'float'=>Float,
+        'decimal'=>Float, 'date'=>Time, 'datetime'=>Time,
+        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB}#.freeze # SEQUEL5
       def cursor_bind_params(conn, cursor, args)
         i = 0
         args.map do |arg, type|
@@ -129,11 +129,7 @@ module Sequel
           when ::Sequel::SQL::Blob
             arg = ::OCI8::BLOB.new(conn, arg)
           end
-          if t = PS_TYPES[type]
-            cursor.bind_param(i, arg, t)
-          else
-            cursor.bind_param(i, arg, arg.class)
-          end
+          cursor.bind_param(i, arg, PS_TYPES[type] || arg.class)
           arg
         end
       end
