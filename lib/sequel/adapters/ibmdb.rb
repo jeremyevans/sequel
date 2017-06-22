@@ -422,7 +422,7 @@ module Sequel
             type = stmt.field_type(i).downcase.to_sym
             # decide if it is a smallint from precision
             type = :boolean  if type == :int && convert && stmt.field_precision(i) < 8
-            type = :blob if type == :clob && Sequel::DB2.use_clob_as_blob
+            type = :blob if type == :clob && db.use_clob_as_blob
             columns << [key, cps[type]]
           end
           cols = columns.map{|c| c[0]}

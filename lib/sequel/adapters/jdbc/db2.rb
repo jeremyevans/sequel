@@ -35,6 +35,7 @@ module Sequel
       end
     end
 
+    # SEQUEL5: Remove
     class TypeConvertor
       def DB2Clob(r, i)
         if v = r.getClob(i)
@@ -44,6 +45,7 @@ module Sequel
         end
       end
     end
+    Sequel::Deprecation.deprecate_constant(self, :TypeConvertor)
 
     # Database and Dataset instance methods for DB2 specific
     # support via JDBC.
@@ -63,7 +65,7 @@ module Sequel
         def set_ps_arg(cps, arg, i)
           case arg
           when Sequel::SQL::Blob
-            if ::Sequel::DB2.use_clob_as_blob
+            if use_clob_as_blob
               cps.setString(i, arg)
             else
               super
@@ -91,7 +93,15 @@ module Sequel
           super
           map = @type_convertor_map
           types = Java::JavaSQL::Types
-          map[types::NCLOB] = map[types::CLOB] = TypeConvertor::INSTANCE.method(:DB2Clob)
+          map[types::NCLOB] = map[types::CLOB] = method(:convert_clob)
+        end
+
+        def convert_clob(r, i)
+          if v = r.getClob(i)
+            v = v.getSubString(1, v.length)
+            v = Sequel::SQL::Blob.new(v) if use_clob_as_blob
+            v
+          end
         end
       end
 

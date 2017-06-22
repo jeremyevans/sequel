@@ -6,11 +6,17 @@ module Sequel
   module DB2
     Sequel::Database.set_shared_adapter_scheme(:db2, self)
 
+    # SEQUEL5: Remove
     @use_clob_as_blob = false
-
     class << self
-      # Whether to use clob as the generic File type, true by default.
-      attr_accessor :use_clob_as_blob
+      def use_clob_as_blob
+        Sequel::Deprecation.deprecate("Sequel::DB2.use_clob_as_blob", "Call this method on the Database instance")
+        @use_clob_as_blob
+      end
+      def use_clob_as_blob=(v)
+        Sequel::Deprecation.deprecate("Sequel::DB2.use_clob_as_blob=", "Call this method on the Database instance")
+        @use_clob_as_blob = v
+      end
     end
 
     module DatabaseMethods
@@ -21,6 +27,16 @@ module Sequel
       NULL          = ''.freeze
       Sequel::Deprecation.deprecate_constant(self, :NULL)
 
+      # Whether to use clob as the generic File type, false by default.
+      #attr_accessor :use_clob_as_blob # SEQUEL5
+
+      # SEQUEL5: Remove
+      attr_writer :use_clob_as_blob
+      def use_clob_as_blob
+        v = @use_clob_as_blob
+        v.nil? ? Sequel::DB2.instance_variable_get(:@use_clob_as_blob) : v
+      end
+    
       # DB2 always uses :db2 as it's database type
       def database_type
         :db2
@@ -250,7 +266,7 @@ module Sequel
 
       # Treat clob as blob if use_clob_as_blob is true
       def schema_column_type(db_type)
-        (::Sequel::DB2::use_clob_as_blob && db_type.downcase == 'clob') ? :blob : super
+        (use_clob_as_blob && db_type.downcase == 'clob') ? :blob : super
       end
 
       # SQL to set the transaction isolation level
@@ -263,7 +279,7 @@ module Sequel
       # use this for blob value:
       #     cast(X'fffefdfcfbfa' as blob(2G))
       def type_literal_generic_file(column)
-        ::Sequel::DB2::use_clob_as_blob ? :clob : :blob
+        use_clob_as_blob ? :clob : :blob
       end
 
       # DB2 uses smallint to store booleans.
@@ -433,7 +449,7 @@ module Sequel
 
       # DB2 uses a literal hexidecimal number for blob strings
       def literal_blob_append(sql, v)
-        if ::Sequel::DB2.use_clob_as_blob
+        if db.use_clob_as_blob
           super
         else
           sql << "BLOB(X'" << v.unpack("H*").first << "')"

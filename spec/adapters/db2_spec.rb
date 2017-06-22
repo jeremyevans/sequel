@@ -28,9 +28,12 @@ describe Sequel::Database do
   end
 end
 
+# SEQUEL5: Remove
 describe "Simple Dataset operations" do
   before(:all) do
-    Sequel::DB2.use_clob_as_blob = true
+    deprecated do
+      Sequel::DB2.use_clob_as_blob = true
+    end
     DB.create_table!(:items) do
       Integer :id, :primary_key => true
       Integer :number
@@ -43,7 +46,40 @@ describe "Simple Dataset operations" do
     @ds.delete
   end
   after(:all) do
-    Sequel::DB2.use_clob_as_blob = false
+    deprecated do
+      Sequel::DB2.use_clob_as_blob = false
+    end
+    DB.drop_table(:items)
+  end
+
+  it "should insert with a primary key specified" do
+    @ds.insert(:id => 1,   :number => 10)
+    @ds.insert(:id => 100, :number => 20)
+    @ds.select_hash(:id, :number).must_equal(1 => 10, 100 => 20)
+  end
+
+  it "should insert into binary columns" do
+    @ds.insert(:id => 1, :bin_string => Sequel.blob("\1"), :bin_clob => Sequel.blob("\2"))
+    @ds.select(:bin_string, :bin_clob).first.must_equal(:bin_string => "\1", :bin_clob => "\2")
+  end
+end
+
+describe "Simple Dataset operations" do
+  before(:all) do
+    DB.use_clob_as_blob = true
+    DB.create_table!(:items) do
+      Integer :id, :primary_key => true
+      Integer :number
+      column  :bin_string, 'varchar(20) for bit data'
+      column  :bin_clob, 'clob'
+    end
+    @ds = DB[:items]
+  end
+  after(:each) do
+    @ds.delete
+  end
+  after(:all) do
+    DB.use_clob_as_blob = false
     DB.drop_table(:items)
   end
 

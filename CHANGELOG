@@ -1,5 +1,9 @@
 === master
 
+* Deprecate Sequel::DB2.use_clob_as_blob accessor (jeremyevans)
+
+* Add Database#use_clob_as_blob accessor on DB2 (jeremyevans)
+
 * Deprecate SEQUEL_POSTGRES_USES_PG constant (jeremyevans)
 
 * Do not swallow original exception if exception is raised inside Database#copy_table on PostgreSQL (jeremyevans)
@@ -24,13 +28,13 @@
 
 * Deprecate Sequel::JDBC::Dataset#convert_types accessor (jeremyevans)
 
-* Add Sequel::JDBC::Dataset#with_convert_types (jeremyevans)
+* Add Dataset#with_convert_types in jdbc adapter (jeremyevans)
 
 * Deprecate Sequel::IBMDB::Dataset#convert_smallint_to_bool= method (jeremyevans)
 
 * Deprecate Sequel::IBMDB.convert_smallint_to_bool accessor (jeremyevans)
 
-* Add Sequel::IBMDB::Database#convert_smallint_to_bool accessor (jeremyevans)
+* Add Database#convert_smallint_to_bool accessor in the ibmdb adapter (jeremyevans)
 
 * Deprecate sequel_3_dataset_methods extension (jeremyevans)
 
