@@ -1,5 +1,9 @@
 === master
 
+* Do not allow connection in postgres adapter if postgres-pr driver is used and force_standard_strings is false (jeremyevans)
+
+* Drop support for ancient postgres driver in postgres adapter, now only pg and postgres-pr drivers are supported (jeremyevans)
+
 * Deprecate Sequel::MySQL.convert_invalid_date_time accessor (jeremyevans)
 
 * Deprecate Sequel::MySQL.convert_tinyint_to_bool accessor (jeremyevans)

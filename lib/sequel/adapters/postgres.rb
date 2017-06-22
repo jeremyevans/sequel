@@ -16,84 +16,9 @@ begin
 
   Sequel::Postgres::USES_PG = true
 rescue LoadError => e 
-  Sequel::Postgres::USES_PG = false
   begin
-    require 'postgres'
-    # Attempt to get uniform behavior for the PGconn object no matter
-    # if pg, postgres, or postgres-pr is used.
-    class PGconn
-      unless method_defined?(:escape_string)
-        if self.respond_to?(:escape)
-          # If there is no escape_string instance method, but there is an
-          # escape class method, use that instead.
-          def escape_string(str)
-            Sequel::Postgres.force_standard_strings ? str.gsub("'", "''") : self.class.escape(str)
-          end
-        else
-          # Raise an error if no valid string escaping method can be found.
-          def escape_string(obj)
-            if Sequel::Postgres.force_standard_strings
-              str.gsub("'", "''")
-            else
-              raise Sequel::Error, "string escaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
-            end
-          end
-        end
-      end
-      unless method_defined?(:escape_bytea)
-        if self.respond_to?(:escape_bytea)
-          # If there is no escape_bytea instance method, but there is an
-          # escape_bytea class method, use that instead.
-          def escape_bytea(obj)
-            self.class.escape_bytea(obj)
-          end
-        else
-          begin
-            require 'postgres-pr/typeconv/conv'
-            require 'postgres-pr/typeconv/bytea'
-            extend Postgres::Conversion
-            # If we are using postgres-pr, use the encode_bytea method from
-            # that.
-            def escape_bytea(obj)
-              self.class.encode_bytea(obj)
-            end
-            instance_eval{alias unescape_bytea decode_bytea}
-          rescue
-            # If no valid bytea escaping method can be found, create one that
-            # raises an error
-            def escape_bytea(obj)
-              raise Sequel::Error, "bytea escaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
-            end
-            # If no valid bytea unescaping method can be found, create one that
-            # raises an error
-            def self.unescape_bytea(obj)
-              raise Sequel::Error, "bytea unescaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
-            end
-          end
-        end
-      end
-      alias_method :finish, :close unless method_defined?(:finish)
-      alias_method :async_exec, :exec unless method_defined?(:async_exec)
-      unless method_defined?(:block)
-        def block(timeout=nil)
-        end
-      end
-      unless defined?(CONNECTION_OK)
-        CONNECTION_OK = -1
-      end
-      unless method_defined?(:status)
-        def status
-          CONNECTION_OK
-        end
-      end
-    end
-    class PGresult 
-      alias_method :nfields, :num_fields unless method_defined?(:nfields) 
-      alias_method :ntuples, :num_tuples unless method_defined?(:ntuples) 
-      alias_method :ftype, :type unless method_defined?(:ftype) 
-      alias_method :fname, :fieldname unless method_defined?(:fname) 
-      alias_method :cmd_tuples, :cmdtuples unless method_defined?(:cmd_tuples) 
-    end 
+    require 'postgres-pr/postgres-compat'
+    Sequel::Postgres::USES_PG = false
   rescue LoadError 
     raise e 
   end 
@@ -103,9 +28,11 @@ module Sequel
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
 
+    # SEQUEL5: Remove
     TYPE_CONVERTOR = Class.new do
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
     end.new
+    Sequel::Deprecation.deprecate_constant(self, :TYPE_CONVERTOR)
 
     if Sequel::Postgres::USES_PG
       # Whether the given sequel_pg version integer is supported.
@@ -148,10 +75,49 @@ module Sequel
       # errors.
       DISCONNECT_ERROR_RE = /\A#{Regexp.union(disconnect_errors)}/
       
-      # Hash of prepared statements for this connection.  Keys are
-      # string names of the server side prepared statement, and values
-      # are SQL strings.
-      attr_reader(:prepared_statements) if USES_PG
+      if USES_PG
+        # Hash of prepared statements for this connection.  Keys are
+        # string names of the server side prepared statement, and values
+        # are SQL strings.
+        attr_reader :prepared_statements
+      else
+        # Make postgres-pr look like pg
+        CONNECTION_OK = -1
+
+        # Escape bytea values.  Uses historical format instead of hex
+        # format for maximum compatibility.
+        def escape_bytea(str)
+          # each_byte used instead of [] for 1.9 compatibility
+          str.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{sprintf('%o', b.each_byte{|x| break x}).rjust(3, '0')}"}
+        end
+        
+        # Escape strings by doubling apostrophes.  This only works if standard
+        # conforming strings are used.
+        def escape_string(str)
+          str.gsub("'", "''")
+        end
+
+        alias finish close
+
+        def async_exec(sql)
+          PGresult.new(@conn.query(sql))
+        end
+
+        def block(timeout=nil)
+        end
+
+        def status
+          CONNECTION_OK
+        end
+
+        class PGresult < ::PGresult
+          alias nfields num_fields
+          alias ntuples num_tuples
+          alias ftype type
+          alias fname fieldname
+          alias cmd_tuples cmdtuples
+        end 
+      end
       
       # Raise a Sequel::DatabaseDisconnectError if a one of the disconnect
       # error classes is raised, or a PGError is raised and the connection
@@ -261,6 +227,10 @@ module Sequel
             conn.set_notice_receiver(&receiver)
           end
         else
+          unless typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.force_standard_strings)) # , true)) # SEQUEL5
+            raise Error, "Cannot create connection using postgres-pr unless force_standard_strings is set"
+          end
+
           conn = Adapter.connect(
             (opts[:host] unless blank_object?(opts[:host])),
             opts[:port] || 5432,
@@ -549,7 +519,7 @@ module Sequel
       def adapter_initialize
         @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.use_iso_date_format))
         initialize_postgres_adapter
-        conversion_procs[17] = TYPE_CONVERTOR.method(:bytea)
+        conversion_procs[17] = method(:unescape_bytea) if USES_PG
         conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
         self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
@@ -568,6 +538,12 @@ module Sequel
         sqls = super
         sqls << "SET DateStyle = 'ISO'" if @use_iso_date_format
         sqls
+      end
+
+      if USES_PG
+        def unescape_bytea(s)
+          ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s))
+        end
       end
 
       def database_error_classes
