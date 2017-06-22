@@ -54,7 +54,7 @@ module Sequel
           end
         end
         
-        # Derby supports transaction DDL statements.
+        # Derby supports transactional DDL statements.
         def supports_transactional_ddl?
           true
         end
@@ -227,8 +227,7 @@ module Sequel
         Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
         # Derby doesn't support an expression between CASE and WHEN,
-        # so remove 
-        # conditions.
+        # so remove conditions.
         def case_expression_sql_append(sql, ce)
           super(sql, ce.with_merged_expression)
         end
@@ -300,7 +299,7 @@ module Sequel
         end
 
         # Derby uses an expression yielding false for false values.
-        # Newer versions can use the FALSE literal, but the latest gem version cannot.
+        # Newer versions can use the FALSE literal, but older versions cannot.
         def literal_false
           if db.svn_version >= 1040133
             'FALSE'
@@ -315,7 +314,7 @@ module Sequel
         end
 
         # Derby uses an expression yielding true for true values.
-        # Newer versions can use the TRUE literal, but the latest gem version cannot.
+        # Newer versions can use the TRUE literal, but older versions cannot.
         def literal_true
           if db.svn_version >= 1040133
             'TRUE'
