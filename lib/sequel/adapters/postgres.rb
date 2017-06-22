@@ -871,3 +871,4 @@ end
 
 # SEQUEL5: Remove
 SEQUEL_POSTGRES_USES_PG = Sequel::Postgres::USES_PG
+Sequel::Deprecation.deprecate_constant(Object, :SEQUEL_POSTGRES_USES_PG)
