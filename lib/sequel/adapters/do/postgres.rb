@@ -4,8 +4,6 @@ Sequel::DataObjects.load_driver 'do_postgres'
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
-  Postgres::CONVERTED_EXCEPTIONS << ::DataObjects::Error
-  
   module DataObjects
     Sequel.synchronize do
       DATABASE_SETUP[:postgres] = proc do |db|
@@ -31,6 +29,11 @@ module Sequel
         
         private
         
+        DATABASE_ERROR_CLASSES = [::DataObjects::Error].freeze
+        def database_error_classes
+          DATABASE_ERROR_CLASSES
+        end
+
         # Extend the adapter with the DataObjects PostgreSQL AdapterMethods
         def setup_connection(conn)
           conn = super(conn)

@@ -26,8 +26,6 @@ end
 
 module Sequel
   module Postgres
-    CONVERTED_EXCEPTIONS << PGError
-
     # SEQUEL5: Remove
     TYPE_CONVERTOR = Class.new do
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
@@ -529,7 +527,7 @@ module Sequel
         begin
           yield
         rescue => e
-          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
+          raise_error(e, :classes=>database_error_classes)
         end
       end
 
@@ -546,8 +544,9 @@ module Sequel
         end
       end
 
+      DATABASE_ERROR_CLASSES = [PGError].freeze
       def database_error_classes
-        [PGError]
+        DATABASE_ERROR_CLASSES
       end
 
       def disconnect_error?(exception, opts)

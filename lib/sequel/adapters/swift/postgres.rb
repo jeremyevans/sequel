@@ -4,8 +4,6 @@ require 'swift/db/postgres'
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
-  Postgres::CONVERTED_EXCEPTIONS << ::Swift::Error
-  
   module Swift
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via Swift.
@@ -23,6 +21,11 @@ module Sequel
         
         private
         
+        DATABASE_ERROR_CLASSES = [::Swift::Error].freeze
+        def database_error_classes
+          DATABASE_ERROR_CLASSES
+        end
+
         # Remove all other options except for ones specifically handled, as
         # otherwise swift passes them to dbic++ which passes them to PostgreSQL
         # which can raise an error.

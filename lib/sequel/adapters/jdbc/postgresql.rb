@@ -4,8 +4,6 @@ Sequel::JDBC.load_driver('org.postgresql.Driver', :Postgres)
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
-  Postgres::CONVERTED_EXCEPTIONS << NativeException
-  
   module JDBC
     Sequel.synchronize do
       DATABASE_SETUP[:postgresql] = proc do |db|
@@ -133,6 +131,11 @@ module Sequel
         def conversion_procs_updated
           super
           Sequel.synchronize{@oid_convertor_map = {}}
+        end
+
+        DATABASE_ERROR_CLASSES = [NativeException].freeze
+        def database_error_classes
+          DATABASE_ERROR_CLASSES
         end
 
         def disconnect_error?(exception, opts)

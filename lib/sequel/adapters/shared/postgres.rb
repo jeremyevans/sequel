@@ -48,6 +48,7 @@ module Sequel
     # Array of exceptions that need to be converted.  JDBC
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
+    Sequel::Deprecation.deprecate_constant(self, :CONVERTED_EXCEPTIONS)
 
     @client_min_messages = :warning
     @force_standard_strings = true
@@ -964,11 +965,6 @@ module Sequel
       # DDL fragment for initial part of CREATE VIEW statement
       def create_view_prefix_sql(name, options)
         create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}#{'RECURSIVE ' if options[:recursive]}#{'MATERIALIZED ' if options[:materialized]}VIEW #{quote_schema_table(name)}", options[:columns] || options[:recursive])
-      end
-
-      # The errors that the main adapters can raise, depends on the adapter being used
-      def database_error_classes
-        CONVERTED_EXCEPTIONS
       end
 
       # SQL for dropping a function from the database.
