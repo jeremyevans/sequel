@@ -277,7 +277,7 @@ module Sequel
       private
 
       # Whether to cast tinyint(1) columns to integer instead of boolean.
-      # By default, uses the opposite of the database's convert_tinyint_to_bool
+      # By default, uses the database's convert_tinyint_to_bool
       # setting.  Exists for compatibility with the mysql adapter.
       def convert_tinyint_to_bool?
         @db.convert_tinyint_to_bool
@@ -303,8 +303,7 @@ module Sequel
 
       # Handle correct quoting of strings using ::Mysql2::Client#escape.
       def literal_string_append(sql, v)
-        s = db.synchronize(@opts[:server]){|c| c.escape(v)}
-        sql << "'" << s << "'"
+        sql << "'" << db.synchronize(@opts[:server]){|c| c.escape(v)} << "'"
       end
     end
   end
