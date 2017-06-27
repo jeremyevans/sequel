@@ -1,5 +1,7 @@
 === master
 
+* Deprecate treating :natrual_inner join type on MySQL as NATURAL LEFT JOIN (jeremyevans)
+
 * Deprecate Dataset#mssql_unicode_strings= on Microsoft SQL Server (jeremyevans)
 
 * Preserve encoding when parsing PostgreSQL arrays (jeltz) (#1387)

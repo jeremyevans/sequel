@@ -12,6 +12,7 @@ module Sequel
       end
     end
 
+    # SEQUEL5: Remove
     @convert_tinyint_to_bool = true
     @default_charset = nil
     @default_collate = nil
@@ -58,6 +59,7 @@ module Sequel
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
+      include Sequel::Database::SplitAlterTable
 
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
@@ -69,7 +71,6 @@ module Sequel
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}#.freeze # SEQUEL5
       COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
 
-      include Sequel::Database::SplitAlterTable
       
       # Set the default charset used for CREATE TABLE.  You can pass the
       # :charset option to create_table to override this setting.
@@ -840,7 +841,7 @@ module Sequel
       # Raises an error on use of :full_outer type, since MySQL doesn't support it.
       def join_table(type, table, expr=nil, opts=OPTS, &block)
         type = :inner if (type == :cross) && !expr.nil?
-        raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
+        raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN or NATURAL FULL JOIN") if type == :full_outer || type == :natural_full
         super(type, table, expr, opts, &block)
       end
       
@@ -851,6 +852,7 @@ module Sequel
         when :straight
           'STRAIGHT_JOIN'
         when :natural_inner
+           Sequel::Deprecation.deprecate(":natural_inner join type being converted to NATURAL LEFT JOIN on MySQL", "Use :natural_left join type for NATURAL LEFT JOIN, or :natural join type for NATURAL JOIN")
           'NATURAL LEFT JOIN'
         else
           super

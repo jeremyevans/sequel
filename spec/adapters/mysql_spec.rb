@@ -297,6 +297,9 @@ describe "MySQL join expressions" do
   it "should raise error for :full_outer join requests." do
     lambda{@ds.join_table(:full_outer, :nodes)}.must_raise(Sequel::Error)
   end
+  it "should raise error for :natural_full join requests." do
+    lambda{@ds.join_table(:natural_full, :nodes)}.must_raise(Sequel::Error)
+  end
   it "should support natural left joins" do
     @ds.join_table(:natural_left, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL LEFT JOIN `nodes`'
   end
@@ -309,7 +312,7 @@ describe "MySQL join expressions" do
   it "should support natural right outer joins" do
     @ds.join_table(:natural_right_outer, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL RIGHT OUTER JOIN `nodes`'
   end
-  it "should support natural inner joins" do
+  deprecated "should support natural inner joins" do
     @ds.join_table(:natural_inner, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL LEFT JOIN `nodes`'
   end
   it "should support cross joins" do
