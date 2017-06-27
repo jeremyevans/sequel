@@ -1315,7 +1315,7 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
 
       NULL = LiteralString.new('NULL').freeze
-      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
+      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)#.freeze # SEQUEL5
       NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:cursor, :insert_conflict]).freeze
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
