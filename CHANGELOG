@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Dataset#mssql_unicode_strings= on Microsoft SQL Server (jeremyevans)
+
 * Preserve encoding when parsing PostgreSQL arrays (jeltz) (#1387)
 
 * Deprecate external modification of Sequel::JDBC::TypeConvertor (jeremyevans)

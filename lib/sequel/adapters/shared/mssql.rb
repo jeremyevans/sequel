@@ -637,6 +637,7 @@ module Sequel
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       def mssql_unicode_strings=(v)
+        Sequel::Deprecation.deprecate("Dataset#mssql_unicode_strings=", "Switch to using with_mssql_unicode_strings, which returns a modified copy")
         @opts[:mssql_unicode_strings] = v
       end
 
