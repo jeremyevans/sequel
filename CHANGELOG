@@ -1,5 +1,9 @@
 === master
 
+* Deprecate Sequel::SqlAnywhere::Dataset#convert_smallint_to_bool= method (jeremyevans)
+
+* Deprecate Sequel::SqlAnywhere.convert_smallint_to_bool accessor (jeremyevans)
+
 * Use savepoints around index creation if creating table inside transaction if ignore_index_errors is used (jeremyevans)
 
 * Deprecate treating :natrual_inner join type on MySQL as NATURAL LEFT JOIN (jeremyevans)
