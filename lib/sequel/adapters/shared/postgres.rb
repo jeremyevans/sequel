@@ -1300,12 +1300,19 @@ module Sequel
       AS = ' AS '.freeze
       Sequel::Deprecation.deprecate_constant(self, :AS)
       XOR_OP = ' # '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :XOR_OP)
       CRLF = "\r\n".freeze
+      Sequel::Deprecation.deprecate_constant(self, :CRLF)
       BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
+      Sequel::Deprecation.deprecate_constant(self, :BLOB_RE)
       WINDOW = " WINDOW ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :WINDOW)
       SELECT_VALUES = "VALUES ".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SELECT_VALUES)
       EMPTY_STRING = ''.freeze
+      Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
       SKIP_LOCKED = " SKIP LOCKED".freeze
+      Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
 
       NULL = LiteralString.new('NULL').freeze
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
