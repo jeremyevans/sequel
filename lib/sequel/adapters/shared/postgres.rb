@@ -1776,7 +1776,7 @@ module Sequel
         sql << "'" << v.gsub("'", "''") << "'"
       end
 
-      # PostgreSQL uses FALSE for false values
+      # PostgreSQL uses true for true values
       def literal_true
         'true'
       end
