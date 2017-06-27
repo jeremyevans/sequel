@@ -387,9 +387,18 @@ module Sequel
       # Use the pg_* system tables to determine indexes on a table
       def indexes(table, opts=OPTS)
         m = output_identifier_meth
-        range = 0...32
-        attnums = server_version >= 80100 ? SQL::Function.new(:ANY, Sequel[:ind][:indkey]) : range.map{|x| SQL::Subscript.new(Sequel[:ind][:indkey], [x])}
         oid = regclass_oid(table, opts)
+
+        if server_version >= 90500
+          order = [Sequel[:indc][:relname], Sequel.function(:array_position, Sequel[:ind][:indkey], Sequel[:att][:attnum])]
+        else
+          range = 0...32
+          order = [Sequel[:indc][:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(Sequel[:ind][:indkey], [x]), x]}, 32, Sequel[:att][:attnum])]
+          attnums = range.map{|x| SQL::Subscript.new(Sequel[:ind][:indkey], [x])} unless server_version >= 80100 
+        end
+
+        attnums ||= SQL::Function.new(:ANY, Sequel[:ind][:indkey])
+
         ds = metadata_dataset.
           from{pg_class.as(:tab)}.
           join(Sequel[:pg_index].as(:ind), :indrelid=>:oid).
@@ -403,7 +412,7 @@ module Sequel
             :indpred=>nil,
             :indisvalid=>true,
             tab[:oid]=>oid}}.
-          order{[indc[:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(ind[:indkey], [x]), x]}, 32, att[:attnum])]}.
+          order(*order).
           select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
         ds = ds.where(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
