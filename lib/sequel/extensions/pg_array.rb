@@ -425,6 +425,7 @@ module Sequel
           @converter = converter 
           @stack = [[]]
           @recorded = new_entry_buffer
+          #@encoding = string.encoding # SEQUEL5
         end
 
         # Take the buffer of recorded characters and add it to the array
@@ -507,6 +508,7 @@ module Sequel
         else
           def new_entry_buffer
             String.new.force_encoding(string.encoding)
+            #String.new.force_encoding(@encoding) # SEQUEL5
           end
         end
       end unless Sequel::Postgres.respond_to?(:parse_pg_array)

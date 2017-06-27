@@ -1,5 +1,7 @@
 === master
 
+* Preserve encoding when parsing PostgreSQL arrays (jeltz) (#1387)
+
 * Deprecate external modification of Sequel::JDBC::TypeConvertor (jeremyevans)
 
 * Deprecate Sequel::DB2.use_clob_as_blob accessor (jeremyevans)
