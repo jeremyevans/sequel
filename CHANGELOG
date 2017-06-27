@@ -1,5 +1,7 @@
 === master
 
+* Use savepoints around index creation if creating table inside transaction if ignore_index_errors is used (jeremyevans)
+
 * Deprecate treating :natrual_inner join type on MySQL as NATURAL LEFT JOIN (jeremyevans)
 
 * Deprecate Dataset#mssql_unicode_strings= on Microsoft SQL Server (jeremyevans)

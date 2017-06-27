@@ -707,7 +707,7 @@ module Sequel
       e = options[:ignore_index_errors] || options[:if_not_exists]
       generator.indexes.each do |index|
         begin
-          index_sql_list(name, [index]).each{|sql| execute_ddl(sql)}
+          transaction(:savepoint=>:only){index_sql_list(name, [index]).each{|sql| execute_ddl(sql)}}
         rescue Error
           raise unless e
         end

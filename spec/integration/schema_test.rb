@@ -387,6 +387,26 @@ describe "Database schema modifiers" do
     @db.table_exists?(:items).must_equal false
   end if DB.supports_transactional_ddl?
   
+  it "should handle errors creating indexes when ignoring index errors" do
+    @db.drop_table?(:items)
+    @db.transaction do
+      @db.create_table(:items, :ignore_index_errors=>true) do
+        Integer :n1
+        Integer :n2
+        index :n1, :name=>'items_n1'
+        index :foo, :name=>'items_f'
+        index :n2, :name=>'items_n2'
+        index :bar, :name=>'items_g'
+      end
+    end
+    @db.table_exists?(:items).must_equal true
+    indexes = @db.indexes(:items).keys
+    indexes.must_include :items_n1
+    indexes.must_include :items_n2
+    indexes.wont_include :items_f
+    indexes.wont_include :items_g
+  end if DB.supports_transactional_ddl?
+  
   describe "join tables" do
     after do
       @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs) if @db.table_exists?(:cats_dogs)
