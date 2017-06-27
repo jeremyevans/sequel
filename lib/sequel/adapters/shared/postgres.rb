@@ -312,68 +312,67 @@ module Sequel
       def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth
         schema, _ = opts.fetch(:schema, schema_and_table(table))
-        range = 0...32
         oid = regclass_oid(table)
 
-        base_ds = metadata_dataset.
+        if server_version >= 90500
+          cpos = Sequel.expr{array_position(co[:conkey], att[:attnum])}
+          rpos = Sequel.expr{array_position(co[:confkey], att2[:attnum])}
+        else
+          range = 0...32
+          cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, att[:attnum])}
+          rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, att2[:attnum])}
+        end
+
+        ds = metadata_dataset.
           from{pg_constraint.as(:co)}.
           join(Sequel[:pg_class].as(:cl), :oid=>:conrelid).
+          join(Sequel[:pg_attribute].as(:att), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+          join(Sequel[:pg_class].as(:cl2), :oid=>Sequel[:co][:confrelid]).
+          join(Sequel[:pg_attribute].as(:att2), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
+          order{[co[:conname], cpos]}.
           where{{
             cl[:relkind]=>'r',
             co[:contype]=>'f',
-            cl[:oid]=>oid}}
-
-        # We split the parsing into two separate queries, which are merged manually later.
-        # This is because PostgreSQL stores both the referencing and referenced columns in
-        # arrays, and I don't know a simple way to not create a cross product, as PostgreSQL
-        # doesn't appear to have a function that takes an array and element and gives you
-        # the index of that element in the array.
-
-        ds = base_ds.
-          join(Sequel[:pg_attribute].as(:att), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
-          order{[
-            co[:conname],
-            SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, att[:attnum])]}.
+            cl[:oid]=>oid,
+            cpos=>rpos
+            }}.
           select{[
             co[:conname].as(:name),
             att[:attname].as(:column),
             co[:confupdtype].as(:on_update),
             co[:confdeltype].as(:on_delete),
-            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable)]}
-
-        ref_ds = base_ds.
-          join(Sequel[:pg_class].as(:cl2), :oid=>Sequel[:co][:confrelid]).
-          join(Sequel[:pg_attribute].as(:att2), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
-          order{[
-            co[:conname],
-            SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, att2[:attnum])]}.
-          select{[
-            co[:conname].as(:name),
             cl2[:relname].as(:table),
-            att2[:attname].as(:refcolumn)]}
+            att2[:attname].as(:refcolumn),
+            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable)
+          ]}
 
         # If a schema is given, we only search in that schema, and the returned :table
         # entry is schema qualified as well.
         if schema
-          ref_ds = ref_ds.join(Sequel[:pg_namespace].as(:nsp2), :oid=>Sequel[:cl2][:relnamespace]).
+          ds = ds.join(Sequel[:pg_namespace].as(:nsp2), :oid=>Sequel[:cl2][:relnamespace]).
             select_append{nsp2[:nspname].as(:schema)}
         end
 
         h = {}
         fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
+
         ds.each do |row|
           if r = h[row[:name]]
             r[:columns] << m.call(row[:column])
+            r[:key] << m.call(row[:refcolumn])
           else
-            h[row[:name]] = {:name=>m.call(row[:name]), :columns=>[m.call(row[:column])], :on_update=>fklod_map[row[:on_update]], :on_delete=>fklod_map[row[:on_delete]], :deferrable=>row[:deferrable]}
+            h[row[:name]] = {
+              :name=>m.call(row[:name]),
+              :columns=>[m.call(row[:column])],
+              :key=>[m.call(row[:refcolumn])],
+              :on_update=>fklod_map[row[:on_update]],
+              :on_delete=>fklod_map[row[:on_delete]],
+              :deferrable=>row[:deferrable],
+              :table=>schema ? SQL::QualifiedIdentifier.new(m.call(row[:schema]), m.call(row[:table])) : m.call(row[:table])
+            }
           end
         end
-        ref_ds.each do |row|
-          r = h[row[:name]]
-          r[:table] ||= schema ? SQL::QualifiedIdentifier.new(m.call(row[:schema]), m.call(row[:table])) : m.call(row[:table])
-          r[:key] ||= []
-          r[:key] << m.call(row[:refcolumn])
-        end
+
         h.values
       end
 
