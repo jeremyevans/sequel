@@ -405,7 +405,7 @@ describe "Database schema modifiers" do
     indexes.must_include :items_n2
     indexes.wont_include :items_f
     indexes.wont_include :items_g
-  end if DB.supports_transactional_ddl?
+  end if DB.supports_transactional_ddl? && DB.database_type != :mssql
   
   describe "join tables" do
     after do
