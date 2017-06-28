@@ -215,7 +215,7 @@ describe "Database index parsing" do
     DB.indexes(:items).must_equal({})
   end
 
-  cspecify "should not include partial indexes", :sqlite do
+  it "should not include partial indexes" do
     DB.create_table!(:items){Integer :n; Integer :a; index :n, :where=>proc{n > 10}}
     DB.indexes(:items).must_equal({})
   end if DB.supports_partial_indexes?

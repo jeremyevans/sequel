@@ -133,8 +133,9 @@ module Sequel
             # If specifically asked for only autocreated indexes, then return those an only those
             next unless r[:name] =~ /\Asqlite_autoindex_/
           elsif r.has_key?(:origin)
-            # If origin is set, then only exclude primary key indexes, leaving regular unique ones
+            # If origin is set, then only exclude primary key indexes and partial indexes
             next if r[:origin] == 'pk'
+            next if r[:partial].to_i == 1
           else
             # When :origin key not present, assume any autoindex could be a primary key one and exclude it
             next if r[:name] =~ /\Asqlite_autoindex_/
