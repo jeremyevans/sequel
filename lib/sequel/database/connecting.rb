@@ -8,7 +8,7 @@ module Sequel
     # ---------------------
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado amalgalite cubrid do ibmdb jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.collect(&:to_sym)
+    ADAPTERS = %w'ado amalgalite cubrid do ibmdb jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.map(&:to_sym)
     # SEQUEL5: Remove cubrid do swift
 
     def self.single_threaded
@@ -58,7 +58,7 @@ module Sequel
           scheme = uri.scheme
           c = adapter_class(scheme)
           uri_options = c.send(:uri_to_options, uri)
-          uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
+          uri.query.split('&').map{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
           uri_options.to_a.each{|k,v| uri_options[k] = (defined?(URI::DEFAULT_PARSER) ? URI::DEFAULT_PARSER : URI).unescape(v) if v.is_a?(String)}
           opts = uri_options.merge(opts).merge!(:orig_opts=>opts.dup, :uri=>conn_string, :adapter=>scheme)
         end

@@ -1150,7 +1150,7 @@ module Sequel
         when BooleanExpression
           case op = ce.op
           when :AND, :OR
-            BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.collect{|a| BooleanExpression.invert(a)})
+            BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.map{|a| BooleanExpression.invert(a)})
           else
             BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.dup)
           end
@@ -1764,7 +1764,7 @@ module Sequel
       def self.like(l, *ces)
         l, lre, lci = like_element(l)
         lci = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive] ? true : lci
-        ces.collect! do |ce|
+        ces.map! do |ce|
           r, rre, rci = like_element(ce)
           BooleanExpression.new(LIKE_MAP[[lre||rre, lci||rci]], l, r)
         end

@@ -133,7 +133,7 @@ module Sequel
           base_ds = model.where(prkey_array.zip(key_array.map{|k| get_column_value(k)}))
           recursive_ds = model.join(t, key_array.zip(prkey_array))
           if c = a[:conditions]
-            (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
+            (base_ds, recursive_ds) = [base_ds, recursive_ds].map do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
@@ -181,7 +181,7 @@ module Sequel
           recursive_case = model.join(t, key_array.zip(prkey_array)).
            select(*recursive_case_columns)
           if c = r[:conditions]
-            (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
+            (base_case, recursive_case) = [base_case, recursive_case].map do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
@@ -228,7 +228,7 @@ module Sequel
           base_ds = model.where(key_array.zip(prkey_array.map{|k| get_column_value(k)}))
           recursive_ds = model.join(t, prkey_array.zip(key_array))
           if c = d[:conditions]
-            (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
+            (base_ds, recursive_ds) = [base_ds, recursive_ds].map do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
@@ -279,7 +279,7 @@ module Sequel
           recursive_case = model.join(t, prkey_array.zip(key_array)).
            select(*recursive_case_columns)
           if c = r[:conditions]
-            (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
+            (base_case, recursive_case) = [base_case, recursive_case].map do |ds|
               (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end

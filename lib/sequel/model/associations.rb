@@ -3039,7 +3039,7 @@ END
           #  specific foreign/primary key
           key_hash = {}
           # Reflections for all associations to eager load
-          reflections = eager_assoc.keys.collect{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
+          reflections = eager_assoc.keys.map{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
       
           # Populate the key_hash entry for each association being eagerly loaded
           reflections.each do |r|

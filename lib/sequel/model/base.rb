@@ -673,7 +673,7 @@ module Sequel
       #   end
       def inherited(subclass)
         super
-        ivs = subclass.instance_variables.collect(&:to_s)
+        ivs = subclass.instance_variables.map(&:to_s)
         inherited_instance_variables.each do |iv, dup|
           next if ivs.include?(iv.to_s)
           if (sup_class_value = instance_variable_get(iv)) && dup
@@ -1060,7 +1060,7 @@ module Sequel
         clear_setter_methods_cache
         columns, bad_columns = columns.partition{|x| /\A[A-Za-z_][A-Za-z0-9_]*\z/.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
-        im = instance_methods.collect(&:to_s)
+        im = instance_methods.map(&:to_s)
         columns.each do |column|
           meth = "#{column}="
           overridable_methods_module.module_eval("def #{column}; self[:#{column}] end", __FILE__, __LINE__) unless im.include?(column.to_s)
@@ -1124,7 +1124,7 @@ module Sequel
           # Set the primary key(s) based on the schema information,
           # if the schema information includes primary key information
           if schema_array.all?{|k,v| v.has_key?(:primary_key)}
-            pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
+            pks = schema_array.map{|k,v| k if v[:primary_key]}.compact
             pks.length > 0 ? set_primary_key(pks) : no_primary_key
           end
 
@@ -1139,7 +1139,7 @@ module Sequel
             # Dataset is for a single table with all columns,
             # so set the columns based on the order they were
             # returned by the schema.
-            cols = schema_array.collect{|k,v| k}
+            cols = schema_array.map{|k,v| k}
             set_columns(cols)
             # Also set the columns for the dataset, so the dataset
             # doesn't have to do a query to get them.
@@ -1161,7 +1161,7 @@ module Sequel
           # SEQUEL5: Remove allowed_columns handling
           allowed_columns.map{|x| "#{x}="}
         else
-          meths = instance_methods.collect(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
+          meths = instance_methods.map(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
           meths
         end
@@ -2493,7 +2493,7 @@ module Sequel
         if type.is_a?(Array)
           type.map{|x| "#{x}="}
         else
-          meths = methods.collect(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
+          meths = methods.map(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if type != :all && primary_key && model.restrict_primary_key?
           meths
         end

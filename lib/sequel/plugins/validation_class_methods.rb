@@ -116,7 +116,7 @@ module Sequel
           validations.each do |att, procs|
             v = case att
             when Array
-              att.collect{|a| o.get_column_value(a)}
+              att.map{|a| o.get_column_value(a)}
             else
               o.get_column_value(att)
             end

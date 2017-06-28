@@ -576,7 +576,7 @@ module Sequel
         last_alias = options[:implicit_qualifier] || @opts[:last_joined_table] || first_source_alias
         qualify_type = options[:qualify]
         if Sequel.condition_specifier?(expr)
-          expr = expr.collect do |k, v|
+          expr = expr.map do |k, v|
             qualify_type = default_join_table_qualification if qualify_type.nil?
             case qualify_type
             when false
@@ -1171,7 +1171,7 @@ module Sequel
 
     # Return true if the dataset has a non-nil value for any key in opts.
     def options_overlap(opts)
-      !(@opts.collect{|k,v| k unless v.nil?}.compact & opts).empty?
+      !(@opts.map{|k,v| k unless v.nil?}.compact & opts).empty?
     end
 
     # From types allowed to be considered a simple_select_all

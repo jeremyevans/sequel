@@ -124,7 +124,7 @@ module Sequel
       cols = n.columns
       csv = String.new
       csv << "#{cols.join(', ')}\r\n" if include_column_titles
-      n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(', ')}\r\n"}
+      n.each{|r| csv << "#{cols.map{|c| r[c]}.join(', ')}\r\n"}
       csv
     end
   end

@@ -275,7 +275,7 @@ module Sequel
     # a select method, and the second is a new hash of preprocessed graph aliases.
     def graph_alias_columns(graph_aliases)
       gas = {}
-      identifiers = graph_aliases.collect do |col_alias, tc| 
+      identifiers = graph_aliases.map do |col_alias, tc| 
         table, column, value = Array(tc)
         column ||= col_alias
         gas[col_alias] = [table, column].freeze
