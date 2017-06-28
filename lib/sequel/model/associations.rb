@@ -1450,7 +1450,7 @@ module Sequel
     
       # This module contains methods added to all association datasets
       module AssociationDatasetMethods
-        Dataset.def_deprecated_opts_setter(self, :model, :association_reflection)
+        Dataset.def_deprecated_opts_setter(self, :model_object, :association_reflection)
 
         # The model object that created the association dataset
         def model_object
@@ -1460,6 +1460,12 @@ module Sequel
         # The association reflection related to the association dataset
         def association_reflection
           @opts[:association_reflection]
+        end
+        
+        private
+
+        def non_sql_option?(key)
+          super || key == :model_object || key == :association_reflection
         end
       end
       
@@ -3134,6 +3140,10 @@ END
           association_filter_handle_inversion(op, expr, keys)
         end
         alias one_to_one_association_filter_expression one_to_many_association_filter_expression
+
+        def non_sql_option?(key)
+          super || key == :eager || key == :eager_graph
+        end
 
         # Build associations from the graph if #eager_graph was used, 
         # and/or load other associations if #eager was used.

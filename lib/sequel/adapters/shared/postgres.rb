@@ -1406,10 +1406,11 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
       SKIP_LOCKED = " SKIP LOCKED".freeze
       Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:cursor, :insert_conflict]).freeze
+      Sequel::Deprecation.deprecate_constant(self, :NON_SQL_OPTIONS)
 
       NULL = LiteralString.new('NULL').freeze
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)#.freeze # SEQUEL5
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:cursor, :insert_conflict]).freeze
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
       Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
@@ -1880,8 +1881,8 @@ module Sequel
       end
 
       # Dataset options that do not affect the generated SQL.
-      def non_sql_options
-        NON_SQL_OPTIONS
+      def non_sql_option?(key)
+        super || key == :cursor || key == :insert_conflict
       end
 
       # PostgreSQL requires parentheses around compound datasets if they use

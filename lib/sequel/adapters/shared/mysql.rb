@@ -719,10 +719,11 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(self, :CURRENT_TIMESTAMP_56)
       ONLY_OFFSET = ",18446744073709551615".freeze
       Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:insert_ignore, :update_ignore, :on_duplicate_key_update]).freeze
+      Sequel::Deprecation.deprecate_constant(self, :NON_SQL_OPTIONS)
 
       MATCH_AGAINST = ["MATCH ".freeze, " AGAINST (".freeze, ")".freeze].freeze
       MATCH_AGAINST_BOOLEAN = ["MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE)".freeze].freeze
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:insert_ignore, :update_ignore, :on_duplicate_key_update]).freeze
 
       Dataset.def_sql_method(self, :delete, %w'delete from where order limit')
       Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
@@ -1106,9 +1107,8 @@ module Sequel
         :values
       end
 
-      # Dataset options that do not affect the generated SQL.
-      def non_sql_options
-        NON_SQL_OPTIONS
+      def non_sql_option?(key)
+        super || key == :insert_ignore || key == :update_ignore || key == :on_duplicate_key_update
       end
 
       def select_only_offset_sql(sql)

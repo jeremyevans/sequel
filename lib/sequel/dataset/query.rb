@@ -20,7 +20,7 @@ module Sequel
 
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
-    NON_SQL_OPTIONS = [:server, :graph, :eager, :eager_graph, :graph_aliases, :row_proc, :quote_identifiers, :identifier_input_method, :identifier_output_method, :skip_symbol_cache, :model, :model_object, :association_reflection, :fetch, :numrows, :autoid].freeze # SEQUEL5: Remove graph_aliases
+    NON_SQL_OPTIONS = [:server, :graph, :graph_aliases, :row_proc, :quote_identifiers, :identifier_input_method, :identifier_output_method, :skip_symbol_cache].freeze # SEQUEL5: Remove graph_aliases
     
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
@@ -281,8 +281,7 @@ module Sequel
     #   # SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS foo(c1, c2)
     def from_self(opts=OPTS)
       fs = {}
-      non_sql = non_sql_options
-      @opts.keys.each{|k| fs[k] = nil unless non_sql.include?(k)}
+      @opts.keys.each{|k| fs[k] = nil unless non_sql_option?(k)}
       c = clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
       if cols = _columns
         c.send(:columns=, cols)
@@ -1183,8 +1182,7 @@ module Sequel
     #   SELECT table.* FROM table
     def simple_select_all?
       return false unless (f = @opts[:from]) && f.length == 1
-      non_sql = non_sql_options
-      o = @opts.reject{|k,v| v.nil? || non_sql.include?(k)}
+      o = @opts.reject{|k,v| v.nil? || non_sql_option?(k)}
       from = f.first
       from = from.expression if from.is_a?(SQL::AliasedExpression)
 
@@ -1360,9 +1358,15 @@ module Sequel
       server?(:default)
     end
 
-    # Dataset options that do not affect the generated SQL.
+    # SEQUEL5: Remove
     def non_sql_options
+      Sequel::Deprecation.deprecate("Dataset#non_sql_options (private method)", "Convert the related code to use the non_sql_option? method")
       NON_SQL_OPTIONS
+    end
+
+    # Whether the given option key does not affect the generated SQL.
+    def non_sql_option?(key)
+      NON_SQL_OPTIONS.include?(key)
     end
 
     # Treat the +block+ as a virtual_row block if not +nil+ and

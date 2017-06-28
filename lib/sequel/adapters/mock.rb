@@ -395,6 +395,10 @@ module Sequel
       def execute_insert(sql, opts=OPTS, &block)
         super(sql, opts.merge(:dataset=>self), &block)
       end
+
+      def non_sql_option?(key)
+        super || key == :fetch || key == :numrows || key == :autoid
+      end
     end
   end
 end

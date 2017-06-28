@@ -540,7 +540,6 @@ module Sequel
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}#.freeze # SEQUEL5
       EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}#.freeze # SEQUEL5
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
       LIMIT_ALL = Object.new.freeze
 
       BOOL_TRUE = '1'.freeze
@@ -629,6 +628,8 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
       FETCH_NEXT = " FETCH NEXT ".freeze
       Sequel::Deprecation.deprecate_constant(self, :FETCH_NEXT)
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
+      Sequel::Deprecation.deprecate_constant(self, :NON_SQL_OPTIONS)
 
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')
@@ -1049,9 +1050,8 @@ module Sequel
         is_2008_or_later? ? :values : :union
       end
 
-      # Dataset options that do not affect the generated SQL.
-      def non_sql_options
-        NON_SQL_OPTIONS
+      def non_sql_option?(key)
+        super || key == :disable_insert_output || key == :mssql_unicode_strings
       end
 
       def select_into_sql(sql)

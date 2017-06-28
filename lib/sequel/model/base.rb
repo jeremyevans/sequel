@@ -2782,6 +2782,10 @@ module Sequel
           where(cond).limit(1)
         end
       end
+
+      def non_sql_option?(key)
+        super || key == :model
+      end
     end
 
     extend ClassMethods

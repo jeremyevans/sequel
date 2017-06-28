@@ -73,8 +73,8 @@ module Sequel
     end
 
     # Dataset options that do not affect the generated SQL.
-    def non_sql_options
-      super + [:defaults, :overrides]
+    def non_sql_option?(key)
+      super || key == :defaults || key == :overrides
     end
   end
 
