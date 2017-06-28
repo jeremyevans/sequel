@@ -129,8 +129,17 @@ module Sequel
         im = input_identifier_meth
         indexes = {}
         metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
-          # :only_autocreated internal option can be used to get only autocreated indexes
-          next if (!!(r[:name] =~ /\Asqlite_autoindex_/) ^ !!opts[:only_autocreated])
+          if opts[:only_autocreated]
+            # If specifically asked for only autocreated indexes, then return those an only those
+            next unless r[:name] =~ /\Asqlite_autoindex_/
+          elsif r.has_key?(:origin)
+            # If origin is set, then only exclude primary key indexes, leaving regular unique ones
+            next if r[:origin] == 'pk'
+          else
+            # When :origin key not present, assume any autoindex could be a primary key one and exclude it
+            next if r[:name] =~ /\Asqlite_autoindex_/
+          end
+
           indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
         end
         indexes.each do |k, v|
@@ -406,8 +415,12 @@ module Sequel
 
         # Determine unique constraints and make sure the new columns have them
         unique_columns = []
-        indexes(table, :only_autocreated=>true).each_value do |h|
-          unique_columns.concat(h[:columns]) if h[:columns].length == 1 && h[:unique]
+        skip_indexes = []
+        indexes(table, :only_autocreated=>true).each do |name, h|
+          skip_indexes << name
+          if h[:columns].length == 1 && h[:unique]
+            unique_columns.concat(h[:columns])
+          end
         end
         unique_columns -= pks
         unless unique_columns.empty?
@@ -430,6 +443,7 @@ module Sequel
            "DROP TABLE #{bt}"
         ]
         indexes(table).each do |name, h|
+          next if skip_indexes.include?(name)
           if (h[:columns].map(&:to_s) - new_columns).empty?
             a << alter_table_sql(table, h.merge(:op=>:add_index, :name=>name))
           end

@@ -717,4 +717,9 @@ describe "A SQLite database" do
     @db[:test2].insert(:name=>'a')
     proc{@db[:test2].insert(:name=>'a')}.must_raise(Sequel::ConstraintViolation, Sequel::UniqueConstraintViolation)
   end
+
+  it "should show unique constraints in Database#indexes" do
+    @db.alter_table(:test2){add_unique_constraint :name}
+    @db.indexes(:test2).values.first[:columns].must_equal [:name]
+  end if DB.sqlite_version >= 30808
 end

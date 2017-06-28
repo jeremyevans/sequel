@@ -1,5 +1,7 @@
 === master
 
+* Make Database#indexes include indexes created automatically from unique constraints on SQLite 3.8.8+ (jeremyevans)
+
 * Deprecate Sequel::Postgres::PG_TYPES, conversion procs should not be registered per-Database (jeremyevans)
 
 * Add Database#add_conversion_proc method on PostgreSQL for registering conversion procs (jeremyevans)
