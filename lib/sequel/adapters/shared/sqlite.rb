@@ -20,12 +20,14 @@ module Sequel
 
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
       Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
+      TABLES_FILTER = Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}
+      Sequel::Deprecation.deprecate_constant(self, :TABLES_FILTER)
+      VIEWS_FILTER = {:type => 'view'.freeze}.freeze
+      Sequel::Deprecation.deprecate_constant(self, :VIEWS_FILTER)
 
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
-      TABLES_FILTER = Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}
       TEMP_STORE = [:default, :file, :memory].freeze
-      VIEWS_FILTER = {:type => 'view'.freeze}.freeze
       TRANSACTION_MODE = {
         :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
         :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
@@ -36,26 +38,6 @@ module Sequel
       # Whether to use integers for booleans in the database.  SQLite recommends
       # booleans be stored as integers, but historically Sequel has used 't'/'f'.
       attr_accessor :integer_booleans
-
-      # A symbol signifying the value of the auto_vacuum PRAGMA.
-      def auto_vacuum
-        AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
-      end
-      
-      # Set the auto_vacuum PRAGMA using the given symbol (:none, :full, or
-      # :incremental).  See pragma_set.  Consider using the :auto_vacuum
-      # Database option instead.
-      def auto_vacuum=(value)
-        value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
-        pragma_set(:auto_vacuum, value)
-      end
-
-      # Set the case_sensitive_like PRAGMA using the given boolean value, if using
-      # SQLite 3.2.3+.  If not using 3.2.3+, no error is raised. See pragma_set.
-      # Consider using the :case_sensitive_like Database option instead.
-      def case_sensitive_like=(value)
-        pragma_set(:case_sensitive_like, !!value ? 'on' : 'off') if sqlite_version >= 30203
-      end
 
       # A symbol signifying the value of the default transaction mode
       attr_reader :transaction_mode
@@ -74,17 +56,49 @@ module Sequel
         :sqlite
       end
       
-      # Boolean signifying the value of the foreign_keys PRAGMA, or nil
-      # if not using SQLite 3.6.19+.
+      # SEQUEL5: Remove
+      def auto_vacuum
+        AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
+      end
+      def auto_vacuum=(value)
+        value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
+        pragma_set(:auto_vacuum, value)
+      end
+      def case_sensitive_like=(value)
+        pragma_set(:case_sensitive_like, !!value ? 'on' : 'off') if sqlite_version >= 30203
+      end
       def foreign_keys
         pragma_get(:foreign_keys).to_i == 1 if sqlite_version >= 30619
       end
-      
-      # Set the foreign_keys PRAGMA using the given boolean value, if using
-      # SQLite 3.6.19+.  If not using 3.6.19+, no error is raised. See pragma_set.
-      # Consider using the :foreign_keys Database option instead.
       def foreign_keys=(value)
         pragma_set(:foreign_keys, !!value ? 'on' : 'off') if sqlite_version >= 30619
+      end
+      def pragma_get(name)
+        Sequel::Deprecation.deprecate('Database#{pragma_get,auto_vacuum,case_sensitive_like,foreign_keys,synchronous,temp_store} on SQLite', "These methods may not be safe when using multiple connections, call fetch(#{"PRAGMA #{name}".inspect}).single_value if you really want to get the pragma value")
+        self["PRAGMA #{name}"].single_value
+      end
+      def pragma_set(name, value)
+        Sequel::Deprecation.deprecate('Database#{pragma_set,auto_vacuum=,case_sensitive_like=,foreign_keys=,synchronous=,temp_store=} on SQLite', "These methods are not thread safe or safe when using multiple connections, pass the appropriate option when connecting to set the pragma correctly for all connections")
+        execute_ddl("PRAGMA #{name} = #{value}")
+      end
+      def synchronous
+        SYNCHRONOUS[pragma_get(:synchronous).to_i]
+      end
+      def synchronous=(value)
+        value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
+        pragma_set(:synchronous, value)
+      end
+      def temp_store
+        TEMP_STORE[pragma_get(:temp_store).to_i]
+      end
+      def temp_store=(value)
+        value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
+        pragma_set(:temp_store, value)
+      end
+
+      # Set the integer_booleans option using the passed in :integer_boolean option.
+      def set_integer_booleans
+        @integer_booleans = @opts.has_key?(:integer_booleans) ? typecast_value_boolean(@opts[:integer_booleans]) : true
       end
 
       # Return the array of foreign key info hashes using the foreign_key_list PRAGMA,
@@ -125,28 +139,6 @@ module Sequel
         indexes
       end
 
-      # Get the value of the given PRAGMA.
-      def pragma_get(name)
-        Sequel::Deprecation.deprecate('Database#{pragma_get,auto_vacuum,case_sensitive_like,foreign_keys,synchronous,temp_store} on SQLite', "These methods may not be safe when using multiple connections, call fetch(#{"PRAGMA #{name}".inspect}).single_value if you really want to get the pragma value")
-        self["PRAGMA #{name}"].single_value
-      end
-      
-      # Set the value of the given PRAGMA to value.
-      #
-      # This method is not thread safe, and will not work correctly if there
-      # are multiple connections in the Database's connection pool. PRAGMA
-      # modifications should be done when the connection is created, using
-      # an option provided when creating the Database object.
-      def pragma_set(name, value)
-        Sequel::Deprecation.deprecate('Database#{pragma_set,auto_vacuum=,case_sensitive_like=,foreign_keys=,synchronous=,temp_store=} on SQLite', "These methods are not thread safe or safe when using multiple connections, pass the appropriate option when connecting to set the pragma correctly for all connections")
-        execute_ddl("PRAGMA #{name} = #{value}")
-      end
-
-      # Set the integer_booleans option using the passed in :integer_boolean option.
-      def set_integer_booleans
-        @integer_booleans = @opts.has_key?(:integer_booleans) ? typecast_value_boolean(@opts[:integer_booleans]) : true
-      end
-      
       # The version of the server as an integer, where 3.6.19 = 30619.
       # If the server version can't be determined, 0 is used.
       def sqlite_version
@@ -190,36 +182,12 @@ module Sequel
         defined?(@use_timestamp_timezones) ? @use_timestamp_timezones : (@use_timestamp_timezones = false)
       end
 
-      # A symbol signifying the value of the synchronous PRAGMA.
-      def synchronous
-        SYNCHRONOUS[pragma_get(:synchronous).to_i]
-      end
-      
-      # Set the synchronous PRAGMA using the given symbol (:off, :normal, or :full). See pragma_set.
-      # Consider using the :synchronous Database option instead.
-      def synchronous=(value)
-        value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
-        pragma_set(:synchronous, value)
-      end
-      
       # Array of symbols specifying the table names in the current database.
       #
       # Options:
       # :server :: Set the server to use.
       def tables(opts=OPTS)
-        tables_and_views(TABLES_FILTER, opts)
-      end
-      
-      # A symbol signifying the value of the temp_store PRAGMA.
-      def temp_store
-        TEMP_STORE[pragma_get(:temp_store).to_i]
-      end
-      
-      # Set the temp_store PRAGMA using the given symbol (:default, :file, or :memory). See pragma_set.
-      # Consider using the :temp_store Database option instead.
-      def temp_store=(value)
-        value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
-        pragma_set(:temp_store, value)
+        tables_and_views(Sequel.~(:name=>'sqlite_sequence') & {:type => 'table'}, opts)
       end
       
       # Creates a dataset that uses the VALUES clause:
@@ -235,7 +203,7 @@ module Sequel
       # Options:
       # :server :: Set the server to use.
       def views(opts=OPTS)
-        tables_and_views(VIEWS_FILTER, opts)
+        tables_and_views({:type => 'view'}, opts)
       end
 
       private
@@ -471,7 +439,7 @@ module Sequel
 
       # Does the reverse of on_delete_clause, eg. converts strings like +'SET NULL'+
       # to symbols +:set_null+.
-      def on_delete_sql_to_sym str
+      def on_delete_sql_to_sym(str)
         case str
         when 'RESTRICT'
           :restrict
