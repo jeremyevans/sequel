@@ -1782,7 +1782,6 @@ module Sequel
           opts.merge!(orig_opts)
           opts.merge!(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
 
-          opts
           opts[:block] = block if block
           if !opts.has_key?(:instance_specific) && (block || orig_opts[:block] || orig_opts[:dataset])
             # It's possible the association is instance specific, in that it depends on
