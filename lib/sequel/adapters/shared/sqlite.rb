@@ -517,6 +517,9 @@ module Sequel
       include Dataset::Replace
       include UnmodifiedIdentifiers::DatasetMethods
 
+      # The allowed values for insert_conflict
+      INSERT_CONFLICT_RESOLUTIONS = %w'ROLLBACK ABORT FAIL IGNORE REPLACE'.each(&:freeze).freeze
+
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}#.freeze # SEQUEL5
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}#.freeze # SEQUEL5
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
@@ -644,7 +647,7 @@ module Sequel
       end
       
       # Return an array of strings specifying a query explanation for a SELECT of the
-      # current dataset. Currently, the options are ignore, but it accepts options
+      # current dataset. Currently, the options are ignored, but it accepts options
       # to be compatible with other adapters.
       def explain(opts=nil)
         # Load the PrettyTable class, needed for explain output
@@ -691,6 +694,10 @@ module Sequel
       #   DB[:table].insert_conflict(:replace).insert(:a=>1, :b=>2)
       #   # INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)
       def insert_conflict(resolution = :ignore)
+        unless INSERT_CONFLICT_RESOLUTIONS.include?(resolution.to_s.upcase)
+          Sequel::Deprecation.deprecate("Passing #{resolution.inspect} argument to Dataset#insert_conflict", "The allowed values are: :rollback, :abort, :fail, :ignore, or :replace")
+          # raise Error, "Invalid value passed to Dataset#insert_conflict: #{resolution.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace"
+        end
         clone(:insert_conflict => resolution)
       end
 

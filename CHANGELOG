@@ -1,5 +1,7 @@
 === master
 
+* Deprecate unexpected values passed to Dataset#insert_conflict on SQLite (jeremyevans)
+
 * Deprecate Sequel::SqlAnywhere::Dataset#convert_smallint_to_bool= method (jeremyevans)
 
 * Deprecate Sequel::SqlAnywhere.convert_smallint_to_bool accessor (jeremyevans)
