@@ -35,12 +35,12 @@ describe "pg_interval extension" do
   end
 
   deprecated "should set up conversion procs correctly" do
-    cp = Sequel::Postgres::PG_TYPES
+    cp = Sequel::Postgres::PG__TYPES
     cp[1186].call("1 sec").must_equal ActiveSupport::Duration.new(1, [[:seconds, 1]])
   end
 
   deprecated "should set up conversion procs for arrays correctly" do
-    cp = Sequel::Postgres::PG_TYPES
+    cp = Sequel::Postgres::PG__TYPES
     cp[1187].call("{1 sec}").must_equal [ActiveSupport::Duration.new(1, [[:seconds, 1]])]
   end
 

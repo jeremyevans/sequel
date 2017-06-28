@@ -33,7 +33,7 @@
 # Related module: Sequel::Postgres::IntervalDatabaseMethods
 
 require 'active_support/duration'
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
@@ -123,7 +123,7 @@ module Sequel
       def self.extended(db)
         db.instance_eval do
           extend_datasets(IntervalDatasetMethods)
-          conversion_procs[1186] = Postgres::IntervalDatabaseMethods::PARSER
+          add_conversion_proc(1186, Postgres::IntervalDatabaseMethods::PARSER)
           if respond_to?(:register_array_type)
             register_array_type('interval', :oid=>1187, :scalar_oid=>1186)
           end
@@ -192,7 +192,7 @@ module Sequel
     end
 
     # SEQUEL5: Remove
-    PG_TYPES[1186] = lambda do |s|
+    PG__TYPES[1186] = lambda do |s|
       Sequel::Deprecation.deprecate("Conversion proc for interval added globally by pg_interval extension", "Load the pg_interval extension into the Database instance")
       Postgres::IntervalDatabaseMethods::PARSER.call(s)
     end

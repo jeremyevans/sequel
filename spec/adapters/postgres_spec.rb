@@ -3387,7 +3387,7 @@ describe 'PostgreSQL interval types' do
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after(:all) do
-    Sequel::Postgres::PG_TYPES.delete(1186)
+    Sequel::Postgres::PG__TYPES.delete(1186) # SEQUEL5: Remove
   end
   after do
     @db.drop_table?(:items)

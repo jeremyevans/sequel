@@ -60,6 +60,12 @@ module Sequel
           db.send(:initialize_postgres_adapter)
         end
 
+        # Remove any current entry for the oid in the oid_convertor_map.
+        def add_conversion_proc(oid, *)
+          super
+          Sequel.synchronize{@oid_convertor_map.delete(oid)}
+        end
+
         # See Sequel::Postgres::Adapter#copy_into
         def copy_into(table, opts=OPTS)
           data = opts[:data]
@@ -136,14 +142,14 @@ module Sequel
             else
               false
             end
-             Sequel.synchronize{@oid_convertor_map[oid] = conv}
+            Sequel.synchronize{@oid_convertor_map[oid] = conv}
           end
           conv
         end
 
         private
         
-        # Clear oid convertor map cache when conversion procs are updated.
+        # SEQUEL5: Remove
         def conversion_procs_updated
           super
           Sequel.synchronize{@oid_convertor_map = {}}

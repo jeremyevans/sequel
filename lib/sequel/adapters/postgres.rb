@@ -286,7 +286,7 @@ module Sequel
             end
           end
         end
-        conversion_procs[1082] = pr
+        add_conversion_proc(1082, pr)
       end
 
       # Disconnect given connection
@@ -525,8 +525,8 @@ module Sequel
       def adapter_initialize
         @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, Postgres.instance_variable_get(:@use_iso_date_format))) # , true)) # SEQUEL5
         initialize_postgres_adapter
-        conversion_procs[17] = method(:unescape_bytea) if USES_PG
-        conversion_procs[1082] = TYPE_TRANSLATOR.method(:date) if @use_iso_date_format
+        add_conversion_proc(17, method(:unescape_bytea)) if USES_PG
+        add_conversion_proc(1082, TYPE_TRANSLATOR.method(:date)) if @use_iso_date_format
         self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
 

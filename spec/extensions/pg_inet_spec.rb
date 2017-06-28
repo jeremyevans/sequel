@@ -19,13 +19,13 @@ describe "pg_inet extension" do
   end unless ipv6_broken
 
   deprecated "should set up conversion procs correctly" do
-    cp = Sequel::Postgres::PG_TYPES
+    cp = Sequel::Postgres::PG__TYPES
     cp[869].call("127.0.0.1").must_equal IPAddr.new('127.0.0.1')
     cp[650].call("127.0.0.1").must_equal IPAddr.new('127.0.0.1')
   end
 
   deprecated "should set up conversion procs for arrays correctly" do
-    cp = Sequel::Postgres::PG_TYPES
+    cp = Sequel::Postgres::PG__TYPES
     cp[1041].call("{127.0.0.1}").must_equal [IPAddr.new('127.0.0.1')]
     cp[651].call("{127.0.0.1}").must_equal [IPAddr.new('127.0.0.1')]
     cp[1040].call("{127.0.0.1}").must_equal ['127.0.0.1']

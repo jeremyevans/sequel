@@ -29,7 +29,7 @@
 # Related module: Sequel::Postgres::InetDatabaseMethods
 
 require 'ipaddr'
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
@@ -41,7 +41,9 @@ module Sequel
       def self.extended(db)
         db.instance_eval do
           extend_datasets(InetDatasetMethods)
-          conversion_procs[869] = conversion_procs[650] = IPAddr.method(:new)
+          meth = IPAddr.method(:new)
+          add_conversion_proc(869, meth)
+          add_conversion_proc(650, meth)
           if respond_to?(:register_array_type)
             register_array_type('inet', :oid=>1041, :scalar_oid=>869)
             register_array_type('cidr', :oid=>651, :scalar_oid=>650)
@@ -113,7 +115,7 @@ module Sequel
 
     # SEQUEL5: Remove
     meth = IPAddr.method(:new)
-    PG_TYPES[869] = PG_TYPES[650] = lambda do |s|
+    PG__TYPES[869] = PG__TYPES[650] = lambda do |s|
       Sequel::Deprecation.deprecate("Conversion proc for inet/cidr added globally by pg_inet extension", "Load the pg_inet extension into the Database instance")
       IPAddr.new(s)
     end

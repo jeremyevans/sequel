@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require %w'pg_types unmodified_identifiers', 'adapters/utils'
+Sequel.require %w'adapters/utils/unmodified_identifiers'
 
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
@@ -18,6 +18,88 @@ module Sequel
   #                 an unqualified object is referenced.
   module Postgres
     Sequel::Database.set_shared_adapter_scheme(:postgres, self)
+
+    NAN             = 0.0/0.0
+    PLUS_INFINITY   = 1.0/0.0
+    MINUS_INFINITY  = -1.0/0.0
+
+    NAN_STR             = 'NaN'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :NAN_STR)
+    PLUS_INFINITY_STR   = 'Infinity'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :PLUS_INFINITY_STR)
+    MINUS_INFINITY_STR  = '-Infinity'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :MINUS_INFINITY_STR)
+    TRUE_STR = 't'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :TRUE_STR)
+    DASH_STR = '-'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DASH_STR)
+    
+    TYPE_TRANSLATOR = tt = Class.new do
+      def boolean(s) s == 't' end
+      def integer(s) s.to_i end
+      def float(s) 
+        case s
+        when 'NaN'
+          NAN
+        when 'Infinity'
+          PLUS_INFINITY
+        when '-Infinity'
+          MINUS_INFINITY
+        else
+          s.to_f 
+        end
+      end
+      def date(s) ::Date.new(*s.split('-').map(&:to_i)) end
+      def bytea(str)
+        str = if str =~ /\A\\x/
+          # PostgreSQL 9.0+ bytea hex format
+          str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
+        else
+          # Historical PostgreSQL bytea escape format
+          str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
+            if s.size == 2 then s[1,1] else s[1,3].oct.chr end
+          }
+        end
+        ::Sequel::SQL::Blob.new(str)
+      end
+    end.new#.freeze # SEQUEL5
+
+    # Type OIDs for string types used by PostgreSQL.  These types don't
+    # have conversion procs associated with them (since the data is
+    # already in the form of a string).
+    STRING_TYPES = [18, 19, 25, 1042, 1043] # SEQUEL5: Remove
+
+    # Hash with type name strings/symbols and callable values for converting PostgreSQL types.
+    # Non-builtin types that don't have fixed numbers should use this to register
+    # conversion procs.
+    PG_NAMED_TYPES = {} unless defined?(PG_NAMED_TYPES)
+    PG_NAMED__TYPES = PG_NAMED_TYPES
+    Sequel::Deprecation.deprecate_constant(self, :PG_NAMED_TYPES)
+
+    # Hash with integer keys and callable values for converting PostgreSQL types.
+    PG_TYPES = {} unless defined?(PG_TYPES)
+
+    #CONVERSION_PROCS = {} # SEQUEL5
+
+    {
+      [16] => tt.method(:boolean),
+      [17] => tt.method(:bytea),
+      [20, 21, 23, 26] => tt.method(:integer),
+      [700, 701] => tt.method(:float),
+      [1700] => ::BigDecimal.method(:new),
+      [1083, 1266] => ::Sequel.method(:string_to_time),
+      [1082] => ::Sequel.method(:string_to_date),
+      [1184, 1114] => ::Sequel.method(:database_to_application_timestamp),
+    }.each do |k,v|
+      k.each do |n|
+        PG_TYPES[n] = v
+        #CONVERSION_PROCS[n] = v # SEQUEL5
+      end
+    end
+    PG__TYPES = PG_TYPES
+    Sequel::Deprecation.deprecate_constant(self, :PG_TYPES)
+
+    #CONVERSION_PROCS.freeze # SEQUEL5
 
     module MockAdapterDatabaseMethods
       def bound_variable_arg(arg, conn)
@@ -175,6 +257,12 @@ module Sequel
       # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
 
+      # Set a conversion proc for the given oid.  The callable can
+      # be passed either as a argument or a block.
+      def add_conversion_proc(oid, callable=Proc.new)
+        conversion_procs[oid] = callable
+      end
+
       # Add a conversion proc for a named type.  This should be used 
       # for types without fixed OIDs, which includes all types that
       # are not included in a default PostgreSQL installation.  If 
@@ -186,7 +274,12 @@ module Sequel
             Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each database you want to support the #{name} type")
           end
         end
-        add_named_conversion_procs(conversion_procs, name=>block)
+        add_named_conversion_procs(conversion_procs, name=>block) # SEQUEL5: Remove
+        # SEQUEL5:
+        #unless oid = from(:pg_type).where(:typtype=>['b', 'e'], :typname=>name.to_s).get(:oid)
+        #  raise Error, "No matching type in pg_type for #{name.inspect}"
+        #end
+        #add_conversion_proc(oid, block) # SEQUEL5
       end
 
       # Commit an existing prepared transaction with the given transaction
@@ -482,8 +575,7 @@ module Sequel
         run "REFRESH MATERIALIZED VIEW#{' CONCURRENTLY' if opts[:concurrently]} #{quote_schema_table(name)}"
       end
       
-      # Reset the database's conversion procs, requires a server query if there
-      # any named types.
+      # SEQUEL5: Remove
       def reset_conversion_procs
         Sequel::Deprecation.deprecate('Database#reset_conversion_procs', 'There should no longer be a need to reset conversion procs')
         @conversion_procs = get_conversion_procs
@@ -631,8 +723,7 @@ module Sequel
 
       private
 
-      # Do a type name-to-oid lookup using the database and update the procs
-      # with the related proc if the database supports the type.
+      # SEQUEL5: Remove
       def add_named_conversion_procs(procs, named_procs)
         unless (named_procs).empty?
           convert_named_procs_to_procs(named_procs).each do |oid, pr|
@@ -781,12 +872,12 @@ module Sequel
         end
       end
 
-      # Callback used when conversion procs are updated.
+      # SEQUEL5: Remove
       def conversion_procs_updated
         nil
       end
 
-      # Convert the hash of named conversion procs into a hash a oid conversion procs. 
+      # SEQUEL5: Remove
       def convert_named_procs_to_procs(named_procs)
         h = {}
         from(:pg_type).where(:typtype=>['b', 'e'], :typname=>named_procs.keys.map(&:to_s)).select_map([:oid, :typname]).each do |oid, name|
@@ -797,10 +888,10 @@ module Sequel
 
       # SEQUEL5: Remove
       def copy_conversion_procs(oids)
-        Sequel::Deprecation.deprecate("Database#copy_conversion_procs", "There is no reason to use this anymore, as PG_TYPES will be frozen in Sequel 5")
+        Sequel::Deprecation.deprecate("Database#copy_conversion_procs", "There is no reason to use this anymore")
         procs = conversion_procs
         oids.each do |oid|
-          procs[oid] = PG_TYPES[oid]
+          procs[oid] = PG__TYPES[oid]
         end
         conversion_procs_updated
       end
@@ -1018,9 +1109,9 @@ module Sequel
         ds.where{{pg_namespace[:nspname]=>expr}}
       end
 
-      # Return a hash with oid keys and callable values, used for converting types.
+      # SEQUEL5: Remove
       def get_conversion_procs
-        procs = PG_TYPES.dup
+        procs = PG__TYPES.dup
         procs[1184] = procs[1114] = method(:to_application_timestamp)
         unless PG_NAMED__TYPES.empty?
           Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each Database instance where you want to support the following type(s): #{PG_NAMED__TYPES.keys.join(', ')}")
@@ -1057,8 +1148,10 @@ module Sequel
         @primary_keys = {}
         @primary_key_sequences = {}
         @supported_types = {}
-        @conversion_procs = get_conversion_procs
-        conversion_procs_updated
+        @conversion_procs = get_conversion_procs # SEQUEL5: Remove
+        conversion_procs_updated # SEQUEL5: Remove
+        # @conversion_procs = CONVERSION_PROCS.dup # SEQUEL5
+        # procs[1184] = procs[1114] = method(:to_application_timestamp) # SEQUEL5
       end
 
       # Backbone of the tables and views support.

@@ -88,7 +88,7 @@
 
 require 'delegate'
 require 'strscan'
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
@@ -405,7 +405,7 @@ module Sequel
             @row_types = {}
             @row_schema_types = {}
             extend(@row_type_method_module = Module.new)
-            conversion_procs[2249] = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
+            add_conversion_proc(2249, PGRow::Parser.new(:converter=>PGRow::ArrayRow))
             if respond_to?(:register_array_type)
               register_array_type('record', :oid=>2287, :scalar_oid=>2249)
             end
@@ -511,7 +511,7 @@ module Sequel
           parser_opts[:typecaster] = opts.fetch(:typecaster, parser_opts[:converter])
 
           parser = Parser.new(parser_opts)
-          @conversion_procs[parser.oid] = parser
+          add_conversion_proc(parser.oid, parser)
 
           if respond_to?(:register_array_type) && array_oid && array_oid > 0
             array_type_name = if type_schema
@@ -533,7 +533,7 @@ module Sequel
             private meth
           end
 
-          conversion_procs_updated
+          conversion_procs_updated # SEQUEL5: Remove
           nil
         end
 
@@ -605,7 +605,7 @@ module Sequel
 
     # SEQUEL5: Remove
     parser = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
-    PG_TYPES[2249] = lambda do |s|
+    PG__TYPES[2249] = lambda do |s|
       Sequel::Deprecation.deprecate("Conversion proc for record added globally by pg_row extension", "Load the pg_row extension into the Database instance")
       parser.call(s)
     end

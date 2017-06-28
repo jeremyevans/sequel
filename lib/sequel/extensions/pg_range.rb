@@ -52,7 +52,7 @@
 # appropriate converter installed.  For user defined
 # types, you can do this via:
 #
-#   DB.conversion_procs[subtype_oid] = lambda{|string| }
+#   DB.add_conversion_proc(subtype_oid){|string| }
 #
 # Then you can call
 # Sequel::Postgres::PGRange::DatabaseMethods#register_range_type
@@ -70,7 +70,7 @@
 #
 # Related module: Sequel::Postgres::PGRange
 
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
@@ -108,7 +108,7 @@ module Sequel
         Sequel::Deprecation.deprecate("Sequel::Postgres::PGRange.register", "Use Database#register_range_type on a Database instance using the pg_range extension") unless opts[:skip_deprecation_warning]
         db_type = db_type.to_s.dup.freeze
 
-        type_procs = opts[:type_procs] || PG_TYPES
+        type_procs = opts[:type_procs] || PG__TYPES
         mod = opts[:typecast_methods_module] || DatabaseMethods
         typecast_method_map = opts[:typecast_method_map] || RANGE_TYPES
 
@@ -238,16 +238,15 @@ module Sequel
             [:int4range, :numrange, :tsrange, :tstzrange, :daterange, :int8range].each do |v|
               @schema_type_classes[v] = PGRange
             end
-          end
 
-          procs = db.conversion_procs
-          procs[3908] = Parser.new("tsrange", procs[1114])
-          procs[3910] = Parser.new("tstzrange", procs[1184])
-          if defined?(PGArray::Creator)
-            procs[3909] = PGArray::Creator.new("tsrange", procs[3908])
-            procs[3911] = PGArray::Creator.new("tstzrange", procs[3910])
+            procs = conversion_procs
+            add_conversion_proc(3908, Parser.new("tsrange", procs[1114]))
+            add_conversion_proc(3910, Parser.new("tstzrange", procs[1184]))
+            if defined?(PGArray::Creator)
+              add_conversion_proc(3909, PGArray::Creator.new("tsrange", procs[3908]))
+              add_conversion_proc(3911, PGArray::Creator.new("tstzrange", procs[3910]))
+            end
           end
-
         end
 
         # Handle Range and PGRange values in bound variables
@@ -311,7 +310,8 @@ module Sequel
             raise Error, "no conversion proc for :subtype_oid=>#{soid.inspect} in conversion_procs" unless converter = conversion_procs[soid]
           end
 
-          parser = conversion_procs[oid] = Parser.new(db_type, converter)
+          parser = Parser.new(db_type, converter)
+          add_conversion_proc(oid, parser)
 
           @pg_range_schema_types[db_type] = db_type.to_sym
 
@@ -322,7 +322,8 @@ module Sequel
           end
 
           @schema_type_classes[:"#{opts[:type_symbol] || db_type}"] = PGRange
-          conversion_procs_updated
+          conversion_procs_updated # SEQUEL5: Remove
+          nil
         end
 
         private
@@ -337,9 +338,7 @@ module Sequel
           end
         end
 
-        # Manually override the typecasting for tsrange and tstzrange types so that
-        # they use the database's timezone instead of the global Sequel
-        # timezone.
+        # SEQUEL5: Remove
         def get_conversion_procs
           procs = super
 

@@ -62,7 +62,7 @@
 
 require 'delegate'
 require 'json'
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
@@ -134,8 +134,8 @@ module Sequel
     module JSONDatabaseMethods
       def self.extended(db)
         db.instance_eval do
-          conversion_procs[114] = JSONDatabaseMethods.method(:db_parse_json)
-          conversion_procs[3802] = JSONDatabaseMethods.method(:db_parse_jsonb)
+          add_conversion_proc(114, JSONDatabaseMethods.method(:db_parse_json))
+          add_conversion_proc(3802, JSONDatabaseMethods.method(:db_parse_jsonb))
           if respond_to?(:register_array_type)
             register_array_type('json', :oid=>199, :scalar_oid=>114)
             register_array_type('jsonb', :oid=>3807, :scalar_oid=>3802)
@@ -262,11 +262,11 @@ module Sequel
     end
 
     # SEQUEL5: Remove
-    PG_TYPES[114] = lambda do |s|
+    PG__TYPES[114] = lambda do |s|
       Sequel::Deprecation.deprecate("Conversion proc for json added globally by pg_json extension", "Load the pg_json extension into the Database instance")
       JSONDatabaseMethods.db_parse_json(s)
     end
-    PG_TYPES[3802] = lambda do |s|
+    PG__TYPES[3802] = lambda do |s|
       Sequel::Deprecation.deprecate("Conversion proc for jsonb added globally by pg_json extension", "Load the pg_json extension into the Database instance")
       JSONDatabaseMethods.db_parse_jsonb(s)
     end

@@ -10,7 +10,7 @@ describe "pg_row extension" do
   end
 
   deprecated "should parse record objects as arrays" do
-    a = Sequel::Postgres::PG_TYPES[2249].call("(a,b,c)")
+    a = Sequel::Postgres::PG__TYPES[2249].call("(a,b,c)")
     a.class.must_equal(@m::ArrayRow)
     a.to_a.must_be_kind_of(Array)
     a[0].must_equal 'a'

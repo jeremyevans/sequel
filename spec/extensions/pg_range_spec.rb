@@ -4,10 +4,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_range extension" do
   before(:all) do
     Sequel.extension :pg_array, :pg_range
-    @pg_types = Sequel::Postgres::PG_TYPES.dup
+    @pg_types = Sequel::Postgres::PG__TYPES.dup # SEQUEL5: Remove
   end
   after(:all) do
-    Sequel::Postgres::PG_TYPES.replace(@pg_types)
+    Sequel::Postgres::PG__TYPES.replace(@pg_types) # SEQUEL5: Remove
   end
 
   before do
@@ -22,7 +22,7 @@ describe "pg_range extension" do
   end
 
   deprecated "should set up conversion procs correctly" do
-    cp = Sequel::Postgres::PG_TYPES
+    cp = Sequel::Postgres::PG__TYPES
     cp[3904].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int4range')
     cp[3906].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'numrange')
     cp[3908].call("[2011-01-02 10:20:30,2011-02-03 10:20:30)").must_equal @R.new(Time.local(2011, 1, 2, 10, 20, 30),Time.local(2011, 2, 3, 10, 20, 30), :exclude_begin=>false, :exclude_end=>true, :db_type=>'tsrange')
@@ -32,7 +32,7 @@ describe "pg_range extension" do
   end
 
   deprecated "should set up conversion procs for arrays correctly" do
-    cp = Sequel::Postgres::PG_TYPES
+    cp = Sequel::Postgres::PG__TYPES
     cp[3905].call("{\"[1,2]\"}").must_equal [@R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int4range')]
     cp[3907].call("{\"[1,2]\"}").must_equal [@R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'numrange')]
     cp[3909].call("{\"[2011-01-02 10:20:30,2011-02-03 10:20:30)\"}").must_equal [@R.new(Time.local(2011, 1, 2, 10, 20, 30),Time.local(2011, 2, 3, 10, 20, 30), :exclude_begin=>false, :exclude_end=>true, :db_type=>'tsrange')]
@@ -207,7 +207,7 @@ describe "pg_range extension" do
 
   deprecated "should support registering custom types with :oid option" do
     @R.register('foo5range', :oid=>331)
-    Sequel::Postgres::PG_TYPES[331].call('[1,3)').must_be_kind_of(@R)
+    Sequel::Postgres::PG__TYPES[331].call('[1,3)').must_be_kind_of(@R)
   end
 
   deprecated "should not support registering custom range types on a per-Database basis for frozen databases" do

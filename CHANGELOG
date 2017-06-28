@@ -1,5 +1,9 @@
 === master
 
+* Deprecate Sequel::Postgres::PG_TYPES, conversion procs should not be registered per-Database (jeremyevans)
+
+* Add Database#add_conversion_proc method on PostgreSQL for registering conversion procs (jeremyevans)
+
 * Deprecate unexpected values passed to Dataset#insert_conflict on SQLite (jeremyevans)
 
 * Deprecate Sequel::SqlAnywhere::Dataset#convert_smallint_to_bool= method (jeremyevans)

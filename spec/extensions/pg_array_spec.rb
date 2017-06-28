@@ -3,10 +3,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_array extension" do
   before(:all) do
     Sequel.extension :pg_array
-    @pg_types = Sequel::Postgres::PG_TYPES.dup
+    @pg_types = Sequel::Postgres::PG__TYPES.dup # SEQUEL5: Remove
   end
   after(:all) do
-    Sequel::Postgres::PG_TYPES.replace(@pg_types)
+    Sequel::Postgres::PG__TYPES.replace(@pg_types) # SEQUEL5: Remove
   end
 
   before do

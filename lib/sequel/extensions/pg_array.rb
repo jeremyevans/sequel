@@ -48,7 +48,7 @@
 # handled and has the appropriate converter installed. For user defined
 # types, you can do this via:
 #
-#   DB.conversion_procs[scalar_type_oid] = lambda{|string| }
+#   DB.add_conversion_proc(scalar_type_oid){|string| }
 #
 # Then you can call
 # Sequel::Postgres::PGArray::DatabaseMethods#register_array_type
@@ -71,7 +71,7 @@
 
 require 'delegate'
 require 'strscan'
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
@@ -115,7 +115,7 @@ module Sequel
 
         db_type = db_type.to_s
         type = (opts[:type_symbol] || db_type).to_sym
-        type_procs = opts[:type_procs] || PG_TYPES
+        type_procs = opts[:type_procs] || PG__TYPES
         mod = opts[:typecast_methods_module] || DatabaseMethods
         typecast_method_map = opts[:typecast_method_map] || ARRAY_TYPES
 
@@ -179,8 +179,8 @@ module Sequel
           db.instance_eval do
             @pg_array_schema_types ||= {}
             procs = conversion_procs
-            procs[1115] = Creator.new("timestamp without time zone", procs[1114])
-            procs[1185] = Creator.new("timestamp with time zone", procs[1184])
+            add_conversion_proc(1115, Creator.new("timestamp without time zone", procs[1114]))
+            add_conversion_proc(1185, Creator.new("timestamp with time zone", procs[1184]))
 
             register_array_type('text', :oid=>1009, :scalar_oid=>25, :type_symbol=>:string)
             register_array_type('integer', :oid=>1007, :scalar_oid=>23)
@@ -261,7 +261,7 @@ module Sequel
         # If a block is given, it is treated as the :converter option.
         def register_array_type(db_type, opts=OPTS, &block)
           # Only for convert_named_procs_to_procs usage
-          type_procs = opts[:type_procs] || conversion_procs
+          type_procs = opts[:type_procs] || conversion_procs # SEQUEL5: Remove
 
           oid = opts[:oid]
           soid = opts[:scalar_oid]
@@ -286,11 +286,13 @@ module Sequel
 
           if soid
             raise Error, "can't provide both a converter and :scalar_oid option to register" if has_converter 
-            converter = type_procs[soid]
+            converter = type_procs[soid] # SEQUEL5: conversion_procs[soid]
           end
 
           array_type = (opts[:array_type] || db_type).to_s.dup.freeze
-          creator = type_procs[oid] = Creator.new(array_type, converter)
+          creator = Creator.new(array_type, converter)
+          type_procs[oid] = creator # SEQUEL5: Remove
+          #add_conversion_proc(oid, creator) # SEQUEL5
 
           typecast_method_map[db_type] = :"#{type}_array"
 
@@ -302,7 +304,8 @@ module Sequel
           end
 
           @schema_type_classes[:"#{type}_array"] = PGArray
-          conversion_procs_updated
+          conversion_procs_updated # SEQUEL5: Remove
+          nil
         end
 
         # SEQUEL5: Remove
@@ -339,9 +342,7 @@ module Sequel
           h
         end
 
-        # Manually override the typecasting for timestamp array types so that
-        # they use the database's timezone instead of the global Sequel
-        # timezone.
+        # SEQUEL5: Remove
         def get_conversion_procs
           procs = super
 
