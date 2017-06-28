@@ -7,8 +7,20 @@ module Sequel
 
     # Class methods for Sequel::Model that implement basic model functionality.
     #
-    # * All of the method names in Model::DATASET_METHODS have class methods created that call
-    #   the Model's dataset with the method of the same name with the given arguments.
+    # * All of the following methods have class methods created that send the method
+    #   to the model's dataset: <<, all, as_hash, avg, count, cross_join, distinct, each,
+    #   each_server, empty?, except, exclude, exclude_having, exclude_where, fetch_rows,
+    #   filter, first, first!, for_update, from, from_self, full_join, full_outer_join,
+    #   get, graph, grep, group, group_and_count, group_append, group_by, having, import,
+    #   inner_join, insert, intersect, interval, invert, join, join_table, last, left_join,
+    #   left_outer_join, limit, lock_style, map, max, min, multi_insert, naked, natural_full_join,
+    #   natural_join, natural_left_join, natural_right_join, offset, order, order_append, order_by,
+    #   order_more, order_prepend, paged_each, qualify, range, reverse, reverse_order, right_join,
+    #   right_outer_join, select, select_all, select_append, select_group, select_hash,
+    #   select_hash_groups, select_map, select_more, select_order_map, server,
+    #   single_record, single_record!, single_value, single_value!, sum, to_hash, to_hash_groups,
+    #   truncate, unfiltered, ungraphed, ungrouped, union, unlimited, unordered, where, where_all,
+    #   where_each, where_single_value, with, with_recursive, with_sql
     module ClassMethods
       # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
       # (default: not set, so all columns not otherwise restricted are allowed).
@@ -707,7 +719,7 @@ module Sequel
 
       # Clear the setter_methods cache when a setter method is added
       def method_added(meth)
-        clear_setter_methods_cache if meth.to_s =~ SETTER_METHOD_REGEXP
+        clear_setter_methods_cache if meth.to_s.end_with?('=')
         super
       end
   
@@ -976,7 +988,7 @@ module Sequel
       end
   
       # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, DATASET_METHODS)
+      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]) # SEQUEL5: Also remove set_graph_aliases
   
       private
       
@@ -1046,7 +1058,7 @@ module Sequel
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
         clear_setter_methods_cache
-        columns, bad_columns = columns.partition{|x| NORMAL_METHOD_NAME_REGEXP.match(x.to_s)}
+        columns, bad_columns = columns.partition{|x| /\A[A-Za-z_][A-Za-z0-9_]*\z/.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
         im = instance_methods.collect(&:to_s)
         columns.each do |column|
@@ -1062,7 +1074,7 @@ module Sequel
       def def_model_dataset_method(meth)
         return if respond_to?(meth, true)
 
-        if meth.to_s =~ NORMAL_METHOD_NAME_REGEXP
+        if meth.to_s =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/
           instance_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
         else
           (class << self; self; end).send(:define_method, meth){|*args, &block| dataset.send(meth, *args, &block)}
@@ -1149,18 +1161,46 @@ module Sequel
           # SEQUEL5: Remove allowed_columns handling
           allowed_columns.map{|x| "#{x}="}
         else
-          meths = instance_methods.collect(&:to_s).grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
+          meths = instance_methods.collect(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
           meths
         end
       end
   
       # A hash of instance variables to automatically set up in subclasses.
-      # See Sequel::Model::INHERITED_INSTANCE_VARIABLES.  It is safe to modify
-      # the hash returned by this method, though it may not be safe to modify
-      # values of the hash.
+      # Keys are instance variable symbols, values should be:
+      # nil :: Assign directly from superclass to subclass (frozen objects)
+      # :dup :: Dup object when assigning from superclass to subclass (mutable objects)
+      # :hash_dup :: Assign hash with same keys, but dup all the values
+      # Proc :: Call with subclass to do the assignment
       def inherited_instance_variables
-        INHERITED_INSTANCE_VARIABLES.dup
+        {
+          :@allowed_columns=>:dup, # SEQUEL5: Remove
+          :@cache_anonymous_models=>nil,
+          :@dataset_method_modules=>:dup,
+          :@dataset_module_class=>nil,
+          :@db=>nil,
+          :@default_set_fields_options=>:dup,
+          :@fast_instance_delete_sql=>nil,
+          :@fast_pk_lookup_sql=>nil,
+          :@finder_loaders=>:dup, # SEQUEL5: Remove
+          :@finders=>:dup, # SEQUEL5: Remove
+          :@plugins=>:dup,
+          :@primary_key=>nil,
+          :@raise_on_save_failure=>nil,
+          :@raise_on_typecast_failure=>nil,
+          :@require_modification=>nil,
+          :@require_valid_table=>nil,
+          :@restrict_primary_key=>nil,
+          :@setter_methods=>nil,
+          :@simple_pk=>nil,
+          :@simple_table=>nil,
+          :@strict_param_setting=>nil,
+          :@typecast_empty_string_to_nil=>nil,
+          :@typecast_on_assignment=>nil,
+          :@use_after_commit_rollback=>nil,
+          :@use_transactions=>nil
+        }
       end
     
       # For the given opts hash and default name or :class option, add a
@@ -1320,19 +1360,21 @@ module Sequel
 
     # Sequel::Model instance methods that implement basic model functionality.
     #
-    # * All of the methods in +HOOKS+ and +AROUND_HOOKS+ create instance methods that are called
+    # * All of the model before/after/around hooks are implemented as instance methods that are called
     #   by Sequel when the appropriate action occurs.  For example, when destroying
     #   a model object, Sequel will call +around_destroy+, which will call +before_destroy+, do
     #   the destroy, and then call +after_destroy+.
     # * The following instance_methods all call the class method of the same
     #   name: columns, db, primary_key, db_schema.
-    # * All of the methods in +BOOLEAN_SETTINGS+ create attr_writers allowing you
-    #   to set values for the attribute.  It also creates instance getters returning
-    #   the value of the setting.  If the value has not yet been set, it
-    #   gets the default value from the class by calling the class method of the same name.
+    # * The following accessor methods are defined via metaprogramming:
+    #   raise_on_save_failure, raise_on_typecast_failure, require_modification,
+    #   strict_param_setting, typecast_empty_string_to_nil, typecast_on_assignment,
+    #   and use_transactions.  The setter methods will change the setting for the
+    #   instance, and the getter methods will check for an instance setting, then
+    #   try the class setting if no instance setting has been set.
     module InstanceMethods
       HOOKS.each{|h| class_eval("def #{h}; end", __FILE__, __LINE__)}
-      AROUND_HOOKS.each{|h| class_eval("def #{h}; yield end", __FILE__, __LINE__)}
+      [:around_create, :around_update, :around_save, :around_destroy, :around_validation].each{|h| class_eval("def #{h}; yield end", __FILE__, __LINE__)}
 
       # Define instance method(s) that calls class method(s) of the
       # same name. Replaces the construct:
@@ -1343,8 +1385,13 @@ module Sequel
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable.
-      BOOLEAN_SETTINGS.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)}
-      attr_writer(*BOOLEAN_SETTINGS)
+      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
+        :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions,
+        :use_after_commit_rollback # SEQUEL5: Remove
+      ].each do |meth|
+        class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)
+        attr_writer(meth)
+      end
 
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns. The returned hash is a reference to the
@@ -1891,7 +1938,7 @@ module Sequel
 
       # Clear the setter_methods cache when a method is added
       def singleton_method_added(meth)
-        @singleton_setter_added = true if meth.to_s =~ SETTER_METHOD_REGEXP
+        @singleton_setter_added = true if meth.to_s.end_with?('=')
         super
       end
   
@@ -2446,7 +2493,7 @@ module Sequel
         if type.is_a?(Array)
           type.map{|x| "#{x}="}
         else
-          meths = methods.collect(&:to_s).grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
+          meths = methods.collect(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if type != :all && primary_key && model.restrict_primary_key?
           meths
         end

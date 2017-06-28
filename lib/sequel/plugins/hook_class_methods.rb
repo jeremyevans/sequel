@@ -88,7 +88,6 @@ module Sequel
         # arbitrary code execution.
         def add_hook_type(*hooks)
           Sequel::Deprecation.deprecate("Sequel::Model.add_hook_type", "You should add your own hook types manually")
-          Model::HOOKS.concat(hooks)
           hooks.each do |hook|
             @hooks[hook] = []
             instance_eval("def #{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end", __FILE__, __LINE__)
@@ -139,7 +138,7 @@ module Sequel
 
       module InstanceMethods
         # SEQUEL5: Make :before_save, :before_destroy, :after_save, :after_destroy hooks use metaprogramming instead of specific definitions
-        (Model::BEFORE_HOOKS - [:before_save, :before_destroy]).each do |h|
+        [:before_create, :before_update, :before_validation].each do |h|
           class_eval(<<-END, __FILE__, __LINE__+1)
             def #{h}
               model.hook_blocks(:#{h}) do |b|
@@ -152,7 +151,7 @@ module Sequel
             end
           END
         end
-        (Model::AFTER_HOOKS - [:after_save, :after_destroy, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]).each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
+        [:after_create, :after_update, :after_validation].each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
 
         def after_destroy
           super

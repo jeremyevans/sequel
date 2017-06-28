@@ -28,9 +28,12 @@ module Sequel
     #   # Add the instance hook methods just to Album instances
     #   Album.plugin :instance_hooks
     module InstanceHooks
-      BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
-      AFTER_HOOKS = Sequel::Model::AFTER_HOOKS
-      HOOKS = BEFORE_HOOKS + AFTER_HOOKS
+      BEFORE_HOOKS, AFTER_HOOKS = Sequel::Model::HOOKS.partition{|l| l.to_s.start_with?('before')}
+      Sequel::Deprecation.deprecate_constant(self, :BEFORE_HOOKS)
+      Sequel::Deprecation.deprecate_constant(self, :AFTER_HOOKS)
+      HOOKS = Sequel::Model::HOOKS
+      Sequel::Deprecation.deprecate_constant(self, :HOOKS)
+      
       # SEQUEL5: Remove
       DEPRECATION_REPLACEMENTS = {
         :after_commit=>"Use obj.after_save_hook{obj.db.after_commit{}} instead",
@@ -40,7 +43,7 @@ module Sequel
       }.freeze
 
       module InstanceMethods 
-        HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
+        Sequel::Model::HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
           def #{h}_hook(&block)
             #{"Sequel::Deprecation.deprecate('Sequel::Model##{h}_hook in the instance_hooks plugin', #{DEPRECATION_REPLACEMENTS[h].inspect})" if DEPRECATION_REPLACEMENTS[h]}
             raise Sequel::Error, "can't add hooks to frozen object" if frozen?
@@ -49,8 +52,8 @@ module Sequel
           end
         END
         
-        (BEFORE_HOOKS - [:before_destroy, :before_save]).each{|h| class_eval("def #{h}; (@instance_hooks && run_before_instance_hooks(:#{h}) == false) ? false : super end", __FILE__, __LINE__)}
-        (AFTER_HOOKS - [:after_validation, :after_save, :after_destroy, :after_commit, :after_destroy_commit, :after_destroy_rollback, :after_rollback]).each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
+        [:before_create, :before_update, :before_validation].each{|h| class_eval("def #{h}; (@instance_hooks && run_before_instance_hooks(:#{h}) == false) ? false : super end", __FILE__, __LINE__)}
+        [:after_create, :after_update].each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
           def #{h}
             super
             return unless @instance_hooks
@@ -127,7 +130,7 @@ module Sequel
         # the beginning of the instance hook's array.  For after hooks, add it
         # to the end.
         def add_instance_hook(hook, &block)
-          instance_hooks(hook).send(BEFORE_HOOKS.include?(hook) ? :unshift : :push, block)
+          instance_hooks(hook).send(hook.to_s.start_with?('before') ? :unshift : :push, block)
         end
         
         # An array of instance level hook blocks for the given hook type.
