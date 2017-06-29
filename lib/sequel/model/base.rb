@@ -237,6 +237,10 @@ module Sequel
         super
       end
 
+      def <<(arg)
+        Sequel::Deprecation.deprecate("Sequel::Model.<<", "Switch to using #insert")
+        dataset << (arg)
+      end
 
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
@@ -988,7 +992,8 @@ module Sequel
       end
   
       # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]) # SEQUEL5: Also remove set_graph_aliases
+      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:<<, :and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases])
+      # SEQUEL5: add :set_graph_aliases to remove list and remove :and
   
       private
       
