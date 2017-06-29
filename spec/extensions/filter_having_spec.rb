@@ -16,11 +16,11 @@ describe "filter_having extension" do
     @ds.filter(:b).sql.must_equal 'SELECT * FROM t WHERE b'
   end
 
-  it "should make and operate on HAVING clause if dataset has a HAVING clause" do
+  deprecated "should make and operate on HAVING clause if dataset has a HAVING clause" do
     @dsh.and(:b).sql.must_equal 'SELECT * FROM t HAVING (a AND b)'
   end
 
-  it "should make and operate on WHERE clause if dataset does not have a HAVING clause" do
+  deprecated "should make and operate on WHERE clause if dataset does not have a HAVING clause" do
     @ds.where(:a).and(:b).sql.must_equal 'SELECT * FROM t WHERE (a AND b)'
   end
 

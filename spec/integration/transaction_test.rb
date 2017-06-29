@@ -14,7 +14,7 @@ describe "Database transactions" do
   end
 
   it "should support transactions" do
-    @db.transaction{@d << {:name => 'abc', :value => 1}}
+    @db.transaction{@d.insert(:name => 'abc', :value => 1)}
     @d.count.must_equal 1
   end
 
@@ -32,25 +32,25 @@ describe "Database transactions" do
   it "should correctly rollback transactions" do
     proc do
       @db.transaction do
-        @d << {:name => 'abc', :value => 1}
+        @d.insert(:name => 'abc', :value => 1)
         raise Interrupt, 'asdf'
       end
     end.must_raise(Interrupt)
 
     @db.transaction do
-      @d << {:name => 'abc', :value => 1}
+      @d.insert(:name => 'abc', :value => 1)
       raise Sequel::Rollback
     end.must_be_nil
 
     proc do
       @db.transaction(:rollback=>:reraise) do
-        @d << {:name => 'abc', :value => 1}
+        @d.insert(:name => 'abc', :value => 1)
         raise Sequel::Rollback
       end
     end.must_raise(Sequel::Rollback)
 
     @db.transaction(:rollback=>:always) do
-      @d << {:name => 'abc', :value => 1}
+      @d.insert(:name => 'abc', :value => 1)
       2
     end.must_equal 2
 
@@ -60,14 +60,14 @@ describe "Database transactions" do
   it "should support nested transactions" do
     @db.transaction do
       @db.transaction do
-        @d << {:name => 'abc', :value => 1}
+        @d.insert(:name => 'abc', :value => 1)
       end 
     end 
     @d.count.must_equal 1
 
     @d.delete
     @db.transaction do
-      @d << {:name => 'abc', :value => 1}
+      @d.insert(:name => 'abc', :value => 1)
       @db.transaction do
         raise Sequel::Rollback
       end 
@@ -75,7 +75,7 @@ describe "Database transactions" do
     @d.count.must_equal 0
 
     proc {@db.transaction do
-      @d << {:name => 'abc', :value => 1}
+      @d.insert(:name => 'abc', :value => 1)
       @db.transaction do
         raise Interrupt, 'asdf'
       end 
@@ -86,9 +86,9 @@ describe "Database transactions" do
   if DB.supports_savepoints?
     it "should handle table_exists? failures inside transactions" do
       @db.transaction do
-        @d << {:name => '1'}
+        @d.insert(:name => '1')
         @db.table_exists?(:asadf098asd9asd98sa).must_equal false
-        @d << {:name => '2'}
+        @d.insert(:name => '2')
       end
       @d.select_order_map(:name).must_equal %w'1 2'
     end
@@ -96,7 +96,7 @@ describe "Database transactions" do
     it "should handle :rollback=>:always inside transactions" do
       @db.transaction do
         @db.transaction(:rollback=>:always) do
-          @d << {:name => 'abc', :value => 1}
+          @d.insert(:name => 'abc', :value => 1)
           2
         end.must_equal 2
       end
@@ -105,36 +105,36 @@ describe "Database transactions" do
 
     it "should handle table_exists? failures inside savepoints" do
       @db.transaction do
-        @d << {:name => '1'}
+        @d.insert(:name => '1')
         @db.transaction(:savepoint=>true) do
-          @d << {:name => '2'}
+          @d.insert(:name => '2')
           @db.table_exists?(:asadf098asd9asd98sa).must_equal false
-          @d << {:name => '3'}
+          @d.insert(:name => '3')
         end
-        @d << {:name => '4'}
+        @d.insert(:name => '4')
       end
       @d.select_order_map(:name).must_equal %w'1 2 3 4'
     end
 
     it "should support nested transactions through savepoints using the savepoint option" do
       @db.transaction do
-        @d << {:name => '1'}
+        @d.insert(:name => '1')
         @db.transaction(:savepoint=>true) do
-          @d << {:name => '2'}
+          @d.insert(:name => '2')
           @db.transaction do
-            @d << {:name => '3'}
+            @d.insert(:name => '3')
             raise Sequel::Rollback
           end
         end
-        @d << {:name => '4'}
+        @d.insert(:name => '4')
         @db.transaction do
-          @d << {:name => '6'}
+          @d.insert(:name => '6')
           @db.transaction(:savepoint=>true) do
-            @d << {:name => '7'}
+            @d.insert(:name => '7')
             raise Sequel::Rollback
           end
         end
-        @d << {:name => '5'}
+        @d.insert(:name => '5')
       end
 
       @d.order(:name).map(:name).must_equal %w{1 4 5 6}
@@ -142,23 +142,23 @@ describe "Database transactions" do
 
     it "should support nested transactions through savepoints using the auto_savepoint option" do
       @db.transaction(:auto_savepoint=>true) do
-        @d << {:name => '1'}
+        @d.insert(:name => '1')
         @db.transaction do
-          @d << {:name => '2'}
+          @d.insert(:name => '2')
           @db.transaction do
-            @d << {:name => '3'}
+            @d.insert(:name => '3')
             raise Sequel::Rollback
           end
         end
-        @d << {:name => '4'}
+        @d.insert(:name => '4')
         @db.transaction(:auto_savepoint=>true) do
-          @d << {:name => '6'}
+          @d.insert(:name => '6')
           @db.transaction do
-            @d << {:name => '7'}
+            @d.insert(:name => '7')
             raise Sequel::Rollback
           end
         end
-        @d << {:name => '5'}
+        @d.insert(:name => '5')
       end
 
       @d.order(:name).map(:name).must_equal %w{1 4 5 6}
@@ -168,7 +168,7 @@ describe "Database transactions" do
   it "should handle returning inside of the block by committing" do
     def ret_commit
       @db.transaction do
-        @db[:items] << {:name => 'abc'}
+        @db[:items].insert(:name => 'abc')
         return
       end
     end
@@ -199,20 +199,20 @@ describe "Database transactions" do
     end
 
     it "should commit prepared transactions using commit_prepared_transaction" do
-      @db.transaction(:prepare=>'XYZ'){@d << {:name => '1'}}
+      @db.transaction(:prepare=>'XYZ'){@d.insert(:name => '1')}
       @db.commit_prepared_transaction('XYZ')
       @d.select_order_map(:name).must_equal ['1']
     end
 
     it "should rollback prepared transactions using rollback_prepared_transaction" do
-      @db.transaction(:prepare=>'XYZ'){@d << {:name => '1'}}
+      @db.transaction(:prepare=>'XYZ'){@d.insert(:name => '1')}
       @db.rollback_prepared_transaction('XYZ')
       @d.select_order_map(:name).must_equal []
     end
 
     if DB.supports_savepoints_in_prepared_transactions?
       it "should support savepoints when using prepared transactions" do
-        @db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@d << {:name => '1'}}}
+        @db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@d.insert(:name => '1')}}
         @db.commit_prepared_transaction('XYZ')
         @d.select_order_map(:name).must_equal ['1']
       end
@@ -221,7 +221,7 @@ describe "Database transactions" do
 
   it "should support all transaction isolation levels" do
     [:uncommitted, :committed, :repeatable, :serializable].each_with_index do |l, i|
-      @db.transaction(:isolation=>l){@d << {:name => 'abc', :value => 1}}
+      @db.transaction(:isolation=>l){@d.insert(:name => 'abc', :value => 1)}
       @d.count.must_equal i + 1
     end
   end
@@ -331,10 +331,10 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby') and RUBY_VERSION < '1.9'
       q1 = Queue.new
       t = Thread.new do
         @db.transaction do
-          @d << {:name => 'abc', :value => 1}
+          @d.insert(:name => 'abc', :value => 1)
           q1.push nil
           q.pop
-          @d << {:name => 'def', :value => 2}
+          @d.insert(:name => 'def', :value => 2)
         end
       end
       q1.pop
@@ -348,14 +348,14 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby') and RUBY_VERSION < '1.9'
         q1 = Queue.new
         t = Thread.new do
           @db.transaction do
-            @d << {:name => 'abc', :value => 1}
+            @d.insert(:name => 'abc', :value => 1)
             @db.transaction(:savepoint=>true) do
-              @d << {:name => 'def', :value => 2}
+              @d.insert(:name => 'def', :value => 2)
               q1.push nil
               q.pop
-              @d << {:name => 'ghi', :value => 3}
+              @d.insert(:name => 'ghi', :value => 3)
             end
-            @d << {:name => 'jkl', :value => 4}
+            @d.insert(:name => 'jkl', :value => 4)
           end
         end
         q1.pop

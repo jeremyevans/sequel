@@ -38,11 +38,11 @@ describe "An Oracle database" do
 
   it "should allow limit and offset with clob columns" do
     notes = []
-    notes << {:id => 1, :title => 'abc', :content => 'zyx'}
-    notes << {:id => 2, :title => 'def', :content => 'wvu'}
-    notes << {:id => 3, :title => 'ghi', :content => 'tsr'}
-    notes << {:id => 4, :title => 'jkl', :content => 'qpo'}
-    notes << {:id => 5, :title => 'mno', :content => 'nml'}
+    notes.insert(:id => 1, :title => 'abc', :content => 'zyx')
+    notes.insert(:id => 2, :title => 'def', :content => 'wvu')
+    notes.insert(:id => 3, :title => 'ghi', :content => 'tsr')
+    notes.insert(:id => 4, :title => 'jkl', :content => 'qpo')
+    notes.insert(:id => 5, :title => 'mno', :content => 'nml')
     DB[:notes].multi_insert(notes)
 
     DB[:notes].sort_by{|x| x[:id]}.must_equal notes
@@ -117,17 +117,17 @@ describe "An Oracle database" do
 
   it "should return the correct record count" do
     @d.count.must_equal 0
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.count.must_equal 3
   end
   
   it "should return the correct records" do
     @d.to_a.must_equal []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
 
     @d.order(:value).to_a.must_equal [
       {:date_created=>nil, :name => 'abc', :value => 123},
@@ -214,9 +214,9 @@ describe "An Oracle database" do
   end
   
   it "should update records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.filter(:name => 'abc').update(:value => 530)
     
     @d[:name => 'def'][:value].must_equal 789
@@ -224,17 +224,17 @@ describe "An Oracle database" do
   end
 
   it "should translate values correctly" do
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.filter{value > 500}.update(:date_created => Sequel.lit("to_timestamp('2009-09-09', 'YYYY-MM-DD')"))
     
     @d[:name => 'def'][:date_created].strftime('%F').must_equal '2009-09-09'
   end
   
   it "should delete records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.filter(:name => 'abc').delete
     
     @d.count.must_equal 1
@@ -248,7 +248,7 @@ describe "An Oracle database" do
   
   it "should support transactions" do
     DB.transaction do
-      @d << {:name => 'abc', :value => 1}
+      @d.insert(:name => 'abc', :value => 1)
     end
 
     @d.count.must_equal 1
@@ -257,15 +257,15 @@ describe "An Oracle database" do
   it "should return correct result" do
     @d1 = DB[:books]
     @d1.delete
-    @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
-    @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
-    @d1 << {:id => 3, :title => 'ccc', :category_id => 101}
-    @d1 << {:id => 4, :title => 'ddd', :category_id => 102}
+    @d1.insert(:id => 1, :title => 'aaa', :category_id => 100)
+    @d1.insert(:id => 2, :title => 'bbb', :category_id => 100)
+    @d1.insert(:id => 3, :title => 'ccc', :category_id => 101)
+    @d1.insert(:id => 4, :title => 'ddd', :category_id => 102)
     
     @d2 = DB[:categories]
     @d2.delete
-    @d2 << {:id => 100, :cat_name => 'ruby'}
-    @d2 << {:id => 101, :cat_name => 'rails'}
+    @d2.insert(:id => 100, :cat_name => 'ruby')
+    @d2.insert(:id => 101, :cat_name => 'rails')
   
     @d1.join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).order(Sequel[:books][:id]).to_a.must_equal [
       {:id => 1, :title => 'aaa', :cat_name => 'ruby'},
@@ -294,9 +294,9 @@ describe "An Oracle database" do
   it "should allow columns to be renamed" do
     @d1 = DB[:books]
     @d1.delete
-    @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
-    @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
-    @d1 << {:id => 3, :title => 'bbb', :category_id => 100}
+    @d1.insert(:id => 1, :title => 'aaa', :category_id => 100)
+    @d1.insert(:id => 2, :title => 'bbb', :category_id => 100)
+    @d1.insert(:id => 3, :title => 'bbb', :category_id => 100)
 
     @d1.select(Sequel.as(:title, :name)).order_by(:id).to_a.must_equal [
       { :name => 'aaa' },

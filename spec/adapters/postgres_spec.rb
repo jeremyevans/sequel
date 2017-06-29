@@ -446,16 +446,16 @@ describe "A PostgreSQL dataset" do
   end
 
   it "should support regexps" do
-    @d << {:name => 'abc', :value => 1}
-    @d << {:name => 'bcd', :value => 2}
+    @d.insert(:name => 'abc', :value => 1)
+    @d.insert(:name => 'bcd', :value => 2)
     @d.filter(:name => /bc/).count.must_equal 2
     @d.filter(:name => /^bc/).count.must_equal 1
   end
 
   it "should support NULLS FIRST and NULLS LAST" do
-    @d << {:name => 'abc'}
-    @d << {:name => 'bcd'}
-    @d << {:name => 'bcd', :value => 2}
+    @d.insert(:name => 'abc')
+    @d.insert(:name => 'bcd')
+    @d.insert(:name => 'bcd', :value => 2)
     @d.order(Sequel.asc(:value, :nulls=>:first), :name).select_map(:name).must_equal %w[abc bcd bcd]
     @d.order(Sequel.asc(:value, :nulls=>:last), :name).select_map(:name).must_equal %w[bcd abc bcd]
     @d.order(Sequel.asc(:value, :nulls=>:first), :name).reverse.select_map(:name).must_equal %w[bcd bcd abc]
@@ -682,12 +682,12 @@ describe "A PostgreSQL dataset" do
   end
 
   it "should truncate with options" do
-    @d << { :name => 'abc', :value => 1}
+    @d.insert( :name => 'abc', :value => 1)
     @d.count.must_equal 1
     @d.truncate(:cascade => true)
     @d.count.must_equal 0
     if @d.db.server_version > 80400
-      @d << { :name => 'abc', :value => 1}
+      @d.insert( :name => 'abc', :value => 1)
       @d.truncate(:cascade => true, :only=>true, :restart=>true)
       @d.count.must_equal 0
     end
@@ -803,7 +803,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
   cspecify "should store milliseconds in time fields for Time objects", [:do], [:swift] do
     t = Time.now
-    @d << {:time=>t}
+    @d.insert(:time=>t)
     t2 = @d.get(:time)
     @d.literal(t2).must_equal @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').must_equal t.strftime('%Y-%m-%d %H:%M:%S')
@@ -812,7 +812,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
   cspecify "should store milliseconds in time fields for DateTime objects", [:do], [:swift] do
     t = DateTime.now
-    @d << {:time=>t}
+    @d.insert(:time=>t)
     t2 = @d.get(:time)
     @d.literal(t2).must_equal @d.literal(t)
     t2.strftime('%Y-%m-%d %H:%M:%S').must_equal t.strftime('%Y-%m-%d %H:%M:%S')
@@ -821,7 +821,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
   if DB.adapter_scheme == :postgres
     it "should handle infinite timestamps if convert_infinite_timestamps is set" do
-      @d << {:time=>Sequel.cast('infinity', DateTime)}
+      @d.insert(:time=>Sequel.cast('infinity', DateTime))
       @db.convert_infinite_timestamps = :nil
       @db[:test3].get(:time).must_be_nil
       @db.convert_infinite_timestamps = :string
@@ -864,7 +864,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     end
 
     it "should handle infinite dates if convert_infinite_timestamps is set" do
-      @d << {:date=>Sequel.cast('infinity', Date)}
+      @d.insert(:date=>Sequel.cast('infinity', Date))
       @db.convert_infinite_timestamps = :nil
       @db[:test3].get(:date).must_be_nil
       @db.convert_infinite_timestamps = :string
@@ -917,12 +917,12 @@ describe "A PostgreSQL database" do
 
   it "should support column operations" do
     @db.create_table!(:test2){text :name; integer :value}
-    @db[:test2] << {}
+    @db[:test2].insert({})
     @db[:test2].columns.must_equal [:name, :value]
 
     @db.add_column :test2, :xyz, :text, :default => '000'
     @db[:test2].columns.must_equal [:name, :value, :xyz]
-    @db[:test2] << {:name => 'mmm', :value => 111}
+    @db[:test2].insert(:name => 'mmm', :value => 111)
     @db[:test2].first[:xyz].must_equal '000'
 
     @db[:test2].columns.must_equal [:name, :value, :xyz]
@@ -932,7 +932,7 @@ describe "A PostgreSQL database" do
 
     @db[:test2].delete
     @db.add_column :test2, :xyz, :text, :default => '000'
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz => 'qqqq')
 
     @db[:test2].columns.must_equal [:name, :value, :xyz]
     @db.rename_column :test2, :xyz, :zyx
@@ -941,7 +941,7 @@ describe "A PostgreSQL database" do
 
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz => 56.78)
     @db.set_column_type :test2, :xyz, :integer
 
     @db[:test2].first[:xyz].must_equal 57
@@ -1518,19 +1518,19 @@ if DB.server_version >= 80300
 
     it "should search by indexed column" do
       record =  {:title => "oopsla conference", :body => "test"}
-      @ds << record
+      @ds.insert(record)
       @ds.full_text_search(:title, "oopsla").all.must_include(record)
     end
 
     it "should join multiple coumns with spaces to search by last words in row" do
       record = {:title => "multiple words", :body => "are easy to search"}
-      @ds << record
+      @ds.insert(record)
       @ds.full_text_search([:title, :body], "words").all.must_include(record)
     end
 
     it "should return rows with a NULL in one column if a match in another column" do
       record = {:title => "multiple words", :body =>nil}
-      @ds << record
+      @ds.insert(record)
       @ds.full_text_search([:title, :body], "words").all.must_include(record)
     end
   end

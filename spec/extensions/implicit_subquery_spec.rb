@@ -9,13 +9,15 @@ describe "Sequel::Dataset::ImplicitSubquery" do
     ods = db[:c]
     ods.columns(:id, :b)
 
-    ds.and(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 WHERE c"
+    deprecated do
+      ds.and(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 WHERE c"
+      ds.exclude_where(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 WHERE NOT c"
+    end
     ds.cross_join(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 CROSS JOIN c"
     ds.distinct.sql.must_equal "SELECT DISTINCT * FROM (SELECT * FROM table) AS t1"
     ds.except(ods).sql.must_equal "SELECT * FROM (SELECT * FROM (SELECT * FROM table) AS t1 EXCEPT SELECT * FROM c) AS t1"
     ds.exclude(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 WHERE NOT c"
     ds.exclude_having(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 HAVING NOT c"
-    ds.exclude_where(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 WHERE NOT c"
     ds.filter(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 WHERE c"
     ds.for_update.sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 FOR UPDATE"
     ds.full_join(:c).sql.must_equal "SELECT * FROM (SELECT * FROM table) AS t1 FULL JOIN c"

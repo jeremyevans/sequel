@@ -121,30 +121,30 @@ if [:mysql, :mysql2].include?(DB.adapter_scheme)
     it "should return tinyint(1)s as bools and tinyint(4)s as integers when set" do
       @db.convert_tinyint_to_bool = true
       @ds.delete
-      @ds << {:b=>true, :i=>10}
+      @ds.insert(:b=>true, :i=>10)
       @ds.all.must_equal [{:b=>true, :i=>10}]
       @ds.delete
-      @ds << {:b=>false, :i=>0}
+      @ds.insert(:b=>false, :i=>0)
       @ds.all.must_equal [{:b=>false, :i=>0}]
       @ds.delete
-      @ds << {:b=>true, :i=>1}
+      @ds.insert(:b=>true, :i=>1)
       @ds.all.must_equal [{:b=>true, :i=>1}]
     end
 
     it "should return all tinyints as integers when unset" do
       @db.convert_tinyint_to_bool = false
       @ds.delete
-      @ds << {:b=>true, :i=>10}
+      @ds.insert(:b=>true, :i=>10)
       @ds.all.must_equal [{:b=>1, :i=>10}]
       @ds.delete
-      @ds << {:b=>false, :i=>0}
+      @ds.insert(:b=>false, :i=>0)
       @ds.all.must_equal [{:b=>0, :i=>0}]
 
       @ds.delete
-      @ds << {:b=>1, :i=>10}
+      @ds.insert(:b=>1, :i=>10)
       @ds.all.must_equal [{:b=>1, :i=>10}]
       @ds.delete
-      @ds << {:b=>0, :i=>0}
+      @ds.insert(:b=>0, :i=>0)
       @ds.all.must_equal [{:b=>0, :i=>0}]
     end
 
@@ -155,7 +155,7 @@ if [:mysql, :mysql2].include?(DB.adapter_scheme)
         def convert_tinyint_to_bool?() false end #mysql2
       end
       ds.delete
-      ds << {:b=>true, :i=>10}
+      ds.insert(:b=>true, :i=>10)
       ds.all.must_equal [{:b=>1, :i=>10}]
       @ds.all.must_equal [{:b=>true, :i=>10}]
     end
@@ -220,8 +220,8 @@ describe "A MySQL dataset" do
   end if false # SEQUEL5
 
   it "should support regexps" do
-    @d << {:name => 'abc', :value => 1}
-    @d << {:name => 'bcd', :value => 2}
+    @d.insert(:name => 'abc', :value => 1)
+    @d.insert(:name => 'bcd', :value => 2)
     @d.filter(:name => /bc/).count.must_equal 2
     @d.filter(:name => /^bc/).count.must_equal 1
   end
@@ -234,7 +234,7 @@ describe "A MySQL dataset" do
 
   it "should correctly literalize strings with comment backslashes in them" do
     @d.delete
-    @d << {:name => ':\\'}
+    @d.insert(:name => ':\\')
 
     @d.first[:name].must_equal ':\\'
   end
@@ -394,7 +394,7 @@ describe "A MySQL database" do
     @db.add_column :test2, :xyz, :text
 
     @db[:test2].columns.must_equal [:name, :value, :xyz]
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => '000'}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz => '000')
     @db[:test2].first[:xyz].must_equal '000'
 
     @db[:test2].columns.must_equal [:name, :value, :xyz]
@@ -404,7 +404,7 @@ describe "A MySQL database" do
 
     @db[:test2].delete
     @db.add_column :test2, :xyz, :text
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz => 'qqqq')
 
     @db[:test2].columns.must_equal [:name, :value, :xyz]
     @db.rename_column :test2, :xyz, :zyx, :type => :text
@@ -413,7 +413,7 @@ describe "A MySQL database" do
 
     @db[:test2].delete
     @db.add_column :test2, :tre, :text
-    @db[:test2] << {:name => 'mmm', :value => 111, :tre => 'qqqq'}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :tre => 'qqqq')
 
     @db[:test2].columns.must_equal [:name, :value, :zyx, :tre]
     @db.rename_column :test2, :tre, :ert, :type => :varchar, :size=>255
@@ -422,7 +422,7 @@ describe "A MySQL database" do
 
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz => 56.78)
     @db.set_column_type :test2, :xyz, :integer
 
     @db[:test2].first[:xyz].must_equal 57
@@ -757,12 +757,12 @@ describe "A grouped MySQL dataset" do
       text :name
       integer :value
     end
-    DB[:test2] << {:name => '11', :value => 10}
-    DB[:test2] << {:name => '11', :value => 20}
-    DB[:test2] << {:name => '11', :value => 30}
-    DB[:test2] << {:name => '12', :value => 10}
-    DB[:test2] << {:name => '12', :value => 20}
-    DB[:test2] << {:name => '13', :value => 10}
+    DB[:test2].insert(:name => '11', :value => 10)
+    DB[:test2].insert(:name => '11', :value => 20)
+    DB[:test2].insert(:name => '11', :value => 30)
+    DB[:test2].insert(:name => '12', :value => 10)
+    DB[:test2].insert(:name => '12', :value => 20)
+    DB[:test2].insert(:name => '13', :value => 10)
   end
   after do
     DB.drop_table?(:test2)

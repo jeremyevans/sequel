@@ -134,7 +134,7 @@ describe "An SQLite database" do
     @db.create_table!(:fk){timestamp :t; datetime :d}
     @db.use_timestamp_timezones = true
     t1 = Time.at(1)
-    @db[:fk] << {:t => t1, :d => t1}
+    @db[:fk].insert(:t => t1, :d => t1)
     @db[:fk].map(:t).must_equal [t1]
     @db[:fk].map(:d).must_equal [t1]
     Sequel.datetime_class = DateTime
@@ -145,9 +145,9 @@ describe "An SQLite database" do
   
   it "should support sequential primary keys" do
     @db.create_table!(:fk) {primary_key :id; text :name}
-    @db[:fk] << {:name => 'abc'}
-    @db[:fk] << {:name => 'def'}
-    @db[:fk] << {:name => 'ghi'}
+    @db[:fk].insert(:name => 'abc')
+    @db[:fk].insert(:name => 'def')
+    @db[:fk].insert(:name => 'ghi')
     @db[:fk].order(:name).all.must_equal [
       {:id => 1, :name => 'abc'},
       {:id => 2, :name => 'def'},
@@ -347,9 +347,9 @@ describe "SQLite::Dataset#delete" do
     end
     @d = DB[:items]
     @d.delete # remove all records
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'def', :value => 4.56}
-    @d << {:name => 'ghi', :value => 7.89}
+    @d.insert(:name => 'abc', :value => 1.23)
+    @d.insert(:name => 'def', :value => 4.56)
+    @d.insert(:name => 'ghi', :value => 7.89)
   end
   after do
     DB.drop_table?(:items)
@@ -382,9 +382,9 @@ describe "SQLite::Dataset#update" do
     end
     @d = DB[:items]
     @d.delete # remove all records
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'def', :value => 4.56}
-    @d << {:name => 'ghi', :value => 7.89}
+    @d.insert(:name => 'abc', :value => 1.23)
+    @d.insert(:name => 'def', :value => 4.56)
+    @d.insert(:name => 'ghi', :value => 7.89)
   end
   
   it "should return the number of records affected" do
@@ -444,16 +444,16 @@ describe "SQLite dataset" do
       Float :value
     end
     @d = DB[:items]
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'def', :value => 4.56}
-    @d << {:name => 'ghi', :value => 7.89}
+    @d.insert(:name => 'abc', :value => 1.23)
+    @d.insert(:name => 'def', :value => 4.56)
+    @d.insert(:name => 'ghi', :value => 7.89)
   end
   after do
     DB.drop_table?(:test, :items)
   end
   
   it "should be able to insert from a subquery" do
-    DB[:test] << @d
+    DB[:test].insert(@d)
     DB[:test].count.must_equal 3
     DB[:test].select(:name, :value).order(:value).to_a.must_equal \
       @d.select(:name, :value).order(:value).to_a
@@ -484,21 +484,21 @@ describe "A SQLite database" do
     @db.add_column :test2, :xyz, :text
     
     @db[:test2].columns.must_equal [:name, :value, :xyz]
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz=>'000'}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz=>'000')
     @db[:test2].first.must_equal(:name => 'mmm', :value => 111, :xyz=>'000')
   end
   
   it "should support drop_column operations" do
     @db.drop_column :test2, :value
     @db[:test2].columns.must_equal [:name]
-    @db[:test2] << {:name => 'mmm'}
+    @db[:test2].insert(:name => 'mmm')
     @db[:test2].first.must_equal(:name => 'mmm')
   end
   
   it "should support drop_column operations in a transaction" do
     @db.transaction{@db.drop_column :test2, :value}
     @db[:test2].columns.must_equal [:name]
-    @db[:test2] << {:name => 'mmm'}
+    @db[:test2].insert(:name => 'mmm')
     @db[:test2].first.must_equal(:name => 'mmm')
   end
 
@@ -506,9 +506,9 @@ describe "A SQLite database" do
     @db.create_table!(:test2){Integer :a; Integer :b; Integer :c; primary_key [:a, :b]}
     @db.drop_column :test2, :c
     @db[:test2].columns.must_equal [:a, :b]
-    @db[:test2] << {:a=>1, :b=>2}
-    @db[:test2] << {:a=>2, :b=>3}
-    proc{@db[:test2] << {:a=>2, :b=>3}}.must_raise(Sequel::UniqueConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+    @db[:test2].insert(:a=>1, :b=>2)
+    @db[:test2].insert(:a=>2, :b=>3)
+    proc{@db[:test2].insert(:a=>2, :b=>3)}.must_raise(Sequel::UniqueConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
   end
 
   it "should keep column attributes when dropping a column" do
@@ -520,9 +520,9 @@ describe "A SQLite database" do
 
     # This lame set of additions and deletions are to test that the primary keys
     # don't get messed up when we recreate the database.
-    @db[:test3] << { :name => "foo", :value => 1}
-    @db[:test3] << { :name => "foo", :value => 2}
-    @db[:test3] << { :name => "foo", :value => 3}
+    @db[:test3].insert( :name => "foo", :value => 1)
+    @db[:test3].insert( :name => "foo", :value => 2)
+    @db[:test3].insert( :name => "foo", :value => 3)
     @db[:test3].filter(:id => 2).delete
 
     @db.drop_column :test3, :value
@@ -558,7 +558,7 @@ describe "A SQLite database" do
   it "should support rename_column operations" do
     @db[:test2].delete
     @db.add_column :test2, :xyz, :text
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
+    @db[:test2].insert(:name => 'mmm', :value => 111, :xyz => 'qqqq')
 
     @db[:test2].columns.must_equal [:name, :value, :xyz]
     @db.rename_column :test2, :xyz, :zyx, :type => :text

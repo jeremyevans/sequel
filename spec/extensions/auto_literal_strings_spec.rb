@@ -114,7 +114,7 @@ describe "Dataset#and" do
     @d1 = @dataset.where(:x => 1)
   end
 
-  it "should accept string filters with placeholders" do
+  deprecated "should accept string filters with placeholders" do
     @d1.and('y > ?', 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (y > 2))'
   end
 end

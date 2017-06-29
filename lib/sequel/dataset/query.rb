@@ -44,6 +44,7 @@ module Sequel
       set_graph_aliases unfiltered ungraphed ungrouped union
       unlimited unordered where with with_recursive with_sql
     METHS
+    # SEQUEL5: Remove and, exclude_where
 
     # Register an extension callback for Dataset objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the
@@ -68,6 +69,7 @@ module Sequel
 
     # Alias for where.
     def and(*cond, &block)
+      Sequel::Deprecation.deprecate("Sequel::Dataset#and", "Use #where, or use the sequel_4_dataset_methods extension")
       where(*cond, &block)
     end
     
@@ -190,6 +192,7 @@ module Sequel
 
     # Alias for exclude.
     def exclude_where(*cond, &block)
+      Sequel::Deprecation.deprecate("Sequel::Dataset#exclude_where", "Use #exclude, or use the sequel_4_dataset_methods extension")
       exclude(*cond, &block)
     end
 

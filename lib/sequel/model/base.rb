@@ -8,14 +8,14 @@ module Sequel
     # Class methods for Sequel::Model that implement basic model functionality.
     #
     # * All of the following methods have class methods created that send the method
-    #   to the model's dataset: <<, all, as_hash, avg, count, cross_join, distinct, each,
-    #   each_server, empty?, except, exclude, exclude_having, exclude_where, fetch_rows,
+    #   to the model's dataset: all, as_hash, avg, count, cross_join, distinct, each,
+    #   each_server, empty?, except, exclude, exclude_having, fetch_rows,
     #   filter, first, first!, for_update, from, from_self, full_join, full_outer_join,
     #   get, graph, grep, group, group_and_count, group_append, group_by, having, import,
-    #   inner_join, insert, intersect, interval, invert, join, join_table, last, left_join,
+    #   inner_join, insert, intersect, invert, join, join_table, last, left_join,
     #   left_outer_join, limit, lock_style, map, max, min, multi_insert, naked, natural_full_join,
     #   natural_join, natural_left_join, natural_right_join, offset, order, order_append, order_by,
-    #   order_more, order_prepend, paged_each, qualify, range, reverse, reverse_order, right_join,
+    #   order_more, order_prepend, paged_each, qualify, reverse, reverse_order, right_join,
     #   right_outer_join, select, select_all, select_append, select_group, select_hash,
     #   select_hash_groups, select_map, select_more, select_order_map, server,
     #   single_record, single_record!, single_value, single_value!, sum, to_hash, to_hash_groups,

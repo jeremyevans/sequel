@@ -15,8 +15,8 @@ describe "Simple Dataset operations" do
   end
 
   it "should support sequential primary keys" do
-    @ds << {:number=>20}
-    @ds << {:number=>30}
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>30)
     @ds.order(:number).all.must_equal [
       {:id => 1, :number=>10},
       {:id => 2, :number=>20},
@@ -28,8 +28,8 @@ describe "Simple Dataset operations" do
       primary_key :id, :type=>:Bignum
       Integer :number
     end
-    @ds << {:number=>20}
-    @ds << {:number=>30}
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>30)
     @ds.order(:number).all.must_equal [{:id => 1, :number=>20}, {:id => 2, :number=>30}]   
   end 
 
@@ -60,7 +60,7 @@ describe "Simple Dataset operations" do
   end
 
   it "should handle LATERAL subqueries correctly" do
-    @ds << {:number=>20}
+    @ds.insert(:number=>20)
     @ds.from(Sequel[:items].as(:i), @ds.where(Sequel[:items][:number]=>Sequel[:i][:number]).lateral).select_order_map([Sequel[:i][:number].as(:n), Sequel[:t1][:number]]).must_equal [[10, 10], [20, 20]]
     @ds.from(Sequel[:items].as(:i)).cross_join(@ds.where(Sequel[:items][:number]=>Sequel[:i][:number]).lateral).select_order_map([Sequel[:i][:number].as(:n), Sequel[:t1][:number]]).must_equal [[10, 10], [20, 20]]
     @ds.from(Sequel[:items].as(:i)).join(@ds.where(Sequel[:items][:number]=>Sequel[:i][:number]).lateral, 1=>1).select_order_map([Sequel[:i][:number].as(:n), Sequel[:t1][:number]]).must_equal [[10, 10], [20, 20]]
@@ -389,9 +389,9 @@ describe Sequel::Dataset do
 
   it "should return the correct record count" do
     @d.count.must_equal 0
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => nil}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => nil)
     5.times do
       @d.count.must_equal 3
       @d.count(:name).must_equal 3
@@ -400,14 +400,14 @@ describe Sequel::Dataset do
   end
 
   it "should handle functions with identifier names correctly" do
-    @d << {:name => 'abc', :value => 6}
+    @d.insert(:name => 'abc', :value => 6)
     @d.get{sum.function(:value)}.must_equal 6
   end
 
   it "should handle aggregate methods on limited datasets correctly" do
-    @d << {:name => 'abc', :value => 6}
-    @d << {:name => 'bcd', :value => 12}
-    @d << {:name => 'def', :value => 18}
+    @d.insert(:name => 'abc', :value => 6)
+    @d.insert(:name => 'bcd', :value => 12)
+    @d.insert(:name => 'def', :value => 18)
     @d = @d.order(:name).limit(2)
     @d.count.must_equal 2
     @d.avg(:value).to_i.must_equal 9
@@ -415,14 +415,14 @@ describe Sequel::Dataset do
     @d.reverse.min(:value).to_i.must_equal 12
     @d.max(:value).to_i.must_equal 12
     @d.sum(:value).to_i.must_equal 18
-    @d.interval(:value).to_i.must_equal 6
+    @d.extension(:sequel_4_dataset_methods).interval(:value).to_i.must_equal 6
   end
 
   it "should return the correct records" do
     @d.to_a.must_equal []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
 
     @d.order(:value).to_a.must_equal [
       {:name => 'abc', :value => 123},
@@ -432,27 +432,27 @@ describe Sequel::Dataset do
   end
 
   it "should update records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.filter(:name => 'abc').update(:value => 530)
     @d[:name => 'def'][:value].must_equal 789
     @d.filter(:value => 530).count.must_equal 2
   end
 
   it "should delete records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.filter(:name => 'abc').delete
     @d.count.must_equal 1
     @d.first[:name].must_equal 'def'
   end
   
   it "should be able to truncate the table" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 789)
     @d.count.must_equal 3
     @d.truncate.must_be_nil
     @d.count.must_equal 0
@@ -517,9 +517,9 @@ describe Sequel::Dataset do
       Integer :value
     end 
     @d = DB[:items]
-    @d << {:value => 123}
-    @d << {:value => 456}
-    @d << {:value => 789}
+    @d.insert(:value => 123)
+    @d.insert(:value => 456)
+    @d.insert(:value => 789)
   end 
   after do
     DB.drop_table?(:items)
@@ -1104,7 +1104,7 @@ describe "Sequel::Dataset convenience methods" do
   end
   
   it "#range should return the range between the maximum and minimum values" do
-    @ds = @ds.unordered
+    @ds = @ds.unordered.extension(:sequel_4_dataset_methods)
     @ds.insert(20, 10)
     @ds.insert(30, 10)
     @ds.range(:a).must_equal(20..30)
@@ -1112,7 +1112,7 @@ describe "Sequel::Dataset convenience methods" do
   end
   
   it "#interval should return the different between the maximum and minimum values" do
-    @ds = @ds.unordered
+    @ds = @ds.unordered.extension(:sequel_4_dataset_methods)
     @ds.insert(20, 10)
     @ds.insert(30, 10)
     @ds.interval(:a).to_i.must_equal 10
@@ -1147,10 +1147,10 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.filter(Sequel.lit("b < ?", 15)).invert.all.must_equal [{:a=>20, :b=>30}]
   end
   
-  it "#and and #or should work correctly" do
+  it "#where and #or should work correctly" do
     @ds.insert(20, 30)
-    @ds.filter(:a=>20).and(:b=>30).all.must_equal [{:a=>20, :b=>30}]
-    @ds.filter(:a=>20).and(:b=>15).all.must_equal []
+    @ds.filter(:a=>20).where(:b=>30).all.must_equal [{:a=>20, :b=>30}]
+    @ds.filter(:a=>20).where(:b=>15).all.must_equal []
     @ds.filter(:a=>20).or(:b=>15).all.must_equal [{:a=>20, :b=>30}]
     @ds.filter(:a=>10).or(:b=>15).all.must_equal []
   end
@@ -1875,7 +1875,7 @@ describe "Dataset replace" do
   end
 
   it "should update a record if the condition is met" do
-    @d << {:id => 111}
+    @d.insert(:id => 111)
     @d.all.must_equal [{:id => 111, :value => nil}]
     @d.replace(:id => 111, :value => 333)
     @d.all.must_equal [{:id => 111, :value => 333}]
