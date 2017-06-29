@@ -2,7 +2,6 @@
 #
 # This adds the following dataset methods:
 #
-# << :: Chainable version of insert
 # and :: alias for where
 # exclude_where :: alias for exclude
 # interval :: Returns max - min, using a single query
@@ -25,15 +24,6 @@
 #
 module Sequel
   module Sequel4DatasetMethods
-    # Inserts the given argument into the database.  Returns self so it
-    # can be used safely when chaining:
-    # 
-    #   DB[:items] << {:id=>0, :name=>'Zero'} << DB[:old_items].select(:id, name)
-    def <<(arg)
-      insert(arg)
-      self
-    end
-    
     # Alias for where.
     def and(*cond, &block)
       where(*cond, &block)

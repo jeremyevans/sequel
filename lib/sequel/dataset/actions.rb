@@ -16,7 +16,7 @@ module Sequel
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
       single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
     METHS
-    # SEQUEL5: Remove <<, interval, and range
+    # SEQUEL5: Remove interval, range
 
     # The clone options to use when retriveing columns for a dataset.
     COLUMNS_CLONE_OPTIONS = {:distinct => nil, :limit => 1, :offset=>nil, :where=>nil, :having=>nil, :order=>nil, :row_proc=>nil, :graph=>nil, :eager_graph=>nil}.freeze
@@ -26,7 +26,6 @@ module Sequel
     # 
     #   DB[:items] << {:id=>0, :name=>'Zero'} << DB[:old_items].select(:id, name)
     def <<(arg)
-      Sequel::Deprecation.deprecate("Sequel::Dataset#<<", "Switch to using #insert, or use the sequel_4_dataset_methods extension")
       insert(arg)
       self
     end

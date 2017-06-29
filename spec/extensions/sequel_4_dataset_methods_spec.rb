@@ -1,21 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Dataset#<<" do
-  before do
-    @db = Sequel.mock.extension(:sequel_4_dataset_methods)
-  end
-
-  it "should call #insert" do
-    @db[:items] << {:name => 1}
-    @db.sqls.must_equal ['INSERT INTO items (name) VALUES (1)']
-  end
-
-  it "should be chainable" do
-    @db[:items] << {:name => 1} << @db[:old_items].select(:name)
-    @db.sqls.must_equal ['INSERT INTO items (name) VALUES (1)', 'INSERT INTO items SELECT name FROM old_items']
-  end
-end
-
 describe "Dataset#and" do
   before do
     @dataset = Sequel.mock.dataset.from(:test).extension(:sequel_4_dataset_methods)

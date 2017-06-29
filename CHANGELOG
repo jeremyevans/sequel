@@ -1,6 +1,6 @@
 === master
 
-* Deprecate Dataset#{<<,and,exclude_where,range,interval}, move to sequel_4_dataset_methods extension (jeremyevans)
+* Deprecate Dataset#{and,exclude_where,range,interval}, move to sequel_4_dataset_methods extension (jeremyevans)
 
 * Make Database#indexes not include partial indexes on SQLite 3.8.8+ (jeremyevans)
 

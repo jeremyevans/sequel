@@ -3268,12 +3268,12 @@ describe "Dataset#<<" do
     @db = Sequel.mock
   end
 
-  deprecated "should call #insert" do
+  it "should call #insert" do
     @db[:items] << {:name => 1}
     @db.sqls.must_equal ['INSERT INTO items (name) VALUES (1)']
   end
 
-  deprecated "should be chainable" do
+  it "should be chainable" do
     @db[:items] << {:name => 1} << @db[:old_items].select(:name)
     @db.sqls.must_equal ['INSERT INTO items (name) VALUES (1)', 'INSERT INTO items SELECT name FROM old_items']
   end
