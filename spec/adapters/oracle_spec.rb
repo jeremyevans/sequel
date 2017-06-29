@@ -38,11 +38,11 @@ describe "An Oracle database" do
 
   it "should allow limit and offset with clob columns" do
     notes = []
-    notes.insert(:id => 1, :title => 'abc', :content => 'zyx')
-    notes.insert(:id => 2, :title => 'def', :content => 'wvu')
-    notes.insert(:id => 3, :title => 'ghi', :content => 'tsr')
-    notes.insert(:id => 4, :title => 'jkl', :content => 'qpo')
-    notes.insert(:id => 5, :title => 'mno', :content => 'nml')
+    notes << {:id => 1, :title => 'abc', :content => 'zyx'}
+    notes << {:id => 2, :title => 'def', :content => 'wvu'}
+    notes << {:id => 3, :title => 'ghi', :content => 'tsr'}
+    notes << {:id => 4, :title => 'jkl', :content => 'qpo'}
+    notes << {:id => 5, :title => 'mno', :content => 'nml'}
     DB[:notes].multi_insert(notes)
 
     DB[:notes].sort_by{|x| x[:id]}.must_equal notes

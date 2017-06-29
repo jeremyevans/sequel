@@ -34,6 +34,7 @@ describe "Simple Dataset operations" do
     deprecated do
       Sequel::DB2.use_clob_as_blob = true
     end
+    DB.send(:remove_instance_variable, :@use_clob_as_blob) if DB.send(:instance_variable_defined?, :@use_clob_as_blob)
     DB.create_table!(:items) do
       Integer :id, :primary_key => true
       Integer :number
@@ -49,6 +50,7 @@ describe "Simple Dataset operations" do
     deprecated do
       Sequel::DB2.use_clob_as_blob = false
     end
+    DB.send(:remove_instance_variable, :@use_clob_as_blob) if DB.send(:instance_variable_defined?, :@use_clob_as_blob)
     DB.drop_table(:items)
   end
 
