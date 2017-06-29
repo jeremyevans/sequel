@@ -62,6 +62,11 @@ describe "class_table_inheritance plugin" do
     Employee.cti_table_map.frozen?.must_equal true
   end
 
+  deprecated "should support cti_key and cti_model_map" do
+    Employee.cti_key.must_equal Employee.sti_key
+    Employee.cti_model_map.must_equal Employee.sti_model_map
+  end
+
   deprecated "should not attempt to use prepared statements" do
     Manager.plugin :prepared_statements
     Manager[1]

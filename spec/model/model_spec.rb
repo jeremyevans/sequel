@@ -489,6 +489,14 @@ describe Sequel::Model, ".require_valid_table = true" do
     c.set_dataset @db[:bars]
     c.columns.must_equal [:id]
   end
+
+  deprecated "should assume nil value is the same as false" do
+    c = Class.new(Sequel::Model)
+    c.require_valid_table = nil
+    ds = @db.dataset
+    def ds.columns; raise Sequel::Error; end
+    c.set_dataset(ds)
+  end
 end
 
 describe Sequel::Model, "constructors" do

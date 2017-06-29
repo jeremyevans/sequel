@@ -1363,8 +1363,10 @@ module Sequel
 
     # SEQUEL5: Remove
     def non_sql_options
+      # :nocov:
       Sequel::Deprecation.deprecate("Dataset#non_sql_options (private method)", "Convert the related code to use the non_sql_option? method")
       NON_SQL_OPTIONS
+      # :nocov:
     end
 
     # Whether the given option key does not affect the generated SQL.

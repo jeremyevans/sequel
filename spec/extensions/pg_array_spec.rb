@@ -268,6 +268,10 @@ describe "pg_array extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foo_array]
   end
 
+  deprecated "should raise error if register given convertor option and block" do
+    proc{Sequel::Postgres::PGArray.register('foo', :converter=>:to_s.to_proc, &:to_s)}.must_raise Sequel::Error
+  end
+
   it "should support registering custom array types" do
     @db.register_array_type('foo')
     @db.typecast_value(:foo_array, []).class.must_equal(Sequel::Postgres::PGArray)

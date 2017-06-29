@@ -64,6 +64,19 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   end
 end
 
+describe Sequel::Model, "#(set|update)_(all|only) without set_allowed_columns" do
+  before do
+    @c = Class.new(Sequel::Model(:items)) do
+      set_primary_key :id
+      columns :x, :y, :z, :id
+    end
+    @c.plugin :whitelist_security
+    @c.strict_param_setting = false
+    @o1 = @c.new
+    DB.reset
+  end
+end
+
 describe Sequel::Model, ".strict_param_setting" do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
@@ -103,6 +116,19 @@ describe Sequel::Model, ".allowed_columns " do
     @c.allowed_columns.must_equal [:x]
     @c.set_allowed_columns :x, :y
     @c.allowed_columns.must_equal [:x, :y]
+  end
+
+  it "should not change behavior if allowed_columns are not set" do
+    i = @c.new(:x => 1, :y => 2, :z => 3)
+    i.values.must_equal(:x => 1, :y => 2, :z => 3)
+    i.set(:x => 4, :y => 5, :z => 6)
+    i.values.must_equal(:x => 4, :y => 5, :z => 6)
+
+    @c.dataset = @c.dataset.with_fetch(:x => 7)
+    i = @c.new
+    i.update(:x => 7)
+    i.values.must_equal(:x => 7)
+    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
   end
 
   it "should only set allowed columns by default" do

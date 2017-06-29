@@ -7,6 +7,7 @@ describe "pg_hstore extension" do
     @db.extend_datasets{def quote_identifiers?; false end}
     @m = Sequel::Postgres
     @c = @m::HStore
+    @db.fetch = {:oid=>9999, :typname=>'hstore'}
     @db.extension :pg_hstore
   end
 
@@ -32,6 +33,15 @@ describe "pg_hstore extension" do
     @db.literal(Sequel.hstore("c"=>'NULL')).must_equal '\'"c"=>"NULL"\'::hstore'
     @db.literal(Sequel.hstore('c'=>'\ "\'=>')).must_equal '\'"c"=>"\\\\ \\"\'\'=>"\'::hstore'
     ['\'"a"=>"b","c"=>"d"\'::hstore', '\'"c"=>"d","a"=>"b"\'::hstore'].must_include(@db.literal(Sequel.hstore("a"=>"b","c"=>"d")))
+  end
+
+  it "should register conversion proc correctly" do
+    @db.conversion_procs[9999].call('"a"=>"b"').must_equal('a'=>'b')
+  end
+
+  deprecated "should reregister conversion proc when resetting conversion procs" do
+    @db.reset_conversion_procs
+    @db.conversion_procs[9999].call('"a"=>"b"').must_equal('a'=>'b')
   end
 
   it "should have Sequel.hstore method for creating HStore instances" do

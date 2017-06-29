@@ -503,9 +503,11 @@ module Sequel
         private
 
         if RUBY_VERSION < '1.9.0'
+          # :nocov:
           def new_entry_buffer
             String.new
           end
+          # :nocov:
         else
           def new_entry_buffer
             String.new.force_encoding(string.encoding)

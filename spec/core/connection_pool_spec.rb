@@ -259,6 +259,23 @@ ThreadedConnectionPoolSpecs = shared_description do
     t.join
   end
 
+  it "should work when acquire fails and then succeeds" do
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>2, :pool_timeout=>0))
+    def pool._acquire(*)
+      if @called
+        super
+      else
+        @called = true
+        nil
+      end
+    end
+    c = nil
+    pool.hold do |c1|
+      c = c1
+    end
+    c.wont_be_nil
+  end
+
   it "should wait until a connection is available if all are checked out" do
     pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0.1, :pool_sleep_time=>0))
     q, q1 = Queue.new, Queue.new

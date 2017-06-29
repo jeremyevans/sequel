@@ -9,6 +9,10 @@ describe "Dataset#where" do
     @dataset.where('price < ? AND id in ?', 100, [1, 2, 3]).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
   
+  it "should use default behavior for array of conditions" do
+    @dataset.where([[:a, 1], [:b, 2]]).sql.must_equal 'SELECT * FROM test WHERE ((a = 1) AND (b = 2))'
+  end
+
   it "should not modify passed array with placeholders" do
     a = ['price < ? AND id in ?', 100, 1, 2, 3]
     b = a.dup
