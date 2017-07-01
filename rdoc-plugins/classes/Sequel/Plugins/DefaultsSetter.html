@@ -43,6 +43,14 @@
             
             <pre class="ruby"><span class="ruby-comment"># column a default NULL</span>&#x000A;<span class="ruby-comment"># column b default 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; nil</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-comment"># =&gt; 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-comment"># =&gt; 3</span></pre>
             
+            <p>You can manually set default values as well:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">default_values</span>[:<span class="ruby-identifier">a</span>] = <span class="ruby-value">4</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 4</span></pre>
+            
+            <p>You can also provide procs to set default values:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">default_values</span>[:<span class="ruby-identifier">a</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>}&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; Date.today</span></pre>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances set defaults (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">defaults_setter</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class set defaults </span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">defaults_setter</span></pre>
@@ -80,7 +88,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_default_values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_default_values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

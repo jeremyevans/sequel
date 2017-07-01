@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-13 13:21:30 -0700</span>
+          <span class='datetime'>2017-06-21 13:54:47 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -39,7 +39,7 @@
             <p>The pg_json_ops extension adds support to Sequel&#39;s DSL to make it
             easier to call PostgreSQL JSON functions and operators (added first in
             PostgreSQL 9.3).  It also supports the JSONB functions and operators added
-            in PostgreSQL 9.4).</p>
+            in PostgreSQL 9.4.</p>
             
             <p>To load the extension:</p>
             
@@ -56,7 +56,7 @@
             <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>(:<span class="ruby-identifier">json_column</span>)&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(:<span class="ruby-identifier">jsonb_column</span>)</pre>
             
             <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-            expression objects, you can call the pg_json or pg_jsonb # method:</p>
+            expression objects, you can call the pg_json or pg_jsonb method:</p>
             
             <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">json_column</span>].<span class="ruby-identifier">pg_json</span>&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">jsonb_column</span>].<span class="ruby-identifier">pg_jsonb</span></pre>
             

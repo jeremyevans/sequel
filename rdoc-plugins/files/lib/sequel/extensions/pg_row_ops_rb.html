@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-13 13:21:30 -0700</span>
+          <span class='datetime'>2017-06-21 13:54:47 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -106,7 +106,7 @@
             
             <p>By casting the expression, you can get a composite type returned:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">a</span>.<span class="ruby-identifier">splat</span>).<span class="ruby-identifier">first</span> <span class="ruby-comment"># SELECT (a.*)::a FROM a</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;&quot;(1,2)&quot;} # or {:a=&gt;{:a=&gt;1, :b=&gt;2}} if the &quot;a&quot; type has been registered</span>&#x000A;                   <span class="ruby-comment"># with the pg_row extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">a</span>.<span class="ruby-identifier">splat</span>(:<span class="ruby-identifier">a</span>)).<span class="ruby-identifier">first</span> <span class="ruby-comment"># SELECT (a.*)::a FROM a</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;&quot;(1,2)&quot;} # or {:a=&gt;{:a=&gt;1, :b=&gt;2}} if the &quot;a&quot; type has been registered</span>&#x000A;                   <span class="ruby-comment"># with the pg_row extension</span></pre>
             
             <p>This feature is mostly useful for a different way to graph tables:</p>
             

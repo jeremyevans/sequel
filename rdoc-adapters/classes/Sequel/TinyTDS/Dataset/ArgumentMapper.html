@@ -35,11 +35,7 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p><a href="../../SQLite.html">SQLite</a> already supports named bind
-            arguments, so use directly.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Protected Instance</h3>
@@ -66,14 +62,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Return a hash with the same values as the given hash, but with the keys
-                  converted to strings.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-map_to_prepared_args-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-map_to_prepared_args-source'><span class="ruby-comment"># File lib/sequel/adapters/tinytds.rb, line 198</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">args</span> = {}&#x000A;  <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)] = <span class="ruby-identifier">v</span>}&#x000A;  <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-map_to_prepared_args-source'><span class="ruby-comment"># File lib/sequel/adapters/tinytds.rb, line 195</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">args</span> = {}&#x000A;  <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">args</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)] = <span class="ruby-identifier">v</span>}&#x000A;  <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

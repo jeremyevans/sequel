@@ -46,7 +46,8 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a href="#attribute-c-use_clob_as_blob">use_clob_as_blob</a></li>
+              <li><a href="#method-c-use_clob_as_blob">use_clob_as_blob</a></li>
+              <li><a href="#method-c-use_clob_as_blob-3D">use_clob_as_blob=</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -59,21 +60,39 @@
             </ol>
           </div>
           <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-use_clob_as_blob'>use_clob_as_blob</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Whether to use clob as the generic File type, true by default.</p>
-                    </td>
-                  </tr>
-                </table>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-use_clob_as_blob'>
+                <a name='method-c-use_clob_as_blob'></a>
+                <div class='synopsis'>
+                  <span class='name'>use_clob_as_blob</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_clob_as_blob-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-use_clob_as_blob-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_clob_as_blob</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::DB2.use_clob_as_blob&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@use_clob_as_blob</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-use_clob_as_blob-3D'>
+                <a name='method-c-use_clob_as_blob-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>use_clob_as_blob=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_clob_as_blob-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-use_clob_as_blob-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 15</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_clob_as_blob=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::DB2.use_clob_as_blob=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@use_clob_as_blob</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

@@ -48,8 +48,18 @@
             is to raise an exception for a missing record, so if you use memcached, you
             will want to use this option.</p>
             
-            <p>Note that only Model.[] method calls with a primary key argument are cached
-            using this plugin.</p>
+            <p>Note that only lookups by primary key are cached using this plugin.  The
+            following methods use a lookup by primary key:</p>
+            <ul><li>
+            <p>Model.with_pk</p>
+            </li><li>
+            <p>Model.with_pk!</p>
+            </li><li>
+            <p>Model.[] # when argument is not hash or nil</p>
+            </li><li>
+            <p>many_to_one association method # without dynamic callback, when primary key
+            matches</p>
+            </li></ul>
             
             <p>Usage:</p>
             
@@ -89,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">store</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@cache_store</span> = <span class="ruby-identifier">store</span>&#x000A;    <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ttl</span>] <span class="ruby-operator">||</span> <span class="ruby-value">3600</span>&#x000A;    <span class="ruby-ivar">@cache_ignore_exceptions</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ignore_exceptions</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">store</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@cache_store</span> = <span class="ruby-identifier">store</span>&#x000A;    <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ttl</span>] <span class="ruby-operator">||</span> <span class="ruby-value">3600</span>&#x000A;    <span class="ruby-ivar">@cache_ignore_exceptions</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ignore_exceptions</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

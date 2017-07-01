@@ -85,19 +85,19 @@
             
             <p>For example, to migrate the database to the latest version:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>)</pre>
             
             <p>For example, to migrate the database all the way down:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-value">0</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, :<span class="ruby-identifier">target=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>)</pre>
             
             <p>For example, to migrate the database to version 4:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-value">4</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, :<span class="ruby-identifier">target=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">4</span>)</pre>
             
             <p>To migrate the database from version 1 to version 5:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-value">5</span>, <span class="ruby-value">1</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, :<span class="ruby-identifier">target=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>, :<span class="ruby-identifier">current=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)</pre>
             
             <p>Part of the <code>migration</code> extension.</p>
           </div>

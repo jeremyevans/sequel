@@ -43,9 +43,7 @@
             
             <p>All of the standard hooks are supported. Instance level before hooks are
             executed in reverse order of addition before calling super.  Instance level
-            after hooks are executed in order of addition after calling super.  If any
-            of the instance level before hook blocks return false, no more instance
-            level before hooks are called and false is returned.</p>
+            after hooks are executed in order of addition after calling super.</p>
             
             <p>Instance level hooks for before and after are cleared after all related
             after level instance hooks have run.  This means that if you add a
@@ -77,14 +75,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>AFTER_HOOKS</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::Model::AFTER_HOOKS</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BEFORE_HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::Model::BEFORE_HOOKS</td>
+                    <td class='context-item-value'>Sequel::Model::HOOKS.partition{|l| l.to_s.start_with?('before')}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -108,7 +99,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>HOOKS</td>
                     <td>=</td>
-                    <td class='context-item-value'>BEFORE_HOOKS + AFTER_HOOKS</td>
+                    <td class='context-item-value'>Sequel::Model::HOOKS</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>

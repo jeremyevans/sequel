@@ -34,141 +34,15 @@
         </ol>
         <div class='parent'>
           Superclass:
-          <strong><a href="Object.html">Object</a></strong>
+          <strong></strong>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Attempt to get uniform behavior for the <a href="PGconn.html">PGconn</a>
-            object no matter if pg, postgres, or postgres-pr is used.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-unescape_bytea">unescape_bytea</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-block">block</a></li>
-              <li><a href="#method-i-escape_bytea">escape_bytea</a></li>
-              <li><a href="#method-i-escape_string">escape_string</a></li>
-              <li><a href="#method-i-status">status</a></li>
-            </ol>
-          </div>
+          <div id='description'></div>
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONNECTION_OK</td>
-                    <td>=</td>
-                    <td class='context-item-value'>-1</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-unescape_bytea'>
-                <a name='method-c-unescape_bytea'></a>
-                <div class='synopsis'>
-                  <span class='name'>unescape_bytea</span>
-                  <span class='arguments'>(obj)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If no valid bytea unescaping method can be found, create one that raises an
-                  error</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-unescape_bytea-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-unescape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;bytea unescaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr.&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-block'>
-                <a name='method-i-block'></a>
-                <div class='synopsis'>
-                  <span class='name'>block</span>
-                  <span class='arguments'>(timeout=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-block-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-block-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">block</span>(<span class="ruby-identifier">timeout</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-escape_bytea'>
-                <a name='method-i-escape_bytea'></a>
-                <div class='synopsis'>
-                  <span class='name'>escape_bytea</span>
-                  <span class='arguments'>(obj)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If there is no <a
-                  href="PGconn.html#method-i-escape_bytea">#escape_bytea</a> instance method,
-                  but there is an <a
-                  href="PGconn.html#method-i-escape_bytea">#escape_bytea</a> class method,
-                  use that instead.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_bytea-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-escape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-escape_string'>
-                <a name='method-i-escape_string'></a>
-                <div class='synopsis'>
-                  <span class='name'>escape_string</span>
-                  <span class='arguments'>(str)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If there is no <a
-                  href="PGconn.html#method-i-escape_string">#escape_string</a> instance
-                  method, but there is an escape class method, use that instead.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_string-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-escape_string-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_string</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&quot;&#39;&quot;</span>, <span class="ruby-string">&quot;&#39;&#39;&quot;</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">str</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-status'>
-                <a name='method-i-status'></a>
-                <div class='synopsis'>
-                  <span class='name'>status</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-status-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-status-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>&#x000A;  <span class="ruby-constant">CONNECTION_OK</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

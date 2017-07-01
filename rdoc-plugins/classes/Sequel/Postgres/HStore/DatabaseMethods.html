@@ -45,6 +45,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-bound_variable_arg">bound_variable_arg</a></li>
+              <li><a href="#method-i-reset_conversion_procs">reset_conversion_procs</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -65,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:parse</span>))&#x000A;    <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:hstore</span>] = <span class="ruby-constant">HStore</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:parse</span>))&#x000A;    <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:hstore</span>] = <span class="ruby-constant">HStore</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -83,7 +84,24 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-bound_variable_arg-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 149</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">HStore</span>&#x000A;    <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">HStore</span>&#x000A;    <span class="ruby-identifier">arg</span>.<span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-reset_conversion_procs'>
+                <a name='method-i-reset_conversion_procs'></a>
+                <div class='synopsis'>
+                  <span class='name'>reset_conversion_procs</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>SEQUEL5: Remove</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-reset_conversion_procs-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-reset_conversion_procs-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 165</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reset_conversion_procs</span>&#x000A;  <span class="ruby-identifier">procs</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:hstore</span>, <span class="ruby-operator">&amp;</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:parse</span>))&#x000A;  <span class="ruby-identifier">procs</span> &#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

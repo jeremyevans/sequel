@@ -59,11 +59,16 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a href="#attribute-c-convert_invalid_date_time">convert_invalid_date_time</a></li>
-              <li><a href="#attribute-c-convert_tinyint_to_bool">convert_tinyint_to_bool</a></li>
-              <li><a href="#attribute-c-default_charset">default_charset</a></li>
-              <li><a href="#attribute-c-default_collate">default_collate</a></li>
-              <li><a href="#attribute-c-default_engine">default_engine</a></li>
+              <li><a href="#method-c-convert_invalid_date_time">convert_invalid_date_time</a></li>
+              <li><a href="#method-c-convert_invalid_date_time-3D">convert_invalid_date_time=</a></li>
+              <li><a href="#method-c-convert_tinyint_to_bool">convert_tinyint_to_bool</a></li>
+              <li><a href="#method-c-convert_tinyint_to_bool-3D">convert_tinyint_to_bool=</a></li>
+              <li><a href="#method-c-default_charset">default_charset</a></li>
+              <li><a href="#method-c-default_charset-3D">default_charset=</a></li>
+              <li><a href="#method-c-default_collate">default_collate</a></li>
+              <li><a href="#method-c-default_collate-3D">default_collate=</a></li>
+              <li><a href="#method-c-default_engine">default_engine</a></li>
+              <li><a href="#method-c-default_engine-3D">default_engine=</a></li>
               <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
             </ol>
           </div>
@@ -112,76 +117,168 @@
                 </table>
               </div>
             </div>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-convert_invalid_date_time'>convert_invalid_date_time</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Whether to convert invalid date time values by default.</p>
-                      
-                      <p>Only applies to <a href="Database.html">Sequel::Database</a> instances
-                      created after this has been set.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-convert_tinyint_to_bool'>convert_tinyint_to_bool</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="../Sequel.html">Sequel</a> converts the column type tinyint(1) to
-                      a boolean by default when using the native <a href="MySQL.html">MySQL</a>
-                      or <a href="Mysql2.html">Mysql2</a> adapter.  You can turn off the
-                      conversion by setting this to false. This setting is ignored when
-                      connecting to <a href="MySQL.html">MySQL</a> via the do or jdbc adapters,
-                      both of which automatically do the conversion.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-default_charset'>default_charset</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Set the default charset used for CREATE TABLE.  You can pass the :charset
-                      option to create_table to override this setting.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-default_collate'>default_collate</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Set the default collation used for CREATE TABLE.  You can pass the :collate
-                      option to create_table to override this setting.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-default_engine'>default_engine</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Set the default engine used for CREATE TABLE.  You can pass the :engine
-                      option to create_table to override this setting.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-convert_invalid_date_time'>
+                <a name='method-c-convert_invalid_date_time'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_invalid_date_time</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_invalid_date_time-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-convert_invalid_date_time-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_invalid_date_time</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.convert_invalid_date_time&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_invalid_date_time</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-convert_invalid_date_time-3D'>
+                <a name='method-c-convert_invalid_date_time-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_invalid_date_time=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_invalid_date_time-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-convert_invalid_date_time-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_invalid_date_time=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.convert_invalid_date_time=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_invalid_date_time</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-convert_tinyint_to_bool'>
+                <a name='method-c-convert_tinyint_to_bool'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_tinyint_to_bool</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_tinyint_to_bool-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-convert_tinyint_to_bool-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_tinyint_to_bool</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.convert_tinyint_to_bool&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_tinyint_to_bool</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-convert_tinyint_to_bool-3D'>
+                <a name='method-c-convert_tinyint_to_bool-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_tinyint_to_bool=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_tinyint_to_bool-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-convert_tinyint_to_bool-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_tinyint_to_bool=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.convert_tinyint_to_bool=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_tinyint_to_bool</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-default_charset'>
+                <a name='method-c-default_charset'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_charset</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-default_charset-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-default_charset-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_charset</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.default_charset&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@default_charset</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-default_charset-3D'>
+                <a name='method-c-default_charset-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_charset=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-default_charset-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-default_charset-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_charset=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.default_charset=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@default_charset</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-default_collate'>
+                <a name='method-c-default_collate'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_collate</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-default_collate-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-default_collate-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_collate</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.default_collate&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@default_collate</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-default_collate-3D'>
+                <a name='method-c-default_collate-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_collate=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-default_collate-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-default_collate-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_collate=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.default_collate=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@default_collate</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-default_engine'>
+                <a name='method-c-default_engine'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_engine</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-default_engine-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-default_engine-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_engine</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.default_engine&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@default_engine</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-default_engine-3D'>
+                <a name='method-c-default_engine-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>default_engine=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-default_engine-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-default_engine-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_engine=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::MySQL.default_engine=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@default_engine</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-class' id='method-method-c-mock_adapter_setup'>
                 <a name='method-c-mock_adapter_setup'></a>
                 <div class='synopsis'>

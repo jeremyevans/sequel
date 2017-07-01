@@ -497,7 +497,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>47</td>
+                    <td class='context-item-value'>48</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -1019,7 +1019,7 @@
                 <a name='method-c-object_to_json'></a>
                 <div class='synopsis'>
                   <span class='name'>object_to_json</span>
-                  <span class='arguments'>(obj, *args)</span>
+                  <span class='arguments'>(obj, *args, &block)</span>
                 </div>
                 <div class='description'>
                   
@@ -1030,7 +1030,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-object_to_json-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-object_to_json-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 190</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-object_to_json-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 190</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-parse_json'>

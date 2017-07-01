@@ -67,6 +67,7 @@
               <li><a href="#method-i-pg_json">pg_json</a></li>
               <li><a href="#method-i-pg_jsonb">pg_jsonb</a></li>
               <li><a href="#method-i-pg_row">pg_row</a></li>
+              <li><a href="#method-i-sql_array">sql_array</a></li>
               <li><a href="#method-i-sql_expr">sql_expr</a></li>
               <li><a href="#method-i-sql_negate">sql_negate</a></li>
               <li><a href="#method-i-sql_or">sql_or</a></li>
@@ -78,18 +79,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='aliases-list'>
-              <h2>Public Instance Aliases</h2>
-              <div class='name-list'>
-                <table summary='Public Instance Aliases'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>sql_array</td>
-                    <td>-&gt;</td>
-                    <td class='context-item-value'><a href="#method-i-sql_value_list">sql_value_list</a></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-case'>
@@ -128,7 +117,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_array-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 583</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 660</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_json'>
@@ -148,7 +137,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_json-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 314</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 325</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_jsonb'>
@@ -168,7 +157,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_jsonb-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 321</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 332</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_row'>
@@ -187,7 +176,23 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_row-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_row-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 607</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_row</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_row-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 636</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_row</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-sql_array'>
+                <a name='method-i-sql_array'></a>
+                <div class='synopsis'>
+                  <span class='name'>sql_array</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_array-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-sql_array-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_array</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Array#sql_array in the core_extensions extension&quot;</span>, <span class="ruby-node">&quot;Use Array#sql_value_list instead&quot;</span>)&#x000A;  <span class="ruby-identifier">sql_value_list</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_expr'>
@@ -212,7 +217,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_expr-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_expr-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_expr</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_expr-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_expr</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_negate'>
@@ -232,7 +237,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_negate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_negate-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_negate</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_negate-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_negate</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_or'>
@@ -252,7 +257,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_or-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_or-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_or</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_or-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 82</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_or</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_string_join'>
@@ -274,7 +279,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string_join-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_string_join-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string_join</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">joiner</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_string_join-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 95</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string_join</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">joiner</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_value_list'>

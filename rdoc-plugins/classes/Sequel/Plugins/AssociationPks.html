@@ -74,6 +74,17 @@
             nil is given. If set to :remove, the setter will treat the nil as an empty
             array, removing the association all currently associated values.</p>
             
+            <p>For many_to_many associations, association_pks assumes the related pks can
+            be accessed directly from the join table.  This works in most cases, but in
+            cases where the :right_primary_key association option is used to specify a
+            different primary key in the associated table, association_pks will return
+            the value of the association primary keys (foreign key values to associated
+            table in the join table), not the associated model primary keys.  If you
+            would like to use the associated model primary keys, you need to use the
+            :association_pks_use_associated_table association option. If the
+            :association_pks_use_associated_table association option is used, no setter
+            method will be added.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclass *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before the association methods)</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span></pre>

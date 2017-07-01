@@ -36,6 +36,13 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a href="#method-c-SqlAnywhereBoolean">SqlAnywhereBoolean</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='class-list'>
@@ -46,6 +53,25 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-SqlAnywhereBoolean'>
+                <a name='method-c-SqlAnywhereBoolean'></a>
+                <div class='synopsis'>
+                  <span class='name'>SqlAnywhereBoolean</span>
+                  <span class='arguments'>(r, i)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-SqlAnywhereBoolean-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-SqlAnywhereBoolean-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlanywhere.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">SqlAnywhereBoolean</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getShort</span>(<span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-value">0</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">wasNull</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

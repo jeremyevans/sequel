@@ -95,29 +95,21 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>AFTER_HOOKS</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      [:after_create, :after_update, :after_save, :after_destroy, :after_validation,
-                      :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]
-                    </td>
+                    <td class='context-item-value'>[:after_create, :after_update, :after_save, :after_destroy, :after_validation, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hooks that are called after an action.  When overriding these, it is
-                      recommended to call <code>super</code> on the first line of your method, so
-                      later hooks are called after earlier hooks.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES</td>
                     <td>=</td>
-                    <td class='context-item-value'>@Model_cache</td>
+                    <td class='context-item-value'>@Model_cache = {}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES_MUTEX</td>
                     <td>=</td>
-                    <td class='context-item-value'>Mutex.new # :nodoc:</td>
+                    <td class='context-item-value'>Mutex.new</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -126,61 +118,38 @@
                     <td>=</td>
                     <td class='context-item-value'>[:around_create, :around_update, :around_save, :around_destroy, :around_validation]</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hooks that are called around an action.  If overridden, these methods must
-                      call super exactly once if the behavior they wrap is desired.  The can be
-                      used to rescue exceptions raised by the code they wrap or ensure that some
-                      behavior is executed no matter what.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>BEFORE_HOOKS</td>
                     <td>=</td>
                     <td class='context-item-value'>[:before_create, :before_update, :before_save, :before_destroy, :before_validation]</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hooks that are called before an action.  Can return false to not do the
-                      action.  When overriding these, it is recommended to call
-                      <code>super</code> as the last line of your method, so later hooks are
-                      called before earlier hooks.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>BOOLEAN_SETTINGS</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
-                      :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions,
-                      :use_after_commit_rollback # SEQUEL5: Remove
-                      ]
-                    </td>
+                    <td class='context-item-value'>[:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions, :use_after_commit_rollback]</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Boolean settings that can be modified at the global, class, or instance
-                      level.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DATASET_METHODS</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) -
-                      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
-                    </td>
+                    <td class='context-item-value'>(Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Class methods added to model that call the method of the same name on the
-                      dataset</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>HOOKS</td>
                     <td>=</td>
-                    <td class='context-item-value'>BEFORE_HOOKS + AFTER_HOOKS</td>
+                    <td class='context-item-value'>
+                      [:before_create, :before_update, :before_save, :before_destroy, :before_validation,
+                      :after_create, :after_update, :after_save, :after_destroy, :after_validation,
+                      :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback # SEQUEL5: Remove commit/rollback hooks
+                      ]
+                    </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -196,41 +165,16 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>INHERITED_INSTANCE_VARIABLES</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      {
-                      :@allowed_columns=>:dup, # SEQUEL5: Remove
-                      :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
-                      :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil,
-                      :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
-                      :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
-                      :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
-                      :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
-                      :@fast_instance_delete_sql=>nil,
-                      :@finders=>:dup, :@finder_loaders=>:dup, # SEQUEL5: Remove
-                      :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
-                      :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}
-                    </td>
+                    <td class='context-item-value'>{ :@allowed_columns=>:dup, :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil, :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil, :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil, :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil, :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil, :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil, :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup, :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil, :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Class instance variables that are inherited in subclasses.  If the value is
-                      <code>:dup</code>, dup is called on the superclass&#39;s instance variable
-                      when creating the instance variable in the subclass. If the value is
-                      <code>nil</code>, the superclass&#39;s instance variable is used directly
-                      in the subclass.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>NORMAL_METHOD_NAME_REGEXP</td>
                     <td>=</td>
                     <td class='context-item-value'>/\A[A-Za-z_][A-Za-z0-9_]*\z/</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Regular expression that determines if a method name is normal in the sense
-                      that it could be used literally in ruby code without using send.  Used to
-                      avoid problems when using eval with a string to define methods.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>OPTS</td>
@@ -242,7 +186,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>RESTRICTED_SETTER_METHODS</td>
                     <td>=</td>
-                    <td class='context-item-value'>instance_methods.map(&:to_s).grep(SETTER_METHOD_REGEXP)</td>
+                    <td class='context-item-value'>instance_methods.map(&:to_s).select{|l| l.end_with?('=')}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -256,11 +200,7 @@
                     <td>=</td>
                     <td class='context-item-value'>/=\z/</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Regular expression that determines if the method is a valid setter name
-                      (i.e. it ends with =).</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                 </table>
               </div>

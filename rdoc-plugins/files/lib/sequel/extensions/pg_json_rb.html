@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-21 12:31:57 -0800</span>
+          <span class='datetime'>2017-06-28 16:24:56 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -83,9 +83,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]))&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>({<span class="ruby-string">&#39;a&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, <span class="ruby-string">&#39;b&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}))</pre>
             
-            <p>If you would like to use PostgreSQL json columns in your model objects, you
-            probably want to modify the schema parsing/typecasting so that it
-            recognizes and correctly handles the json type, which you can do by:</p>
+            <p>To use this extension, please load it into the Database instance:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_json</span></pre>
             
@@ -126,7 +124,7 @@
               <ol>
                 <li>delegate</li>
                 <li>json</li>
-                <li>adapters/utils/pg_types</li>
+                <li>adapters/shared/postgres</li>
               </ol>
             </div>
           </div>

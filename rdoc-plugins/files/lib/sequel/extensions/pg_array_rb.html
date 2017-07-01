@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-01-19 10:04:33 -0800</span>
+          <span class='datetime'>2017-06-29 15:23:07 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -90,12 +90,10 @@
             <p>This extension by default includes handlers for array types for all scalar
             types that the native postgres adapter handles. It also makes it easy to
             add support for other array types.  In general, you just need to make sure
-            that the scalar type is handled and has the appropriate converter installed
-            in Sequel::Postgres::PG_TYPES or the Database instance&#39;s
-            conversion_procs usingthe appropriate type OID.  For user defined types,
-            you can do this via:</p>
+            that the scalar type is handled and has the appropriate converter
+            installed. For user defined types, you can do this via:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">scalar_type_oid</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_conversion_proc</span>(<span class="ruby-identifier">scalar_type_oid</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }</pre>
             
             <p>Then you can call <a
             href="../../../../classes/Sequel/Postgres/PGArray/DatabaseMethods.html#method-i-register_array_type">Sequel::Postgres::PGArray::DatabaseMethods#register_array_type</a>
@@ -103,20 +101,6 @@
             support the foo[] type (assuming the foo type is already supported):</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_array_type</span>(<span class="ruby-string">&#39;foo&#39;</span>)</pre>
-            
-            <p>You can also register array types on a global basis using <a
-            href="../../../../classes/Sequel/Postgres/PGArray.html#method-c-register">Sequel::Postgres::PGArray.register</a>.
-            In this case, you&#39;ll have to specify the type oids:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_TYPES</span>[<span class="ruby-value">1234</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">register</span>(<span class="ruby-string">&#39;foo&#39;</span>, :<span class="ruby-identifier">oid=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">4321</span>, :<span class="ruby-identifier">scalar_oid=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1234</span>)</pre>
-            
-            <p>Both <a
-            href="../../../../classes/Sequel/Postgres/PGArray/DatabaseMethods.html#method-i-register_array_type">Sequel::Postgres::PGArray::DatabaseMethods#register_array_type</a>
-            and <a
-            href="../../../../classes/Sequel/Postgres/PGArray.html#method-c-register">Sequel::Postgres::PGArray.register</a>
-            support many options to customize the array type handling.  See the <a
-            href="../../../../classes/Sequel/Postgres/PGArray.html#method-c-register">Sequel::Postgres::PGArray.register</a>
-            method documentation.</p>
             
             <p>While this extension can parse PostgreSQL arrays with explicit bounds, it
             currently ignores explicit bounds, so such values do not round trip.</p>
@@ -135,7 +119,7 @@
               <ol>
                 <li>delegate</li>
                 <li>strscan</li>
-                <li>adapters/utils/pg_types</li>
+                <li>adapters/shared/postgres</li>
               </ol>
             </div>
           </div>

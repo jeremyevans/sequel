@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-16 10:57:41 -0700</span>
+          <span class='datetime'>2017-06-28 16:24:56 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -47,9 +47,7 @@
             href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
             so they work on all adapters.</p>
             
-            <p>If you would like to use interval columns in your model objects, you
-            probably want to modify the typecasting so that it recognizes and correctly
-            handles the interval columns, which you can do by:</p>
+            <p>To use this extension, load it into the Database instance:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_interval</span></pre>
             
@@ -77,7 +75,7 @@
               <h2>Required files</h2>
               <ol>
                 <li>active_support/duration</li>
-                <li>adapters/utils/pg_types</li>
+                <li>adapters/shared/postgres</li>
               </ol>
             </div>
           </div>

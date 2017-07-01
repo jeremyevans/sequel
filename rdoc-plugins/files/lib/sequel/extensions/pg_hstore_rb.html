@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-03-28 16:44:29 -0700</span>
+          <span class='datetime'>2017-06-29 15:23:07 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -92,7 +92,7 @@
             </li><li>
             <p>[]=</p>
             </li><li>
-            <p>assoc (ruby 1.9 only)</p>
+            <p>assoc</p>
             </li><li>
             <p>delete</p>
             </li><li>
@@ -104,7 +104,7 @@
             </li><li>
             <p>include?</p>
             </li><li>
-            <p>key (ruby 1.9 only)</p>
+            <p>key</p>
             </li><li>
             <p>key?</p>
             </li><li>
@@ -114,7 +114,7 @@
             </li><li>
             <p>merge!</p>
             </li><li>
-            <p>rassoc (ruby 1.9 only)</p>
+            <p>rassoc</p>
             </li><li>
             <p>replace</p>
             </li><li>
@@ -129,9 +129,9 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>))</pre>
             
-            <p>If you would like to use hstore columns in your model objects, you probably
-            want to modify the schema parsing/typecasting so that it recognizes and
-            correctly handles the hstore columns, which you can do by:</p>
+            <p>To use this extension, first load it into your <a
+            href="../../../../classes/Sequel/Database.html">Sequel::Database</a>
+            instance:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_hstore</span></pre>
             

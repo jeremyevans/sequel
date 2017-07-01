@@ -107,28 +107,28 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>QUALIFY</td>
                     <td>=</td>
-                    <td class='context-item-value'>[OPEN, CLOSE_DOT].freeze</td>
+                    <td class='context-item-value'>['(', ').'].freeze.each(&:freeze)</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ROW</td>
                     <td>=</td>
-                    <td class='context-item-value'>[OPEN, CLOSE_STAR].freeze</td>
+                    <td class='context-item-value'>['(', '.*)'].freeze.each(&:freeze)</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ROW_CAST</td>
                     <td>=</td>
-                    <td class='context-item-value'>[OPEN, CLOSE_STAR_CAST].freeze</td>
+                    <td class='context-item-value'>['(', '.*)::'].freeze.each(&:freeze)</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>WRAP</td>
                     <td>=</td>
-                    <td class='context-item-value'>[EMPTY].freeze</td>
+                    <td class='context-item-value'>[""].freeze.each(&:freeze)</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -152,7 +152,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-wrap-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-wrap-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">WRAP</span>, [<span class="ruby-identifier">expr</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-wrap-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">WRAP</span>, [<span class="ruby-identifier">expr</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -174,7 +174,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-2A-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 127</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>([<span class="ruby-keyword">self</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>([<span class="ruby-keyword">self</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -194,7 +194,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 111</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">member</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">member</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">QUALIFY</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">member</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>(<span class="ruby-keyword">self</span>)[<span class="ruby-identifier">member</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 117</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">member</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">member</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">QUALIFY</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">member</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>(<span class="ruby-keyword">self</span>)[<span class="ruby-identifier">member</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-splat'>
@@ -218,7 +218,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-splat-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-splat-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 146</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">splat</span>(<span class="ruby-identifier">cast_to</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot splat a PGRowOp with multiple arguments&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cast_to</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW_CAST</span>, <span class="ruby-identifier">args</span> <span class="ruby-operator">+</span> [<span class="ruby-identifier">cast_to</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-splat-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">splat</span>(<span class="ruby-identifier">cast_to</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot splat a PGRowOp with multiple arguments&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cast_to</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW_CAST</span>, <span class="ruby-identifier">args</span> <span class="ruby-operator">+</span> [<span class="ruby-identifier">cast_to</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

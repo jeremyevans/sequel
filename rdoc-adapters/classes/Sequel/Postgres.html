@@ -40,12 +40,6 @@
           <li class='other'>
             <a href="../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
           </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/swift/postgres_rb.html">lib/sequel/adapters/swift/postgres.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/utils/pg_types_rb.html">lib/sequel/adapters/utils/pg_types.rb</a>
-          </li>
           <li>
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
           </li>
@@ -56,25 +50,18 @@
           <div id='description'>
             
             <p>Top level module for holding all PostgreSQL-related modules and classes for
-            <a href="../Sequel.html">Sequel</a>.  There are a few module level
-            accessors that are added via metaprogramming.  These are:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="Postgres.html#attribute-c-client_min_messages">::client_min_messages</a> </td><td>
+            <a href="../Sequel.html">Sequel</a>.  All adapters that connect to
+            PostgreSQL support the following options:</p>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:client_min_messages </td><td>
             <p>Change the minimum level of messages that PostgreSQL will send to the the
             client.  The PostgreSQL default is NOTICE, the <a
             href="../Sequel.html">Sequel</a> default is WARNING.  Set to nil to not
             change the server default. Overridable on a per instance basis via the
             :client_min_messages option.</p>
-            </td></tr><tr><td class='label'><a href="Postgres.html#attribute-c-force_standard_strings">::force_standard_strings</a> </td><td>
+            </td></tr><tr><td class='label'>:force_standard_strings </td><td>
             <p>Set to false to not force the use of standard strings.  Overridable on a
             per instance basis via the :force_standard_strings option.</p>
-            </td></tr></tbody></table>
-            
-            <p>It is not recommened you use these module-level accessors.  Instead, use
-            the database option to make the setting per-Database.</p>
-            
-            <p>All adapters that connect to PostgreSQL support the following option in
-            addition to those mentioned above:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:search_path </td><td>
+            </td></tr><tr><td class='label'>:search_path </td><td>
             <p>Set the schema search_path for this Database&#39;s connections. Allows to
             to set which schemas do not need explicit qualification, and in which order
             to check the schemas when an unqualified object is referenced.</p>
@@ -84,11 +71,14 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a href="#attribute-c-client_min_messages">client_min_messages</a></li>
-              <li><a href="#attribute-c-force_standard_strings">force_standard_strings</a></li>
+              <li><a href="#method-c-client_min_messages">client_min_messages</a></li>
+              <li><a href="#method-c-client_min_messages-3D">client_min_messages=</a></li>
+              <li><a href="#method-c-force_standard_strings">force_standard_strings</a></li>
+              <li><a href="#method-c-force_standard_strings-3D">force_standard_strings=</a></li>
               <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
               <li><a href="#method-c-sequel_pg_version_supported-3F">sequel_pg_version_supported?</a></li>
-              <li><a href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
+              <li><a href="#method-c-use_iso_date_format">use_iso_date_format</a></li>
+              <li><a href="#method-c-use_iso_date_format-3D">use_iso_date_format=</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -117,12 +107,7 @@
                     <td>=</td>
                     <td class='context-item-value'>[]</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Array of exceptions that need to be converted.  <a
-                      href="JDBC.html">JDBC</a> uses NativeExceptions, the native adapter uses
-                      PGError.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DASH_STR</td>
@@ -160,6 +145,13 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PGError</td>
+                    <td>=</td>
+                    <td class='context-item-value'>PG::Error if defined?(PG::Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>PG_NAMED_TYPES</td>
                     <td>=</td>
                     <td class='context-item-value'>{} unless defined?(PG_NAMED_TYPES)</td>
@@ -187,6 +179,27 @@
                       
                       <p>Hash with integer keys and callable values for converting PostgreSQL types.</p>
                     </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PG__TYPES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>PG_TYPES</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PGconn</td>
+                    <td>=</td>
+                    <td class='context-item-value'>PG::Connection if defined?(PG::Connection)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PGresult</td>
+                    <td>=</td>
+                    <td class='context-item-value'>PG::Result if defined?(PG::Result)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>PLUS_INFINITY</td>
@@ -230,7 +243,10 @@
                       end.new
                     </td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
+                    <td class='context-item-desc'>
+                      
+                      <p>SEQUEL5: Remove</p>
+                    </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>TYPE_TRANSLATOR</td>
@@ -279,57 +295,72 @@
                 </table>
               </div>
             </div>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-client_min_messages'>client_min_messages</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>By default, <a href="../Sequel.html">Sequel</a> sets the minimum level of
-                      log messages sent to the client to WARNING, where PostgreSQL uses a default
-                      of NOTICE.  This is to avoid a lot of mostly useless messages when running
-                      migrations, such as a couple of lines for every serial primary key field.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-force_standard_strings'>force_standard_strings</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>By default, <a href="../Sequel.html">Sequel</a> forces the use of standard
-                      strings, so that &#39;\&#39; is interpreted as \ and not .  While
-                      PostgreSQL &lt;9.1 defaults to interpreting plain strings, newer versions
-                      use standard strings by default.  <a href="../Sequel.html">Sequel</a>
-                      assumes that <a href="SQL.html">SQL</a> standard strings will be used. 
-                      Setting this to false means <a href="../Sequel.html">Sequel</a> will use
-                      the database&#39;s default.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-use_iso_date_format'>use_iso_date_format</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>As an optimization, <a href="../Sequel.html">Sequel</a> sets the date style
-                      to ISO, so that PostgreSQL provides the date in a known format that <a
-                      href="../Sequel.html">Sequel</a> can parse faster.  This can be turned off
-                      if you require a date style other than ISO.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-client_min_messages'>
+                <a name='method-c-client_min_messages'></a>
+                <div class='synopsis'>
+                  <span class='name'>client_min_messages</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-client_min_messages-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-client_min_messages-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">client_min_messages</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.client_min_messages&quot;</span>, <span class="ruby-string">&quot;Use the :client_min_messages Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@client_min_messages</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-client_min_messages-3D'>
+                <a name='method-c-client_min_messages-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>client_min_messages=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-client_min_messages-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-client_min_messages-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">client_min_messages=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.client_min_messages=&quot;</span>, <span class="ruby-string">&quot;Use the :client_min_messages Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@client_min_messages</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-force_standard_strings'>
+                <a name='method-c-force_standard_strings'></a>
+                <div class='synopsis'>
+                  <span class='name'>force_standard_strings</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-force_standard_strings-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-force_standard_strings-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 137</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">force_standard_strings</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.force_standard_strings&quot;</span>, <span class="ruby-string">&quot;Use the :force_standard_strings Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@force_standard_strings</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-force_standard_strings-3D'>
+                <a name='method-c-force_standard_strings-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>force_standard_strings=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-force_standard_strings-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-force_standard_strings-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">force_standard_strings=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.force_standard_strings=&quot;</span>, <span class="ruby-string">&quot;Use the :force_standard_strings Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@force_standard_strings</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-class' id='method-method-c-mock_adapter_setup'>
                 <a name='method-c-mock_adapter_setup'></a>
                 <div class='synopsis'>
@@ -343,7 +374,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-mock_adapter_setup-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 113</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-sequel_pg_version_supported-3F'>
@@ -360,7 +391,39 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-sequel_pg_version_supported-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-use_iso_date_format'>
+                <a name='method-c-use_iso_date_format'></a>
+                <div class='synopsis'>
+                  <span class='name'>use_iso_date_format</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_iso_date_format-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-use_iso_date_format-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_iso_date_format</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.use_iso_date_format&quot;</span>, <span class="ruby-string">&quot;Use the :use_iso_date_format Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@use_iso_date_format</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-use_iso_date_format-3D'>
+                <a name='method-c-use_iso_date_format-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>use_iso_date_format=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_iso_date_format-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-use_iso_date_format-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_iso_date_format=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.use_iso_date_format=&quot;</span>, <span class="ruby-string">&quot;Use the :use_iso_date_format Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@use_iso_date_format</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

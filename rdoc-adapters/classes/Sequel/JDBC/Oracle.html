@@ -42,6 +42,13 @@
             href="Oracle.html">Oracle</a> databases accessed via <a
             href="../JDBC.html">JDBC</a>.</p>
           </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a href="#method-c-OracleDecimal">OracleDecimal</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='class-list'>
@@ -52,6 +59,39 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>JAVA_BIG_DECIMAL_CONSTRUCTOR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-OracleDecimal'>
+                <a name='method-c-OracleDecimal'></a>
+                <div class='synopsis'>
+                  <span class='name'>OracleDecimal</span>
+                  <span class='arguments'>(r, i)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-OracleDecimal-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-OracleDecimal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">OracleDecimal</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBigDecimal</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">long_value</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-constant">JAVA_BIG_DECIMAL_CONSTRUCTOR</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;      <span class="ruby-identifier">i</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

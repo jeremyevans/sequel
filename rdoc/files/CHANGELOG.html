@@ -29,12 +29,196 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-06-01 08:42:54 -0700</span>
+          <span class='datetime'>2017-06-30 14:44:21 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.48.0+-282017-07-01-29">4.48.0 (2017-07-01)<span><a href="#label-4.48.0+-282017-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Deprecate Model.<< (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Dataset#{and,exclude_where,range,interval}, move to
+            sequel_4_dataset_methods extension (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#indexes not include partial indexes on SQLite 3.8.8+
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#indexes include indexes created automatically from unique
+            constraints on SQLite 3.8.8+ (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::Postgres::PG_TYPES, conversion procs should not be
+            registered per-Database (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#add_conversion_proc method on PostgreSQL for registering
+            conversion procs (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate unexpected values passed to Dataset#insert_conflict on SQLite
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::SqlAnywhere::Dataset#convert_smallint_to_bool= method
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::SqlAnywhere.convert_smallint_to_bool accessor
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use savepoints around index creation if creating table inside transaction
+            if ignore_index_errors is used (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate treating :natrual_inner join type on MySQL as NATURAL LEFT JOIN
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Dataset#mssql_unicode_strings= on Microsoft SQL Server
+            (jeremyevans)</p>
+            </li><li>
+            <p>Preserve encoding when parsing PostgreSQL arrays (jeltz) (#1387)</p>
+            </li><li>
+            <p>Deprecate external modification of Sequel::JDBC::TypeConvertor
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::DB2.use_clob_as_blob accessor (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#use_clob_as_blob accessor on DB2 (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate SEQUEL_POSTGRES_USES_PG constant (jeremyevans)</p>
+            </li><li>
+            <p>Do not swallow original exception if exception is raised inside
+            Database#copy_table on PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::Postgres.client_min_messages and force_standard_strings
+            accessors (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::Postgres.use_iso_date_format accessor (jeremyevans)</p>
+            </li><li>
+            <p>Do not allow connection in postgres adapter if postgres-pr driver is used
+            and force_standard_strings is false (jeremyevans)</p>
+            </li><li>
+            <p>Drop support for ancient postgres driver in postgres adapter, now only pg
+            and postgres-pr drivers are supported (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::MySQL.convert_invalid_date_time accessor (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::MySQL.convert_tinyint_to_bool accessor (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::MySQL.default_{charset,collate,engine} accessors
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#default_{charset,collate,engine} accessors on MySQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make mock adapter thread safe (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::JDBC::Dataset#convert_types accessor (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_convert_types in jdbc adapter (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::IBMDB::Dataset#convert_smallint_to_bool= method
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::IBMDB.convert_smallint_to_bool accessor (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#convert_smallint_to_bool accessor in the ibmdb adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate sequel_3_dataset_methods extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate query_literals extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate using subtype conversion procs added after registering composite
+            type in the pg_row extension (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t try canceling copy in Database#copy_into if copier is not created
+            yet (aakashAu) (#1384)</p>
+            </li><li>
+            <p>Deprecate global conversion procs added by pg_* extensions, when extension
+            isn&#39;t loaded into Database instance (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::Postgres::PGRange.register in the pg_range extension
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::Postgres::PGArray.register in the pg_array extension
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Database#copy_conversion_procs (private method) on PostgreSQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Database#reset_conversion_procs on PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate meta_def extension (jeremyevans)</p>
+            </li><li>
+            <p>Make class_table_inheritance plugin with :alias option not use subquery for
+            datasets that don&#39;t join (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate hash_aliases extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate filter_having extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate empty_array_ignore_nulls extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Array#sql_array in the <a
+            href="doc/core_extensions_rdoc.html">core_extensions</a> extension
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make validation_helpers plugin :allow_blank option work correctly when the
+            blank extension is not loaded (jeremyevans)</p>
+            </li><li>
+            <p>Make validation_class_methods plugin no longer require the blank extension
+            (jeremyevans)</p>
+            </li><li>
+            <p>Clear cached associations when touching associations in the touch plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make pg_array_associations model plugin load pg_array extension into
+            database (jeremyevans)</p>
+            </li><li>
+            <p>Remove support for :strict option in nested_attributes plugin, use
+            :unmatched_pk option instead (jeremyevans)</p>
+            </li><li>
+            <p>Make to_json class/dataset method in json_serializer plugin accept
+            :instance_block option to pass block to Model#to_json (jeremyevans)</p>
+            </li><li>
+            <p>Make to_json methods in json_serializer plugin accept blocks that are used
+            to transform values before serializing to JSON (jeremyevans)</p>
+            </li><li>
+            <p>Make <a
+            href="../classes/Sequel.html#method-c-object_to_json">Sequel.object_to_json</a>
+            pass block to to_json (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate identifier_columns plugin, not needed with Sequel.split_symbols =
+            false (jeremyevans)</p>
+            </li><li>
+            <p>Make reloading column_conflicts plugin not remove existing conflict
+            markings (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate cti_base_model, cti_key, and cti_model_map class methods in
+            class_table_inheritance plugin (jeremyevans)</p>
+            </li><li>
+            <p>Make Model.skip_auto_validations(:not_null) in the auto_validations plugin
+            skip not null checks for columns with default values (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#copy_into in jdbc/postgresql adapter respect :server option
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make to_hash and to_hash_groups handle options in the static_cache plugin,
+            and add rename to_hash to as_hash (jeremyevans)</p>
+            </li><li>
+            <p>Rename Dataset#to_hash to as_hash, and add to_hash as an alias, to allow
+            undefing to_hash to fix ruby calling it implicitly (jeremyevans) (#1375)</p>
+            </li><li>
+            <p>Handle PG* constants deprecated in pg 0.21.0 in the postgres adapter
+            (jeremyevans) (#1377, #1378)</p>
+            </li><li>
+            <p>Support :association_pks_use_associated_table association option in
+            association_pks plugin (jeremyevans)</p>
+            </li><li>
+            <p>Make pg_hstore extension reset hstore conversion proc when running
+            Database#reset_conversion_procs (jeremyevans)</p>
+            </li><li>
+            <p>Fix incorrect SQL used for inserting into a CTI subclass sharing the
+            primary table when using the :alias option (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.47.0+-282017-06-01-29">4.47.0 (2017-06-01)<span><a href="#label-4.47.0+-282017-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
