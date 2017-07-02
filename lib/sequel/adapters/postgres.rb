@@ -218,7 +218,8 @@ module Sequel
             :user => opts[:user],
             :password => opts[:password],
             :connect_timeout => opts[:connect_timeout] || 20,
-            :sslmode => opts[:sslmode]
+            :sslmode => opts[:sslmode],
+            :sslrootcert => opts[:sslrootcert]
           }.delete_if { |key, value| blank_object?(value) }
           connection_params.merge!(opts[:driver_options]) if opts[:driver_options]
           conn = Adapter.connect(connection_params)
