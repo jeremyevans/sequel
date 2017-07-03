@@ -42,8 +42,15 @@ module Sequel
           super
           map = @type_convertor_map
           map[Java::JavaSQL::Types::TIME] = SQLServer.method(:MSSQLRubyTime)
-          if defined?(Java::MicrosoftSql::Types::DATETIMEOFFSET)
-            map[Java::MicrosoftSql::Types::DATETIMEOFFSET] = lambda do |r, i|
+
+          # Work around constant lazy loading in some drivers
+          begin
+            dto = Java::MicrosoftSql::Types::DATETIMEOFFSET
+          rescue NameError
+          end
+
+          if dto
+            map[dto] = lambda do |r, i|
               if v = r.getDateTimeOffset(i)
                 to_application_timestamp(v.to_s)
               end
