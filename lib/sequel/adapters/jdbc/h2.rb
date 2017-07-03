@@ -30,6 +30,15 @@ module Sequel
           :h2
         end
 
+        def freeze
+          h2_version
+          super
+        end
+
+        def h2_version
+          @h2_version ||= get(Sequel.function(:H2VERSION))
+        end
+
         # Rollback an existing prepared transaction with the given transaction
         # identifier string.
         def rollback_prepared_transaction(transaction_id, opts=OPTS)
@@ -84,7 +93,7 @@ module Sequel
 
               sqls = [super(table, op)]
 
-              if pk && op[:type] != :identity
+              if pk && (h2_version >= '1.4' || op[:type] != :identity)
                 sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})"
               end
 

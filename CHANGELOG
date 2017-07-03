@@ -1,5 +1,7 @@
 === master
 
+* Make alter_table add_primary_key work correctly on H2 1.4+ (jeremyevans)
+
 * Support :sslrootcert Database option in the postgres adapter (dleavitt) (#1391)
 
 === 4.48.0 (2017-07-01)
