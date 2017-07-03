@@ -40,7 +40,13 @@ describe "bin/sequel" do
     DB2.disconnect
     File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
     File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
-    File.delete(TMP_FILE) if File.file?(TMP_FILE)
+    if File.file?(TMP_FILE)
+      begin
+        File.delete(TMP_FILE)
+      rescue Errno::ENOENT
+        nil
+      end
+    end
     File.delete(OUTPUT) if File.file?(OUTPUT)
   end
   
