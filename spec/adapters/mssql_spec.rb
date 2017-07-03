@@ -17,13 +17,13 @@ describe "A MSSQL database" do
   end
 
   it "should be able to read fractional part of timestamp" do
-    rs = @db["select getutcdate() as full_date, cast(datepart(millisecond, getutcdate()) as int) as milliseconds"].first
-    rs[:milliseconds].must_equal rs[:full_date].usec/1000
+    rs = @db["select getutcdate() as full_date, cast(round(datepart(millisecond, getutcdate()), 0) as int) as milliseconds"].first
+    rs[:milliseconds].must_be_close_to(rs[:full_date].usec/1000, 2)
   end
 
   it "should be able to write fractional part of timestamp" do
-    t = Time.utc(2001, 12, 31, 23, 59, 59, 997000)
-    (t.usec/1000).must_equal @db["select cast(datepart(millisecond, ?) as int) as milliseconds", t].get
+    t = Time.utc(2001, 12, 31, 23, 59, 59, 996000)
+    (t.usec/1000).must_equal @db["select cast(round(datepart(millisecond, ?), 0) as int) as milliseconds", t].get
   end
   
   it "should not raise an error when getting the server version" do
