@@ -284,7 +284,7 @@ The following additional options are supported:
 
 === postgres
 
-Requires: pg (or postgres if pg is not available)
+Requires: pg (or postgres-pr/postgres-compat if pg is not available)
 
 The Sequel postgres adapter works with the pg, postgres, and postgres-pr ruby libraries.
 The pg library is the best supported, as it supports real bound variables and prepared statements.
@@ -308,8 +308,9 @@ The following additional options are supported:
 :notice_receiver :: A proc that be called with the PGresult objects that have notice or warning messages.
                     The default notice receiver just prints the messages to stderr, but this can be used
                     to handle notice/warning messages differently.  Only respected if using the pg library).
-:sslmode :: Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL (only
+:sslmode :: Set to 'disable', 'allow', 'prefer', 'require', 'verify-ca', or 'verify-full' to choose how to treat SSL (only
             respected if using the pg library)
+:sslrootcert :: Specify the path to the root SSL certificate to use.
 :search_path :: Set to the schema search_path.  This can either be a single string containing the schemas
                 separated by commas (for use via a URL: <tt>postgres:///?search_path=schema1,schema2</tt>), or it
                 can be an array of strings (for use via an option:
