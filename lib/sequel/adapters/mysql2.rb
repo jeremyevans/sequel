@@ -260,7 +260,7 @@ module Sequel
 
       # Use streaming to implement paging if Mysql2 supports it.
       def paged_each(opts=OPTS, &block)
-        if STREAMING_SUPPORTED
+        if STREAMING_SUPPORTED && opts[:stream] != false
           stream.each(&block)
         else
           super

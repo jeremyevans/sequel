@@ -1367,6 +1367,15 @@ if DB.adapter_scheme == :mysql2
     it "should correctly handle early returning when streaming results" do
       3.times{@ds.each{|r| break r[:a]}.must_equal 0}
     end
+
+    describe "#paged_each" do
+      it "should bypass streaming when :stream => false passed in" do
+        ds = DB[:a].order(:a)
+        ds.stub(:stream, -> { raise("Should not call stream." )}) do
+          ds.paged_each(stream: false) { |x| x }
+        end
+      end
+    end
   end
 end
 
