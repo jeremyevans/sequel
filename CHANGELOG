@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#paged_each :stream => false option on mysql2 to disable streaming (Aryk) (#1395)
+
 * Make datetimeoffset handling in the jdbc/sqlserver adapter work on more drivers (jeremyevans)
 
 * Make alter_table add_primary_key work correctly on H2 1.4+ (jeremyevans)
