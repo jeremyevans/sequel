@@ -44,6 +44,19 @@ describe "Composition plugin" do
     o.valid?.must_equal true
   end
 
+  it "should have decomposer work with column_conflicts plugin" do
+    @c.plugin :column_conflicts
+    @c.set_column_conflict! :year
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    o = @c.new
+    def o.validate
+      [:year, :month, :day].each{|c| errors.add(c, "not present") unless send(c)}
+    end
+    o.valid?.must_equal false
+    o.date = Date.new(1, 2, 3)
+    o.valid?.must_equal true
+  end
+
   it "should set column values even when not validating" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @c.load({}).set(:date=>Date.new(4, 8, 12)).save(:validate=>false)

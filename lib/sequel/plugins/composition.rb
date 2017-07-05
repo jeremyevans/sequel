@@ -123,9 +123,9 @@ module Sequel
               setters = setter_meths.zip(cov_methods)
               opts[:decomposer] = proc do
                 if (o = compositions[name]).nil?
-                  setter_meths.each{|sm| get_column_value(sm, nil)}
+                  setter_meths.each{|sm| set_column_value(sm, nil)}
                 else
-                  setters.each{|sm, cm| get_column_value(sm, o.send(cm))}
+                  setters.each{|sm, cm| set_column_value(sm, o.send(cm))}
                 end
               end
             end
