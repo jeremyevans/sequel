@@ -517,6 +517,130 @@ describe "Database#extend_datasets" do
   end
 end
   
+describe "Database#extend_datasets custom methods" do
+  before do
+    @db = Sequel.mock
+  end
+
+  def ds
+    @db[:items]
+  end
+  
+  it "should have dataset_module support a where method" do
+    @db.extend_datasets{where :released, :released}
+    ds.released.sql.must_equal 'SELECT * FROM items WHERE released'
+    ds.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND released)'
+  end
+
+  it "should have dataset_module support a having method" do
+    @db.extend_datasets{having(:released){released}}
+    ds.released.sql.must_equal 'SELECT * FROM items HAVING released'
+    ds.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE foo HAVING released'
+  end
+
+  it "should have dataset_module support an exclude method" do
+    @db.extend_datasets{exclude :released, :released}
+    ds.released.sql.must_equal 'SELECT * FROM items WHERE NOT released'
+    ds.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND NOT released)'
+  end
+
+  it "should have dataset_module support an exclude_having method" do
+    @db.extend_datasets{exclude_having :released, :released}
+    ds.released.sql.must_equal 'SELECT * FROM items HAVING NOT released'
+    ds.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE foo HAVING NOT released'
+  end
+
+  it "should have dataset_module support a distinct method" do
+    @db.extend_datasets{def supports_distinct_on?; true end; distinct :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT DISTINCT ON (baz) * FROM items'
+    ds.where(:bar).foo.sql.must_equal 'SELECT DISTINCT ON (baz) * FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a grep method" do
+    @db.extend_datasets{grep :foo, :baz, 'quux%'}
+    ds.foo.sql.must_equal 'SELECT * FROM items WHERE ((baz LIKE \'quux%\' ESCAPE \'\\\'))'
+    ds.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE (bar AND ((baz LIKE \'quux%\' ESCAPE \'\\\')))'
+  end
+
+  it "should have dataset_module support a group method" do
+    @db.extend_datasets{group :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT * FROM items GROUP BY baz'
+    ds.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a group_and_count method" do
+    @db.extend_datasets{group_and_count :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT baz, count(*) AS count FROM items GROUP BY baz'
+    ds.where(:bar).foo.sql.must_equal 'SELECT baz, count(*) AS count FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a group_append method" do
+    @db.extend_datasets{group_append :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT * FROM items GROUP BY baz'
+    ds.group(:bar).foo.sql.must_equal 'SELECT * FROM items GROUP BY bar, baz'
+  end
+
+  it "should have dataset_module support a limit method" do
+    @db.extend_datasets{limit :foo, 1}
+    ds.foo.sql.must_equal 'SELECT * FROM items LIMIT 1'
+    ds.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar LIMIT 1'
+  end
+
+  it "should have dataset_module support a offset method" do
+    @db.extend_datasets{offset :foo, 1}
+    ds.foo.sql.must_equal 'SELECT * FROM items OFFSET 1'
+    ds.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar OFFSET 1'
+  end
+
+  it "should have dataset_module support a order method" do
+    @db.extend_datasets{order(:foo){:baz}}
+    ds.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz'
+    ds.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar ORDER BY baz'
+  end
+
+  it "should have dataset_module support a order_append method" do
+    @db.extend_datasets{order_append :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz'
+    ds.order(:bar).foo.sql.must_equal 'SELECT * FROM items ORDER BY bar, baz'
+  end
+
+  it "should have dataset_module support a order_prepend method" do
+    @db.extend_datasets{order_prepend :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz'
+    ds.order(:bar).foo.sql.must_equal 'SELECT * FROM items ORDER BY baz, bar'
+  end
+
+  it "should have dataset_module support a select method" do
+    @db.extend_datasets{select :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT baz FROM items'
+    ds.where(:bar).foo.sql.must_equal 'SELECT baz FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a select_all method" do
+    @db.extend_datasets{select_all :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT baz.* FROM items'
+    ds.where(:bar).foo.sql.must_equal 'SELECT baz.* FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a select_append method" do
+    @db.extend_datasets{select_append :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT *, baz FROM items'
+    ds.where(:bar).foo.sql.must_equal 'SELECT *, baz FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a select_group method" do
+    @db.extend_datasets{select_group :foo, :baz}
+    ds.foo.sql.must_equal 'SELECT baz FROM items GROUP BY baz'
+    ds.where(:bar).foo.sql.must_equal 'SELECT baz FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a server method" do
+    @db.extend_datasets{server :foo, :baz}
+    ds.foo.opts[:server].must_equal :baz
+    ds.where(:bar).foo.opts[:server].must_equal :baz
+  end
+end
+
 describe "Database#disconnect_connection" do
   it "should call close on the connection" do
     o = Object.new
