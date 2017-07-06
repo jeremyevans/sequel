@@ -69,6 +69,9 @@ module Sequel
     # This allows you to override any of the dataset methods even if they are
     # defined directly on the dataset class that this Database object uses.
     #
+    # If a block is given, a Dataset::DatasetModule instance is created, allowing
+    # for the easy creation of named dataset methods that will do caching.
+    #
     # Examples:
     #
     #   # Introspec columns for all of DB's datasets
@@ -82,9 +85,19 @@ module Sequel
     #       super
     #     end
     #   end
+    #
+    #   # Add some named dataset methods
+    #   DB.extend_datasets do
+    #     order :by_id, :id
+    #     select :with_id_and_name, :id, :name
+    #     where :active, :active
+    #   end
+    #
+    #   DB[:table].active.with_id_and_name.by_id
+    #   # SELECT id, name FROM table WHERE active ORDER BY id
     def extend_datasets(mod=nil, &block)
       raise(Error, "must provide either mod or block, not both") if mod && block
-      mod = Module.new(&block) if block
+      mod = Dataset::DatasetModule.new(&block) if block
       if @dataset_modules.empty?
        @dataset_modules = [mod]
        @dataset_class = Class.new(@dataset_class)

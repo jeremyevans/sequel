@@ -1087,12 +1087,12 @@ module Sequel
       # Return a clone of the dataset extended with the given modules.
       # Note that like Object#extend, when multiple modules are provided
       # as arguments the cloned dataset is extended with the modules in reverse
-      # order.  If a block is provided, a module is created using the block and
+      # order.  If a block is provided, a DatasetModule is created using the block and
       # the clone is extended with that module after any modules given as arguments.
       def with_extend(*mods, &block)
         c = _clone(:freeze=>false)
         c.extend(*mods) unless mods.empty?
-        c.extend(Module.new(&block)) if block
+        c.extend(DatasetModule.new(&block)) if block
         c.freeze if frozen? # SEQUEL5: Remove if frozen?
         c
       end
@@ -1101,7 +1101,7 @@ module Sequel
       def with_extend(*mods, &block) # :nodoc:
         c = clone
         c.extend(*mods) unless mods.empty?
-        c.extend(Module.new(&block)) if block
+        c.extend(DatasetModule.new(&block)) if block
         c
       end
       # :nocov:

@@ -1,5 +1,9 @@
 === master
 
+* Make Database#extend_datasets and Dataset#with_extend now use a Dataset::DatasetModule instance if given a block (jeremyevans)
+
+* Add Sequel::Dataset::DatasetModule, now a superclass of Sequel::Model::DatasetModule (jeremyevans)
+
 * Make composition plugin with :mapping option work correctly if Model#get_column_value is overridden (jeremyevans)
 
 * Support Dataset#paged_each :stream => false option on mysql2 to disable streaming (Aryk) (#1395)
