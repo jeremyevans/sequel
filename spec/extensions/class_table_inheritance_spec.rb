@@ -1080,15 +1080,13 @@ describe "class_table_inheritance plugin with :alias option" do
     class ::Staff < Employee
       many_to_one :manager
     end 
+    class ::Intern < Employee
+    end 
     @ds = Employee.dataset
     @db.sqls
   end
   after do
-    Object.send(:remove_const, :Ceo)
-    Object.send(:remove_const, :Executive)
-    Object.send(:remove_const, :Manager)
-    Object.send(:remove_const, :Staff)
-    Object.send(:remove_const, :Employee)
+    [:Intern, :Ceo, :Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
   end
 
   it "should freeze CTI information when freezing model class" do
@@ -1128,6 +1126,7 @@ describe "class_table_inheritance plugin with :alias option" do
     Executive.simple_table.must_be_nil
     Ceo.simple_table.must_be_nil
     Staff.simple_table.must_be_nil
+    Intern.simple_table.must_be_nil
   end
   
   it "should have working row_proc if using set_dataset in subclass to remove columns" do
@@ -1142,10 +1141,11 @@ describe "class_table_inheritance plugin with :alias option" do
     Executive.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)) AS employees'
     Ceo.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (employees.kind IN (\'Ceo\'))) AS employees'
     Staff.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)) AS employees'
+    Intern.dataset.sql.must_equal 'SELECT * FROM employees WHERE (employees.kind IN (\'Intern\'))'
   end
   
   it "should return rows with the correct class based on the polymorphic_key value" do
-    @ds.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}]).all.collect{|x| x.class}.must_equal [Employee, Manager, Executive, Ceo, Staff]
+    @ds.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}, {:kind=>'Intern'}]).all.collect{|x| x.class}.must_equal [Employee, Manager, Executive, Ceo, Staff, Intern]
   end 
   
   it "should return rows with the correct class based on the polymorphic_key value for subclasses" do
@@ -1165,7 +1165,7 @@ describe "class_table_inheritance plugin with :alias option" do
   
   it "should return rows with the current class if cti_key is nil" do
     Employee.plugin(:class_table_inheritance, :alias=>:employees)
-    Employee.dataset.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}]).all.map{|x| x.class}.must_equal [Employee, Employee, Employee, Employee, Employee]
+    Employee.dataset.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}, {:kind=>'Intern'}]).all.map{|x| x.class}.must_equal [Employee, Employee, Employee, Employee, Employee, Employee]
   end
   
   it "should return rows with the current class if cti_key is nil in subclasses" do
@@ -1178,15 +1178,17 @@ describe "class_table_inheritance plugin with :alias option" do
   end
   
   it "should handle a model map with integer values" do
-    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo}, :alias=>:employees)
+    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo, 4=>:Intern}, :alias=>:employees)
+    Object.send(:remove_const, :Intern)
     Object.send(:remove_const, :Ceo)
     Object.send(:remove_const, :Executive)
     Object.send(:remove_const, :Manager)
+    class ::Intern < Employee; end 
     class ::Manager < Employee; end 
     class ::Executive < Manager; end 
     class ::Ceo < Executive; end 
-    Employee.dataset = Employee.dataset.with_fetch([{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}])
-    Employee.all.collect{|x| x.class}.must_equal [Employee, Employee, Manager, Executive, Ceo]
+    Employee.dataset = Employee.dataset.with_fetch([{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}, {:kind=>4}])
+    Employee.all.collect{|x| x.class}.must_equal [Employee, Employee, Manager, Executive, Ceo, Intern]
     Manager.dataset = Manager.dataset.with_fetch([{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}])
     Manager.all.collect{|x| x.class}.must_equal [Manager, Employee, Manager, Executive, Ceo]
   end
@@ -1202,6 +1204,11 @@ describe "class_table_inheritance plugin with :alias option" do
   it "should sets the model class name for the key when creating new parent class records" do
     Employee.create
     @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]
+  end
+  
+  it "should sets the model class name for the key when creating new class records for subclass without separate table" do
+    Intern.create
+    @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Intern')"]
   end
   
   it "should sets the model class name for the key when creating new subclass records" do
@@ -1278,10 +1285,11 @@ describe "class_table_inheritance plugin with :alias option" do
     Manager.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer})
     Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer}, :num_managers=>{:type=>:integer})
     Staff.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :manager_id=>{:type=>:integer})
+    Intern.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string})
   end
 
   it "should use the correct primary key (which should have the same name in all subclasses)" do
-    [Employee, Manager, Executive, Ceo, Staff].each{|c| c.primary_key.must_equal :id}
+    [Employee, Manager, Executive, Ceo, Staff, Intern].each{|c| c.primary_key.must_equal :id}
   end
 
   it "should have table_name return the table name of the most specific table" do
@@ -1290,20 +1298,43 @@ describe "class_table_inheritance plugin with :alias option" do
     Executive.table_name.must_equal :employees
     Ceo.table_name.must_equal :employees
     Staff.table_name.must_equal :employees
+    Intern.table_name.must_equal :employees
   end
 
   it "should delete the correct rows from all tables when deleting" do
+    Employee.load(:id=>1).delete
+    @db.sqls.must_equal ["DELETE FROM employees WHERE (id = 1)"]
+
+    Intern.load(:id=>1).delete
+    @db.sqls.must_equal ["DELETE FROM employees WHERE (id = 1)"]
+
     Ceo.load(:id=>1).delete
     @db.sqls.must_equal ["DELETE FROM executives WHERE (id = 1)", "DELETE FROM managers WHERE (id = 1)", "DELETE FROM employees WHERE (id = 1)"]
   end
 
   it "should not allow deletion of frozen object" do
-    o = Ceo.load(:id=>1)
-    o.freeze
-    proc{o.delete}.must_raise(Sequel::Error)
-    @db.sqls.must_equal []
+    [Ceo, Executive, Employee, Manager, Intern].each do |c|
+      o = c.load(:id=>1)
+      o.freeze
+      proc{o.delete}.must_raise(Sequel::Error)
+      @db.sqls.must_equal []
+    end
   end
 
+  it "should insert the correct rows into all tables when inserting into parent class" do
+    Employee.create(:name=>'E')
+    sqls = @db.sqls
+    sqls.length.must_equal 1
+    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Employee)', '(E|Employee)'\)/)
+  end
+    
+  it "should insert the correct rows into all tables when inserting into subclass without separate table" do
+    Intern.create(:name=>'E')
+    sqls = @db.sqls
+    sqls.length.must_equal 1
+    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Intern)', '(E|Intern)'\)/)
+  end
+    
   it "should insert the correct rows into all tables when inserting" do
     Ceo.create(:num_managers=>3, :num_staff=>2, :name=>'E')
     sqls = @db.sqls
@@ -1340,6 +1371,16 @@ describe "class_table_inheritance plugin with :alias option" do
     sqls[0].must_match(/INSERT INTO employees \((name|kind|id), (name|kind|id), (name|kind|id)\) VALUES \(('E'|'Ceo'|2), ('E'|'Ceo'|2), ('E'|'Ceo'|2)\)/)
     sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/)
     sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/)
+  end
+
+  it "should update the correct rows in all tables when updating parent class" do
+    Employee.load(:id=>2).update(:name=>'E')
+    @db.sqls.must_equal ["UPDATE employees SET name = 'E' WHERE (id = 2)"]
+  end
+
+  it "should update the correct rows in all tables when updating subclass without separate table" do
+    Intern.load(:id=>2).update(:name=>'E')
+    @db.sqls.must_equal ["UPDATE employees SET name = 'E' WHERE (id = 2)"]
   end
 
   it "should update the correct rows in all tables when updating" do

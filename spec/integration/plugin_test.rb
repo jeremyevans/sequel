@@ -38,7 +38,8 @@ describe "Class Table Inheritance Plugin" do
     class ::Staff < Employee
       many_to_one :manager
     end 
-    
+    class ::Intern < Employee
+    end 
     
     @i1 = @db[:employees].insert(:name=>'E', :kind=>'Employee')
     @i2 = @db[:employees].insert(:name=>'S', :kind=>'Staff')
@@ -51,9 +52,10 @@ describe "Class Table Inheritance Plugin" do
     @db[:managers].insert(:id=>@i5, :num_staff=>2)
     @db[:executives].insert(:id=>@i5, :num_managers=>1)
     @db[:staff].insert(:id=>@i2, :manager_id=>@i4)
+    @i6 = @db[:employees].insert(:name=>'I', :kind=>'Intern')
   end
   after do
-    [:Ceo, :Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
+    [:Intern, :Ceo, :Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
     @db.drop_table? :staff, :executives, :managers, :employees
@@ -65,7 +67,8 @@ describe "Class Table Inheritance Plugin" do
       Staff.load(:id=>@i2, :name=>'S', :kind=>'Staff'),
       Manager.load(:id=>@i3, :name=>'M', :kind=>'Manager'),
       Executive.load(:id=>@i4, :name=>'Ex', :kind=>'Executive'),
-      Ceo.load(:id=>@i5, :name=>'C', :kind=>'Ceo')
+      Ceo.load(:id=>@i5, :name=>'C', :kind=>'Ceo'),
+      Intern.load(:id=>@i6, :name=>'I', :kind=>'Intern'),
     ]
   end
   
@@ -102,6 +105,7 @@ describe "Class Table Inheritance Plugin" do
     Manager.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_staff]
     Executive.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_managers, :num_staff]
     Ceo.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_managers, :num_staff]
+    Intern.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name]
   end
   
   it "should include columns for tables for ancestor classes" do
@@ -110,6 +114,7 @@ describe "Class Table Inheritance Plugin" do
     Manager.columns.must_equal [:id, :name, :kind, :num_staff]
     Executive.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
     Ceo.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
+    Intern.columns.must_equal [:id, :name, :kind]
   end
   
   it "should delete rows from all tables" do
