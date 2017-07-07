@@ -521,16 +521,9 @@ describe Sequel::SQL::VirtualRow do
     @d.l{function(arg1, 10, 'arg3')}.must_equal 'function("arg1", 10, \'arg3\')'
   end
 
-  deprecated "should treat methods with a block and no arguments as a function call with no arguments" do
-    @d.l{version{}}.must_equal 'version()'
-  end
 
   it "should treat methods followed by function as a function call with no arguments" do
     @d.l{version.function}.must_equal 'version()'
-  end
-
-  deprecated "should treat methods with a block and a leading argument :* as a function call with the SQL wildcard" do
-    @d.l{count(:*){}}.must_equal 'count(*)'
   end
 
   it "should treat methods followed by function.* as a function call with * argument" do
@@ -546,65 +539,9 @@ describe Sequel::SQL::VirtualRow do
     @d.literal(Sequel.expr{sum(1) * 2}).must_equal '(sum(1) * 2)'
   end
 
-  deprecated "should treat methods with a block and a leading argument :distinct as a function call with DISTINCT and the additional method arguments" do
-    @d.l{count(:distinct, column1){}}.must_equal 'count(DISTINCT "column1")'
-    @d.l{count(:distinct, column1, column2){}}.must_equal 'count(DISTINCT "column1", "column2")'
-  end
-
   it "should support distinct methods on functions to use DISTINCT before the arguments" do
     @d.l{count(column1).distinct}.must_equal 'count(DISTINCT "column1")'
     @d.l{count(column1, column2).distinct}.must_equal 'count(DISTINCT "column1", "column2")'
-  end
-
-  deprecated "should raise an error if an unsupported argument is used with a block" do
-    proc{@d.where{count(:blah){}}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should treat methods with a block and a leading argument :over as a window function call" do
-    @d.l{rank(:over){}}.must_equal 'rank() OVER ()'
-  end
-
-  deprecated "should support :partition options for window function calls" do
-    @d.l{rank(:over, :partition=>column1){}}.must_equal 'rank() OVER (PARTITION BY "column1")'
-    @d.l{rank(:over, :partition=>[column1, column2]){}}.must_equal 'rank() OVER (PARTITION BY "column1", "column2")'
-  end
-
-  deprecated "should support :args options for window function calls" do
-    @d.l{avg(:over, :args=>column1){}}.must_equal 'avg("column1") OVER ()'
-    @d.l{avg(:over, :args=>[column1, column2]){}}.must_equal 'avg("column1", "column2") OVER ()'
-  end
-
-  deprecated "should support :order option for window function calls" do
-    @d.l{rank(:over, :order=>column1){}}.must_equal 'rank() OVER (ORDER BY "column1")'
-    @d.l{rank(:over, :order=>[column1, column2]){}}.must_equal 'rank() OVER (ORDER BY "column1", "column2")'
-  end
-
-  deprecated "should support :window option for window function calls" do
-    @d.l{rank(:over, :window=>:win){}}.must_equal 'rank() OVER ("win")'
-  end
-
-  deprecated "should support :*=>true option for window function calls" do
-    @d.l{count(:over, :* =>true){}}.must_equal 'count(*) OVER ()'
-  end
-
-  deprecated "should support :frame=>:all option for window function calls" do
-    @d.l{rank(:over, :frame=>:all){}}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)'
-  end
-
-  deprecated "should support :frame=>:rows option for window function calls" do
-    @d.l{rank(:over, :frame=>:rows){}}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
-  end
-
-  deprecated "should support :frame=>'some string' option for window function calls" do
-    @d.l{rank(:over, :frame=>'RANGE BETWEEN 3 PRECEDING AND CURRENT ROW'){}}.must_equal 'rank() OVER (RANGE BETWEEN 3 PRECEDING AND CURRENT ROW)'
-  end
-
-  deprecated "should raise an error if an invalid :frame option is used" do
-    proc{@d.l{rank(:over, :frame=>:blah){}}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should support all these options together" do
-    @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.must_equal 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
   end
 
   it "should handle method.function.over as a window function call" do

@@ -1895,39 +1895,10 @@ module Sequel
         # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
         # on arguments and whether a block is provided.  Does not currently call the block.
         # See the class level documentation.
-        def method_missing(m, *args, &block)
-          if block
-            if args.empty?
-              Sequel::Deprecation.deprecate("Passing a block to a virtual row method to create a Sequel::SQL::Function", "Replace the block with a call to .function to create a function, or use the virtual_row_method_block extension")
-              Function.new(m)
-            else
-              case args.shift
-              when :*
-                Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :* argument to create a Sequel::SQL::Function", "Remove the :* argument and block and a call to .function.* to create a function(*) call, or use the virtual_row_method_block extension")
-                Function.new(m, *args).*
-              when :distinct
-                Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :distinct argument to create a Sequel::SQL::Function", "Remove the :distinct argument and block with a call to .function.distinct to create a function(DISTINCT ...) call, or use the virtual_row_method_block extension")
-                Function.new(m, *args).distinct
-              when :over
-                opts = args.shift || OPTS
-                f = Function.new(m, *::Kernel.Array(opts[:args]))
-                if opts[:*]
-                  Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :over argument and :* option to create a Sequel::SQL::WindowFunction", "Remove the :over argument, :* option and block with a call to .function.*.over with the options to create a function(*) OVER (...) call, or use the virtual_row_method_block extension")
-                  f = f.*
-                else
-                  Sequel::Deprecation.deprecate("Passing a block to a virtual row method with a :over argument to create a Sequel::SQL::WindowFunction", "Remove the :over argument and block with a call to .function.over with the options to create a function(...) OVER (...) call, or use the virtual_row_method_block extension")
-                end
-                f.over(opts)
-              else
-                Kernel.raise(Error, 'unsupported VirtualRow method argument used with block')
-              end
-            end
-          elsif args.empty?
-            if split = Sequel.split_symbols?
+        def method_missing(m, *args)
+          if args.empty?
+            if Sequel.split_symbols?
               table, column = m.to_s.split('__', 2)
-              if column && split == :deprecated
-                Sequel::Deprecation.deprecate("Splitting virtual row method names", "Either set Sequel.split_symbols = true, or change #{m.inspect} to #{table}[:#{column}]")
-              end
               column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
             else
               Identifier.new(m)
