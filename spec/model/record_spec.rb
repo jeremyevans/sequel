@@ -436,7 +436,7 @@ describe "Model#freeze" do
   end
 
   it "should still have working class attr overriddable methods" do
-    Sequel::Model::BOOLEAN_SETTINGS.each{|m| @o.send(m) == Album.send(m)}
+    [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions].each{|m| @o.send(m) == Album.send(m)}
   end
 
   it "should have working new? method" do
