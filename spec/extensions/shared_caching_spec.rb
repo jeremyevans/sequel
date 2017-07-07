@@ -91,33 +91,6 @@ describe "Shared caching behavior" do
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.must_equal []
     end
-
-    it "should not use a simple primary key lookup if the prepared_statements_associations method is being used" do
-      deprecated do
-        c2 = Class.new(Sequel::Model(@db[:not_caching_model].with_fetch(:id=>1)))
-        c = Class.new(Sequel::Model(@db[:lookup_model]))
-        c.class_eval do
-          plugin :prepared_statements_associations
-          columns :id, :caching_model_id
-          many_to_one :caching_model, :class=>c2
-        end
-        c.load(:id=>3, :caching_model_id=>1).caching_model.must_equal c2.load(:id=>1)
-        @db.sqls.wont_equal []
-      end
-    end
-
-    it "should use a simple primary key lookup if the prepared_statements_associations method is being used but associated model also uses caching" do
-      deprecated do
-        c = Class.new(Sequel::Model(:lookup_model))
-        c.class_eval do
-          plugin :prepared_statements_associations
-          columns :id, :caching_model_id
-          many_to_one :caching_model
-        end
-        c.load(:id=>3, :caching_model_id=>1).caching_model.must_be_same_as(@cm1)
-        @db.sqls.must_equal []
-      end
-    end
   end
 
   describe "With caching plugin" do
