@@ -76,12 +76,7 @@ module Sequel
     
     # The default dataset class to use for the database
     def dataset_class_default
-      if self.class == Sequel::Database
-        Sequel::Dataset
-      else
-        Sequel::Deprecation.deprecate("Using self.class.const_get(:DatasetClass) to get the default dataset class", "Modify the database adapter to implement Database#dataset_class_default")
-        self.class.const_get(:DatasetClass)
-      end
+      Sequel::Dataset
     end
 
     # Reset the default dataset used by most Database methods that

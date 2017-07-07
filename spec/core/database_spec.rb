@@ -5,12 +5,6 @@ describe "A new Database" do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
   
-  deprecated "should support DatasetClass constant" do
-    dbc = Class.new(Sequel::Database)
-    dbc::DatasetClass = dsc = Class.new(Sequel::Dataset)
-    dbc.new.dataset.must_be_kind_of(dsc)
-  end
-
   deprecated "should allow dup/clone" do
     @db.dup.must_be_kind_of @db.class
     @db.clone.must_be_kind_of @db.class
