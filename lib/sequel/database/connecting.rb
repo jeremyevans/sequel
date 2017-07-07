@@ -8,8 +8,7 @@ module Sequel
     # ---------------------
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado amalgalite cubrid do ibmdb jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.map(&:to_sym)
-    # SEQUEL5: Remove cubrid do swift
+    ADAPTERS = %w'ado amalgalite ibmdb jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite tinytds'.map(&:to_sym)
 
     # The Database subclass for the given adapter scheme.
     # Raises Sequel::AdapterNotFound if the adapter
