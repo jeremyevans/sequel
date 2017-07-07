@@ -17,15 +17,11 @@ module Sequel
     #   # SELECT ..., table.column AS some_alias
     def add_graph_aliases(graph_aliases)
       graph = opts[:graph]
-      unless (ga = opts[:graph_aliases]) || (graph && (ga = graph[:column_aliases])) # SEQUEL5: Remove graph_aliases support
+      unless (graph && (ga = graph[:column_aliases]))
         raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      if opts[:graph_aliases]
-        select_append(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases).freeze) # SEQUEL5: Remove
-      else
-        select_append(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>Hash[ga].merge!(graph_aliases).freeze).freeze)
-      end
+      select_append(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>Hash[ga].merge!(graph_aliases).freeze).freeze)
     end
 
     # Similar to Dataset#join_table, but uses unambiguous aliases for selected
@@ -118,8 +114,6 @@ module Sequel
 
       # Whether to include the table in the result set
       add_table = options[:select] == false ? false : true
-      # Whether to add the columns to the list of column aliases
-      add_columns = !ds.opts.include?(:graph_aliases) # SEQUEL5: Remove graph_aliases support
 
       if graph = opts[:graph]
         graph = graph.dup
@@ -146,26 +140,24 @@ module Sequel
         # All columns in the master table are never
         # aliased, but are not included if set_graph_aliases
         # has been used.
-        if add_columns
-          if (select = @opts[:select]) && !select.empty? && !(select.length == 1 && (select.first.is_a?(SQL::ColumnAll)))
-            select = select.map do |sel|
-              raise Error, "can't figure out alias to use for graphing for #{sel.inspect}" unless column = _hash_key_symbol(sel)
-              column_aliases[column] = [master, column]
-              if from_selfed
-                # Initial dataset was wrapped in subselect, selected all
-                # columns in the subselect, qualified by the subselect alias.
-                Sequel.qualify(qualifier, Sequel.identifier(column))
-              else
-                # Initial dataset not wrapped in subslect, just make
-                # sure columns are qualified in some way.
-                qualified_expression(sel, qualifier)
-              end
+        if (select = @opts[:select]) && !select.empty? && !(select.length == 1 && (select.first.is_a?(SQL::ColumnAll)))
+          select = select.map do |sel|
+            raise Error, "can't figure out alias to use for graphing for #{sel.inspect}" unless column = _hash_key_symbol(sel)
+            column_aliases[column] = [master, column]
+            if from_selfed
+              # Initial dataset was wrapped in subselect, selected all
+              # columns in the subselect, qualified by the subselect alias.
+              Sequel.qualify(qualifier, Sequel.identifier(column))
+            else
+              # Initial dataset not wrapped in subslect, just make
+              # sure columns are qualified in some way.
+              qualified_expression(sel, qualifier)
             end
-          else
-            select = columns.map do |column|
-              column_aliases[column] = [master, column]
-              SQL::QualifiedIdentifier.new(qualifier, column)
-            end
+          end
+        else
+          select = columns.map do |column|
+            column_aliases[column] = [master, column]
+            SQL::QualifiedIdentifier.new(qualifier, column)
           end
         end
       end
@@ -178,7 +170,7 @@ module Sequel
       table_aliases[table_alias] = add_table ? dataset : nil
 
       # Add the columns to the selection unless we are ignoring them
-      if add_table && add_columns
+      if add_table
         column_aliases = graph[:column_aliases]
         ca_num = graph[:column_alias_num]
         # Which columns to add to the result set
@@ -207,7 +199,7 @@ module Sequel
       end
       [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k].freeze}
       ds = ds.clone(:graph=>graph.freeze)
-      add_columns ? ds.select(*select) : ds
+      ds.select(*select)
     end
 
     # This allows you to manually specify the graph aliases to use
@@ -238,15 +230,14 @@ module Sequel
       if graph = opts[:graph]
         select(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>graph_aliases.freeze).freeze)
       else
-        Sequel::Deprecation.deprecate("Calling Dataset#set_graph_aliases before Dataset#graph", "Call Dataset#set_graph_aliases after Dataset#graph now")
-        select(*columns).clone(:graph_aliases=>graph_aliases.freeze) # SEQUEL5: Remove
+        raise Error, "cannot call #set_graph_aliases on an ungraphed dataset"
       end
     end
 
     # Remove the splitting of results into subhashes, and all metadata
     # related to the current graph (if any).
     def ungraphed
-      clone(:graph=>nil, :graph_aliases=>nil) # SEQUEL5: Remove :graph_aliases
+      clone(:graph=>nil)
     end
 
     private

@@ -991,8 +991,8 @@ module Sequel
       end
   
       # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server]) - [:<<, :and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases])
-      # SEQUEL5: add :set_graph_aliases to remove list and remove :and
+      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server]) - [:<<, :and, :or, :[], :columns, :columns!, :delete, :update, :set_graph_aliases, :add_graph_aliases])
+      # SEQUEL5: remove :and
   
       private
       
