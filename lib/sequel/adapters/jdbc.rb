@@ -6,31 +6,14 @@ Sequel.require 'adapters/utils/stored_procedures'
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
   module JDBC
-    # Make it accesing the java.lang hierarchy more ruby friendly.
-    module JavaLang
-      include_package 'java.lang'
-    end
-    Sequel::Deprecation.deprecate_constant(self, :JavaLang)
-    
     # Make it accesing the java.sql hierarchy more ruby friendly.
     module JavaSQL
       include_package 'java.sql'
     end
 
-    # Make it accesing the javax.naming hierarchy more ruby friendly.
-    module JavaxNaming
-      include_package 'javax.naming'
-    end
-    Sequel::Deprecation.deprecate_constant(self, :JavaxNaming)
-
     # Used to identify a jndi connection and to extract the jndi
     # resource name.
     JNDI_URI_REGEXP = /\Ajdbc:jndi:(.+)/
-    
-    # The types to check for 0 scale to transform :decimal types
-    # to :integer.
-    DECIMAL_TYPE_RE = /number|numeric|decimal/io
-    Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
     
     # Contains procs keyed on subadapter type that extend the
     # given database object so it supports the correct database type.
@@ -714,9 +697,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include StoredProcedures
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-      
       PreparedStatementMethods = prepared_statements_module(
         "sql = self; opts = Hash[opts]; opts[:arguments] = bind_arguments",
         Sequel::Dataset::UnnumberedArgumentMapper,

@@ -353,11 +353,6 @@ module Sequel
   class Migrator
     MIGRATION_FILE_PATTERN = /\A(\d+)_.+\.rb\z/i.freeze
 
-    MIGRATION_SPLITTER = '_'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :MIGRATION_SPLITTER)
-    MINIMUM_TIMESTAMP = 20000101
-    Sequel::Deprecation.deprecate_constant(self, :MINIMUM_TIMESTAMP)
-
     # Exception class raised when there is an error with the migrator's
     # file structure, database, or arguments.
     class Error < Sequel::Error
@@ -508,11 +503,6 @@ module Sequel
   # version number starting with 1, where missing or duplicate migration file
   # versions are not allowed.  Part of the +migration+ extension.
   class IntegerMigrator < Migrator
-    DEFAULT_SCHEMA_COLUMN = :version
-    DEFAULT_SCHEMA_TABLE = :schema_info
-    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_COLUMN)
-    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_TABLE)
-
     Error = Migrator::Error
 
     # The current version for this migrator
@@ -669,11 +659,6 @@ module Sequel
   # after later migrations.  If you plan to do that, the responsibility is on
   # you to make sure the migrations don't conflict. Part of the +migration+ extension.
   class TimestampMigrator < Migrator
-    DEFAULT_SCHEMA_COLUMN = :filename
-    DEFAULT_SCHEMA_TABLE = :schema_migrations
-    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_COLUMN)
-    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SCHEMA_TABLE)
-    
     Error = Migrator::Error
 
     # Array of strings of applied migration filenames

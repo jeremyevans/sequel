@@ -23,17 +23,6 @@ module Sequel
     PLUS_INFINITY   = 1.0/0.0
     MINUS_INFINITY  = -1.0/0.0
 
-    NAN_STR             = 'NaN'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :NAN_STR)
-    PLUS_INFINITY_STR   = 'Infinity'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :PLUS_INFINITY_STR)
-    MINUS_INFINITY_STR  = '-Infinity'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :MINUS_INFINITY_STR)
-    TRUE_STR = 't'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :TRUE_STR)
-    DASH_STR = '-'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :DASH_STR)
-    
     TYPE_TRANSLATOR = tt = Class.new do
       def boolean(s) s == 't' end
       def integer(s) s.to_i end
@@ -119,9 +108,6 @@ module Sequel
       end
     end
 
-    CONVERTED_EXCEPTIONS = []
-    Sequel::Deprecation.deprecate_constant(self, :CONVERTED_EXCEPTIONS)
-
     # SEQUEL5: Remove
     @client_min_messages = :warning
     @force_standard_strings = true
@@ -188,13 +174,6 @@ module Sequel
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
-
-      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :RE_CURRVAL_ERROR)
-      POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
-      Sequel::Deprecation.deprecate_constant(self, :POSTGRES_DEFAULT_RE)
-      UNLOGGED = 'UNLOGGED '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :UNLOGGED)
 
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'=>:no_action, 'r'=>:restrict, 'c'=>:cascade, 'n'=>:set_null, 'd'=>:set_default}.freeze
@@ -896,10 +875,6 @@ module Sequel
         conversion_procs_updated
       end
 
-      EXCLUSION_CONSTRAINT_SQL_STATE = '23P01'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXCLUSION_CONSTRAINT_SQL_STATE)
-      DEADLOCK_SQL_STATE = '40P01'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DEADLOCK_SQL_STATE)
       def database_specific_error_class_from_sqlstate(sqlstate)
         if sqlstate == '23P01'
           ExclusionConstraintViolation
@@ -1335,79 +1310,6 @@ module Sequel
     # Instance methods for datasets that connect to a PostgreSQL database.
     module DatasetMethods
       include UnmodifiedIdentifiers::DatasetMethods
-
-      ACCESS_SHARE = 'ACCESS SHARE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ACCESS_SHARE)
-      ACCESS_EXCLUSIVE = 'ACCESS EXCLUSIVE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ACCESS_EXCLUSIVE)
-      BOOL_FALSE = 'false'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      BOOL_TRUE = 'true'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      COMMA_SEPARATOR = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
-      EXCLUSIVE = 'EXCLUSIVE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXCLUSIVE)
-      EXPLAIN = 'EXPLAIN '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN)
-      EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN_ANALYZE)
-      FOR_SHARE = ' FOR SHARE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FOR_SHARE)
-      PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
-      Sequel::Deprecation.deprecate_constant(self, :PG_TIMESTAMP_FORMAT)
-      QUERY_PLAN = 'QUERY PLAN'.to_sym
-      Sequel::Deprecation.deprecate_constant(self, :QUERY_PLAN)
-      ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROW_EXCLUSIVE)
-      ROW_SHARE = 'ROW SHARE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROW_SHARE)
-      SHARE = 'SHARE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SHARE)
-      SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SHARE_ROW_EXCLUSIVE)
-      SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SHARE_UPDATE_EXCLUSIVE)
-      SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_WITH_RECURSIVE)
-      SPACE = ' '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SPACE)
-      FROM = ' FROM '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FROM)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      APOS_RE = /'/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
-      DOUBLE_APOS = "''".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
-      PAREN_CLOSE = ')'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-      PAREN_OPEN = '('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
-      COMMA = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      ESCAPE = " ESCAPE ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ESCAPE)
-      BACKSLASH = "\\".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
-      AS = ' AS '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AS)
-      XOR_OP = ' # '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :XOR_OP)
-      CRLF = "\r\n".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CRLF)
-      BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BLOB_RE)
-      WINDOW = " WINDOW ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :WINDOW)
-      SELECT_VALUES = "VALUES ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SELECT_VALUES)
-      EMPTY_STRING = ''.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
-      SKIP_LOCKED = " SKIP LOCKED".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:cursor, :insert_conflict]).freeze
-      Sequel::Deprecation.deprecate_constant(self, :NON_SQL_OPTIONS)
 
       NULL = LiteralString.new('NULL').freeze
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)#.freeze # SEQUEL5

@@ -3,19 +3,6 @@
 module Sequel
   module JDBC
     module Transactions
-      TRANSACTION_BEGIN = 'Transaction.begin'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_BEGIN)
-      TRANSACTION_COMMIT = 'Transaction.commit'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_COMMIT)
-      TRANSACTION_RELEASE_SP = 'Transaction.release_savepoint'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_RELEASE_SP)
-      TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_ROLLBACK)
-      TRANSACTION_ROLLBACK_SP = 'Transaction.rollback_savepoint'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_ROLLBACK_SP)
-      TRANSACTION_SAVEPOINT= 'Transaction.savepoint'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_SAVEPOINT)
-
       def freeze
         supports_savepoints?
         super

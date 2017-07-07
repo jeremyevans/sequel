@@ -28,12 +28,6 @@ module Sequel
     #   # Add the instance hook methods just to Album instances
     #   Album.plugin :instance_hooks
     module InstanceHooks
-      BEFORE_HOOKS, AFTER_HOOKS = Sequel::Model::HOOKS.partition{|l| l.to_s.start_with?('before')}
-      Sequel::Deprecation.deprecate_constant(self, :BEFORE_HOOKS)
-      Sequel::Deprecation.deprecate_constant(self, :AFTER_HOOKS)
-      HOOKS = Sequel::Model::HOOKS
-      Sequel::Deprecation.deprecate_constant(self, :HOOKS)
-      
       # SEQUEL5: Remove
       DEPRECATION_REPLACEMENTS = {
         :after_commit=>"Use obj.after_save_hook{obj.db.after_commit{}} instead",

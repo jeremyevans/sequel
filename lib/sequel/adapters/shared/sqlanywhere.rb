@@ -23,21 +23,6 @@ module Sequel
       # Override the default SqlAnywhere.convert_smallint_to_bool setting for this database.
       attr_writer :convert_smallint_to_bool
 
-      AUTO_INCREMENT = 'IDENTITY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
-      SQL_BEGIN = "BEGIN TRANSACTION".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_BEGIN)
-      SQL_COMMIT = "COMMIT TRANSACTION".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_COMMIT)
-      SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK)
-      TEMPORARY = "GLOBAL TEMPORARY ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
-      SMALLINT_RE = /smallint/i.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SMALLINT_RE)
-      DECIMAL_TYPE_RE = /numeric/i
-      Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
-
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the SqlAnywhere module setting.
       def convert_smallint_to_bool
@@ -278,49 +263,6 @@ module Sequel
     end
 
     module DatasetMethods
-      BOOL_TRUE = '1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      BOOL_FALSE = '0'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      WILDCARD = LiteralString.new('%').freeze
-      Sequel::Deprecation.deprecate_constant(self, :WILDCARD)
-      TOP = " TOP ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TOP)
-      START_AT = " START AT ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :START_AT)
-      SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_WITH_RECURSIVE)
-      DATE_FUNCTION = 'today()'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATE_FUNCTION)
-      NOW_FUNCTION = 'now()'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOW_FUNCTION)
-      DATEPART = 'datepart'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATEPART)
-      REGEXP = 'REGEXP'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :REGEXP)
-      NOT_REGEXP = 'NOT REGEXP'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOT_REGEXP)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      APOS_RE = /'/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
-      DOUBLE_APOS = "''".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
-      BACKSLASH_RE = /\\/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_RE)
-      QUAD_BACKSLASH = "\\\\\\\\".freeze
-      Sequel::Deprecation.deprecate_constant(self, :QUAD_BACKSLASH)
-      BLOB_START = "0x".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BLOB_START)
-      HSTAR = "H*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-      CROSS_APPLY = 'CROSS APPLY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CROSS_APPLY)
-      OUTER_APPLY = 'OUTER APPLY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :OUTER_APPLY)
-      ONLY_OFFSET = " TOP 2147483647".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
-
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
       Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having compounds order lock')
 

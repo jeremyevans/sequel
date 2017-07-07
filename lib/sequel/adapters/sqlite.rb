@@ -60,9 +60,6 @@ module Sequel
       end
     end.new
 
-    TYPE_TRANSLATOR = tt
-    Sequel::Deprecation.deprecate_constant(self, :TYPE_TRANSLATOR)
-
     # Hash with string keys and callable values for converting SQLite types.
     SQLITE_TYPES = {}
     {
@@ -295,12 +292,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-      
-      PREPARED_ARG_PLACEHOLDER = ':'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PREPARED_ARG_PLACEHOLDER)
-      
       # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper

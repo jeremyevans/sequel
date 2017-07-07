@@ -26,18 +26,6 @@ module Sequel
       :time=>Sequel::SQLTime, :boolean=>[TrueClass, FalseClass].freeze, :float=>Float, :decimal=>BigDecimal,
       :blob=>Sequel::SQL::Blob}.freeze
 
-    # Module to be included in shared adapters so that when the DatabaseMethods are
-    # included in the database, the identifier mangling defaults are reset correctly.
-    module ResetIdentifierMangling
-      def self.extended(obj)
-        # :nocov:
-        Sequel::Deprecation.deprecate("Sequel::Database::ResetIdentifierMangling is no longer needed and will be removed in Sequel 5.  Please update your adapter")
-        obj.send(:reset_identifier_mangling) if obj.respond_to?(:reset_identifier_mangling)
-        # :nocov:
-      end
-    end
-    Sequel::Deprecation.deprecate_constant(self, :ResetIdentifierMangling)
-
     # Nested hook Proc; each new hook Proc just wraps the previous one.
     @initialize_hook = Proc.new {|db| }
 
@@ -502,11 +490,6 @@ module Sequel
     def typecast_value_float(value)
       Float(value)
     end
-
-    # Used for checking/removing leading zeroes from strings so they don't get
-    # interpreted as octal.
-    LEADING_ZERO_RE = /\A0+(\d)/
-    Sequel::Deprecation.deprecate_constant(self, :LEADING_ZERO_RE)
 
     if RUBY_VERSION >= '1.9'
       # Typecast the value to an Integer

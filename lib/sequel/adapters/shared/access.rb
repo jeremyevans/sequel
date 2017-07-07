@@ -90,45 +90,6 @@ module Sequel
       OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}#.freeze # SEQUEL5
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}#.freeze # SEQUEL5
 
-      DATE_FORMAT = '#%Y-%m-%d#'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATE_FORMAT)
-      TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
-      TOP = " TOP ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TOP)
-      BRACKET_CLOSE =  ']'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BRACKET_CLOSE)
-      BRACKET_OPEN = '['.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BRACKET_OPEN)
-      COMMA = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      PAREN_CLOSE = ')'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-      PAREN_OPEN = '('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
-      INTO = " INTO ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :INTO)
-      FROM = ' FROM '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FROM)
-      SPACE = ' '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SPACE)
-      NOT_EQUAL = ' <> '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOT_EQUAL)
-      BOOL_FALSE = '0'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      BOOL_TRUE = '-1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      DATE_FUNCTION = 'Date()'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATE_FUNCTION)
-      NOW_FUNCTION = 'Now()'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOW_FUNCTION)
-      TIME_FUNCTION = 'Time()'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TIME_FUNCTION)
-      DATEPART_OPEN = "datepart(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATEPART_OPEN)
-      EMULATED_FUNCTION_MAP = {:char_length=>:len}
-      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
-
       # Access doesn't support CASE, but it can be emulated with nested
       # IIF function calls.
       def case_expression_sql_append(sql, ce)

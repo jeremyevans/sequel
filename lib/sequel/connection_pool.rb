@@ -27,10 +27,6 @@
 class Sequel::ConnectionPool
   OPTS = Sequel::OPTS
 
-  # The default server to use
-  DEFAULT_SERVER = :default
-  Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SERVER)
-  
   # A map of [single threaded, sharded] values to symbols or ConnectionPool subclasses.
   CONNECTION_POOL_MAP = {[true, false] => :single, 
     [true, true] => :sharded_single,

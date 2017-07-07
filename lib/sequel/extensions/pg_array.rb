@@ -79,33 +79,6 @@ module Sequel
     class PGArray < DelegateClass(Array)
       include Sequel::SQL::AliasMethods
 
-      ARRAY = "ARRAY".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ARRAY)
-      DOUBLE_COLON = '::'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_COLON)
-      EMPTY_ARRAY = "'{}'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_ARRAY)
-      EMPTY_BRACKET = '[]'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_BRACKET)
-      OPEN_BRACKET = '['.freeze
-      Sequel::Deprecation.deprecate_constant(self, :OPEN_BRACKET)
-      CLOSE_BRACKET = ']'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_BRACKET)
-      COMMA = ','.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      BACKSLASH = '\\'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
-      EMPTY_STRING = ''.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
-      OPEN_BRACE = '{'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :OPEN_BRACE)
-      CLOSE_BRACE = '}'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_BRACE)
-      NULL = 'NULL'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NULL)
-      QUOTE = '"'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :QUOTE)
-
       # SEQUEL5: Remove
       ARRAY_TYPES = {}
 
@@ -162,15 +135,6 @@ module Sequel
       private_class_method :define_array_typecast_method
 
       module DatabaseMethods
-        APOS = "'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :APOS)
-        DOUBLE_APOS = "''".freeze
-        Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
-        ESCAPE_RE = /("|\\)/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
-        ESCAPE_REPLACEMENT = '\\\\\1'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACEMENT)
-
         BLOB_RANGE = 1...-1
 
         # Create the local hash of database type strings to schema type symbols,
@@ -408,15 +372,6 @@ module Sequel
       # Note that does not handle all forms out input that PostgreSQL will
       # accept, and it will not raise an error for all forms of invalid input.
       class Parser < StringScanner
-        UNQUOTED_RE = /[{}",]|[^{}",]+/
-        Sequel::Deprecation.deprecate_constant(self, :UNQUOTED_RE)
-        QUOTED_RE = /["\\]|[^"\\]+/
-        Sequel::Deprecation.deprecate_constant(self, :QUOTED_RE)
-        NULL_RE = /NULL",/
-        Sequel::Deprecation.deprecate_constant(self, :NULL_RE)
-        OPEN_RE = /((\[\d+:\d+\])+=)?\{/
-        Sequel::Deprecation.deprecate_constant(self, :OPEN_RE)
-
         # Set the source for the input, and any converter callable
         # to call with objects to be created.  For nested parsers
         # the source may contain text after the end current parse,

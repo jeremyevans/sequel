@@ -9,11 +9,6 @@ module Sequel
     module MSSQL
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
-        # Query to use to get the number of rows affected by an update or
-        # delete query.
-        ROWS_AFFECTED = "SELECT @@ROWCOUNT AS AffectedRows"
-        Sequel::Deprecation.deprecate_constant(self, :ROWS_AFFECTED)
-        
         # Issue a separate query to get the rows modified.  ADO appears to
         # use pass by reference with an integer variable, which is obviously
         # not supported directly in ruby, and I'm not aware of a workaround.

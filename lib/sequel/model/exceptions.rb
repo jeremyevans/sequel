@@ -13,10 +13,6 @@ module Sequel
     end
   end
 
-  # Alias for HookFailed, kept for backwards compatibility
-  BeforeHookFailed = HookFailed
-  Sequel::Deprecation.deprecate_constant(self, :BeforeHookFailed)
-  
   (
   # Exception class raised when +require_modification+ is set and an UPDATE or DELETE statement to modify the dataset doesn't
   # modify a single row.

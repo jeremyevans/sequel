@@ -7,27 +7,6 @@ module Sequel
     # These methods execute code on the database that modifies the database's schema.
     # ---------------------
 
-    AUTOINCREMENT = 'AUTOINCREMENT'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
-    COMMA_SEPARATOR = ', '.freeze
-    Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
-    NOT_NULL = ' NOT NULL'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :NOT_NULL)
-    NULL = ' NULL'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :NULL)
-    PRIMARY_KEY = ' PRIMARY KEY'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY)
-    TEMPORARY = 'TEMPORARY '.freeze
-    Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
-    UNDERSCORE = '_'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE)
-    UNIQUE = ' UNIQUE'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNIQUE)
-    UNSIGNED = ' UNSIGNED'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNSIGNED)
-    DEFAULT_JOIN_TABLE_COLUMN_OPTIONS = {:null=>false}
-    Sequel::Deprecation.deprecate_constant(self, :DEFAULT_JOIN_TABLE_COLUMN_OPTIONS)
-
     # The order of column modifiers to use when defining a column.
     COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
 

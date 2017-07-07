@@ -26,12 +26,6 @@ end
 
 module Sequel
   module Postgres
-    # SEQUEL5: Remove
-    TYPE_CONVERTOR = Class.new do
-      def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
-    end.new
-    Sequel::Deprecation.deprecate_constant(self, :TYPE_CONVERTOR)
-
     if Sequel::Postgres::USES_PG
       # Whether the given sequel_pg version integer is supported.
       def self.sequel_pg_version_supported?(version)
@@ -666,13 +660,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include Sequel::Postgres::DatasetMethods
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      DEFAULT_CURSOR_NAME = 'sequel_cursor'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_CURSOR_NAME)
-      
       # Yield all rows returned by executing the given SQL and converting
       # the types.
       def fetch_rows(sql)
@@ -869,7 +856,3 @@ if Sequel::Postgres::USES_PG && !ENV['NO_SEQUEL_PG']
   rescue LoadError
   end
 end
-
-# SEQUEL5: Remove
-SEQUEL_POSTGRES_USES_PG = Sequel::Postgres::USES_PG
-Sequel::Deprecation.deprecate_constant(Object, :SEQUEL_POSTGRES_USES_PG)

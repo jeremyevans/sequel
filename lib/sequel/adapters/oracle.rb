@@ -324,12 +324,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-
-      PREPARED_ARG_PLACEHOLDER = ':'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PREPARED_ARG_PLACEHOLDER)
-      
       # Oracle already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper

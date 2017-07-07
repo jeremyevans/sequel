@@ -16,9 +16,6 @@ module Sequel
     module H2
       # Instance methods for H2 Database objects accessed via JDBC.
       module DatabaseMethods
-        PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
-      
         # Commit an existing prepared transaction with the given transaction
         # identifier string.
         def commit_prepared_transaction(transaction_id, opts=OPTS)
@@ -178,15 +175,6 @@ module Sequel
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
-
-        APOS = "'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :APOS)
-        HSTAR = "H*".freeze
-        Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-        TIME_FORMAT = "'%H:%M:%S'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :TIME_FORMAT)
-        ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
-        Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
 
         # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql_append(sql, op, args)

@@ -13,27 +13,6 @@ module Sequel
     end
 
     module DatabaseMethods
-      AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
-      SERVER_VERSION_RE = /^(\d+)\.(\d+)\.(\d+)/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SERVER_VERSION_RE)
-      SERVER_VERSION_SQL = "SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SERVER_VERSION_SQL)
-      SQL_BEGIN = "BEGIN TRANSACTION".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_BEGIN)
-      SQL_COMMIT = "COMMIT TRANSACTION".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_COMMIT)
-      SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK)
-      SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK_TO_SAVEPOINT)
-      SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_SAVEPOINT)
-      MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
-      Sequel::Deprecation.deprecate_constant(self, :MSSQL_DEFAULT_RE)
-      DECIMAL_TYPE_RE = /number|numeric|decimal/io
-      Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
-
       FOREIGN_KEY_ACTION_MAP = {0 => :no_action, 1 => :cascade, 2 => :set_null, 3 => :set_default}.freeze
 
       include Sequel::Database::SplitAlterTable
@@ -541,95 +520,6 @@ module Sequel
       EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}#.freeze # SEQUEL5
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
       LIMIT_ALL = Object.new.freeze
-
-      BOOL_TRUE = '1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      BOOL_FALSE = '0'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      COMMA_SEPARATOR = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
-      TABLE_HINT = " WITH (".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TABLE_HINT)
-      READPAST = "READPAST".freeze
-      Sequel::Deprecation.deprecate_constant(self, :READPAST)
-      NOLOCK = 'NOLOCK'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOLOCK)
-      UPDLOCK = 'UPDLOCK'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :UPDLOCK)
-      WILDCARD = LiteralString.new('*').freeze
-      Sequel::Deprecation.deprecate_constant(self, :WILDCARD)
-      BRACKET_CLOSE =  ']'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BRACKET_CLOSE)
-      BRACKET_OPEN = '['.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BRACKET_OPEN)
-      COMMA = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      PAREN_CLOSE = ')'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-      PAREN_SPACE_OPEN = ' ('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_SPACE_OPEN)
-      SPACE = ' '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SPACE)
-      FROM = ' FROM '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FROM)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      APOS_RE = /'/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
-      DOUBLE_APOS = "''".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
-      INTO = " INTO ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :INTO)
-      DOUBLE_BRACKET_CLOSE = ']]'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_BRACKET_CLOSE)
-      DATEPART_SECOND_OPEN = "CAST((datepart(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATEPART_SECOND_OPEN)
-      DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATEPART_SECOND_MIDDLE)
-      DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATEPART_SECOND_CLOSE)
-      DATEPART_OPEN = "datepart(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATEPART_OPEN)
-      OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :OUTPUT_INSERTED)
-      HEX_START = '0x'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :HEX_START)
-      UNICODE_STRING_START = "N'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :UNICODE_STRING_START)
-      BACKSLASH_CRLF_RE = /\\((?:\r\n)|\n)/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_CRLF_RE)
-      BACKSLASH_CRLF_REPLACE = '\\\\\\\\\\1\\1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_CRLF_REPLACE)
-      TOP_PAREN = " TOP (".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TOP_PAREN)
-      TOP = " TOP ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TOP)
-      OUTPUT = " OUTPUT ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :OUTPUT)
-      HSTAR = "H*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-      CASE_SENSITIVE_COLLATION = 'Latin1_General_CS_AS'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CASE_SENSITIVE_COLLATION)
-      CASE_INSENSITIVE_COLLATION = 'Latin1_General_CI_AS'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CASE_INSENSITIVE_COLLATION)
-      DEFAULT_TIMESTAMP_FORMAT = "'%Y-%m-%dT%H:%M:%S%N%z'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_TIMESTAMP_FORMAT)
-      FORMAT_DATE = "'%Y%m%d'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :FORMAT_DATE)
-      CROSS_APPLY = 'CROSS APPLY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CROSS_APPLY)
-      OUTER_APPLY = 'OUTER APPLY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :OUTER_APPLY)
-      OFFSET = " OFFSET ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :OFFSET)
-      ROWS = " ROWS".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROWS)
-      ROWS_ONLY = " ROWS ONLY".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
-      FETCH_NEXT = " FETCH NEXT ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :FETCH_NEXT)
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
-      Sequel::Deprecation.deprecate_constant(self, :NON_SQL_OPTIONS)
 
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')

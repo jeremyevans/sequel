@@ -54,11 +54,6 @@ module Sequel
         include Sequel::DB2::DatabaseMethods
         include Sequel::JDBC::Transactions
 
-        PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
-        IDENTITY_VAL_LOCAL = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1".freeze
-        Sequel::Deprecation.deprecate_constant(self, :IDENTITY_VAL_LOCAL)
-        
         private
 
         def set_ps_arg(cps, arg, i)

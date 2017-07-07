@@ -458,11 +458,4 @@ module Sequel
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)
-
-  COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze
-  Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE1)
-  COLUMN_REF_RE2 = /\A((?:(?!___).)+)___(.+)\z/.freeze
-  Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE2)
-  COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
-  Sequel::Deprecation.deprecate_constant(self, :COLUMN_REF_RE3)
 end

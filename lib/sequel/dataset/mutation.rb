@@ -7,10 +7,6 @@ module Sequel
     # These methods modify the receiving dataset and should be used with care.
     # ---------------------
     
-    # All methods that should have a ! method added that modifies the receiver.
-    MUTATION_METHODS = QUERY_METHODS - [:naked, :from_self]
-    Sequel::Deprecation.deprecate_constant(self, :MUTATION_METHODS)
-    
     # Setup mutation (e.g. filter!) methods.  These operate the same as the
     # non-! methods, but replace the options of the current dataset with the
     # options of the resulting dataset.

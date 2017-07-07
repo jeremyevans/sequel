@@ -91,21 +91,6 @@ module Sequel
 
       # Parser for PostgreSQL hstore output format.
       class Parser < StringScanner
-        QUOTE_RE = /"/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :QUOTE_RE)
-        KV_SEP_RE = /"\s*=>\s*/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :KV_SEP_RE)
-        NULL_RE = /NULL/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :NULL_RE)
-        SEP_RE = /,\s*/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :SEP_RE)
-        QUOTED_RE = /(\\"|[^"])*/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :QUOTED_RE)
-        REPLACE_RE = /\\(.)/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)
-        REPLACE_WITH = '\1'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :REPLACE_WITH)
-
         # Parse the output format that PostgreSQL uses for hstore
         # columns.  Note that this does not attempt to parse all
         # input formats that PostgreSQL will accept.  For instance,
@@ -197,21 +182,6 @@ module Sequel
       # if you grab the underlying hash, it will still convert non-string
       # keys to strings during lookup.
       DEFAULT_PROC = lambda{|h, k| h[k.to_s] unless k.is_a?(String)}
-
-      QUOTE = '"'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :QUOTE)
-      COMMA = ",".freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      KV_SEP = "=>".freeze
-      Sequel::Deprecation.deprecate_constant(self, :KV_SEP)
-      NULL = "NULL".freeze
-      Sequel::Deprecation.deprecate_constant(self, :NULL)
-      ESCAPE_RE = /("|\\)/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
-      ESCAPE_REPLACE = '\\\\\1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACE)
-      HSTORE_CAST = '::hstore'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTORE_CAST)
 
       if RUBY_VERSION >= '1.9'
         # Undef 1.9 marshal_{dump,load} methods in the delegate class,

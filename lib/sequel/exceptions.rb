@@ -116,17 +116,5 @@ module Sequel
 
   # SEQUEL5: Remove
   (UnbindDuplicate = Class.new(Error)).name
-
-  Error::AdapterNotFound = AdapterNotFound
-  Error::InvalidOperation = InvalidOperation
-  Error::InvalidValue = InvalidValue
-  Error::PoolTimeoutError = PoolTimeout
-  Error::Rollback = Rollback
-
   Sequel::Deprecation.deprecate_constant(self, :UnbindDuplicate)
-  Sequel::Deprecation.deprecate_constant(Error, :AdapterNotFound)
-  Sequel::Deprecation.deprecate_constant(Error, :InvalidOperation)
-  Sequel::Deprecation.deprecate_constant(Error, :InvalidValue)
-  Sequel::Deprecation.deprecate_constant(Error, :PoolTimeoutError)
-  Sequel::Deprecation.deprecate_constant(Error, :Rollback)
 end

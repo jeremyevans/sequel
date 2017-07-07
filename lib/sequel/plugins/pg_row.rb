@@ -52,11 +52,6 @@ module Sequel
     #   DB[:company].insert(:name=>'MS', :address=>
     #     Address.load(:street=>'123 Foo St', :city=>'Bar Town', :zip=>'12345'))
     module PgRow
-      ROW = 'ROW'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROW)
-      CAST = '::'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST)
-
       # When loading the extension, make sure the database has the pg_row extension
       # loaded, load the custom database extensions, and automatically register the
       # row type if the model has a dataset.

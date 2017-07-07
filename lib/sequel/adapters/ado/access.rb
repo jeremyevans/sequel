@@ -90,11 +90,6 @@ module Sequel
         include Sequel::Access::DatabaseMethods
         include Sequel::Database::SplitAlterTable
     
-        DECIMAL_TYPE_RE = /decimal/io
-        Sequel::Deprecation.deprecate_constant(self, :DECIMAL_TYPE_RE)
-        LAST_INSERT_ID = "SELECT @@IDENTITY".freeze
-        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
-
         # Remove cached schema after altering a table, since otherwise it can be cached
         # incorrectly in the rename column case.
         def alter_table(name, *)

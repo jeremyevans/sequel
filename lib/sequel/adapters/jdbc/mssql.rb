@@ -9,13 +9,6 @@ module Sequel
     module MSSQL
       # Database instance methods for MSSQL databases accessed via JDBC.
       module DatabaseMethods
-        PRIMARY_KEY_INDEX_RE = /\Apk__/i.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
-        ATAT_IDENTITY = 'SELECT @@IDENTITY'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ATAT_IDENTITY)
-        SCOPE_IDENTITY = 'SELECT SCOPE_IDENTITY()'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :SCOPE_IDENTITY)
-        
         include Sequel::MSSQL::DatabaseMethods
         
         private

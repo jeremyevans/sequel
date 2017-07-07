@@ -49,11 +49,6 @@ module Sequel
       include Sequel::MySQL::MysqlMysql2::DatabaseMethods
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
       
-      # Regular expression used for getting accurate number of rows
-      # matched by an update statement.
-      AFFECTED_ROWS_RE = /Rows matched:\s+(\d+)\s+Changed:\s+\d+\s+Warnings:\s+\d+/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AFFECTED_ROWS_RE)
-      
       set_adapter_scheme :mysql
 
       # Hash of conversion procs for the current database
@@ -307,9 +302,6 @@ module Sequel
       include Sequel::MySQL::DatasetMethods
       include Sequel::MySQL::MysqlMysql2::DatasetMethods
       include Sequel::MySQL::PreparedStatements::DatasetMethods
-
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # Yield all rows matching this dataset.  If the dataset is set to
       # split multiple statements, yield arrays of hashes one per statement

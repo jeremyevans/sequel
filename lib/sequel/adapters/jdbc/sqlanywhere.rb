@@ -48,9 +48,6 @@ module Sequel
         include Sequel::SqlAnywhere::DatabaseMethods
         include Sequel::JDBC::Transactions
 
-        LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
-
         private
 
         # Get the last inserted id.

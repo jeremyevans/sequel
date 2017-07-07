@@ -17,9 +17,6 @@ module Sequel
     module HSQLDB
       # Instance methods for HSQLDB Database objects accessed via JDBC.
       module DatabaseMethods
-        PRIMARY_KEY_INDEX_RE = /\Asys_idx_sys_pk_/i.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
-
         include ::Sequel::JDBC::Transactions
 
         # HSQLDB uses the :hsqldb database type.
@@ -146,23 +143,6 @@ module Sequel
       
       # Dataset class for HSQLDB datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        BOOL_TRUE = 'TRUE'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-        BOOL_FALSE = 'FALSE'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-        SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-        Sequel::Deprecation.deprecate_constant(self, :SQL_WITH_RECURSIVE)
-        APOS = "'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :APOS)
-        HSTAR = "H*".freeze
-        Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-        BLOB_OPEN = "X'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :BLOB_OPEN)
-        DEFAULT_FROM = " FROM (VALUES (0))".freeze
-        Sequel::Deprecation.deprecate_constant(self, :DEFAULT_FROM)
-        TIME_FORMAT = "'%H:%M:%S'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :TIME_FORMAT)
-
         # Handle HSQLDB specific case insensitive LIKE and bitwise operator support.
         def complex_expression_sql_append(sql, op, args)
           case op

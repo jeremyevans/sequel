@@ -209,10 +209,6 @@ module Sequel
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
-        APOS = "'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :APOS)
-        HSTORE_TYPE = 'hstore'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :HSTORE_TYPE)
         
         private
         

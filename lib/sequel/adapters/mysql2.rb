@@ -239,9 +239,6 @@ module Sequel
       include Sequel::MySQL::PreparedStatements::DatasetMethods unless NativePreparedStatements
       STREAMING_SUPPORTED = ::Mysql2::VERSION >= '0.3.12'
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-
       if NativePreparedStatements
         PreparedStatementMethods = prepared_statements_module(
           "sql = self; opts = Hash[opts]; opts[:arguments] = bind_arguments",

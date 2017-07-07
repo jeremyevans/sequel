@@ -18,9 +18,6 @@ module Sequel
     #   # Make the Album class active_model compliant
     #   Album.plugin :active_model
     module ActiveModel
-      DEFAULT_TO_PARAM_JOINER = '-'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_TO_PARAM_JOINER)
-      
       # ActiveModel compliant error class
       class Errors < Sequel::Model::Errors
         # Add autovivification so that #[] always returns an array.

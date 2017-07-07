@@ -25,31 +25,6 @@ module Sequel
   # pluralization and singularization rules that is runs. This guarantees that your rules run before any of the rules that may
   # already have been loaded.
   module Inflections
-    CAMELIZE_CONVERT_REGEXP = /(^|_)(.)/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :CAMELIZE_CONVERT_REGEXP)
-    CAMELIZE_MODULE_REGEXP = /\/(.?)/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :CAMELIZE_MODULE_REGEXP)
-    DASH = '-'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :DASH)
-    DEMODULIZE_CONVERT_REGEXP = /^.*::/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :DEMODULIZE_CONVERT_REGEXP)
-    EMPTY_STRING= ''.freeze
-    Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
-    SLASH = '/'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SLASH)
-    VALID_CONSTANT_NAME_REGEXP = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :VALID_CONSTANT_NAME_REGEXP)
-    UNDERSCORE = '_'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE)
-    UNDERSCORE_CONVERT_REGEXP1 = /([A-Z]+)([A-Z][a-z])/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_CONVERT_REGEXP1)
-    UNDERSCORE_CONVERT_REGEXP2 = /([a-z\d])([A-Z])/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_CONVERT_REGEXP2)
-    UNDERSCORE_CONVERT_REPLACE = '\1_\2'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_CONVERT_REPLACE)
-    UNDERSCORE_MODULE_REGEXP = /::/.freeze
-    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_MODULE_REGEXP)
-
     @plurals, @singulars, @uncountables = [], [], []
 
     class << self

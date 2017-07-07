@@ -3,11 +3,6 @@
 module Sequel
   class Dataset
     module Replace
-      INSERT = 'INSERT'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :INSERT)
-      REPLACE = 'REPLACE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :REPLACE)
-
       # Execute a REPLACE statement on the database (deletes any duplicate
       # rows before inserting).
       def replace(*values)

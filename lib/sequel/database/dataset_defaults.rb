@@ -7,10 +7,6 @@ module Sequel
     # This methods change the default behavior of this database's datasets.
     # ---------------------
 
-    # The default class to use for datasets
-    DatasetClass = Sequel::Dataset
-    Sequel::Deprecation.deprecate_constant(self, :DatasetClass)
-
     # SEQUEL5: Remove
     @identifier_input_method = nil
     @identifier_output_method = nil

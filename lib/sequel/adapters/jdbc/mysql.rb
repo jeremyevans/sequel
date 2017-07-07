@@ -19,8 +19,6 @@ module Sequel
       # Database instance methods for MySQL databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
-        LAST_INSERT_ID = 'SELECT LAST_INSERT_ID()'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
         
         private
         

@@ -53,10 +53,6 @@ module Sequel
 
     # DateTime subclass literalized as CURRENT_TIMESTAMP
     class DateTime < ::DateTime; end
-
-    # Mapping of Time/DateTime classes to subclasses literalized as CURRENT_TIMESTAMP
-    MAP = {::Time=>Time, ::DateTime=>DateTime}
-    Sequel::Deprecation.deprecate_constant(self, :MAP)
   end
 
   Dataset.register_extension(:current_datetime_timestamp, CurrentDateTimeTimestamp::DatasetMethods)

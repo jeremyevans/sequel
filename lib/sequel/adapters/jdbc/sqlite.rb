@@ -19,10 +19,6 @@ module Sequel
       # Instance methods for SQLite Database objects accessed via JDBC.
       module DatabaseMethods
         include Sequel::SQLite::DatabaseMethods
-        LAST_INSERT_ROWID = 'SELECT last_insert_rowid()'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ROWID)
-        FOREIGN_KEY_ERROR_RE = /query does not return ResultSet/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :FOREIGN_KEY_ERROR_RE)
         
         # Swallow pointless exceptions when the foreign key list pragma
         # doesn't return any rows.

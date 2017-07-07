@@ -88,17 +88,6 @@ module Sequel
   module Postgres
     # This class represents a composite type expression reference.
     class PGRowOp < SQL::PlaceholderLiteralString
-      OPEN = '('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :OPEN)
-      CLOSE_DOT = ').'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_DOT)
-      CLOSE_STAR = '.*)'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_STAR)
-      CLOSE_STAR_CAST = '.*)::'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_STAR_CAST)
-      EMPTY = "".freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY)
-
       ROW = ['(', '.*)'].freeze.each(&:freeze)
       ROW_CAST = ['(', '.*)::'].freeze.each(&:freeze)
       QUALIFY = ['(', ').'].freeze.each(&:freeze)

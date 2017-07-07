@@ -381,9 +381,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include Sequel::DB2::DatasetMethods
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-
       module CallableStatementMethods
         # Extend given dataset with this module so subselects inside subselects in
         # prepared statements work.

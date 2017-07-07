@@ -86,9 +86,6 @@ module Sequel
     # CONVERSION_PROCS.freeze # SEQUEL5
 
     class Database < Sequel::Database
-      DISCONNECT_ERROR_RE = /Communication link failure/
-      Sequel::Deprecation.deprecate_constant(self, :DISCONNECT_ERROR_RE)
-
       set_adapter_scheme :ado
 
       attr_reader :conversion_procs
@@ -232,9 +229,6 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-
       def fetch_rows(sql)
         execute(sql) do |recordset|
           cols = []

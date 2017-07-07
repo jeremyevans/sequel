@@ -11,13 +11,6 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :odbc
 
-      GUARDED_DRV_NAME = /^\{.+\}$/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :GUARDED_DRV_NAME)
-      DRV_NAME_GUARDS = '{%s}'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DRV_NAME_GUARDS)
-      DISCONNECT_ERRORS = /\A08S01/.freeze 
-      Sequel::Deprecation.deprecate_constant(self, :DISCONNECT_ERRORS)
-
       def connect(server)
         opts = server_opts(server)
         conn = if opts.include?(:drvconnect)
@@ -93,18 +86,6 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      BOOL_TRUE = '1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      BOOL_FALSE = '0'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ODBC_DATE_FORMAT)
-      TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
-
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-
       def fetch_rows(sql)
         execute(sql) do |s|
           i = -1

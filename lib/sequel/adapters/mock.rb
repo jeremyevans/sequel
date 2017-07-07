@@ -311,9 +311,6 @@ module Sequel
     end
 
     class Dataset < Sequel::Dataset
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-
       # The autoid setting for this dataset, if it has been overridden
       def autoid
         cache_get(:_autoid) || @opts[:autoid]

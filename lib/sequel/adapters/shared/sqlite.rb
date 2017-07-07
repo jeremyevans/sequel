@@ -18,13 +18,6 @@ module Sequel
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
 
-      PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
-      TABLES_FILTER = Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}
-      Sequel::Deprecation.deprecate_constant(self, :TABLES_FILTER)
-      VIEWS_FILTER = {:type => 'view'.freeze}.freeze
-      Sequel::Deprecation.deprecate_constant(self, :VIEWS_FILTER)
-
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
       TEMP_STORE = [:default, :file, :memory].freeze
@@ -538,47 +531,6 @@ module Sequel
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}#.freeze # SEQUEL5
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}#.freeze # SEQUEL5
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
-
-      NOT_SPACE = 'NOT '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOT_SPACE)
-      COMMA = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      PAREN_CLOSE = ')'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-      AS = ' AS '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AS)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      EXTRACT_OPEN = "CAST(strftime(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXTRACT_OPEN)
-      EXTRACT_CLOSE = ') AS '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXTRACT_CLOSE)
-      NUMERIC = 'NUMERIC'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NUMERIC)
-      INTEGER = 'INTEGER'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :INTEGER)
-      BACKTICK = '`'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKTICK)
-      BACKTICK_RE = /`/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKTICK_RE)
-      DOUBLE_BACKTICK = '``'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_BACKTICK)
-      BLOB_START = "X'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BLOB_START)
-      HSTAR = "H*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-      DATE_OPEN = "date(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATE_OPEN)
-      DATETIME_OPEN = "datetime(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DATETIME_OPEN)
-      ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
-      OR = " OR ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :OR)
-      SELECT_VALUES = "VALUES ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SELECT_VALUES)
-      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
-      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])

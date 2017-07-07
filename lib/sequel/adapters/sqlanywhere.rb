@@ -27,9 +27,6 @@ module Sequel
       def time(s) ::Sequel.string_to_time(s) end
     end.new
 
-    TYPE_TRANSLATOR = tt
-    Sequel::Deprecation.deprecate_constant(self, :TYPE_TRANSLATOR)
-
     SQLANYWHERE_TYPES = {}
     {
         [0, 484] => tt.method(:decimal),
@@ -45,9 +42,6 @@ module Sequel
     # Database class for SQLAnywhere databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::SqlAnywhere::DatabaseMethods
-
-      DEFAULT_CONFIG = { :user => 'dba', :password => 'sql' }
-      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_CONFIG)
 
       attr_accessor :api
 
@@ -110,8 +104,6 @@ module Sequel
 
       private
 
-      LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :LAST_INSERT_ID)
       def _execute(conn, type, sql, opts)
         unless rs = log_connection_yield(sql, conn){@api.sqlany_execute_direct(conn, sql)}
           result, errstr = @api.sqlany_error(conn)
@@ -151,9 +143,6 @@ module Sequel
     # Dataset class for SqlAnywhere datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::SqlAnywhere::DatasetMethods
-
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
 
       # Yield all rows matching this dataset.  If the dataset is set to
       # split multiple statements, yield arrays of hashes one per statement

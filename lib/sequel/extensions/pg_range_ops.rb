@@ -76,8 +76,6 @@ module Sequel
         :adjacent_to => ["(".freeze, " -|- ".freeze, ")".freeze].freeze,
         :overlaps => ["(".freeze, " && ".freeze, ")".freeze].freeze,
       }#.freeze # SEQUEL5
-      FUNCTIONS = %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'
-      Sequel::Deprecation.deprecate_constant(self, :FUNCTIONS)
 
       %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'.each do |f|
         class_eval("def #{f}; function(:#{f}) end", __FILE__, __LINE__)

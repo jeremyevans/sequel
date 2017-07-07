@@ -159,9 +159,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
 
-      Database::DatasetClass = self
-      Sequel::Deprecation.deprecate_constant(Database, :DatasetClass)
-      
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |stmt|

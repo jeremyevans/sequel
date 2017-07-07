@@ -61,16 +61,8 @@ module Sequel
       include UnmodifiedIdentifiers::DatabaseMethods
       include Sequel::Database::SplitAlterTable
 
-      AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AUTO_INCREMENT)
-      PRIMARY = 'PRIMARY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PRIMARY)
-      MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
-      Sequel::Deprecation.deprecate_constant(self, :MYSQL_TIMESTAMP_RE)
-
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}#.freeze # SEQUEL5
       COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
-
       
       # Set the default charset used for CREATE TABLE.  You can pass the
       # :charset option to create_table to override this setting.
@@ -629,99 +621,6 @@ module Sequel
   
     # Dataset methods shared by datasets that use MySQL databases.
     module DatasetMethods
-      BOOL_TRUE = '1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      BOOL_FALSE = '0'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      COMMA_SEPARATOR = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA_SEPARATOR)
-      FOR_SHARE = ' LOCK IN SHARE MODE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FOR_SHARE)
-      SQL_CALC_FOUND_ROWS = ' SQL_CALC_FOUND_ROWS'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SQL_CALC_FOUND_ROWS)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      APOS_RE = /'/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
-      DOUBLE_APOS = "''".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
-      SPACE = ' '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SPACE)
-      PAREN_CLOSE = ')'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-      PAREN_OPEN = '('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
-      NOT_SPACE = 'NOT '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOT_SPACE)
-      FROM = ' FROM '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FROM)
-      COMMA = ', '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      LIMIT = " LIMIT ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :LIMIT)
-      GROUP_BY = " GROUP BY ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :GROUP_BY)
-      ESCAPE = " ESCAPE ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ESCAPE)
-      BACKSLASH = "\\".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH)
-      REGEXP = 'REGEXP'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :REGEXP)
-      LIKE = 'LIKE'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :LIKE)
-      BINARY = 'BINARY '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BINARY)
-      CONCAT = "CONCAT".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CONCAT)
-      CAST_BITCOMP_OPEN = "CAST(~".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST_BITCOMP_OPEN)
-      CAST_BITCOMP_CLOSE = " AS SIGNED INTEGER)".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST_BITCOMP_CLOSE)
-      STRAIGHT_JOIN = 'STRAIGHT_JOIN'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :STRAIGHT_JOIN)
-      NATURAL_LEFT_JOIN = 'NATURAL LEFT JOIN'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NATURAL_LEFT_JOIN)
-      BACKTICK = '`'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKTICK)
-      BACKTICK_RE = /`/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKTICK_RE)
-      DOUBLE_BACKTICK = '``'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_BACKTICK)
-      EMPTY_COLUMNS = " ()".freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_COLUMNS)
-      EMPTY_VALUES = " VALUES ()".freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_VALUES)
-      IGNORE = " IGNORE".freeze
-      Sequel::Deprecation.deprecate_constant(self, :IGNORE)
-      ON_DUPLICATE_KEY_UPDATE = " ON DUPLICATE KEY UPDATE ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ON_DUPLICATE_KEY_UPDATE)
-      EQ_VALUES = '=VALUES('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EQ_VALUES)
-      EQ = '='.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EQ)
-      WITH_ROLLUP = ' WITH ROLLUP'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :WITH_ROLLUP)
-      EXPLAIN = 'EXPLAIN '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN)
-      EXPLAIN_EXTENDED = 'EXPLAIN EXTENDED '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EXPLAIN_EXTENDED)
-      BACKSLASH_RE = /\\/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BACKSLASH_RE)
-      QUAD_BACKSLASH = "\\\\\\\\".freeze
-      Sequel::Deprecation.deprecate_constant(self, :QUAD_BACKSLASH)
-      BLOB_START = "0x".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BLOB_START)
-      EMPTY_BLOB = "''".freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_BLOB)
-      HSTAR = "H*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-      CURRENT_TIMESTAMP_56 = 'CURRENT_TIMESTAMP(6)'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CURRENT_TIMESTAMP_56)
-      ONLY_OFFSET = ",18446744073709551615".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ONLY_OFFSET)
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:insert_ignore, :update_ignore, :on_duplicate_key_update]).freeze
-      Sequel::Deprecation.deprecate_constant(self, :NON_SQL_OPTIONS)
-
       MATCH_AGAINST = ["MATCH ".freeze, " AGAINST (".freeze, ")".freeze].freeze
       MATCH_AGAINST_BOOLEAN = ["MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE)".freeze].freeze
 

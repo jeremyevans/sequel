@@ -66,11 +66,6 @@ Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres
-    CAST_JSON = '::json'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :CAST_JSON)
-    CAST_JSONB = '::jsonb'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :CAST_JSONB)
-
     # Class representing PostgreSQL JSON/JSONB column array values.
     class JSONArrayBase < DelegateClass(Array)
       include Sequel::SQL::AliasMethods

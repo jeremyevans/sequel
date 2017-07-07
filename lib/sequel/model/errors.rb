@@ -5,9 +5,6 @@ module Sequel
     # Errors represents validation errors, a simple hash subclass
     # with a few convenience methods.
     class Errors < ::Hash
-      ATTRIBUTE_JOINER = ' and '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ATTRIBUTE_JOINER)
-
       # Adds an error for the given attribute.
       #
       #   errors.add(:name, 'is not valid') if name == 'invalid'

@@ -31,27 +31,6 @@ module Sequel
   class Model
     OPTS = Sequel::OPTS
 
-    DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
-    Sequel::Deprecation.deprecate_constant(self, :DATASET_METHODS)
-    BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions, :use_after_commit_rollback]
-    Sequel::Deprecation.deprecate_constant(self, :BOOLEAN_SETTINGS)
-    BEFORE_HOOKS = [:before_create, :before_update, :before_save, :before_destroy, :before_validation]
-    Sequel::Deprecation.deprecate_constant(self, :BEFORE_HOOKS)
-    AFTER_HOOKS = [:after_create, :after_update, :after_save, :after_destroy, :after_validation, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]
-    Sequel::Deprecation.deprecate_constant(self, :AFTER_HOOKS)
-    AROUND_HOOKS = [:around_create, :around_update, :around_save, :around_destroy, :around_validation]
-    Sequel::Deprecation.deprecate_constant(self, :AROUND_HOOKS)
-    NORMAL_METHOD_NAME_REGEXP = /\A[A-Za-z_][A-Za-z0-9_]*\z/
-    Sequel::Deprecation.deprecate_constant(self, :NORMAL_METHOD_NAME_REGEXP)
-    SETTER_METHOD_REGEXP = /=\z/
-    Sequel::Deprecation.deprecate_constant(self, :SETTER_METHOD_REGEXP)
-    ANONYMOUS_MODEL_CLASSES = @Model_cache = {}
-    Sequel::Deprecation.deprecate_constant(self, :ANONYMOUS_MODEL_CLASSES)
-    ANONYMOUS_MODEL_CLASSES_MUTEX = Mutex.new
-    Sequel::Deprecation.deprecate_constant(self, :ANONYMOUS_MODEL_CLASSES_MUTEX)
-    INHERITED_INSTANCE_VARIABLES = { :@allowed_columns=>:dup, :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil, :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil, :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil, :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil, :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil, :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil, :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup, :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil, :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}
-    Sequel::Deprecation.deprecate_constant(self, :INHERITED_INSTANCE_VARIABLES)
-
     # Empty instance methods to create that the user can override to get hook/callback behavior.
     # Just like any other method defined by Sequel, if you override one of these, you should
     # call +super+ to get the default behavior (while empty by default, they can also be defined

@@ -9,26 +9,6 @@ module Sequel
     # them do.
     # ---------------------
 
-    SQL_BEGIN = 'BEGIN'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SQL_BEGIN)
-    SQL_COMMIT = 'COMMIT'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SQL_COMMIT)
-    SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SQL_RELEASE_SAVEPOINT)
-    SQL_ROLLBACK = 'ROLLBACK'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK)
-    SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TO SAVEPOINT autopoint_%d'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SQL_ROLLBACK_TO_SAVEPOINT)
-    SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :SQL_SAVEPOINT)
-    
-    TRANSACTION_BEGIN = 'Transaction.begin'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_BEGIN)
-    TRANSACTION_COMMIT = 'Transaction.commit'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_COMMIT)
-    TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
-    Sequel::Deprecation.deprecate_constant(self, :TRANSACTION_ROLLBACK)
-
     TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ UNCOMMITTED'.freeze,
       :committed=>'READ COMMITTED'.freeze,
       :repeatable=>'REPEATABLE READ'.freeze,

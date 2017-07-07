@@ -17,9 +17,6 @@ module Sequel
     module Derby
       # Instance methods for Derby Database objects accessed via JDBC.
       module DatabaseMethods
-        PRIMARY_KEY_INDEX_RE = /\Asql\d+\z/i.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PRIMARY_KEY_INDEX_RE)
-
         include ::Sequel::JDBC::Transactions
 
         # Derby doesn't support casting integer to varchar, only integer to char,
@@ -191,41 +188,6 @@ module Sequel
       
       # Dataset class for Derby datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        PAREN_CLOSE = ')'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-        PAREN_OPEN = '('.freeze
-        Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
-        OFFSET = " OFFSET ".freeze
-        Sequel::Deprecation.deprecate_constant(self, :OFFSET)
-        CAST_STRING_OPEN = "RTRIM(".freeze
-        Sequel::Deprecation.deprecate_constant(self, :CAST_STRING_OPEN)
-        BLOB_OPEN = "CAST(X'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :BLOB_OPEN)
-        BLOB_CLOSE = "' AS BLOB)".freeze
-        Sequel::Deprecation.deprecate_constant(self, :BLOB_CLOSE)
-        HSTAR = "H*".freeze
-        Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-        TIME_FORMAT = "'%H:%M:%S'".freeze
-        Sequel::Deprecation.deprecate_constant(self, :TIME_FORMAT)
-        DEFAULT_FROM = " FROM sysibm.sysdummy1".freeze
-        Sequel::Deprecation.deprecate_constant(self, :DEFAULT_FROM)
-        ROWS = " ROWS".freeze
-        Sequel::Deprecation.deprecate_constant(self, :ROWS)
-        FETCH_FIRST = " FETCH FIRST ".freeze
-        Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST)
-        ROWS_ONLY = " ROWS ONLY".freeze
-        Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
-        BOOL_TRUE_OLD = '(1 = 1)'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE_OLD)
-        BOOL_FALSE_OLD = '(1 = 0)'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE_OLD)
-        BOOL_TRUE = 'TRUE'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-        BOOL_FALSE = 'FALSE'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-        EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
-        Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
-
         # Derby doesn't support an expression between CASE and WHEN,
         # so remove conditions.
         def case_expression_sql_append(sql, ce)

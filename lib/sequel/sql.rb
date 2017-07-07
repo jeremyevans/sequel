@@ -1923,11 +1923,6 @@ module Sequel
     #
     # For a more detailed explanation, see the {Virtual Rows guide}[rdoc-ref:doc/virtual_rows.rdoc].
     class VirtualRow < BasicObject
-      QUESTION_MARK = LiteralString.new('?').freeze
-      Sequel::Deprecation.deprecate_constant(self, :QUESTION_MARK)
-      DOUBLE_UNDERSCORE = '__'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_UNDERSCORE)
-
       include OperatorBuilders
 
       %w'> < >= <='.each do |op|

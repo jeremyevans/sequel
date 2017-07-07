@@ -80,29 +80,6 @@ module Sequel
       # SEQUEL5: Remove
       RANGE_TYPES = {}
 
-      EMPTY = 'empty'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY)
-      EMPTY_STRING = ''.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
-      COMMA = ','.freeze
-      Sequel::Deprecation.deprecate_constant(self, :COMMA)
-      QUOTED_EMPTY_STRING = '""'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :QUOTED_EMPTY_STRING)
-      OPEN_PAREN = "(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :OPEN_PAREN)
-      CLOSE_PAREN = ")".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_PAREN)
-      OPEN_BRACKET = "[".freeze
-      Sequel::Deprecation.deprecate_constant(self, :OPEN_BRACKET)
-      CLOSE_BRACKET = "]".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CLOSE_BRACKET)
-      ESCAPE_RE = /("|,|\\|\[|\]|\(|\))/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
-      ESCAPE_REPLACE = '\\\\\1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACE)
-      CAST = '::'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST)
-
       # SEQUEL5: Remove
       def self.register(db_type, opts=OPTS, &block)
         Sequel::Deprecation.deprecate("Sequel::Postgres::PGRange.register", "Use Database#register_range_type on a Database instance using the pg_range extension") unless opts[:skip_deprecation_warning]
@@ -154,13 +131,6 @@ module Sequel
 
       # Creates callable objects that convert strings into PGRange instances.
       class Parser
-        PARSER = /\A(\[|\()("((?:\\"|[^"])*)"|[^"]*),("((?:\\"|[^"])*)"|[^"]*)(\]|\))\z/
-        Sequel::Deprecation.deprecate_constant(self, :PARSER)
-        REPLACE_RE = /\\(.)/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)
-        REPLACE_WITH = '\1'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :REPLACE_WITH)
-
         # The database range type for this parser (e.g. 'int4range'),
         # automatically setting the db_type for the returned PGRange instances.
         attr_reader :db_type

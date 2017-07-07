@@ -14,11 +14,6 @@ module Sequel
     end
 
     module DatabaseMethods
-      TEMPORARY = 'GLOBAL TEMPORARY '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :TEMPORARY)
-      AUTOINCREMENT = ''.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
-
       attr_accessor :autosequence
 
       def create_sequence(name, opts=OPTS)
@@ -321,31 +316,6 @@ module Sequel
     module DatasetMethods
       ROW_NUMBER_EXPRESSION = LiteralString.new('ROWNUM').freeze
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
-
-      SPACE = ' '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :SPACE)
-      APOS = "'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS)
-      APOS_RE = /'/.freeze
-      Sequel::Deprecation.deprecate_constant(self, :APOS_RE)
-      DOUBLE_APOS = "''".freeze
-      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_APOS)
-      FROM = ' FROM '.freeze
-      Sequel::Deprecation.deprecate_constant(self, :FROM)
-      TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_FORMAT)
-      TIMESTAMP_OFFSET_FORMAT = "%+03i:%02i".freeze
-      Sequel::Deprecation.deprecate_constant(self, :TIMESTAMP_OFFSET_FORMAT)
-      BOOL_FALSE = "'N'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      BOOL_TRUE = "'Y'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      HSTAR = "H*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-      DUAL = ' FROM DUAL'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :DUAL)
-      SKIP_LOCKED = " SKIP LOCKED".freeze
-      Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
 
       include(Module.new do
         Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order limit lock')

@@ -7,10 +7,6 @@ module Sequel
     # This methods generally execute SQL code on the database server.
     # ---------------------
 
-    STRING_DEFAULT_RE = /\A'(.*)'\z/
-    Sequel::Deprecation.deprecate_constant(self, :STRING_DEFAULT_RE)
-    CURRENT_TIMESTAMP_RE = /now|today|CURRENT|getdate|\ADate\(\)\z/i
-    Sequel::Deprecation.deprecate_constant(self, :CURRENT_TIMESTAMP_RE)
     COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime]#.freeze # SEQUEL5
     COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]#.freeze # SEQUEL5
 

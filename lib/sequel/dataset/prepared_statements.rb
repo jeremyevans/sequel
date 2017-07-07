@@ -91,9 +91,6 @@ module Sequel
     module PreparedStatementMethods
       Dataset.def_deprecated_opts_setter(self, :log_sql, :prepared_type, :prepared_args, :orig_dataset, :prepared_modify_values)
 
-      PLACEHOLDER_RE = /\A\$(.*)\z/
-      Sequel::Deprecation.deprecate_constant(self, :PLACEHOLDER_RE)
-      
       # Whether to log the full SQL query.  By default, just the prepared statement
       # name is generally logged on adapters that support native prepared statements.
       def log_sql

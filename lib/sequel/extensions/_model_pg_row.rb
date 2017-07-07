@@ -4,13 +4,6 @@ module Sequel
   module Plugins
     module PgRow
       module DatabaseMethods
-        ESCAPE_RE = /("|\\)/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
-        ESCAPE_REPLACEMENT = '\\\\\1'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACEMENT)
-        COMMA = ','
-        Sequel::Deprecation.deprecate_constant(self, :COMMA)
-
         # Handle Sequel::Model instances in bound variables.
         def bound_variable_arg(arg, conn)
           case arg

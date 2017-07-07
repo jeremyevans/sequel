@@ -20,13 +20,6 @@ module Sequel
     end
 
     module DatabaseMethods
-      AUTOINCREMENT = 'GENERATED ALWAYS AS IDENTITY'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :AUTOINCREMENT)
-      NOT_NULL      = ' NOT NULL'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NOT_NULL)
-      NULL          = ''.freeze
-      Sequel::Deprecation.deprecate_constant(self, :NULL)
-
       # Whether to use clob as the generic File type, false by default.
       #attr_accessor :use_clob_as_blob # SEQUEL5
 
@@ -303,35 +296,6 @@ module Sequel
       include EmulateOffsetWithRowNumber
 
       BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}#.freeze # SEQUEL5
-
-      PAREN_CLOSE = ')'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_CLOSE)
-      PAREN_OPEN = '('.freeze
-      Sequel::Deprecation.deprecate_constant(self, :PAREN_OPEN)
-      BOOL_TRUE = '1'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_TRUE)
-      BOOL_FALSE = '0'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :BOOL_FALSE)
-      CAST_STRING_OPEN = "RTRIM(CHAR(".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST_STRING_OPEN)
-      CAST_STRING_CLOSE = "))".freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST_STRING_CLOSE)
-      FETCH_FIRST_ROW_ONLY = " FETCH FIRST ROW ONLY".freeze
-      Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST_ROW_ONLY)
-      FETCH_FIRST = " FETCH FIRST ".freeze
-      Sequel::Deprecation.deprecate_constant(self, :FETCH_FIRST)
-      ROWS_ONLY = " ROWS ONLY".freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROWS_ONLY)
-      EMPTY_FROM_TABLE = ' FROM "SYSIBM"."SYSDUMMY1"'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :EMPTY_FROM_TABLE)
-      HSTAR = "H*".freeze
-      Sequel::Deprecation.deprecate_constant(self, :HSTAR)
-      BLOB_OPEN = "BLOB(X'".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BLOB_OPEN)
-      BLOB_CLOSE = "')".freeze
-      Sequel::Deprecation.deprecate_constant(self, :BLOB_CLOSE)
-      EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
-      Sequel::Deprecation.deprecate_constant(self, :EMULATED_FUNCTION_MAP)
 
       # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql_append(sql, expr, type)

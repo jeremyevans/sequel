@@ -93,11 +93,6 @@ Sequel.require 'adapters/shared/postgres'
 module Sequel
   module Postgres
     module PGRow
-      ROW = 'ROW'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :ROW)
-      CAST = '::'.freeze
-      Sequel::Deprecation.deprecate_constant(self, :CAST)
-
       # Class for row-valued/composite types that are treated as arrays. By default,
       # this is only used for generic PostgreSQL record types, as registered
       # types use HashRow by default.
@@ -225,25 +220,6 @@ module Sequel
       # will accept, it only handles the output format that
       # PostgreSQL uses.
       class Splitter < StringScanner
-        OPEN_PAREN = /\(/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :OPEN_PAREN)
-        CLOSE_PAREN = /\)/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :CLOSE_PAREN)
-        UNQUOTED_RE = /[^,)]*/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :UNQUOTED_RE)
-        SEP_RE = /[,)]/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :SEP_RE)
-        QUOTE_RE = /"/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :QUOTE_RE)
-        QUOTE_SEP_RE = /"[,)]/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :QUOTE_SEP_RE)
-        QUOTED_RE = /(\\.|""|[^"])*/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :QUOTED_RE)
-        REPLACE_RE = /\\(.)|"(")/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :REPLACE_RE)
-        REPLACE_WITH = '\1\2'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :REPLACE_WITH)
-
         # Split the stored string into an array of strings, handling
         # the different types of quoting.
         def parse
@@ -387,13 +363,6 @@ module Sequel
       end
 
       module DatabaseMethods
-        ESCAPE_RE = /("|\\)/.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
-        ESCAPE_REPLACEMENT = '\\\\\1'.freeze
-        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACEMENT)
-        COMMA = ','.freeze
-        Sequel::Deprecation.deprecate_constant(self, :COMMA)
-
         # A hash mapping row type keys (usually symbols), to option
         # hashes.  At the least, the values will contain the :parser
         # option for the Parser instance that the type will use.

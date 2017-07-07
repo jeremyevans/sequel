@@ -29,10 +29,6 @@ module Sequel
     #   # albums and the +updated_at+ column for tags
     #   Artist.plugin :touch, :associations=>[{:albums=>:updated_on}, :tags]
     module Touch
-      # The default column to update when touching
-      TOUCH_COLUMN_DEFAULT = :updated_at
-      Sequel::Deprecation.deprecate_constant(self, :TOUCH_COLUMN_DEFAULT)
-
       def self.apply(model, opts=OPTS)
         model.instance_variable_set(:@touched_associations, {})
       end
