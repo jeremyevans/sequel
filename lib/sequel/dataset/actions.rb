@@ -12,12 +12,11 @@ module Sequel
     # Action methods defined by Sequel that execute code on the database.
     ACTION_METHODS = (<<-METHS).split.map(&:to_sym).freeze
       << [] all as_hash avg count columns columns! delete each
-      empty? fetch_rows first first! get import insert interval last
-      map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
+      empty? fetch_rows first first! get import insert last
+      map max min multi_insert paged_each select_hash select_hash_groups select_map select_order_map
       single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
       where_all where_each where_single_value
     METHS
-    # SEQUEL5: Remove interval, range
 
     # The clone options to use when retriveing columns for a dataset.
     COLUMNS_CLONE_OPTIONS = {:distinct => nil, :limit => 1, :offset=>nil, :where=>nil, :having=>nil, :order=>nil, :row_proc=>nil, :graph=>nil, :eager_graph=>nil}.freeze
@@ -404,26 +403,6 @@ module Sequel
       end
     end
     
-    # Returns the interval between minimum and maximum values for the given 
-    # column/expression. Uses a virtual row block if no argument is given.
-    #
-    #   DB[:table].interval(:id) # SELECT (max(id) - min(id)) FROM table LIMIT 1
-    #   # => 6
-    #   DB[:table].interval{function(column)} # SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1
-    #   # => 7
-    def interval(column=Sequel.virtual_row(&Proc.new))
-      Sequel::Deprecation.deprecate("Sequel::Dataset#interval", "Use #max - #min, or use the sequel_4_dataset_methods extension")
-      if loader = cached_placeholder_literalizer(:_interval_loader) do |pl|
-          arg = pl.arg
-          aggregate_dataset.limit(1).select((SQL::Function.new(:max, arg) - SQL::Function.new(:min, arg)).as(:interval))
-        end
-
-        loader.get(column)
-      else
-        aggregate_dataset.get{(max(column) - min(column)).as(:interval)}
-      end
-    end
-
     # Reverses the order and then runs #first with the given arguments and block.  Note that this
     # will not necessarily give you the last record in the dataset,
     # unless you have an unambiguous order.  If there is not
@@ -618,30 +597,6 @@ module Sequel
       self
     end
 
-    # Returns a +Range+ instance made from the minimum and maximum values for the
-    # given column/expression.  Uses a virtual row block if no argument is given.
-    #
-    #   DB[:table].range(:id) # SELECT max(id) AS v1, min(id) AS v2 FROM table LIMIT 1
-    #   # => 1..10
-    #   DB[:table].interval{function(column)} # SELECT max(function(column)) AS v1, min(function(column)) AS v2 FROM table LIMIT 1
-    #   # => 0..7
-    def range(column=Sequel.virtual_row(&Proc.new))
-      Sequel::Deprecation.deprecate("Sequel::Dataset#range", "Use #min..#max, or use the sequel_4_dataset_methods extension")
-      r = if loader = cached_placeholder_literalizer(:_range_loader) do |pl|
-            arg = pl.arg
-            aggregate_dataset.limit(1).select(SQL::Function.new(:min, arg).as(:v1), SQL::Function.new(:max, arg).as(:v2))
-          end
-
-        loader.first(column)
-      else
-        aggregate_dataset.select{[min(column).as(v1), max(column).as(v2)]}.first
-      end
-
-      if r
-        (r[:v1]..r[:v2])
-      end
-    end
-    
     # Returns a hash with key_column values as keys and value_column values as
     # values.  Similar to as_hash, but only selects the columns given.  Like
     # as_hash, it accepts an optional :hash parameter, into which entries will

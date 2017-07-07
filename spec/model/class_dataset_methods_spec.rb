@@ -60,10 +60,6 @@ describe Sequel::Model, "class dataset methods"  do
     @c.insert.must_equal 2
     @db.sqls.must_equal ["INSERT INTO items DEFAULT VALUES"]
     @c.intersect(@d, :from_self=>false).sql.must_equal "SELECT * FROM items INTERSECT SELECT * FROM items"
-    deprecated do
-      @c.interval(:id).must_equal 1
-    end
-    @db.sqls.must_equal ["SELECT (max(id) - min(id)) AS interval FROM items LIMIT 1"]
     @c.join(@c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
     @c.join_table(:inner, @c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
     @c.last.must_equal @c.load(:id=>1)
@@ -148,10 +144,6 @@ describe Sequel::Model, "class dataset methods"  do
     sc.invert.sql.must_equal 'SELECT a FROM items WHERE NOT a GROUP BY a ORDER BY a LIMIT 2'
     sc.dataset = sc.dataset.with_fetch(:v1=>1, :v2=>2)
     @db.sqls
-    deprecated do
-      sc.range(:a).must_equal(1..2)
-    end
-    @db.sqls.must_equal ["SELECT min(a) AS v1, max(a) AS v2 FROM (SELECT a FROM items WHERE a GROUP BY a ORDER BY a LIMIT 2) AS t1 LIMIT 1"]
     sc.reverse.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a ORDER BY a DESC LIMIT 2'
     sc.reverse_order.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a ORDER BY a DESC LIMIT 2'
     sc.select_more(:a).sql.must_equal 'SELECT a, a FROM items WHERE a GROUP BY a ORDER BY a LIMIT 2'
