@@ -5,11 +5,6 @@ describe "DB#create_table" do
     @db = Sequel.mock
   end
   
-  deprecated "should support an CreateTableGenerator as second argument" do
-    @db.create_table(:cats, Sequel::Schema::CreateTableGenerator.new(@db){})
-    @db.sqls.must_equal ['CREATE TABLE cats ()']
-  end
-  
   it "should accept the table name" do
     @db.create_table(:cats) {}
     @db.sqls.must_equal ['CREATE TABLE cats ()']
@@ -1016,11 +1011,6 @@ end
 describe "DB#alter_table" do
   before do
     @db = Sequel.mock
-  end
-  
-  deprecated "should support an AlterTableGenerator as second argument" do
-    @db.alter_table(:cats, Sequel::Schema::AlterTableGenerator.new(@db){set_column_allow_null :score, false})
-    @db.sqls.must_equal ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
   end
   
   it "should allow adding not null constraint via set_column_allow_null with false argument" do
