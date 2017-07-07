@@ -237,10 +237,8 @@ describe "Sequel::Model.freeze" do
       model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
     end
     model.first_by_name('a').values.must_equal(:id=>1, :x=>1)
-    model.dataset.frozen?.must_equal false
 
     model.frozen?.must_equal false
-    model.dataset.frozen?.must_equal false
     model.db_schema.frozen?.must_equal false
     model.db_schema[:id].frozen?.must_equal false
     model.setter_methods.frozen?.must_equal false
@@ -493,8 +491,7 @@ describe Sequel::Model, ".require_valid_table = true" do
   deprecated "should assume nil value is the same as false" do
     c = Class.new(Sequel::Model)
     c.require_valid_table = nil
-    ds = @db.dataset
-    def ds.columns; raise Sequel::Error; end
+    ds = @db.dataset.with_extend{def columns; raise Sequel::Error; end}
     c.set_dataset(ds)
   end
 end

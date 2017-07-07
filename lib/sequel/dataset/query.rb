@@ -95,7 +95,7 @@ module Sequel
         unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
           c.clear_columns_cache
         end
-        c.freeze if frozen? # SEQUEL5: Remove if frozen?
+        c.freeze
         c
       end
     else
@@ -106,7 +106,7 @@ module Sequel
         unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
           c.clear_columns_cache
         end
-        c.freeze if frozen? # SEQUEL5: c.opts.freeze
+        c.opts.freeze
         c
       end
       # :nocov:
@@ -203,7 +203,7 @@ module Sequel
       def extension(*a)
         c = _clone(:freeze=>false)
         c.send(:_extension!, a)
-        c.freeze if frozen? # SEQUEL5: Remove if frozen?
+        c.freeze
         c
       end
     else
@@ -1076,7 +1076,7 @@ module Sequel
         c = _clone(:freeze=>false)
         c.extend(*mods) unless mods.empty?
         c.extend(DatasetModule.new(&block)) if block
-        c.freeze if frozen? # SEQUEL5: Remove if frozen?
+        c.freeze
         c
       end
     else

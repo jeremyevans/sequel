@@ -828,7 +828,7 @@ module Sequel
     # Only allow caching the select SQL if the dataset is frozen and hasn't
     # specifically been marked as not allowing SQL caching.
     def cache_sql?
-      frozen? && !@opts[:no_cache_sql] && !cache_get(:_no_cache_sql)
+      !@opts[:no_cache_sql] && !cache_get(:_no_cache_sql)
     end
 
     # Raise an InvalidOperation exception if deletion is not allowed

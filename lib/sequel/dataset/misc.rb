@@ -24,9 +24,9 @@ module Sequel
     # the Database#dataset method return an instance of that subclass.
     def initialize(db)
       @db = db
-      @opts = {} # OPTS # SEQUEL5
+      @opts = OPTS
       @cache = {}
-      # freeze # SEQUEL5
+      freeze
     end
 
     # Define a hash value such that datasets with the same class, DB, and opts
@@ -46,23 +46,8 @@ module Sequel
       self == o
     end
 
-    # SEQUEL5: Remove other dup methods
-    # def dup
-    #   self
-    # end
-    if TRUE_FREEZE
-      # Similar to #clone, but returns an unfrozen clone if the receiver is frozen.
-      def dup
-        _clone(:freeze=>false)
-      end
-    else
-      # :nocov:
-      def dup
-        c = clone
-        c.instance_variable_set(:@opts, Hash[c.opts])
-        c
-      end
-      # :nocov:
+    def dup
+      self
     end
     
     # Yield a dataset for each server in the connection pool that is tied to that server.
@@ -92,12 +77,11 @@ module Sequel
     else
       # :nocov:
       def freeze # :nodoc:
-        @opts.freeze # SEQUEL5: remove
         self
       end
 
       def frozen?  # :nodoc:
-        @opts.frozen? # SEQUEL5: true
+        true
       end
       # :nocov:
     end
@@ -295,7 +279,7 @@ module Sequel
     def cached_dataset(key)
       unless ds = cache_get(key)
         ds = yield
-        cache_set(key, ds) if frozen? # SEQUEL5: Remove if frozen?
+        cache_set(key, ds)
       end
 
       ds

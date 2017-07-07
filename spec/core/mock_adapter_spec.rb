@@ -310,7 +310,7 @@ describe "Sequel Mock Adapter" do
   it "should be able to set the columns to set in the dataset as an array of arrays of symbols" do
     db = Sequel.mock(:columns=>[[:a, :b], [:c, :d]])
     db[:t].columns.must_equal [:a, :b]
-    db[:t].columns.must_equal [:c, :d]
+    db[:x].columns.must_equal [:c, :d]
   end
 
   it "should be able to set the columns to set in the dataset as a proc" do
@@ -323,7 +323,7 @@ describe "Sequel Mock Adapter" do
     db = Sequel.mock
     db.columns = [[:a, :b], [:c, :d]]
     db[:t].columns.must_equal [:a, :b]
-    db[:t].columns.must_equal [:c, :d]
+    db[:x].columns.must_equal [:c, :d]
   end
 
   it "should raise Error if given an invalid columns" do

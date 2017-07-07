@@ -159,9 +159,7 @@ module Sequel
       @dataset_modules.freeze
       @schema_type_classes.freeze
       @loaded_extensions.freeze
-      # SEQUEL5: Frozen by default, remove this
-      @default_dataset.freeze
-      metadata_dataset.freeze
+      metadata_dataset
       super
     end
 

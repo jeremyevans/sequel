@@ -76,7 +76,7 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph_each should only include the columns selected with #set_graph_aliases and #add_graph_aliases, if called" do
-    @db.fetch = [nil, [{:x=>2,:y=>3}], nil, [{:x=>2}], [{:x=>2, :q=>18}]]
+    @db.fetch = [[{:x=>2,:y=>3}], [{:x=>2}], [{:x=>2, :q=>18}]]
 
     @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y]).all.must_equal [{:points=>{:x=>2}, :lines=>{:y=>3}}]
     ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x])
@@ -86,17 +86,17 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a third argument for each entry" do
-    @db.fetch = [nil, {:x=>2,:y=>3}]
+    @db.fetch = [{:x=>2,:y=>3}]
     @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, Sequel.function(:random)]).all.must_equal [{:points=>{:z1=>2}, :lines=>{:z2=>3}}]
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a single argument for each entry" do
-    @db.fetch = [nil, {:x=>2,:y=>3}]
+    @db.fetch = [{:x=>2,:y=>3}]
     @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines]).all.must_equal [{:points=>{:x=>2}, :lines=>{:y=>3}}]
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a symbol for each entry" do
-    @db.fetch = [nil, {:x=>2,:y=>3}]
+    @db.fetch = [{:x=>2,:y=>3}]
     @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines).all.must_equal [{:points=>{:x=>2}, :lines=>{:y=>3}}]
   end
 

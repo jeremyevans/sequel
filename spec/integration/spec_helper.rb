@@ -30,7 +30,6 @@ IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTI
 
 unless defined?(DB)
   DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])
-  DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
   DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 end
 
