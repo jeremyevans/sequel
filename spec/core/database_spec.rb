@@ -5,15 +5,10 @@ describe "A new Database" do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
   
-  deprecated "should allow dup/clone" do
-    @db.dup.must_be_kind_of @db.class
-    @db.clone.must_be_kind_of @db.class
-  end
-
   it "should not allow dup/clone" do
     proc{@db.dup}.must_raise Sequel::Error
     proc{@db.clone}.must_raise Sequel::Error
-  end if false # SEQUEL5
+  end
 
   it "should receive options" do
     @db.opts[1].must_equal 2
