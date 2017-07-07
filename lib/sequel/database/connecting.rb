@@ -15,16 +15,7 @@ module Sequel
     # could not be loaded.
     def self.adapter_class(scheme)
       return scheme if scheme.is_a?(Class)
-
-      if scheme.to_s.include?('-')
-        # :nocov:
-        Sequel::Deprecation.deprecate("Automatically converting '-' to '_' in adapter schemes", "Use '_' instead of '-' in the adapter scheme")
-        # :nocov:
-      end
-
-      scheme = scheme.to_s.gsub('-', '_').to_sym # SEQUEL5: Remove
-      # scheme = scheme.to_sym # SEQUEL5
-
+      scheme = scheme.to_sym
       load_adapter(scheme)
     end
 
