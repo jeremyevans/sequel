@@ -3,10 +3,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_array extension" do
   before(:all) do
     Sequel.extension :pg_array
-    @pg_types = Sequel::Postgres::PG__TYPES.dup # SEQUEL5: Remove
-  end
-  after(:all) do
-    Sequel::Postgres::PG__TYPES.replace(@pg_types) # SEQUEL5: Remove
   end
 
   before do
@@ -261,17 +257,6 @@ describe "pg_array extension" do
     @db.select(Sequel.pg_array([1], :integer).as(:col1)).sql.must_equal 'SELECT ARRAY[1]::integer[] AS col1'
   end
 
-  deprecated "should support registering custom array types" do
-    Sequel::Postgres::PGArray.register('foo')
-    @db.typecast_value(:foo_array, []).class.must_equal(Sequel::Postgres::PGArray)
-    @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foo_array]
-  end
-
-  deprecated "should raise error if register given convertor option and block" do
-    proc{Sequel::Postgres::PGArray.register('foo', :converter=>:to_s.to_proc, &:to_s)}.must_raise Sequel::Error
-  end
-
   it "should support registering custom array types" do
     @db.register_array_type('foo')
     @db.typecast_value(:foo_array, []).class.must_equal(Sequel::Postgres::PGArray)
@@ -299,20 +284,6 @@ describe "pg_array extension" do
   it "should support using an existing scaler conversion proc via the :scalar_oid option" do
     @db.register_array_type('foo', :oid=>1234, :scalar_oid=>16)
     @db.conversion_procs[1234].call('{t}').must_equal [true]
-  end
-
-  deprecated "should support using a given conversion procs hash via the :type_procs option" do
-    h = {16=>proc{|s| "!#{s}"}}
-    Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>16, :type_procs=>h)
-    h[1234].call('{t}').must_equal ["!t"]
-  end
-
-  deprecated "should support adding methods to the given module via the :typecast_methods_module option" do
-    m = Module.new
-    Sequel::Postgres::PGArray.register('foo15', :scalar_typecast=>:boolean, :typecast_methods_module=>m)
-    @db.typecast_value(:foo15_array, ['t']).must_equal ['t']
-    @db.extend(m)
-    @db.typecast_value(:foo15_array, ['t']).must_equal [true]
   end
 
   it "should not raise an error if using :scalar_oid option with unexisting scalar conversion proc" do
@@ -394,29 +365,13 @@ describe "pg_array extension" do
   end
 
   it "should set appropriate timestamp conversion procs when adding conversion procs" do
-    @db.fetch = [[{:oid=>2222, :typname=>'foo'}], [{:oid=>2222, :typarray=>2223, :typname=>'foo'}]]
+    @db.fetch = [[{:oid=>2222}], [{:oid=>2222, :typarray=>2223}]]
     @db.add_named_conversion_proc(:foo){|v| v*2}
     procs = @db.conversion_procs
     procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
     procs[2222].call('1').must_equal '11'
     procs[2223].call('{"2"}').must_equal ['22']
-  end
-
-  deprecated "should set appropriate timestamp conversion procs when resetting conversion procs when modifying PG_NAMED_TYPES" do
-    @pg_named_types = Sequel::Postgres::PG_NAMED_TYPES.dup
-    begin
-      Sequel::Postgres::PG_NAMED_TYPES[:foo] = proc{|v| v*2}
-      @db.fetch = [[{:oid=>2222, :typname=>'foo'}], [{:oid=>2222, :typarray=>2223, :typname=>'foo'}]]
-      @db.reset_conversion_procs
-      procs = @db.conversion_procs
-      procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
-      procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
-      procs[2222].call('1').must_equal '11'
-      procs[2223].call('{"2"}').must_equal ['22']
-    ensure
-      Sequel::Postgres::PG_NAMED_TYPES.replace(@pg_named_types)
-    end
   end
 
   it "should return correct results for Database#schema_type_class" do

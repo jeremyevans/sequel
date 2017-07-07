@@ -53,22 +53,7 @@ module Sequel
       end
     end.new#.freeze # SEQUEL5
 
-    # Type OIDs for string types used by PostgreSQL.  These types don't
-    # have conversion procs associated with them (since the data is
-    # already in the form of a string).
-    STRING_TYPES = [18, 19, 25, 1042, 1043] # SEQUEL5: Remove
-
-    # Hash with type name strings/symbols and callable values for converting PostgreSQL types.
-    # Non-builtin types that don't have fixed numbers should use this to register
-    # conversion procs.
-    PG_NAMED_TYPES = {} unless defined?(PG_NAMED_TYPES)
-    PG_NAMED__TYPES = PG_NAMED_TYPES
-    Sequel::Deprecation.deprecate_constant(self, :PG_NAMED_TYPES)
-
-    # Hash with integer keys and callable values for converting PostgreSQL types.
-    PG_TYPES = {} unless defined?(PG_TYPES)
-
-    #CONVERSION_PROCS = {} # SEQUEL5
+    CONVERSION_PROCS = {}
 
     {
       [16] => tt.method(:boolean),
@@ -81,14 +66,10 @@ module Sequel
       [1184, 1114] => ::Sequel.method(:database_to_application_timestamp),
     }.each do |k,v|
       k.each do |n|
-        PG_TYPES[n] = v
-        #CONVERSION_PROCS[n] = v # SEQUEL5
+        CONVERSION_PROCS[n] = v
       end
     end
-    PG__TYPES = PG_TYPES
-    Sequel::Deprecation.deprecate_constant(self, :PG_TYPES)
-
-    #CONVERSION_PROCS.freeze # SEQUEL5
+    CONVERSION_PROCS.freeze
 
     module MockAdapterDatabaseMethods
       def bound_variable_arg(arg, conn)
@@ -242,23 +223,15 @@ module Sequel
         conversion_procs[oid] = callable
       end
 
-      # Add a conversion proc for a named type.  This should be used 
-      # for types without fixed OIDs, which includes all types that
-      # are not included in a default PostgreSQL installation.  If 
-      # a block is given, it is used as the conversion proc, otherwise
-      # the conversion proc is looked up in the PG_NAMED_TYPES hash.
+      # Add a conversion proc for a named type, using the given block.
+      # This should be used for types without fixed OIDs, which includes all types that
+      # are not included in a default PostgreSQL installation.
       def add_named_conversion_proc(name, &block)
-        unless block
-          if block = PG_NAMED__TYPES[name]
-            Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each database you want to support the #{name} type")
-          end
+        name = name.to_s if name.is_a?(Symbol)
+        unless oid = from(:pg_type).where(:typtype=>['b', 'e'], :typname=>name.to_s).get(:oid)
+          raise Error, "No matching type in pg_type for #{name.inspect}"
         end
-        add_named_conversion_procs(conversion_procs, name=>block) # SEQUEL5: Remove
-        # SEQUEL5:
-        #unless oid = from(:pg_type).where(:typtype=>['b', 'e'], :typname=>name.to_s).get(:oid)
-        #  raise Error, "No matching type in pg_type for #{name.inspect}"
-        #end
-        #add_conversion_proc(oid, block) # SEQUEL5
+        add_conversion_proc(oid, block)
       end
 
       # Commit an existing prepared transaction with the given transaction
@@ -554,14 +527,6 @@ module Sequel
         run "REFRESH MATERIALIZED VIEW#{' CONCURRENTLY' if opts[:concurrently]} #{quote_schema_table(name)}"
       end
       
-      # SEQUEL5: Remove
-      def reset_conversion_procs
-        Sequel::Deprecation.deprecate('Database#reset_conversion_procs', 'There should no longer be a need to reset conversion procs')
-        @conversion_procs = get_conversion_procs
-        conversion_procs_updated
-        @conversion_procs
-      end
-
       # Reset the primary key sequence for the given table, basing it on the
       # maximum current value of the table's primary key.
       def reset_primary_key_sequence(table)
@@ -702,16 +667,6 @@ module Sequel
 
       private
 
-      # SEQUEL5: Remove
-      def add_named_conversion_procs(procs, named_procs)
-        unless (named_procs).empty?
-          convert_named_procs_to_procs(named_procs).each do |oid, pr|
-            procs[oid] ||= pr
-          end
-          conversion_procs_updated
-        end
-      end
-
       def alter_table_add_column_sql(table, op)
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
       end
@@ -849,30 +804,6 @@ module Sequel
         else
           super
         end
-      end
-
-      # SEQUEL5: Remove
-      def conversion_procs_updated
-        nil
-      end
-
-      # SEQUEL5: Remove
-      def convert_named_procs_to_procs(named_procs)
-        h = {}
-        from(:pg_type).where(:typtype=>['b', 'e'], :typname=>named_procs.keys.map(&:to_s)).select_map([:oid, :typname]).each do |oid, name|
-          h[oid.to_i] = named_procs[name.untaint.to_sym]
-        end
-        h
-      end
-
-      # SEQUEL5: Remove
-      def copy_conversion_procs(oids)
-        Sequel::Deprecation.deprecate("Database#copy_conversion_procs", "There is no reason to use this anymore")
-        procs = conversion_procs
-        oids.each do |oid|
-          procs[oid] = PG__TYPES[oid]
-        end
-        conversion_procs_updated
       end
 
       def database_specific_error_class_from_sqlstate(sqlstate)
@@ -1084,17 +1015,6 @@ module Sequel
         ds.where{{pg_namespace[:nspname]=>expr}}
       end
 
-      # SEQUEL5: Remove
-      def get_conversion_procs
-        procs = PG__TYPES.dup
-        procs[1184] = procs[1114] = method(:to_application_timestamp)
-        unless PG_NAMED__TYPES.empty?
-          Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each Database instance where you want to support the following type(s): #{PG_NAMED__TYPES.keys.join(', ')}")
-        end
-        add_named_conversion_procs(procs, PG_NAMED__TYPES)
-        procs
-      end
-
       # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
         cols = index[:columns]
@@ -1123,10 +1043,8 @@ module Sequel
         @primary_keys = {}
         @primary_key_sequences = {}
         @supported_types = {}
-        @conversion_procs = get_conversion_procs # SEQUEL5: Remove
-        conversion_procs_updated # SEQUEL5: Remove
-        # @conversion_procs = CONVERSION_PROCS.dup # SEQUEL5
-        # procs[1184] = procs[1114] = method(:to_application_timestamp) # SEQUEL5
+        procs = @conversion_procs = CONVERSION_PROCS.dup
+        procs[1184] = procs[1114] = method(:to_application_timestamp)
       end
 
       # Backbone of the tables and views support.

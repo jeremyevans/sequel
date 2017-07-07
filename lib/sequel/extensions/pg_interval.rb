@@ -181,15 +181,6 @@ module Sequel
         end
       end
     end
-
-    # SEQUEL5: Remove
-    PG__TYPES[1186] = lambda do |s|
-      Sequel::Deprecation.deprecate("Conversion proc for interval added globally by pg_interval extension", "Load the pg_interval extension into the Database instance")
-      Postgres::IntervalDatabaseMethods::PARSER.call(s)
-    end
-    if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('interval', :oid=>1187, :scalar_oid=>1186, :skip_deprecation_warning=>true)
-    end
   end
 
   Database.register_extension(:pg_interval, Postgres::IntervalDatabaseMethods)

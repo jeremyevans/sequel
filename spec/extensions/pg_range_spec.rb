@@ -4,10 +4,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_range extension" do
   before(:all) do
     Sequel.extension :pg_array, :pg_range
-    @pg_types = Sequel::Postgres::PG__TYPES.dup # SEQUEL5: Remove
-  end
-  after(:all) do
-    Sequel::Postgres::PG__TYPES.replace(@pg_types) # SEQUEL5: Remove
   end
 
   before do
@@ -19,26 +15,6 @@ describe "pg_range extension" do
       def quote_identifiers?; false end
     end
     @db.extension(:pg_array, :pg_range)
-  end
-
-  deprecated "should set up conversion procs correctly" do
-    cp = Sequel::Postgres::PG__TYPES
-    cp[3904].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int4range')
-    cp[3906].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'numrange')
-    cp[3908].call("[2011-01-02 10:20:30,2011-02-03 10:20:30)").must_equal @R.new(Time.local(2011, 1, 2, 10, 20, 30),Time.local(2011, 2, 3, 10, 20, 30), :exclude_begin=>false, :exclude_end=>true, :db_type=>'tsrange')
-    cp[3910].call("[2011-01-02 10:20:30,2011-02-03 10:20:30)").must_equal @R.new(Time.local(2011, 1, 2, 10, 20, 30),Time.local(2011, 2, 3, 10, 20, 30), :exclude_begin=>false, :exclude_end=>true, :db_type=>'tstzrange')
-    cp[3912].call("[2011-01-02,2011-02-03)").must_equal  @R.new(Date.new(2011, 1, 2),Date.new(2011, 2, 3), :exclude_begin=>false, :exclude_end=>true, :db_type=>'daterange')
-    cp[3926].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int8range')
-  end
-
-  deprecated "should set up conversion procs for arrays correctly" do
-    cp = Sequel::Postgres::PG__TYPES
-    cp[3905].call("{\"[1,2]\"}").must_equal [@R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int4range')]
-    cp[3907].call("{\"[1,2]\"}").must_equal [@R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'numrange')]
-    cp[3909].call("{\"[2011-01-02 10:20:30,2011-02-03 10:20:30)\"}").must_equal [@R.new(Time.local(2011, 1, 2, 10, 20, 30),Time.local(2011, 2, 3, 10, 20, 30), :exclude_begin=>false, :exclude_end=>true, :db_type=>'tsrange')]
-    cp[3911].call("{\"[2011-01-02 10:20:30,2011-02-03 10:20:30)\"}").must_equal [@R.new(Time.local(2011, 1, 2, 10, 20, 30),Time.local(2011, 2, 3, 10, 20, 30), :exclude_begin=>false, :exclude_end=>true, :db_type=>'tstzrange')]
-    cp[3913].call("{\"[2011-01-02,2011-02-03)\"}").must_equal [@R.new(Date.new(2011, 1, 2),Date.new(2011, 2, 3), :exclude_begin=>false, :exclude_end=>true, :db_type=>'daterange')]
-    cp[3927].call("{\"[1,2]\"}").must_equal [@R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int8range')]
   end
 
   it "should set up conversion procs correctly" do
@@ -169,50 +145,6 @@ describe "pg_range extension" do
     it "should raise errors for unhandled values" do
       proc{@db.typecast_value(:int4range, 1)}.must_raise(Sequel::InvalidValue)
     end
-  end
-
-  deprecated "should support registering custom range types" do
-    @R.register('foorange')
-    @db.typecast_value(:foorange, 1..2).must_be_kind_of(@R)
-    @db.fetch = [{:name=>'id', :db_type=>'foorange'}]
-    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foorange]
-  end
-
-  deprecated "should support using a block as a custom conversion proc given as block" do
-    @R.register('foo2range'){|s| (s*2).to_i}
-    @db.typecast_value(:foo2range, '[1,2]').must_be :==, (11..22)
-  end
-
-  deprecated "should support using a block as a custom conversion proc given as :converter option" do
-    @R.register('foo3range', :converter=>proc{|s| (s*2).to_i})
-    @db.typecast_value(:foo3range, '[1,2]').must_be :==, (11..22)
-  end
-
-  deprecated "should support using an existing scaler conversion proc via the :subtype_oid option" do
-    @R.register('foo4range', :subtype_oid=>16)
-    @db.typecast_value(:foo4range, '[t,f]').must_equal @R.new(true, false, :db_type=>'foo4range')
-  end
-
-  deprecated "should raise an error if using :subtype_oid option with unexisting scalar conversion proc" do
-    proc{@R.register('fooirange', :subtype_oid=>0)}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should raise an error if using :converter option and a block argument" do
-    proc{@R.register('fooirange', :converter=>proc{}){}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should raise an error if using :subtype_oid option and a block argument" do
-    proc{@R.register('fooirange', :subtype_oid=>16){}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should support registering custom types with :oid option" do
-    @R.register('foo5range', :oid=>331)
-    Sequel::Postgres::PG__TYPES[331].call('[1,3)').must_be_kind_of(@R)
-  end
-
-  deprecated "should not support registering custom range types on a per-Database basis for frozen databases" do
-    @db.freeze
-    proc{@db.register_range_type('banana', :oid=>7865){|s| s}}.must_raise RuntimeError, TypeError
   end
 
   it "should support registering custom range types" do
@@ -347,20 +279,6 @@ describe "pg_range extension" do
       @sp.call('["a",""]').must_equal @R.new("a", "")
       @sp.call('["",""]').must_equal @R.new("", "")
     end
-  end
-
-  deprecated "should set appropriate timestamp range conversion procs when resetting conversion procs" do
-    @db.reset_conversion_procs
-    procs = @db.conversion_procs
-    procs[3908].call('[2011-10-20 11:12:13,2011-10-20 11:12:14]').must_be :==, (Time.local(2011, 10, 20, 11, 12, 13)..(Time.local(2011, 10, 20, 11, 12, 14)))
-    procs[3910].call('[2011-10-20 11:12:13,2011-10-20 11:12:14]').must_be :==, (Time.local(2011, 10, 20, 11, 12, 13)..(Time.local(2011, 10, 20, 11, 12, 14)))
-  end
-
-  deprecated "should set appropriate timestamp range array conversion procs when resetting conversion procs" do
-    @db.reset_conversion_procs
-    procs = @db.conversion_procs
-    procs[3909].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').must_be :==, [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]
-    procs[3911].call('{"[2011-10-20 11:12:13,2011-10-20 11:12:14]"}').must_be :==, [Time.local(2011, 10, 20, 11, 12, 13)..Time.local(2011, 10, 20, 11, 12, 14)]
   end
 
   describe "a PGRange instance" do

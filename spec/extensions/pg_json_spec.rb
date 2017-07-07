@@ -17,18 +17,6 @@ describe "pg_json extension" do
     @db.extension(:pg_array, :pg_json)
   end
 
-  deprecated "should set up conversion procs correctly" do
-    cp = Sequel::Postgres::PG__TYPES
-    cp[114].call("{}").must_equal @hc.new({})
-    cp[3802].call("{}").must_equal @bhc.new({})
-  end
-
-  deprecated "should set up conversion procs for arrays correctly" do
-    cp = Sequel::Postgres::PG__TYPES
-    cp[199].call("{[]}").must_equal [@ac.new([])]
-    cp[3807].call("{[]}").must_equal [@bac.new([])]
-  end
-
   it "should set up conversion procs correctly" do
     cp = @db.conversion_procs
     cp[114].call("{}").must_equal @hc.new({})

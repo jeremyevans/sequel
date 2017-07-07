@@ -112,18 +112,6 @@ module Sequel
         end
       end
     end
-
-    # SEQUEL5: Remove
-    meth = IPAddr.method(:new)
-    PG__TYPES[869] = PG__TYPES[650] = lambda do |s|
-      Sequel::Deprecation.deprecate("Conversion proc for inet/cidr added globally by pg_inet extension", "Load the pg_inet extension into the Database instance")
-      IPAddr.new(s)
-    end
-    if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('inet', :oid=>1041, :scalar_oid=>869, :skip_deprecation_warning=>true)
-      PGArray.register('cidr', :oid=>651, :scalar_oid=>650, :skip_deprecation_warning=>true)
-      PGArray.register('macaddr', :oid=>1040, :skip_deprecation_warning=>true)
-    end
   end
 
   Database.register_extension(:pg_inet, Postgres::InetDatabaseMethods)

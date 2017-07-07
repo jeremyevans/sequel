@@ -15,11 +15,12 @@ def logger.method_missing(m, msg)
 end
 DB.loggers << logger
 
-DB.extension :pg_array, :pg_hstore, :pg_range, :pg_row, :pg_inet, :pg_json, :pg_enum
+DB.extension :pg_array, :pg_range, :pg_row, :pg_inet, :pg_json, :pg_enum
 begin
   DB.extension :pg_interval
 rescue LoadError
 end
+DB.extension :pg_hstore if DB.type_supported?('hstore')
 
 describe "PostgreSQL", '#create_table' do
   before do
@@ -1777,39 +1778,6 @@ if DB.adapter_scheme == :postgres
       @db[:foo].get(:bar).must_equal 'foo'.reverse
     end
   end
-
-  describe "Postgres::PG_NAMED_TYPES" do
-    before(:all) do
-      deprecated do
-        @db = DB
-        @cp = @db.conversion_procs.dup
-        @db.conversion_procs.delete(1013)
-        Sequel::Postgres::PG_NAMED_TYPES[:oidvector] = lambda{|v| v.reverse}
-        @db.reset_conversion_procs
-        @db.register_array_type('oidvector')
-      end
-    end
-    after(:all) do
-      deprecated do
-        Sequel::Postgres::PG_NAMED_TYPES.delete(:oidvector)
-        @db.conversion_procs.replace(@cp)
-        @db.drop_table?(:foo)
-        @db.drop_enum(:foo_enum) rescue nil
-      end
-    end
-
-    deprecated "should look up conversion procs by name" do
-      @db.create_table!(:foo){oidvector :bar}
-      @db[:foo].insert(Sequel.cast('21', :oidvector))
-      @db[:foo].get(:bar).must_equal '12'
-    end
-
-    deprecated "should handle array types of named types" do
-      @db.create_table!(:foo){column :bar, 'oidvector[]'}
-      @db[:foo].insert(Sequel.pg_array(['21'], :oidvector))
-      @db[:foo].get(:bar).must_equal ['12']
-    end
-  end
 end
 
 if uses_pg_or_jdbc && DB.server_version >= 90000
@@ -3385,9 +3353,6 @@ describe 'PostgreSQL interval types' do
     @db = DB
     @ds = @db[:items]
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
-  end
-  after(:all) do
-    Sequel::Postgres::PG__TYPES.delete(1186) # SEQUEL5: Remove
   end
   after do
     @db.drop_table?(:items)

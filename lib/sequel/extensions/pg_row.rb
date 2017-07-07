@@ -402,8 +402,6 @@ module Sequel
           super
         end
 
-        STRING_TYPES = [18, 19, 25, 1042, 1043].freeze
-
         # Register a new row type for the Database instance. db_type should be the type
         # symbol.  This parses the PostgreSQL system tables to get information the
         # composite type, and by default has the type return instances of a subclass
@@ -456,23 +454,7 @@ module Sequel
 
           # Using the conversion_procs, lookup converters for each member of the composite type
           parser_opts[:column_converters] = parser_opts[:column_oids].map do |oid|
-            # procs[oid] # SEQUEL5
-
-            # SEQUEL5: Remove
-            if pr = procs[oid]
-              pr
-            elsif !STRING_TYPES.include?(oid)
-              # It's not a string type, and it's possible a conversion proc for this
-              # oid will be added later, so do a runtime check for it.
-              lambda do |s|
-                if (pr = procs[oid])
-                  Sequel::Deprecation.deprecate("Calling conversion proc for subtype (oid: #{oid}) of composite type (oid: #{parser_opts[:oid]}) not added until after composite type registration", "Register subtype conversion procs before registering composite type")
-                  pr.call(s)
-                else
-                  s
-                end
-              end
-            end
+            procs[oid]
           end
 
           # Setup the converter and typecaster
@@ -502,19 +484,7 @@ module Sequel
             private meth
           end
 
-          conversion_procs_updated # SEQUEL5: Remove
           nil
-        end
-
-        # SEQUEL5: Remove
-        def reset_conversion_procs
-          procs = super
-
-          row_types.values.each do |opts|
-            register_row_type(opts[:type], opts)
-          end
-
-          procs
         end
 
         # Handle typecasting of the given object to the given database type.
@@ -570,16 +540,6 @@ module Sequel
           end
         end
       end
-    end
-
-    # SEQUEL5: Remove
-    parser = PGRow::Parser.new(:converter=>PGRow::ArrayRow)
-    PG__TYPES[2249] = lambda do |s|
-      Sequel::Deprecation.deprecate("Conversion proc for record added globally by pg_row extension", "Load the pg_row extension into the Database instance")
-      parser.call(s)
-    end
-    if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('record', :oid=>2287, :scalar_oid=>2249, :skip_deprecation_warning=>true)
     end
   end
 

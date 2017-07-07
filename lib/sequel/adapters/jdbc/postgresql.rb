@@ -135,12 +135,6 @@ module Sequel
 
         private
         
-        # SEQUEL5: Remove
-        def conversion_procs_updated
-          super
-          Sequel.synchronize{@oid_convertor_map = {}}
-        end
-
         DATABASE_ERROR_CLASSES = [NativeException].freeze
         def database_error_classes
           DATABASE_ERROR_CLASSES

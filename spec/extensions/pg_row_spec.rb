@@ -9,16 +9,6 @@ describe "pg_row extension" do
     @db.sqls
   end
 
-  deprecated "should parse record objects as arrays" do
-    a = Sequel::Postgres::PG__TYPES[2249].call("(a,b,c)")
-    a.class.must_equal(@m::ArrayRow)
-    a.to_a.must_be_kind_of(Array)
-    a[0].must_equal 'a'
-    a.must_equal %w'a b c'
-    a.db_type.must_be_nil
-    @db.literal(a).must_equal "ROW('a', 'b', 'c')"
-  end
-
   it "should parse record objects as arrays" do
     a = @db.conversion_procs[2249].call("(a,b,c)")
     a.class.must_equal(@m::ArrayRow)
@@ -143,30 +133,6 @@ describe "pg_row extension" do
     p.converter.must_equal Array
     p.typecaster.must_equal Hash
     p.column_converters.must_equal [Array]
-  end
-
-  deprecated "should reload registered row types when reseting conversion procs" do
-    db = Sequel.mock(:host=>'postgres')
-    db.extend_datasets{def quote_identifiers?; false end}
-    db.extension(:pg_row)
-    db.conversion_procs[4] = proc{|s| s.to_i}
-    db.conversion_procs[5] = proc{|s| s * 2}
-    db.sqls
-    db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
-    db.register_row_type(:foo)
-    db.sqls.must_equal ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
-      "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
-
-    begin
-      pgnt = Sequel::Postgres::PG_NAMED_TYPES.dup
-      Sequel::Postgres::PG_NAMED_TYPES.clear
-      db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
-      db.reset_conversion_procs
-      db.sqls.must_equal ["SELECT pg_type.oid, typrelid, typarray FROM pg_type WHERE ((typtype = 'c') AND (typname = 'foo')) LIMIT 1",
-        "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
-    ensure
-      Sequel::Postgres::PG_NAMED_TYPES.replace pgnt
-    end
   end
 
   it "should handle ArrayRows and HashRows in bound variables" do
@@ -300,15 +266,6 @@ describe "pg_row extension" do
     @db.typecast_value(:pg_row_foo, %w'1 b').must_equal(:bar=>1, :baz=>'bb')
     @db.typecast_value(:pg_row_foo, :bar=>'1', :baz=>'b').must_equal(:bar=>1, :baz=>'bb')
     @db.typecast_value(:pg_row_foo, 'bar'=>'1', 'baz'=>'b').must_equal(:bar=>1, :baz=>'bb')
-  end
-
-  deprecated "should handle conversion procs that aren't added until later" do
-    @db.conversion_procs[5] = proc{|s| s * 2}
-    @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
-    c = proc{|h| [h]}
-    @db.register_row_type(:foo, :converter=>c)
-    @db.conversion_procs[4] = proc{|s| s.to_i}
-    @db.conversion_procs[1].call('(1,b)').must_equal [{:bar=>1, :baz=>'bb'}]
   end
 
   it "should handle nil values when converting columns" do

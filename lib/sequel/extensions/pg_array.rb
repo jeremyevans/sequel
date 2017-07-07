@@ -79,61 +79,6 @@ module Sequel
     class PGArray < DelegateClass(Array)
       include Sequel::SQL::AliasMethods
 
-      # SEQUEL5: Remove
-      ARRAY_TYPES = {}
-
-      # SEQUEL5: Remove
-      def self.register(db_type, opts=OPTS, &block)
-        Sequel::Deprecation.deprecate("Sequel::Postgres::PGArray.register", "Use Database#register_array_type on a Database instance using the pg_array extension") unless opts[:skip_deprecation_warning]
-
-        db_type = db_type.to_s
-        type = (opts[:type_symbol] || db_type).to_sym
-        type_procs = opts[:type_procs] || PG__TYPES
-        mod = opts[:typecast_methods_module] || DatabaseMethods
-        typecast_method_map = opts[:typecast_method_map] || ARRAY_TYPES
-
-        if converter = opts[:converter]
-          raise Error, "can't provide both a block and :converter option to register" if block
-        else
-          converter = block
-        end
-
-        if soid = opts[:scalar_oid]
-          raise Error, "can't provide both a converter and :scalar_oid option to register" if converter 
-          converter = type_procs[soid]
-        end
-
-        array_type = (opts[:array_type] || db_type).to_s.dup.freeze
-        creator = Creator.new(array_type, converter)
-
-        typecast_method_map[db_type] = :"#{type}_array"
-
-        define_array_typecast_method(mod, type, creator, opts.fetch(:scalar_typecast, type))
-
-        if oid = opts[:oid]
-          if opts[:skip_deprecation_warning]
-            def creator.call(s)
-              Sequel::Deprecation.deprecate("Conversion proc for #{type}[] added globally by pg_array or other pg_* extension", "Load the appropriate pg_* extension(s) into the Database instance")
-              super
-            end
-          end
-          type_procs[oid] = creator
-        end
-
-        nil
-      end
-
-      # SEQUEL5: Remove
-      def self.define_array_typecast_method(mod, type, creator, scalar_typecast)
-        mod.class_eval do
-          meth = :"typecast_value_#{type}_array"
-          scalar_typecast_method = :"typecast_value_#{scalar_typecast}"
-          define_method(meth){|v| typecast_value_pg_array(v, creator, scalar_typecast_method)}
-          private meth
-        end
-      end
-      private_class_method :define_array_typecast_method
-
       module DatabaseMethods
         BLOB_RANGE = 1...-1
 
@@ -143,8 +88,8 @@ module Sequel
           db.instance_eval do
             @pg_array_schema_types ||= {}
             procs = conversion_procs
-            add_conversion_proc(1115, Creator.new("timestamp without time zone", procs[1114]))
-            add_conversion_proc(1185, Creator.new("timestamp with time zone", procs[1184]))
+            register_array_type('timestamp without time zone', :oid=>1115, :scalar_oid=>1114, :type_symbol=>:datetime)
+            register_array_type('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime)
 
             register_array_type('text', :oid=>1009, :scalar_oid=>25, :type_symbol=>:string)
             register_array_type('integer', :oid=>1007, :scalar_oid=>23)
@@ -182,6 +127,15 @@ module Sequel
               @schema_type_classes[v] = PGArray
             end
           end
+        end
+
+        def add_named_conversion_proc(name, &block)
+          ret = super
+          name = name.to_s if name.is_a?(Symbol)
+          from(:pg_type).where(:typname=>name).select_map([:oid, :typarray]).each do |scalar_oid, array_oid|
+            register_array_type(name, :oid=>array_oid.to_i, :scalar_oid=>scalar_oid.to_i)
+          end
+          ret
         end
 
         # Handle arrays in bound variables
@@ -224,9 +178,6 @@ module Sequel
         #
         # If a block is given, it is treated as the :converter option.
         def register_array_type(db_type, opts=OPTS, &block)
-          # Only for convert_named_procs_to_procs usage
-          type_procs = opts[:type_procs] || conversion_procs # SEQUEL5: Remove
-
           oid = opts[:oid]
           soid = opts[:scalar_oid]
 
@@ -250,13 +201,12 @@ module Sequel
 
           if soid
             raise Error, "can't provide both a converter and :scalar_oid option to register" if has_converter 
-            converter = type_procs[soid] # SEQUEL5: conversion_procs[soid]
+            converter = conversion_procs[soid]
           end
 
           array_type = (opts[:array_type] || db_type).to_s.dup.freeze
           creator = Creator.new(array_type, converter)
-          type_procs[oid] = creator # SEQUEL5: Remove
-          #add_conversion_proc(oid, creator) # SEQUEL5
+          add_conversion_proc(oid, creator)
 
           typecast_method_map[db_type] = :"#{type}_array"
 
@@ -268,13 +218,7 @@ module Sequel
           end
 
           @schema_type_classes[:"#{type}_array"] = PGArray
-          conversion_procs_updated # SEQUEL5: Remove
           nil
-        end
-
-        # SEQUEL5: Remove
-        def schema_type_class(type)
-          super || (ARRAY_TYPES.each_value{|v| return PGArray if type == v}; nil)
         end
 
         private
@@ -295,32 +239,11 @@ module Sequel
           end
         end
 
-        # Automatically handle array types for the given named types. 
-        def convert_named_procs_to_procs(named_procs)
-          h = super
-          unless h.empty?
-            from(:pg_type).where(:oid=>h.keys).select_map([:typname, :oid, :typarray]).each do |name, scalar_oid, array_oid|
-              register_array_type(name, :type_procs=>h, :oid=>array_oid.to_i, :scalar_oid=>scalar_oid.to_i)
-            end
-          end
-          h
-        end
-
-        # SEQUEL5: Remove
-        def get_conversion_procs
-          procs = super
-
-          procs[1115] = Creator.new("timestamp without time zone", procs[1114])
-          procs[1185] = Creator.new("timestamp with time zone", procs[1184])
-
-          procs
-        end
-
         # Look into both the current database's array schema types and the global
         # array schema types to get the type symbol for the given database type
         # string.
         def pg_array_schema_type(type)
-          @pg_array_schema_types[type] || ARRAY_TYPES[type] # SEQUEL5: Remove || ARRAY_TYPES[type] 
+          @pg_array_schema_types[type]
         end
 
         # Make the column type detection handle registered array types.
@@ -551,36 +474,6 @@ module Sequel
         end
         sql << ']'
       end
-
-      # SEQUEL5: Remove
-      register('text', :oid=>1009, :scalar_oid=>25, :type_symbol=>:string, :skip_deprecation_warning=>true)
-      register('integer', :oid=>1007, :scalar_oid=>23, :skip_deprecation_warning=>true)
-      register('bigint', :oid=>1016, :scalar_oid=>20, :scalar_typecast=>:integer, :skip_deprecation_warning=>true)
-      register('numeric', :oid=>1231, :scalar_oid=>1700, :type_symbol=>:decimal, :skip_deprecation_warning=>true)
-      register('double precision', :oid=>1022, :scalar_oid=>701, :type_symbol=>:float, :skip_deprecation_warning=>true)
-      register('boolean', :oid=>1000, :scalar_oid=>16, :skip_deprecation_warning=>true)
-      register('bytea', :oid=>1001, :scalar_oid=>17, :type_symbol=>:blob, :skip_deprecation_warning=>true)
-      register('date', :oid=>1182, :scalar_oid=>1082, :skip_deprecation_warning=>true)
-      register('time without time zone', :oid=>1183, :scalar_oid=>1083, :type_symbol=>:time, :skip_deprecation_warning=>true)
-      register('timestamp without time zone', :oid=>1115, :scalar_oid=>1114, :type_symbol=>:datetime, :skip_deprecation_warning=>true)
-      register('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone, :scalar_typecast=>:time, :skip_deprecation_warning=>true)
-      register('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime, :skip_deprecation_warning=>true)
-      register('smallint', :oid=>1005, :scalar_oid=>21, :scalar_typecast=>:integer, :skip_deprecation_warning=>true)
-      register('oid', :oid=>1028, :scalar_oid=>26, :scalar_typecast=>:integer, :skip_deprecation_warning=>true)
-      register('real', :oid=>1021, :scalar_oid=>700, :scalar_typecast=>:float, :skip_deprecation_warning=>true)
-      register('character', :oid=>1014, :array_type=>:text, :scalar_typecast=>:string, :skip_deprecation_warning=>true)
-      register('character varying', :oid=>1015, :scalar_typecast=>:string, :type_symbol=>:varchar, :skip_deprecation_warning=>true)
-      register('xml', :oid=>143, :scalar_oid=>142, :skip_deprecation_warning=>true)
-      register('money', :oid=>791, :scalar_oid=>790, :skip_deprecation_warning=>true)
-      register('bit', :oid=>1561, :scalar_oid=>1560, :skip_deprecation_warning=>true)
-      register('bit varying', :oid=>1563, :scalar_oid=>1562, :type_symbol=>:varbit, :skip_deprecation_warning=>true)
-      register('uuid', :oid=>2951, :scalar_oid=>2950, :skip_deprecation_warning=>true)
-      register('xid', :oid=>1011, :scalar_oid=>28, :skip_deprecation_warning=>true)
-      register('cid', :oid=>1012, :scalar_oid=>29, :skip_deprecation_warning=>true)
-      register('name', :oid=>1003, :scalar_oid=>19, :skip_deprecation_warning=>true)
-      register('tid', :oid=>1010, :scalar_oid=>27, :skip_deprecation_warning=>true)
-      register('int2vector', :oid=>1006, :scalar_oid=>22, :skip_deprecation_warning=>true)
-      register('oidvector', :oid=>1013, :scalar_oid=>30, :skip_deprecation_warning=>true)
     end
   end
 

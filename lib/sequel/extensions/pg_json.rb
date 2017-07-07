@@ -255,20 +255,6 @@ module Sequel
         end
       end
     end
-
-    # SEQUEL5: Remove
-    PG__TYPES[114] = lambda do |s|
-      Sequel::Deprecation.deprecate("Conversion proc for json added globally by pg_json extension", "Load the pg_json extension into the Database instance")
-      JSONDatabaseMethods.db_parse_json(s)
-    end
-    PG__TYPES[3802] = lambda do |s|
-      Sequel::Deprecation.deprecate("Conversion proc for jsonb added globally by pg_json extension", "Load the pg_json extension into the Database instance")
-      JSONDatabaseMethods.db_parse_jsonb(s)
-    end
-    if defined?(PGArray) && PGArray.respond_to?(:register)
-      PGArray.register('json', :oid=>199, :scalar_oid=>114, :skip_deprecation_warning=>true)
-      PGArray.register('jsonb', :oid=>3807, :scalar_oid=>3802, :skip_deprecation_warning=>true)
-    end
   end
 
   module SQL::Builders

@@ -39,11 +39,6 @@ describe "pg_hstore extension" do
     @db.conversion_procs[9999].call('"a"=>"b"').must_equal('a'=>'b')
   end
 
-  deprecated "should reregister conversion proc when resetting conversion procs" do
-    @db.reset_conversion_procs
-    @db.conversion_procs[9999].call('"a"=>"b"').must_equal('a'=>'b')
-  end
-
   it "should have Sequel.hstore method for creating HStore instances" do
     Sequel.hstore({}).class.must_equal(@c)
   end
