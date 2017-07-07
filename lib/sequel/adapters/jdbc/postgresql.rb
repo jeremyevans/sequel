@@ -13,20 +13,6 @@ module Sequel
       end
     end
 
-    # SEQUEL5: Remove
-    class Type_Convertor
-      def RubyPGArray(r, i)
-        if v = r.getArray(i)
-          v.array.to_ary
-        end
-      end 
-      def RubyPGHstore(r, i)
-        if v = r.getObject(i)
-          v.to_hash
-        end
-      end 
-    end
-
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via JDBC.
     module Postgres

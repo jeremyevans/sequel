@@ -14,22 +14,6 @@ module Sequel
       end
     end
 
-    # SEQUEL5: Remove
-    class Type_Convertor
-      JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
-
-      def OracleDecimal(r, i)
-        if v = r.getBigDecimal(i)
-          i = v.long_value
-          if v == JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i)
-            i
-          else
-            BigDecimal.new(v.to_string)
-          end
-        end
-      end 
-    end
-
     # Database and Dataset support for Oracle databases accessed via JDBC.
     module Oracle
       JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)

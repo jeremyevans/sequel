@@ -14,15 +14,6 @@ module Sequel
       end
     end
 
-    # SEQUEL5: Remove
-    class Type_Convertor
-      def MSSQLRubyTime(r, i)
-        if v = r.getString(i)
-          Sequel.string_to_time("#{v}")
-        end
-      end
-    end
-
     # Database and Dataset instance methods for SQLServer specific
     # support via JDBC.
     module SQLServer

@@ -83,8 +83,7 @@ module Sequel
         end
       end
 
-      INSTANCE = new
-      o = INSTANCE
+      o = new
       MAP = Hash.new(o.method(:Object))
       types = Java::JavaSQL::Types
 
@@ -126,13 +125,8 @@ module Sequel
 
       MAP.freeze
       BASIC_MAP.freeze
-      INSTANCE.freeze
-      # freeze # SEQUEL5
+      freeze
     end
-
-    # SEQUEL5: Remove
-    Type_Convertor = TypeConvertor
-    Sequel::Deprecation.deprecate_constant(self, :TypeConvertor)
 
     # JDBC Databases offer a fairly uniform interface that does not change
     # much based on the sub adapter.
@@ -665,8 +659,8 @@ module Sequel
       # that runs queries works correctly.  This cannot be overriding in subadapters,
       def setup_type_convertor_map_early
         # SEQUEL5: Change back to TypeConvertor
-        @type_convertor_map = Type_Convertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>method(:timestamp_convert))
-        @basic_type_convertor_map = Type_Convertor::BASIC_MAP.dup
+        @type_convertor_map = TypeConvertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>method(:timestamp_convert))
+        @basic_type_convertor_map = TypeConvertor::BASIC_MAP.dup
       end
 
       # Yield a new statement object, and ensure that it is closed before returning.

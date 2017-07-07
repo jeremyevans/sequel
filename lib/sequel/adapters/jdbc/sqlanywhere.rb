@@ -28,15 +28,6 @@ module Sequel
       end
     end
 
-    # SEQUEL5: Remove
-    class Type_Convertor
-      def SqlAnywhereBoolean(r, i)
-        if v = Short(r, i)
-          v != 0
-        end
-      end
-    end
-
     module SqlAnywhere
       def self.SqlAnywhereBoolean(r, i)
         v = r.getShort(i)

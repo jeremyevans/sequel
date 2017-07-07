@@ -35,17 +35,6 @@ module Sequel
       end
     end
 
-    # SEQUEL5: Remove
-    class Type_Convertor
-      def DB2Clob(r, i)
-        if v = r.getClob(i)
-          v = v.getSubString(1, v.length)
-          v = Sequel::SQL::Blob.new(v) if ::Sequel::DB2::use_clob_as_blob
-          v
-        end
-      end
-    end
-
     # Database and Dataset instance methods for DB2 specific
     # support via JDBC.
     module DB2
