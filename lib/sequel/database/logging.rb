@@ -34,13 +34,6 @@ module Sequel
 
     # Yield to the block, logging any errors at error level to all loggers,
     # and all other queries with the duration at warn or info level.
-    def log_yield(sql, args=nil, &block)
-      Sequel::Deprecation.deprecate("Sequel::Database#log_yield", "Update the adapter to use Sequel::Database#log_connection_yield")
-      log_connection_yield(sql, nil, args, &block)
-    end
-
-    # Yield to the block, logging any errors at error level to all loggers,
-    # and all other queries with the duration at warn or info level.
     def log_connection_yield(sql, conn, args=nil)
       return yield if @loggers.empty?
       sql = "#{connection_info(conn) if conn && log_connection_info}#{sql}#{"; #{args.inspect}" if args}"
