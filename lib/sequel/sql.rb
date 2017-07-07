@@ -1891,12 +1891,6 @@ module Sequel
         freeze
       end
 
-      # Return a literal string created with the given string.
-      def `(s)
-        Sequel::Deprecation.deprecate("Using Sequel#VirtualRow#` to create a literal SQL fragment", "Use Sequel.lit instead")
-        Sequel::LiteralString.new(s)
-      end
-
       include(Module.new do
         # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
         # on arguments and whether a block is provided.  Does not currently call the block.

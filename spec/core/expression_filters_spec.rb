@@ -766,11 +766,6 @@ describe Sequel::SQL::VirtualRow do
     @d.l{|o| o.<=(1, :b)}.must_equal '(1 <= "b")'
     @d.l{|o| o.>=(1, :b)}.must_equal '(1 >= "b")'
   end
-
-  deprecated "should have have ` produce literal strings" do
-    @d.l{a > `some SQL`}.must_equal '("a" > some SQL)'
-    @d.l{|o| o.a > o.`('some SQL')}.must_equal '("a" > some SQL)' #`
-  end
 end
 
 describe "Sequel core extension replacements" do
