@@ -1907,64 +1907,6 @@ describe "Database#remove_servers" do
   end
 end
 
-describe "Database#each_server with do/jdbc adapter connection string without :adapter option" do
-  deprecated "should yield a separate database object for each server" do
-    require 'sequel/adapters/mock'
-    klass = Class.new(Sequel::Database)
-    def klass.adapter_class(v)
-      raise unless v == :jdbc
-      Sequel::Mock::Database
-    end
-    @db = klass.connect('jdbc:blah:', :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
-
-    hosts = []
-    @db.each_server do |db|
-      db.must_be_kind_of(Sequel::Database)
-      db.wont_equal @db
-      db.opts[:adapter_class].must_equal Sequel::Mock::Database
-      db.opts[:database].must_equal 2
-      hosts << db.opts[:host]
-    end
-    hosts.sort.must_equal [1, 3]
-  end
-
-  deprecated "should raise if not given a block" do
-    proc{Sequel.mock.each_server}.must_raise(Sequel::Error)
-  end
-end
-
-describe "Database#each_server" do
-  before do
-    @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
-  end
-
-  deprecated "should yield a separate database object for each server" do
-    hosts = []
-    @db.each_server do |db|
-      db.must_be_kind_of(Sequel::Database)
-      db.wont_equal @db
-      db.opts[:adapter].must_equal :mock
-      db.opts[:database].must_equal 2
-      hosts << db.opts[:host]
-    end
-    hosts.sort.must_equal [1, 3, 4]
-  end
-
-  deprecated "should disconnect and remove entry from Sequel::DATABASES after use" do
-    dbs = []
-    dcs = []
-    @db.each_server do |db|
-      dbs << db
-      Sequel::DATABASES.must_include(db)
-      meta_def(db, :disconnect){dcs << db}
-    end
-    dbs.each do |db|
-      Sequel::DATABASES.wont_include(db)
-    end
-    dbs.must_equal dcs
-  end
-end
-  
 describe "Database#raise_error" do
   before do
     @db = Sequel.mock
