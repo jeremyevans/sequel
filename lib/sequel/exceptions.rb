@@ -113,8 +113,4 @@ module Sequel
   # and won't reraise it (unless a reraise is requested).
   Rollback = Class.new(Error)
   ).name
-
-  # SEQUEL5: Remove
-  (UnbindDuplicate = Class.new(Error)).name
-  Sequel::Deprecation.deprecate_constant(self, :UnbindDuplicate)
 end

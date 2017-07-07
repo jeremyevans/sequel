@@ -915,23 +915,6 @@ module Sequel
       end
     end
 
-    # Unbind bound variables from this dataset's filter and return an array of two
-    # objects.  The first object is a modified dataset where the filter has been
-    # replaced with one that uses bound variable placeholders.  The second object
-    # is the hash of unbound variables.  You can then prepare and execute (or just
-    # call) the dataset with the bound variables to get results.
-    #
-    #   ds, bv = DB[:items].where(:a=>1).unbind
-    #   ds # SELECT * FROM items WHERE (a = $a)
-    #   bv #  {:a => 1}
-    #   ds.call(:select, bv)
-    def unbind
-      Sequel::Deprecation.deprecate("Dataset#unbind", "Switch to using placeholders manually instead of unbinding them")
-      u = Unbinder.new
-      ds = clone(:where=>u.transform(opts[:where]), :join=>u.transform(opts[:join]))
-      [ds, u.binds]
-    end
-
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
     # 
     #   DB[:items].group(:a).having(:a=>1).where(:b).unfiltered
