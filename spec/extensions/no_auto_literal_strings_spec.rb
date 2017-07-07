@@ -10,10 +10,6 @@ describe "no_auto_literal_strings extension" do
     proc{@ds.having("a")}.must_raise Sequel::Error
     proc{@ds.filter("a")}.must_raise Sequel::Error
     proc{@ds.exclude_having("a")}.must_raise Sequel::Error
-    deprecated do
-      proc{@ds.exclude_where("a")}.must_raise Sequel::Error
-      proc{@ds.and("a")}.must_raise Sequel::Error
-    end
     proc{@ds.where(:a).or("a")}.must_raise Sequel::Error
     proc{@ds.first("a")}.must_raise Sequel::Error
     proc{@ds.order(:a).last("a")}.must_raise Sequel::Error
@@ -29,10 +25,6 @@ describe "no_auto_literal_strings extension" do
     @ds.having(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t HAVING (a)'
     @ds.filter(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t WHERE (a)'
     @ds.exclude_having(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t HAVING NOT (a)'
-    deprecated do
-      @ds.exclude_where(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t WHERE NOT (a)'
-      @ds.and(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t WHERE (a)'
-    end
     @ds.where(:a).or(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t WHERE (a OR (a))'
     @ds.first(Sequel.lit("a"))
     @ds.order(:a).last(Sequel.lit("a"))

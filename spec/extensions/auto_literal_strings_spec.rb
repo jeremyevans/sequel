@@ -112,17 +112,6 @@ describe "Dataset#exclude" do
   end
 end
 
-describe "Dataset#and" do
-  before do
-    @dataset = Sequel.mock.dataset.from(:test).extension(:auto_literal_strings)
-    @d1 = @dataset.where(:x => 1)
-  end
-
-  deprecated "should accept string filters with placeholders" do
-    @d1.and('y > ?', 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (y > 2))'
-  end
-end
-  
 describe "Dataset#or" do
   before do
     @dataset = Sequel.mock.dataset.from(:test).extension(:auto_literal_strings)

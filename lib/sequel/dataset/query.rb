@@ -37,14 +37,13 @@ module Sequel
     
     # Methods that return modified datasets
     QUERY_METHODS = ((<<-METHS).split.map(&:to_sym) + JOIN_METHODS).freeze
-      add_graph_aliases and distinct except exclude exclude_having exclude_where
+      add_graph_aliases distinct except exclude exclude_having
       filter for_update from from_self graph grep group group_and_count group_append group_by having intersect invert
       limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
       reverse reverse_order select select_all select_append select_group select_more server
       set_graph_aliases unfiltered ungraphed ungrouped union
       unlimited unordered where with with_recursive with_sql
     METHS
-    # SEQUEL5: Remove and, exclude_where
 
     # Register an extension callback for Dataset objects.  ext should be the
     # extension name symbol, and mod should either be a Module that the
@@ -67,12 +66,6 @@ module Sequel
       Sequel.synchronize{EXTENSIONS[ext] = block}
     end
 
-    # Alias for where.
-    def and(*cond, &block)
-      Sequel::Deprecation.deprecate("Sequel::Dataset#and", "Use #where, or use the sequel_4_dataset_methods extension")
-      where(*cond, &block)
-    end
-    
     # On Ruby 2.4+, use clone(:freeze=>false) to create clones, because
     # we use true freezing in that case, and we need to modify the opts
     # in the frozen copy.
@@ -188,12 +181,6 @@ module Sequel
     # to SQL 3-valued boolean logic.
     def exclude_having(*cond, &block)
       add_filter(:having, cond, true, &block)
-    end
-
-    # Alias for exclude.
-    def exclude_where(*cond, &block)
-      Sequel::Deprecation.deprecate("Sequel::Dataset#exclude_where", "Use #exclude, or use the sequel_4_dataset_methods extension")
-      exclude(*cond, &block)
     end
 
     if TRUE_FREEZE

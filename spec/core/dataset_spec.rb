@@ -759,42 +759,6 @@ describe "Dataset#or" do
   end
 end
 
-describe "Dataset#and" do
-  before do
-    @dataset = Sequel.mock.dataset.from(:test)
-    @d1 = @dataset.where(:x => 1)
-  end
-  
-  deprecated "should add a WHERE filter if none exists" do
-    @dataset.and(:a => 1).sql.must_equal 'SELECT * FROM test WHERE (a = 1)'
-  end
-  
-  deprecated "should add an expression to the where clause" do
-    @d1.and(:y => 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (y = 2))'
-  end
-  
-  deprecated "should accept string filters with placeholders" do
-    @d1.and('y > ?', 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (y > 2))'
-  end
-
-  deprecated "should accept placeholder literal string filters" do
-    @d1.and(Sequel.lit('y > ?', 2)).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (y > 2))'
-  end
-
-  deprecated "should accept expression filters" do
-    @d1.and(Sequel.expr(:yy) > 3).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (yy > 3))'
-  end
-      
-  deprecated "should accept blocks passed to filter" do
-    @d1.and{yy > 3}.sql.must_equal 'SELECT * FROM test WHERE ((x = 1) AND (yy > 3))'
-  end
-  
-  deprecated "should correctly add parens to give predictable results" do
-    @d1.or(:y => 2).and(:z => 3).sql.must_equal 'SELECT * FROM test WHERE (((x = 1) OR (y = 2)) AND (z = 3))'
-    @d1.and(:y => 2).or(:z => 3).sql.must_equal 'SELECT * FROM test WHERE (((x = 1) AND (y = 2)) OR (z = 3))'
-  end
-end
-
 describe "Dataset#exclude" do
   before do
     @dataset = Sequel.mock.dataset.from(:test)
@@ -840,24 +804,8 @@ describe "Dataset#exclude" do
   end
 end
 
-describe "Dataset#exclude_where" do
-  before do
-    @dataset = Sequel.mock.dataset.from(:test)
-  end
-
-  deprecated "should correctly negate the expression and add it to the where clause" do
-    @dataset.exclude_where(:region=>'Asia').sql.must_equal "SELECT * FROM test WHERE (region != 'Asia')"
-    @dataset.exclude_where(:region=>'Asia').exclude_where(:region=>'NA').sql.must_equal "SELECT * FROM test WHERE ((region != 'Asia') AND (region != 'NA'))"
-  end
-
-  deprecated "should affect the where clause even if having clause is already used" do
-    @dataset.group_and_count(:name).having{count > 2}.exclude_where(:region=>'Asia').sql.
-      must_equal "SELECT name, count(*) AS count FROM test WHERE (region != 'Asia') GROUP BY name HAVING (count > 2)"
-  end
-end
-
 describe "Dataset#exclude_having" do
-  deprecated "should correctly negate the expression and add it to the having clause" do
+  it "should correctly negate the expression and add it to the having clause" do
     Sequel.mock.dataset.from(:test).exclude_having{count > 2}.exclude_having{count < 0}.sql.must_equal "SELECT * FROM test HAVING ((count <= 2) AND (count >= 0))"
   end
 end

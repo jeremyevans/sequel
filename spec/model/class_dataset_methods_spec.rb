@@ -29,9 +29,6 @@ describe Sequel::Model, "class dataset methods"  do
     @c.except(@d, :from_self=>false).sql.must_equal "SELECT * FROM items EXCEPT SELECT * FROM items"
     @c.exclude(:a).sql.must_equal "SELECT * FROM items WHERE NOT a"
     @c.exclude_having(:a).sql.must_equal "SELECT * FROM items HAVING NOT a"
-    deprecated do
-      @c.exclude_where(:a).sql.must_equal "SELECT * FROM items WHERE NOT a"
-    end
     @c.fetch_rows("S"){|r| r.must_equal(:id=>1)}
     @db.sqls.must_equal ["S"]
     @c.filter(:a).sql.must_equal "SELECT * FROM items WHERE a"
