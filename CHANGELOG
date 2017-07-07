@@ -1,5 +1,7 @@
 === master
 
+* Make Sequel::Error#cause use #wrapped_exception if it exists on ruby 2.1+ (jeremyevans)
+
 * Make Dataset#where_all, #where_each, #where_single_value core dataset methods instead of just model dataset methods (jeremyevans)
 
 * Make Database#extend_datasets and Dataset#with_extend now use a Dataset::DatasetModule instance if given a block (jeremyevans)

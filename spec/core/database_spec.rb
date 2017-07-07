@@ -2381,6 +2381,31 @@ describe "Database#typecast_value" do
     end
   end
 
+  it "should have an underlying exception class available at cause" do
+    begin
+      @db.typecast_value(:date, 'a')
+      true.must_equal false
+    rescue Sequel::InvalidValue => e
+      e.cause.must_be_kind_of(ArgumentError)
+    end
+  end if RUBY_VERSION >= '2.1'
+
+  it "should have an underlying exception class available at cause when using nested exceptions" do
+    begin
+      begin
+        raise ArgumentError
+      rescue => e1
+        begin
+          raise RuntimeError
+        rescue => e2
+          @db.send(:raise_error, e1)
+        end
+      end
+    rescue Sequel::DatabaseError => e
+      e.cause.must_be_kind_of(ArgumentError)
+    end
+  end if RUBY_VERSION >= '2.1'
+
   it "should include underlying exception class in #inspect" do
     begin
       @db.typecast_value(:date, 'a')

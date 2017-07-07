@@ -7,6 +7,14 @@ module Sequel
     # If this exception wraps an underlying exception, the underlying
     # exception is held here.
     attr_accessor :wrapped_exception
+
+    if RUBY_VERSION >= '2.1'
+      # Returned the wrapped exception if one exists, otherwise use
+      # ruby's default behavior.
+      def cause
+        wrapped_exception || super
+      end
+    end
   end  
     
   (
