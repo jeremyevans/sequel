@@ -90,15 +90,8 @@ module Sequel
   # in the dataset are qualified with a given table name.
   class Qualifier < ASTTransformer
     # Set the table used to qualify unqualified columns
-    def initialize(table, unused=nil)
-      if unused
-        # :nocov:
-        Sequel::Deprecation.deprecate("Passing two arguments to Sequel::Qualifier.new", 'Pass only the second argument specifying the table used for qualification')
-        @table = unused
-        # :nocov:
-      else
-        @table = table
-      end
+    def initialize(table)
+      @table = table
     end
 
     private
