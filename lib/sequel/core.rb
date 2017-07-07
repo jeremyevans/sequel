@@ -147,39 +147,6 @@ module Sequel
     extensions.each{|e| Kernel.require "sequel/extensions/#{e}"}
   end
   
-  # Set the method to call on identifiers going into the database.  This affects
-  # the literalization of identifiers by calling this method on them before they are input.
-  # Sequel upcases identifiers in all SQL strings for most databases, so to turn that off:
-  #
-  #   Sequel.identifier_input_method = nil
-  # 
-  # to downcase instead:
-  #
-  #   Sequel.identifier_input_method = :downcase
-  #
-  # Other String instance methods work as well.
-  def self.identifier_input_method=(value)
-    # SEQUEL5: Remove
-    Database.identifier_input_method = value
-  end
-
-  # Set the method to call on identifiers coming out of the database.  This affects
-  # the literalization of identifiers by calling this method on them when they are
-  # retrieved from the database.  Sequel downcases identifiers retrieved for most
-  # databases, so to turn that off:
-  #
-  #   Sequel.identifier_output_method = nil
-  # 
-  # to upcase instead:
-  #
-  #   Sequel.identifier_output_method = :upcase
-  #
-  # Other String instance methods work as well.
-  def self.identifier_output_method=(value)
-    # SEQUEL5: Remove
-    Database.identifier_output_method = value
-  end
-
   # The exception classed raised if there is an error parsing JSON.
   # This can be overridden to use an alternative json implementation.
   def self.json_parser_error_class
@@ -196,15 +163,6 @@ module Sequel
   # This can be overridden to use an alternative json implementation.
   def self.parse_json(json)
     JSON.parse(json, :create_additions=>false)
-  end
-
-  # Set whether to quote identifiers for all databases by default. By default,
-  # Sequel quotes identifiers in all SQL strings, so to turn that off:
-  #
-  #   Sequel.quote_identifiers = false
-  def self.quote_identifiers=(value)
-    # SEQUEL5: Remove
-    Database.quote_identifiers = value
   end
 
   # Convert each item in the array to the correct type, handling multi-dimensional

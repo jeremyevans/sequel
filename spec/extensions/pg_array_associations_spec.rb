@@ -748,6 +748,9 @@ end
 describe "Sequel::Model.finalize_associations" do
   before do
     @db = Sequel.mock(:host=>'postgres', :numrows=>1)
+    @db.extend_datasets do
+      def quote_identifiers?; false end
+    end
     class ::Foo < Sequel::Model(@db)
       plugin :pg_array_associations
       many_to_pg_array :items

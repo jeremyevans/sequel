@@ -7,38 +7,6 @@ module Sequel
     # This methods change the default behavior of this database's datasets.
     # ---------------------
 
-    # SEQUEL5: Remove
-    @identifier_input_method = nil
-    @identifier_output_method = nil
-    @quote_identifiers = nil
-    class << self
-      # The identifier input method to use by default for all databases (default: adapter default)
-      attr_reader :identifier_input_method
-
-      # The identifier output method to use by default for all databases (default: adapter default)
-      attr_reader :identifier_output_method
-
-      # Whether to quote identifiers (columns and tables) by default for all databases (default: adapter default)
-      attr_reader :quote_identifiers
-    end
-
-    # Change the default identifier input method to use for all databases,
-    def self.identifier_input_method=(v)
-      Sequel::Deprecation.deprecate("Sequel.identifier_input_method= and Sequel::Database.identifier_input_method=", "Call Sequel::Database#identifier_input_method= instead")
-      @identifier_input_method = v.nil? ? false : v
-    end
-
-    # Change the default identifier output method to use for all databases,
-    def self.identifier_output_method=(v)
-      Sequel::Deprecation.deprecate("Sequel.identifier_output_method= and Sequel::Database.identifier_output_method=", "Call Sequel::Database#identifier_output_method= instead")
-      @identifier_output_method = v.nil? ? false : v
-    end
-
-    def self.quote_identifiers=(v)
-      Sequel::Deprecation.deprecate("Sequel.quote_identifiers= and Sequel::Database.quote_identifiers=", "Call Sequel::Database#quote_identifiers= instead")
-      @quote_identifiers = v
-    end
-
     # The class to use for creating datasets.  Should respond to
     # new with the Database argument as the first argument, and
     # an optional options hash.

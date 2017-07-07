@@ -45,8 +45,7 @@ IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTI
 unless defined?(DB)
   env_var = "SEQUEL_#{SEQUEL_ADAPTER_TEST.to_s.upcase}_URL"
   env_var = ENV.has_key?(env_var) ? env_var : 'SEQUEL_INTEGRATION_URL'
-  # SEQUEL5: Remove :identifier_mangling=>false
-  DB = Sequel.connect(ENV[env_var], :identifier_mangling=>false)
+  DB = Sequel.connect(ENV[env_var])
   DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
   DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 end

@@ -41,14 +41,6 @@ class Minitest::HooksSpec
   end
 end
 
-# SEQUEL5: Remove
-output = Sequel::Deprecation.output
-Sequel::Deprecation.output = nil
-Sequel.quote_identifiers = false
-Sequel.identifier_input_method = nil
-Sequel.identifier_output_method = nil
-Sequel::Deprecation.output = output
-
 class << Sequel::Model
   attr_writer :db_schema
   alias orig_columns columns

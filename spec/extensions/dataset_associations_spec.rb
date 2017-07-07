@@ -4,6 +4,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
   before do
     @db = Sequel.mock(:host=>'postgres')
     @db.extend_datasets do
+      def quote_identifiers?; false end
       def supports_window_functions?; true; end
       def supports_distinct_on?; true; end
     end

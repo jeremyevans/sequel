@@ -5149,7 +5149,7 @@ describe "Dataset extensions" do
     end
   end
   before do
-    @ds = Sequel.mock(:identifier_mangling=>false).dataset
+    @ds = Sequel.mock.dataset
   end
 
   it "should be able to register an extension with a module Database#extension extend the module" do
@@ -5190,7 +5190,7 @@ describe "Dataset extensions" do
 
   it "should register a Database extension for modifying all datasets when registering with a module" do
     Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
-    Sequel.mock(:identifier_mangling=>false).extension(:foo).dataset.a.must_equal 1
+    Sequel.mock.extension(:foo).dataset.a.must_equal 1
   end
 
   it "should raise an Error if registering with both a module and a block" do
@@ -5567,7 +5567,7 @@ end
 
 describe "Dataset#output_identifier" do
   it "should handle empty identifiers and uppercase identifiers" do
-    meth = Sequel::Database.new(:identifier_mangling=>false).dataset.method(:output_identifier)
+    meth = Sequel::Database.new.dataset.method(:output_identifier)
     meth.call('').must_equal :untitled
     meth.call('A').must_equal :a
   end

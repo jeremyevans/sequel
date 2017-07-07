@@ -96,7 +96,6 @@ module Sequel
     #
     # Accepts the following options:
     # :default_string_column_size :: The default size of string columns, 255 by default.
-    # :identifier_mangling :: Whether to support non-default identifier mangling for the current database.
     # :logger :: A specific logger to use.
     # :loggers :: An array of loggers to use.
     # :name :: A name to use for the Database object.
@@ -138,10 +137,6 @@ module Sequel
 
       reset_default_dataset
       adapter_initialize
-      if typecast_value_boolean(@opts.fetch(:identifier_mangling, true))
-        # SEQUEL5: Remove
-        extension(:_deprecated_identifier_mangling)
-      end
 
       unless typecast_value_boolean(@opts[:keep_reference]) == false
         Sequel.synchronize{::Sequel::DATABASES.push(self)}

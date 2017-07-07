@@ -29,8 +29,7 @@ require './spec/guards_helper'
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 
 unless defined?(DB)
-  # SEQUEL5: Remove :identifier_mangling=>false
-  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'], :identifier_mangling=>false)
+  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])
   DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
   DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 end

@@ -4,13 +4,6 @@ describe "A new Database" do
   before do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
-  after do
-    deprecated do
-      Sequel.quote_identifiers = false
-      Sequel.identifier_input_method = nil
-      Sequel.identifier_output_method = nil
-    end
-  end
   
   deprecated "should support DatasetClass constant" do
     dbc = Class.new(Sequel::Database)
@@ -2669,7 +2662,7 @@ describe "Database extensions" do
     end
   end
   before do
-    @db = Sequel.mock(:identifier_mangling=>false)
+    @db = Sequel.mock
   end
   after do
     Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
@@ -2724,8 +2717,8 @@ describe "Database extensions" do
     Sequel::Database.extension(:foo, :bar)
     @db.wont_respond_to(:a)
     @db.wont_respond_to(:b)
-    Sequel.mock(:identifier_mangling=>false).a.must_equal 1
-    Sequel.mock(:identifier_mangling=>false).b.must_equal 2
+    Sequel.mock.a.must_equal 1
+    Sequel.mock.b.must_equal 2
   end
 end
 
@@ -2816,6 +2809,6 @@ end
 
 describe "Dataset identifier folding" do
   it "should fold to uppercase by default, as per SQL" do
-    Sequel::Database.new(:identifier_mangling=>false).send(:folds_unquoted_identifiers_to_uppercase?).must_equal true
+    Sequel::Database.new.send(:folds_unquoted_identifiers_to_uppercase?).must_equal true
   end
 end

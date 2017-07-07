@@ -120,10 +120,9 @@ module Sequel
       # Reset the identifier mangling options.  Overrides any already set on
       # the instance.  Only for internal use by shared adapters.
       def reset_identifier_mangling
-        # SEQUEL5: Stop checking Database.*
-        @quote_identifiers = @opts.fetch(:quote_identifiers){(qi = Database.quote_identifiers).nil? ? quote_identifiers_default : qi}
-        @identifier_input_method = @opts.fetch(:identifier_input_method){(iim = Database.identifier_input_method).nil? ? identifier_input_method_default : (iim if iim)}
-        @identifier_output_method = @opts.fetch(:identifier_output_method){(iom = Database.identifier_output_method).nil? ? identifier_output_method_default : (iom if iom)}
+        @quote_identifiers = @opts.fetch(:quote_identifiers, quote_identifiers_default)
+        @identifier_input_method = @opts.fetch(:identifier_input_method, identifier_input_method_default)
+        @identifier_output_method = @opts.fetch(:identifier_output_method, identifier_output_method_default)
         reset_default_dataset
       end
     end
