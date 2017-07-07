@@ -33,7 +33,7 @@ describe "pg_array extension" do
   it "should preserve encoding when parsing text arrays" do
     c = @converter[1009]
     c.call("{a,\u00E4}".encode('ISO-8859-1')).map(&:encoding).must_equal [Encoding::ISO_8859_1, Encoding::ISO_8859_1]
-  end if RUBY_VERSION >= '1.9'
+  end
 
   it "should parse multi-dimensional text arrays" do
     c = @converter[1009]

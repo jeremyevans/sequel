@@ -10,20 +10,9 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   require 'sequel'
 end
 
-# SEQUEL5: Remove
-output = Sequel::Deprecation.output
-Sequel::Deprecation.output = nil
-Sequel.quote_identifiers = false
-Sequel.identifier_input_method = nil
-Sequel.identifier_output_method = nil
-Sequel::Deprecation.output = output
-
 Regexp.send(:include, Sequel::SQL::StringMethods)
 String.send(:include, Sequel::SQL::StringMethods)
 Sequel.extension :core_extensions
-if RUBY_VERSION < '1.9.0'
-  Sequel.extension :ruby18_symbol_extensions
-end
 Sequel.extension :symbol_aref
 Sequel.extension :virtual_row_method_block
 
@@ -53,45 +42,6 @@ describe "Core extensions" do
     end
   end
   
-  if RUBY_VERSION < '1.9.0'
-    it "should not allow inequality operations on true, false, or nil" do
-      @d.lit(:x > 1).must_equal "(x > 1)"
-      @d.lit(:x < true).must_equal "(x < 't')"
-      @d.lit(:x >= false).must_equal "(x >= 'f')"
-      @d.lit(:x <= nil).must_equal "(x <= NULL)"
-    end
-
-    it "should not allow inequality operations on boolean complex expressions" do
-      @d.lit(:x > (:y > 5)).must_equal "(x > (y > 5))"
-      @d.lit(:x < (:y < 5)).must_equal "(x < (y < 5))"
-      @d.lit(:x >= (:y >= 5)).must_equal "(x >= (y >= 5))"
-      @d.lit(:x <= (:y <= 5)).must_equal "(x <= (y <= 5))"
-      @d.lit(:x > {:y => nil}).must_equal "(x > (y IS NULL))"
-      @d.lit(:x < ~{:y => nil}).must_equal "(x < (y IS NOT NULL))"
-      @d.lit(:x >= {:y => 5}).must_equal "(x >= (y = 5))"
-      @d.lit(:x <= ~{:y => 5}).must_equal "(x <= (y != 5))"
-      @d.lit(:x >= {:y => [1,2,3]}).must_equal "(x >= (y IN (1, 2, 3)))"
-      @d.lit(:x <= ~{:y => [1,2,3]}).must_equal "(x <= (y NOT IN (1, 2, 3)))"
-    end
-    
-    it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
-      @d.l(:x > 100).must_equal '(x > 100)'
-      @d.l(:x < 100.01).must_equal '(x < 100.01)'
-      @d.l(:x >= 100000000000000000000000000000000000).must_equal '(x >= 100000000000000000000000000000000000)'
-      @d.l(:x <= 100).must_equal '(x <= 100)'
-    end
-    
-    it "should support negation of >, <, >=, and <= via Symbol#~" do
-      @d.l(~(:x > 100)).must_equal '(x <= 100)'
-      @d.l(~(:x < 100.01)).must_equal '(x >= 100.01)'
-      @d.l(~(:x >= 100000000000000000000000000000000000)).must_equal '(x < 100000000000000000000000000000000000)'
-      @d.l(~(:x <= 100)).must_equal '(x > 100)'
-    end
-    
-    it "should support double negation via ~" do
-      @d.l(~~(:x > 100)).must_equal '(x > 100)'
-    end
-  end
   it "should support NOT via Symbol#~" do
     @d.l(~:x).must_equal 'NOT x'
   end
@@ -504,17 +454,6 @@ describe "Blob" do
   end
 end
 
-if RUBY_VERSION < '1.9.0'
-  describe "Symbol#[]" do
-    it "should format an SQL Function" do
-      ds = Sequel.mock.dataset
-      ds.literal(:xyz[]).must_equal 'xyz()'
-      ds.literal(:xyz[1]).must_equal 'xyz(1)'
-      ds.literal(:xyz[1, 2, :abc[3]]).must_equal 'xyz(1, 2, abc(3))'
-    end
-  end
-end
-
 describe "Symbol#*" do
   before do
     @ds = Sequel.mock.dataset
@@ -740,11 +679,7 @@ describe "symbol_aref extensions" do
   end
 
   it "should not affect other arguments to Symbol#[]" do
-    if RUBY_VERSION >= '1.9'
-      :x[0].must_equal "x"
-    else
-      @db.literal(:x[0]).must_equal "x(0)"
-    end
+    :x[0].must_equal "x"
   end
 end
 

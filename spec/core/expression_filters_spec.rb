@@ -110,28 +110,26 @@ describe "Blockless Ruby Filters" do
     @d.l{(x + y) =~ /blah/}.must_equal '((x + y) ~ \'blah\')'
   end
 
-  if RUBY_VERSION >= '1.9'
-    it "should support != and similar inversions via !~ method" do
-      @d.l{x !~ 100}.must_equal '(x != 100)'
-      @d.l{x !~ 'a'}.must_equal '(x != \'a\')'
-      @d.l{x !~ true}.must_equal '(x IS NOT TRUE)'
-      @d.l{x !~ false}.must_equal '(x IS NOT FALSE)'
-      @d.l{x !~ nil}.must_equal '(x IS NOT NULL)'
-      @d.l{x !~ (1...5)}.must_equal '((x < 1) OR (x >= 5))'
-      @d.l{x !~ [1,2,3]}.must_equal '(x NOT IN (1, 2, 3))'
+  it "should support != and similar inversions via !~ method" do
+    @d.l{x !~ 100}.must_equal '(x != 100)'
+    @d.l{x !~ 'a'}.must_equal '(x != \'a\')'
+    @d.l{x !~ true}.must_equal '(x IS NOT TRUE)'
+    @d.l{x !~ false}.must_equal '(x IS NOT FALSE)'
+    @d.l{x !~ nil}.must_equal '(x IS NOT NULL)'
+    @d.l{x !~ (1...5)}.must_equal '((x < 1) OR (x >= 5))'
+    @d.l{x !~ [1,2,3]}.must_equal '(x NOT IN (1, 2, 3))'
 
-      @d.l{(x + y) !~ 100}.must_equal '((x + y) != 100)'
-      @d.l{(x + y) !~ 'a'}.must_equal '((x + y) != \'a\')'
-      @d.l{(x + y) !~ true}.must_equal '((x + y) IS NOT TRUE)'
-      @d.l{(x + y) !~ false}.must_equal '((x + y) IS NOT FALSE)'
-      @d.l{(x + y) !~ nil}.must_equal '((x + y) IS NOT NULL)'
-      @d.l{(x + y) !~ (1...5)}.must_equal '(((x + y) < 1) OR ((x + y) >= 5))'
-      @d.l{(x + y) !~ [1,2,3]}.must_equal '((x + y) NOT IN (1, 2, 3))'
+    @d.l{(x + y) !~ 100}.must_equal '((x + y) != 100)'
+    @d.l{(x + y) !~ 'a'}.must_equal '((x + y) != \'a\')'
+    @d.l{(x + y) !~ true}.must_equal '((x + y) IS NOT TRUE)'
+    @d.l{(x + y) !~ false}.must_equal '((x + y) IS NOT FALSE)'
+    @d.l{(x + y) !~ nil}.must_equal '((x + y) IS NOT NULL)'
+    @d.l{(x + y) !~ (1...5)}.must_equal '(((x + y) < 1) OR ((x + y) >= 5))'
+    @d.l{(x + y) !~ [1,2,3]}.must_equal '((x + y) NOT IN (1, 2, 3))'
 
-      @d = @d.with_extend{def supports_regexp?; true end}
-      @d.l{x !~ /blah/}.must_equal '(x !~ \'blah\')'
-      @d.l{(x + y) !~ /blah/}.must_equal '((x + y) !~ \'blah\')'
-    end
+    @d = @d.with_extend{def supports_regexp?; true end}
+    @d.l{x !~ /blah/}.must_equal '(x !~ \'blah\')'
+    @d.l{(x + y) !~ /blah/}.must_equal '((x + y) !~ \'blah\')'
   end
   
   it "should support ~ via Hash and Regexp (if supported by database)" do
@@ -779,23 +777,6 @@ describe Sequel::SQL::VirtualRow do
     @d.l{num < Math::PI.to_i}.must_equal "(\"num\" < 3)"
   end
   
-  deprecated "should deal with methods added to Object after requiring Sequel" do
-    class Object
-      def adsoiwemlsdaf; 42; end
-    end
-    Sequel::BasicObject.remove_methods!
-    @d.l{a > adsoiwemlsdaf}.must_equal '("a" > "adsoiwemlsdaf")'
-  end
-  
-  deprecated "should deal with private methods added to Kernel after requiring Sequel" do
-    module Kernel
-      private
-      def adsoiwemlsdaf2; 42; end
-    end
-    Sequel::BasicObject.remove_methods!
-    @d.l{a > adsoiwemlsdaf2}.must_equal '("a" > "adsoiwemlsdaf2")'
-  end
-
   it "should have operator methods defined that produce Sequel expression objects" do
     @d.l{|o| o.&({:a=>1}, :b)}.must_equal '(("a" = 1) AND "b")'
     @d.l{|o| o.|({:a=>1}, :b)}.must_equal '(("a" = 1) OR "b")'
@@ -1044,13 +1025,9 @@ describe "Sequel core extension replacements" do
     o = Sequel.blob(('a'..'z').to_a.join)
     o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"abcdefghij\" end=\"qrstuvwxyz\">"
     o = Sequel.blob(255.chr)
-    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=1 content=\"#{RUBY_VERSION >= '1.9' ? "\\xFF" : "\\377"}\">"
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=1 content=\"\\xFF\">"
     o = Sequel.blob((230..255).map(&:chr).join)
-    if RUBY_VERSION >= '1.9'
-      o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xEC\\xED\\xEE\\xEF\" end=\"\\xF6\\xF7\\xF8\\xF9\\xFA\\xFB\\xFC\\xFD\\xFE\\xFF\">"
-    else
-      o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\" end=\"\\366\\367\\370\\371\\372\\373\\374\\375\\376\\377\">"
-    end
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xEC\\xED\\xEE\\xEF\" end=\"\\xF6\\xF7\\xF8\\xF9\\xFA\\xFB\\xFC\\xFD\\xFE\\xFF\">"
   end
 
   it "Sequel.deep_qualify should do a deep qualification into nested structors" do

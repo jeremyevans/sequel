@@ -41,10 +41,7 @@ module Sequel
     #
     #   Sequel.datetime_class = DateTime
     #
-    # For ruby versions less than 1.9.2, +Time+ has a limited range (1901 to
-    # 2038), so if you use datetimes out of that range, you need to switch
-    # to +DateTime+.  Also, before 1.9.2, +Time+ can only handle local and UTC
-    # times, not other timezones.  Note that +Time+ and +DateTime+ objects
+    # Note that +Time+ and +DateTime+ objects
     # have a different API, and in cases where they implement the same methods,
     # they often implement them differently (e.g. + using seconds on +Time+ and
     # days on +DateTime+).

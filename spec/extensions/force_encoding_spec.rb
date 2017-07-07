@@ -1,5 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
-if RUBY_VERSION >= '1.9.0'
+
 describe "force_encoding plugin" do
   before do
     @c = Class.new(Sequel::Model)
@@ -124,6 +124,3 @@ describe "force_encoding plugin" do
     o.x.encoding.must_equal @e1
   end
 end 
-else
-  skip_warn "force_encoding plugin: only works on ruby 1.9+"
-end

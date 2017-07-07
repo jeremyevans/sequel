@@ -1,42 +1,16 @@
 # frozen-string-literal: true
 
 module Sequel
-  if RUBY_VERSION < '1.9.0'
-  # :nocov:
-    # If on Ruby 1.8, create a <tt>Sequel::BasicObject</tt> class that is similar to the
-    # the Ruby 1.9 +BasicObject+ class.  This is used in a few places where proxy
-    # objects are needed that respond to any method call.
-    class BasicObject
-      # The instance methods to not remove from the class when removing
-      # other methods.
-      KEEP_METHODS = %w"__id__ __send__ __metaclass__ instance_eval instance_exec == equal? initialize method_missing"
-
-      # Remove all but the most basic instance methods from the class.  A separate
-      # method so that it can be called again if necessary if you load libraries
-      # after Sequel that add instance methods to +Object+.
-      def self.remove_methods!
-        ((private_instance_methods + instance_methods) - KEEP_METHODS).each{|m| undef_method(m)}
-      end
-      remove_methods!
-    end
-  # :nocov:
-  else
-    # If on 1.9, create a <tt>Sequel::BasicObject</tt> class that is just like the
-    # default +BasicObject+ class, except that missing constants are resolved in
-    # +Object+.  This allows the virtual row support to work with classes
-    # without prefixing them with ::, such as:
-    #
-    #   DB[:bonds].where{maturity_date > Time.now}
-    class BasicObject < ::BasicObject
-      # Lookup missing constants in <tt>::Object</tt>
-      def self.const_missing(name)
-        ::Object.const_get(name)
-      end
-
-      # No-op method on ruby 1.9, which has a real +BasicObject+ class.
-      def self.remove_methods!
-        Sequel::Deprecation.deprecate("Sequel::BasicObject#remove_methods!", "It has no effect, so stop calling it")
-      end
+  # The <tt>Sequel::BasicObject</tt> class is just like the
+  # default +BasicObject+ class, except that missing constants are resolved in
+  # +Object+.  This allows the virtual row support to work with classes
+  # without prefixing them with ::, such as:
+  #
+  #   DB[:bonds].where{maturity_date > Time.now}
+  class BasicObject < ::BasicObject
+    # Lookup missing constants in <tt>::Object</tt>
+    def self.const_missing(name)
+      ::Object.const_get(name)
     end
   end
 
@@ -845,7 +819,7 @@ module Sequel
     #   Sequel[:a] =~ [1, 2] # (a IN [1, 2])
     #   Sequel[:a] =~ nil # (a IS NULL)
     #
-    # On Ruby 1.9+, this also adds the !~ method, for easily setting up not equals,
+    # This also adds the !~ method, for easily setting up not equals,
     # exclusion, and inverse pattern matching.  This is the same as as inverting the
     # result of the =~ method
     #
@@ -859,12 +833,8 @@ module Sequel
         BooleanExpression.send(:from_value_pair, self, other)
       end
 
-      if RUBY_VERSION >= '1.9'
-        module_eval(<<-END, __FILE__, __LINE__+1)
-          def !~(other)
-            ~(self =~ other)
-          end
-        END
+      def !~(other)
+        ~(self =~ other)
       end
     end
 
@@ -1843,10 +1813,8 @@ module Sequel
       end
     end
 
-    # The purpose of the +VirtualRow+ class is to allow the easy creation of SQL identifiers and functions
-    # without relying on methods defined on +Symbol+.  This is useful if another library defines
-    # the methods defined by Sequel, if you are running on ruby 1.9, or if you are not using the
-    # core extensions.
+    # The purpose of the +VirtualRow+ class is to allow the easy creation of SQL identifiers and functions,
+    # in a way that leads to more compact code.
     #
     # An instance of this class is yielded to the block supplied to <tt>Dataset#where</tt>, <tt>Dataset#order</tt>, and <tt>Dataset#select</tt>
     # (and the other methods that accept a block and pass it to one of those methods).

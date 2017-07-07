@@ -176,14 +176,12 @@ module Sequel
       # keys to strings during lookup.
       DEFAULT_PROC = lambda{|h, k| h[k.to_s] unless k.is_a?(String)}
 
-      if RUBY_VERSION >= '1.9'
-        # Undef 1.9 marshal_{dump,load} methods in the delegate class,
-        # so that ruby 1.9 uses the old style _dump/_load methods defined
-        # in the delegate class, instead of the marshal_{dump,load} methods
-        # in the Hash class.
-        undef_method :marshal_load
-        undef_method :marshal_dump
-      end
+      # Undef marshal_{dump,load} methods in the delegate class,
+      # so that ruby uses the old style _dump/_load methods defined
+      # in the delegate class, instead of the marshal_{dump,load} methods
+      # in the Hash class.
+      undef_method :marshal_load
+      undef_method :marshal_dump
 
       # Use custom marshal loading, since underlying hash uses a default proc.
       def self._load(args)
@@ -197,12 +195,12 @@ module Sequel
       end
 
       # Override methods that accept key argument to convert to string.
-      (%w'[] delete has_key? include? key? member?' + Array((%w'assoc' if RUBY_VERSION >= '1.9.0'))).each do |m|
+      %w'[] delete has_key? include? key? member? assoc'.each do |m|
         class_eval("def #{m}(k) super(k.to_s) end", __FILE__, __LINE__)
       end
 
       # Override methods that accept value argument to convert to string unless nil.
-      (%w'has_value? value?' + Array((%w'key rassoc' if RUBY_VERSION >= '1.9.0'))).each do |m|
+      %w'has_value? value? key rassoc'.each do |m|
         class_eval("def #{m}(v) super(convert_value(v)) end", __FILE__, __LINE__)
       end
 

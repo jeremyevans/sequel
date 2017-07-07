@@ -1,19 +1,12 @@
 # frozen-string-literal: true
 
-if RUBY_VERSION < "1.9"
-  # :nocov:
-  require 'fastercsv'
-  # :nocov:
-else
-  require 'csv'
-end
+require 'csv'
 
 module Sequel
   module Plugins
     # csv_serializer handles serializing entire Sequel::Model objects to CSV,
     # as well as support for deserializing CSV directly into Sequel::Model
-    # objects.  It requires either the csv standard library when usnig ruby 1.9+,
-    # or the fastercsv gem when using ruby 1.8.
+    # objects.  It requires the csv standard library.
     #
     # Basic Example:
     #

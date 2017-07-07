@@ -1,6 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-
 describe "pg_range extension" do
   before(:all) do
     Sequel.extension :pg_array, :pg_range
@@ -338,10 +337,8 @@ describe "pg_range extension" do
     it "should quack like a range" do
       @r1.cover?(1.5).must_equal true
       @r1.cover?(2.5).must_equal false
-      if RUBY_VERSION >= '1.9'
-        @r1.first(1).must_equal [1]
-        @r1.last(1).must_equal [2]
-      end
+      @r1.first(1).must_equal [1]
+      @r1.last(1).must_equal [2]
       @r1.to_a.must_equal [1, 2]
       @r1.first.must_equal 1
       @r1.last.must_equal 2

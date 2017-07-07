@@ -497,15 +497,14 @@ module Sequel
       # Support DateTime objects used in bound variables
       def java_sql_datetime(datetime)
         ts = java.sql.Timestamp.new(Time.local(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec).to_i * 1000)
-        ts.setNanos((datetime.sec_fraction * (RUBY_VERSION >= '1.9.0' ?  1000000000 : 86400000000000)).to_i)
+        ts.setNanos((datetime.sec_fraction * 1000000000).to_i)
         ts
       end
 
       # Support fractional seconds for Time objects used in bound variables
       def java_sql_timestamp(time)
         ts = java.sql.Timestamp.new(time.to_i * 1000)
-        # Work around jruby 1.6 ruby 1.9 mode bug # SEQUEL5: Remove workaround
-        ts.setNanos((RUBY_VERSION >= '1.9.0' && time.nsec != 0) ? time.nsec : time.usec * 1000)
+        ts.setNanos(time.nsec)
         ts
       end 
       

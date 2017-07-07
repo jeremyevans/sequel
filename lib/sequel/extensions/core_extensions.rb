@@ -219,9 +219,7 @@ class Symbol
   end
 
   # Returns a <tt>Sequel::SQL::Function</tt> with this as the function name,
-  # and the given arguments. This is aliased as <tt>Symbol#[]</tt> if the RUBY_VERSION
-  # is less than 1.9.0. Ruby 1.9 defines <tt>Symbol#[]</tt>, and Sequel
-  # doesn't override methods defined by ruby itself.
+  # and the given arguments.
   #
   #   :now.sql_function # SQL: now()
   #   :sum.sql_function(:a) # SQL: sum(a)

@@ -83,7 +83,6 @@ module Sequel
         # Escape bytea values.  Uses historical format instead of hex
         # format for maximum compatibility.
         def escape_bytea(str)
-          # each_byte used instead of [] for 1.9 compatibility
           str.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{sprintf('%o', b.each_byte{|x| break x}).rjust(3, '0')}"}
         end
         

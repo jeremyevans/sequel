@@ -158,7 +158,7 @@ describe Sequel::Model do
     c.must_equal false
     @c.validates{c = respond_to?(:length_of)}
     c.must_equal true
-  end if RUBY_VERSION >= '1.9'
+  end
 end
 
 describe Sequel::Model do

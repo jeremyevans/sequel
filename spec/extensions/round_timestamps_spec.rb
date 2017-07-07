@@ -1,6 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-if RUBY_VERSION >= '1.9.0'
 describe "Sequel::Dataset::RoundTimestamps" do
   before do
     @dataset = Sequel.mock.dataset.extension(:round_timestamps)
@@ -37,7 +36,4 @@ describe "Sequel::Dataset::RoundTimestamps" do
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5.4999999)).must_equal "'2010-01-02 03:04:05'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(54999999, 10000000))).must_equal "'2010-01-02 03:04:05'"
   end
-end
-else
-  skip_warn "round_timestamps extension: only works on ruby 1.9+"
 end

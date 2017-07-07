@@ -36,16 +36,7 @@ module Sequel
         "{#{obj.map{|k, v| "#{eval_inspect(k)} => #{eval_inspect(v)}"}.join(', ')}}"
       when Time
         datepart = "%Y-%m-%dT" unless obj.is_a?(Sequel::SQLTime)
-        if RUBY_VERSION < '1.9'
-        # :nocov:
-          # Time on 1.8 doesn't handle %N (or %z on Windows), manually set the usec value in the string
-          hours, mins = obj.utc_offset.divmod(3600)
-          mins /= 60
-          "#{obj.class}.parse(#{obj.strftime("#{datepart}%H:%M:%S.#{sprintf('%06i%+03i%02i', obj.usec, hours, mins)}").inspect})#{'.utc' if obj.utc?}"
-        # :nocov:
-        else
-          "#{obj.class}.parse(#{obj.strftime("#{datepart}%T.%N%z").inspect})#{'.utc' if obj.utc?}"
-        end
+        "#{obj.class}.parse(#{obj.strftime("#{datepart}%T.%N%z").inspect})#{'.utc' if obj.utc?}"
       when DateTime
         # Ignore date of calendar reform
         "DateTime.parse(#{obj.strftime('%FT%T.%N%z').inspect})"

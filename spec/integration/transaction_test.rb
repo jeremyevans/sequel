@@ -315,57 +315,6 @@ describe "Database transactions" do
   end
 end
 
-if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby') and RUBY_VERSION < '1.9'
-  describe "Database transactions and Thread#kill" do
-    before do
-      @db = DB
-      @db.create_table!(:items, :engine=>'InnoDB'){String :name; Integer :value}
-      @d = @db[:items]
-    end
-    after do
-      @db.drop_table?(:items)
-    end
-
-    it "should handle transactions inside threads" do
-      q = Queue.new
-      q1 = Queue.new
-      t = Thread.new do
-        @db.transaction do
-          @d.insert(:name => 'abc', :value => 1)
-          q1.push nil
-          q.pop
-          @d.insert(:name => 'def', :value => 2)
-        end
-      end
-      q1.pop
-      t.kill
-      @d.count.must_equal 0
-    end
-
-    if DB.supports_savepoints?
-      it "should handle transactions with savepoints inside threads" do
-        q = Queue.new
-        q1 = Queue.new
-        t = Thread.new do
-          @db.transaction do
-            @d.insert(:name => 'abc', :value => 1)
-            @db.transaction(:savepoint=>true) do
-              @d.insert(:name => 'def', :value => 2)
-              q1.push nil
-              q.pop
-              @d.insert(:name => 'ghi', :value => 3)
-            end
-            @d.insert(:name => 'jkl', :value => 4)
-          end
-        end
-        q1.pop
-        t.kill
-        @d.count.must_equal 0
-      end
-    end
-  end
-end
-
 describe "Database transaction retrying" do
   before(:all) do
     @db = DB

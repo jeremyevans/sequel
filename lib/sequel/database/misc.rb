@@ -76,7 +76,7 @@ module Sequel
         :user => uri.user,
         :password => uri.password,
         :port => uri.port,
-        :host => RUBY_VERSION < '1.9.3' ? uri.host : uri.hostname,
+        :host => uri.hostname,
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1])
       }
     end
@@ -486,20 +486,9 @@ module Sequel
       Float(value)
     end
 
-    if RUBY_VERSION >= '1.9'
-      # Typecast the value to an Integer
-      def typecast_value_integer(value)
-        (value.is_a?(String) && value =~ /\A0+(\d)/) ? Integer(value, 10) : Integer(value)
-      end
-    else
-    # :nocov:
-      # Replacement string when replacing leading zeroes.
-      LEADING_ZERO_REP = "\\1".freeze 
-      # Typecast the value to an Integer
-      def typecast_value_integer(value)
-        Integer(value.is_a?(String) ? value.sub(LEADING_ZERO_RE, LEADING_ZERO_REP) : value)
-      end
-    # :nocov:
+    # Typecast the value to an Integer
+    def typecast_value_integer(value)
+      (value.is_a?(String) && value =~ /\A0+(\d)/) ? Integer(value, 10) : Integer(value)
     end
 
     # Typecast the value to a String
@@ -519,8 +508,7 @@ module Sequel
         if value.is_a?(SQLTime)
           value
         else
-          # specifically check for nsec == 0 value to work around JRuby 1.6 ruby 1.9 mode bug
-          SQLTime.create(value.hour, value.min, value.sec, (value.respond_to?(:nsec) && value.nsec != 0) ? value.nsec/1000.0 : value.usec)
+          SQLTime.create(value.hour, value.min, value.sec, value.nsec/1000.0)
         end
       when String
         Sequel.string_to_time(value)

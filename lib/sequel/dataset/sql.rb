@@ -987,7 +987,7 @@ module Sequel
       v2 = db.from_application_timestamp(v)
       fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
         if m == '%N'
-          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(RUBY_VERSION >= '1.9.0' ? 1000000 : 86400000000) : v.usec) if supports_timestamp_usecs?
+          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(1000000) : v.usec) if supports_timestamp_usecs?
         else
           if supports_timestamp_timezones?
             # Would like to just use %z format, but it doesn't appear to work on Windows

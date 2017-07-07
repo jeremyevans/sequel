@@ -62,7 +62,7 @@ describe "Migration.apply" do
     m = Sequel::Migration.new(Sequel.mock)
     m.respond_to?(:foo).must_equal false
     m.respond_to?(:execute).must_equal true
-  end if RUBY_VERSION >= '1.9'
+  end
 end
 
 describe "SimpleMigration#apply" do

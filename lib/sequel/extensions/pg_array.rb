@@ -380,17 +380,9 @@ module Sequel
 
         private
 
-        if RUBY_VERSION < '1.9.0'
-          # :nocov:
-          def new_entry_buffer
-            String.new
-          end
-          # :nocov:
-        else
-          def new_entry_buffer
-            String.new.force_encoding(string.encoding)
-            #String.new.force_encoding(@encoding) # SEQUEL5
-          end
+        def new_entry_buffer
+          String.new.force_encoding(string.encoding)
+          #String.new.force_encoding(@encoding) # SEQUEL5
         end
       end unless Sequel::Postgres.respond_to?(:parse_pg_array)
 

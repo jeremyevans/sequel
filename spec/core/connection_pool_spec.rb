@@ -97,19 +97,6 @@ describe "A connection pool handling connections" do
     @cpool.hold {:block_return}.must_equal :block_return
   end
 
-  if RUBY_VERSION < '1.9.0' and !defined?(RUBY_ENGINE)
-    it "#hold should remove dead threads from the pool if it reaches its max_size" do
-      Thread.new{@cpool.hold{Thread.current.exit!}}.join
-      @cpool.allocated.keys.map{|t| t.alive?}.must_equal [false]
-
-      Thread.new{@cpool.hold{Thread.current.exit!}}.join
-      @cpool.allocated.keys.map{|t| t.alive?}.must_equal [false, false]
-
-      Thread.new{@cpool.hold{}}.join
-      @cpool.allocated.must_equal({})
-    end
-  end
-
   it "#make_new should not make more than max_size connections" do
     q = Queue.new
     50.times{Thread.new{@cpool.hold{q.pop}}}

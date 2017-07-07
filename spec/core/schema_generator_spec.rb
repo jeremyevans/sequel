@@ -21,7 +21,7 @@ describe Sequel::Schema::CreateTableGenerator do
   
   it "should respond to everything" do
     @generator.respond_to?(:foo).must_equal true
-  end if RUBY_VERSION >= '1.9'
+  end
 
   it "should primary key column first" do
     @columns.first[:name].must_equal :id

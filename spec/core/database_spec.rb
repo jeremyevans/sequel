@@ -118,7 +118,7 @@ describe "A new Database" do
 
   it 'should strip square brackets for ipv6 hosts' do
     Sequel.connect('mock://[::1]').opts[:host].must_equal "::1"
-  end if RUBY_VERSION >= '1.9.3'
+  end
 end
 
 describe "Database#freeze" do

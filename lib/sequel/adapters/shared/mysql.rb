@@ -854,9 +854,8 @@ module Sequel
         true
       end
 
-      # MySQL does support fractional timestamps in literal timestamps, but it
-      # ignores them.  Also, using them seems to cause problems on 1.9.  Since
-      # they are ignored anyway, not using them is probably best.
+      # Check the database setting for whether fractional timestamps
+      # are suppported.
       def supports_timestamp_usecs?
         db.supports_timestamp_usecs?
       end

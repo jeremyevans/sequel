@@ -1260,13 +1260,7 @@ module Sequel
 
       # Check if the plugin module +plugin+ defines the constant named by +submod+.
       def plugin_module_defined?(plugin, submod)
-        if RUBY_VERSION >= '1.9'
-          plugin.const_defined?(submod, false)
-        else
-        # :nocov:
-          plugin.const_defined?(submod)
-        # :nocov:
-        end
+        plugin.const_defined?(submod, false)
       end
   
       # An hash of prepared argument values for the given arguments, with keys
@@ -2384,24 +2378,12 @@ module Sequel
         Errors
       end
 
-      if RUBY_VERSION >= '1.9'
-        # Clone constructor -- freeze internal data structures if the original's
-        # are frozen.
-        def initialize_clone(other)
-          super
-          freeze if other.frozen?
-          self
-        end
-      else
-        # :nocov:
-        # Ruby 1.8 doesn't support initialize_clone, so override clone to dup and freeze. 
-        def clone
-          o = dup
-          o.freeze if frozen?
-          o
-        end
-        public :clone
-        # :nocov:
+      # Clone constructor -- freeze internal data structures if the original's
+      # are frozen.
+      def initialize_clone(other)
+        super
+        freeze if other.frozen?
+        self
       end
 
       # Copy constructor -- Duplicate internal data structures.

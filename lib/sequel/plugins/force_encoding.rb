@@ -1,6 +1,5 @@
 # frozen-string-literal: true
 
-if RUBY_VERSION >= '1.9.0'
 module Sequel
   module Plugins
     # The ForceEncoding plugin allows you force specific encodings for all
@@ -76,9 +75,4 @@ module Sequel
       end
     end
   end
-end
-else
-# :nocov:
-  raise LoadError, 'ForceEncoding plugin only works on Ruby 1.9+'
-# :nocov:
 end

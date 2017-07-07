@@ -41,26 +41,12 @@ else
       alias_method :aref_before_sequel, :[] 
     end
 
-    if RUBY_VERSION >= '1.9'
-      # 
-      def [](v)
-        case v
-        when Symbol, Sequel::SQL::Identifier, Sequel::SQL::QualifiedIdentifier
-          Sequel::SQL::QualifiedIdentifier.new(self, v)
-        else
-          aref_before_sequel(v)
-        end
-      end
-    else
-      def [](*v)
-        arg = v.first if v.length == 1
-
-        case arg
-        when Symbol, Sequel::SQL::Identifier, Sequel::SQL::QualifiedIdentifier
-          Sequel::SQL::QualifiedIdentifier.new(self, arg)
-        else
-          respond_to?(:aref_before_sequel) ? aref_before_sequel(*v) : super(*v)
-        end
+    def [](v)
+      case v
+      when Symbol, Sequel::SQL::Identifier, Sequel::SQL::QualifiedIdentifier
+        Sequel::SQL::QualifiedIdentifier.new(self, v)
+      else
+        aref_before_sequel(v)
       end
     end
   end

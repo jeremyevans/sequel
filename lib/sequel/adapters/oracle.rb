@@ -40,8 +40,8 @@ module Sequel
         
         # The ruby-oci8 gem which retrieves oracle columns with a type of
         # DATE, TIMESTAMP, TIMESTAMP WITH TIME ZONE is complex based on the
-        # ruby version (1.9.2 or later) and Oracle version (9 or later)
-        # In the now standard case of 1.9.2 and Oracle 9 or later, the timezone
+        # ruby version and Oracle version (9 or later)
+        # In the now standard case of Oracle 9 or later, the timezone
         # is determined by the Oracle session timezone. Thus if the user
         # requests Sequel provide UTC timezone to the application,
         # we need to alter the session timezone to be UTC

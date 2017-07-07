@@ -95,10 +95,8 @@ describe "pg_hstore extension" do
 
     Sequel.hstore('foo'=>'bar', '1'=>'2').values_at(:foo3, :foo, :foo2, 1).must_equal [nil, 'bar', nil, '2']
 
-    if RUBY_VERSION >= '1.9.0'
-      Sequel.hstore('foo'=>'bar').assoc(:foo).must_equal ['foo', 'bar']
-      Sequel.hstore('foo'=>'bar').assoc(:foo2).must_be_nil
-    end
+    Sequel.hstore('foo'=>'bar').assoc(:foo).must_equal ['foo', 'bar']
+    Sequel.hstore('foo'=>'bar').assoc(:foo2).must_be_nil
   end
 
   it "should convert has_value?/value? lookups to string" do
@@ -119,28 +117,26 @@ describe "pg_hstore extension" do
     Sequel.hstore('1'=>'bar').to_hash[1].must_equal 'bar'
   end
 
-  if RUBY_VERSION >= '1.9.0'
-    it "should convert key lookups to string" do
-      Sequel.hstore('foo'=>'bar').key(:bar).must_equal 'foo'
-      Sequel.hstore('foo'=>'bar').key(:bar2).must_be_nil
-    end
+  it "should convert key lookups to string" do
+    Sequel.hstore('foo'=>'bar').key(:bar).must_equal 'foo'
+    Sequel.hstore('foo'=>'bar').key(:bar2).must_be_nil
+  end
 
-    it "should handle nil values in key lookups" do
-      Sequel.hstore('foo'=>'').key('').must_equal 'foo'
-      Sequel.hstore('foo'=>'').key(nil).must_be_nil
-      Sequel.hstore('foo'=>nil).key(nil).must_equal 'foo'
-    end
+  it "should handle nil values in key lookups" do
+    Sequel.hstore('foo'=>'').key('').must_equal 'foo'
+    Sequel.hstore('foo'=>'').key(nil).must_be_nil
+    Sequel.hstore('foo'=>nil).key(nil).must_equal 'foo'
+  end
 
-    it "should convert rassoc lookups to string" do
-      Sequel.hstore('foo'=>'bar').rassoc(:bar).must_equal ['foo', 'bar']
-      Sequel.hstore('foo'=>'bar').rassoc(:bar2).must_be_nil
-    end
+  it "should convert rassoc lookups to string" do
+    Sequel.hstore('foo'=>'bar').rassoc(:bar).must_equal ['foo', 'bar']
+    Sequel.hstore('foo'=>'bar').rassoc(:bar2).must_be_nil
+  end
 
-    it "should handle nil values in rassoc lookups" do
-      Sequel.hstore('foo'=>'').rassoc('').must_equal ['foo', '']
-      Sequel.hstore('foo'=>'').rassoc(nil).must_be_nil
-      Sequel.hstore('foo'=>nil).rassoc(nil).must_equal ['foo', nil]
-    end
+  it "should handle nil values in rassoc lookups" do
+    Sequel.hstore('foo'=>'').rassoc('').must_equal ['foo', '']
+    Sequel.hstore('foo'=>'').rassoc(nil).must_be_nil
+    Sequel.hstore('foo'=>nil).rassoc(nil).must_equal ['foo', nil]
   end
 
   it "should have delete convert key to string" do

@@ -1,11 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-begin
-  csv_lib = RUBY_VERSION < '1.9' ? 'fastercsv' : 'csv'
-  require csv_lib
-rescue LoadError => e
-  skip_warn "csv_serializer plugin: can't load #{csv_lib} (#{e.class}: #{e})"
-else
+require 'csv' 
+
 describe "Sequel::Plugins::CsvSerializer" do
   before do
     artist = @Artist = Class.new(Sequel::Model(:artists))
@@ -184,5 +180,4 @@ describe "Sequel::Plugins::CsvSerializer" do
     @Album.csv_serializer_opts.frozen?.must_equal true
     @Album.csv_serializer_opts[:only].frozen?.must_equal true
   end
-end
 end

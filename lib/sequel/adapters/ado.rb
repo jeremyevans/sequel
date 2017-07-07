@@ -61,14 +61,8 @@ module Sequel
       Sequel.blob(v.pack('c*'))
     end
 
-    if RUBY_VERSION >= '1.9'
-      def cp.date(v)
-        Date.new(v.year, v.month, v.day)
-      end
-    else
-      def cp.date(v)
-        Date.new(*v[0...10].split('/').map{|x| x.to_i})
-      end
+    def cp.date(v)
+      Date.new(v.year, v.month, v.day)
     end
 
     CONVERSION_PROCS = {}
@@ -239,7 +233,7 @@ module Sequel
           recordset.Fields.each do |field|
             type = field.Type
             cp = if type == AdDBTimeStamp
-              ts_cp ||= if RUBY_VERSION >= '1.9'
+              ts_cp ||= begin
                 nsec_div = 1000000000.0/(10**(timestamp_precision))
                 nsec_mul = 10**(timestamp_precision+3)
                 meth = db.method(:to_application_timestamp)
@@ -247,9 +241,6 @@ module Sequel
                   # Fractional second handling is not correct on ruby <2.2
                   meth.call([v.year, v.month, v.day, v.hour, v.min, v.sec, (v.nsec/nsec_div).round * nsec_mul])
                 end
-              else
-                # Ruby 1.8 returns AdDBTimeStamp values as a string
-                db.method(:to_application_timestamp)
               end
             else
               conversion_procs[type]

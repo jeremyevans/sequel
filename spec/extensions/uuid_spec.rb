@@ -37,18 +37,16 @@ describe "Sequel::Plugins::Uuid" do
     o.uuid.must_equal @uuid
   end
 
-  if RUBY_VERSION >= '1.9'
-    it "should allow specifying the uuid field via the :field option" do
-      c = Class.new(Sequel::Model(:t))
-      c.class_eval do
-        columns :id, :u
-        plugin :uuid, :field=>:u
-        def _save_refresh(*) end
-      end
-      o = c.create
-      c.db.sqls.first.must_match(/INSERT INTO t \(u\) VALUES \('[-0-9a-f]+'\)/)
-      o.u.must_match(/[-0-9a-f]+/)
+  it "should allow specifying the uuid field via the :field option" do
+    c = Class.new(Sequel::Model(:t))
+    c.class_eval do
+      columns :id, :u
+      plugin :uuid, :field=>:u
+      def _save_refresh(*) end
     end
+    o = c.create
+    c.db.sqls.first.must_match(/INSERT INTO t \(u\) VALUES \('[-0-9a-f]+'\)/)
+    o.u.must_match(/[-0-9a-f]+/)
   end
 
   it "should not raise an error if the model doesn't have the uuid column" do
