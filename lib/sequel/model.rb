@@ -69,17 +69,5 @@ module Sequel
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via +set+/+update+/+new+/etc..
     RESTRICTED_SETTER_METHODS = instance_methods.map(&:to_s).select{|l| l.end_with?('=')}#.freeze # SEQUEL5
-
-    # SEQUEL5: Remove
-    class DeprecatedColumnsUpdated # :nodoc:
-      def initialize(columns_updated)
-        @columns_updated = columns_updated
-      end
-
-      def method_missing(*args, &block)
-        Sequel::Deprecation.deprecate("Accessing @columns_updated directly", "Use the columns_updated plugin and switch to the columns_updated method")
-        @columns_updated.send(*args, &block)
-      end
-    end
   end
 end

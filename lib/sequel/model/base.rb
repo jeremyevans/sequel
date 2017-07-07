@@ -2027,35 +2027,6 @@ module Sequel
 
       private
       
-      # Run code directly after the INSERT query, before after_create.
-      # This is only a temporary API, it should not be overridden by external code.
-      def _after_create(pk)
-        # SEQUEL5: Remove
-        @this = nil
-        @new = false
-        @was_new = true
-      end
-
-      # Run code after around_save returns, before calling after_commit.
-      # This is only a temporary API, it should not be overridden by external code.
-      def _after_save(pk)
-        # SEQUEL5: Remove
-        if @was_new
-          @was_new = nil
-          pk ? _save_refresh : changed_columns.clear
-        else
-          @columns_updated = nil
-        end
-        @modified = false
-      end
-
-      # Run code directly after the UPDATE query, before after_update.
-      # This is only a temporary API, it should not be overridden by external code.
-      def _after_update
-        # SEQUEL5: Remove
-        @this = nil
-      end
-
       # Run code before any validation is done, but also run it before saving
       # even if validation is skipped.  This is a private hook.  It exists so that
       # plugins can set values automatically before validation (as the values
@@ -2213,12 +2184,10 @@ module Sequel
                 raise_hook_failure(:before_create)
               end
               pk = _insert
-              _after_create(pk) # SEQUEL5: Remove
-              # SEQUEL5
-              # @this = nil
-              # @new = false
-              # @modified = false
-              # pk ? _save_refresh : changed_columns.clear
+              @this = nil
+              @new = false
+              @modified = false
+              pk ? _save_refresh : changed_columns.clear
               after_create
               true
             end
@@ -2232,7 +2201,7 @@ module Sequel
               end
               columns = opts[:columns]
               if columns.nil?
-                columns_updated = if opts[:changed] # SEQUEL5: Use local variable instead of instance variable
+                columns_updated = if opts[:changed]
                   @values.reject{|k,v| !changed_columns.include?(k)}
                 else
                   _save_update_all_columns_hash
@@ -2244,10 +2213,8 @@ module Sequel
                 changed_columns.reject!{|c| columns.include?(c)}
               end
               _update_columns(columns_updated)
-              _after_update # SEQUEL5: Remove
-              # SEQUEL5
-              # @this = nil
-              # @modified = false
+              @this = nil
+              @modified = false
               after_update
               true
             end
@@ -2257,7 +2224,6 @@ module Sequel
           true
         end
         raise_hook_failure(:around_save) unless called_save
-        _after_save(pk) # SEQUEL5: Remove
         if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
           Sequel::Deprecation.deprecate("Model#after_commit", "Instead, call db.after_commit in Model#after_save")
           db.after_commit(sh){after_commit}
@@ -2295,7 +2261,6 @@ module Sequel
       # Plugins can override this method in order to update with
       # additional columns, even when the column hash is initially empty.
       def _update_columns(columns)
-        @columns_updated ||= DeprecatedColumnsUpdated.new(columns) # SEQUEL5: Remove
         _update(columns) unless columns.empty?
       end
 

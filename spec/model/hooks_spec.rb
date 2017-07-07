@@ -17,7 +17,7 @@ describe "Model#before_create && Model#after_create" do
   it "should be called around new record creation" do
     @c.send(:define_method, :before_create){DB << "BLAH before"}
     @c.create(:x => 2)
-    DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after', 'SELECT * FROM items WHERE x = 2']
+    DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'SELECT * FROM items WHERE x = 2', 'BLAH after']
   end
 
   deprecated ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
@@ -124,7 +124,7 @@ describe "Model#before_save && Model#after_save" do
     @c.set_primary_key :x
     @c.unrestrict_primary_key
     @c.create(:x => 2)
-    DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after', 'SELECT * FROM items WHERE x = 2']
+    DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'SELECT * FROM items WHERE x = 2', 'BLAH after']
   end
 
   deprecated "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
@@ -318,7 +318,7 @@ describe "Model around filters" do
       end
     end
     @c.create(:x => 2)
-    DB.sqls.must_equal ['ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', "SELECT * FROM items WHERE id = 10"]
+    DB.sqls.must_equal ['ac_before', 'INSERT INTO items (x) VALUES (2)', "SELECT * FROM items WHERE id = 10", 'ac_after']
   end
 
   it "around_delete should be called around record destruction" do
@@ -364,7 +364,7 @@ describe "Model around filters" do
       end
     end
     @c.create(:x => 2)
-    DB.sqls.must_equal ['as_before', 'ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', 'as_after', "SELECT * FROM items WHERE id = 10"]
+    DB.sqls.must_equal ['as_before', 'ac_before', 'INSERT INTO items (x) VALUES (2)', "SELECT * FROM items WHERE id = 10", 'ac_after', 'as_after']
     @c.load(:id=>1, :x => 2).save
     DB.sqls.must_equal ['as_before', 'au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after', 'as_after']
   end

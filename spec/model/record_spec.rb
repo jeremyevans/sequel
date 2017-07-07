@@ -195,37 +195,6 @@ describe "Model#save" do
     o.changed_columns.must_equal []
   end
 
-  deprecated "should store previous value of @new in @was_new and as well as the hash used for updating in @columns_updated until after hooks finish running" do
-    res = nil
-    @c.send(:define_method, :after_save){ res = [@columns_updated, @was_new]}
-    o = @c.new(:x => 1, :y => nil)
-    o[:x] = 2
-    o.save
-    res.must_equal [nil, true]
-    o.after_save
-    res.must_equal [nil, nil]
-
-    res = nil
-    o = @c.load(:id => 23,:x => 1, :y => nil)
-    o[:x] = 2
-    o.save
-    res[0].fetch(:x).must_equal 2
-    res[0].fetch(:y).must_be_nil
-    res.fetch(1).must_be_nil
-    o.after_save
-    res.must_equal [nil, nil]
-
-    res = nil
-    o = @c.load(:id => 23,:x => 2, :y => nil)
-    o[:x] = 2
-    o[:y] = 22
-    o.save(:columns=>:x)
-    res[0].fetch(:x).must_equal 2
-    res.fetch(1).must_be_nil
-    o.after_save
-    res.must_equal [nil, nil]
-  end
-  
   it "should use Model's use_transactions setting by default" do
     @c.use_transactions = true
     @c.load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)

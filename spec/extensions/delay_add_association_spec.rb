@@ -16,7 +16,7 @@ describe "Sequel::Plugins::DelayAddAssociation" do
     @o.add_c(@c.load(:id=>2, :name=>'b'))
     @db.sqls.must_equal []
     @o.save
-    @db.sqls.must_equal ["INSERT INTO cs (name) VALUES ('a')", "UPDATE cs SET c_id = 1 WHERE (id = 2)", "SELECT * FROM cs WHERE (id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["INSERT INTO cs (name) VALUES ('a')", "SELECT * FROM cs WHERE (id = 1) LIMIT 1", "UPDATE cs SET c_id = 1 WHERE (id = 2)"]
   end
 
   it "should immediately reflect changes in cached association" do
@@ -55,12 +55,11 @@ describe "Sequel::Plugins::DelayAddAssociation" do
     @o.add_c(:name=>'b')
     @db.sqls.must_equal []
     @o.save
-    sqls = @db.sqls
-    sqls.length.must_equal 4
-    sqls[0].must_equal "INSERT INTO cs (name) VALUES ('a')"
-    ["INSERT INTO cs (name, c_id) VALUES ('b', 1)", "INSERT INTO cs (c_id, name) VALUES (1, 'b')"].must_include sqls[1]
-    sqls[2].must_equal "SELECT * FROM cs WHERE (id = 2) LIMIT 1"
-    sqls[3].must_equal "SELECT * FROM cs WHERE (id = 1) LIMIT 1"
+    @db.sqls.must_equal [
+      "INSERT INTO cs (name) VALUES ('a')",
+      "SELECT * FROM cs WHERE (id = 1) LIMIT 1",
+      "INSERT INTO cs (name, c_id) VALUES ('b', 1)",
+      "SELECT * FROM cs WHERE (id = 2) LIMIT 1"]
   end
 
   it "should work when passing in primary keys" do
@@ -69,6 +68,6 @@ describe "Sequel::Plugins::DelayAddAssociation" do
     @o.add_c(2)
     @db.sqls.must_equal ["SELECT * FROM cs WHERE (id = 2) LIMIT 1"]
     @o.save
-    @db.sqls.must_equal ["INSERT INTO cs (name) VALUES ('a')", "UPDATE cs SET c_id = 1 WHERE (id = 2)", "SELECT * FROM cs WHERE (id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["INSERT INTO cs (name) VALUES ('a')", "SELECT * FROM cs WHERE (id = 1) LIMIT 1", "UPDATE cs SET c_id = 1 WHERE (id = 2)"]
   end
 end
