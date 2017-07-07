@@ -373,22 +373,14 @@ describe "Dataset#where" do
     @dataset.filter([]).sql.must_equal @dataset.sql
   end
 
-  deprecated "should just clone if given an empty string argument" do
-    @dataset.where('').sql.must_equal @dataset.sql
-    @dataset.filter('').sql.must_equal @dataset.sql
+  it "should raise if no arguments or block" do
+    proc{@dataset.where}.must_raise Sequel::Error
+    proc{@dataset.filter}.must_raise Sequel::Error
   end
   
-  deprecated "should just clone if given no arguments or block" do
-    @dataset.where.sql.must_equal @dataset.sql
-    @dataset.filter.sql.must_equal @dataset.sql
-  end
-  
-  deprecated "should ignore nil argument if block is given" do
-    @d1.where(nil){a}.sql.must_equal @d1.where(:a).sql
-  end
-  
-  deprecated "should ignore nil argument if block has no existing filter" do
-    @dataset.where(nil).sql.must_equal @dataset.sql
+  it "should treat nil as NULL argument if block has no existing filter" do
+    @dataset.where(nil).sql.must_equal "SELECT * FROM test WHERE NULL"
+    @d1.where(nil).sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND NULL)"
   end
   
   it "should work with hashes" do
@@ -725,10 +717,6 @@ describe "Dataset#or" do
     @d1.or([]).sql.must_equal @d1.sql
   end
 
-  deprecated "should just clone if given an empty string argument" do
-    @d1.or('').sql.must_equal @d1.sql
-  end
-  
   it "should add an alternative expression to the where clause" do
     @d1.or(:y => 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) OR (y = 2))'
   end
@@ -841,10 +829,6 @@ describe "Dataset#having" do
     @dataset.having([]).sql.must_equal @dataset.sql
   end
 
-  deprecated "should just clone if given an empty string argument" do
-    @dataset.having('').sql.must_equal @dataset.sql
-  end
-  
   deprecated "should handle string arguments" do
     @grouped.having('sum(population) > 10').select_sql.must_equal "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING (sum(population) > 10)"
   end

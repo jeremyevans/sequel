@@ -1190,30 +1190,18 @@ module Sequel
 
     def add_filter(clause, cond, invert=false, combine=:AND, &block)
       if cond == EMPTY_ARRAY && !block
-        Sequel::Deprecation.deprecate("Passing no arguments and no block to a filtering method", "Include at least one argument or a block when calling a filtering method")
-        #raise Error, "must provide an argument to a filtering method if not passing a block" # SEQUEL5
+        raise Error, "must provide an argument to a filtering method if not passing a block"
       end
       
       cond = cond.first if cond.size == 1
 
       empty = cond == OPTS || cond == EMPTY_ARRAY
-      old_empty = cond.respond_to?(:empty?) && cond.empty?
-      if old_empty && !empty
-        Sequel::Deprecation.deprecate("Treating #{cond.inspect} as a empty filter expression", "Only {} and [] are considered empty expressions now")
-        empty = true
-      end
 
       if empty && !block
-        clone
+        self 
       else
         if cond == nil
-          if block
-            Sequel::Deprecation.deprecate("Ignoring explicit nil argument when passing a block to a filtering method", "Do not pass an explicit nil argument to the filtering method, only pass the block")
-          end
-          unless @opts[clause]
-            Sequel::Deprecation.deprecate("Ignoring explicit nil argument to a filtering method if dataset has no explicit filter", "Starting in Sequel 5, this will add a NULL condition")
-          end
-          #cond = Sequel::NULL # SEQUEL5
+          cond = Sequel::NULL
         end
         if empty && block
           cond = nil
@@ -1225,17 +1213,6 @@ module Sequel
         clone(clause => cond)
       end
     end
-
-    # :nocov:
-    def _filter_or_exclude(invert, clause, *cond, &block)
-      Sequel::Deprecation.deprecate("Sequel::Dataset#_filter/_filter_or_exclude (private methods)", "Switch to calling a public dataset filtering method directly")
-      add_filter(clause, cond, invert, &block)
-    end
-
-    def _filter(clause, *cond, &block)
-      _filter_or_exclude(false, clause, *cond, &block)
-    end
-    # :nocov:
 
     # The default :qualify option to use for join tables if one is not specified.
     def default_join_table_qualification
