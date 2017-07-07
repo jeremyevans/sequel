@@ -1589,14 +1589,6 @@ describe "A single threaded database" do
     db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
   end
   
-  deprecated "should be constructable using Database.single_threaded = true" do
-    Sequel::Database.single_threaded = true
-    Sequel.single_threaded.must_equal true
-    Sequel::Database.single_threaded.must_equal true
-    db = Sequel::Database.new{123}
-    db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
-  end
-
   it "should be constructable using Sequel.single_threaded = true" do
     Sequel.single_threaded = true
     Sequel.single_threaded.must_equal true
