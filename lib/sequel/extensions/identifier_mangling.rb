@@ -135,25 +135,12 @@ module Sequel
         @opts.fetch(:identifier_input_method, db.identifier_input_method)
       end
       
-      # Set the method to call on identifiers going into the database for this dataset
-      def identifier_input_method=(v)
-        raise_if_frozen!(%w"identifier_input_method= with_identifier_input_method")
-        skip_symbol_cache!
-        @opts[:identifier_input_method] = v
-      end
-      
       # The String instance method to call on identifiers before sending them to
       # the database.
       def identifier_output_method
         @opts.fetch(:identifier_output_method, db.identifier_output_method)
       end
     
-      # Set the method to call on identifiers coming the database for this dataset
-      def identifier_output_method=(v)
-        raise_if_frozen!(%w"identifier_output_method= with_identifier_output_method")
-        @opts[:identifier_output_method] = v
-      end
-
       # Check with the database to see if identifier quoting is enabled
       def quote_identifiers?
         @opts.fetch(:quote_identifiers, db.quote_identifiers?)

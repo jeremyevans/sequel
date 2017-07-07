@@ -37,8 +37,6 @@ module Sequel
   end
 
   module DatasetQuery
-    Dataset.def_mutation_method(:query, :module=>self)
-
     # Translates a query block into a dataset. Query blocks are an
     # alternative to Sequel's usual method chaining, by using
     # instance_eval with a proxy object:

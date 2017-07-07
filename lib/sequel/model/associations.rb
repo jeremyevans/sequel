@@ -2653,8 +2653,6 @@ module Sequel
       #
       #   Artist.eager(:albums => {proc{|ds| ds.where{year > 1990}}=>{:tracks => :genre}})
       module DatasetMethods
-        Sequel::Dataset.def_mutation_method(:eager, :eager_graph, :module=>self)
-
         %w'inner left right full'.each do |type|
           class_eval <<END, __FILE__, __LINE__+1
             def association_#{type}_join(*associations)

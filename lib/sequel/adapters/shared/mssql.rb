@@ -521,7 +521,6 @@ module Sequel
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
       LIMIT_ALL = Object.new.freeze
 
-      Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns output values')
       Dataset.def_sql_method(self, :update, [['if is_2005_or_later?', %w'with update limit table set output from where'], ['else', %w'update table set output from where']])

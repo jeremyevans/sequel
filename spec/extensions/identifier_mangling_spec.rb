@@ -221,35 +221,6 @@ describe "Dataset" do
     db[:a].identifier_output_method.must_equal :downcase
   end
   
-  # SEQUEL5: Remove
-  unless Sequel.mock(:identifier_mangling=>true).dataset.frozen?
-    deprecated "should have quote_identifiers= method which changes literalization of identifiers" do
-      @dataset.quote_identifiers = true
-      @dataset.literal(:a).must_equal '"a"'
-      @dataset.quote_identifiers = false
-      @dataset.literal(:a).must_equal 'a'
-    end
-    
-    deprecated "should have identifier_input_method= method which changes literalization of identifiers" do
-      @dataset.identifier_input_method = :upcase
-      @dataset.literal(:a).must_equal 'A'
-      @dataset.identifier_input_method = :downcase
-      @dataset.literal(:A).must_equal 'a'
-      @dataset.identifier_input_method = :reverse
-      @dataset.literal(:at_b).must_equal 'b_ta'
-    end
-    
-    deprecated "should have identifier_output_method= method which changes identifiers returned from the database" do
-      @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
-      @dataset.identifier_output_method = :upcase
-      @dataset.send(:output_identifier, "at_b_C").must_equal :AT_B_C
-      @dataset.identifier_output_method = :downcase
-      @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_c
-      @dataset.identifier_output_method = :reverse
-      @dataset.send(:output_identifier, "at_b_C").must_equal :C_b_ta
-    end
-  end
-  
   it "should have with_quote_identifiers method which returns cloned dataset with changed literalization of identifiers" do
     @dataset.with_quote_identifiers(true).literal(:a).must_equal '"a"'
     @dataset.with_quote_identifiers(false).literal(:a).must_equal 'a'
@@ -282,18 +253,6 @@ describe "Dataset" do
     @dataset.with_identifier_output_method(:upcase).send(:output_identifier, "").must_equal :UNTITLED
     @dataset.with_identifier_output_method(:downcase).send(:output_identifier, "").must_equal :untitled
     @dataset.with_identifier_output_method(:reverse).send(:output_identifier, "").must_equal :deltitnu
-  end
-end
-
-describe "Frozen Datasets" do
-  before do
-    @ds = Sequel.mock(:identifier_mangling=>true)[:test].freeze
-  end
-
-  deprecated "should raise an error when calling mutation methods" do
-    proc{@ds.identifier_input_method = :a}.must_raise RuntimeError
-    proc{@ds.identifier_output_method = :a}.must_raise RuntimeError
-    proc{@ds.quote_identifiers = false}.must_raise RuntimeError
   end
 end
 

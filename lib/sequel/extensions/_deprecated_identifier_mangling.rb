@@ -68,23 +68,10 @@ module Sequel
         @opts.fetch(:identifier_input_method, db.identifier_input_method)
       end
       
-      def identifier_input_method=(v)
-        Sequel::Deprecation.deprecate("Dataset#identifier_input_method=", "Explicitly load the identifier_mangling extension if you would like to use this")
-        raise_if_frozen!(%w"identifier_input_method= with_identifier_input_method")
-        skip_symbol_cache!
-        @opts[:identifier_input_method] = v
-      end
-      
       def identifier_output_method
         @opts.fetch(:identifier_output_method, db.identifier_output_method)
       end
     
-      def identifier_output_method=(v)
-        Sequel::Deprecation.deprecate("Dataset#identifier_output_method=", "Explicitly load the identifier_mangling extension if you would like to use this")
-        raise_if_frozen!(%w"identifier_output_method= with_identifier_output_method")
-        @opts[:identifier_output_method] = v
-      end
-
       def quote_identifiers?
         @opts.fetch(:quote_identifiers, db.quote_identifiers?)
       end

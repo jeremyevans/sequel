@@ -87,17 +87,6 @@ describe "Dataset#query" do
     q.sql.must_equal "SELECT * FROM xyz"
   end
   
-  # SEQUEL5: Remove
-  unless Sequel.mock.dataset.frozen?
-    deprecated "should have an appropriate mutation method" do
-      @d.query! do
-        select :a, Sequel[:b].as(:mongo)
-        from :yyy
-      end
-      @d.sql.must_equal "SELECT a, b AS mongo FROM yyy"
-    end
-  end
-
   it "should raise on non-chainable method calls" do
     proc {@d.query {row_proc}}.must_raise(Sequel::Error)
     proc {@d.query {all}}.must_raise(Sequel::Error)
