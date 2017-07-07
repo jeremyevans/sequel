@@ -109,14 +109,6 @@ describe "Sequel::Model()" do
       Object.send(:remove_const, :Album) if defined?(::Album)
     end
 
-    deprecated "Sequel.cache_anonymous_models should return value for Sequel::Model" do
-      Sequel.cache_anonymous_models.must_equal true
-      Sequel::Model.cache_anonymous_models = false
-      Sequel.cache_anonymous_models.must_equal false
-      Sequel.cache_anonymous_models = true
-      Sequel.cache_anonymous_models.must_equal true
-    end
-
     it "should work without raising an exception with a symbol" do
       class ::Album < Sequel::Model(:table); end
       class ::Album < Sequel::Model(:table); end

@@ -3,18 +3,6 @@
 require 'sequel/core'
 
 module Sequel
-  # Delegate to Sequel::Model, only for backwards compatibility.
-  def self.cache_anonymous_models
-    Sequel::Deprecation.deprecate("Sequel.cache_anonymous_models", "Use Sequel::Model.cache_anonymous_models")
-    Model.cache_anonymous_models
-  end
-
-  # Delegate to Sequel::Model, only for backwards compatibility.
-  def self.cache_anonymous_models=(v)
-    Sequel::Deprecation.deprecate("Sequel.cache_anonymous_models=", "Use Sequel::Model.cache_anonymous_models=")
-    Model.cache_anonymous_models = v
-  end
-
   # <tt>Sequel::Model</tt> is an object relational mapper built on top of Sequel core.  Each
   # model class is backed by a dataset instance, and many dataset methods can be
   # called directly on the class.  Model datasets return rows as model instances,
