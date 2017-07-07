@@ -992,7 +992,7 @@ module Sequel
       end
   
       # Add model methods that call dataset methods
-      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:<<, :and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases])
+      Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server]) - [:<<, :and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases])
       # SEQUEL5: add :set_graph_aliases to remove list and remove :and
   
       private
@@ -2684,52 +2684,6 @@ module Sequel
         as_hash(*a)
       end
 
-      # Return an array of all rows matching the given filter condition, also
-      # yielding each row to the given block.  Basically the same as where(cond).all(&block),
-      # except it can be optimized to not create an intermediate dataset.
-      #
-      #   Artist.where_all(:id=>[1,2,3])
-      #   # SELECT * FROM artists WHERE (id IN (1, 2, 3))
-      def where_all(cond, &block)
-        if loader = _model_where_loader
-          loader.all(filter_expr(cond), &block)
-        else
-          where(cond).all(&block)
-        end
-      end
-
-      # Iterate over all rows matching the given filter condition, 
-      # yielding each row to the given block.  Basically the same as where(cond).each(&block),
-      # except it can be optimized to not create an intermediate dataset.
-      #
-      #   Artist.where_each(:id=>[1,2,3]){|row| p row}
-      #   # SELECT * FROM artists WHERE (id IN (1, 2, 3))
-      def where_each(cond, &block)
-        if loader = _model_where_loader
-          loader.each(filter_expr(cond), &block)
-        else
-          where(cond).each(&block)
-        end
-      end
-
-      # Filter the datasets using the given filter condition, then return a single value.
-      # This assumes that the dataset has already been setup to limit the selection to
-      # a single column.  Basically the same as where(cond).single_value,
-      # except it can be optimized to not create an intermediate dataset.
-      #
-      #   Artist.select(:name).where_single_value(:id=>1)
-      #   # SELECT name FROM artists WHERE (id = 1) LIMIT 1
-      def where_single_value(cond)
-        if loader = cached_placeholder_literalizer(:_model_where_single_value_loader) do |pl|
-            single_value_ds.where(pl.arg)
-          end
-
-          loader.get(filter_expr(cond))
-        else
-          where(cond).single_value
-        end
-      end
-
       # Given a primary key value, return the first record in the dataset with that primary key
       # value.  If no records matches, returns nil.
       #
@@ -2756,11 +2710,12 @@ module Sequel
 
       private
 
-      # Loader used for where_all and where_each.
+      # SEQUEL5: Remove
       def _model_where_loader
-        cached_placeholder_literalizer(:_model_where_loader) do |pl|
-          where(pl.arg)
-        end
+        # :nocov:
+        Sequel::Deprecation.deprecate("Dataset#_model_where_loader", "Use _where_loader instead")
+        _where_loader
+        # :nocov:
       end
 
       # If the dataset is not already ordered, and the model has a primary key,

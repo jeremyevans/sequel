@@ -135,6 +135,12 @@ describe Sequel::Model, "class dataset methods"  do
     @c.with(:a, @d).sql.must_equal "WITH a AS (SELECT * FROM items) SELECT * FROM items"
     @c.with_recursive(:a, @d, @d).sql.must_equal "WITH a AS (SELECT * FROM items UNION ALL SELECT * FROM items) SELECT * FROM items"
     @c.with_sql('S').sql.must_equal "S"
+    @c.where_all(:id=>1){|r|}.must_equal [@c.load(:id=>1)]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1)"]
+    @c.where_each(:id=>1){|r|}
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1)"]
+    @c.where_single_value(:id=>1).must_equal 1
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1"]
 
     sc = Class.new(@c)
     sc.set_dataset(@d.where(:a).order(:a).select(:a).group(:a).limit(2))

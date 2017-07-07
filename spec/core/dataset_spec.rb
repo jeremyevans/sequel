@@ -5653,3 +5653,56 @@ describe "Dataset#output_identifier" do
     meth.call('A').must_equal :a
   end
 end
+
+describe "Dataset#where_all"  do
+  before do
+    @ds = Sequel.mock(:fetch=>{:id=>1})[:items].freeze
+  end
+
+  it "should filter dataset with condition, and return related rows" do
+    5.times do
+      @ds.where_all(:id=>1).must_equal [{:id=>1}]
+      @ds.db.sqls.must_equal ['SELECT * FROM items WHERE (id = 1)']
+    end
+  end
+
+  it "should yield each row to the given block" do
+    5.times do
+      a = []
+      @ds.where_all(:id=>1){|r| a << r}.must_equal [{:id=>1}]
+      a.must_equal [{:id=>1}]
+      @ds.db.sqls.must_equal ['SELECT * FROM items WHERE (id = 1)']
+    end
+  end
+end
+
+describe "Dataset#where_each"  do
+  before do
+    @ds = Sequel.mock(:fetch=>{:id=>1})[:items].freeze
+  end
+
+  it "should yield each row to the given block" do
+    5.times do
+      a = []
+      @ds.where_each(:id=>1){|r| a << r}
+      a.must_equal [{:id=>1}]
+      @ds.db.sqls.must_equal ['SELECT * FROM items WHERE (id = 1)']
+    end
+  end
+end
+
+describe "Dataset#where_single_value"  do
+  before do
+    @ds = Sequel.mock(:fetch=>{:id=>1})[:items].with_extend do
+      select :only_id, :id
+    end.freeze
+  end
+
+  it "should return single value" do
+    5.times do
+      a = []
+      @ds.only_id.where_single_value(:id=>1).must_equal 1
+      @ds.db.sqls.must_equal ['SELECT id FROM items WHERE (id = 1) LIMIT 1']
+    end
+  end
+end

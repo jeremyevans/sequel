@@ -15,6 +15,7 @@ module Sequel
       empty? fetch_rows first first! get import insert interval last
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
       single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
+      where_all where_each where_single_value
     METHS
     # SEQUEL5: Remove interval, range
 
@@ -917,6 +918,52 @@ module Sequel
       end
     end
 
+    # Return an array of all rows matching the given filter condition, also
+    # yielding each row to the given block.  Basically the same as where(cond).all(&block),
+    # except it can be optimized to not create an intermediate dataset.
+    #
+    #   DB[:table].where_all(:id=>[1,2,3])
+    #   # SELECT * FROM table WHERE (id IN (1, 2, 3))
+    def where_all(cond, &block)
+      if loader = _where_loader
+        loader.all(filter_expr(cond), &block)
+      else
+        where(cond).all(&block)
+      end
+    end
+
+    # Iterate over all rows matching the given filter condition, 
+    # yielding each row to the given block.  Basically the same as where(cond).each(&block),
+    # except it can be optimized to not create an intermediate dataset.
+    #
+    #   DB[:table].where_each(:id=>[1,2,3]){|row| p row}
+    #   # SELECT * FROM table WHERE (id IN (1, 2, 3))
+    def where_each(cond, &block)
+      if loader = _where_loader
+        loader.each(filter_expr(cond), &block)
+      else
+        where(cond).each(&block)
+      end
+    end
+
+    # Filter the datasets using the given filter condition, then return a single value.
+    # This assumes that the dataset has already been setup to limit the selection to
+    # a single column.  Basically the same as where(cond).single_value,
+    # except it can be optimized to not create an intermediate dataset.
+    #
+    #   DB[:table].select(:name).where_single_value(:id=>1)
+    #   # SELECT name FROM table WHERE (id = 1) LIMIT 1
+    def where_single_value(cond)
+      if loader = cached_placeholder_literalizer(:_where_single_value_loader) do |pl|
+          single_value_ds.where(pl.arg)
+        end
+
+        loader.get(filter_expr(cond))
+      else
+        where(cond).single_value
+      end
+    end
+
     # Run the given SQL and return an array of all rows.  If a block is given,
     # each row is yielded to the block after all rows are loaded. See with_sql_each.
     def with_sql_all(sql, &block)
@@ -1042,6 +1089,13 @@ module Sequel
     # A cached dataset for a single record for this dataset.
     def _single_record_ds
       cached_dataset(:_single_record_ds){clone(:limit=>1)}
+    end
+
+    # Loader used for where_all and where_each.
+    def _where_loader
+      cached_placeholder_literalizer(:_where_loader) do |pl|
+        where(pl.arg)
+      end
     end
 
     # Automatically alias the given expression if it does not have an identifiable alias.
