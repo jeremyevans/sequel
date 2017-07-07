@@ -28,9 +28,8 @@ module Sequel
     def self.connect(conn_string, opts = OPTS)
       case conn_string
       when String
-        # SEQUEL5: Remove do
-        if match = /\A(jdbc|do):/.match(conn_string)
-          c = adapter_class(match[1].to_sym)
+        if match = /\Ajdbc:/.match(conn_string)
+          c = adapter_class(:jdbc)
           opts = opts.merge(:orig_opts=>opts.dup)
           opts = {:uri=>conn_string}.merge!(opts)
         else

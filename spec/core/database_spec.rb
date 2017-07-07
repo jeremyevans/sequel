@@ -93,14 +93,6 @@ describe "A new Database" do
     db.opts[:uri].must_equal 'jdbc:test://host/db_name'
   end
 
-  it "should just use a :uri option for do with the full connection string" do
-    db = Sequel::Database.stub(:adapter_class, Sequel::Database) do
-      Sequel.connect('do:test://host/db_name')
-    end
-    db.must_be_kind_of(Sequel::Database)
-    db.opts[:uri].must_equal 'do:test://host/db_name'
-  end
-
   it "should populate :adapter option when using connection string" do
     Sequel.connect('mock:/').opts[:adapter].must_equal "mock"
   end
