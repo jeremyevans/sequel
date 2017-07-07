@@ -16,27 +16,15 @@ class Minitest::HooksSpec
   end
 
   def self.with_symbol_splitting(a, &block)
-    it(a) do
+    it("#{a}, with symbol splitting enabled") do
       with_symbol_splitting{instance_exec(&block)}
     end
-    it("#{a}, except when symbol_splitting disabled") do
-      without_symbol_splitting{instance_exec(&block)}
-    end
-  end
-
-  def without_symbol_splitting
-    Sequel.split_symbols = false
-    DB.send(:reset_default_dataset) if defined?(DB)
-    proc{yield}.must_raise Minitest::Assertion
-  ensure
-    Sequel.split_symbols = :deprecated
-    DB.send(:reset_default_dataset) if defined?(DB)
   end
 
   def with_symbol_splitting
     Sequel.split_symbols = true
     yield
   ensure
-    Sequel.split_symbols = :deprecated
+    Sequel.split_symbols = false
   end
 end

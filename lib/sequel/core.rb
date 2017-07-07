@@ -24,7 +24,7 @@
 module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
-  @split_symbols = :deprecated
+  @split_symbols = false
   @single_threaded = false
 
   class << self
@@ -197,19 +197,10 @@ module Sequel
       if split = split_symbols?
         v = case s = sym.to_s
         when /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/
-          if split == :deprecated
-            Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.qualify(#{$1.inspect}, #{$2.inspect}).as(#{$3.inspect})")
-          end
           [$1.freeze, $2.freeze, $3.freeze].freeze
         when /\A((?:(?!___).)+)___(.+)\z/
-          if split == :deprecated
-            Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.identifier(#{$1.inspect}).as(#{$2.inspect})")
-          end
           [nil, $1.freeze, $2.freeze].freeze
         when /\A((?:(?!__).)+)__(.+)\z/
-          if split == :deprecated
-            Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.qualify(#{$1.inspect}, #{$2.inspect})")
-          end
           [$1.freeze, $2.freeze, nil].freeze
         else
           [nil, s.freeze, nil].freeze

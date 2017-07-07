@@ -23,30 +23,15 @@ describe "Blockless Ruby Filters" do
     @d.l(:x__y___z).must_equal 'x.y AS z'
   end
 
-  deprecated "should support qualified columns and aliased columns using symbols 2" do
-    @d.l(:x__y).must_equal 'x.y'
-    @d.l(:x___y).must_equal 'x AS y'
-    @d.l(:x__y___z).must_equal 'x.y AS z'
-  end
-
   with_symbol_splitting "should support qualified columns using virtual rows" do
     @d.l(Sequel.expr{x__y}).must_equal 'x.y'
   end
 
-  deprecated "should support qualified columns using virtual rows" do
-    @d.l(Sequel.expr{x__y}).must_equal 'x.y'
-  end
-
   it "should not split symbols or virtual row methods if symbol splitting is disabled" do
-    begin
-      Sequel.split_symbols = false
-      @d.l(:x__y).must_equal 'x__y'
-      @d.l(:x___y).must_equal 'x___y'
-      @d.l(:x__y___z).must_equal 'x__y___z'
-      @d.l(Sequel.expr{x__y}).must_equal 'x__y'
-    ensure
-      Sequel.split_symbols = :deprecated
-    end
+    @d.l(:x__y).must_equal 'x__y'
+    @d.l(:x___y).must_equal 'x___y'
+    @d.l(:x__y___z).must_equal 'x__y___z'
+    @d.l(Sequel.expr{x__y}).must_equal 'x__y'
   end
 
   it "should support NOT with SQL functions" do
