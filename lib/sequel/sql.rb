@@ -122,20 +122,6 @@ module Sequel
       def inspect
         "#<#{self.class} #{instance_variables.map{|iv| "#{iv}=>#{instance_variable_get(iv).inspect}"}.join(', ')}>"
       end
-
-      # Returns +self+, because <tt>SQL::Expression</tt> already acts like +LiteralString+.
-      def lit
-        Sequel::Deprecation.deprecate("Sequel::SQL::Expression#lit", "This method returns self, so just use the receiver")
-        self
-      end
-      
-      # Alias of +to_s+
-      def sql_literal(ds)
-        Sequel::Deprecation.deprecate("Sequel::SQL::Expression#sql_literal", "Call Sequel::Dataset#literal with the expression instead")
-        s = String.new
-        to_s_append(ds, s)
-        s
-      end
     end
 
     # Represents a complex SQL expression, with a given operator and one
