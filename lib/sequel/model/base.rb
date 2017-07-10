@@ -225,11 +225,6 @@ module Sequel
         klass
       end
   
-      def <<(arg)
-        Sequel::Deprecation.deprecate("Sequel::Model.<<", "Switch to using #insert")
-        dataset << (arg)
-      end
-
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
       # object is given, it finds the first record whose primary key(s) match

@@ -9,10 +9,6 @@ describe Sequel::Model, "class dataset methods"  do
   end
 
   it "should call the dataset method of the same name with the same args" do
-    deprecated do
-      @c.<<({}).must_equal @d
-    end
-    @db.sqls.must_equal ["INSERT INTO items DEFAULT VALUES"]
     @c.all.must_equal [@c.load(:id=>1)]
     @db.sqls.must_equal ["SELECT * FROM items"]
     @c.avg(:id).must_equal 1
@@ -54,7 +50,7 @@ describe Sequel::Model, "class dataset methods"  do
     @c.import([:id], [[1]])
     @db.sqls.must_equal ["BEGIN", "INSERT INTO items (id) VALUES (1)", "COMMIT"]
     @c.inner_join(@c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
-    @c.insert.must_equal 2
+    @c.insert.must_equal 1
     @db.sqls.must_equal ["INSERT INTO items DEFAULT VALUES"]
     @c.intersect(@d, :from_self=>false).sql.must_equal "SELECT * FROM items INTERSECT SELECT * FROM items"
     @c.join(@c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
