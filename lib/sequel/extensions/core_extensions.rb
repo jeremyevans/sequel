@@ -48,10 +48,6 @@ class Array
   def sql_value_list
     ::Sequel::SQL::ValueList.new(self)
   end
-  def sql_array
-    Sequel::Deprecation.deprecate("Array#sql_array in the core_extensions extension", "Use Array#sql_value_list instead")
-    sql_value_list
-  end
 
   # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, matching all of the
   # conditions.  Rarely do you need to call this explicitly, as Sequel generally
