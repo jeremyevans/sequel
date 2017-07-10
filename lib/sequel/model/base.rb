@@ -447,143 +447,10 @@ module Sequel
         find(cond) || create(cond, &block)
       end
 
-      FINDER_TYPES = [:first, :all, :each, :get].freeze
-
-      # Create an optimized finder method using a dataset placeholder literalizer.
-      # This pre-computes the SQL to use for the query, except for given arguments.
-      #
-      # There are two ways to use this.  The recommended way is to pass a symbol
-      # that represents a model class method that returns a dataset:
-      #
-      #   def Artist.by_name(name)
-      #     where(:name=>name)
-      #   end
-      #
-      #   Artist.finder :by_name
-      #
-      # This creates an optimized first_by_name method, which you can call normally:
-      #
-      #   Artist.first_by_name("Joe")
-      #
-      # The alternative way to use this to pass your own block:
-      #
-      #   Artist.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
-      #
-      # Note that if you pass your own block, you are responsible for manually setting
-      # limits if necessary (as shown above).
-      #
-      # Options:
-      # :arity :: When using a symbol method name, this specifies the arity of the method.
-      #           This should be used if if the method accepts an arbitrary number of arguments,
-      #           or the method has default argument values.  Note that if the method is defined
-      #           as a dataset method, the class method Sequel creates accepts an arbitrary number
-      #           of arguments, so you should use this option in that case.  If you want to handle
-      #           multiple possible arities, you need to call the finder method multiple times with
-      #           unique :arity and :name methods each time.
-      # :name :: The name of the method to create.  This must be given if you pass a block.
-      #          If you use a symbol, this defaults to the symbol prefixed by the type.
-      # :mod :: The module in which to create the finder method.  Defaults to the singleton
-      #         class of the model.
-      # :type :: The type of query to run.  Can be :first, :each, :all, or :get, defaults to
-      #          :first.
-      #
-      # Caveats:
-      #
-      # This doesn't handle all possible cases.  For example, if you have a method such as:
-      #
-      #   def Artist.by_name(name)
-      #     name ? where(:name=>name) : exclude(:name=>nil)
-      #   end
-      #
-      # Then calling a finder without an argument will not work as you expect.
-      #
-      #   Artist.finder :by_name
-      #   Artist.by_name(nil).first
-      #   # WHERE (name IS NOT NULL)
-      #   Artist.first_by_name(nil)
-      #   # WHERE (name IS NULL)
-      #
-      # See Dataset::PlaceholderLiteralizer for additional caveats.
-      def finder(meth=OPTS, opts=OPTS, &block)
-        Sequel::Deprecation.deprecate("Sequel::Model.finder and Sequel::Model.prepared_finder", "They have been moved to the finder plugin")
-        if block
-          raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
-          raise Error, "cannot pass two option hashes to Model.finder" unless opts.equal?(OPTS)
-          opts = meth
-          raise Error, "must provide method name via :name option when passing block to Model.finder" unless meth_name = opts[:name]
-        end
-
-        type = opts.fetch(:type, :first)
-        unless prepare = opts[:prepare]
-          raise Error, ":type option to Model.finder must be :first, :all, :each, or :get" unless FINDER_TYPES.include?(type)
-        end
-        limit1 = type == :first || type == :get
-        meth_name ||= opts[:name] || :"#{type}_#{meth}"
-
-        argn = lambda do |model|
-          if arity = opts[:arity]
-            arity
-          else
-            method = block || model.method(meth)
-            (method.arity < 0 ? method.arity.abs - 1 : method.arity)
-          end
-        end
-
-        loader_proc = if prepare
-          proc do |model|
-            args = prepare_method_args('$a', argn.call(model))
-            ds = if block
-              model.instance_exec(*args, &block)
-            else
-              model.send(meth, *args)
-            end
-            ds = ds.limit(1) if limit1
-            model_name = model.name
-            if model_name.to_s.empty?
-              model_name = model.object_id
-            else
-              model_name = model_name.gsub(/\W/, '_')
-            end
-            ds.prepare(type, :"#{model_name}_#{meth_name}")
-          end
-        else
-          proc do |model|
-            n = argn.call(model)
-            block ||= lambda do |pl, model2|
-              args = (0...n).map{pl.arg}
-              ds = model2.send(meth, *args)
-              ds = ds.limit(1) if limit1
-              ds
-            end
-
-            Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block) 
-          end
-        end
-
-        @finder_loaders[meth_name] = loader_proc
-        mod = opts[:mod] || (class << self; self; end)
-        if prepare
-          def_prepare_method(mod, meth_name)
-        else
-          def_finder_method(mod, meth_name, type)
-        end
-      end
-
-      def first_where(cond)
-        Sequel::Deprecation.deprecate("Sequel::Model.first_where", "Instead, use Sequel::Model.first")
-        if cond.is_a?(Integer)
-          dataset.where(cond).first(cond)
-        else
-          dataset.first(cond)
-        end
-      end
-
       # Freeze a model class, disallowing any further changes to it.
       def freeze
         dataset_module.freeze
         overridable_methods_module.freeze
-
-        @finder_loaders.freeze # SEQUEL5: Remove
 
         if @dataset
           @dataset.freeze
@@ -591,14 +458,11 @@ module Sequel
           db_schema.freeze.each_value(&:freeze)
           columns.freeze
           setter_methods.freeze
-          @finder_loaders.each_key{|k| finder_for(k)} # SEQUEL5: Remove
-        else
-          @setter_methods = [].freeze
         end
 
+        @setter_methods = [].freeze
         @dataset_method_modules.freeze
         @default_set_fields_options.freeze
-        @finders.freeze # SEQUEL5: Remove
         @plugins.freeze
         @allowed_columns.freeze if @allowed_columns  # SEQUEL5: Remove
 
@@ -744,28 +608,6 @@ module Sequel
         end
       end
   
-      # Similar to finder, but uses a prepared statement instead of a placeholder
-      # literalizer. This makes the SQL used static (cannot vary per call), but
-      # allows binding argument values instead of literalizing them into the SQL
-      # query string.
-      #
-      # If a block is used with this method, it is instance_execed by the model,
-      # and should accept the desired number of placeholder arguments.
-      #
-      # The options are the same as the options for finder, with the following
-      # exception:
-      # :type :: Specifies the type of prepared statement to create
-      def prepared_finder(meth=OPTS, opts=OPTS, &block)
-        # SEQUEL5: Remove
-        if block
-          raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
-          meth = meth.merge(:prepare=>true)
-        else
-          opts = opts.merge(:prepare=>true)
-        end
-        finder(meth, opts, &block)
-      end
-
       # Restrict the setting of the primary key(s) when using mass assignment (e.g. +set+).  Because
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
@@ -1004,33 +846,6 @@ module Sequel
         end
       end
 
-      # Define a finder method in the given module with the given method name that
-      # load rows using the finder with the given name.
-      def def_finder_method(mod, meth, type)
-        # SEQUEL5: Remove
-        mod.send(:define_method, meth){|*args, &block| finder_for(meth).send(type, *args, &block)}
-      end
-
-      # Define a prepared_finder method in the given module that will call the associated prepared
-      # statement.
-      def def_prepare_method(mod, meth)
-        # SEQUEL5: Remove
-        mod.send(:define_method, meth){|*args, &block| finder_for(meth).call(prepare_method_arg_hash(args), &block)}
-      end
-
-      # Find the finder to use for the give method.  If a finder has not been loaded
-      # for the method, load the finder and set correctly in the finders hash, then
-      # return the finder.
-      def finder_for(meth)
-        # SEQUEL5: Remove
-        unless finder = (frozen? ? @finders[meth] : Sequel.synchronize{@finders[meth]})
-          finder_loader = @finder_loaders.fetch(meth)
-          finder = finder_loader.call(self)
-          Sequel.synchronize{@finders[meth] = finder}
-        end
-        finder
-      end
-
       # Get the schema from the database, fall back on checking the columns
       # via the database if that will return inaccurate results or if
       # it raises an error.
@@ -1106,8 +921,6 @@ module Sequel
           :@default_set_fields_options=>:dup,
           :@fast_instance_delete_sql=>nil,
           :@fast_pk_lookup_sql=>nil,
-          :@finder_loaders=>:dup, # SEQUEL5: Remove
-          :@finders=>:dup, # SEQUEL5: Remove
           :@plugins=>:dup,
           :@primary_key=>nil,
           :@raise_on_save_failure=>nil,

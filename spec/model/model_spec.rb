@@ -179,10 +179,8 @@ describe "Sequel::Model.freeze" do
     model = Class.new(Sequel::Model(:items))
     deprecated do
       model.set_allowed_columns [:id]
-      model.finder(:name=>:f_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
     end
     model.freeze
-    model.f_by_name(1)
 
     model.frozen?.must_equal true
     model.dataset.frozen?.must_equal true
@@ -193,10 +191,9 @@ describe "Sequel::Model.freeze" do
     model.send(:overridable_methods_module).frozen?.must_equal true
     model.default_set_fields_options.frozen?.must_equal true
 
-    proc{model.dataset_module{}}.must_raise RuntimeError, TypeError
+    proc{model.dataset_module{}}.must_raise RuntimeError
     deprecated do
       model.allowed_columns.frozen?.must_equal true
-      proc{model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}}.must_raise RuntimeError, TypeError
     end
   end
 
@@ -211,10 +208,7 @@ describe "Sequel::Model.freeze" do
     model.send(:overridable_methods_module).frozen?.must_equal true
     model.default_set_fields_options.frozen?.must_equal true
 
-    proc{model.dataset_module{}}.must_raise RuntimeError, TypeError
-    deprecated do
-      proc{model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}}.must_raise RuntimeError, TypeError
-    end
+    proc{model.dataset_module{}}.must_raise RuntimeError
   end
 
   it "should allow subclasses of frozen model classes to work correctly" do
@@ -225,10 +219,6 @@ describe "Sequel::Model.freeze" do
 
     model.dataset_module{}
     model.plugin Module.new
-    deprecated do
-      model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
-    end
-    model.first_by_name('a').values.must_equal(:id=>1, :x=>1)
 
     model.frozen?.must_equal false
     model.db_schema.frozen?.must_equal false
@@ -580,242 +570,6 @@ describe Sequel::Model, ".find" do
 
     @c.find{(x > 1) & (y < 2)}.must_be_kind_of(@c)
     DB.sqls.must_equal ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
-  end
-end
-
-describe Sequel::Model, ".first_where" do
-  deprecated "should take a condition and do a lookup" do
-    db = Sequel.mock(:fetch=>[])
-    c = Class.new(Sequel::Model(db[:items]))
-    db.sqls
-    c.first_where(:a)
-    db.sqls.must_equal ['SELECT * FROM items WHERE a LIMIT 1']
-    proc{c.first_where(1)}.must_raise Sequel::Error
-  end
-end
-
-describe Sequel::Model, ".finder" do
-  before do
-    @h = {:id=>1}
-    @db = Sequel.mock(:fetch=>@h)
-    @c = Class.new(Sequel::Model(@db[:items]))
-    @c.instance_eval do
-      def foo(a, b)
-        where(:bar=>a).order(b)
-      end
-    end
-    @o = @c.load(@h)
-    @db.sqls
-  end
-
-  deprecated "should create a method that calls the method given and returns the first instance" do
-    @c.finder :foo
-    @c.first_foo(1, 2).must_equal @o
-    @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
-  end
-
-  deprecated "should work correctly when subclassing" do
-    @c.finder(:foo)
-    @sc = Class.new(@c)
-    @sc.set_dataset :foos
-    @db.sqls
-    @sc.first_foo(1, 2).must_equal @sc.load(@h)
-    @sc.first_foo(3, 4).must_equal @sc.load(@h)
-    @db.sqls.must_equal ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
-  end
-
-  deprecated "should work correctly when dataset is modified" do
-    @c.finder(:foo)
-    @c.first_foo(1, 2).must_equal @o
-    @c.set_dataset :foos
-    @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
-  end
-
-  deprecated "should create a method based on the given block if no method symbol provided" do
-    @c.finder(:name=>:first_foo){|pl, ds| ds.where(pl.arg).limit(1)}
-    @c.first_foo(:id=>1).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-  end
-
-  deprecated "should raise an error if both a block and method symbol given" do
-    proc{@c.finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should raise an error if two option hashes are provided" do
-    proc{@c.finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should support :type option" do
-    @c.finder :foo, :type=>:all
-    @c.finder :foo, :type=>:each
-    @c.finder :foo, :type=>:get
-
-    a = []
-    @c.all_foo(1, 2){|r| a << r}.must_equal [@o]
-    a.must_equal [@o]
-   
-    a = []
-    @c.each_foo(3, 4){|r| a << r}
-    a.must_equal [@o]
-
-    @c.get_foo(5, 6).must_equal 1
-
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4", "SELECT * FROM items WHERE (bar = 5) ORDER BY 6 LIMIT 1"]
-  end
-
-  deprecated "should support :name option" do
-    @c.finder :foo, :name=>:find_foo
-    @c.find_foo(1, 2).must_equal @o
-    @c.find_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
-  end
-
-  deprecated "should support :arity option" do
-    def @c.foobar(*b)
-      ds = dataset
-      b.each_with_index do |a, i|
-        ds = ds.where(i=>a)
-      end
-      ds
-    end
-    @c.finder :foobar, :arity=>1, :name=>:find_foobar_1
-    @c.finder :foobar, :arity=>2, :name=>:find_foobar_2
-    @c.find_foobar_1(:a)
-    @c.find_foobar_2(:a, :b)
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (0 = a) LIMIT 1", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1"]
-  end
-
-  deprecated "should support :mod option" do
-    m = Module.new
-    @c.finder :foo, :mod=>m
-    proc{@c.first_foo}.must_raise NoMethodError
-    @c.extend m
-    @c.first_foo(1, 2).must_equal @o
-    @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
-  end
-
-  deprecated "should raise error when calling with the wrong arity" do
-    @c.finder :foo
-    proc{@c.first_foo(1)}.must_raise Sequel::Error
-    proc{@c.first_foo(1,2,3)}.must_raise Sequel::Error
-  end
-end
-
-describe Sequel::Model, ".prepared_finder" do
-  before do
-    @h = {:id=>1}
-    @db = Sequel.mock(:fetch=>@h)
-    @db.extend_datasets do
-      def select_sql
-        sql = super
-        sql << ' -- prepared' if is_a?(Sequel::Dataset::PreparedStatementMethods)
-        sql
-      end
-    end
-    @c = Class.new(Sequel::Model(@db[:items]))
-    @c.instance_eval do
-      def foo(a, b)
-        where(:bar=>a).order(b)
-      end
-    end
-    @o = @c.load(@h)
-    @db.sqls
-  end
-
-  deprecated "should create a method that calls the method given and returns the first instance" do
-    @c.prepared_finder :foo
-    @c.first_foo(1, 2).must_equal @o
-    @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should work correctly when subclassing" do
-    @c.prepared_finder(:foo)
-    @sc = Class.new(@c)
-    @sc.set_dataset :foos
-    @db.sqls
-    @sc.first_foo(1, 2).must_equal @sc.load(@h)
-    @sc.first_foo(3, 4).must_equal @sc.load(@h)
-    @db.sqls.must_equal ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should work correctly when dataset is modified" do
-    @c.prepared_finder(:foo)
-    @c.first_foo(1, 2).must_equal @o
-    @c.set_dataset :foos
-    @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should create a method based on the given block if no method symbol provided" do
-    @c.prepared_finder(:name=>:first_foo){|a1| where(:id=>a1).limit(1)}
-    @c.first_foo(1).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should raise an error if both a block and method symbol given" do
-    proc{@c.prepared_finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should raise an error if two option hashes are provided" do
-    proc{@c.prepared_finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
-  end
-
-  deprecated "should support :type option" do
-    @c.prepared_finder :foo, :type=>:all
-    @c.prepared_finder :foo, :type=>:each
-
-    a = []
-    @c.all_foo(1, 2){|r| a << r}.must_equal [@o]
-    a.must_equal [@o]
-   
-    a = []
-    @c.each_foo(3, 4){|r| a << r}
-    a.must_equal [@o]
-
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 -- prepared"]
-  end
-
-  deprecated "should support :name option" do
-    @c.prepared_finder :foo, :name=>:find_foo
-    @c.find_foo(1, 2).must_equal @o
-    @c.find_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should support :arity option" do
-    def @c.foobar(*b)
-      ds = dataset
-      b.each_with_index do |a, i|
-        ds = ds.where(i=>a)
-      end
-      ds
-    end
-    @c.prepared_finder :foobar, :arity=>1, :name=>:find_foobar_1
-    @c.prepared_finder :foobar, :arity=>2, :name=>:find_foobar_2
-    @c.find_foobar_1(:a)
-    @c.find_foobar_2(:a, :b)
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (0 = a) LIMIT 1 -- prepared", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should support :mod option" do
-    m = Module.new
-    @c.prepared_finder :foo, :mod=>m
-    proc{@c.first_foo}.must_raise NoMethodError
-    @c.extend m
-    @c.first_foo(1, 2).must_equal @o
-    @c.first_foo(3, 4).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
-  end
-
-  deprecated "should handle models with names" do
-    def @c.name; 'foobar' end
-    @c.prepared_finder :foo
-    @c.first_foo(1, 2).must_equal @o
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared"]
   end
 end
 

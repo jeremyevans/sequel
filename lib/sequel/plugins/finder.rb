@@ -190,7 +190,7 @@ module Sequel
           finder(meth, opts, &block)
         end
 
-        Plugins.inherited_instance_variables(self, :@finders=>:dup, :@autoreloading_associations=>:hash_dup, :@default_association_options=>:dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
+        Plugins.inherited_instance_variables(self, :@finders=>:dup, :@finder_loaders=>:dup)
 
         private
 
