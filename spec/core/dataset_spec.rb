@@ -248,19 +248,17 @@ describe "A dataset with a limit" do
     @dataset.db.sqls.must_equal ['DELETE FROM a']
   end
   
-  if false #SEQUEL5
-    it "should raise on #update" do
-      proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
-    end
+  it "should raise on #update" do
+    proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
+  end
 
-    it "should raise on #delete" do
-      proc{@dataset.delete}.must_raise(Sequel::InvalidOperation)
-    end
-    
-    it "should raise on #truncate" do
-      proc{@dataset.truncate}.must_raise(Sequel::InvalidOperation)
-      proc{@dataset.skip_limit_check.truncate}.must_raise(Sequel::InvalidOperation)
-    end
+  it "should raise on #delete" do
+    proc{@dataset.delete}.must_raise(Sequel::InvalidOperation)
+  end
+  
+  it "should raise on #truncate" do
+    proc{@dataset.truncate}.must_raise(Sequel::InvalidOperation)
+    proc{@dataset.skip_limit_check.truncate}.must_raise(Sequel::InvalidOperation)
   end
 end
 
@@ -279,19 +277,17 @@ describe "A dataset with an offset" do
     @dataset.db.sqls.must_equal ['DELETE FROM a']
   end
   
-  if false #SEQUEL5
-    it "should raise on #update" do
-      proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
-    end
+  it "should raise on #update" do
+    proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
+  end
 
-    it "should raise on #delete" do
-      proc{@dataset.delete}.must_raise(Sequel::InvalidOperation)
-    end
-    
-    it "should raise on #truncate" do
-      proc{@dataset.truncate}.must_raise(Sequel::InvalidOperation)
-      proc{@dataset.skip_limit_check.truncate}.must_raise(Sequel::InvalidOperation)
-    end
+  it "should raise on #delete" do
+    proc{@dataset.delete}.must_raise(Sequel::InvalidOperation)
+  end
+  
+  it "should raise on #truncate" do
+    proc{@dataset.truncate}.must_raise(Sequel::InvalidOperation)
+    proc{@dataset.skip_limit_check.truncate}.must_raise(Sequel::InvalidOperation)
   end
 end
 

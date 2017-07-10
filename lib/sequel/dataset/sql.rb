@@ -840,9 +840,7 @@ module Sequel
     # Emit deprecation warning if the dataset uses limits or offsets.
     def check_not_limited!(type)
       return if @opts[:skip_limit_check] && type != :truncate
-      # SEQUEL5
-      #raise InvalidOperation, "Dataset##{type} not supported on datasets with limits or offsets" if opts[:limit] || opts[:offset]
-      Sequel::Deprecation.deprecate("Dataset##{type} on datasets with limits or offsets", "Call unlimited to remove the limit #{'or skip_limit_check to ignore the limit ' unless type == :truncate}before calling #{type}") if @opts[:limit] || @opts[:offset]
+      raise InvalidOperation, "Dataset##{type} not supported on datasets with limits or offsets" if opts[:limit] || opts[:offset]
     end
 
     # Alias of check_modification_allowed!
