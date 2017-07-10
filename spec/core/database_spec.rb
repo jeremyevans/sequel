@@ -6,8 +6,8 @@ describe "A new Database" do
   end
   
   it "should not allow dup/clone" do
-    proc{@db.dup}.must_raise Sequel::Error
-    proc{@db.clone}.must_raise Sequel::Error
+    proc{@db.dup}.must_raise NoMethodError
+    proc{@db.clone}.must_raise NoMethodError
   end
 
   it "should receive options" do

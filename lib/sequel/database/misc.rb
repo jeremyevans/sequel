@@ -164,9 +164,7 @@ module Sequel
     end
 
     # Disallow dup/clone for Database instances
-    def initialize_copy(_)
-      raise(Error, "cannot dup/clone a Sequel::Database instance")
-    end
+    undef_method :dup, :clone, :initialize_copy, :initialize_clone, :initialize_dup
 
     # Cast the given type to a literal type
     #
