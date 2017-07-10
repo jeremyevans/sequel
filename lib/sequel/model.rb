@@ -44,7 +44,7 @@ module Sequel
     @raise_on_save_failure = true
     @raise_on_typecast_failure = false
     @require_modification = nil
-    @require_valid_table = nil
+    @require_valid_table = true
     @restrict_primary_key = true
     @setter_methods = nil
     @simple_pk = nil

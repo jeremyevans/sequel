@@ -747,14 +747,7 @@ module Sequel
         rescue Sequel::DatabaseConnectionError
           raise
         rescue Sequel::Error
-          case do_raise
-          when nil
-            Sequel::Deprecation.deprecate("Setting a model class dataset to an invalid dataset", "Either use a valid dataset or set require_valid_table = false for the model class")
-          when false
-            # nothing
-          else
-            raise
-          end
+          raise if do_raise
         end
       end
 
