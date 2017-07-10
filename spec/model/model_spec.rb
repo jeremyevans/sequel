@@ -559,36 +559,6 @@ describe Sequel::Model, "new" do
   end
 end
 
-describe Sequel::Model, ".subset" do
-  before do
-    @c = Class.new(Sequel::Model(:items))
-    DB.reset
-  end
-
-  deprecated "should create a filter on the underlying dataset" do
-    proc {@c.new_only}.must_raise(NoMethodError)
-    
-    @c.subset(:new_only){age < 'new'}
-    
-    @c.new_only.sql.must_equal "SELECT * FROM items WHERE (age < 'new')"
-    @c.dataset.new_only.sql.must_equal "SELECT * FROM items WHERE (age < 'new')"
-    
-    @c.subset(:pricey){price > 100}
-    
-    @c.pricey.sql.must_equal "SELECT * FROM items WHERE (price > 100)"
-    @c.dataset.pricey.sql.must_equal "SELECT * FROM items WHERE (price > 100)"
-    
-    @c.pricey.new_only.sql.must_equal "SELECT * FROM items WHERE ((price > 100) AND (age < 'new'))"
-    @c.new_only.pricey.sql.must_equal "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
-  end
-
-  deprecated "should not override existing model methods" do
-    def @c.active() true end
-    @c.subset(:active, :active)
-    @c.active.must_equal true
-  end
-end
-
 describe Sequel::Model, ".find" do
   before do
     @c = Class.new(Sequel::Model(:items))
