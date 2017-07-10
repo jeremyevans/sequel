@@ -200,8 +200,7 @@ module Sequel
             send(*prepared_type, &block) 
           end
         else
-          Sequel::Deprecation.deprecate("Using an unsupported prepared statement type (#{prepared_type.inspect})", 'Switch to using :select as the prepared statement type')
-          all(&block)
+          raise Error, "unsupported prepared statement type used: #{prepared_type.inspect}"
         end
       end
       
