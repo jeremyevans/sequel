@@ -26,7 +26,7 @@ describe "Class Table Inheritance Plugin" do
   before do
     [:staff, :executives, :managers, :employees].each{|t| @db[t].delete}
     class ::Employee < Sequel::Model(@db)
-      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}, :alias=>:employees
+      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     end 
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff

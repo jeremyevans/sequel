@@ -759,10 +759,7 @@ module Sequel
           self.simple_table = db.literal(ds).freeze
           ds = db.from(ds)
         when Dataset
-          if ds.joined_dataset?
-            # raise Error, "Using a joined dataset as a model dataset is not support, use from_self on the dataset to wrap it in a subquery" # SEQUEL5
-            Sequel::Deprecation.deprecate("Using a joined dataset as a Sequel::Model dataset", respond_to?(:cti_base_model) ? "Use the class_table_inheritance plugin :alias option in #{cti_base_model.inspect}" : "Call from_self on the dataset to wrap it in a subquery")
-          end
+          ds = ds.from_self(:alias=>ds.first_source) if ds.joined_dataset?
 
           self.simple_table = if ds.send(:simple_select_all?)
             ds.literal(ds.first_source_table).freeze
@@ -1626,15 +1623,7 @@ module Sequel
       def this
         return @this if @this
         raise Error, "No dataset for model #{model}" unless ds = model.instance_dataset
-
-        cond = if ds.joined_dataset?
-          # SEQUEL5: Remove as joined model datasets are now allowed
-          qualified_pk_hash
-        else
-          pk_hash
-        end
-
-        @this = use_server(ds.where(cond))
+        @this = use_server(ds.where(pk_hash))
       end
       
       # Runs #set with the passed hash and then runs save_changes.

@@ -64,13 +64,13 @@ describe "Sequel::Plugins::TableSelect" do
     @Album.dataset.sql.must_equal 'SELECT foo.* FROM (SELECT * FROM a1 CROSS JOIN a2) AS foo'
   end
 
-  deprecated "should not add a table.* selection on existing dataset with multiple tables" do
+  it "should work with implicit subqueries used for joined datasets" do
     @Album.dataset = @Album.db.from(:a1, :a2)
     @Album.plugin :table_select
-    @Album.dataset.sql.must_equal 'SELECT * FROM a1, a2'
+    @Album.dataset.sql.must_equal 'SELECT a1.* FROM (SELECT * FROM a1, a2) AS a1'
 
     @Album.dataset = @Album.db.from(:a1).cross_join(:a2)
-    @Album.dataset.sql.must_equal 'SELECT * FROM a1 CROSS JOIN a2'
+    @Album.dataset.sql.must_equal 'SELECT a1.* FROM (SELECT * FROM a1 CROSS JOIN a2) AS a1'
   end
 
   it "works correctly when loaded on model without a dataset" do

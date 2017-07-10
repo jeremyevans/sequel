@@ -297,6 +297,13 @@ describe Sequel::Model do
     proc{@model.set_dataset(Object.new)}.must_raise(Sequel::Error)
   end
 
+  it "set_dataset should use a subquery for joined datasets" do
+    @model.set_dataset(DB.from(:foo, :bar))
+    @model.dataset.sql.must_equal 'SELECT * FROM (SELECT * FROM foo, bar) AS foo'
+    @model.set_dataset(DB[:foo].cross_join(:bar))
+    @model.dataset.sql.must_equal 'SELECT * FROM (SELECT * FROM foo CROSS JOIN bar) AS foo'
+  end
+
   it "set_dataset should add the destroy method to the dataset that destroys each object" do
     ds = DB[:foo]
     ds.wont_respond_to(:destroy)
@@ -748,12 +755,6 @@ describe Sequel::Model, ".[]" do
     DB.sqls.must_equal ["SELECT * FROM items WHERE name = 'sharon'"]
   end
 
-  deprecated "should use a qualified primary key if the dataset is joined" do
-    @c.dataset = @c.dataset.cross_join(:a)
-    @c[1].must_equal @c.load(:name => 'sharon', :id => 1)
-    DB.sqls.must_equal ["SELECT * FROM items CROSS JOIN a WHERE (items.id = 1) LIMIT 1"]
-  end
-
   it "should handle a dataset that uses a subquery" do
     @c.dataset = @c.dataset.cross_join(:a).from_self(:alias=>:b)
     @c[1].must_equal @c.load(:name => 'sharon', :id => 1)
@@ -824,14 +825,6 @@ describe "Model.db_schema" do
     @c.db_schema.must_equal(:x=>{:type=>:integer}, :z=>{}, :y=>{:type=>:string})
   end
 
-  deprecated "should not raise error if setting dataset where getting schema and columns raises an error" do
-    def @db.schema(table, opts={})
-      raise Sequel::Error
-    end
-    @c.dataset = @dataset.join(:x, :id).from_self.columns(:id, :x)
-    @c.db_schema.must_equal(:x=>{}, :id=>{})
-  end
-  
   it "should not raise error if setting dataset where getting schema and columns raises an error and require_valid_table is false" do
     @c.require_valid_table = false
     def @db.schema(table, opts={})

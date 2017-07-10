@@ -51,18 +51,22 @@ module Sequel
     #   # SELECT * FROM employees
     #
     #   Manager.dataset.sql
-    #   # SELECT employees.id, employees.name, employees.kind,
-    #   #        managers.num_staff
-    #   # FROM employees
-    #   # JOIN managers ON (managers.id = employees.id)
+    #   # SELECT * FROM (
+    #   #   SELECT employees.id, employees.name, employees.kind,
+    #   #          managers.num_staff
+    #   #   FROM employees
+    #   #   JOIN managers ON (managers.id = employees.id)
+    #   # ) AS employees
     #
     #   CEO.dataset.sql
-    #   # SELECT employees.id, employees.name, employees.kind,
-    #   #        managers.num_staff, executives.num_managers
-    #   # FROM employees
-    #   # JOIN managers ON (managers.id = employees.id)
-    #   # JOIN executives ON (executives.id = managers.id)
-    #   # WHERE (employees.kind IN ('CEO'))
+    #   # SELECT * FROM (
+    #   #   SELECT employees.id, employees.name, employees.kind,
+    #   #          managers.num_staff, executives.num_managers
+    #   #   FROM employees
+    #   #   JOIN managers ON (managers.id = employees.id)
+    #   #   JOIN executives ON (executives.id = managers.id)
+    #   #   WHERE (employees.kind IN ('CEO'))
+    #   # ) AS employees
     #
     # This allows CEO.all to return instances with all attributes
     # loaded.  The plugin overrides the deleting, inserting, and updating
@@ -121,7 +125,7 @@ module Sequel
     #
     #   # Use a subquery for all subclass datasets, fixing issues with ambiguous
     #   # column names.
-    #   Employee.plugin :class_table_inheritance, :key=>:kind, :alias=>:employees
+    #   Employee.plugin :class_table_inheritance, :key=>:kind
     #
     #   # Specifying the tables with a :table_map hash
     #   Employee.plugin :class_table_inheritance,
@@ -183,7 +187,7 @@ module Sequel
       end
 
       # Initialize the plugin using the following options:
-      # :alias :: Use a subquery for each subclass dataset that joins to another table,
+      # :alias :: Change the alias used for the subquery in model datasets.
       #           using this as the alias.
       # :key :: Column symbol that holds the key that identifies the class to use.
       #         Necessary if you want to call model methods on a superclass
@@ -203,7 +207,7 @@ module Sequel
           @cti_instance_dataset = @instance_dataset
           @cti_table_columns = columns
           @cti_table_map = opts[:table_map] || {}
-          @cti_alias = opts[:alias] # || table_name # SEQUEL5
+          @cti_alias = opts[:alias] || @dataset.first_source
         end
       end
 
@@ -311,14 +315,12 @@ module Sequel
             sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)
 
-            if @cti_alias # SEQUEL5: remove if
-              ds = ds.from_self(:alias=>@cti_alias)
-            end
+            ds = ds.from_self(:alias=>@cti_alias)
 
             set_dataset(ds)
             set_columns(self.columns)
             @dataset = @dataset.with_row_proc(lambda{|r| subclass.sti_load(r)})
-            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>@cti_alias||table)} # SEQUEL5: remove ||table
+            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>@cti_alias)}
 
             @cti_models += [self]
             @cti_tables += [table]
@@ -334,11 +336,7 @@ module Sequel
         # The table name for the current model class's main table.
         def table_name
           if cti_tables
-            if @cti_alias # SEQUEL5: remove if
-              @cti_alias
-            else
-              cti_tables.last
-            end
+            @cti_alias
           else
             super
           end
@@ -360,7 +358,7 @@ module Sequel
         # when setting subclass dataset.
         def sti_subclass_dataset(key)
           ds = super
-          if @cti_alias && cti_models[0] != self # SEQUEL5: remove @cti_alias
+          if cti_models[0] != self
             ds = ds.from_self(:alias=>@cti_alias)
           end
           ds
