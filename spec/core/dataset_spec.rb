@@ -388,61 +388,22 @@ describe "Dataset#where" do
       must_match(/WHERE \(\(name = 'xyz'\) AND \(price = 342\)\)|WHERE \(\(price = 342\) AND \(name = 'xyz'\)\)/)
   end
   
-  deprecated "should handle literal strings in arrays in filter methods" do
-    @dataset.where([Sequel.lit("a")]).sql.must_equal 'SELECT * FROM test WHERE (a)'
-  end
-
-  deprecated "should work with a string with placeholders and arguments for those placeholders" do
-    @dataset.where('price < ? AND id in ?', 100, [1, 2, 3]).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
-  end
-  
   it "should work with a placeholder literal string" do
     @dataset.where(Sequel.lit('price < ? AND id in ?', 100, [1, 2, 3])).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
   
-  deprecated "should not modify passed array with placeholders" do
-    a = ['price < ? AND id in ?', 100, 1, 2, 3]
-    b = a.dup
-    @dataset.where(a)
-    b.must_equal a
-  end
-
-  deprecated "should work with strings (custom SQL expressions)" do
-    @dataset.where('(a = 1 AND b = 2)').select_sql.must_equal "SELECT * FROM test WHERE ((a = 1 AND b = 2))"
-  end
-    
   it "should work with literal strings" do
     @dataset.where(Sequel.lit('(a = 1 AND b = 2)')).select_sql.must_equal "SELECT * FROM test WHERE ((a = 1 AND b = 2))"
-  end
-    
-  deprecated "should work with a string with named placeholders and a hash of placeholder value arguments" do
-    @dataset.where('price < :price AND id in :ids', :price=>100, :ids=>[1, 2, 3]).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
     
   it "should work with named placeholder strings" do
     @dataset.where(Sequel.lit('price < :price AND id in :ids', :price=>100, :ids=>[1, 2, 3])).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
     
-  deprecated "should not modify passed array with named placeholders" do
-    a = ['price < :price AND id in :ids', {:price=>100}]
-    b = a.dup
-    @dataset.where(a)
-    b.must_equal a
-  end
-
-  deprecated "should not replace named placeholders that don't exist in the hash" do
-    @dataset.where('price < :price AND id in :ids', :price=>100).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
-  end
-  
   it "should not replace named placeholders that don't exist in the hash when using placeholder strings" do
     @dataset.where(Sequel.lit('price < :price AND id in :ids', :price=>100)).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
   end
   
-  deprecated "should raise an error for a mismatched number of placeholders" do
-    proc{@dataset.where('price < ? AND id in ?', 100).select_sql}.must_raise(Sequel::Error)
-    proc{@dataset.where('price < ? AND id in ?', 100, [1, 2, 3], 4).select_sql}.must_raise(Sequel::Error)
-  end
-
   it "should raise an error for a mismatched number of placeholders in placeholder literal strings" do
     proc{@dataset.where(Sequel.lit('price < ? AND id in ?', 100)).select_sql}.must_raise(Sequel::Error)
     proc{@dataset.where(Sequel.lit('price < ? AND id in ?', 100, [1, 2, 3], 4)).select_sql}.must_raise(Sequel::Error)
@@ -458,17 +419,8 @@ describe "Dataset#where" do
     proc{@dataset.where(Sequel.lit(['price < ', ' AND id in '], 100, [1, 2, 3], 4)).select_sql}.must_raise(Sequel::Error)
   end
   
-  deprecated "should handle partial names" do
-    @dataset.where('price < :price AND id = :p', :p=>2, :price=>100).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id = 2)"
-  end
-
   it "should handle partial names when using placeholder literal strings" do
     @dataset.where(Sequel.lit('price < :price AND id = :p', :p=>2, :price=>100)).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id = 2)"
-  end
-
-  deprecated "should handle ::cast syntax when no parameters are supplied" do
-    @dataset.where('price::float = 10', {}).select_sql.must_equal "SELECT * FROM test WHERE (price::float = 10)"
-    @dataset.where('price::float ? 10', {}).select_sql.must_equal "SELECT * FROM test WHERE (price::float ? 10)"
   end
 
   it "should handle ::cast syntax when no parameters are supplied when using placeholder strings" do
@@ -482,18 +434,6 @@ describe "Dataset#where" do
     @d1.update_sql(:GDP => 0).must_equal "UPDATE test SET GDP = 0 WHERE (region = 'Asia')"
   end
     
-  deprecated "should affect select, delete and update statements when using strings" do
-    @d2 = @dataset.where('region = ?', 'Asia')
-    @d2.select_sql.must_equal "SELECT * FROM test WHERE (region = 'Asia')"
-    @d2.delete_sql.must_equal "DELETE FROM test WHERE (region = 'Asia')"
-    @d2.update_sql(:GDP => 0).must_equal "UPDATE test SET GDP = 0 WHERE (region = 'Asia')"
-    
-    @d3 = @dataset.where("a = 1")
-    @d3.select_sql.must_equal "SELECT * FROM test WHERE (a = 1)"
-    @d3.delete_sql.must_equal "DELETE FROM test WHERE (a = 1)"
-    @d3.update_sql(:GDP => 0).must_equal "UPDATE test SET GDP = 0 WHERE (a = 1)"
-  end
-  
   it "should affect select, delete and update statements when using literal strings" do
     @d2 = @dataset.where(Sequel.lit('region = ?', 'Asia'))
     @d2.select_sql.must_equal "SELECT * FROM test WHERE (region = 'Asia')"
@@ -513,18 +453,6 @@ describe "Dataset#where" do
     @d1.where{GDP() > 1000}.select_sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > 1000))"
   end
 
-  deprecated "should be composable using AND operator (for scoping) when using strings" do
-    @d2 = @dataset.where('region = ?', 'Asia')
-    @d2.where('GDP > ?', 1000).select_sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > 1000))"
-    @d2.where(:name => ['Japan', 'China']).select_sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND (name IN ('Japan', 'China')))"
-    @d2.where('GDP > ?').select_sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > ?))"
-
-    @d3 = @dataset.where("a = 1")
-    @d3.where('b = 2').select_sql.must_equal "SELECT * FROM test WHERE ((a = 1) AND (b = 2))"
-    @d3.where(:c => 3).select_sql.must_equal "SELECT * FROM test WHERE ((a = 1) AND (c = 3))"
-    @d3.where('d = ?', 4).select_sql.must_equal "SELECT * FROM test WHERE ((a = 1) AND (d = 4))"
-  end
-      
   it "should be composable using AND operator (for scoping) when using literal strings" do
     @d2 = @dataset.where(Sequel.lit('region = ?', 'Asia'))
     @d2.where(Sequel.lit('GDP > ?', 1000)).select_sql.must_equal "SELECT * FROM test WHERE ((region = 'Asia') AND (GDP > 1000))"
@@ -537,10 +465,6 @@ describe "Dataset#where" do
     @d3.where(Sequel.lit('d = ?', 4)).select_sql.must_equal "SELECT * FROM test WHERE ((a = 1) AND (d = 4))"
   end
       
-  deprecated "should be composable using AND operator (for scoping) with block and string" do
-    @dataset.where("a = 1").where{e < 5}.select_sql.must_equal "SELECT * FROM test WHERE ((a = 1) AND (e < 5))"
-  end
-  
   it "should be composable using AND operator (for scoping) with block and literal string" do
     @dataset.where(Sequel.lit("a = 1")).where{e < 5}.select_sql.must_equal "SELECT * FROM test WHERE ((a = 1) AND (e < 5))"
   end
@@ -652,18 +576,8 @@ describe "Dataset#where" do
     @dataset.filter(Sequel::SQLFALSE).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
   end
 
-  deprecated "should allow the use of multiple arguments" do
-    @dataset.filter(:a, :b).sql.must_equal 'SELECT * FROM test WHERE (a AND b)'
-    @dataset.filter(:a, :b=>1).sql.must_equal 'SELECT * FROM test WHERE (a AND (b = 1))'
-    @dataset.filter(:a, Sequel.expr(:c) > 3, :b=>1).sql.must_equal 'SELECT * FROM test WHERE (a AND (c > 3) AND (b = 1))'
-  end
-
   it "should allow the use of blocks and arguments simultaneously" do
     @dataset.filter(Sequel.expr(:zz) < 3){yy > 3}.sql.must_equal 'SELECT * FROM test WHERE ((zz < 3) AND (yy > 3))'
-  end
-
-  deprecated "should allow the use of procs" do
-    @dataset.filter(proc{yy > 3}).sql.must_equal 'SELECT * FROM test WHERE (yy > 3)'
   end
 
   it "should yield a VirtualRow to the block" do
@@ -721,10 +635,6 @@ describe "Dataset#or" do
     @d1.or(:y => 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) OR (y = 2))'
   end
   
-  deprecated "should accept string filters" do
-    @d1.or('y > ?', 2).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) OR (y > 2))'
-  end
-
   it "should accept literal string filters" do
     @d1.or(Sequel.lit('y > ?', 2)).sql.must_equal 'SELECT * FROM test WHERE ((x = 1) OR (y > 2))'
   end
@@ -760,14 +670,6 @@ describe "Dataset#exclude" do
     @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
       must_match(Regexp.union(/WHERE \(\(region != 'Asia'\) OR \(name != 'Japan'\)\)/,
                                 /WHERE \(\(name != 'Japan'\) OR \(region != 'Asia'\)\)/))
-  end
-
-  deprecated "should parenthesize a single string condition correctly" do
-    @dataset.exclude("region = 'Asia' AND name = 'Japan'").select_sql.must_equal "SELECT * FROM test WHERE NOT (region = 'Asia' AND name = 'Japan')"
-  end
-
-  deprecated "should parenthesize an array condition correctly" do
-    @dataset.exclude('region = ? AND name = ?', 'Asia', 'Japan').select_sql.must_equal "SELECT * FROM test WHERE NOT (region = 'Asia' AND name = 'Japan')"
   end
 
   it "should parenthesize a single literal string condition correctly" do
@@ -827,10 +729,6 @@ describe "Dataset#having" do
   it "should just clone if given an empty array or hash argument" do
     @dataset.having({}).sql.must_equal @dataset.sql
     @dataset.having([]).sql.must_equal @dataset.sql
-  end
-
-  deprecated "should handle string arguments" do
-    @grouped.having('sum(population) > 10').select_sql.must_equal "SELECT region, sum(population), avg(gdp) FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 
   it "should handle literal string arguments" do
@@ -2625,10 +2523,6 @@ describe "Dataset#join_table" do
       'RIGHT OUTER JOIN (SELECT * FROM attributes WHERE (name = \'blah\')) AS "t3" ON ("t3"."attribute_id" = "t2"."id")'
   end
 
-  deprecated "should support using a string as the join condition" do
-    @d.join(:categories, "c.item_id = items.id", :table_alias=>:c).sql.must_equal 'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
-  end
-  
   it "should support using a literal string as the join condition" do
     @d.join(:categories, Sequel.lit("c.item_id = items.id"), :table_alias=>:c).sql.must_equal 'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
   end
@@ -2861,16 +2755,6 @@ describe "Dataset #first and #last" do
       ds.last(Sequel.lit('y = 16')){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
       @d.first(Sequel.lit('y = ?', 25)){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
       ds.last(Sequel.lit('y = ?', 16)){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
-    end
-  end
-
-  deprecated "should combine block and standard argument filters if argument is a string" do
-    ds = @d.order(:name).freeze
-    5.times do
-      @d.first('y = 25'){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
-      ds.last('y = 16'){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
-      @d.first('y = ?', 25){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
-      ds.last('y = ?', 16){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
     end
   end
 
@@ -4007,11 +3891,6 @@ describe "Dataset prepared statements and bound variables " do
       '<Sequel::Mock::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = $n)">'
   end
     
-  deprecated "should handle literal strings" do
-    @ds.filter("num = ?", :$n).call(:select, :n=>1)
-    @db.sqls.must_equal ['SELECT * FROM items WHERE (num = 1)']
-  end
-    
   it "should handle literal strings" do
     @ds.filter(Sequel.lit("num = ?", :$n)).call(:select, :n=>1)
     @db.sqls.must_equal ['SELECT * FROM items WHERE (num = 1)']
@@ -4037,11 +3916,6 @@ describe "Dataset prepared statements and bound variables " do
   it "should handle subselects in subselects" do
     @ds.filter(:$b).filter(:num=>@ds.select(:num).filter(:num=>@ds.select(:num).filter(:num=>:$n))).call(:select, :n=>1, :b=>0)
     @db.sqls.must_equal ['SELECT * FROM items WHERE (0 AND (num IN (SELECT num FROM items WHERE (num IN (SELECT num FROM items WHERE (num = 1))))))']
-  end
-    
-  deprecated "should handle subselects with strings" do
-    @ds.filter(:$b).filter(:num=>@ds.select(:num).filter("num = ?", :$n)).call(:select, :n=>1, :b=>0)
-    @db.sqls.must_equal ['SELECT * FROM items WHERE (0 AND (num IN (SELECT num FROM items WHERE (num = 1))))']
   end
     
   it "should handle subselects with literal strings" do

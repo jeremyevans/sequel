@@ -1237,22 +1237,13 @@ module Sequel
       when Array
         if Sequel.condition_specifier?(expr)
           SQL::BooleanExpression.from_value_pairs(expr)
-        #else # SEQUEL5
-        #  raise(Error, "Invalid filter expression: #{expr.inspect}") 
-        elsif (sexpr = expr[0]).is_a?(String)
-          Sequel::Deprecation.deprecate("Calling a dataset filtering method with multiple arguments or an array where the first argument/element is a string", "Use Sequel.lit(#{sexpr.inspect}#{", #{expr[1..-1].map(&:inspect).join(', ')}" if expr.length > 1}) to create an SQL fragment expression and pass that to the dataset filtering method, or use the auto_literal_strings extension")
-          SQL::PlaceholderLiteralString.new(sexpr, expr[1..-1], true)
         else
-          Sequel::Deprecation.deprecate("Passing multiple arguments as filter arguments when not using a conditions specifier (#{expr.inspect})", "Pass the arguments to separate filter methods or use Sequel.& to combine them")
-          SQL::BooleanExpression.new(:AND, *expr.map{|x| filter_expr(x)})
+          raise Error, "Invalid filter expression: #{expr.inspect}"
         end
-      when Proc
-        Sequel::Deprecation.deprecate("Passing Proc objects as filter arguments", "Pass them as blocks to the filtering methods or to Sequel.expr")
-        filter_expr(Sequel.virtual_row(&expr))
       when LiteralString
         LiteralString.new("(#{expr})")
-      when Numeric, SQL::NumericExpression, SQL::StringExpression #, Proc, String # SEQUEL5
-        raise(Error, "Invalid filter expression: #{expr.inspect}") 
+      when Numeric, SQL::NumericExpression, SQL::StringExpression, Proc, String
+        raise Error, "Invalid filter expression: #{expr.inspect}"
       when TrueClass, FalseClass
         if supports_where_true?
           SQL::BooleanExpression.new(:NOOP, expr)
@@ -1261,9 +1252,6 @@ module Sequel
         else
           SQL::Constants::SQLFALSE
         end
-      when String
-        Sequel::Deprecation.deprecate("Calling a dataset filtering method with a plain string", "Use Sequel.lit(#{expr.inspect}) to create a literal string and pass that to the dataset filtering method, or use the auto_literal_strings extension")
-        LiteralString.new("(#{expr})")
       when PlaceholderLiteralizer::Argument
         expr.transform{|v| filter_expr(v)}
       when SQL::PlaceholderLiteralString

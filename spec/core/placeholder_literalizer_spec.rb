@@ -56,12 +56,6 @@ describe "Dataset::PlaceholderLiteralizer" do
     @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1)", "SELECT * FROM items WHERE a(b)"]
   end
   
-  deprecated "should handle calls with a literal strings used as filter arguments" do
-    loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
-    loader.first("a = 1").must_equal @h
-    @db.sqls.must_equal ["SELECT * FROM items WHERE (a = 1)"]
-  end
-  
   it "should handle calls with a literal strings used as filter arguments" do
     loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
     loader.first(Sequel.lit("a = 1")).must_equal @h
@@ -81,13 +75,6 @@ describe "Dataset::PlaceholderLiteralizer" do
     loader.first(1).must_equal @h
     loader.first(2).must_equal @h
     @db.sqls.must_equal ["SELECT * FROM items WHERE ((a = 1) AND (b = 1))", "SELECT * FROM items WHERE ((a = 2) AND (b = 2))"]
-  end
-  
-  deprecated "should handle calls with a placeholder used multiple times in different capacities" do
-    loader = @c.loader(@ds){|pl, ds| a = pl.arg; ds.where(a).where(:b=>a)}
-    loader.first("a = 1").must_equal @h
-    loader.first(["a = ?", 2]).must_equal @h
-    @db.sqls.must_equal ["SELECT * FROM items WHERE ((a = 1) AND (b = 'a = 1'))", "SELECT * FROM items WHERE ((a = 2) AND (b IN ('a = ?', 2)))"]
   end
   
   it "should handle calls with a placeholder used multiple times in different capacities" do
