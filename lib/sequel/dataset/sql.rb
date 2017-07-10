@@ -179,8 +179,7 @@ module Sequel
       when LiteralString
         # nothing
       when String
-        Sequel::Deprecation.deprecate("Calling Sequel::Dataset#update/update_sql with a plain string", "Use Sequel.lit(#{values.inspect}) to create a literal string and pass that to update/update_sql, or use the auto_literal_strings extension")
-        # raise Error, "plain string passed to Dataset#update" # SEQUEL5
+        raise Error, "plain string passed to Dataset#update is not supported, use Sequel.lit to use a literal string"
       end
 
       clone(:values=>values).send(:_update_sql)

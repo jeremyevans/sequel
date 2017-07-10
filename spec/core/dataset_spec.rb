@@ -3471,8 +3471,8 @@ describe "Dataset#update_sql" do
     @ds = Sequel.mock.dataset.from(:items)
   end
   
-  deprecated "should accept strings" do
-    @ds.update_sql("a = b").must_equal "UPDATE items SET a = b"
+  it "should raise Error for plain strings" do
+    proc{@ds.update_sql("a = b")}.must_raise Sequel::Error
   end
   
   it "should accept literal strings" do
