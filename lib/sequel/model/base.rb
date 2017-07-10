@@ -391,11 +391,8 @@ module Sequel
       # at runtime.  If you have that need, you should look into Sequel's
       # sharding support.
       def db=(db)
+        raise Error, "Cannot use Sequel::Model.db= on model with existing dataset.  Use Sequel::Model.dataset= instead." if @dataset
         @db = db
-        if @dataset
-          Sequel::Deprecation.deprecate("Sequel::Model.db= when the model has an existing dataset", "Use Sequel::Model.dataset= instead")
-          set_dataset(db.dataset.clone(@dataset.opts))
-        end
       end
       
       # Returns the cached schema information if available or gets it

@@ -565,26 +565,21 @@ describe "Model.db=" do
   before do
     @db1 = Sequel.mock
     @db2 = Sequel.mock
-    
-    @m = Class.new(Sequel::Model(@db1[:blue].filter(:x=>1)))
+    @m = Class.new(Sequel::Model(@db1))
   end
   
-  deprecated "should affect the underlying dataset" do
+  it "should change database for model" do
     @m.db = @db2
-    
-    @m.dataset.db.must_equal @db2
-    @m.dataset.db.wont_equal @db1
+    @m.db.must_equal @db2
   end
 
-  deprecated "should keep the same dataset options" do
-    @m.db = @db2
-    @m.dataset.sql.must_equal 'SELECT * FROM blue WHERE (x = 1)'
+  it "should raise Error for model with existing dataset" do
+    @m.dataset = :table
+    proc{@m.db = @db2}.must_raise Sequel::Error
   end
 
   it "should use the database for subclasses" do
-    @m = Class.new(Sequel::Model)
-    @m.db = @db2
-    Class.new(@m).db.must_equal @db2
+    Class.new(@m).db.must_equal @db1
   end
 end
 
