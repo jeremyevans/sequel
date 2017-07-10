@@ -269,15 +269,10 @@ describe Sequel::Model do
     DB.reset
   end
 
-  deprecated "should allow dup/clone" do
-    @model.dup.must_be :<, @model.superclass
-    @model.clone.must_be :<, @model.superclass
-  end
-
   it "should not allow dup/clone" do
-    proc{@model.dup}.must_raise Sequel::Error
-    proc{@model.clone}.must_raise Sequel::Error
-  end if false # SEQUEL5
+    proc{@model.dup}.must_raise NoMethodError
+    proc{@model.clone}.must_raise NoMethodError
+  end
 
   it "has table_name return name of table" do
     @model.table_name.must_equal :items

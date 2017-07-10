@@ -225,17 +225,6 @@ module Sequel
         klass
       end
   
-      def initialize_copy(_)
-        Sequel::Deprecation.deprecate("Model.clone", "Create a subclass of the model instead of cloning it")
-        # raise(Error, "cannot dup/clone a Sequel::Model class") # SEQUEL5
-        super
-      end
-      def dup
-        Sequel::Deprecation.deprecate("Model.dup", "Create a subclass of the model instead of duping it")
-        # raise(Error, "cannot dup/clone a Sequel::Model class") # SEQUEL5
-        super
-      end
-
       def <<(arg)
         Sequel::Deprecation.deprecate("Sequel::Model.<<", "Switch to using #insert")
         dataset << (arg)
@@ -2694,5 +2683,7 @@ module Sequel
 
     extend ClassMethods
     plugin self
+
+    singleton_class.send(:undef_method, :dup, :clone, :initialize_copy, :initialize_clone, :initialize_dup)
   end
 end
