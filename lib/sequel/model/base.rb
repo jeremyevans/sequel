@@ -2497,8 +2497,6 @@ module Sequel
 
     # DatasetMethods contains methods that all model datasets have.
     module DatasetMethods
-      Dataset.def_deprecated_opts_setter(self, :model)
-
       # The model class associated with this dataset
       #
       #   Artist.dataset.model # => Artist

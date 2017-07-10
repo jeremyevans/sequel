@@ -3,8 +3,6 @@
 module Sequel 
   class Dataset
     module StoredProcedureMethods
-      Dataset.def_deprecated_opts_setter(self, :sproc_type, :sproc_name, :sproc_args)
-
       # The name of the stored procedure to call
       def sproc_name
         @opts[:sproc_name]

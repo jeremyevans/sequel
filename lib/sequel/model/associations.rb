@@ -1451,8 +1451,6 @@ module Sequel
     
       # This module contains methods added to all association datasets
       module AssociationDatasetMethods
-        Dataset.def_deprecated_opts_setter(self, :model_object, :association_reflection)
-
         # The model object that created the association dataset
         def model_object
           @opts[:model_object]

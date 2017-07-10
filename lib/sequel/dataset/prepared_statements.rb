@@ -37,23 +37,10 @@ module Sequel
     end
     private_class_method :prepared_statements_module
 
-    def self.def_deprecated_opts_setter(mod, *meths)
-      meths.each do |meth|
-        mod.send(:define_method, :"#{meth}=") do |v|
-          # :nocov:
-          Sequel::Deprecation.deprecate("Dataset##{meth}=", "The API has changed, and this value should now be passed in as an option via Dataset#clone")
-          @opts[meth] = v
-          # :nocov:
-        end
-      end
-    end
-    
     # Default implementation of the argument mapper to allow
     # native database support for bind variables and prepared
     # statements (as opposed to the emulated ones used by default).
     module ArgumentMapper
-      Dataset.def_deprecated_opts_setter(self, :prepared_statement_name, :bind_arguments)
-      
       # The name of the prepared statement, if any.
       def prepared_statement_name
         @opts[:prepared_statement_name]
@@ -89,8 +76,6 @@ module Sequel
     # into the query, which works on all databases, as it is no different
     # from using the dataset without bind variables.
     module PreparedStatementMethods
-      Dataset.def_deprecated_opts_setter(self, :log_sql, :prepared_type, :prepared_args, :orig_dataset, :prepared_modify_values)
-
       # Whether to log the full SQL query.  By default, just the prepared statement
       # name is generally logged on adapters that support native prepared statements.
       def log_sql
