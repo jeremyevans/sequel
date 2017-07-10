@@ -29,7 +29,6 @@ module Sequel
       :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback # SEQUEL5: Remove commit/rollback hooks
     ]#.freeze # SEQUEL5
 
-    @allowed_columns = nil # SEQUEL5: Remove
     @cache_anonymous_models = true
     @db = nil
     @db_schema = nil
@@ -37,8 +36,6 @@ module Sequel
     @dataset_method_modules = []
     @default_eager_limit_strategy = true
     @default_set_fields_options = {}
-    @finders = {} # SEQUEL5: Remove
-    @finder_loaders = {} # SEQUEL5: Remove
     @overridable_methods_module = nil
     @fast_pk_lookup_sql = nil
     @fast_instance_delete_sql = nil

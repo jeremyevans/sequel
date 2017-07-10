@@ -177,9 +177,6 @@ end
 describe "Sequel::Model.freeze" do
   it "should freeze the model class and not allow any changes" do
     model = Class.new(Sequel::Model(:items))
-    deprecated do
-      model.set_allowed_columns [:id]
-    end
     model.freeze
 
     model.frozen?.must_equal true
@@ -192,9 +189,6 @@ describe "Sequel::Model.freeze" do
     model.default_set_fields_options.frozen?.must_equal true
 
     proc{model.dataset_module{}}.must_raise RuntimeError
-    deprecated do
-      model.allowed_columns.frozen?.must_equal true
-    end
   end
 
   it "should freeze a model class without a dataset without breaking" do

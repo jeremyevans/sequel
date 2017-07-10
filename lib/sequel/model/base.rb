@@ -464,7 +464,6 @@ module Sequel
         @dataset_method_modules.freeze
         @default_set_fields_options.freeze
         @plugins.freeze
-        @allowed_columns.freeze if @allowed_columns  # SEQUEL5: Remove
 
         super
       end
@@ -622,22 +621,6 @@ module Sequel
         @restrict_primary_key
       end
   
-      # Set the columns to allow when using mass assignment (e.g. +set+).  Using this means that
-      # any columns not listed here will not be modified.  If you have any virtual
-      # setter methods (methods that end in =) that you want to be used during
-      # mass assignment, they need to be listed here as well (without the =).
-      #
-      # It may be better to use a method such as +set_only+ or +set_fields+ that lets you specify
-      # the allowed fields per call.
-      #
-      #   Artist.set_allowed_columns(:name, :hometown)
-      #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
-      #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
-      def set_allowed_columns(*cols)
-        Sequel::Deprecation.deprecate("Sequel::Model.set_allowed_columns", "Load the whitelist_security plugin into the model class")
-        clear_setter_methods_cache
-        @allowed_columns = cols
-      end
   
       # Sets the dataset associated with the Model class. +ds+ can be a +Symbol+,
       # +LiteralString+, <tt>SQL::Identifier</tt>, <tt>SQL::QualifiedIdentifier</tt>,
@@ -895,14 +878,9 @@ module Sequel
       # Uncached version of setter_methods, to be overridden by plugins
       # that want to modify the methods used.
       def get_setter_methods
-        if allowed_columns
-          # SEQUEL5: Remove allowed_columns handling
-          allowed_columns.map{|x| "#{x}="}
-        else
-          meths = instance_methods.map(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
-          meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
-          meths
-        end
+        meths = instance_methods.map(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
+        meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
+        meths
       end
   
       # A hash of instance variables to automatically set up in subclasses.
@@ -913,7 +891,6 @@ module Sequel
       # Proc :: Call with subclass to do the assignment
       def inherited_instance_variables
         {
-          :@allowed_columns=>:dup, # SEQUEL5: Remove
           :@cache_anonymous_models=>nil,
           :@dataset_method_modules=>:dup,
           :@dataset_module_class=>nil,
@@ -1578,17 +1555,6 @@ module Sequel
         set_restricted(hash, :default)
       end
   
-      # Set all values using the entries in the hash, ignoring any setting of
-      # allowed_columns in the model.
-      #
-      #   Artist.set_allowed_columns(:num_albums)
-      #   artist.set_all(:name=>'Jim')
-      #   artist.name # => 'Jim'
-      def set_all(hash)
-        Sequel::Deprecation.deprecate("Sequel::Model#set_all", "Switch to set or load the whitelist_security plugin into the model class")
-        set_restricted(hash, :all)
-      end
-  
       # For each of the fields in the given array +fields+, call the setter
       # method with the value of that +hash+ entry for the field. Returns self.
       #
@@ -1647,19 +1613,6 @@ module Sequel
         self
       end
   
-      # Set the values using the entries in the hash, only if the key
-      # is included in only.  It may be a better idea to use +set_fields+
-      # instead of this method.
-      #
-      #   artist.set_only({:name=>'Jim'}, :name)
-      #   artist.name # => 'Jim'
-      #
-      #   artist.set_only({:hometown=>'LA'}, :name) # Raise Error
-      def set_only(hash, *only)
-        Sequel::Deprecation.deprecate("Sequel::Model#set_only", "Switch to set_fields with the :missing=>:skip option or load the whitelist_security plugin into the model class")
-        set_restricted(hash, only.flatten)
-      end
-  
       # Set the shard that this object is tied to.  Returns self.
       def set_server(s)
         @server = s
@@ -1698,16 +1651,6 @@ module Sequel
         update_restricted(hash, :default)
       end
   
-      # Update all values using the entries in the hash, ignoring any setting of
-      # +allowed_columns+ in the model.
-      #
-      #   Artist.set_allowed_columns(:num_albums)
-      #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
-      def update_all(hash)
-        Sequel::Deprecation.deprecate("Sequel::Model#update_all", "Switch to update or load the whitelist_security plugin into the model class")
-        update_restricted(hash, :all)
-      end
-  
       # Update the instances values by calling +set_fields+ with the arguments, then
       # saves any changes to the record.  Returns self.
       #
@@ -1721,19 +1664,6 @@ module Sequel
         save_changes
       end
 
-      # Update the values using the entries in the hash, only if the key
-      # is included in only.  It may be a better idea to use +update_fields+
-      # instead of this method.
-      #
-      #   artist.update_only({:name=>'Jim'}, :name)
-      #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
-      #
-      #   artist.update_only({:hometown=>'LA'}, :name) # Raise Error
-      def update_only(hash, *only)
-        Sequel::Deprecation.deprecate("Sequel::Model#update_only", "Switch to update_fields with the :missing=>:skip option or load the whitelist_security plugin into the model class")
-        update_restricted(hash, only.flatten)
-      end
-      
       # Validates the object.  If the object is invalid, errors should be added
       # to the errors attribute.  By default, does nothing, as all models
       # are valid by default.  See the {"Model Validations" guide}[rdoc-ref:doc/validations.rdoc].
@@ -2168,10 +2098,8 @@ module Sequel
       # :all :: Allow setting all setters, except those specifically restricted (such as ==).
       # Array :: Only allow setting of columns in the given array.
       def setter_methods(type)
-        if type == :default
-          if !@singleton_setter_added || model.allowed_columns # SEQUEL5: Remove model.allowed_columns
-            return model.setter_methods
-          end
+        if type == :default && !@singleton_setter_added
+          return model.setter_methods
         end
 
         if type.is_a?(Array)

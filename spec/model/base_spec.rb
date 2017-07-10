@@ -517,39 +517,6 @@ describe "Model.db=" do
   end
 end
 
-describe Sequel::Model, ".allowed_columns " do
-  before do
-    @c = Class.new(Sequel::Model(:blahblah)) do
-      columns :x, :y, :z
-    end
-    @c.strict_param_setting = false
-    @c.instance_variable_set(:@columns, [:x, :y, :z])
-    DB.reset
-  end
-  
-  deprecated "should set the allowed columns correctly" do
-    @c.allowed_columns.must_be_nil
-    @c.set_allowed_columns :x
-    @c.allowed_columns.must_equal [:x]
-    @c.set_allowed_columns :x, :y
-    @c.allowed_columns.must_equal [:x, :y]
-  end
-
-  deprecated "should only set allowed columns by default" do
-    @c.set_allowed_columns :x, :y
-    i = @c.new(:x => 1, :y => 2, :z => 3)
-    i.values.must_equal(:x => 1, :y => 2)
-    i.set(:x => 4, :y => 5, :z => 6)
-    i.values.must_equal(:x => 4, :y => 5)
-
-    @c.dataset = @c.dataset.with_fetch(:x => 7)
-    i = @c.new
-    i.update(:x => 7, :z => 9)
-    i.values.must_equal(:x => 7)
-    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
-  end
-end
-
 describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
@@ -605,13 +572,6 @@ describe Sequel::Model, ".strict_param_setting" do
     c = @c.new
     proc{c.set(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.update(:a=>1)}.must_raise(Sequel::MassAssignmentRestriction)
-    deprecated do
-      @c.set_allowed_columns :x, :y
-      proc{c.set_all(:use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
-      proc{c.set_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
-      proc{c.update_all(:use_after_commit_rollback=>false)}.must_raise(Sequel::MassAssignmentRestriction)
-      proc{c.update_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
-    end
   end
 
   it "should be disabled by strict_param_setting = false" do
