@@ -133,20 +133,6 @@ module Sequel
       def prev_page
         current_page > 1 ? (current_page - 1) : nil
       end
-
-      # SEQUEL5: Remove
-      # :nocov:
-      def set_pagination_info(page_no, page_size, record_count)
-        Sequel::Deprecation.deprecate("Dataset#set_pagination_info", "It should no longer be necessary to call this method")
-        self.current_page = page_no
-        self.page_size = page_size
-        self.pagination_record_count = record_count
-        page_count = (record_count / page_size.to_f).ceil
-        page_count = 1 if page_count == 0
-        self.page_count = page_count
-        self
-      end
-      # :nocov:
     end
   end
 
