@@ -296,14 +296,12 @@ module Sequel
     end
     
     # Prepare an SQL statement for later execution.  Takes a type similar to #call,
-    # and the +name+ symbol of the prepared statement.  While +name+ defaults to +nil+,
-    # it should always be provided as a symbol for the name of the prepared statement,
-    # as some databases require that prepared statements have names.
+    # and the +name+ symbol of the prepared statement.
     #
     # This returns a clone of the dataset extended with PreparedStatementMethods,
     # which you can +call+ with the hash of bind variables to use.
     # The prepared statement is also stored in
-    # the associated database, where it can be called by name.
+    # the associated Database, where it can be called by name.
     # The following usage is identical:
     #
     #   ps = DB[:table].where(:name=>:$name).prepare(:first, :select_by_name)
@@ -313,19 +311,10 @@ module Sequel
     #   # => {:id=>1, :name=>'Blah'}
     #
     #   DB.call(:select_by_name, :name=>'Blah') # Same thing
-    def prepare(type, name=nil, *values)
+    def prepare(type, name, *values)
       ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules)
-
-      if name
-        ps.prepared_sql
-        db.set_prepared_statement(name, ps)
-      else
-        # :nocov:
-        # SEQUEL5: Add coverage
-        Sequel::Deprecation.deprecate("Dataset#prepare will change to requiring a name argument in Sequel 5, please update your code") unless name
-        # :nocov:
-      end
-
+      ps.prepared_sql
+      db.set_prepared_statement(name, ps)
       ps
     end
     
