@@ -69,15 +69,6 @@ module Sequel
         # hash values.
         attr_reader :compositions
         
-        def composition_module
-          Sequel::Deprecation.deprecate('Sequel::Model.composition_module', 'There is no replacement')
-          @composition_module
-        end
-        def composition_module=(v)
-          Sequel::Deprecation.deprecate('Sequel::Model.composition_module=', 'There is no replacement')
-          @composition_module = v
-        end
-        
         # Define a composition for this model, with name being the name of the composition.
         # You must provide either a :mapping option or both the :composer and :decomposer options. 
         #

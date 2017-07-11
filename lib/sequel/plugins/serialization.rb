@@ -113,15 +113,6 @@ module Sequel
         # called to serialize the column.
         attr_reader :serialization_map
 
-        def serialization_module
-          Sequel::Deprecation.deprecate('Sequel::Model.serialization_module', 'There is no replacement')
-          @serialization_module
-        end
-        def serialization_module=(v)
-          Sequel::Deprecation.deprecate('Sequel::Model.serialization_module=', 'There is no replacement')
-          @serialization_module = v
-        end
-
         Plugins.inherited_instance_variables(self, :@deserialization_map=>:dup, :@serialization_map=>:dup)
 
         # Freeze serialization metadata when freezing model class.

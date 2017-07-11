@@ -42,12 +42,6 @@ describe "Sequel::Plugins::LazyAttributes" do
     Object.send(:remove_const, :LazyAttributesModel)
   end
   
-  deprecated "should allow access to lazy_attributes_module" do
-    @c.lazy_attributes_module.must_be_kind_of Module
-    @c.lazy_attributes_module = v = Module.new
-    @c.lazy_attributes_module.must_equal v
-  end
-
   it "should allowing adding additional lazy attributes via plugin :lazy_attributes" do
     @c.set_dataset(@ds.select(:id, :blah))
     @c.dataset.sql.must_equal 'SELECT id, blah FROM la'

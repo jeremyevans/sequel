@@ -9,12 +9,6 @@ describe "Composition plugin" do
     DB.reset
   end
   
-  deprecated "should allow access to composition_module" do
-    @c.composition_module.must_be_kind_of Module
-    @c.composition_module = v = Module.new
-    @c.composition_module.must_equal v
-  end
-
   it ".composition should add compositions" do
     @o.wont_respond_to(:date)
     @c.composition :date, :mapping=>[:year, :month, :day]
