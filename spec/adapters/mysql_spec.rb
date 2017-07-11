@@ -312,9 +312,6 @@ describe "MySQL join expressions" do
   it "should support natural right outer joins" do
     @ds.join_table(:natural_right_outer, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL RIGHT OUTER JOIN `nodes`'
   end
-  deprecated "should support natural inner joins" do
-    @ds.join_table(:natural_inner, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL LEFT JOIN `nodes`'
-  end
   it "should support cross joins" do
     @ds.join_table(:cross, :nodes).sql.must_equal 'SELECT * FROM `nodes` CROSS JOIN `nodes`'
   end

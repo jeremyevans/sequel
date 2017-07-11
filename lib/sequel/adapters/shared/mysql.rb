@@ -678,15 +678,10 @@ module Sequel
         super(type, table, expr, opts, &block)
       end
       
-      # Transforms :natural_inner to NATURAL LEFT JOIN and straight to
-      # STRAIGHT_JOIN.
+      # Transforms :straight to STRAIGHT_JOIN.
       def join_type_sql(join_type)
-        case join_type
-        when :straight
+        if join_type == :straight
           'STRAIGHT_JOIN'
-        when :natural_inner
-           Sequel::Deprecation.deprecate(":natural_inner join type being converted to NATURAL LEFT JOIN on MySQL", "Use :natural_left join type for NATURAL LEFT JOIN, or :natural join type for NATURAL JOIN")
-          'NATURAL LEFT JOIN'
         else
           super
         end
