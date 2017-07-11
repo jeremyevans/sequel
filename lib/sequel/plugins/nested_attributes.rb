@@ -118,11 +118,7 @@ module Sequel
           reflections = associations.map{|a| association_reflection(a) || raise(Error, "no association named #{a} for #{self}")}
           reflections.each do |r|
             r[:nested_attributes] = opts
-            r[:nested_attributes][:unmatched_pk] ||= (
-              if opts.has_key?(:strict)
-                Sequel::Deprecation.deprecate("The nested_attributes :strict option", "Use the :unmatched_pk option instead")
-              end
-              opts.delete(:strict) == false ? :ignore : :raise)
+            r[:nested_attributes][:unmatched_pk] ||= :raise
             r[:nested_attributes][:reject_if] ||= block
             def_nested_attribute_method(r)
           end

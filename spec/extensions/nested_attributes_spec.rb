@@ -456,17 +456,6 @@ describe "NestedAttributes plugin" do
     ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])
   end
   
-  deprecated "should not raise an Error if an unmatched primary key is given, if the :strict=>false option is used" do
-    @Artist.nested_attributes :albums, :strict=>false
-    al = @Album.load(:id=>10, :name=>'Al')
-    ar = @Artist.load(:id=>20, :name=>'Ar')
-    ar.associations[:albums] = [al]
-    ar.set(:albums_attributes=>[{:id=>30, :_delete=>'t'}])
-    @db.sqls.must_equal []
-    ar.save
-    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 20)"]
-  end
-  
   it "should not raise an Error if an unmatched primary key is given, if the :unmatched_pk=>:ignore option is used" do
     @Artist.nested_attributes :albums, :unmatched_pk=>:ignore
     al = @Album.load(:id=>10, :name=>'Al')
@@ -484,17 +473,6 @@ describe "NestedAttributes plugin" do
     ar.associations[:concerts] = [co]
     proc{ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-04', :_delete=>'t'}])}.must_raise(Sequel::Error)
     ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_delete=>'t'}])
-  end
-
-  deprecated "should not raise an Error if an unmatched composite primary key is given, if the :strict=>false option is used" do
-    @Artist.nested_attributes :concerts, :strict=>false
-    ar = @Artist.load(:id=>10, :name=>'Ar')
-    co = @Concert.load(:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl')
-    ar.associations[:concerts] = [co]
-    ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-06', :_delete=>'t'}])
-    @db.sqls.must_equal []
-    ar.save
-    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 10)"]
   end
 
   it "should not raise an Error if an unmatched composite primary key is given, if the :unmatched_pk=>:ignore option is used" do
