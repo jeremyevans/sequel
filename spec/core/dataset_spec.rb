@@ -51,6 +51,20 @@ describe "Dataset#clone" do
     @dataset = @dataset.with_row_proc(Proc.new{|r| r})
     clone = @dataset.clone
 
+    if RUBY_VERSION >= '2.4'
+      clone.must_be_same_as @dataset
+    else
+      clone.object_id.wont_equal @dataset.object_id
+      clone.class.must_equal @dataset.class
+      clone.db.must_equal @dataset.db
+      clone.opts.must_equal @dataset.opts
+    end
+  end
+  
+  it "should create an exact copy of the dataset when given an empty hash" do
+    @dataset = @dataset.with_row_proc(Proc.new{|r| r})
+    clone = @dataset.clone({})
+
     clone.object_id.wont_equal @dataset.object_id
     clone.class.must_equal @dataset.class
     clone.db.must_equal @dataset.db
