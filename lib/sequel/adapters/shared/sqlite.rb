@@ -49,46 +49,6 @@ module Sequel
         :sqlite
       end
       
-      # SEQUEL5: Remove
-      def auto_vacuum
-        AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
-      end
-      def auto_vacuum=(value)
-        value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
-        pragma_set(:auto_vacuum, value)
-      end
-      def case_sensitive_like=(value)
-        pragma_set(:case_sensitive_like, !!value ? 'on' : 'off') if sqlite_version >= 30203
-      end
-      def foreign_keys
-        pragma_get(:foreign_keys).to_i == 1 if sqlite_version >= 30619
-      end
-      def foreign_keys=(value)
-        pragma_set(:foreign_keys, !!value ? 'on' : 'off') if sqlite_version >= 30619
-      end
-      def pragma_get(name)
-        Sequel::Deprecation.deprecate('Database#{pragma_get,auto_vacuum,case_sensitive_like,foreign_keys,synchronous,temp_store} on SQLite', "These methods may not be safe when using multiple connections, call fetch(#{"PRAGMA #{name}".inspect}).single_value if you really want to get the pragma value")
-        self["PRAGMA #{name}"].single_value
-      end
-      def pragma_set(name, value)
-        Sequel::Deprecation.deprecate('Database#{pragma_set,auto_vacuum=,case_sensitive_like=,foreign_keys=,synchronous=,temp_store=} on SQLite', "These methods are not thread safe or safe when using multiple connections, pass the appropriate option when connecting to set the pragma correctly for all connections")
-        execute_ddl("PRAGMA #{name} = #{value}")
-      end
-      def synchronous
-        SYNCHRONOUS[pragma_get(:synchronous).to_i]
-      end
-      def synchronous=(value)
-        value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
-        pragma_set(:synchronous, value)
-      end
-      def temp_store
-        TEMP_STORE[pragma_get(:temp_store).to_i]
-      end
-      def temp_store=(value)
-        value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
-        pragma_set(:temp_store, value)
-      end
-
       # Set the integer_booleans option using the passed in :integer_boolean option.
       def set_integer_booleans
         @integer_booleans = @opts.has_key?(:integer_booleans) ? typecast_value_boolean(@opts[:integer_booleans]) : true

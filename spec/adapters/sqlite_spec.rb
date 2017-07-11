@@ -5,55 +5,13 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 describe "An SQLite database" do
   before do
     @db = DB
-    deprecated do
-    @fk = @db.foreign_keys
-    end
   end
   after do
     @db.drop_table?(:fk)
-    deprecated do
-      @db.auto_vacuum = :none
-      @db.run 'VACUUM'
-      @db.foreign_keys = @fk
-      @db.case_sensitive_like = true
-    end
     @db.use_timestamp_timezones = false
     Sequel.datetime_class = Time
   end
 
-  deprecated "should support getting setting pragma values" do
-    @db.pragma_set(:auto_vacuum, '0')
-    @db.run 'VACUUM'
-    @db.pragma_get(:auto_vacuum).to_s.must_equal '0'
-    @db.pragma_set(:auto_vacuum, '1')
-    @db.run 'VACUUM'
-    @db.pragma_get(:auto_vacuum).to_s.must_equal '1'
-    @db.pragma_set(:auto_vacuum, '2')
-    @db.run 'VACUUM'
-    @db.pragma_get(:auto_vacuum).to_s.must_equal '2'
-  end
-  
-  deprecated "should support getting and setting the auto_vacuum pragma" do
-    @db.auto_vacuum = :full
-    @db.run 'VACUUM'
-    @db.auto_vacuum.must_equal :full
-    @db.auto_vacuum = :incremental
-    @db.run 'VACUUM'
-    @db.auto_vacuum.must_equal :incremental
-    
-    proc {@db.auto_vacuum = :invalid}.must_raise(Sequel::Error)
-  end
-  
-  deprecated "should respect case sensitive like false" do
-    @db.case_sensitive_like = false
-    @db.get(Sequel.like('a', 'A')).to_s.must_equal '1'
-  end
-  
-  deprecated "should respect case sensitive like true" do
-    @db.case_sensitive_like = true
-    @db.get(Sequel.like('a', 'A')).to_s.must_equal '0'
-  end
-  
   it "should support casting to Date by using the date function" do
     @db.get(Sequel.cast('2012-10-20 11:12:13', Date)).must_equal '2012-10-20'
   end
@@ -65,28 +23,6 @@ describe "An SQLite database" do
   
   it "should provide the SQLite version as an integer" do
     @db.sqlite_version.must_be_kind_of(Integer)
-  end
-  
-  deprecated "should support setting and getting the foreign_keys pragma" do
-    (@db.sqlite_version >= 30619 ? [true, false] : [nil]).must_include(@db.foreign_keys)
-    @db.foreign_keys = true
-    @db.foreign_keys = false
-  end
-  
-  deprecated "should enforce foreign key integrity if foreign_keys pragma is set" do
-    @db.foreign_keys = true
-    @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
-    @db[:fk].insert(1, nil)
-    @db[:fk].insert(2, 1)
-    @db[:fk].insert(3, 3)
-    proc{@db[:fk].insert(4, 5)}.must_raise(Sequel::ForeignKeyConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
-  end if DB.sqlite_version >= 30619
-  
-  deprecated "should not enforce foreign key integrity if foreign_keys pragma is unset" do
-    @db.foreign_keys = false
-    @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
-    @db[:fk].insert(1, 2)
-    @db[:fk].all.must_equal [{:id=>1, :parent_id=>2}]
   end
   
   it "should support a use_timestamp_timezones setting" do
@@ -108,28 +44,6 @@ describe "An SQLite database" do
     @db.tables.must_include(:fk)
   end
 
-  deprecated "should support getting and setting the synchronous pragma" do
-    @db.synchronous = :off
-    @db.synchronous.must_equal :off
-    @db.synchronous = :normal
-    @db.synchronous.must_equal :normal
-    @db.synchronous = :full
-    @db.synchronous.must_equal :full
-    
-    proc {@db.synchronous = :invalid}.must_raise(Sequel::Error)
-  end
-  
-  deprecated "should support getting and setting the temp_store pragma" do
-    @db.temp_store = :default
-    @db.temp_store.must_equal :default
-    @db.temp_store = :file
-    @db.temp_store.must_equal :file
-    @db.temp_store = :memory
-    @db.temp_store.must_equal :memory
-    
-    proc {@db.temp_store = :invalid}.must_raise(Sequel::Error)
-  end
-  
   cspecify "should support timestamps and datetimes and respect datetime_class", [:do], [:jdbc], [:swift] do
     @db.create_table!(:fk){timestamp :t; datetime :d}
     @db.use_timestamp_timezones = true
