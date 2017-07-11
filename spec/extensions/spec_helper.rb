@@ -30,10 +30,6 @@ end
 
 Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby'
 
-def skip_warn(s)
-  warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
-end
-
 class Minitest::HooksSpec
   # SEQUEL5: Replace with define_singleton_method
   def meta_def(obj, name, &block)

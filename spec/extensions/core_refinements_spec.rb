@@ -525,6 +525,4 @@ describe "Postgres extensions integration" do
     @db.literal((1..2).pg_range(:int4range)).must_equal "int4range(1,2,'[]')"
   end
 end
-else
-  skip_warn "core_refinements extension: only works on ruby 2.0+"
 end

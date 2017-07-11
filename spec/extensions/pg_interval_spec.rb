@@ -6,8 +6,8 @@ begin
     require 'active_support/gem_version'
   rescue LoadError
   end
-rescue LoadError => exc
-  skip_warn "pg_interval plugin: can't load active_support/duration (#{exc.class}: #{exc})"
+rescue LoadError
+  warn "Skipping test of pg_interval plugin: can't load active_support/duration"
 else
 describe "pg_interval extension" do
   before do

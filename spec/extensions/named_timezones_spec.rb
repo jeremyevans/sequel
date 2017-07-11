@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 begin
   require 'tzinfo'
 rescue LoadError => e
-  skip_warn "named_timezones_spec: can't load tzinfo (#{e.class}: #{e})"
+  warn "Skipping test of named_timezones extension: can't load tzinfo"
 else
 Sequel.extension :thread_local_timezones
 Sequel.extension :named_timezones
