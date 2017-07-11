@@ -807,9 +807,7 @@ module Sequel
       # Allow update and delete for unordered, limited datasets only.
       def check_not_limited!(type)
         return if @opts[:skip_limit_check] && type != :truncate
-        #SEQUEL5
-        #raise Sequel::InvalidOperation, "Dataset##{type} not suppored on ordered, limited datasets" if opts[:order] && opts[:limit]
-        Sequel::Deprecation.deprecate("Dataset##{type} on ordered, limited datasets", "Call unlimited to not use a limit, or unordered to not use an order, or skip_limit_check to ignore the limit") if @opts[:order] && @opts[:limit]
+        raise Sequel::InvalidOperation, "Dataset##{type} not suppored on ordered, limited datasets" if opts[:order] && opts[:limit]
         super if type == :truncate || @opts[:offset]
       end
 
