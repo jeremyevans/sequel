@@ -622,8 +622,7 @@ module Sequel
       #   # INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)
       def insert_conflict(resolution = :ignore)
         unless INSERT_CONFLICT_RESOLUTIONS.include?(resolution.to_s.upcase)
-          Sequel::Deprecation.deprecate("Passing #{resolution.inspect} argument to Dataset#insert_conflict", "The allowed values are: :rollback, :abort, :fail, :ignore, or :replace")
-          # raise Error, "Invalid value passed to Dataset#insert_conflict: #{resolution.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace"
+          raise Error, "Invalid value passed to Dataset#insert_conflict: #{resolution.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace"
         end
         clone(:insert_conflict => resolution)
       end
