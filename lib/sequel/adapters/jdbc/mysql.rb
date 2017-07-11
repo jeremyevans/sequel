@@ -22,15 +22,6 @@ module Sequel
         
         private
         
-        # The database name for the given database.  Need to parse it out
-        # of the connection string, since the JDBC does no parsing on the
-        # given connection string by default.
-        def database_name
-          Sequel::Deprecation.deprecate("Database#database_name", "Instead, use .get(Sequel.function(:DATABASE))")
-          u = URI.parse(uri.sub(/\Ajdbc:/, ''))
-          (m = /\/(.*)/.match(u.path)) && m[1]
-        end
-        
         # MySQL exception handling with SQLState is less accurate than with regexps.
         def database_exception_use_sqlstates?
           false
