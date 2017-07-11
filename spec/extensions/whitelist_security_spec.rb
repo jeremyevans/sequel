@@ -16,7 +16,7 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
     @c.strict_param_setting = true
 
-    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_transactions => false)}.must_raise(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_all(:x => 1, :y => 2, :z=>3)
     o.values.must_equal(:x => 1, :y => 2, :z=>3)
 
@@ -32,9 +32,9 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   end
 
   it "#set_all should set not set restricted fields" do
-    @o1.use_after_commit_rollback.must_be_nil
-    @o1.set_all(:x => 1, :use_after_commit_rollback => true)
-    @o1.use_after_commit_rollback.must_be_nil
+    @o1.use_transactions.must_equal false 
+    @o1.set_all(:x => 1, :use_transactions => true)
+    @o1.use_transactions.must_equal false
     @o1.values.must_equal(:x => 1)
   end
 

@@ -60,7 +60,6 @@ module Sequel
     @strict_param_setting = true
     @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
-    @use_after_commit_rollback = nil
     @use_transactions = true
 
     Sequel.require %w"default_inflections inflections plugins dataset_module base exceptions errors", "model"

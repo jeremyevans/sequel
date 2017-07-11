@@ -128,10 +128,16 @@ module Sequel
       # database to typecast the value correctly.
       attr_accessor :typecast_on_assignment
   
-      # Whether to enable the after_commit and after_rollback hooks when saving/destroying
-      # instances.  On by default, can be turned off for performance reasons or when using
-      # prepared transactions (which aren't compatible with after commit/rollback).
-      attr_accessor :use_after_commit_rollback # SEQUEL5: Deprecate after release
+      # :nocov:
+      def use_after_commit_rollback
+        Sequel::Deprecation.deprecate("Model.use_after_commit_rollback", "Model transaction hooks have been removed, switch to using database transaction hooks")
+        false
+      end
+      def use_after_commit_rollback=(v)
+        Sequel::Deprecation.deprecate("Model.use_after_commit_rollback=", "Model transaction hooks have been removed, switch to using database transaction hooks")
+        false
+      end
+      # :nocov:
   
       # Whether to use a transaction by default when saving/deleting records (default: true).
       # If you are sending database queries in before_* or after_* hooks, you shouldn't change
@@ -902,7 +908,6 @@ module Sequel
           :@strict_param_setting=>nil,
           :@typecast_empty_string_to_nil=>nil,
           :@typecast_on_assignment=>nil,
-          :@use_after_commit_rollback=>nil,
           :@use_transactions=>nil
         }
       end
@@ -1084,14 +1089,23 @@ module Sequel
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable.
-      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
-        :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions,
-        :use_after_commit_rollback # SEQUEL5: Remove
-      ].each do |meth|
+      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, 
+        :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions].each do |meth|
         class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)
         attr_writer(meth)
       end
 
+      # :nocov:
+      def use_after_commit_rollback
+        Sequel::Deprecation.deprecate("Model#use_after_commit_rollback", "Model transaction hooks have been removed, switch to using database transaction hooks")
+        false
+      end
+      def use_after_commit_rollback=(v)
+        Sequel::Deprecation.deprecate("Model#use_after_commit_rollback=", "Model transaction hooks have been removed, switch to using database transaction hooks")
+        false
+      end
+      # :nocov:
+  
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns. The returned hash is a reference to the
       # receiver's values hash, and modifying it will also modify the receiver's
