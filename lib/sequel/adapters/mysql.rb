@@ -30,19 +30,6 @@ module Sequel
     end
     # MYSQL_TYPES.freeze # SEQUEL5
 
-    # SEQUEL5: Remove
-    @convert_invalid_date_time = false
-    class << self
-      def convert_invalid_date_time
-        Sequel::Deprecation.deprecate("Sequel::MySQL.convert_invalid_date_time", "Call this method on the Database instance")
-        @convert_invalid_date_time
-      end
-      def convert_invalid_date_time=(v)
-        Sequel::Deprecation.deprecate("Sequel::MySQL.convert_invalid_date_time=", "Call this method on the Database instance")
-        @convert_invalid_date_time = v
-      end
-    end
-
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
@@ -226,8 +213,8 @@ module Sequel
       
       def adapter_initialize
         @conversion_procs = MYSQL_TYPES.dup
-        self.convert_tinyint_to_bool = Sequel::MySQL.instance_variable_get(:@convert_tinyint_to_bool) # true # SEQUEL5
-        self.convert_invalid_date_time = Sequel::MySQL.instance_variable_get(:@convert_invalid_date_time) # false # SEQUEL5
+        self.convert_tinyint_to_bool = true
+        self.convert_invalid_date_time = false
       end
 
       # Try to get an accurate number of rows matched using the query
