@@ -1504,7 +1504,12 @@ module Sequel
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
-        _before_validation
+        # :nocov:
+        if method(:_before_validation).owner != InstanceMethods
+          Sequel::Deprecation.deprecate("Using Model#_before_validation", "You should switch to using Model#before_validation")
+          _before_validation
+        end
+        # :nocov:
         unless checked_save_failure(opts){_valid?(opts)}
           raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
           return
@@ -1652,7 +1657,12 @@ module Sequel
       #   artist.set(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
-        _before_validation
+        # :nocov:
+        if method(:_before_validation).owner != InstanceMethods
+          Sequel::Deprecation.deprecate("Using Model#_before_validation", "You should switch to using Model#before_validation")
+          _before_validation
+        end
+        # :nocov:
         begin
           _valid?(opts)
         rescue HookFailed
@@ -1662,10 +1672,7 @@ module Sequel
 
       private
       
-      # Run code before any validation is done, but also run it before saving
-      # even if validation is skipped.  This is a private hook.  It exists so that
-      # plugins can set values automatically before validation (as the values
-      # need to be validated), but should be set even if validation is skipped.
+      # SEQUEL51: Remove
       def _before_validation
       end
 
