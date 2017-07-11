@@ -173,16 +173,6 @@ module Sequel
         full_tables('BASE TABLE', opts)
       end
       
-      # Changes the database in use by issuing a USE statement.  I would be
-      # very careful if I used this.
-      def use(db_name)
-        Sequel::Deprecation.deprecate("Database#use", "Create a new Sequel::Database instance instead of using Database#use")
-        disconnect
-        @opts[:database] = db_name if self << "USE #{db_name}"
-        @schemas = {}
-        self
-      end
-      
       # Return an array of symbols specifying view names in the current database.
       #
       # Options:
