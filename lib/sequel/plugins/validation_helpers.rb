@@ -222,7 +222,7 @@ module Sequel
         #             model's dataset.
         # :message :: The message to use (default: 'is already taken')
         # :only_if_modified :: Only check the uniqueness if the object is new or
-        #                      one of the columns has been modified.
+        #                      one of the columns has been modified, true by default.
         # :where :: A callable object where call takes three arguments, a dataset,
         #           the current object, and an array of columns, and should return
         #           a modified dataset that is filtered to include only rows with
@@ -249,8 +249,7 @@ module Sequel
           atts.each do |a|
             arr = Array(a)
             next if arr.any?{|x| errors.on(x)}
-            # SEQUEL5: Default only_if_modified to true
-            next if opts[:only_if_modified] && !new? && !arr.any?{|x| changed_columns.include?(x)}
+            next if opts.fetch(:only_if_modified, true) && !new? && !arr.any?{|x| changed_columns.include?(x)}
             ds = opts[:dataset] || model.dataset
             ds = if where
               where.call(ds, self, arr)
