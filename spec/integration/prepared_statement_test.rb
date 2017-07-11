@@ -332,27 +332,27 @@ describe "Bound Argument Types" do
     @db.drop_table?(:items)
   end
 
-  cspecify "should handle date type", [:do, :sqlite], [:tinytds], [:jdbc, :mssql], [:jdbc, :sqlite], :oracle do 
+  cspecify "should handle date type", [:tinytds], [:jdbc, :mssql], [:jdbc, :sqlite], :oracle do 
     @ds.filter(:d=>:$x).prepare(:first, :ps_date).call(:x=>@vs[:d])[:d].must_equal @vs[:d]
   end
 
-  cspecify "should handle datetime type", [:do], [:mysql2], [:jdbc, :sqlite], [:tinytds], [:oracle] do
+  cspecify "should handle datetime type", [:mysql2], [:jdbc, :sqlite], [:tinytds], [:oracle] do
     Sequel.datetime_class = DateTime
     @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>@vs[:dt])[:dt].must_equal @vs[:dt]
   end
 
-  cspecify "should handle datetime type with fractional seconds", [:do, :postgres], [:jdbc, :sqlite], [:oracle] do
+  cspecify "should handle datetime type with fractional seconds", [:jdbc, :sqlite], [:oracle] do
     Sequel.datetime_class = DateTime
     fract_time = DateTime.parse('2010-10-12 13:14:15.500000')
     @ds.prepare(:update, :ps_datetime_up, :dt=>:$x).call(:x=>fract_time)
     @ds.literal(@ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]).must_equal @ds.literal(fract_time)
   end
 
-  cspecify "should handle time type", [:do], [:jdbc, :sqlite], [:swift], [:oracle] do
+  cspecify "should handle time type", [:jdbc, :sqlite], [:oracle] do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].must_equal @vs[:t]
   end
 
-  cspecify "should handle time type with fractional seconds", [:do, :postgres], [:jdbc, :sqlite], [:oracle], [:swift, :postgres] do
+  cspecify "should handle time type with fractional seconds", [:jdbc, :sqlite], :oracle do
     fract_time = @vs[:t] + 0.5
     @ds.prepare(:update, :ps_time_up, :t=>:$x).call(:x=>fract_time)
     @ds.literal(@ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t]).must_equal @ds.literal(fract_time)
@@ -384,7 +384,7 @@ describe "Bound Argument Types" do
     @ds.get(:file).must_equal zero_blob
   end
 
-  cspecify "should handle float type", [:swift, :sqlite] do
+  it "should handle float type" do
     @ds.filter(:f=>:$x).prepare(:first, :ps_float).call(:x=>@vs[:f])[:f].must_equal @vs[:f]
   end
 
@@ -392,7 +392,7 @@ describe "Bound Argument Types" do
     @ds.filter(:s=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].must_equal @vs[:s]
   end
 
-  cspecify "should handle boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
+  cspecify "should handle boolean type", [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
     @ds.filter(:b=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].must_equal @vs[:b]
   end
 end

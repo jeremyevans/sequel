@@ -39,7 +39,7 @@ describe "Sequel timezone support" do
     @db.drop_table(:t)
   end
 
-  cspecify "should support using UTC for database storage and local time for the application", [:tinytds], [:do, :mysql], [:do, :postgres], [:oracle] do
+  cspecify "should support using UTC for database storage and local time for the application", [:tinytds], [:oracle] do
     Sequel.database_timezone = :utc
     Sequel.application_timezone = :local
     _test_timezone
@@ -48,7 +48,7 @@ describe "Sequel timezone support" do
     _test_timezone
   end
 
-  cspecify "should support using local time for database storage and UTC for the application", [:tinytds], [:do, :mysql], [:do, :postgres], [:oracle] do
+  cspecify "should support using local time for database storage and UTC for the application", [:tinytds], [:oracle] do
     Sequel.database_timezone = :local
     Sequel.application_timezone = :utc
     _test_timezone
@@ -57,7 +57,7 @@ describe "Sequel timezone support" do
     _test_timezone
   end
 
-  cspecify "should support using UTC for both database storage and for application", [:do, :mysql], [:do, :postgres], [:oracle] do
+  cspecify "should support using UTC for both database storage and for application", [:oracle] do
     Sequel.default_timezone = :utc
     _test_timezone
     Sequel.database_timezone = :local
@@ -65,7 +65,7 @@ describe "Sequel timezone support" do
     _test_timezone
   end
 
-  cspecify "should support using local time for both database storage and for application", [:do, :postgres], [:oracle] do
+  cspecify "should support using local time for both database storage and for application", [:oracle] do
     Sequel.default_timezone = :local
     _test_timezone
     Sequel.database_timezone = :utc

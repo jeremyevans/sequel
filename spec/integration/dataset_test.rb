@@ -102,7 +102,7 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>11}]
   end
   
-  cspecify "should have update return the number of matched rows", [:do, :mysql] do
+  it "should have update return the number of matched rows" do
     @ds.update(:number=>:number).must_equal 1
     @ds.filter(:id=>1).update(:number=>:number).must_equal 1
     @ds.filter(:id=>2).update(:number=>:number).must_equal 0
@@ -165,7 +165,7 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>10}]
   end
 
-  cspecify "should skip locked rows correctly", [:do] do
+  it "should skip locked rows correctly" do
     @ds.insert(:number=>10)
     q1 = Queue.new
     q2 = Queue.new
@@ -921,13 +921,13 @@ describe Sequel::SQL::Constants do
     (Time.now - @c[@ds.get(:t)]).must_be_close_to 0, 60
   end
 
-  cspecify "should have working CURRENT_TIMESTAMP", [:jdbc, :sqlite], [:swift] do
+  cspecify "should have working CURRENT_TIMESTAMP", [:jdbc, :sqlite] do
     @db.create_table!(:constants){DateTime :ts}
     @ds.insert(:ts=>Sequel::CURRENT_TIMESTAMP)
     (Time.now - @c[@ds.get(:ts)]).must_be_close_to 0, 60
   end
 
-  cspecify "should have working CURRENT_TIMESTAMP when used as a column default", [:jdbc, :sqlite], [:swift] do
+  cspecify "should have working CURRENT_TIMESTAMP when used as a column default", [:jdbc, :sqlite] do
     @db.create_table!(:constants){DateTime :ts, :default=>Sequel::CURRENT_TIMESTAMP}
     @ds.insert
     (Time.now - @c[@ds.get(:ts)]).must_be_close_to 0, 60

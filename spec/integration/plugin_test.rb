@@ -570,7 +570,7 @@ describe "Touch plugin" do
     @album.updated_at.to_i.must_be_close_to Time.now.to_i, 2
   end
   
-  cspecify "should update the timestamp column for many_to_one associated records when the record is updated or destroyed", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+  cspecify "should update the timestamp column for many_to_one associated records when the record is updated or destroyed", [:jdbc, :sqlite] do
     Album.many_to_one :artist
     Album.plugin :touch, :associations=>:artist
     @artist.updated_at.must_be_nil
@@ -590,7 +590,7 @@ describe "Touch plugin" do
     end
   end
 
-  cspecify "should update the timestamp column for one_to_many associated records when the record is updated", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+  cspecify "should update the timestamp column for one_to_many associated records when the record is updated", [:jdbc, :sqlite] do
     Artist.one_to_many :albums
     Artist.plugin :touch, :associations=>:albums
     @album.updated_at.must_be_nil
@@ -603,7 +603,7 @@ describe "Touch plugin" do
     end
   end
 
-  cspecify "should update the timestamp column for many_to_many associated records when the record is updated", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
+  cspecify "should update the timestamp column for many_to_many associated records when the record is updated", [:jdbc, :sqlite] do
     Artist.many_to_many :albums
     Artist.plugin :touch, :associations=>:albums
     @artist.add_album(@album)

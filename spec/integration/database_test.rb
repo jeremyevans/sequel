@@ -104,7 +104,7 @@ describe Sequel::Database do
     @db.disconnect_connection(conn)
   end
 
-  cspecify "should provide ability to check connections for validity", [:do, :postgres] do
+  it "should provide ability to check connections for validity" do
     conn = @db.synchronize{|c| c}
     @db.valid_connection?(conn).must_equal true
     @db.disconnect
