@@ -644,12 +644,14 @@ describe "Model#save_changes" do
   end
 
   it "should take options passed to save" do
-    o = @c.new(:x => 1)
-    def o.before_validation; cancel_action; end
-    proc{o.save_changes}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-    o.save_changes(:validate=>false)
-    DB.sqls.first.must_equal "INSERT INTO items (x) VALUES (1)"
+    o = @c.load(:id=>1, :x => 1)
+    o.x = 2
+    o.save_changes
+    DB.sqls.must_equal ["UPDATE items SET x = 2 WHERE (id = 1)"]
+
+    o.x = 3
+    o.save_changes(:transaction=>true)
+    DB.sqls.must_equal ["BEGIN", "UPDATE items SET x = 3 WHERE (id = 1)", "COMMIT"]
   end
 
   it "should do nothing if no changed columns" do

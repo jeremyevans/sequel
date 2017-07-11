@@ -1505,11 +1505,9 @@ module Sequel
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
         _before_validation
-        if opts[:validate] != false # SEQUEL5: Remove if
-          unless checked_save_failure(opts){_valid?(opts)}
-            raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
-            return
-          end
+        unless checked_save_failure(opts){_valid?(opts)}
+          raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
+          return
         end
         checked_save_failure(opts){checked_transaction(opts){_save(opts)}}
       end
@@ -1899,14 +1897,16 @@ module Sequel
         return errors.empty? if frozen?
         errors.clear
         called = false
-        # skip_validate = opts[:validate] == false # SEQUEL5
+        skip_validate = opts[:validate] == false
         around_validation do
           called = true
           before_validation
-          validate # unless skip_validate # SEQUEL5
+          validate unless skip_validate
           after_validation
         end
-        # return true if skip_validate # SEQUEL5
+
+        return true if skip_validate
+
         if called
           errors.empty?
         else
