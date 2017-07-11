@@ -717,16 +717,6 @@ module Sequel
           end
       end
       
-      # Whether to convert some Java types to ruby types when retrieving rows.
-      def convert_types
-        Sequel::Deprecation.deprecate("Sequel::JDBC::Dataset#convert_types", "The private #convert_types? method returns whether to convert types for this dataset")
-        @opts[:convert_types]
-      end
-      def convert_types=(v)
-        Sequel::Deprecation.deprecate("Sequel::JDBC::Dataset#convert_types=", "Switch to using #with_convert_types, which returns a modified copy")
-        @opts[:convert_types] = v
-      end
-
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
         execute(sql){|result| process_result_set(result, &block)}
