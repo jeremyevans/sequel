@@ -77,14 +77,14 @@ module Sequel
           super
         end
         
-        private
-        
         # Set the create timestamp when creating
-        def _before_validation
+        def before_validation
           set_create_timestamp if new?
           super
         end
         
+        private
+
         # If the object has accessor methods for the create timestamp field, and
         # the create timestamp value is nil or overwriting it is allowed, set the
         # create timestamp field to the time given or the current time.  If setting

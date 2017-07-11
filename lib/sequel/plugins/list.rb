@@ -170,16 +170,16 @@ module Sequel
           self.next(n * -1)
         end
 
-        private
-
         # Set the value of the position_field to the maximum value plus 1 unless the
         # position field already has a value.
-        def _before_validation
+        def before_validation
           unless get_column_value(position_field)
             set_column_value("#{position_field}=", list_dataset.max(position_field).to_i+1)
           end
           super
         end
+
+        private
 
         # The model's position field, an instance method for ease of use.
         def position_field

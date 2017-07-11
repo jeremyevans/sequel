@@ -182,14 +182,14 @@ module Sequel
           super
         end
 
-        private
-
         # Serialize deserialized values before saving
-        def _before_validation
+        def before_validation
           serialize_deserialized_values
           super
         end
         
+        private
+
         # Clear any cached deserialized values when doing a manual refresh.
         def _refresh_set_values(hash)
           @deserialized_values.clear if @deserialized_values

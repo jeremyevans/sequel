@@ -168,15 +168,15 @@ module Sequel
           super
         end
 
-        private
-
         # For each composition, set the columns in the model class based
         # on the composition object.
-        def _before_validation
+        def before_validation
           @compositions.keys.each{|n| instance_eval(&model.compositions[n][:decomposer])} if @compositions
           super
         end
         
+        private
+
         # Clear the cached compositions when manually refreshing.
         def _refresh_set_values(hash)
           @compositions.clear if @compositions

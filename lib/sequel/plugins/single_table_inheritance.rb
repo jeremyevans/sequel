@@ -244,10 +244,8 @@ module Sequel
       end
 
       module InstanceMethods
-        private
-
         # Set the sti_key column based on the sti_key_map.
-        def _before_validation
+        def before_validation
           if new? && model.sti_key && !self[model.sti_key]
             set_column_value("#{model.sti_key}=", model.sti_key_chooser.call(self))
           end
