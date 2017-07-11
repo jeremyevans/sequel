@@ -38,25 +38,6 @@ describe "prepared_statements plugin" do
     @c.send(:use_prepared_statements_for_pk_lookup?).must_equal true
   end
 
-  it "should use prepared statements for refreshes if default is not optimized" do
-    @p.send(:use_prepared_statements_for?, :refresh).must_equal false 
-    @c.set_primary_key [:id, :name]
-    @p.send(:use_prepared_statements_for?, :refresh).must_equal true
-  end
-
-  it "should use prepared statements for deletes if default is not optimized" do
-    @p.send(:use_prepared_statements_for?, :delete).must_equal false 
-    @c.set_primary_key [:id, :name]
-    @p.send(:use_prepared_statements_for?, :delete).must_equal true
-  end
-
-  it "should use prepared statements for deletes if default on Oracle and DB2" do
-    def @db.database_type; :oracle end
-    @p.send(:use_prepared_statements_for?, :delete).must_equal true
-    def @db.database_type; :db2 end
-    @p.send(:use_prepared_statements_for?, :delete).must_equal true
-  end
-
   it "should raise Error for unsupported prepared statement types" do
     proc{@p.send(:use_prepared_statements_for?, :foo)}.must_raise Sequel::Error
   end
@@ -100,22 +81,7 @@ describe "prepared_statements plugin" do
 
     it "should correctly create instance" do
       @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
-      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo')", "SELECT #{@columns} FROM people WHERE (id = 1) LIMIT 1"]
-    end
-
-    it "should correctly lookup by primary key" do
-      @c[1].must_equal @p
-      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
-    end 
-
-    it "should correctly delete instance" do
-      @p.destroy.must_equal @p
-      @db.sqls.must_equal ["DELETE FROM people WHERE (id = 1)"]
-    end
-
-    it "should correctly delete instance when specifying server" do
-      @p.set_server(:read_only).destroy.must_equal @p
-      @db.sqls.must_equal ["DELETE FROM people WHERE (id = 1) -- read_only"]
+      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo')", "SELECT * FROM people WHERE id = 1"]
     end
 
     it "should correctly update instance when specifying server" do
@@ -125,7 +91,7 @@ describe "prepared_statements plugin" do
 
     it "should correctly create instance when specifying server" do
       @c.new(:name=>'foo').set_server(:read_only).save.must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
-      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') -- read_only", "SELECT #{@columns} FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') -- read_only", "SELECT * FROM people WHERE id = 1 -- read_only"]
     end
 
     it "should correctly create instance if dataset supports insert_select when specifying server" do
@@ -150,14 +116,15 @@ describe "prepared_statements plugin" do
 
     it "should work correctly when subclassing" do
       c = Class.new(@c)
-      c[1].must_equal c.load(:id=>1, :name=>'foo', :i=>2)
-      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @db.sqls
+      c.load(:id=>1, :name=>'foo', :i=>2).save
+      @db.sqls.must_equal ["UPDATE people SET name = 'foo', i = 2 WHERE (id = 1)"]
     end 
 
     it "should correctly handle without schema type when placeholder type specifiers are required" do
       @c.dataset = @ds.with_extend{def requires_placeholder_type_specifiers?; true end}
-      @c[1].must_equal @p
-      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @p.save
+      @db.sqls.must_equal ["UPDATE people SET name = 'foo', i = 2 WHERE (id = 1)"]
     end
 
     it "should correctly handle with schema type when placeholder type specifiers are required" do
@@ -181,8 +148,8 @@ describe "prepared_statements plugin" do
         end
       end
       @c.db_schema[:id][:type] = :integer
-      @c[1].must_equal @p
-      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @p.save
+      @db.sqls.must_equal ["UPDATE people SET name = 'foo', i = 2 WHERE (id = 1)"]
     end 
   end
 
