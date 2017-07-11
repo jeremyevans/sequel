@@ -7,7 +7,7 @@ describe "server_logging extension" do
     def @o.log; logs.length.must_equal 1; logs.first.length.must_equal 1; logs.shift.first; end
     def @o.to_ary; [self]; end
     def @o.method_missing(m, *args); (@logs ||= []) << args; end
-    @db = Sequel::mock(:servers=>{:read_only=>{}, :b=>{}}, :logger=>@o).extension(:server_logging)
+    @db = Sequel::mock(:test=>false, :servers=>{:read_only=>{}, :b=>{}}, :logger=>@o).extension(:server_logging)
   end
 
   it "should include shard when logging" do

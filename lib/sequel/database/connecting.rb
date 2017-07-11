@@ -48,16 +48,17 @@ module Sequel
       else
         raise Error, "Sequel::Database.connect takes either a Hash or a String, given: #{conn_string.inspect}"
       end
+
       # process opts a bit
       opts = opts.inject({}) do |m, (k,v)|
         k = :user if k.to_s == 'username'
         m[k.to_sym] = v
         m
       end
+
       begin
         db = c.new(opts)
-        # SEQUEL5: Default opts[:test] to true
-        db.test_connection if opts[:test] && db.send(:typecast_value_boolean, opts[:test])
+        db.test_connection if db.send(:typecast_value_boolean, opts.fetch(:test, true))
         if block_given?
           return yield(db)
         end

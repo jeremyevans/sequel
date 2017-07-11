@@ -81,7 +81,7 @@ describe "A new Database" do
   end
 
   it "should just use a :uri option for jdbc with the full connection string" do
-    db = Sequel::Database.stub(:adapter_class, Sequel::Database) do
+    db = Sequel::Database.stub(:adapter_class, Class.new(Sequel::Database){def connect(*); Object.new end}) do
       Sequel.connect('jdbc:test://host/db_name')
     end
     db.must_be_kind_of(Sequel::Database)
@@ -258,6 +258,7 @@ describe "Database#uri" do
   before do
     @c = Class.new(Sequel::Database) do
       def dataset_class_default; Sequel::Dataset end
+      def connect(*); Object.new end
       set_adapter_scheme :mau
     end
     
@@ -1536,14 +1537,12 @@ describe "A single threaded database" do
   end
   
   it "should convert an Exception on connection into a DatabaseConnectionError" do
-    db = Sequel::Database.new(:single_threaded => true, :servers=>{})
-    def db.connect(*) raise Exception end
+    db = Class.new(Sequel::Database){def connect(*) raise Exception end}.new(:single_threaded => true, :servers=>{}, :test=>false)
     proc {db.pool.hold {|c|}}.must_raise(Sequel::DatabaseConnectionError)
   end
   
   it "should raise a DatabaseConnectionError if the connection proc returns nil" do
-    db = Sequel.mock(:single_threaded => true, :servers=>{})
-    def db.connect(*) end
+    db = Class.new(Sequel::Database){def connect(*) end}.new(:single_threaded => true, :servers=>{}, :test=>false)
     proc {db.pool.hold {|c|}}.must_raise(Sequel::DatabaseConnectionError)
   end
 end
