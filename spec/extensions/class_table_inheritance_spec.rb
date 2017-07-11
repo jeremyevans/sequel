@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "class_table_inheritance plugin with :alias option" do
+describe "class_table_inheritance plugin" do
   before do
     @db = Sequel.mock(:autoid=>proc{|sql| 1})
     def @db.supports_schema_parsing?() true end
@@ -28,7 +28,7 @@ describe "class_table_inheritance plugin with :alias option" do
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
       end
-      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}, :alias=>:employees
+      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     end 
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff
@@ -116,12 +116,12 @@ describe "class_table_inheritance plugin with :alias option" do
   end
   
   it "should return rows with the current class if sti_key is nil" do
-    Employee.plugin(:class_table_inheritance, :alias=>:employees)
+    Employee.plugin :class_table_inheritance
     Employee.dataset.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}, {:kind=>'Intern'}]).all.map{|x| x.class}.must_equal [Employee, Employee, Employee, Employee, Employee, Employee]
   end
   
   it "should return rows with the current class if sti_key is nil in subclasses" do
-    Employee.plugin(:class_table_inheritance, :alias=>:employees)
+    Employee.plugin :class_table_inheritance
     Object.send(:remove_const, :Executive)
     Object.send(:remove_const, :Manager)
     class ::Manager < Employee; end 
@@ -130,7 +130,7 @@ describe "class_table_inheritance plugin with :alias option" do
   end
   
   it "should handle a model map with integer values" do
-    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo, 4=>:Intern}, :alias=>:employees)
+    Employee.plugin :class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive, 3=>:Ceo, 4=>:Intern}
     Object.send(:remove_const, :Intern)
     Object.send(:remove_const, :Ceo)
     Object.send(:remove_const, :Executive)
@@ -494,8 +494,8 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
   end
 end
 
-describe "class_table_inheritance plugin with duplicate columns and :alias option" do
-  before do
+describe "class_table_inheritance plugin with duplicate columns" do
+  it "should raise error" do
     @db = Sequel.mock(:autoid=>proc{|sql| 1})
     def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
@@ -515,21 +515,13 @@ describe "class_table_inheritance plugin with duplicate columns and :alias optio
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
       end
-      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}, :alias=>:emps
+      plugin :class_table_inheritance
     end 
-    deprecated do
-    class ::Manager < Employee; end
-    end
-    @ds = Employee.dataset
-    @db.sqls
+    proc{class ::Manager < Employee; end}.must_raise Sequel::Error
   end
   after do
     Object.send(:remove_const, :Manager)
     Object.send(:remove_const, :Employee)
-  end
-
-  it "should select names from both tables" do
-    Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.name FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS emps'
   end
 end
 

@@ -279,8 +279,7 @@ module Sequel
             cols = columns - [pk]
             dup_cols = cols & ds.columns
             unless dup_cols.empty?
-              # raise Error, "class_table_inheritance with duplicate column names (other than the primary key column) is not supported, make sure tables have unique column names"
-              Sequel::Deprecation.deprecate("Using class_table_inheritance with duplicate column names (#{n} => #{dup_cols}) in subclass tables (other than the primary key column)', 'Make sure all tables used have unique column names, or implement support for handling duplicate column names in the class_table_inheritance plugin")
+              raise Error, "class_table_inheritance with duplicate column names (other than the primary key column) is not supported, make sure tables have unique column names"
             end
             sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)
