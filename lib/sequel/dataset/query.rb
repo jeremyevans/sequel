@@ -692,7 +692,7 @@ module Sequel
     #   DB[:items].or(:b) # SELECT * FROM items
     def or(*cond, &block)
       if @opts[:where].nil?
-        clone
+        self
       else
         add_filter(:where, cond, false, :OR, &block)
       end
@@ -756,7 +756,7 @@ module Sequel
     #   # SELECT i.* FROM items WHERE (i.id = 1)
     def qualify(table=first_source)
       o = @opts
-      return clone if o[:sql] # SEQUEL5: return self
+      return self if o[:sql]
       h = {}
       (o.keys & QUALIFY_KEYS).each do |k|
         h[k] = qualified_expression(o[k], table)
