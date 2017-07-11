@@ -271,13 +271,6 @@ module Sequel
         super || (e.is_a?(::Mysql::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
       end
       
-      # The database name when using the native adapter is always stored in
-      # the :database option.
-      def database_name
-        Sequel::Deprecation.deprecate("Database#database_name", "Instead, use .get(Sequel.function(:DATABASE))")
-        @opts[:database]
-      end
-      
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
         convert_tinyint_to_bool && db_type =~ /\Atinyint\(1\)/ ? :boolean : super
