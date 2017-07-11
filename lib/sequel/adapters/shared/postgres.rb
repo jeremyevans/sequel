@@ -51,7 +51,7 @@ module Sequel
         end
         ::Sequel::SQL::Blob.new(str)
       end
-    end.new#.freeze # SEQUEL5
+    end.new.freeze
 
     CONVERSION_PROCS = {}
 
@@ -1206,7 +1206,7 @@ module Sequel
       include UnmodifiedIdentifiers::DatasetMethods
 
       NULL = LiteralString.new('NULL').freeze
-      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)#.freeze # SEQUEL5
+      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze).freeze
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
       Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])

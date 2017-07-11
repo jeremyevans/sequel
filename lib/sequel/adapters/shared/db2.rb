@@ -275,7 +275,7 @@ module Sequel
     module DatasetMethods
       include EmulateOffsetWithRowNumber
 
-      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}#.freeze # SEQUEL5
+      BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR, :'B~'=>:BITNOT}.freeze
 
       # DB2 casts strings using RTRIM and CHAR instead of VARCHAR.
       def cast_sql_append(sql, expr, type)

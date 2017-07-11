@@ -16,7 +16,7 @@ module Sequel
       def boolean(s) s.to_i != 0 end
       def integer(s) s.to_i end
       def float(s) s.to_f end
-    end.new#.freeze # SEQUEL5
+    end.new.freeze
 
     # Hash with integer keys and callable values for converting MySQL types.
     MYSQL_TYPES = {}

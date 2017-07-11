@@ -25,7 +25,7 @@ module Sequel
       JDBC_TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>JavaSQL::Connection::TRANSACTION_READ_UNCOMMITTED,
         :committed=>JavaSQL::Connection::TRANSACTION_READ_COMMITTED,
         :repeatable=>JavaSQL::Connection::TRANSACTION_REPEATABLE_READ,
-        :serializable=>JavaSQL::Connection::TRANSACTION_SERIALIZABLE}#.freeze # SEQUEL5
+        :serializable=>JavaSQL::Connection::TRANSACTION_SERIALIZABLE}.freeze
 
       # Set the transaction isolation level on the given connection using
       # the JDBC API.

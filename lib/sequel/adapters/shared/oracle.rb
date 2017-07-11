@@ -83,7 +83,7 @@ module Sequel
         false
       end
 
-      IGNORE_OWNERS = %w'APEX_040000 CTXSYS EXFSYS MDSYS OLAPSYS ORDDATA ORDSYS SYS SYSTEM XDB XDBMETADATA XDBPM XFILES WMSYS'#.freeze # SEQUEL5
+      IGNORE_OWNERS = %w'APEX_040000 CTXSYS EXFSYS MDSYS OLAPSYS ORDDATA ORDSYS SYS SYSTEM XDB XDBMETADATA XDBPM XFILES WMSYS'.freeze
 
       def tables(opts=OPTS)
         m = output_identifier_meth
@@ -248,7 +248,7 @@ module Sequel
       TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ COMMITTED'.freeze,
         :committed=>'READ COMMITTED'.freeze,
         :repeatable=>'SERIALIZABLE'.freeze,
-        :serializable=>'SERIALIZABLE'.freeze}#.freeze # SEQUEL5
+        :serializable=>'SERIALIZABLE'.freeze}.freeze
       # Oracle doesn't support READ UNCOMMITTED OR REPEATABLE READ transaction
       # isolation levels, so upgrade to the next highest level in those cases.
       def set_transaction_isolation_sql(level)

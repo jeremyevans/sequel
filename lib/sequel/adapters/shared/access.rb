@@ -85,10 +85,10 @@ module Sequel
       include EmulateOffsetWithReverseAndCount
       include UnmodifiedIdentifiers::DatasetMethods
 
-      EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}#.freeze # SEQUEL5
+      EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}.freeze
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
-      OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}#.freeze # SEQUEL5
-      CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}#.freeze # SEQUEL5
+      OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}.freeze
+      CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}.freeze
 
       # Access doesn't support CASE, but it can be emulated with nested
       # IIF function calls.

@@ -516,8 +516,8 @@ module Sequel
       end)
       include EmulateOffsetWithRowNumber
 
-      CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}#.freeze # SEQUEL5
-      EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}#.freeze # SEQUEL5
+      CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}.freeze
+      EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}.freeze
       #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
       LIMIT_ALL = Object.new.freeze
 

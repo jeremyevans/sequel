@@ -18,8 +18,8 @@ module Sequel
       include UnmodifiedIdentifiers::DatabaseMethods
       include Sequel::Database::SplitAlterTable
 
-      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}#.freeze # SEQUEL5
-      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
+      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}.freeze
+      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references].freeze
       
       # Set the default charset used for CREATE TABLE.  You can pass the
       # :charset option to create_table to override this setting.

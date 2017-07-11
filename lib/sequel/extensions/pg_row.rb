@@ -211,7 +211,7 @@ module Sequel
         end
       end
 
-      ROW_TYPE_CLASSES = [HashRow, ArrayRow]#.freeze # SEQUEL5
+      ROW_TYPE_CLASSES = [HashRow, ArrayRow].freeze
 
       # This parser-like class splits the PostgreSQL
       # row-valued/composite type output string format

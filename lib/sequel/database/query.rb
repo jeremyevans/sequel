@@ -7,8 +7,8 @@ module Sequel
     # This methods generally execute SQL code on the database server.
     # ---------------------
 
-    COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime]#.freeze # SEQUEL5
-    COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval]#.freeze # SEQUEL5
+    COLUMN_SCHEMA_DATETIME_TYPES = [:date, :datetime].freeze
+    COLUMN_SCHEMA_STRING_TYPES = [:string, :blob, :date, :datetime, :time, :enum, :set, :interval].freeze
 
     # The prepared statement object hash for this database, keyed by name symbol
     attr_reader :prepared_statements

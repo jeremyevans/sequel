@@ -15,7 +15,7 @@ module Sequel
           :tables  => 20,
           :views   => 23,
           :foreign_keys => 27
-        }#.freeze # SEQUEL5
+        }.freeze
         
         attr_reader :type, :criteria
 
@@ -42,7 +42,7 @@ module Sequel
             131 => "DECIMAL",
             201 => "TEXT",
             205 => "IMAGE"
-          }#.freeze # SEQUEL5
+          }.freeze
           #DATA_TYPE.each_value(&:freeze) # SEQUEL5
           
           def initialize(row)

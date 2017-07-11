@@ -18,7 +18,7 @@ module Sequel
       :blob => ::Sequel::SQL::Blob.method(:new),
       :time => ::Sequel.method(:string_to_time),
       :date => ::Sequel.method(:string_to_date)
-    }#.freeze # SEQUEL5
+    }.freeze
 
     # Wraps an underlying connection to DB2 using IBM_DB.
     class Connection

@@ -8,12 +8,12 @@ module Sequel
     # ---------------------
 
     # The order of column modifiers to use when defining a column.
-    COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]#.freeze # SEQUEL5
+    COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references].freeze
 
     # The alter table operations that are combinable.
     COMBINABLE_ALTER_TABLE_OPS = [:add_column, :drop_column, :rename_column,
       :set_column_type, :set_column_default, :set_column_null,
-      :add_constraint, :drop_constraint]#.freeze # SEQUEL5
+      :add_constraint, :drop_constraint].freeze
 
     # Adds a column to the specified table. This method expects a column name,
     # a datatype and optionally a hash with additional constraints and options:

@@ -13,12 +13,12 @@ module Sequel
       # ORA-01012: not logged on
       # ORA-03113: end-of-file on communication channel
       # ORA-03114: not connected to ORACLE
-      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]#.freeze # SEQUEL5
+      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ].freeze
       
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
         :clob=>lambda(&:read)
-      }#.freeze # SEQUEL5
+      }.freeze
 
       # Hash of conversion procs for this database.
       attr_reader :conversion_procs
@@ -114,7 +114,7 @@ module Sequel
 
       PS_TYPES = {'string'=>String, 'integer'=>Integer, 'float'=>Float,
         'decimal'=>Float, 'date'=>Time, 'datetime'=>Time,
-        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB}#.freeze # SEQUEL5
+        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB}.freeze
       def cursor_bind_params(conn, cursor, args)
         i = 0
         args.map do |arg, type|

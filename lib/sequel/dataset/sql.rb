@@ -245,10 +245,10 @@ module Sequel
     DEFAULT = LiteralString.new('DEFAULT').freeze
 
     EXISTS = ['EXISTS '.freeze].freeze
-    BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}#.freeze # SEQUEL5
-    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :offset, :compounds]#.freeze # SEQUEL5
+    BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}.freeze
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :offset, :compounds].freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
-    QUALIFY_KEYS = [:select, :where, :having, :order, :group]#.freeze # SEQUEL5
+    QUALIFY_KEYS = [:select, :where, :having, :order, :group].freeze
 
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     LIKE_OPERATORS = ::Sequel::SQL::ComplexExpression::LIKE_OPERATORS

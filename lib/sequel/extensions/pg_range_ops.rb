@@ -75,7 +75,7 @@ module Sequel
         :starts_after => ["(".freeze, " &> ".freeze, ")".freeze].freeze,
         :adjacent_to => ["(".freeze, " -|- ".freeze, ")".freeze].freeze,
         :overlaps => ["(".freeze, " && ".freeze, ")".freeze].freeze,
-      }#.freeze # SEQUEL5
+      }.freeze
 
       %w'lower upper isempty lower_inc upper_inc lower_inf upper_inf'.each do |f|
         class_eval("def #{f}; function(:#{f}) end", __FILE__, __LINE__)
