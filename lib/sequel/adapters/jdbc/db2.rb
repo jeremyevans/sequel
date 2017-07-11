@@ -21,13 +21,7 @@ module Sequel
           alias views jdbc_views
           alias indexes jdbc_indexes
           %w'schema_parse_table tables views indexes'.each do |s|
-            class_eval(<<-END, __FILE__, __LINE__+1)
-              def jdbc_#{s}(*a)
-                Sequel::Deprecation.deprecate("Database#jdbc_#{s} in the jdbc/db2 adapter", "Use Database\##{s} instead")
-                #{s}(*a)
-              end
-            END
-            # remove_method(:"jdbc_#{s}") # SEQUEL5
+            remove_method(:"jdbc_#{s}")
           end
         end
         db.dataset_class = Sequel::JDBC::DB2::Dataset
