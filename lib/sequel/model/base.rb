@@ -22,9 +22,10 @@ module Sequel
     #   truncate, unfiltered, ungraphed, ungrouped, union, unlimited, unordered, where, where_all,
     #   where_each, where_single_value, with, with_recursive, with_sql
     module ClassMethods
-      # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
-      # (default: not set, so all columns not otherwise restricted are allowed).
-      attr_reader :allowed_columns # SEQUEL5: Deprecate after release
+      def allowed_columns
+        Sequel::Deprecation.deprecate("Model.allowed_columns", "It has been moved to the whitelist_security plugin")
+        nil
+      end
 
       # Whether to cache the anonymous models created by Sequel::Model(), true by default.  This is
       # required for reloading them correctly (avoiding the superclass mismatch).

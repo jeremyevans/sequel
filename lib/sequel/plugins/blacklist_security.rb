@@ -58,7 +58,8 @@ module Sequel
         # restricted_columns.
         def get_setter_methods
           meths = super
-          if !(respond_to?(:allowed_columns) && allowed_columns) && restricted_columns
+          #if !(respond_to?(:allowed_columns) && allowed_columns) && restricted_columns
+          if (!defined?(::Sequel::Plugins::WhitelistSecurity) || !plugins.include?(::Sequel::Plugins::WhitelistSecurity) || !allowed_columns) && restricted_columns
             meths -= restricted_columns.map{|x| "#{x}="}
           end
           meths
