@@ -525,12 +525,6 @@ module Sequel
       Dataset.def_sql_method(self, :insert, %w'with insert into columns output values')
       Dataset.def_sql_method(self, :update, [['if is_2005_or_later?', %w'with update limit table set output from where'], ['else', %w'update table set output from where']])
 
-      # Allow overriding of the mssql_unicode_strings option at the dataset level.
-      def mssql_unicode_strings=(v)
-        Sequel::Deprecation.deprecate("Dataset#mssql_unicode_strings=", "Switch to using with_mssql_unicode_strings, which returns a modified copy")
-        @opts[:mssql_unicode_strings] = v
-      end
-
       # Use the database's mssql_unicode_strings setting if the dataset hasn't overridden it.
       def mssql_unicode_strings
         opts.has_key?(:mssql_unicode_strings) ? opts[:mssql_unicode_strings] : db.mssql_unicode_strings
