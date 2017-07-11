@@ -89,29 +89,6 @@ module Sequel
       end
     end
 
-    # SEQUEL5: Remove
-    @client_min_messages = :warning
-    @force_standard_strings = true
-    class << self
-      def client_min_messages
-        Sequel::Deprecation.deprecate("Sequel::Postgres.client_min_messages", "Use the :client_min_messages Database option instead")
-        @client_min_messages
-      end
-      def client_min_messages=(v)
-        Sequel::Deprecation.deprecate("Sequel::Postgres.client_min_messages=", "Use the :client_min_messages Database option instead")
-        @client_min_messages = v
-      end
-
-      def force_standard_strings
-        Sequel::Deprecation.deprecate("Sequel::Postgres.force_standard_strings", "Use the :force_standard_strings Database option instead")
-        @force_standard_strings
-      end
-      def force_standard_strings=(v)
-        Sequel::Deprecation.deprecate("Sequel::Postgres.force_standard_strings=", "Use the :force_standard_strings Database option instead")
-        @force_standard_strings = v
-      end
-    end
-
     class CreateTableGenerator < Sequel::Schema::CreateTableGenerator
       # Add an exclusion constraint when creating the table. Elements should be
       # an array of 2 element arrays, with the first element being the column or
@@ -760,9 +737,9 @@ module Sequel
       def connection_configuration_sqls
         sqls = []
 
-        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, Postgres.instance_variable_get(:@force_standard_strings))) # , true)) # SEQUEL5
+        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, true))
 
-        cmm = @opts.fetch(:client_min_messages, Postgres.instance_variable_get(:@client_min_messages)) # , :warning) # SEQUEL5
+        cmm = @opts.fetch(:client_min_messages, :warning)
         if cmm && !cmm.to_s.empty?
           cmm = cmm.to_s.upcase.strip
           unless VALID_CLIENT_MIN_MESSAGES.include?(cmm)
