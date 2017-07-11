@@ -968,25 +968,6 @@ module Sequel
         plugin.const_defined?(submod, false)
       end
   
-      # An hash of prepared argument values for the given arguments, with keys
-      # starting at a.  Used by the methods created by prepared_finder.
-      def prepare_method_arg_hash(args)
-        # SEQUEL5: Remove
-        h = {}
-        prepare_method_args('a', args.length).zip(args).each{|k, v| h[k] = v}
-        h
-      end
-
-      # An array of prepared statement argument names, of length n and starting with base.
-      def prepare_method_args(base, n)
-        # SEQUEL5: Remove
-        (0...n).map do
-          s = base.to_sym
-          base = base.next
-          s
-        end
-      end
-
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
       #
