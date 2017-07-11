@@ -837,7 +837,7 @@ module Sequel
       raise(InvalidOperation, "Joined datasets cannot be modified") if !supports_modifying_joins? && joined_dataset?
     end
 
-    # Emit deprecation warning if the dataset uses limits or offsets.
+    # Raise error if the dataset uses limits or offsets.
     def check_not_limited!(type)
       return if @opts[:skip_limit_check] && type != :truncate
       raise InvalidOperation, "Dataset##{type} not supported on datasets with limits or offsets" if opts[:limit] || opts[:offset]
