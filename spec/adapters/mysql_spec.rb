@@ -440,54 +440,6 @@ describe "A MySQL database" do
   end
 end  
 
-# SEQUEL5: Remove
-describe "A MySQL database with table options" do
-  before do
-    @options = {:engine=>'MyISAM', :charset=>'latin1', :collate => 'latin1_swedish_ci'}
-
-    deprecated do
-      Sequel::MySQL.default_engine = 'InnoDB'
-      Sequel::MySQL.default_charset = 'utf8'
-      Sequel::MySQL.default_collate = 'utf8_general_ci'
-    end
-
-    @db = DB
-    @db.drop_table?(:items)
-
-    DB.sqls.clear
-  end
-  after do
-    @db.drop_table?(:items)
-
-    deprecated do
-      Sequel::MySQL.default_engine = nil
-      Sequel::MySQL.default_charset = nil
-      Sequel::MySQL.default_collate = nil
-    end
-  end
-
-  it "should allow to pass custom options (engine, charset, collate) for table creation" do
-    @db.create_table(:items, @options){Integer :size; text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=MyISAM DEFAULT CHARSET=latin1 DEFAULT COLLATE=latin1_swedish_ci"]
-    end
-  end
-
-  it "should use default options if specified (engine, charset, collate) for table creation" do
-    @db.create_table(:items){Integer :size; text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8_general_ci"]
-    end
-  end
-
-  it "should not use default if option has a nil value" do
-    @db.create_table(:items, :engine=>nil, :charset=>nil, :collate=>nil){Integer :size; text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`size` integer, `name` text)"]
-    end
-  end
-end
-
 describe "A MySQL database with table options" do
   before do
     @options = {:engine=>'MyISAM', :charset=>'latin1', :collate => 'latin1_swedish_ci'}
