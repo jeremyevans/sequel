@@ -679,12 +679,6 @@ module Sequel
           to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
         end
       end
-
-      # SEQUEL5: Remove
-      def timestamp_convertor
-        Sequel::Deprecation.deprecate("Sequel::JDBC::Database#timestamp_convertor", "Use method(:timestamp_convert) instead")
-        method(:timestamp_convert)
-      end
     end
     
     class Dataset < Sequel::Dataset
