@@ -167,29 +167,15 @@ module Sequel
         convert_input_timestamp(ary, input_timezone)
       when Time
         if datetime_class == DateTime
-          if v.respond_to?(:to_datetime)
-            v.to_datetime
-          else
-          # :nocov:
-            # SEQUEL5: Remove
-            # Ruby 1.8 code, %N not available and %z broken on Windows
-            offset_hours, offset_minutes = (v.utc_offset/60).divmod(60)
-            string_to_datetime(v.strftime("%Y-%m-%dT%H:%M:%S") << sprintf(".%06i%+03i%02i", v.usec, offset_hours, offset_minutes))
-          # :nocov:
-          end
+          v.to_datetime
         else
           v
         end
       when DateTime
         if datetime_class == DateTime
           v
-        elsif v.respond_to?(:to_time)
-          v.to_time
         else
-        # :nocov:
-        # SEQUEL5: Remove
-          string_to_datetime(v.strftime("%FT%T.%N%z"))
-        # :nocov:
+          v.to_time
         end
       else
         raise InvalidValue, "Invalid convert_input_timestamp type: #{v.inspect}"
