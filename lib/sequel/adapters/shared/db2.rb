@@ -6,30 +6,10 @@ module Sequel
   module DB2
     Sequel::Database.set_shared_adapter_scheme(:db2, self)
 
-    # SEQUEL5: Remove
-    @use_clob_as_blob = false
-    class << self
-      def use_clob_as_blob
-        Sequel::Deprecation.deprecate("Sequel::DB2.use_clob_as_blob", "Call this method on the Database instance")
-        @use_clob_as_blob
-      end
-      def use_clob_as_blob=(v)
-        Sequel::Deprecation.deprecate("Sequel::DB2.use_clob_as_blob=", "Call this method on the Database instance")
-        @use_clob_as_blob = v
-      end
-    end
-
     module DatabaseMethods
       # Whether to use clob as the generic File type, false by default.
-      #attr_accessor :use_clob_as_blob # SEQUEL5
+      attr_accessor :use_clob_as_blob
 
-      # SEQUEL5: Remove
-      attr_writer :use_clob_as_blob
-      def use_clob_as_blob
-        v = @use_clob_as_blob
-        v.nil? ? Sequel::DB2.instance_variable_get(:@use_clob_as_blob) : v
-      end
-    
       # DB2 always uses :db2 as it's database type
       def database_type
         :db2
