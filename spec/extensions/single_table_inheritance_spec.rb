@@ -19,6 +19,22 @@ describe Sequel::Model, "single table inheritance plugin" do
     Object.send(:remove_const, :StiTest)
   end
 
+  describe "#sti_load" do
+    it "should load instances of the correct type" do
+      StiTest.sti_load(id: 3).must_be_instance_of StiTest
+      StiTest.sti_load(id: 3, kind: 'StiTestSub1').must_be_instance_of StiTestSub1
+      StiTest.sti_load(id: 3, kind: 'StiTestSub2').must_be_instance_of StiTestSub2
+    end
+  end
+
+  describe "#sti_class_from_sti_key" do
+    it "should load the correct subclass based on the key" do
+      StiTest.sti_class_from_sti_key('StiTest').must_equal StiTest
+      StiTest.sti_class_from_sti_key('StiTestSub1').must_equal StiTestSub1
+      StiTest.sti_class_from_sti_key('StiTestSub2').must_equal StiTestSub2
+    end
+  end
+
   it "should freeze sti metadata when freezing model class" do
     StiTest.freeze
     StiTest.sti_dataset.frozen?.must_equal true
