@@ -981,9 +981,6 @@ module Sequel
           ds.literal_append(sql, pk)
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
-        elsif dataset.joined_dataset?
-          # SEQUEL5: Remove as joined model datasets are not allowed
-          dataset.first(qualified_primary_key_hash(pk))
         else
           dataset.first(primary_key_hash(pk))
         end
