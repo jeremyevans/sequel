@@ -78,23 +78,6 @@ describe "convert_smallint_to_bool" do
       @ds.all.must_equal [{:b=>true, :i=>1}]
     end
 
-    deprecated "should return all smallints as integers when unset" do
-      @ds.convert_smallint_to_bool = false
-      @ds.delete
-      @ds.insert(:b=>true, :i=>10)
-      @ds.all.must_equal [{:b=>1, :i=>10}]
-      @ds.delete
-      @ds.insert(:b=>false, :i=>0)
-      @ds.all.must_equal [{:b=>0, :i=>0}]
-    
-      @ds.delete
-      @ds.insert(:b=>1, :i=>10)
-      @ds.all.must_equal [{:b=>1, :i=>10}]
-      @ds.delete
-      @ds.insert(:b=>0, :i=>0)
-      @ds.all.must_equal [{:b=>0, :i=>0}]
-    end
-
     it "should support with_convert_smallint_to_bool for returning modified dataset with setting changed" do
       @ds = @ds.with_convert_smallint_to_bool(false)
       @ds.delete
