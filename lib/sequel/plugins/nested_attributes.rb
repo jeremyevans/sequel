@@ -81,15 +81,6 @@ module Sequel
       end
       
       module ClassMethods
-        def nested_attributes_module
-          Sequel::Deprecation.deprecate('Sequel::Model.nested_attributes_module', 'There is no replacement')
-          @nested_attributes_module
-        end
-        def nested_attributes_module=(v)
-          Sequel::Deprecation.deprecate('Sequel::Model.nested_attributes_module=', 'There is no replacement')
-          @nested_attributes_module = v
-        end
-        
         # Freeze nested_attributes_module when freezing model class.
         def freeze
           @nested_attributes_module.freeze if @nested_attributes_module

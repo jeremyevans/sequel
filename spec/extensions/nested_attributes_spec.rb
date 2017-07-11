@@ -49,12 +49,6 @@ describe "NestedAttributes plugin" do
     @db.sqls
   end
   
-  deprecated "should allow access to nested_attributes_module" do
-    @Artist.nested_attributes_module.must_be_kind_of Module
-    @Artist.nested_attributes_module = v = Module.new
-    @Artist.nested_attributes_module.must_equal v
-  end
-
   it "should support creating new many_to_one objects" do
     a = @Album.new({:name=>'Al', :artist_attributes=>{:name=>'Ar'}})
     @db.sqls.must_equal []
