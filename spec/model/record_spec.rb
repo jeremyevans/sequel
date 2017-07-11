@@ -1360,7 +1360,7 @@ describe Sequel::Model, "#each" do
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
   
-  deprecated "should iterate over the values" do
+  it "should iterate over the values" do
     h = {}
     @m.each{|k, v| h[k] = v}
     h.must_equal(:a => 1, :b => 2, :id => 4444)

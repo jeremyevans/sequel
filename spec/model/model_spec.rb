@@ -466,7 +466,7 @@ describe Sequel::Model, ".require_valid_table = true" do
     c.columns.must_equal [:id]
   end
 
-  deprecated "should assume nil value is the same as false" do
+  it "should assume nil value is the same as false" do
     c = Class.new(Sequel::Model)
     c.require_valid_table = nil
     ds = @db.dataset.with_extend{def columns; raise Sequel::Error; end}
