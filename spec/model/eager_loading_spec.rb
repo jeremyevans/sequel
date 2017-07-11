@@ -1483,20 +1483,26 @@ describe Sequel::Model, "#eager_graph" do
     a.first.lgenre.must_equal sub.load(:id => 4)
   end
   
-  it "should correctly handle an aliased join table in many_to_many and one_through_one with conditions" do
+  it "should correctly handle an aliased join table in many_to_many and one_through_one with graph_conditions or graph_block" do
     c = Class.new(GraphAlbum)
-    c.many_to_many :genres, :clone=>:genres, :join_table=>Sequel[:ag].as(:ga), :conditions=>'true', :ignore_conditions_warning=> true
-    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ga.genre_id)'
-    c.many_to_many :genres, :clone=>:genres, :join_table=>Sequel[:ag].as(:ga), :conditions=>'true', :graph_block => proc{true}
-    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND \'t\')'
+    c.many_to_many :genres, :clone=>:genres, :join_table=>Sequel[:ag].as(:ga), :graph_conditions=>{:a=>:b}
+    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND (genres.a = ga.b))'
+    c.many_to_many :genres, :clone=>:genres, :join_table=>Sequel[:ag].as(:ga), :graph_block => proc{true}
+    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND (genres.a = ga.b) AND \'t\')'
   end
 
-  with_symbol_splitting "should correctly handle an aliased join table symbol in many_to_many and one_through_one with conditions" do
+  with_symbol_splitting "should correctly handle an aliased join table symbol in many_to_many and one_through_one with graph_conditions or graph_block" do
     c = Class.new(GraphAlbum)
-    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga, :conditions=>'true', :ignore_conditions_warning=> true
-    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ga.genre_id)'
-    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga, :conditions=>'true', :graph_block => proc{true}
-    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND \'t\')'
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga, :graph_conditions=>{:a=>:b}
+    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND (genres.a = ga.b))'
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga, :graph_block => proc{true}
+    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND (genres.a = ga.b) AND \'t\')'
+  end
+
+  it "should raise Error when using eager_graph with :conditions option that isn't a conditions specifier" do
+    c = Class.new(GraphAlbum)
+    c.many_to_many :genres, :clone=>:genres, :join_table=>Sequel[:ag].as(:ga), :conditions=>'true'
+    proc{c.eager_graph(:genres)}.must_raise Sequel::Error
   end
 
   with_symbol_splitting "should correctly handle an aliased join table symbol in many_to_many and one_through_one" do
