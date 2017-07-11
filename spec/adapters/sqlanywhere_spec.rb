@@ -6,10 +6,9 @@ describe "convert_smallint_to_bool" do
   before do
     @db = DB
     @ds = @db[:booltest]
-    @db.send(:remove_instance_variable, :@convert_smallint_to_bool) if @db.instance_variable_defined?(:@convert_smallint_to_bool)
   end
   after do
-    @db.send(:remove_instance_variable, :@convert_smallint_to_bool) if @db.instance_variable_defined?(:@convert_smallint_to_bool)
+    @db.convert_smallint_to_bool = true
   end
   
   describe "Database#convert_smallint_to_bool" do
