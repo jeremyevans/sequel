@@ -541,7 +541,6 @@ module Sequel
             0
           end
         end
-        Sequel::Deprecation.deprecate('Sequel no longer supports PostgreSQL <8.2, some things may not work.') if @server_version < 80200
         @server_version
       end
 
