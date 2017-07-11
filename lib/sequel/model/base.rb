@@ -2138,53 +2138,6 @@ module Sequel
         model.use_transactions ? @db.transaction(:server=>opts[:server], &pr) : pr.call
       end
 
-      # Allow Sequel::Model classes to be used as dataset arguments when graphing:
-      #
-      #   Artist.graph(Album, :artist_id=>id)
-      #   # SELECT artists.id, artists.name, albums.id AS albums_id, albums.artist_id, albums.name AS albums_name
-      #   # FROM artists LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
-      def graph(table, *args, &block)
-        if table.is_a?(Class) && table < Sequel::Model
-          Sequel::Deprecation.deprecate("Passing Sequel::Model class as first argument to Sequel::Dataset#graph", "Pass the model's dataset as the first argument instead")
-          super(table.dataset, *args, &block)
-        else
-          super
-        end
-      end
-
-      # Handle Sequel::Model instances when inserting, using the model instance's
-      # values for the insert, unless the model instance can be used directly in
-      # SQL.
-      #
-      #   Album.insert(Album.load(:name=>'A'))
-      #   # INSERT INTO albums (name) VALUES ('A')
-      def insert_sql(*values)
-        if values.size == 1 && (v = values[0]).is_a?(Sequel::Model) && !v.respond_to?(:sql_literal_append)
-          Sequel::Deprecation.deprecate("Passing Sequel::Model instance argument to Sequel::Dataset#insert", "Pass model_instance.values or model_instance.to_hash as the argument instead")
-          super(v.to_hash)
-        else
-          super
-        end
-      end
-
-      # Allow Sequel::Model classes to be used as table name arguments in dataset
-      # join methods:
-      #
-      #   Artist.join(Album, :artist_id=>id)
-      #   # SELECT * FROM artists INNER JOIN albums ON (albums.artist_id = artists.id)
-      def join_table(type, table, *args, &block)
-        if table.is_a?(Class) && table < Sequel::Model
-          Sequel::Deprecation.deprecate("Passing Sequel::Model class to a dataset join method", "Pass the model's table name or dataset as the first argument instead")
-          if table.dataset.simple_select_all?
-            super(type, table.table_name, *args, &block)
-          else
-            super(type, table.dataset, *args, &block)
-          end
-        else
-          super
-        end
-      end
-
       # If there is no order already defined on this dataset, order it by
       # the primary key and call last.
       #
@@ -2261,14 +2214,6 @@ module Sequel
       end
 
       private
-
-      # SEQUEL5: Remove
-      def _model_where_loader
-        # :nocov:
-        Sequel::Deprecation.deprecate("Dataset#_model_where_loader", "Use _where_loader instead")
-        _where_loader
-        # :nocov:
-      end
 
       # If the dataset is not already ordered, and the model has a primary key,
       # return a clone ordered by the primary key.
