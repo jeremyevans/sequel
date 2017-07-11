@@ -19,7 +19,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     Object.send(:remove_const, :StiTest)
   end
 
-  describe "#sti_load" do
+  describe ".sti_load" do
     it "should load instances of the correct type" do
       StiTest.sti_load(id: 3).must_be_instance_of StiTest
       StiTest.sti_load(id: 3, kind: 'StiTestSub1').must_be_instance_of StiTestSub1
@@ -27,7 +27,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     end
   end
 
-  describe "#sti_class_from_sti_key" do
+  describe ".sti_class_from_sti_key" do
     it "should load the correct subclass based on the key" do
       StiTest.sti_class_from_sti_key('StiTest').must_equal StiTest
       StiTest.sti_class_from_sti_key('StiTestSub1').must_equal StiTestSub1
