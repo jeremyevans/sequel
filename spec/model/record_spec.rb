@@ -237,17 +237,6 @@ describe "Model#save" do
     DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
-  deprecated "should rollback if before_save returns false and raise_on_save_failure = true" do
-    o = @c.load(:id => 3, :x => 1, :y => nil)
-    o.use_transactions = true
-    o.raise_on_save_failure = true
-    def o.before_save
-      false
-    end
-    proc { o.save(:columns=>:y) }.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
-  end
-
   it "should rollback if before_save calls cancel_action and raise_on_save_failure = true" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true

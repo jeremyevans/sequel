@@ -24,10 +24,18 @@ module Sequel
     # call +super+ to get the default behavior (while empty by default, they can also be defined
     # by plugins).  See the {"Model Hooks" guide}[rdoc-ref:doc/model_hooks.rdoc] for
     # more detail on hooks.
-    HOOKS = [:before_create, :before_update, :before_save, :before_destroy, :before_validation,
-      :after_create, :after_update, :after_save, :after_destroy, :after_validation,
-      :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback # SEQUEL5: Remove commit/rollback hooks
-    ]#.freeze # SEQUEL5
+    HOOKS = [
+      :after_create,
+      :after_destroy,
+      :after_save,
+      :after_update,
+      :after_validation,
+      :before_create,
+      :before_destroy,
+      :before_save,
+      :before_update,
+      :before_validation
+    ].freeze
 
     @cache_anonymous_models = true
     @db = nil

@@ -140,39 +140,6 @@ describe Sequel::Model, "hook_class_methods plugin" do
     adds.must_equal ['456']
   end
   
-  deprecated "should stop processing if a before hook returns false" do
-    flag = true
-    adds = []
-    
-    a = model_class.call Sequel::Model do
-      before_save{adds << 'cruel'; flag}
-      before_save{adds << 'blah'; flag}
-    end
-    
-    a.new.before_save
-    adds.must_equal ['blah', 'cruel']
-
-    # chain should not break on nil
-    adds = []
-    flag = nil
-    a.new.before_save
-    adds.must_equal ['blah', 'cruel']
-    
-    adds = []
-    flag = false
-    a.new.before_save
-    adds.must_equal ['blah']
-    
-    b = Class.new(a)
-    b.class_eval do
-      before_save{adds << 'mau'}
-    end
-    
-    adds = []
-    b.new.before_save
-    adds.must_equal ['mau', 'blah']
-  end
-
   it "should stop processing if a before hook calls cancel_action" do
     flag = true
     adds = []
@@ -226,22 +193,9 @@ describe "Model#before_create && Model#after_create" do
     DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
   end
 
-  deprecated ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
-    @c.before_create{false}
-    proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
     @c.before_create{cancel_action}
     proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
-    @c.before_create{false}
-    @c.raise_on_save_failure = false
-    @c.create(:x => 2).must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -269,22 +223,9 @@ describe "Model#before_update && Model#after_update" do
     DB.sqls.must_equal ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
 
-  deprecated "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
-    @c.before_update{false}
-    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#save should cancel the save and raise an error if before_update calls cancel_action and raise_on_save_failure is true" do
     @c.before_update{cancel_action}
     proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
-    @c.before_update{false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -320,22 +261,9 @@ describe "Model#before_save && Model#after_save" do
     DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
   end
 
-  deprecated "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
-    @c.before_save{false}
-    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#save should cancel the save and raise an error if before_save calls cancel_action and raise_on_save_failure is true" do
     @c.before_save{cancel_action}
     proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
-    @c.before_save{false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -363,22 +291,9 @@ describe "Model#before_destroy && Model#after_destroy" do
     DB.sqls.must_equal ['BLAH before', "DELETE FROM items WHERE id = 2233", 'BLAH after']
   end
 
-  deprecated "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
-    @c.before_destroy{false}
-    proc{@c.load(:id => 2233).destroy}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#destroy should cancel the destroy and raise an error if before_destroy calls cancel_action and raise_on_save_failure is true" do
     @c.before_destroy{cancel_action}
     proc{@c.load(:id => 2233).destroy}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
-    @c.before_destroy{false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).destroy.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -430,22 +345,9 @@ describe "Model#before_validation && Model#after_validation" do
     DB.sqls.must_equal ['BLAH before', 'BLAH after']
   end
 
-  deprecated "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
-    @c.before_validation{false}
-    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#save should cancel the save and raise an error if before_validation calls cancel_action and raise_on_save_failure is true" do
     @c.before_validation{cancel_action}
     proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
-    @c.before_validation{false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -454,52 +356,6 @@ describe "Model#before_validation && Model#after_validation" do
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
-  end
-end
-
-describe "Model transaction hooks" do
-  before do
-    DB.reset
-
-    @c = model_class.call(Sequel::Model(:items)) do
-      columns :x
-      after_save {DB << "AS"}
-      after_destroy {DB << "AD"}
-      self.use_transactions = true
-    end
-  end
-  
-  deprecated "should call after_commit or after_rollback depending on whether the transaction commits or rolls back" do
-    @c.after_commit{DB << 'AC'}
-    @c.after_rollback{DB << 'AR'}
-    m = @c.load(:id => 2233, :x=>123)
-
-    m.save
-    DB.sqls.must_equal ['BEGIN', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'AS', 'COMMIT', 'AC']
-
-    @c.db.transaction(:rollback=>:always){m.save}
-    DB.sqls.must_equal ['BEGIN', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'AS', 'ROLLBACK', 'AR']
-
-    @c.db.transaction do
-      m.save
-      DB.sqls.must_equal ['BEGIN', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'AS']
-    end
-  end
-  
-  deprecated "should call after_destroy_commit or after_destroy_rollback depending on whether the transaction commits or rolls back" do
-    @c.after_destroy_commit {DB << 'ADC'}
-    @c.after_destroy_rollback{DB << 'ADR'}
-
-    @c.load(:id => 2233).destroy
-    DB.sqls.must_equal ['BEGIN', 'DELETE FROM items WHERE id = 2233', 'AD', 'COMMIT', 'ADC']
-
-    @c.db.transaction(:rollback=>:always){@c.load(:id => 2233).destroy}
-    DB.sqls.must_equal ['BEGIN', 'DELETE FROM items WHERE id = 2233', 'AD', 'ROLLBACK', 'ADR']
-
-    @c.db.transaction do
-      @c.load(:id => 2233).destroy
-      DB.sqls.must_equal ['BEGIN', 'DELETE FROM items WHERE id = 2233', 'AD']
-    end
   end
 end
 
@@ -520,54 +376,5 @@ describe "Model.has_hooks?" do
   it "should return true if hooks are inherited" do
     @d = Class.new(@c)
     @d.has_hooks?(:before_save).must_equal false
-  end
-end
-
-describe "Model#add_hook_type" do
-  before do
-    deprecated do
-      class ::Foo < Sequel::Model(:items)
-        plugin :hook_class_methods
-        add_hook_type :before_bar, :after_bar
-
-        def bar
-          return :b if before_bar == false
-          return :a if after_bar == false
-          true
-        end
-      end
-      @f = Class.new(Foo)
-    end
-  end
-  after do
-    Object.send(:remove_const, :Foo)
-  end
-
-  deprecated "should have before_bar and after_bar class methods" do
-    @f.must_respond_to(:before_bar)
-    @f.must_respond_to(:before_bar)
-  end
-
-  deprecated "should have before_bar and after_bar instance methods" do
-    @f.new.must_respond_to(:before_bar)
-    @f.new.must_respond_to(:before_bar)
-  end
-
-  deprecated "it should return true for bar when before_bar and after_bar hooks are returing true" do
-    a = 1
-    @f.before_bar { a += 1}
-    @f.new.bar.must_equal true
-    a.must_equal 2
-    @f.after_bar { a *= 2}
-    @f.new.bar.must_equal true
-    a.must_equal 6
-  end
-
-  deprecated "it should return nil for bar when before_bar and after_bar hooks are returing false" do
-    @f.new.bar.must_equal true
-    @f.after_bar { false }
-    @f.new.bar.must_equal :a
-    @f.before_bar { false }
-    @f.new.bar.must_equal :b
   end
 end

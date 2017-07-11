@@ -97,59 +97,6 @@ describe "Sequel::Model basic support" do
     i.save.must_be_nil
   end
 
-  deprecated "#should respect after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks" do
-    i = Item.create(:name=>'J')
-    i.use_transactions = true
-    def i.hooks
-      @hooks
-    end
-    def i.rb=(x)
-      @hooks = []
-      @rb = x
-    end
-    def i.after_save
-      @hooks << :as
-      raise Sequel::Rollback if @rb
-    end
-    def i.after_destroy
-      @hooks << :ad
-      raise Sequel::Rollback if @rb
-    end
-    def i.after_commit
-      @hooks << :ac
-    end
-    def i.after_rollback
-      @hooks << :ar
-    end
-    def i.after_destroy_commit
-      @hooks << :adc
-    end
-    def i.after_destroy_rollback
-      @hooks << :adr
-    end
-    i.name = 'K'
-    i.rb = true
-    i.save.must_be_nil
-    i.reload.name.must_equal 'J'
-    i.hooks.must_equal [:as, :ar]
-
-    i.rb = true
-    i.destroy.must_be_nil
-    i.exists?.must_equal true
-    i.hooks.must_equal [:ad, :adr]
-
-    i.name = 'K'
-    i.rb = false
-    i.save.wont_equal nil
-    i.reload.name.must_equal 'K'
-    i.hooks.must_equal [:as, :ac]
-
-    i.rb = false
-    i.destroy.wont_equal nil
-    i.exists?.must_equal false
-    i.hooks.must_equal [:ad, :adc]
-  end
-
   it "#exists? should return whether the item is still in the database" do
     i = Item.create(:name=>'J')
     i.exists?.must_equal true

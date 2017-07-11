@@ -20,25 +20,11 @@ describe "Model#before_create && Model#after_create" do
     DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'SELECT * FROM items WHERE x = 2', 'BLAH after']
   end
 
-  deprecated ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_create){false}
-    proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-    @c.load(:id => 2233).save
-  end
-
   it ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
     @c.send(:define_method, :before_create){cancel_action 'not good'}
     proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed, 'not good')
     DB.sqls.must_equal []
     @c.load(:id => 2233).save
-  end
-
-  deprecated ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_create){false}
-    @c.raise_on_save_failure = false
-    @c.create(:x => 2).must_be_nil
-    DB.sqls.must_equal []
   end
 
   it ".create should cancel the save and return nil if before_create calls cancel_action and raise_on_save_failure is false" do
@@ -67,29 +53,9 @@ describe "Model#before_update && Model#after_update" do
     DB.sqls.must_equal ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
 
-  deprecated "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_update){false}
-    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#save should cancel the save and raise an error if before_update calls cancel_action and raise_on_save_failure is true" do
     @c.send(:define_method, :before_update){cancel_action}
     proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and raise an error if before_update returns false and raise_on_failure option is true" do
-    @c.send(:define_method, :before_update){false}
-    @c.raise_on_save_failure = false
-    proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_update){false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -127,30 +93,10 @@ describe "Model#before_save && Model#after_save" do
     DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'SELECT * FROM items WHERE x = 2', 'BLAH after']
   end
 
-  deprecated "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_save){false}
-    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and raise an error if before_save returns false and raise_on_failure option is true" do
-    @c.send(:define_method, :before_save){false}
-    @c.raise_on_save_failure = false
-    proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#save should cancel the save and raise an error if before_save calls cancel_action and raise_on_failure option is true" do
     @c.send(:define_method, :before_save){cancel_action}
     @c.raise_on_save_failure = false
     proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_save){false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -185,29 +131,9 @@ describe "Model#before_destroy && Model#after_destroy" do
     DB.sqls.must_equal ['BLAH before', 'DELETE FROM items WHERE id = 2233', 'BLAH after']
   end
 
-  deprecated "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_destroy){false}
-    proc{@c.load(:id => 2233).destroy}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
   it "#destroy should cancel the destroy and raise an error if before_destroy calls cancel_action and raise_on_save_failure is true" do
     @c.send(:define_method, :before_destroy){cancel_action; true}
     proc{@c.load(:id => 2233).destroy}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_failure option is true" do
-    @c.send(:define_method, :before_destroy){false}
-    @c.raise_on_save_failure = false
-    proc{@c.load(:id => 2233).destroy(:raise_on_failure => true)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_destroy){false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).destroy.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -257,29 +183,9 @@ describe "Model#before_validation && Model#after_validation" do
     DB.sqls.must_equal ['BLAH before', 'BLAH after']
   end
 
-  deprecated "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_validation){false}
-    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and raise an error if before_validation returns false and raise_on_failure option is true" do
-    @c.send(:define_method, :before_validation){false}
-    @c.raise_on_save_failure = false
-    proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-  
   it "#save should cancel the save and raise an error if before_validation calls cancel_action and raise_on_save_failure is true" do
     @c.send(:define_method, :before_validation){cancel_action}
     proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
-    DB.sqls.must_equal []
-  end
-
-  deprecated "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_validation){false}
-    @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -292,11 +198,6 @@ describe "Model#before_validation && Model#after_validation" do
   
   it "#valid? should return false if before_validation calls cancel_action" do
     @c.send(:define_method, :before_validation){cancel_action}
-    @c.load(:id => 2233).valid?.must_equal false
-  end
-  
-  deprecated "#valid? should return false if before_validation returns false" do
-    @c.send(:define_method, :before_validation){false}
     @c.load(:id => 2233).valid?.must_equal false
   end
 end
@@ -465,201 +366,5 @@ describe "Model around filters" do
     o = @c.new
     def o.around_validation() end
     o.save.must_be_nil
-  end
-end
-
-describe "Model#after_commit and #after_rollback" do
-  before do
-    @db = Sequel.mock(:servers=>{:test=>{}})
-    @m = Class.new(Sequel::Model(@db[:items])) do
-      attr_accessor :rb
-      def _delete
-      end
-      def after_save
-        db.execute('as')
-        raise Sequel::Rollback if rb
-      end
-      def after_commit
-        db.execute('ac')
-      end
-      def after_rollback
-        db.execute('ar')
-      end
-      def after_destroy
-        db.execute('ad')
-        raise Sequel::Rollback if rb
-      end
-      def after_destroy_commit
-        db.execute('adc')
-      end
-      def after_destroy_rollback
-        db.execute('adr')
-      end
-    end
-    @m.use_transactions = true
-    @o = @m.load({})
-    @db.sqls
-  end
-
-  deprecated "should call after_commit for save after the transaction commits if it commits" do
-    @o.save
-    @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT', 'ac']
-  end
-
-  deprecated "should call after_rollback for save after the transaction rolls back if it rolls back" do
-    @o.rb = true
-    @o.save
-    @db.sqls.must_equal ['BEGIN', 'as', 'ROLLBACK', 'ar']
-  end
-
-  deprecated "should have after_commit respect any surrounding transactions" do
-    @db.transaction do
-      @o.save
-    end
-    @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT', 'ac']
-  end
-
-  deprecated "should have after_rollback respect any surrounding transactions" do
-    @db.transaction do
-      @o.rb = true
-      @o.save
-    end
-    @db.sqls.must_equal ['BEGIN', 'as', 'ROLLBACK', 'ar']
-  end
-
-  deprecated "should have after_commit work with surrounding transactions and sharding" do
-    @db.transaction(:server=>:test) do
-      @o.save
-    end
-    @db.sqls.must_equal ['BEGIN -- test', 'BEGIN', 'as', 'COMMIT', 'ac', 'COMMIT -- test']
-  end
-
-  deprecated "should have after_rollback work with surrounding transactions and sharding" do
-    @db.transaction(:server=>:test) do
-      @o.rb = true
-      @o.save
-    end
-    @db.sqls.must_equal ['BEGIN -- test', 'BEGIN', 'as', 'ROLLBACK', 'ar', 'COMMIT -- test']
-  end
-
-  deprecated "should call after_destroy_commit for destroy after the transaction commits if it commits" do
-    @o.destroy
-    @db.sqls.must_equal ['BEGIN', 'ad', 'COMMIT', 'adc']
-  end
-
-  deprecated "should call after_destroy_rollback for destroy after the transaction rolls back if it rolls back" do
-    @o.rb = true
-    @o.destroy
-    @db.sqls.must_equal ['BEGIN', 'ad', 'ROLLBACK', 'adr']
-  end
-
-  deprecated "should have after_destroy_commit respect any surrounding transactions" do
-    @db.transaction do
-      @o.destroy
-    end
-    @db.sqls.must_equal ['BEGIN', 'ad', 'COMMIT', 'adc']
-  end
-
-  deprecated "should have after_destroy_rollback respect any surrounding transactions" do
-    @db.transaction do
-      @o.rb = true
-      @o.destroy
-    end
-    @db.sqls.must_equal ['BEGIN', 'ad', 'ROLLBACK', 'adr']
-  end
-
-  deprecated "should have after_destroy commit work with surrounding transactions and sharding" do
-    @db.transaction(:server=>:test) do
-      @o.destroy
-    end
-    @db.sqls.must_equal ['BEGIN -- test', 'BEGIN', 'ad', 'COMMIT', 'adc', 'COMMIT -- test']
-  end
-
-  deprecated "should have after_destroy_rollback work with surrounding transactions and sharding" do
-    @db.transaction(:server=>:test) do
-      @o.rb = true
-      @o.destroy
-    end
-    @db.sqls.must_equal ['BEGIN -- test', 'BEGIN', 'ad', 'ROLLBACK', 'adr', 'COMMIT -- test']
-  end
-
-  deprecated "should not call after_commit if use_after_commit_rollback is false" do
-    @o.use_after_commit_rollback = false
-    @o.save
-    @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT']
-  end
-
-  deprecated "should not call after_rollback if use_after_commit_rollback is false" do
-    @o.use_after_commit_rollback = false
-    @o.rb = true
-    @o.save
-    @db.sqls.must_equal ['BEGIN', 'as', 'ROLLBACK']
-  end
-
-  deprecated "should not call after_destroy_commit if use_after_commit_rollback is false" do
-    @o.use_after_commit_rollback = false
-    @o.destroy
-    @db.sqls.must_equal ['BEGIN', 'ad', 'COMMIT']
-  end
-
-  deprecated "should not call after_destroy_rollback for save if use_after_commit_rollback is false" do
-    @o.use_after_commit_rollback = false
-    @o.rb = true
-    @o.destroy
-    @db.sqls.must_equal ['BEGIN', 'ad', 'ROLLBACK']
-  end
-
-  deprecated "should handle use_after_commit_rollback at the class level" do
-    @m.use_after_commit_rollback = false
-    @o.save
-    @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT']
-  end
-
-  deprecated "should handle use_after_commit_rollback when subclassing" do
-    @m.use_after_commit_rollback = false
-    o = Class.new(@m).load({})
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT']
-  end
-
-  deprecated "should handle use_after_commit_rollback when subclassing after loading" do
-    @m = Class.new(Sequel::Model(@db[:items]))
-    @m.use_transactions = true
-    o = @m.load({})
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'COMMIT']
-
-    c = Class.new(@m)
-    o = c.load({})
-    def o.after_commit; db.execute 'ac' end
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'COMMIT', 'ac']
-
-    o = c.load({})
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'COMMIT']
-
-    c.send(:define_method, :after_commit){db.execute 'ac'}
-    o = c.load({})
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'COMMIT', 'ac']
-
-    c = Class.new(@m)
-    c.send(:include, Module.new{def after_commit; db.execute 'ac'; end})
-    o = c.load({})
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'COMMIT', 'ac']
-
-    c.use_after_commit_rollback = false
-    o = c.load({})
-    @db.sqls
-    o.save
-    @db.sqls.must_equal ['BEGIN', 'COMMIT']
   end
 end

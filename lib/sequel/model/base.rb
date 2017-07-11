@@ -1709,27 +1709,14 @@ module Sequel
       # allow running inside a transaction
       def _destroy(opts)
         sh = {:server=>this_server}
-        uacr = use_after_commit_rollback
-        if uacr.nil? ? (method(:after_destroy_rollback).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_destroy_rollback", "Instead, call db.after_rollback in Model#before_destroy")
-          db.after_rollback(sh){after_destroy_rollback}
-        end
         called = false
         around_destroy do
           called = true
-          if before_destroy == false
-            Sequel::Deprecation.deprecate("Having before_destroy return false to cancel the destroy", "Instead, call cancel_action inside before_destroy")
-            raise_hook_failure(:before_destroy)
-          end
+          before_destroy
           _destroy_delete
           after_destroy
-          true
         end
         raise_hook_failure(:around_destroy) unless called
-        if uacr.nil? ? (method(:after_destroy_commit).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_destroy_commit", "Instead, call db.after_commit in Model#after_destroy")
-          db.after_commit(sh){after_destroy_commit}
-        end
         self
       end
       
@@ -1805,28 +1792,17 @@ module Sequel
       # it's own transaction.
       def _save(opts)
         sh = {:server=>this_server}
-        uacr = use_after_commit_rollback
-        if uacr.nil? ? (method(:after_rollback).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_rollback", "Instead, call db.after_rollback in Model#before_save")
-          db.after_rollback(sh){after_rollback}
-        end
         pk = nil
         called_save = false
         called_cu = false
         around_save do
           called_save = true
-          if before_save == false
-            Sequel::Deprecation.deprecate("Having before_save return false to cancel the save", "Instead, call cancel_action inside before_save")
-            raise_hook_failure(:before_save)
-          end
+          before_save
 
           if new?
             around_create do
               called_cu = true
-              if before_create == false
-                Sequel::Deprecation.deprecate("Having before_create return false to cancel the create", "Instead, call cancel_action inside before_create")
-                raise_hook_failure(:before_create)
-              end
+              before_create
               pk = _insert
               @this = nil
               @new = false
@@ -1839,10 +1815,7 @@ module Sequel
           else
             around_update do
               called_cu = true
-              if before_update == false
-                Sequel::Deprecation.deprecate("Having before_update return false to cancel the update", "Instead, call cancel_action inside before_update")
-                raise_hook_failure(:before_update)
-              end
+              before_update
               columns = opts[:columns]
               if columns.nil?
                 columns_updated = if opts[:changed]
@@ -1868,10 +1841,6 @@ module Sequel
           true
         end
         raise_hook_failure(:around_save) unless called_save
-        if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_commit", "Instead, call db.after_commit in Model#after_save")
-          db.after_commit(sh){after_commit}
-        end
         self
       end
 
@@ -1940,13 +1909,9 @@ module Sequel
         # skip_validate = opts[:validate] == false # SEQUEL5
         around_validation do
           called = true
-          if before_validation == false
-            Sequel::Deprecation.deprecate("Having before_validation return false to mark the object as invalid", "Instead, call cancel_action inside before_validation")
-            raise_hook_failure(:before_validation)
-          else
-            validate # unless skip_validate # SEQUEL5
-            after_validation
-          end
+          before_validation
+          validate # unless skip_validate # SEQUEL5
+          after_validation
         end
         # return true if skip_validate # SEQUEL5
         if called
