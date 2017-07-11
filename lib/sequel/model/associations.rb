@@ -3232,7 +3232,7 @@ END
           @records_map = records_map
 
           datasets = opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
-          column_aliases = opts[:graph_aliases] || opts[:graph][:column_aliases] # SEQUEL5: Remove :graph_aliases support
+          column_aliases = opts[:graph][:column_aliases]
           primary_keys = {}
           column_maps = {}
           models = {}
