@@ -169,6 +169,10 @@ module Sequel
         v = 'untitled' if v == ''
         (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
       end
+
+      def non_sql_option?(key)
+        super || key == :identifier_input_method || key == :identifier_output_method
+      end
     end
   end
 

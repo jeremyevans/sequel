@@ -20,7 +20,7 @@ module Sequel
 
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
-    NON_SQL_OPTIONS = [:server, :graph, :graph_aliases, :row_proc, :quote_identifiers, :identifier_input_method, :identifier_output_method, :skip_symbol_cache].freeze # SEQUEL5: Remove graph_aliases
+    NON_SQL_OPTIONS = [:server, :graph, :row_proc, :quote_identifiers, :skip_symbol_cache].freeze
     
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
