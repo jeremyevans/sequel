@@ -88,69 +88,6 @@ describe Sequel::Database do
   end
 end
 
-# SEQUEL5: remove
-describe "Sequel::IBMDB.convert_smallint_to_bool" do
-  before do
-    @db = DB
-    @db.create_table!(:booltest){column :b, 'smallint'; column :i, 'integer'}
-    @ds = @db[:booltest]
-  end
-  after do
-    deprecated do
-      Sequel::IBMDB.convert_smallint_to_bool = true
-    end
-    @db.drop_table(:booltest)
-  end
-  
-  deprecated "should consider smallint datatypes as boolean if set, but not larger smallints" do
-    @db.schema(:booltest, :reload=>true).first.last[:type].must_equal :boolean
-    @db.schema(:booltest, :reload=>true).first.last[:db_type].must_match /smallint/i
-    Sequel::IBMDB.convert_smallint_to_bool = false
-    @db.schema(:booltest, :reload=>true).first.last[:type].must_equal :integer
-    @db.schema(:booltest, :reload=>true).first.last[:db_type].must_match /smallint/i
-  end
-  
-  deprecated "should return smallints as bools and integers as integers when set" do
-    Sequel::IBMDB.convert_smallint_to_bool = true
-    @ds.delete
-    @ds.insert(:b=>true, :i=>10)
-    @ds.all.must_equal [{:b=>true, :i=>10}]
-    @ds.delete
-    @ds.insert(:b=>false, :i=>0)
-    @ds.all.must_equal [{:b=>false, :i=>0}]
-    @ds.delete
-    @ds.insert(:b=>true, :i=>1)
-    @ds.all.must_equal [{:b=>true, :i=>1}]
-
-    @ds = @ds.with_convert_smallint_to_bool(false)
-    @ds.delete
-    @ds.insert(:b=>true, :i=>10)
-    @ds.all.must_equal [{:b=>1, :i=>10}]
-  end
-
-  deprecated "should return all smallints as integers when unset" do
-    Sequel::IBMDB.convert_smallint_to_bool = false
-    @ds.delete
-    @ds.insert(:b=>true, :i=>10)
-    @ds.all.must_equal [{:b=>1, :i=>10}]
-    @ds.delete
-    @ds.insert(:b=>false, :i=>0)
-    @ds.all.must_equal [{:b=>0, :i=>0}]
-    
-    @ds.delete
-    @ds.insert(:b=>1, :i=>10)
-    @ds.all.must_equal [{:b=>1, :i=>10}]
-    @ds.delete
-    @ds.insert(:b=>0, :i=>0)
-    @ds.all.must_equal [{:b=>0, :i=>0}]
-
-    @ds = @ds.with_convert_smallint_to_bool(true)
-    @ds.delete
-    @ds.insert(:b=>true, :i=>10)
-    @ds.all.must_equal [{:b=>true, :i=>10}]
-  end
-end if DB.adapter_scheme == :ibmdb
-
 describe "Sequel::IBMDB::Database#convert_smallint_to_bool" do
   before do
     @db = DB
@@ -158,7 +95,7 @@ describe "Sequel::IBMDB::Database#convert_smallint_to_bool" do
     @ds = @db[:booltest]
   end
   after do
-    @db.convert_smallint_to_bool = nil # SEQUEL5: true
+    @db.convert_smallint_to_bool = true
     @db.drop_table(:booltest)
   end
   
