@@ -21,9 +21,9 @@ describe Sequel::Model, "single table inheritance plugin" do
 
   describe ".sti_load" do
     it "should load instances of the correct type" do
-      StiTest.sti_load(id: 3).must_be_instance_of StiTest
-      StiTest.sti_load(id: 3, kind: 'StiTestSub1').must_be_instance_of StiTestSub1
-      StiTest.sti_load(id: 3, kind: 'StiTestSub2').must_be_instance_of StiTestSub2
+      StiTest.sti_load(:id => 3).must_be_instance_of StiTest
+      StiTest.sti_load(:id => 3, :kind => 'StiTestSub1').must_be_instance_of StiTestSub1
+      StiTest.sti_load(:id => 3, :kind => 'StiTestSub2').must_be_instance_of StiTestSub2
     end
   end
 
