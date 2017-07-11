@@ -90,13 +90,6 @@ describe "Sequel::Plugins::AssociationPks" do
     @db.sqls.must_equal ["SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 3)"]
   end
 
-  deprecated "should set associated pks correctly for a one_to_many association when :delay_pks is not set" do
-    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
-    @Artist.load(:id=>1).album_pks = [1, 2]
-    @db.sqls.must_equal ["UPDATE albums SET artist_id = 1 WHERE (id IN (1, 2))",
-      "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (1, 2)))"]
-  end
-
   it "should set associated pks correctly for a one_to_many association" do
     @Artist.load(:id=>1).album_pks = [1, 2]
     @db.sqls.must_equal ["UPDATE albums SET artist_id = 1 WHERE (id IN (1, 2))",

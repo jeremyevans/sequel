@@ -1315,25 +1315,9 @@ describe "AssociationPks plugin" do
     Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [@h2], []]
   end
 
-  deprecated "should handle :delay_pks=>true association option for new instances" do
+  it "should default to delaying association_pks setter method changes until saving" do
     album_class = Class.new(Album)
     album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>true, :join_table=>:albums_tags, :left_key=>:album_id
-    album = album_class.new(:name=>'test album')
-    album.tag_pks.must_equal []
-    album.tag_pks = [@t1, @t2]
-    album.tag_pks.must_equal [@t1, @t2]
-    album.save
-    album_class.with_pk!(album.pk).tag_pks.sort.must_equal [@t1, @t2]
-
-    album.tag_pks = []
-    album.tag_pks.must_equal []
-    album.save
-    album_class.with_pk!(album.pk).tag_pks.sort.must_equal []
-  end
-
-  it "should handle :delay_pks=>:always association option for existing instances" do
-    album_class = Class.new(Album)
-    album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>:always, :join_table=>:albums_tags, :left_key=>:album_id
     album = album_class.with_pk!(@al1)
     album.tag_pks.sort.must_equal [@t1, @t2, @t3]
     album.tag_pks = [@t1, @t2]
