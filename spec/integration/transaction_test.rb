@@ -192,7 +192,6 @@ describe "Database transactions" do
       c = Class.new(Sequel::Model(@d))
       c.set_primary_key :name
       c.unrestrict_primary_key
-      c.use_after_commit_rollback = false
       @db.transaction(:prepare=>'XYZ'){c.create(:name => '1'); c.create(:name => '2').destroy}
       @db.commit_prepared_transaction('XYZ')
       @d.select_order_map(:name).must_equal ['1']
