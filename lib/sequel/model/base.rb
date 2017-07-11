@@ -2248,6 +2248,9 @@ module Sequel
     extend ClassMethods
     plugin self
 
-    singleton_class.send(:undef_method, :dup, :clone, :initialize_copy, :initialize_clone, :initialize_dup)
+    singleton_class.send(:undef_method, :dup, :clone, :initialize_copy)
+    if RUBY_VERSION >= '1.9.3'
+      singleton_class.send(:undef_method, :initialize_clone, :initialize_dup)
+    end
   end
 end

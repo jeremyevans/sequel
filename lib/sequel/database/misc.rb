@@ -164,7 +164,10 @@ module Sequel
     end
 
     # Disallow dup/clone for Database instances
-    undef_method :dup, :clone, :initialize_copy, :initialize_clone, :initialize_dup
+    undef_method :dup, :clone, :initialize_copy
+    if RUBY_VERSION >= '1.9.3'
+      undef_method :initialize_clone, :initialize_dup
+    end
 
     # Cast the given type to a literal type
     #
