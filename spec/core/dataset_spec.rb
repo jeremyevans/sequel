@@ -2223,10 +2223,7 @@ describe "Dataset#first_source_alias" do
   end
   
   it "should be the entire first source if not aliased" do
-    deprecated do
-      # SEQUEL5: Remove deprecation block, but keep code
-      @ds.from(:s__t).first_source_alias.must_equal :s__t
-    end
+    @ds.from(:s__t).first_source_alias.must_equal :s__t
   end
   
   with_symbol_splitting "should be the alias if aliased when using symbol splitting" do
@@ -2266,10 +2263,7 @@ describe "Dataset#first_source_table" do
   
   it "should be the entire first source if not aliased" do
     @ds.from(:t).first_source_table.must_equal :t
-    deprecated do
-      # SEQUEL5: Remove deprecation block, but keep code
-      @ds.from(:s__t).first_source_table.must_equal :s__t
-    end
+    @ds.from(:s__t).first_source_table.must_equal :s__t
   end
   
   it "should be the entire first source if not aliased" do
