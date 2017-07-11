@@ -4,30 +4,11 @@ module Sequel
   module SqlAnywhere
     Sequel::Database.set_shared_adapter_scheme(:sqlanywhere, self)
 
-    # SEQUEL5: Remove
-    @convert_smallint_to_bool = true
-    class << self
-      def convert_smallint_to_bool
-        Sequel::Deprecation.deprecate("Sequel::SqlAnywhere.convert_smallint_to_bool", "Call this method on the Database instance")
-        @convert_smallint_to_bool
-      end
-      def convert_smallint_to_bool=(v)
-        Sequel::Deprecation.deprecate("Sequel::SqlAnywhere.convert_smallint_to_bool=", "Call this method on the Database instance")
-        @convert_smallint_to_bool = v
-      end
-    end
-
     module DatabaseMethods
       attr_reader :conversion_procs
 
-      # Override the default SqlAnywhere.convert_smallint_to_bool setting for this database.
-      attr_writer :convert_smallint_to_bool
-
-      # Whether to convert smallint to boolean arguments for this dataset.
-      # Defaults to the SqlAnywhere module setting.
-      def convert_smallint_to_bool
-        defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = ::Sequel::SqlAnywhere.instance_variable_get(:@convert_smallint_to_bool)) # true) # SEQUEL5
-      end
+      # Set whether to convert smallint type to boolean for this Database instance
+      attr_accessor :convert_smallint_to_bool
 
       # Sysbase Server uses the :sqlanywhere type.
       def database_type
@@ -35,7 +16,6 @@ module Sequel
       end
 
       def freeze
-        convert_smallint_to_bool
         @conversion_procs.freeze
         super
       end
@@ -265,12 +245,6 @@ module Sequel
     module DatasetMethods
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
       Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having compounds order lock')
-
-      # Override the default IBMDB.convert_smallint_to_bool setting for this dataset.
-      def convert_smallint_to_bool=(v)
-        Sequel::Deprecation.deprecate("Sequel::SqlAnywhere::Dataset#convert_smallint_to_bool=", "Call with_convert_smallint_to_bool instead, which returns a modified copy instead of modifying the object")
-        @opts[:convert_smallint_to_bool] = v
-      end
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the IBMDB module setting.

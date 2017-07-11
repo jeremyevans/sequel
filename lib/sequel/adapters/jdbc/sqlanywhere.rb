@@ -23,6 +23,7 @@ module Sequel
     Sequel.synchronize do
       DATABASE_SETUP[:sqlanywhere] = proc do |db|
         db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
+        db.convert_smallint_to_bool = true
         db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
         drv
       end

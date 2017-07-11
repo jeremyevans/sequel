@@ -124,6 +124,7 @@ module Sequel
       end
 
       def adapter_initialize
+        @convert_smallint_to_bool = true
         @conversion_procs = SQLANYWHERE_TYPES.dup
         @conversion_procs[392] = method(:to_application_timestamp_sa)
         @api = SQLAnywhere::SQLAnywhereInterface.new
@@ -152,7 +153,7 @@ module Sequel
         cps = db.conversion_procs
         api = db.api
         execute(sql) do |rs|
-          convert = (convert_smallint_to_bool and db.convert_smallint_to_bool)
+          convert = convert_smallint_to_bool
           col_infos = []
           api.sqlany_num_cols(rs).times do |i|
             _, _, name, _, type = api.sqlany_get_column_info(rs, i)
