@@ -216,14 +216,6 @@ module Sequel
         # backed by a new table.
         attr_reader :cti_models
 
-        # The parent/root/base model for this class table inheritance hierarchy.
-        # This is the only model in the hierarchy that loads the
-        # class_table_inheritance plugin. For backwards compatibility.
-        def cti_base_model
-          Sequel::Deprecation.deprecate("#{self}.cti_base_model", "Use #{self}.cti_models.first instead")
-          @cti_models.first
-        end
-
         # An array of column symbols for the backing database table,
         # giving the columns to update in each backing database table.
         attr_reader :cti_table_columns
@@ -241,28 +233,6 @@ module Sequel
         # Specified with the :table_map option to the plugin, and should be used if
         # the implicit naming is incorrect.
         attr_reader :cti_table_map
-
-        # Hash with table name symbol keys and arrays of column symbol values,
-        # giving the columns to update in each backing database table.
-        # For backwards compatibility.
-        def cti_columns
-          Sequel::Deprecation.deprecate("#{self}.cti_columns", "Use #{self}.cti_models to get the models, cti_table_name to get the name for the model, and cti_table_columns to get the columns for the model")
-          h = {}
-          cti_models.each { |m| h[m.cti_table_name] = m.cti_table_columns }
-          h
-        end
-
-        # Alias to sti_key, for backwards compatibility.
-        def cti_key
-          Sequel::Deprecation.deprecate("#{self}.cti_key", "Use #{self}.sti_key instead")
-          sti_key
-        end
-
-        # Alias to sti_model_map, for backwards compatibility.
-        def cti_model_map
-          Sequel::Deprecation.deprecate("#{self}.cti_model_map", "Use #{self}.sti_model_map instead")
-          sti_model_map
-        end
 
         # Freeze CTI information when freezing model class.
         def freeze
