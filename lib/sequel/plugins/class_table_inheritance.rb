@@ -305,7 +305,7 @@ module Sequel
 
         # The table name for the current model class's main table.
         def table_name
-          if cti_tables
+          if cti_tables && cti_tables.length > 1
             @cti_alias
           else
             super

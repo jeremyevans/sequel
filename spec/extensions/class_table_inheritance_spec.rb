@@ -381,7 +381,7 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
       end
-      plugin :class_table_inheritance, :table_map=>{:Staff=>:staff}, :alias=>:employees
+      plugin :class_table_inheritance, :table_map=>{:Staff=>:staff}, :alias=>:emps
     end 
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff
@@ -415,9 +415,9 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
 
   it "should use a joined dataset in subclasses" do
     Employee.dataset.sql.must_equal 'SELECT * FROM employees'
-    Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS employees'
-    Executive.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)) AS employees'
-    Staff.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)) AS employees'
+    Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS emps'
+    Executive.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)) AS emps'
+    Staff.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)) AS emps'
   end
   
   it "should return rows with the current class if sti_key is nil" do
@@ -425,7 +425,6 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
     Employee.dataset = Employee.dataset.with_fetch([{}])
     Employee.first.class.must_equal Employee
   end
-  
   
   it "should include schema for columns for tables for ancestor classes" do
     Employee.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string})
@@ -440,9 +439,9 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
 
   it "should have table_name return the table name of the most specific table" do
     Employee.table_name.must_equal :employees
-    Manager.table_name.must_equal :employees
-    Executive.table_name.must_equal :employees
-    Staff.table_name.must_equal :employees
+    Manager.table_name.must_equal :emps
+    Executive.table_name.must_equal :emps
+    Staff.table_name.must_equal :emps
   end
 
   it "should delete the correct rows from all tables when deleting" do
@@ -485,13 +484,13 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
   it "should handle many_to_one relationships correctly" do
     Manager.dataset = Manager.dataset.with_fetch(:id=>3, :name=>'E',  :num_staff=>3)
     Staff.load(:manager_id=>3).manager.must_equal Manager.load(:id=>3, :name=>'E', :num_staff=>3)
-    @db.sqls.must_equal ['SELECT * FROM (SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS employees WHERE (id = 3) LIMIT 1']
+    @db.sqls.must_equal ['SELECT * FROM (SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS emps WHERE (id = 3) LIMIT 1']
   end
   
   it "should handle one_to_many relationships correctly" do
     Staff.dataset = Staff.dataset.with_fetch(:id=>1, :name=>'S', :manager_id=>3)
     Executive.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :manager_id=>3)]
-    @db.sqls.must_equal ['SELECT * FROM (SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)) AS employees WHERE (employees.manager_id = 3)']
+    @db.sqls.must_equal ['SELECT * FROM (SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)) AS emps WHERE (emps.manager_id = 3)']
   end
 end
 
