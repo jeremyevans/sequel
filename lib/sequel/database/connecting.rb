@@ -28,7 +28,7 @@ module Sequel
     def self.connect(conn_string, opts = OPTS)
       case conn_string
       when String
-        if match = /\Ajdbc:/.match(conn_string)
+        if conn_string.start_with?('jdbc:')
           c = adapter_class(:jdbc)
           opts = opts.merge(:orig_opts=>opts.dup)
           opts = {:uri=>conn_string}.merge!(opts)
