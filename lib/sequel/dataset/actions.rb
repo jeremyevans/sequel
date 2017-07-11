@@ -91,6 +91,8 @@ module Sequel
       end
     end
     
+    COUNT_SELECT = Sequel.function(:count).*.as(:count)
+
     # Returns the number of records in the dataset. If an argument is provided,
     # it is used as the argument to count.  If a block is provided, it is
     # treated as a virtual row, and the result is used as the argument to
@@ -105,8 +107,7 @@ module Sequel
     def count(arg=(no_arg=true), &block)
       if no_arg && !block
         cached_dataset(:_count_ds) do
-          aggregate_dataset.select(Sequel.function(:count).*.as(:count)).single_value_ds
-          #aggregate_dataset.select(COUNT_SELECT).single_value_ds # SEQUEL5
+          aggregate_dataset.select(COUNT_SELECT).single_value_ds
         end.single_value!.to_i
       else
         if block
@@ -120,9 +121,6 @@ module Sequel
         _aggregate(:count, arg)
       end
     end
-    # SEQUEL5
-    #COUNT_SELECT = Sequel.function(:count).*.as(:count)
-    #private_constant :COUNT_SELECT
 
     # Deletes the records in the dataset.  The returned value should be 
     # number of records deleted, but that is adapter dependent.
@@ -156,19 +154,17 @@ module Sequel
       self
     end
     
+    EMPTY_SELECT = Sequel::SQL::AliasedExpression.new(1, :one)
+
     # Returns true if no records exist in the dataset, false otherwise
     #
     #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
     #   # => false
     def empty?
       cached_dataset(:_empty_ds) do
-        single_value_ds.unordered.select(Sequel::SQL::AliasedExpression.new(1, :one))
-        # single_value_ds.unordered.select(EMPTY_SELECT) # SEQUEL5
+        single_value_ds.unordered.select(EMPTY_SELECT)
       end.single_value!.nil?
     end
-    # SEQUEL5
-    #EMPTY_SELECT = Sequel::SQL::AliasedExpression.new(1, :one)
-    #private_constant :EMPTY_SELECT
 
     # If a integer argument is given, it is interpreted as a limit, and then returns all 
     # matching records up to that limit.  If no argument is passed,
