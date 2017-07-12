@@ -36,6 +36,7 @@ module Minitest::Spec::DSL
   def cspecify(message, *checked, &block)
     if pending = Sequel.guarded?(*checked)
       it(message) do
+        proc{instance_exec(&block)}.must_raise(Exception) if ENV['SEQUEL_CHECK_PENDING']
         skip "Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}"
       end
     else
