@@ -303,8 +303,8 @@ module Sequel
           super(source)
           @converter = converter 
           @stack = [[]]
-          @recorded = new_entry_buffer
-          #@encoding = string.encoding # SEQUEL5
+          @encoding = string.encoding
+          @recorded = String.new.force_encoding(@encoding)
         end
 
         # Take the buffer of recorded characters and add it to the array
@@ -318,7 +318,7 @@ module Sequel
               entry = @converter.call(entry)
             end
             @stack.last.push(entry)
-            @recorded = new_entry_buffer
+            @recorded = String.new.force_encoding(@encoding)
           end
         end
 
@@ -376,13 +376,6 @@ module Sequel
           end
 
           raise Sequel::Error, "array parsing finished with array unclosed"
-        end
-
-        private
-
-        def new_entry_buffer
-          String.new.force_encoding(string.encoding)
-          #String.new.force_encoding(@encoding) # SEQUEL5
         end
       end unless Sequel::Postgres.respond_to?(:parse_pg_array)
 
