@@ -73,16 +73,6 @@ describe "null_dataset extension" do
     @i.must_equal 1
   end
 
-  deprecated "should have nullify! method modify receiver" do
-    ds = @db[:table]
-    # SEQUEL5: Remove
-    unless ds.frozen?
-      ds.nullify!.must_be_same_as(ds)
-      ds.each(&@pr)
-      @i.must_equal 0
-    end
-  end
-
   it "should work with method chaining" do
     @ds.where(:a=>1).select(:b).each(&@pr)
     @i.must_equal 0
