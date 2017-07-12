@@ -352,8 +352,11 @@ module Sequel
   # Part of the +migration+ extension.
   class Migrator
     MIGRATION_FILE_PATTERN = /\A(\d+)_.+\.rb\z/i.freeze
+
     MIGRATION_SPLITTER = '_'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :MIGRATION_SPLITTER)
     MINIMUM_TIMESTAMP = 20000101
+    Sequel::Deprecation.deprecate_constant(self, :MINIMUM_TIMESTAMP)
 
     # Exception class raised when there is an error with the migrator's
     # file structure, database, or arguments.
@@ -408,7 +411,7 @@ module Sequel
       if self.equal?(Migrator)
         Dir.new(directory).each do |file|
           next unless MIGRATION_FILE_PATTERN.match(file)
-          return TimestampMigrator if file.split(MIGRATION_SPLITTER, 2).first.to_i > MINIMUM_TIMESTAMP
+          return TimestampMigrator if file.split('_', 2).first.to_i > 20000101
         end
         IntegerMigrator
       else
@@ -497,7 +500,7 @@ module Sequel
 
     # Return the integer migration version based on the filename.
     def migration_version_from_file(filename)
-      filename.split(MIGRATION_SPLITTER, 2).first.to_i
+      filename.split('_', 2).first.to_i
     end
   end
 

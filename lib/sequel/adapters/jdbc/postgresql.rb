@@ -211,6 +211,8 @@ module Sequel
         include Sequel::Postgres::DatasetMethods
         APOS = "'".freeze
         Sequel::Deprecation.deprecate_constant(self, :APOS)
+        HSTORE_TYPE = 'hstore'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :HSTORE_TYPE)
         
         private
         
@@ -228,7 +230,6 @@ module Sequel
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
         ARRAY_METHOD = Postgres.method(:RubyPGArray)
         PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]#.freeze # SEQUEL5
-        HSTORE_TYPE = 'hstore'.freeze
         HSTORE_METHOD = Postgres.method(:RubyPGHstore)
 
         def type_convertor(map, meta, type, i)
@@ -241,7 +242,7 @@ module Sequel
               ARRAY_METHOD
             elsif oid == 2950 # UUID
               map[STRING_TYPE]
-            elsif meta.getPGType(i) == HSTORE_TYPE
+            elsif meta.getPGType(i) == 'hstore'
               HSTORE_METHOD
             else
               super

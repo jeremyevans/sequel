@@ -5,14 +5,17 @@ module Sequel
     module PgRow
       module DatabaseMethods
         ESCAPE_RE = /("|\\)/.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_RE)
         ESCAPE_REPLACEMENT = '\\\\\1'.freeze
+        Sequel::Deprecation.deprecate_constant(self, :ESCAPE_REPLACEMENT)
         COMMA = ','
+        Sequel::Deprecation.deprecate_constant(self, :COMMA)
 
         # Handle Sequel::Model instances in bound variables.
         def bound_variable_arg(arg, conn)
           case arg
           when Sequel::Model
-            "(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(COMMA)})"
+            "(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(',')})"
           else
             super
           end
@@ -34,7 +37,7 @@ module Sequel
         def bound_variable_array(arg)
           case arg
           when Sequel::Model
-            "\"(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(COMMA).gsub(ESCAPE_RE, ESCAPE_REPLACEMENT)})\""
+            "\"(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(',').gsub(/("|\\)/, '\\\\\1')})\""
           else
             super
           end

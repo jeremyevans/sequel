@@ -18,8 +18,8 @@ module Sequel
     #   # Make the Album class active_model compliant
     #   Album.plugin :active_model
     module ActiveModel
-      # The default string to join composite primary keys with in to_param.
       DEFAULT_TO_PARAM_JOINER = '-'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_TO_PARAM_JOINER)
       
       # ActiveModel compliant error class
       class Errors < Sequel::Model::Errors
@@ -119,7 +119,7 @@ module Sequel
         
         # The string to use to join composite primary key param strings.
         def to_param_joiner
-          DEFAULT_TO_PARAM_JOINER
+          '-'
         end
       end
     end

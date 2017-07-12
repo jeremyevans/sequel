@@ -53,7 +53,9 @@ module Sequel
     #     Address.load(:street=>'123 Foo St', :city=>'Bar Town', :zip=>'12345'))
     module PgRow
       ROW = 'ROW'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ROW)
       CAST = '::'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :CAST)
 
       # When loading the extension, make sure the database has the pg_row extension
       # loaded, load the custom database extensions, and automatically register the
@@ -75,9 +77,9 @@ module Sequel
       module InstanceMethods
         # Literalize the model instance and append it to the sql.
         def sql_literal_append(ds, sql)
-          sql << ROW
+          sql << 'ROW'
           ds.literal_append(sql, values.values_at(*columns))
-          sql << CAST
+          sql << '::'
           ds.quote_schema_table_append(sql, model.dataset.first_source_table)
         end
       end

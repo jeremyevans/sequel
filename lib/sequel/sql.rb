@@ -1918,6 +1918,7 @@ module Sequel
     class VirtualRow < BasicObject
       QUESTION_MARK = LiteralString.new('?').freeze
       DOUBLE_UNDERSCORE = '__'.freeze
+      Sequel::Deprecation.deprecate_constant(self, :DOUBLE_UNDERSCORE)
 
       include OperatorBuilders
 
@@ -1972,7 +1973,7 @@ module Sequel
             end
           elsif args.empty?
             if split = Sequel.split_symbols?
-              table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
+              table, column = m.to_s.split('__', 2)
               if column && split == :deprecated
                 Sequel::Deprecation.deprecate("Splitting virtual row method names", "Either set Sequel.split_symbols = true, or change #{m.inspect} to #{table}[:#{column}]")
               end

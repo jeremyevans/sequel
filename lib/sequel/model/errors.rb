@@ -6,6 +6,7 @@ module Sequel
     # with a few convenience methods.
     class Errors < ::Hash
       ATTRIBUTE_JOINER = ' and '.freeze
+      Sequel::Deprecation.deprecate_constant(self, :ATTRIBUTE_JOINER)
 
       # Adds an error for the given attribute.
       #
@@ -40,7 +41,7 @@ module Sequel
       def full_messages
         inject([]) do |m, kv| 
           att, errors = *kv
-          errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(ATTRIBUTE_JOINER)} #{e}")}
+          errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(' and ')} #{e}")}
           m
         end
       end

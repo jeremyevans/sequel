@@ -26,17 +26,29 @@ module Sequel
   # already have been loaded.
   module Inflections
     CAMELIZE_CONVERT_REGEXP = /(^|_)(.)/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CAMELIZE_CONVERT_REGEXP)
     CAMELIZE_MODULE_REGEXP = /\/(.?)/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :CAMELIZE_MODULE_REGEXP)
     DASH = '-'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DASH)
     DEMODULIZE_CONVERT_REGEXP = /^.*::/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :DEMODULIZE_CONVERT_REGEXP)
     EMPTY_STRING= ''.freeze
+    Sequel::Deprecation.deprecate_constant(self, :EMPTY_STRING)
     SLASH = '/'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :SLASH)
     VALID_CONSTANT_NAME_REGEXP = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :VALID_CONSTANT_NAME_REGEXP)
     UNDERSCORE = '_'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE)
     UNDERSCORE_CONVERT_REGEXP1 = /([A-Z]+)([A-Z][a-z])/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_CONVERT_REGEXP1)
     UNDERSCORE_CONVERT_REGEXP2 = /([a-z\d])([A-Z])/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_CONVERT_REGEXP2)
     UNDERSCORE_CONVERT_REPLACE = '\1_\2'.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_CONVERT_REPLACE)
     UNDERSCORE_MODULE_REGEXP = /::/.freeze
+    Sequel::Deprecation.deprecate_constant(self, :UNDERSCORE_MODULE_REGEXP)
 
     @plurals, @singulars, @uncountables = [], [], []
 
@@ -113,7 +125,7 @@ module Sequel
     def camelize(s)
       s = s.to_s
       return s.camelize if s.respond_to?(:camelize)
-      s = s.gsub(CAMELIZE_MODULE_REGEXP){|x| "::#{x[-1..-1].upcase unless x == SLASH}"}.gsub(CAMELIZE_CONVERT_REGEXP){|x| x[-1..-1].upcase}
+      s = s.gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
       s
     end
   
@@ -123,7 +135,7 @@ module Sequel
     def constantize(s)
       s = s.to_s
       return s.constantize if s.respond_to?(:constantize)
-      raise(NameError, "#{s.inspect} is not a valid constant name!") unless m = VALID_CONSTANT_NAME_REGEXP.match(s)
+      raise(NameError, "#{s.inspect} is not a valid constant name!") unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(s)
       Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
     end
   
@@ -131,7 +143,7 @@ module Sequel
     def demodulize(s)
       s = s.to_s
       return s.demodulize if s.respond_to?(:demodulize)
-      s.gsub(DEMODULIZE_CONVERT_REGEXP, EMPTY_STRING)
+      s.gsub(/^.*::/, '')
     end
   
     # Returns the plural form of the word in the string.
@@ -157,8 +169,8 @@ module Sequel
     def underscore(s)
       s = s.to_s
       return s.underscore if s.respond_to?(:underscore)
-      s.gsub(UNDERSCORE_MODULE_REGEXP, SLASH).gsub(UNDERSCORE_CONVERT_REGEXP1, UNDERSCORE_CONVERT_REPLACE).
-        gsub(UNDERSCORE_CONVERT_REGEXP2, UNDERSCORE_CONVERT_REPLACE).tr(DASH, UNDERSCORE).downcase
+      s.gsub('::', '/').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').
+        gsub(/([a-z\d])([A-Z])/, '\1_\2').tr('-', '_').downcase
     end
   end
 end
