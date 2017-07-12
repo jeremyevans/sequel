@@ -210,7 +210,7 @@ module Sequel
 
           typecast_method_map[db_type] = :"#{type}_array"
 
-          (class << self; self end).class_eval do # singleton_class.class_eval do # SEQUEL5
+          singleton_class.class_eval do
             meth = :"typecast_value_#{type}_array"
             scalar_typecast_method = :"typecast_value_#{opts.fetch(:scalar_typecast, type)}"
             define_method(meth){|v| typecast_value_pg_array(v, creator, scalar_typecast_method)}

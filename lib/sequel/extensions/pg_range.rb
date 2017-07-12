@@ -233,7 +233,7 @@ module Sequel
 
           @pg_range_schema_types[db_type] = db_type.to_sym
 
-          (class << self; self end).class_eval do
+          singleton_class.class_eval do
             meth = :"typecast_value_#{db_type}"
             define_method(meth){|v| typecast_value_pg_range(v, parser)}
             private meth
