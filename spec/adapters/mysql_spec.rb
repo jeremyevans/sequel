@@ -217,7 +217,7 @@ describe "A MySQL dataset" do
   it "should raise error for updating a dataset with an offset" do
     proc{@d.offset(1).update(:value => 4)}.must_raise Sequel::InvalidOperation
     proc{@d.order(:value).offset(1).update(:value => 4)}.must_raise Sequel::InvalidOperation
-  end if false # SEQUEL5
+  end
 
   it "should support regexps" do
     @d.insert(:name => 'abc', :value => 1)

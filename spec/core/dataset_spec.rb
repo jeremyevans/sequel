@@ -361,7 +361,6 @@ describe "Dataset#where" do
     @d1 = @dataset.where(:region => 'Asia')
   end
   
-  if false # SEQUEL5: remove if
   it "should just clone if given no arguments or block" do
     proc{@dataset.where}.must_raise Sequel::Error
   end
@@ -372,7 +371,6 @@ describe "Dataset#where" do
   
   it "should handle nil argument if block has no existing filter" do
     @dataset.where(nil).sql.must_equal "SELECT * FROM test WHERE NULL"
-  end
   end
   
   it "should just clone if given an empty array or hash argument" do

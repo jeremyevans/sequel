@@ -312,7 +312,7 @@ describe "Update/Delete on limited datasets" do
     proc{@ds.limit(1, 1).update(:id=>Sequel[:id]+10)}.must_raise Sequel::InvalidOperation
     proc{@ds.order(:id).limit(1).update(:id=>Sequel[:id]+10)}.must_raise Sequel::InvalidOperation
     proc{@ds.order(:id).limit(1).delete}.must_raise Sequel::InvalidOperation
-  end if false # SEQUEL5 
+  end
 end if DB.dataset.send(:is_2012_or_later?)
 
 describe "Common Table Expressions" do
