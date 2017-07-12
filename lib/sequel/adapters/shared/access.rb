@@ -86,7 +86,7 @@ module Sequel
       include UnmodifiedIdentifiers::DatasetMethods
 
       EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}.freeze
-      #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
+      EXTRACT_MAP.each_value(&:freeze)
       OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}.freeze
 

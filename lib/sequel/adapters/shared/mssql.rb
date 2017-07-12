@@ -518,7 +518,7 @@ module Sequel
 
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}.freeze
       EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}.freeze
-      #EXTRACT_MAP.each_value(&:freeze) # SEQUEL5
+      EXTRACT_MAP.each_value(&:freeze)
       LIMIT_ALL = Object.new.freeze
 
       Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')

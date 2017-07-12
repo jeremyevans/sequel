@@ -28,7 +28,7 @@ module Sequel
     }.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
-    # MYSQL_TYPES.freeze # SEQUEL5
+    MYSQL_TYPES.freeze
 
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database

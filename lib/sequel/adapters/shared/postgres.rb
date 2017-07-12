@@ -136,7 +136,7 @@ module Sequel
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       FOREIGN_KEY_LIST_ON_DELETE_MAP = {'a'=>:no_action, 'r'=>:restrict, 'c'=>:cascade, 'n'=>:set_null, 'd'=>:set_default}.freeze
       ON_COMMIT = {:drop => 'DROP', :delete_rows => 'DELETE ROWS', :preserve_rows => 'PRESERVE ROWS'}.freeze
-      #ON_COMMIT.each_value(&:freeze) # SEQUEL5
+      ON_COMMIT.each_value(&:freeze)
 
       # SQL fragment for custom sequences (ones not created by serial primary key),
       # Returning the schema and literal form of the sequence name, by parsing

@@ -37,7 +37,7 @@ module Sequel
     }.each do |k,v|
       k.each{|n| SQLANYWHERE_TYPES[n] = v}
     end
-    # SQLANYWHERE_TYPES.freeze # SEQUEL5
+    SQLANYWHERE_TYPES.freeze
 
     # Database class for SQLAnywhere databases used with Sequel.
     class Database < Sequel::Database

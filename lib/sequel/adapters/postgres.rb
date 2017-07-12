@@ -42,7 +42,7 @@ module Sequel
       if defined?(::PG::ConnectionBad)
         DISCONNECT_ERROR_CLASSES << ::PG::ConnectionBad
       end
-      #DISCONNECT_ERROR_CLASSES.freeze # SEQUEL5
+      DISCONNECT_ERROR_CLASSES.freeze
       
       disconnect_errors = [
         'could not receive data from server',

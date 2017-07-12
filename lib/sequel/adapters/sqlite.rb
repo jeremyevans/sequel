@@ -73,7 +73,7 @@ module Sequel
     }.each do |k,v|
       k.each{|n| SQLITE_TYPES[n] = v}
     end
-    # SQLITE_TYPES.freeze # SEQUEL5
+    SQLITE_TYPES.freeze
     
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.

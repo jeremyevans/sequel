@@ -43,7 +43,7 @@ module Sequel
             201 => "TEXT",
             205 => "IMAGE"
           }.freeze
-          #DATA_TYPE.each_value(&:freeze) # SEQUEL5
+          DATA_TYPE.each_value(&:freeze)
           
           def initialize(row)
             @row = row

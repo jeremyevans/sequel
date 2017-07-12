@@ -77,7 +77,7 @@ module Sequel
         CONVERSION_PROCS[i] = method
       end
     end
-    # CONVERSION_PROCS.freeze # SEQUEL5
+    CONVERSION_PROCS.freeze
 
     class Database < Sequel::Database
       set_adapter_scheme :ado
