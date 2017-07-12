@@ -460,14 +460,13 @@ module Sequel
         overridable_methods_module.freeze
 
         if @dataset
-          @dataset.freeze
-          @instance_dataset.freeze
           db_schema.freeze.each_value(&:freeze)
           columns.freeze
           setter_methods.freeze
+        else
+          @setter_methods = [].freeze
         end
 
-        @setter_methods = [].freeze
         @dataset_method_modules.freeze
         @default_set_fields_options.freeze
         @plugins.freeze
@@ -1284,7 +1283,7 @@ module Sequel
           validate
           errors.freeze
         end
-        this.freeze if !new? && model.primary_key
+        this if !new? && model.primary_key
         super
       end
   

@@ -156,7 +156,6 @@ module Sequel
         # because of how STI works, you should not freeze an STI subclass
         # until after all subclasses of it have been created.
         def freeze
-          @sti_dataset.freeze
           @sti_key_array.freeze if @sti_key_array
           @sti_key_map.freeze if @sti_key_map.is_a?(Hash)
           @sti_model_map.freeze if @sti_model_map.is_a?(Hash)

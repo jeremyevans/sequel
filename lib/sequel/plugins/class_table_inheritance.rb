@@ -238,7 +238,6 @@ module Sequel
         def freeze
           @cti_models.freeze
           @cti_tables.freeze
-          @cti_instance_dataset.freeze
           @cti_table_columns.freeze
           @cti_table_map.freeze
 
