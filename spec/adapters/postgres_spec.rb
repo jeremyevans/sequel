@@ -4,7 +4,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 uses_pg = Sequel::Postgres::USES_PG if DB.adapter_scheme == :postgres
 uses_pg_or_jdbc = uses_pg || DB.adapter_scheme == :jdbc
-# SEQUEL5: Remove native handling
 
 def DB.sqls
   (@sqls ||= [])
@@ -2091,7 +2090,6 @@ describe 'PostgreSQL array handling' do
   before(:all) do
     @db = DB
     @ds = @db[:items]
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
     @tp = lambda{@db.schema(:items).map{|a| a.last[:type]}}
   end
   after do
@@ -2110,27 +2108,23 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([1], :int2), Sequel.pg_array([nil, 2], :int4), Sequel.pg_array([3, nil], :int8), Sequel.pg_array([4, nil, 4.5], :real), Sequel.pg_array([5, nil, 5.5], "double precision"))
     @ds.count.must_equal 1
     rs = @ds.all
-    if @native
-      rs.must_equal [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
     @ds.delete
     @ds.insert(Sequel.pg_array([[1], [2]], :int2), Sequel.pg_array([[nil, 2], [3, 4]], :int4), Sequel.pg_array([[3, nil], [nil, nil]], :int8), Sequel.pg_array([[4, nil], [nil, 4.5]], :real), Sequel.pg_array([[5, nil], [nil, 5.5]], "double precision"))
 
     rs = @ds.all
-    if @native
-      rs.must_equal [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'insert and retrieve decimal arrays' do
@@ -2141,26 +2135,22 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')], :numeric))
     @ds.count.must_equal 1
     rs = @ds.all
-    if @native
-      rs.must_equal [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
     @ds.delete
     @ds.insert(Sequel.pg_array([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]], :numeric))
     rs = @ds.all
-    if @native
-      rs.must_equal [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'insert and retrieve string arrays' do
@@ -2173,26 +2163,22 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], 'char(4)'), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c', '', ''], :varchar), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :text))
     @ds.count.must_equal 1
     rs = @ds.all
-    if @native
-      rs.must_equal [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c', '', ''], :t=>['a', nil, 'NULL', 'b"\'c']}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c', '', ''], :t=>['a', nil, 'NULL', 'b"\'c']}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
     @ds.delete
     @ds.insert(Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], 'char(4)'), Sequel.pg_array([[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :varchar), Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], :text))
     rs = @ds.all
-    if @native
-      rs.must_equal [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'insert and retrieve arrays of other types' do
@@ -2212,14 +2198,12 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([true, false], :bool), Sequel.pg_array([d, nil], :date), Sequel.pg_array([t, nil], :time), Sequel.pg_array([ts, nil], :timestamp), Sequel.pg_array([ts, nil], :timestamptz))
     @ds.count.must_equal 1
     rs = @ds.all
-    if @native
-      rs.must_equal [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
     @db.create_table!(:items) do
       column :ba, 'bytea[]'
@@ -2229,15 +2213,13 @@ describe 'PostgreSQL array handling' do
     @tp.call.must_equal [:blob_array, :time_timezone_array, :oid_array]
     @ds.insert(Sequel.pg_array([Sequel.blob("a\0"), nil], :bytea), Sequel.pg_array([t, nil], :timetz), Sequel.pg_array([1, 2, 3], :oid))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      rs.must_equal [{:ba=>[Sequel.blob("a\0"), nil], :tz=>[t, nil], :o=>[1, 2, 3]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    rs.must_equal [{:ba=>[Sequel.blob("a\0"), nil], :tz=>[t, nil], :o=>[1, 2, 3]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
     @db.create_table!(:items) do
       column :x, 'xml[]'
@@ -2261,21 +2243,19 @@ describe 'PostgreSQL array handling' do
                Sequel.pg_array(['N'], :name),
                Sequel.pg_array(['1 2'], :oidvector))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      r = rs.first
-      m = r.delete(:m)
-      m.class.must_equal(Sequel::Postgres::PGArray)
-      m.to_a.must_be_kind_of(Array)
-      m.first.must_be_kind_of(String)
-      r.must_be(:==, :x=>['<a></a>'], :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :o=>['1 2'])
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      r[:m] = m
-      @ds.delete
-      @ds.insert(r)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    r = rs.first
+    m = r.delete(:m)
+    m.class.must_equal(Sequel::Postgres::PGArray)
+    m.to_a.must_be_kind_of(Array)
+    m.first.must_be_kind_of(String)
+    r.must_be(:==, :x=>['<a></a>'], :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :o=>['1 2'])
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    r[:m] = m
+    @ds.delete
+    @ds.insert(r)
+    @ds.all.must_equal rs
   end
 
   it 'insert and retrieve empty arrays' do
@@ -2284,15 +2264,13 @@ describe 'PostgreSQL array handling' do
     end
     @ds.insert(:n=>Sequel.pg_array([], :integer))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      rs.must_equal [{:n=>[]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    rs.must_equal [{:n=>[]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'convert ruby array :default values' do
@@ -2301,15 +2279,13 @@ describe 'PostgreSQL array handling' do
     end
     @ds.insert
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      rs.must_equal [{:n=>[]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    rs.must_equal [{:n=>[]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'insert and retrieve custom array types' do
@@ -2338,14 +2314,12 @@ describe 'PostgreSQL array handling' do
     @ds.insert(Sequel.pg_array([int2v], :int2vector))
     @ds.count.must_equal 1
     rs = @ds.all
-    if @native
-      rs.must_equal [{:b=>[int2v]}]
-      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
-      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs.must_equal [{:b=>[int2v]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'retrieve arrays with explicit bounds' do
@@ -2441,7 +2415,6 @@ describe 'PostgreSQL array handling' do
       column :t, 'text[]'
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
     h = {:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']]}
     o = c.create(h)
     o.i.must_equal [1, 2, nil]
@@ -2460,7 +2433,6 @@ describe 'PostgreSQL array handling' do
       column :t, 'varchar[]'
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
     o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
     o.i.must_equal [1, 2, nil]
     o.f.must_equal [[1, 2.5], [3, 4.5]]
@@ -2538,11 +2510,9 @@ describe 'PostgreSQL array handling' do
       @ds.from{Sequel.pg_array([1,2,3]).op.unnest([4,5,6], [7,8]).as(:t1, [:a, :b, :c])}.select_order_map([:a, :b, :c]).must_equal [[1, 4, 7], [2, 5, 8], [3, 6, nil]]
     end
 
-    if @native
-      @ds.get(Sequel.pg_array(:i).push(4)).must_equal [1, 2, 3, 4]
-      @ds.get(Sequel.pg_array(:i).unshift(4)).must_equal [4, 1, 2, 3]
-      @ds.get(Sequel.pg_array(:i).concat(:i2)).must_equal [1, 2, 3, 2, 1]
-    end
+    @ds.get(Sequel.pg_array(:i).push(4)).must_equal [1, 2, 3, 4]
+    @ds.get(Sequel.pg_array(:i).unshift(4)).must_equal [4, 1, 2, 3]
+    @ds.get(Sequel.pg_array(:i).concat(:i2)).must_equal [1, 2, 3, 2, 1]
 
     if @db.type_supported?(:hstore)
       Sequel.extension :pg_hstore_ops
@@ -2557,7 +2527,6 @@ describe 'PostgreSQL hstore handling' do
     @db = DB
     @ds = @db[:items]
     @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -2569,17 +2538,15 @@ describe 'PostgreSQL hstore handling' do
     end
     @ds.insert(Sequel.hstore(@h))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      v = rs.first[:h]
-      v.must_equal @h
-      v.class.must_equal(Sequel::Postgres::HStore)
-      v.to_hash.must_be_kind_of(Hash)
-      v.to_hash.must_equal @h
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    v = rs.first[:h]
+    v.must_equal @h
+    v.class.must_equal(Sequel::Postgres::HStore)
+    v.to_hash.must_be_kind_of(Hash)
+    v.to_hash.must_equal @h
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'insert and retrieve hstore[] values' do
@@ -2588,16 +2555,14 @@ describe 'PostgreSQL hstore handling' do
     end
     @ds.insert(Sequel.pg_array([Sequel.hstore(@h)], :hstore))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      v = rs.first[:h].first
-      v.class.must_equal(Sequel::Postgres::HStore)
-      v.to_hash.must_be_kind_of(Hash)
-      v.to_hash.must_equal @h
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    v = rs.first[:h].first
+    v.class.must_equal(Sequel::Postgres::HStore)
+    v.to_hash.must_be_kind_of(Hash)
+    v.to_hash.must_equal @h
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'use hstore in bound variables' do
@@ -2639,7 +2604,6 @@ describe 'PostgreSQL hstore handling' do
     end
     Sequel.extension :pg_hstore_ops
     c.plugin :many_through_many
-    c.plugin :pg_typecast_on_load, :h unless @native
 
     h = {'item_id'=>"2", 'left_item_id'=>"1"}
     o2 = c.create(:id=>2)
@@ -2802,7 +2766,6 @@ describe 'PostgreSQL json type' do
     @ds = @db[:items]
     @a = [1, 2, {'a'=>'b'}, 3.0]
     @h = {'a'=>'b', '1'=>[3, 4, 5]}
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -2821,32 +2784,28 @@ describe 'PostgreSQL json type' do
       @db.create_table!(:items){column :j, json_type}
       @ds.insert(pg_json.call(@h))
       @ds.count.must_equal 1
-      if @native
-        rs = @ds.all
-        v = rs.first[:j]
-        v.class.must_equal(hash_class)
-        v.to_hash.must_be_kind_of(Hash)
-        v.must_equal @h
-        v.to_hash.must_equal @h
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
-      end
+      rs = @ds.all
+      v = rs.first[:j]
+      v.class.must_equal(hash_class)
+      v.to_hash.must_be_kind_of(Hash)
+      v.must_equal @h
+      v.to_hash.must_equal @h
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
 
       @ds.delete
       @ds.insert(pg_json.call(@a))
       @ds.count.must_equal 1
-      if @native
-        rs = @ds.all
-        v = rs.first[:j]
-        v.class.must_equal(array_class)
-        v.to_a.must_be_kind_of(Array)
-        v.must_equal @a
-        v.to_a.must_equal @a
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
-      end
+      rs = @ds.all
+      v = rs.first[:j]
+      v.class.must_equal(array_class)
+      v.to_a.must_be_kind_of(Array)
+      v.must_equal @a
+      v.to_a.must_equal @a
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
     end
 
     it 'insert and retrieve json[] values' do
@@ -2854,17 +2813,15 @@ describe 'PostgreSQL json type' do
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])])
       @ds.insert(j)
       @ds.count.must_equal 1
-      if @native
-        rs = @ds.all
-        v = rs.first[:j]
-        v.class.must_equal(Sequel::Postgres::PGArray)
-        v.to_a.must_be_kind_of(Array)
-        v.must_equal j
-        v.to_a.must_equal j
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
-      end
+      rs = @ds.all
+      v = rs.first[:j]
+      v.class.must_equal(Sequel::Postgres::PGArray)
+      v.to_a.must_be_kind_of(Array)
+      v.must_equal j
+      v.to_a.must_equal j
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
     end
 
     it 'with models' do
@@ -2873,7 +2830,6 @@ describe 'PostgreSQL json type' do
         column :h, json_type
       end
       c = Class.new(Sequel::Model(@db[:items]))
-      c.plugin :pg_typecast_on_load, :h unless @native
       c.create(:h=>pg_json.call(@h)).h.must_equal @h
       c.create(:h=>pg_json.call(@a)).h.must_equal @a
     end
@@ -3005,7 +2961,6 @@ describe 'PostgreSQL inet/cidr types' do
       @ipv6 = IPAddr.new(@v6)
       @ipv6nm = IPAddr.new(@v6nm)
     end
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -3015,32 +2970,28 @@ describe 'PostgreSQL inet/cidr types' do
     @db.create_table!(:items){inet :i; cidr :c}
     @ds.insert(@ipv4, @ipv4nm)
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      rs.first[:i].must_equal @ipv4
-      rs.first[:c].must_equal @ipv4nm
-      rs.first[:i].must_be_kind_of(IPAddr)
-      rs.first[:c].must_be_kind_of(IPAddr)
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    rs.first[:i].must_equal @ipv4
+    rs.first[:c].must_equal @ipv4nm
+    rs.first[:i].must_be_kind_of(IPAddr)
+    rs.first[:c].must_be_kind_of(IPAddr)
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
     unless ipv6_broken
       @ds.delete
       @ds.insert(@ipv6, @ipv6nm)
       @ds.count.must_equal 1
-      if @native
-        rs = @ds.all
-        rs.first[:j]
-        rs.first[:i].must_equal @ipv6
-        rs.first[:c].must_equal @ipv6nm
-        rs.first[:i].must_be_kind_of(IPAddr)
-        rs.first[:c].must_be_kind_of(IPAddr)
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
-      end
+      rs = @ds.all
+      rs.first[:j]
+      rs.first[:i].must_equal @ipv6
+      rs.first[:c].must_equal @ipv6nm
+      rs.first[:i].must_be_kind_of(IPAddr)
+      rs.first[:c].must_be_kind_of(IPAddr)
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
     end
   end
 
@@ -3048,18 +2999,16 @@ describe 'PostgreSQL inet/cidr types' do
     @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
     @ds.insert(Sequel.pg_array([@ipv4], 'inet'), Sequel.pg_array([@ipv4nm], 'cidr'), Sequel.pg_array(['12:34:56:78:90:ab'], 'macaddr'))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      rs.first.values.all?{|c| c.is_a?(Sequel::Postgres::PGArray)}.must_equal true
-      rs.first[:i].first.must_equal @ipv4
-      rs.first[:c].first.must_equal @ipv4nm
-      rs.first[:m].first.must_equal '12:34:56:78:90:ab'
-      rs.first[:i].first.must_be_kind_of(IPAddr)
-      rs.first[:c].first.must_be_kind_of(IPAddr)
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    rs.first.values.all?{|c| c.is_a?(Sequel::Postgres::PGArray)}.must_equal true
+    rs.first[:i].first.must_equal @ipv4
+    rs.first[:c].first.must_equal @ipv4nm
+    rs.first[:m].first.must_equal '12:34:56:78:90:ab'
+    rs.first[:i].first.must_be_kind_of(IPAddr)
+    rs.first[:c].first.must_be_kind_of(IPAddr)
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'use ipaddr in bound variables' do
@@ -3095,7 +3044,6 @@ describe 'PostgreSQL inet/cidr types' do
       cidr :c
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :i, :c unless @native
     c.create(:i=>@v4, :c=>@v4nm).values.values_at(:i, :c).must_equal [@ipv4, @ipv4nm]
     unless ipv6_broken
       c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).must_equal [@ipv6, @ipv6nm]
@@ -3177,7 +3125,6 @@ describe 'PostgreSQL range types' do
     @r.each{|k, v| @ra[k] = Sequel.pg_array([v], @map[k])}
     @r.each{|k, v| @pgr[k] = Sequel.pg_range(v)}
     @r.each{|k, v| @pgra[k] = Sequel.pg_array([Sequel.pg_range(v)], @map[k])}
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -3190,18 +3137,16 @@ describe 'PostgreSQL range types' do
       input.each{|k, v| h[k] = Sequel.cast(v, @map[k])}
       @ds.insert(h)
       @ds.count.must_equal 1
-      if @native
-        rs = @ds.all
-        rs.first.each do |k, v|
-          v.class.must_equal(Sequel::Postgres::PGRange)
-          v.to_range.must_be_kind_of(Range)
-          v.must_be :==, @r[k]
-          v.to_range.must_equal @r[k]
-        end
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
+      rs = @ds.all
+      rs.first.each do |k, v|
+        v.class.must_equal(Sequel::Postgres::PGRange)
+        v.to_range.must_be_kind_of(Range)
+        v.must_be :==, @r[k]
+        v.to_range.must_equal @r[k]
       end
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
       @ds.delete
     end
   end
@@ -3211,20 +3156,18 @@ describe 'PostgreSQL range types' do
     [@ra, @pgra].each do |input|
       @ds.insert(input)
       @ds.count.must_equal 1
-      if @native
-        rs = @ds.all
-        rs.first.each do |k, v|
-          v.class.must_equal(Sequel::Postgres::PGArray)
-          v.to_a.must_be_kind_of(Array)
-          v.first.class.must_equal(Sequel::Postgres::PGRange)
-          v.first.to_range.must_be_kind_of(Range)
-          v.must_be :==, @ra[k].to_a
-          v.first.must_be :==, @r[k]
-        end
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
+      rs = @ds.all
+      rs.first.each do |k, v|
+        v.class.must_equal(Sequel::Postgres::PGArray)
+        v.to_a.must_be_kind_of(Array)
+        v.first.class.must_equal(Sequel::Postgres::PGRange)
+        v.first.to_range.must_be_kind_of(Range)
+        v.must_be :==, @ra[k].to_a
+        v.first.must_be :==, @r[k]
       end
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
       @ds.delete
     end
   end
@@ -3254,14 +3197,12 @@ describe 'PostgreSQL range types' do
   it 'with models' do
     @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
     v = c.create(@r).values
     v.delete(:id)
     v.must_be :==, @r
 
     @db.create_table!(:items){primary_key :id; column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
     v = c.create(@ra).values
     v.delete(:id)
     v.each{|k,v1| v1.must_be :==, @ra[k].to_a}
@@ -3270,10 +3211,8 @@ describe 'PostgreSQL range types' do
   it 'works with current_datetime_timestamp extension' do
     ds = @db.dataset.extension(:current_datetime_timestamp)
     tsr = ds.get(Sequel.pg_range(ds.current_datetime..ds.current_datetime, :tstzrange))
-    if @native
-      tsr.begin.must_be_kind_of Time
-      tsr.end.must_be_kind_of Time
-    end
+    tsr.begin.must_be_kind_of Time
+    tsr.end.must_be_kind_of Time
   end
 
   it 'operations/functions with pg_range_ops' do
@@ -3350,7 +3289,6 @@ describe 'PostgreSQL interval types' do
   before(:all) do
     @db = DB
     @ds = @db[:items]
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after do
     @db.drop_table?(:items)
@@ -3380,16 +3318,14 @@ describe 'PostgreSQL interval types' do
     ].each do |instr, outstr, value, parts|
       @ds.insert(instr)
       @ds.count.must_equal 1
-      if @native
-        @ds.get(Sequel.cast(:i, String)).must_equal outstr
-        rs = @ds.all
-        rs.first[:i].is_a?(ActiveSupport::Duration).must_equal true
-        rs.first[:i].must_equal ActiveSupport::Duration.new(value, parts)
-        rs.first[:i].parts.sort_by{|k,v| k.to_s}.reject{|k,v| v == 0}.must_equal parts.sort_by{|k,v| k.to_s}
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
-      end
+      @ds.get(Sequel.cast(:i, String)).must_equal outstr
+      rs = @ds.all
+      rs.first[:i].is_a?(ActiveSupport::Duration).must_equal true
+      rs.first[:i].must_equal ActiveSupport::Duration.new(value, parts)
+      rs.first[:i].parts.sort_by{|k,v| k.to_s}.reject{|k,v| v == 0}.must_equal parts.sort_by{|k,v| k.to_s}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
       @ds.delete
     end
   end
@@ -3398,16 +3334,14 @@ describe 'PostgreSQL interval types' do
     @db.create_table!(:items){column :i, 'interval[]'}
     @ds.insert(Sequel.pg_array(['1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds'], 'interval'))
     @ds.count.must_equal 1
-    if @native
-      rs = @ds.all
-      rs.first[:i].is_a?(Sequel::Postgres::PGArray).must_equal true
-      rs.first[:i].first.is_a?(ActiveSupport::Duration).must_equal true
-      rs.first[:i].first.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
-      rs.first[:i].first.parts.sort_by{|k,v| k.to_s}.must_equal [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
-    end
+    rs = @ds.all
+    rs.first[:i].is_a?(Sequel::Postgres::PGArray).must_equal true
+    rs.first[:i].first.is_a?(ActiveSupport::Duration).must_equal true
+    rs.first[:i].first.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+    rs.first[:i].first.parts.sort_by{|k,v| k.to_s}.must_equal [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
   end
 
   it 'use intervals in bound variables' do
@@ -3435,7 +3369,6 @@ describe 'PostgreSQL interval types' do
       interval :i
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :i, :c unless @native
     v = c.create(:i=>'1 year 2 mons 25 days 05:06:07').i
     v.is_a?(ActiveSupport::Duration).must_equal true
     v.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
@@ -3467,8 +3400,6 @@ describe 'PostgreSQL row-valued/composite types' do
     @db.register_row_type(Sequel.qualify(:public, :person))
     @db.register_row_type(Sequel[:public][:company])
     @new_oids = @db.conversion_procs.keys - oids
-
-    @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
   after(:all) do
     @new_oids.each{|oid| @db.conversion_procs.delete(oid)}
@@ -3482,22 +3413,20 @@ describe 'PostgreSQL row-valued/composite types' do
   it 'insert and retrieve row types' do
     @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
     @ds.count.must_equal 1
-    if @native
-      # Single row valued type
-      rs = @ds.all
-      v = rs.first[:address]
-      v.class.superclass.must_equal(Sequel::Postgres::PGRow::HashRow)
-      v.to_hash.must_be_kind_of(Hash)
-      v.to_hash.must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.must_equal rs
+    # Single row valued type
+    rs = @ds.all
+    v = rs.first[:address]
+    v.class.superclass.must_equal(Sequel::Postgres::PGRow::HashRow)
+    v.to_hash.must_be_kind_of(Hash)
+    v.to_hash.must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
 
-      # Nested row value type
-      p = @ds.get(:person)
-      p[:id].must_equal 1
-      p[:address].must_equal v
-    end
+    # Nested row value type
+    p = @ds.get(:person)
+    p[:id].must_equal 1
+    p[:address].must_equal v
   end
 
   it 'insert and retrieve row types containing domains' do
@@ -3522,19 +3451,17 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds = @db[:company]
     @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))
     @ds.count.must_equal 1
-    if @native
-      v = @ds.get(:company)
-      v.class.superclass.must_equal(Sequel::Postgres::PGRow::HashRow)
-      v.to_hash.must_be_kind_of(Hash)
-      v[:id].must_equal 1
-      employees = v[:employees]
-      employees.class.must_equal(Sequel::Postgres::PGArray)
-      employees.to_a.must_be_kind_of(Array)
-      employees.must_equal [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
-      @ds.delete
-      @ds.insert(v[:id], v[:employees])
-      @ds.get(:company).must_equal v
-    end
+    v = @ds.get(:company)
+    v.class.superclass.must_equal(Sequel::Postgres::PGRow::HashRow)
+    v.to_hash.must_be_kind_of(Hash)
+    v[:id].must_equal 1
+    employees = v[:employees]
+    employees.class.must_equal(Sequel::Postgres::PGArray)
+    employees.to_a.must_be_kind_of(Array)
+    employees.must_equal [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
+    @ds.delete
+    @ds.insert(v[:id], v[:employees])
+    @ds.get(:company).must_equal v
   end
 
   it 'use row types in bound variables' do
@@ -3569,11 +3496,9 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds = @db[:company]
     @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))
     @ds.get(Sequel.pg_row(:company)[:id]).must_equal 1
-    if @native
-      @ds.get(Sequel.pg_row(:company)[:employees]).must_equal [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
-      @ds.get(Sequel.pg_row(:company)[:employees][1]).must_equal(:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'})
-      @ds.get(Sequel.pg_row(:company)[:employees][1][:address]).must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
-    end
+    @ds.get(Sequel.pg_row(:company)[:employees]).must_equal [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
+    @ds.get(Sequel.pg_row(:company)[:employees][1]).must_equal(:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'})
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address]).must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
     @ds.get(Sequel.pg_row(:company)[:employees][1][:id]).must_equal 1
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:street]).must_equal '123 Sesame St'
     @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:city]).must_equal 'Somewhere'
@@ -3598,22 +3523,18 @@ describe 'PostgreSQL row-valued/composite types' do
       @db[:b].select(Sequel.pg_row(:b)[:a]).first.must_equal(:a=>2)
       @db[:b].select(Sequel.pg_row(:b).splat[:a]).first.must_equal(:a=>1)
 
-      if @native
-        @db[:b].select(:b).first.must_equal(:b=>{:a=>2})
-        @db[:b].select(Sequel.pg_row(:b).splat).first.must_equal(:a=>1, :b=>{:a=>2})
-        @db[:b].select(Sequel.pg_row(:b).splat(:b)).first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
-      end
+      @db[:b].select(:b).first.must_equal(:b=>{:a=>2})
+      @db[:b].select(Sequel.pg_row(:b).splat).first.must_equal(:a=>1, :b=>{:a=>2})
+      @db[:b].select(Sequel.pg_row(:b).splat(:b)).first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
     end
 
     it "* should expand the table type into separate columns" do
       ds = @db[:b].select(Sequel.pg_row(:b).splat(:b)).from_self(:alias=>:t)
-      if @native
-        ds.first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
-        ds.select(Sequel.pg_row(:b).*).first.must_equal(:a=>1, :b=>{:a=>2})
-        ds.select(Sequel.pg_row(:b)[:b]).first.must_equal(:b=>{:a=>2})
-        ds.select(Sequel.pg_row(Sequel[:t][:b]).*).first.must_equal(:a=>1, :b=>{:a=>2})
-        ds.select(Sequel.pg_row(Sequel[:t][:b])[:b]).first.must_equal(:b=>{:a=>2})
-      end
+      ds.first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
+      ds.select(Sequel.pg_row(:b).*).first.must_equal(:a=>1, :b=>{:a=>2})
+      ds.select(Sequel.pg_row(:b)[:b]).first.must_equal(:b=>{:a=>2})
+      ds.select(Sequel.pg_row(Sequel[:t][:b]).*).first.must_equal(:a=>1, :b=>{:a=>2})
+      ds.select(Sequel.pg_row(Sequel[:t][:b])[:b]).first.must_equal(:b=>{:a=>2})
       ds.select(Sequel.pg_row(:b)[:a]).first.must_equal(:a=>1)
       ds.select(Sequel.pg_row(Sequel[:t][:b])[:a]).first.must_equal(:a=>1)
     end
@@ -3642,41 +3563,37 @@ describe 'PostgreSQL row-valued/composite types' do
     it 'insert and retrieve row types as model objects' do
       @ds.insert(:id=>1, :address=>@a)
       @ds.count.must_equal 1
-      if @native
-        # Single row valued type
-        rs = @ds.all
-        v = rs.first[:address]
-        v.must_be_kind_of(Address)
-        v.must_equal @a
-        @ds.delete
-        @ds.insert(rs.first)
-        @ds.all.must_equal rs
+      # Single row valued type
+      rs = @ds.all
+      v = rs.first[:address]
+      v.must_be_kind_of(Address)
+      v.must_equal @a
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.must_equal rs
 
-        # Nested row value type
-        p = @ds.get(:person)
-        p.must_be_kind_of(Person)
-        p.id.must_equal 1
-        p.address.must_be_kind_of(Address)
-        p.address.must_equal @a
-      end
+      # Nested row value type
+      p = @ds.get(:person)
+      p.must_be_kind_of(Person)
+      p.id.must_equal 1
+      p.address.must_be_kind_of(Address)
+      p.address.must_equal @a
     end
 
     it 'insert and retrieve arrays of row types as model objects' do
       @ds = @db[:company]
       @ds.insert(:id=>1, :employees=>@es)
       @ds.count.must_equal 1
-      if @native
-        v = @ds.get(:company)
-        v.must_be_kind_of(Company)
-        v.id.must_equal 1
-        employees = v[:employees]
-        employees.class.must_equal(Sequel::Postgres::PGArray)
-        employees.to_a.must_be_kind_of(Array)
-        employees.must_equal @es
-        @ds.delete
-        @ds.insert(v.id, v.employees)
-        @ds.get(:company).must_equal v
-      end
+      v = @ds.get(:company)
+      v.must_be_kind_of(Company)
+      v.id.must_equal 1
+      employees = v[:employees]
+      employees.class.must_equal(Sequel::Postgres::PGArray)
+      employees.to_a.must_be_kind_of(Array)
+      employees.must_equal @es
+      @ds.delete
+      @ds.insert(v.id, v.employees)
+      @ds.get(:company).must_equal v
     end
 
     it 'use model objects in bound variables' do
@@ -3695,7 +3612,6 @@ describe 'PostgreSQL row-valued/composite types' do
     end if uses_pg_or_jdbc
 
     it 'model typecasting' do
-      Person.plugin :pg_typecast_on_load, :address unless @native
       a = Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
       o = Person.create(:id=>1, :address=>['123 Sesame St', 'Somewhere', '12345'])
       o.address.must_equal a
@@ -3704,7 +3620,6 @@ describe 'PostgreSQL row-valued/composite types' do
       o = Person.create(:id=>1, :address=>a)
       o.address.must_equal a
 
-      Company.plugin :pg_typecast_on_load, :employees unless @native
       e = Person.new(:id=>1, :address=>a)
       o = Company.create(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
       o.employees.must_equal [e]
