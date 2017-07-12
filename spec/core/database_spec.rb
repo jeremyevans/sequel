@@ -60,7 +60,7 @@ describe "A new Database" do
   it "should have the connection pool use the connect method to get connections" do
     cc = nil
     d = Sequel::Database.new
-    meta_def(d, :connect){|c| 1234}
+    d.define_singleton_method(:connect){|c| 1234}
     d.synchronize {|c| cc = c}
     cc.must_equal 1234
   end
@@ -606,7 +606,7 @@ end
 describe "Database#synchronize" do
   before do
     @db = Sequel::Database.new(:max_connections => 1)
-    meta_def(@db, :connect){|c| 12345}
+    @db.define_singleton_method(:connect){|c| 12345}
   end
   
   it "should wrap the supplied block in pool.hold" do
@@ -631,7 +631,7 @@ describe "Database#test_connection" do
   before do
     @db = Sequel::Database.new
     pr = proc{@test = rand(100)}
-    meta_def(@db, :connect){|c| pr.call}
+    @db.define_singleton_method(:connect){|c| pr.call}
   end
   
   it "should attempt to get a connection" do
@@ -677,7 +677,7 @@ DatabaseTransactionSpecs = shared_description do
   end
   
   it "should support transaction isolation levels" do
-    meta_def(@db, :supports_transaction_isolation_levels?){true}
+    @db.define_singleton_method(:supports_transaction_isolation_levels?){true}
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
       @db.transaction(:isolation=>l){@db.run "DROP TABLE #{l}"}
     end
@@ -688,7 +688,7 @@ DatabaseTransactionSpecs = shared_description do
   end
 
   it "should allow specifying a default transaction isolation level" do
-    meta_def(@db, :supports_transaction_isolation_levels?){true}
+    @db.define_singleton_method(:supports_transaction_isolation_levels?){true}
     [:uncommitted, :committed, :repeatable, :serializable].each do |l|
       @db.transaction_isolation_level = l
       @db.transaction{@db.run "DROP TABLE #{l}"}
@@ -779,8 +779,8 @@ DatabaseTransactionSpecs = shared_description do
   
   it "should handle errors when sending BEGIN" do
     ec = Class.new(StandardError)
-    meta_def(@db, :database_error_classes){[ec]}
-    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /BEGIN/ ? raise(ec, 'bad') : super(c, sql)}
+    @db.define_singleton_method(:database_error_classes){[ec]}
+    @db.define_singleton_method(:log_connection_execute){|c, sql| sql =~ /BEGIN/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{@db.execute 'DROP TABLE test;'}
     rescue Sequel::DatabaseError => e
@@ -792,8 +792,8 @@ DatabaseTransactionSpecs = shared_description do
   
   it "should handle errors when sending COMMIT" do
     ec = Class.new(StandardError)
-    meta_def(@db, :database_error_classes){[ec]}
-    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /COMMIT/ ? raise(ec, 'bad') : super(c, sql)}
+    @db.define_singleton_method(:database_error_classes){[ec]}
+    @db.define_singleton_method(:log_connection_execute){|c, sql| sql =~ /COMMIT/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{@db.execute 'DROP TABLE test;'}
     rescue Sequel::DatabaseError => e
@@ -805,8 +805,8 @@ DatabaseTransactionSpecs = shared_description do
   
   it "should raise original exception if there is an exception raised when rolling back" do
     ec = Class.new(StandardError)
-    meta_def(@db, :database_error_classes){[ec]}
-    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
+    @db.define_singleton_method(:database_error_classes){[ec]}
+    @db.define_singleton_method(:log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{raise ArgumentError, 'asdf'}
     rescue => e
@@ -817,8 +817,8 @@ DatabaseTransactionSpecs = shared_description do
   
   it "should raise original exception if there is an exception raised when rolling back when using :rollback=>:always" do
     ec = Class.new(StandardError)
-    meta_def(@db, :database_error_classes){[ec]}
-    meta_def(@db, :log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
+    @db.define_singleton_method(:database_error_classes){[ec]}
+    @db.define_singleton_method(:log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction(:rollback=>:always){}
     rescue => e
@@ -910,10 +910,10 @@ DatabaseTransactionSpecs = shared_description do
   end
 
   it "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
-    meta_def(@db, :commit_transaction){raise ArgumentError}
+    @db.define_singleton_method(:commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.must_raise(ArgumentError)
 
-    meta_def(@db, :database_error_classes){[ArgumentError]}
+    @db.define_singleton_method(:database_error_classes){[ArgumentError]}
     lambda{@db.transaction{}}.must_raise(Sequel::DatabaseError)
   end
   
@@ -1040,13 +1040,13 @@ DatabaseTransactionSpecs = shared_description do
   end
 
   it "should raise an error if you attempt to use after_commit inside a prepared transaction" do
-    meta_def(@db, :supports_prepared_transactions?){true}
+    @db.define_singleton_method(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{@db.execute('foo')}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
   end
 
   it "should raise an error if you attempt to use after_rollback inside a prepared transaction" do
-    meta_def(@db, :supports_prepared_transactions?){true}
+    @db.define_singleton_method(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
   end
@@ -1112,13 +1112,13 @@ describe "Database#transaction with savepoint support" do
   end
 
   it "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
-    meta_def(@db, :supports_prepared_transactions?){true}
+    @db.define_singleton_method(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{@db.execute('foo')}}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 
   it "should raise an error if you attempt to use after_rollback inside a savepoint in a prepared transaction" do
-    meta_def(@db, :supports_prepared_transactions?){true}
+    @db.define_singleton_method(:supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('foo')}}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
@@ -1137,7 +1137,7 @@ end
 describe "Database#transaction without savepoint support" do
   before do
     @db = Sequel.mock(:servers=>{:test=>{}})
-    meta_def(@db, :supports_savepoints?){false}
+    @db.define_singleton_method(:supports_savepoints?){false}
   end
 
   it "should not create savepoint if inside a transaction when :savepoint=>:only is used" do
@@ -1301,11 +1301,11 @@ describe "Database#transaction with savepoints" do
   end
   
   it "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
-    meta_def(@db, :commit_transaction){raise ArgumentError}
+    @db.define_singleton_method(:commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.must_raise(ArgumentError)
     lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.must_raise(ArgumentError)
 
-    meta_def(@db, :database_error_classes){[ArgumentError]}
+    @db.define_singleton_method(:database_error_classes){[ArgumentError]}
     lambda{@db.transaction{}}.must_raise(Sequel::DatabaseError)
     lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.must_raise(Sequel::DatabaseError)
   end
@@ -1516,7 +1516,7 @@ describe "A single threaded database" do
   before do
     conn = 1234567
     @db = Sequel::Database.new(:single_threaded => true)
-    meta_def(@db, :connect) do |c|
+    @db.define_singleton_method(:connect) do |c|
       conn += 1
     end
   end
@@ -2367,8 +2367,8 @@ describe "Database#supports_savepoints_in_prepared_transactions?" do
 
   it "should be true if both savepoints and prepared transactions are supported" do
     db = Sequel::Database.new
-    meta_def(db, :supports_savepoints?){true}
-    meta_def(db, :supports_prepared_transactions?){true}
+    db.define_singleton_method(:supports_savepoints?){true}
+    db.define_singleton_method(:supports_prepared_transactions?){true}
     db.supports_savepoints_in_prepared_transactions?.must_equal true
   end
 end

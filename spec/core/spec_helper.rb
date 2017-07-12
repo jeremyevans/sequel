@@ -18,13 +18,6 @@ require 'minitest/shared_description'
 
 require "#{File.dirname(File.dirname(__FILE__))}/deprecation_helper.rb"
 
-class Minitest::HooksSpec
-  # SEQUEL5: Replace with define_singleton_method
-  def meta_def(obj, name, &block)
-    (class << obj; self end).send(:define_method, name, &block)
-  end
-end
-
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection
   Sequel::Database.extension :columns_introspection

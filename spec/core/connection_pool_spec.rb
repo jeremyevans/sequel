@@ -407,7 +407,7 @@ ThreadedConnectionPoolSpecs = shared_description do
   it "should not store connections if :connection_handling=>:disconnect" do
     @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:connection_handling=>:disconnect))
     d = []
-    meta_def(@pool.db, :disconnect_connection){|c| d << c}
+    @pool.db.define_singleton_method(:disconnect_connection){|c| d << c}
     @pool.hold do |cc|
       cc.must_equal 1
       Thread.new{@pool.hold{|cc2| _(cc2).must_equal 2}}.join
@@ -467,7 +467,7 @@ describe "ConnectionPool#disconnect" do
     @pool.available_connections.size.must_equal 5
     @pool.available_connections.each {|c| c[:id].wont_equal nil}
     conns = []
-    meta_def(@pool.db, :disconnect_connection){|c| conns << c}
+    @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
     @pool.disconnect
     conns.size.must_equal 5
   end
@@ -484,7 +484,7 @@ describe "ConnectionPool#disconnect" do
       @pool.available_connections.size.must_equal 4
       @pool.available_connections.each {|c| c.wont_be_same_as(conn)}
       conns = []
-      meta_def(@pool.db, :disconnect_connection){|c| conns << c}
+      @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
       @pool.disconnect
       conns.size.must_equal 4
       @pool.size.must_equal 1
@@ -600,7 +600,7 @@ describe "A connection pool with multiple servers" do
     conns = []
     @pool.size.must_equal 1
     @pool.size(:read_only).must_equal 1
-    meta_def(@pool.db, :disconnect_connection){|c| conns << c}
+    @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
     @pool.disconnect
     conns.sort.must_equal %w'default1 read_only1'
     @pool.size.must_equal 0

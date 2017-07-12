@@ -30,13 +30,6 @@ end
 
 Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby'
 
-class Minitest::HooksSpec
-  # SEQUEL5: Replace with define_singleton_method
-  def meta_def(obj, name, &block)
-    (class << obj; self end).send(:define_method, name, &block)
-  end
-end
-
 class << Sequel::Model
   attr_writer :db_schema
   alias orig_columns columns

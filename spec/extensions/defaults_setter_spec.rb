@@ -9,7 +9,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @c.instance_variable_set(:@db_schema, {:a=>{}})
     @c.plugin :defaults_setter
     @c.columns :a
-    @pr = proc{|x| meta_def(db, :schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}; c.dataset = c.dataset; c}
+    @pr = proc{|x| db.define_singleton_method(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}; c.dataset = c.dataset; c}
   end
   after do
     Sequel.datetime_class = Time
