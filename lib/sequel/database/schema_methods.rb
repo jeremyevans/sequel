@@ -43,6 +43,7 @@ module Sequel
       rescue DatabaseError
         raise unless e
       end
+      nil
     end
     
     # Alters the given table with the specified block. Example:
@@ -121,6 +122,7 @@ module Sequel
         primary_key(keys) unless options[:no_primary_key]
         index(keys.reverse, options[:index_options] || {}) unless options[:no_index]
       end
+      nil
     end
 
     # Forcibly create a join table, attempting to drop it if it already exists, then creating it.
@@ -182,8 +184,8 @@ module Sequel
         generator = options[:generator] || create_table_generator(&block)
         create_table_from_generator(name, generator, options)
         create_table_indexes_from_generator(name, generator, options)
-        nil
       end
+      nil
     end
 
     # Forcibly create a table, attempting to drop it if it already exists, then creating it.
@@ -233,6 +235,7 @@ module Sequel
       end
 
       create_view(name, source, options)
+      nil
     end
     
     # Creates a view based on a dataset or an SQL string:
@@ -336,6 +339,7 @@ module Sequel
           drop_table(name, options) if table_exists?(name)
         end
       end
+      nil
     end
     
     # Drops one or more views corresponding to the given names:

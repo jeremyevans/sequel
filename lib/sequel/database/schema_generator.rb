@@ -64,6 +64,7 @@ module Sequel
         types.each do |type|
           class_eval("def #{type}(name, opts={}); column(name, #{type}, opts); end", __FILE__, __LINE__)
         end
+        nil
       end
       
       # Add an unnamed constraint to the DDL, specified by the given block
@@ -130,6 +131,7 @@ module Sequel
         if index_opts = opts[:index]
           index(name, index_opts.is_a?(Hash) ? index_opts : {})
         end
+        nil
       end
       
       # Adds a named constraint (or unnamed if name is nil) to the DDL,
@@ -143,6 +145,7 @@ module Sequel
       def constraint(name, *args, &block)
         opts = name.is_a?(Hash) ? name : {:name=>name}
         constraints << opts.merge(:type=>:check, :check=>block || args)
+        nil
       end
       
       # Add a foreign key in the table that references another table to the DDL. See column
@@ -222,6 +225,7 @@ module Sequel
       #   # CREATE INDEX table_artist_id_name_index ON table (artist_id, name)
       def index(columns, opts = OPTS)
         indexes << {:columns => Array(columns)}.merge!(opts)
+        nil
       end
       
       # Add a column with the given type, name, and opts to the DDL.  See +column+ for available
@@ -276,6 +280,7 @@ module Sequel
         else
           columns.unshift(column)
         end
+        nil
       end
 
       # The name of the primary key for this generator, if it has a primary key.
@@ -296,6 +301,7 @@ module Sequel
       # to name the constraint.
       def unique(columns, opts = OPTS)
         constraints << {:type => :unique, :columns => Array(columns)}.merge!(opts)
+        nil
       end
 
       private
@@ -304,11 +310,13 @@ module Sequel
       def composite_primary_key(columns, *args)
         opts = args.pop || {}
         constraints << {:type => :primary_key, :columns => columns}.merge!(opts)
+        nil
       end
 
       # Add a composite foreign key constraint
       def composite_foreign_key(columns, opts)
         constraints << {:type => :foreign_key, :columns => columns}.merge!(opts)
+        nil
       end
       
       add_type_method(*GENERIC_TYPES)
@@ -350,6 +358,7 @@ module Sequel
       # :first :: Create this new column before all other existing columns
       def add_column(name, type, opts = OPTS)
         @operations << {:op => :add_column, :name => name, :type => type}.merge!(opts)
+        nil
       end
       
       # Add a constraint with the given name and args to the DDL for the table.
@@ -362,6 +371,7 @@ module Sequel
       def add_constraint(name, *args, &block)
         opts = name.is_a?(Hash) ? name : {:name=>name}
         @operations << opts.merge(:op=>:add_constraint, :type=>:check, :check=>block || args)
+        nil
       end
 
       # Add a unique constraint to the given column(s)
@@ -372,6 +382,7 @@ module Sequel
       # Supports the same :deferrable option as CreateTableGenerator#column.
       def add_unique_constraint(columns, opts = OPTS)
         @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge!(opts)
+        nil
       end
 
       # Add a foreign key with the given name and referencing the given table
@@ -440,6 +451,7 @@ module Sequel
       # :type :: clustered uses a clustered index, full_text uses a full text index.
       def add_index(columns, opts = OPTS)
         @operations << {:op => :add_index, :columns => Array(columns)}.merge!(opts)
+        nil
       end
       
       # Add a primary key to the DDL for the table.  See CreateTableGenerator#column
@@ -475,6 +487,7 @@ module Sequel
       #               exist.
       def drop_column(name, opts=OPTS)
         @operations << {:op => :drop_column, :name => name}.merge!(opts)
+        nil
       end
       
       # Remove a constraint from the DDL for the table. MySQL/SQLite specific options:
@@ -486,6 +499,7 @@ module Sequel
       #   drop_constraint(:unique_name, :cascade=>true) # DROP CONSTRAINT unique_name CASCADE
       def drop_constraint(name, opts=OPTS)
         @operations << {:op => :drop_constraint, :name => name}.merge!(opts)
+        nil
       end
       
       # Remove a foreign key and the associated column from the DDL for the table. General options:
@@ -520,6 +534,7 @@ module Sequel
       #   drop_index([:a, :b], :name=>:foo) # DROP INDEX foo
       def drop_index(columns, options=OPTS)
         @operations << {:op => :drop_index, :columns => Array(columns)}.merge!(options)
+        nil
       end
 
       # Modify a column's name in the DDL for the table.
@@ -527,6 +542,7 @@ module Sequel
       #   rename_column(:name, :artist_name) # RENAME COLUMN name TO artist_name
       def rename_column(name, new_name, opts = OPTS)
         @operations << {:op => :rename_column, :name => name, :new_name => new_name}.merge!(opts)
+        nil
       end
       
       # Modify a column's default value in the DDL for the table.
@@ -541,6 +557,7 @@ module Sequel
       # can lose the type and NULL/NOT NULL setting for the column.
       def set_column_default(name, default)
         @operations << {:op => :set_column_default, :name => name, :default => default}
+        nil
       end
 
       # Modify a column's type in the DDL for the table.
@@ -555,6 +572,7 @@ module Sequel
       # can lose the default and NULL/NOT NULL setting for the column.
       def set_column_type(name, type, opts=OPTS)
         @operations << {:op => :set_column_type, :name => name, :type => type}.merge!(opts)
+        nil
       end
       
       # Set a given column as allowing NULL values.
@@ -565,6 +583,7 @@ module Sequel
       # can lose the default and type for the column.
       def set_column_allow_null(name, allow_null=true)
         @operations << {:op => :set_column_null, :name => name, :null => allow_null}
+        nil
       end
 
       # Set a given column as not allowing NULL values.
@@ -582,16 +601,19 @@ module Sequel
       # Add a composite primary key constraint
       def add_composite_primary_key(columns, opts)
         @operations << {:op => :add_constraint, :type => :primary_key, :columns => columns}.merge!(opts)
+        nil
       end
 
       # Add a composite foreign key constraint
       def add_composite_foreign_key(columns, table, opts)
         @operations << {:op => :add_constraint, :type => :foreign_key, :columns => columns, :table => table}.merge!(opts)
+        nil
       end
 
       # Drop a composite foreign key constraint
       def drop_composite_foreign_key(columns, opts)
         @operations << {:op => :drop_constraint, :type => :foreign_key, :columns => columns}.merge!(opts)
+        nil
       end
     end
   end

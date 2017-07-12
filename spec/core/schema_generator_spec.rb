@@ -3,18 +3,18 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 describe Sequel::Schema::CreateTableGenerator do
   before do
     @generator = Sequel::Schema::CreateTableGenerator.new(Sequel.mock) do
-      string :title
-      column :body, :text
-      foreign_key :parent_id
-      primary_key :id
-      check 'price > 100'
-      constraint(:xxx) {{:yyy => :zzz}}
-      index :title
-      index [:title, :body], :unique => true
-      foreign_key :node_id, :nodes
-      foreign_key :deferrable_node_id, :nodes, :deferrable => true
-      primary_key [:title, :parent_id], :name => :cpk
-      foreign_key [:node_id, :prop_id], :nodes_props, :name => :cfk
+      string(:title).must_be_nil
+      column(:body, :text).must_be_nil
+      foreign_key(:parent_id).must_be_nil
+      primary_key(:id).must_be_nil
+      check('price > 100').must_be_nil
+      constraint(:xxx){{:yyy => :zzz}}.must_be_nil
+      index(:title).must_be_nil
+      index([:title, :body], :unique => true).must_be_nil
+      foreign_key(:node_id, :nodes).must_be_nil
+      foreign_key(:deferrable_node_id, :nodes, :deferrable => true).must_be_nil
+      primary_key([:title, :parent_id], :name => :cpk).must_be_nil
+      foreign_key([:node_id, :prop_id], :nodes_props, :name => :cfk).must_be_nil
     end
     @columns, @indexes, @constraints = @generator.columns, @generator.indexes, @generator.constraints
   end
@@ -126,29 +126,29 @@ end
 describe Sequel::Schema::AlterTableGenerator do
   before do
     @generator = Sequel::Schema::AlterTableGenerator.new(Sequel.mock) do
-      add_column :aaa, :text
-      drop_column :bbb
-      rename_column :ccc, :ho
-      set_column_type :ddd, :float
-      set_column_default :eee, 1
-      add_index [:fff, :ggg]
-      drop_index :hhh
-      drop_index :hhh, :name=>:blah_blah
-      add_full_text_index :blah
-      add_spatial_index :geom
-      add_index :blah, :type => :hash
-      add_index :blah, :where => {:something => true}
-      add_constraint :con1, 'fred > 100'
-      drop_constraint :con2
-      add_unique_constraint [:aaa, :bbb, :ccc], :name => :con3
-      add_primary_key :id
-      add_foreign_key :node_id, :nodes
-      add_primary_key [:aaa, :bbb]
-      add_foreign_key [:node_id, :prop_id], :nodes_props
-      add_foreign_key [:node_id, :prop_id], :nodes_props, :name => :fkey
-      drop_foreign_key :node_id
-      drop_foreign_key [:node_id, :prop_id]
-      drop_foreign_key [:node_id, :prop_id], :name => :fkey
+      add_column(:aaa, :text).must_be_nil
+      drop_column(:bbb).must_be_nil
+      rename_column(:ccc, :ho).must_be_nil
+      set_column_type(:ddd, :float).must_be_nil
+      set_column_default(:eee, 1).must_be_nil
+      add_index([:fff, :ggg]).must_be_nil
+      drop_index(:hhh).must_be_nil
+      drop_index(:hhh, :name=>:blah_blah).must_be_nil
+      add_full_text_index(:blah).must_be_nil
+      add_spatial_index(:geom).must_be_nil
+      add_index(:blah, :type => :hash).must_be_nil
+      add_index(:blah, :where => {:something => true}).must_be_nil
+      add_constraint(:con1, 'fred > 100').must_be_nil
+      drop_constraint(:con2).must_be_nil
+      add_unique_constraint([:aaa, :bbb, :ccc], :name => :con3).must_be_nil
+      add_primary_key(:id).must_be_nil
+      add_foreign_key(:node_id, :nodes).must_be_nil
+      add_primary_key([:aaa, :bbb]).must_be_nil
+      add_foreign_key([:node_id, :prop_id], :nodes_props).must_be_nil
+      add_foreign_key([:node_id, :prop_id], :nodes_props, :name => :fkey).must_be_nil
+      drop_foreign_key(:node_id).must_be_nil
+      drop_foreign_key([:node_id, :prop_id]).must_be_nil
+      drop_foreign_key([:node_id, :prop_id], :name => :fkey).must_be_nil
     end
   end
   

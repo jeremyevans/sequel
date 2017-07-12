@@ -6,7 +6,7 @@ describe "DB#create_table" do
   end
   
   it "should accept the table name" do
-    @db.create_table(:cats) {}
+    @db.create_table(:cats){}.must_be_nil
     @db.sqls.must_equal ['CREATE TABLE cats ()']
   end
 
@@ -746,7 +746,7 @@ describe "DB#create_table!" do
   
   it "should create the table if it does not exist" do
     @db.define_singleton_method(:table_exists?){|a| false}
-    @db.create_table!(:cats){|*a|}
+    @db.create_table!(:cats){|*a|}.must_be_nil
     @db.sqls.must_equal ['CREATE TABLE cats ()']
   end
   
@@ -770,7 +770,7 @@ describe "DB#create_table?" do
   
   it "should not create the table if the table already exists" do
     @db.define_singleton_method(:table_exists?){|a| true}
-    @db.create_table?(:cats){|*a|}
+    @db.create_table?(:cats){|*a|}.must_be_nil
     @db.sqls.must_equal []
   end
   
@@ -804,7 +804,7 @@ describe "DB#create_join_table" do
   end
   
   it "should take a hash with foreign keys and table name values" do
-    @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.create_join_table(:cat_id=>:cats, :dog_id=>:dogs).must_be_nil
     @db.sqls.must_equal ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
   
@@ -853,7 +853,7 @@ describe "DB#create_join_table?" do
   
   it "should create the table if it does not already exist" do
     @db.define_singleton_method(:table_exists?){|a| false}
-    @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs).must_be_nil
     @db.sqls.must_equal ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
 
@@ -888,7 +888,7 @@ describe "DB#create_join_table!" do
   
   it "should drop the table first if it already exists" do
     @db.define_singleton_method(:table_exists?){|a| true}
-    @db.create_join_table!(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.create_join_table!(:cat_id=>:cats, :dog_id=>:dogs).must_be_nil
     @db.sqls.must_equal ['DROP TABLE cats_dogs', 'CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
 
@@ -911,7 +911,7 @@ describe "DB#drop_join_table" do
   end
   
   it "should take a hash with foreign keys and table name values and drop the table" do
-    @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.drop_join_table(:cat_id=>:cats, :dog_id=>:dogs).must_be_nil
     @db.sqls.must_equal ['DROP TABLE cats_dogs']
   end
   
@@ -944,7 +944,7 @@ describe "DB#drop_table" do
   end
 
   it "should generate a DROP TABLE statement" do
-    @db.drop_table :cats
+    @db.drop_table(:cats).must_be_nil
     @db.sqls.must_equal ['DROP TABLE cats']
   end
 
@@ -966,7 +966,7 @@ describe "DB#drop_table?" do
   
   it "should drop the table if it exists" do
     @db.define_singleton_method(:table_exists?){|a| true}
-    @db.drop_table?(:cats)
+    @db.drop_table?(:cats).must_be_nil
     @db.sqls.must_equal ["DROP TABLE cats"]
   end
   
@@ -1009,7 +1009,7 @@ describe "DB#alter_table" do
   it "should allow adding not null constraint via set_column_allow_null with false argument" do
     @db.alter_table(:cats) do
       set_column_allow_null :score, false
-    end
+    end.must_be_nil
     @db.sqls.must_equal ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
   end
   
@@ -1356,7 +1356,7 @@ end
 describe "Database#add_column" do
   it "should construct proper SQL" do
     db = Sequel.mock
-    db.add_column :test, :name, :text, :unique => true
+    db.add_column(:test, :name, :text, :unique => true).must_be_nil
     db.sqls.must_equal ['ALTER TABLE test ADD COLUMN name text UNIQUE']
   end
 end
@@ -1367,7 +1367,7 @@ describe "Database#drop_column" do
   end
   
   it "should construct proper SQL" do
-    @db.drop_column :test, :name
+    @db.drop_column(:test, :name).must_be_nil
     @db.sqls.must_equal ['ALTER TABLE test DROP COLUMN name']
   end
   
@@ -1383,7 +1383,7 @@ describe "Database#rename_column" do
   end
   
   it "should construct proper SQL" do
-    @db.rename_column :test, :abc, :def
+    @db.rename_column(:test, :abc, :def).must_be_nil
     @db.sqls.must_equal ['ALTER TABLE test RENAME COLUMN abc TO def']
   end
 end
@@ -1394,7 +1394,7 @@ describe "Database#set_column_type" do
   end
   
   it "should construct proper SQL" do
-    @db.set_column_type :test, :name, :integer
+    @db.set_column_type(:test, :name, :integer).must_be_nil
     @db.sqls.must_equal ['ALTER TABLE test ALTER COLUMN name TYPE integer']
   end
 end
@@ -1405,7 +1405,7 @@ describe "Database#set_column_default" do
   end
   
   it "should construct proper SQL" do
-    @db.set_column_default :test, :name, 'zyx'
+    @db.set_column_default(:test, :name, 'zyx').must_be_nil
     @db.sqls.must_equal ["ALTER TABLE test ALTER COLUMN name SET DEFAULT 'zyx'"]
   end
 end
@@ -1416,7 +1416,7 @@ describe "Database#add_index" do
   end
   
   it "should construct proper SQL" do
-    @db.add_index :test, :name, :unique => true
+    @db.add_index(:test, :name, :unique => true).must_be_nil
     @db.sqls.must_equal ['CREATE UNIQUE INDEX test_name_index ON test (name)']
   end
   
@@ -1432,7 +1432,7 @@ describe "Database#drop_index" do
   end
   
   it "should construct proper SQL" do
-    @db.drop_index :test, :name
+    @db.drop_index(:test, :name).must_be_nil
     @db.sqls.must_equal ['DROP INDEX test_name_index']
   end
   
@@ -1444,7 +1444,7 @@ describe "Database#drop_table" do
   end
   
   it "should construct proper SQL" do
-    @db.drop_table :test
+    @db.drop_table(:test).must_be_nil
     @db.sqls.must_equal ['DROP TABLE test']
   end
   
@@ -1460,7 +1460,7 @@ describe "Database#rename_table" do
   end
   
   it "should construct proper SQL" do
-    @db.rename_table :abc, :xyz
+    @db.rename_table(:abc, :xyz).must_be_nil
     @db.sqls.must_equal ['ALTER TABLE abc RENAME TO xyz']
   end
 end
@@ -1471,7 +1471,7 @@ describe "Database#create_view" do
   end
   
   it "should construct proper SQL with raw SQL" do
-    @db.create_view :test, "SELECT * FROM xyz"
+    @db.create_view(:test, "SELECT * FROM xyz").must_be_nil
     @db.sqls.must_equal ['CREATE VIEW test AS SELECT * FROM xyz']
     @db.create_view Sequel.identifier(:test), "SELECT * FROM xyz"
     @db.sqls.must_equal ['CREATE VIEW test AS SELECT * FROM xyz']
@@ -1523,7 +1523,7 @@ describe "Database#drop_view" do
   end
   
   with_symbol_splitting "should construct proper SQL for splittable symbols" do
-    @db.drop_view :sch__test
+    @db.drop_view(:sch__test).must_be_nil
     @db.sqls.must_equal ['DROP VIEW sch.test']
   end
 
