@@ -103,8 +103,7 @@ module Sequel
               f = f.distinct
             end
             literal_append(sql, f)
-          # SEQUEL5: Remove cubrid
-          when :mysql, :hsqldb, :cubrid, :h2
+          when :mysql, :hsqldb, :h2
             sql << "GROUP_CONCAT("
             if distinct
               sql << "DISTINCT "
