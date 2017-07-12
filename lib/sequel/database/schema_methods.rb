@@ -109,7 +109,7 @@ module Sequel
     # :no_index :: Set to true not to create the second index.
     # :no_primary_key :: Set to true to not create the primary key.
     def create_join_table(hash, options=OPTS)
-      keys = hash.keys.sort_by(&:to_s)
+      keys = hash.keys.sort
       create_table(join_table_name(hash, options), options) do
         keys.each do |key|
           v = hash[key]

@@ -492,9 +492,9 @@ module Sequel
       #   end
       def inherited(subclass)
         super
-        ivs = subclass.instance_variables.map(&:to_s)
+        ivs = subclass.instance_variables
         inherited_instance_variables.each do |iv, dup|
-          next if ivs.include?(iv.to_s)
+          next if ivs.include?(iv)
           if (sup_class_value = instance_variable_get(iv)) && dup
             sup_class_value = case dup
             when :dup
@@ -804,10 +804,10 @@ module Sequel
         clear_setter_methods_cache
         columns, bad_columns = columns.partition{|x| /\A[A-Za-z_][A-Za-z0-9_]*\z/.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
-        im = instance_methods.map(&:to_s)
+        im = instance_methods
         columns.each do |column|
           meth = "#{column}="
-          overridable_methods_module.module_eval("def #{column}; self[:#{column}] end", __FILE__, __LINE__) unless im.include?(column.to_s)
+          overridable_methods_module.module_eval("def #{column}; self[:#{column}] end", __FILE__, __LINE__) unless im.include?(column)
           overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end", __FILE__, __LINE__) unless im.include?(meth)
         end
       end

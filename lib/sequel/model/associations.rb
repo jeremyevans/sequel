@@ -3354,7 +3354,7 @@ END
         # Return a suitable hash key for any subhash +h+, which is an array of values by column order.
         # This is only used if the primary key cannot be used.
         def hkey(h)
-          h.sort_by{|x| x[0].to_s}
+          h.sort_by{|x| x[0]}
         end
 
         # Return the subhash for the master table by parsing the values out of the main hash +h+

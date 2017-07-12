@@ -202,7 +202,7 @@ module Sequel
         # If there is a limit on the nested attributes for this association,
         # make sure the length of the attributes_list is not greater than the limit.
         def nested_attributes_list_setter(meta, attributes_list)
-          attributes_list = attributes_list.sort_by(&:to_s).map{|k,v| v} if attributes_list.is_a?(Hash)
+          attributes_list = attributes_list.sort.map{|k,v| v} if attributes_list.is_a?(Hash)
           if (limit = meta[:limit]) && attributes_list.length > limit
             raise(Error, "number of nested attributes (#{attributes_list.length}) exceeds the limit (#{limit})")
           end
