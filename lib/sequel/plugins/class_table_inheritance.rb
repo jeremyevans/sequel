@@ -388,10 +388,15 @@ module Sequel
 
         # Update rows in all backing tables, using the columns in each table.
         def _update(columns)
+          return super if model.cti_models[0] == model
           model.cti_models.each do |m|
             h = {}
             m.cti_table_columns.each{|c| h[c] = columns[c] if columns.include?(c)}
-            cti_this(m).update(h) unless h.empty?
+            unless h.empty?
+              ds = cti_this(m)
+              n = ds.update(h)
+              raise(NoExistingObject, "Attempt to update object did not result in a single row modification (SQL: #{ds.update_sql(h)})") if require_modification && n != 1
+            end
           end
         end
       end

@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "class_table_inheritance plugin" do
   before do
-    @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    @db = Sequel.mock(:numrows=>1, :autoid=>proc{|sql| 1})
     def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
       {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
@@ -62,6 +62,10 @@ describe "class_table_inheritance plugin" do
     Manager.plugin :prepared_statements
     Manager.load(:id=>1, :kind=>'Manager', :num_staff=>2).save
     @db.sqls.must_equal ["UPDATE employees SET kind = 'Manager' WHERE (id = 1)", "UPDATE managers SET num_staff = 2 WHERE (id = 1)"]
+
+    Employee.plugin :prepared_statements
+    Employee.load(:id=>2, :kind=>'Employee').save
+    @db.sqls.must_equal ["UPDATE employees SET kind = 'Employee' WHERE (id = 2)"]
   end
 
   it "#cti_models.first should be the model that loaded the plugin" do
@@ -335,6 +339,12 @@ describe "class_table_inheritance plugin" do
     @db.sqls.must_equal ["UPDATE employees SET name = 'E' WHERE (id = 2)", "UPDATE managers SET num_staff = 2 WHERE (id = 2)", "UPDATE executives SET num_managers = 3 WHERE (id = 2)"]
   end
 
+  it "should raise error if one of the updates does not update a single row" do
+    @db.numrows = [1, 0]
+    proc{Ceo.load(:id=>2).update(:num_managers=>3, :num_staff=>2, :name=>'E')}.must_raise Sequel::NoExistingObject
+    @db.sqls.must_equal ["UPDATE employees SET name = 'E' WHERE (id = 2)", "UPDATE managers SET num_staff = 2 WHERE (id = 2)"]
+  end
+
   it "should handle many_to_one relationships correctly" do
     Manager.dataset = Manager.dataset.with_fetch(:id=>3, :name=>'E', :kind=>'Ceo', :num_managers=>3)
     Staff.load(:manager_id=>3).manager.must_equal Ceo.load(:id=>3, :name=>'E', :kind=>'Ceo', :num_managers=>3)
@@ -350,7 +360,7 @@ end
 
 describe "class_table_inheritance plugin without sti_key with :alias option" do
   before do
-    @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    @db = Sequel.mock(:numrows=>1, :autoid=>proc{|sql| 1})
     def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
       {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}]],
