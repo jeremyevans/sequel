@@ -314,6 +314,10 @@ describe "Database#dataset" do
     e.sql.must_equal 'SELECT * FROM miu'
   end
   
+  it "should provide a #from dataset that supports virtual row blocks" do
+    @db.from{a(b)}.sql.must_equal 'SELECT * FROM a(b)'
+  end
+  
   it "should provide a #select dataset" do
     d = @db.select(:a, :b, :c).from(:mau)
     d.must_be_kind_of(Sequel::Dataset)
