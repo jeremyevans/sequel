@@ -2040,13 +2040,9 @@ module Sequel
           return model.setter_methods
         end
 
-        if type.is_a?(Array)
-          type.map{|x| "#{x}="}
-        else
-          meths = methods.map(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
-          meths -= Array(primary_key).map{|x| "#{x}="} if type != :all && primary_key && model.restrict_primary_key?
-          meths
-        end
+        meths = methods.map(&:to_s).select{|l| l.end_with?('=')} - RESTRICTED_SETTER_METHODS
+        meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
+        meths
       end
 
       # The server/shard that the model object's dataset uses, or :default if the

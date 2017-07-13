@@ -107,6 +107,10 @@ module Sequel
         def setter_methods(type)
           if type == :default && model.allowed_columns
             model.setter_methods
+          elsif type.is_a?(Array)
+            type.map{|x| "#{x}="}
+          elsif type == :all && primary_key && model.restrict_primary_key?
+            super + Array(primary_key).map{|x| "#{x}="}
           else
             super
           end
