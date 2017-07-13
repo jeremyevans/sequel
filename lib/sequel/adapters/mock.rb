@@ -316,35 +316,14 @@ module Sequel
         cache_get(:_autoid) || @opts[:autoid]
       end
 
-      # Override the databases's autoid setting for this dataset
-      def autoid=(v)
-        Sequel::Deprecation.deprecate("Sequel::Mock::Dataset#autoid=", "Use with_autoid to return a modified dataset")
-        cache_set(:_autoid, nil)
-        @opts[:autoid] = v
-      end
-
       # The fetch setting for this dataset, if it has been overridden
       def _fetch
         cache_get(:_fetch) || @opts[:fetch]
       end
 
-      # Override the databases's fetch setting for this dataset
-      def _fetch=(v)
-        Sequel::Deprecation.deprecate("Sequel::Mock::Dataset#_fetch=", "Use with_fetch to return a modified dataset")
-        cache_set(:_fetch, nil)
-        @opts[:fetch] = v
-      end
-
       # The numrows setting for this dataset, if it has been overridden
       def numrows
         cache_get(:_numrows) || @opts[:numrows]
-      end
-
-      # Override the databases's numrows setting for this dataset
-      def numrows=(v)
-        Sequel::Deprecation.deprecate("Sequel::Mock::Dataset#_numrows=", "Use with_numrows to return a modified dataset")
-        cache_set(:_numrows, nil)
-        @opts[:numrows] = v
       end
 
       # If arguments are provided, use them to set the columns
