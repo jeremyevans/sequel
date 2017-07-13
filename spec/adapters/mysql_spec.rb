@@ -598,18 +598,15 @@ end
 if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and DB.adapter_scheme == :mysql
   describe "A MySQL database" do
     it "should accept a socket option" do
-      db = Sequel.mysql(DB.opts[:database], :host => 'localhost', :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
-      db.test_connection
+      Sequel.mysql(DB.opts[:database], :host => 'localhost', :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE, :keep_reference=>false)
     end
 
     it "should accept a socket option without host option" do
-      db = Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
-      db.test_connection
+      Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE, :keep_reference=>false)
     end
 
     it "should fail to connect with invalid socket" do
-      db = Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket =>'blah')
-      proc{db.test_connection}.must_raise Sequel::DatabaseConnectionError
+      proc{Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket =>'blah', :keep_reference=>false)}.must_raise Sequel::DatabaseConnectionError
     end
   end
 end
