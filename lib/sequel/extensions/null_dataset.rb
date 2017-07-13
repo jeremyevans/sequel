@@ -41,7 +41,7 @@ module Sequel
     module Nullifiable
       # Return a cloned nullified dataset.
       def nullify
-        clone.with_extend(NullDataset)
+        with_extend(NullDataset)
       end
     end
 
