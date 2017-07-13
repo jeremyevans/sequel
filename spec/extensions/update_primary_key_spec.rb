@@ -74,7 +74,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
 
   it "should work correctly when using the prepared_statements plugin" do
     @c.plugin :prepared_statements
-    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]])
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>4}], [{:a=>3}]])
     o = @c.first
     o.update(:a=>2, :b=>4)
     @c.all.must_equal [@c.load(:a=>2, :b=>4)]
@@ -82,7 +82,8 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     ["UPDATE a SET a = 2, b = 4 WHERE (a = 1)", "UPDATE a SET b = 4, a = 2 WHERE (a = 1)"].must_include(sqls.slice!(1))
     sqls.must_equal ["SELECT * FROM a LIMIT 1", "SELECT * FROM a"]
 
-    o.delete
+    @c.create(:a=>3)
+    DB.sqls.must_equal ["INSERT INTO a (a) VALUES (3)", "SELECT * FROM a WHERE a = 3"]
   end
 
   it "should clear the associations cache of non-many_to_one associations when changing the primary key" do
