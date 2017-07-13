@@ -89,7 +89,6 @@ The following options can be specified and are passed to the database's internal
                   connection object (and server argument if the callable accepts 2 arguments),
                   useful for customizations that you want to apply to all connections (default: nil).
 :max_connections :: The maximum size of the connection pool (default: 4 connections on most databases)
-:pool_sleep_time :: The number of seconds to sleep before trying to acquire a connection again (default: 0.001 seconds)
 :pool_timeout :: The number of seconds to wait if a connection cannot be acquired before raising an error (default: 5 seconds)
 
 == Adapter specific connection options

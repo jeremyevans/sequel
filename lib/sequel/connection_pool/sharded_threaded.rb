@@ -20,11 +20,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     @available_connections = {}
     @connections_to_remove = []
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
-
-    if USE_WAITER
-      @waiter = nil
-      @waiters = {}
-    end
+    remove_instance_variable(:@waiter)
+    @waiters = {}
 
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
@@ -40,7 +37,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
           @servers[server] = server
           @available_connections[server] = []
           @allocated[server] = {}
-          @waiters[server] = ConditionVariable.new if USE_WAITER
+          @waiters[server] = ConditionVariable.new
         end
       end
     end
@@ -150,7 +147,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       servers.each do |server|
         if @servers.include?(server)
           conns = disconnect_server_connections(server)
-          @waiters.delete(server) if USE_WAITER
+          @waiters.delete(server)
           @available_connections.delete(server)
           @allocated.delete(server)
           @servers.delete(server)
@@ -183,55 +180,37 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     end
   end
   
-  if USE_WAITER
-    # Assigns a connection to the supplied thread, if one
-    # is available. The calling code should NOT already have the mutex when
-    # calling this.
-    #
-    # This should return a connection is one is available within the timeout,
-    # or nil if a connection could not be acquired within the timeout.
-    def acquire(thread, server)
-      sync do
-        if conn = _acquire(thread, server)
-          return conn
-        end
+  # Assigns a connection to the supplied thread, if one
+  # is available. The calling code should NOT already have the mutex when
+  # calling this.
+  #
+  # This should return a connection is one is available within the timeout,
+  # or nil if a connection could not be acquired within the timeout.
+  def acquire(thread, server)
+    sync do
+      if conn = _acquire(thread, server)
+        return conn
+      end
 
-        time = Time.now
-        @waiters[server].wait(@mutex, @timeout)
+      time = Time.now
+      @waiters[server].wait(@mutex, @timeout)
+      Thread.pass
+
+      until conn = _acquire(thread, server)
+        deadline ||= time + @timeout
+        current_time = Time.now
+        raise_pool_timeout(current_time - time, server) if current_time > deadline
+        # :nocov:
+        # It's difficult to get to this point, it can only happen if there is a race condition
+        # where a connection cannot be acquired even after the thread is signalled by the condition
+        # variable that a connection is ready.
+        @waiters[server].wait(@mutex, deadline - current_time)
         Thread.pass
-
-        until conn = _acquire(thread, server)
-          deadline ||= time + @timeout
-          current_time = Time.now
-          raise_pool_timeout(current_time - time, server) if current_time > deadline
-          # :nocov:
-          # It's difficult to get to this point, it can only happen if there is a race condition
-          # where a connection cannot be acquired even after the thread is signalled by the condition
-          # variable that a connection is ready.
-          @waiters[server].wait(@mutex, deadline - current_time)
-          Thread.pass
-          # :nocov:
-        end
-
-        conn
+        # :nocov:
       end
-    end
-  else
-    # :nocov:
-    def acquire(thread, server)
-      unless conn = sync{_acquire(thread, server)}
-        time = Time.now
-        timeout = time + @timeout
-        sleep_time = @sleep_time
-        sleep sleep_time
-        until conn = sync{_acquire(thread, server)}
-          raise_pool_timeout(Time.now - time, server) if Time.now > timeout
-          sleep sleep_time
-        end
-      end
+
       conn
     end
-    # :nocov:
   end
 
   # Returns an available connection to the given server. If no connection is
@@ -246,10 +225,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # before calling this.
   def checkin_connection(server, conn)
     available_connections(server) << conn
-    if USE_WAITER
-      @waiters[server].signal
-      Thread.pass
-    end
+    @waiters[server].signal
+    Thread.pass
     conn
   end
 

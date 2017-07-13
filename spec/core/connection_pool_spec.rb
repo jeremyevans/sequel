@@ -1,5 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
-CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :pool_sleep_time=>0.001, :max_connections=>4}
+CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :max_connections=>4}
 require 'sequel/connection_pool/sharded_threaded'
 
 mock_db = lambda do |*a, &b|
@@ -33,10 +33,9 @@ end
 
 describe "ConnectionPool options" do
   it "should support string option values" do
-    cpool = Sequel::ConnectionPool.get_pool(mock_db.call, {:max_connections=>'5', :pool_timeout=>'3', :pool_sleep_time=>'0.01'})
+    cpool = Sequel::ConnectionPool.get_pool(mock_db.call, {:max_connections=>'5', :pool_timeout=>'3'})
     cpool.max_size.must_equal 5
     cpool.instance_variable_get(:@timeout).must_equal 3
-    cpool.instance_variable_get(:@sleep_time).must_equal 0.01 unless cpool.class::USE_WAITER
   end
 
   it "should raise an error unless size is positive" do
@@ -264,7 +263,7 @@ ThreadedConnectionPoolSpecs = shared_description do
   end
 
   it "should wait until a connection is available if all are checked out" do
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0.1, :pool_sleep_time=>0))
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0.1))
     q, q1 = Queue.new, Queue.new
     t = Thread.new do
       pool.hold do |c|
