@@ -172,8 +172,6 @@ module Sequel
         case arg
         when Sequel::SQL::Blob
           {:value=>arg, :type=>17, :format=>1}
-        when Sequel::SQLTime
-          literal(arg)
         when DateTime, Time
           literal(arg)
         else
