@@ -642,7 +642,7 @@ describe "Database schema modifiers" do
     @ds.order(:id).all.must_equal [{:id=>"10"}, {:id=>"20"}]
   end
 
-  cspecify "should set column types without modifying NULL/NOT NULL", [:jdbc, :db2], [:db2], :oracle, :derby do
+  cspecify "should set column types without modifying NULL/NOT NULL", [:jdbc, :db2], [:db2], :derby do
     @db.create_table!(:items){Integer :id, :null=>false, :default=>2}
     proc{@ds.insert(:id=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
     @db.alter_table(:items){set_column_type :id, String}

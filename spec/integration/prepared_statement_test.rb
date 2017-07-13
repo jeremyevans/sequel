@@ -348,11 +348,11 @@ describe "Bound Argument Types" do
     @ds.literal(@ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]).must_equal @ds.literal(fract_time)
   end
 
-  cspecify "should handle time type", [:jdbc, :sqlite], [:oracle] do
+  cspecify "should handle time type", [:jdbc, :sqlite] do
     @ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].must_equal @vs[:t]
   end
 
-  cspecify "should handle time type with fractional seconds", [:jdbc, :sqlite], :oracle do
+  cspecify "should handle time type with fractional seconds", [:jdbc, :sqlite] do
     fract_time = @vs[:t] + 0.5
     @ds.prepare(:update, :ps_time_up, :t=>:$x).call(:x=>fract_time)
     @ds.literal(@ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t]).must_equal @ds.literal(fract_time)
