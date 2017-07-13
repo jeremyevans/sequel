@@ -663,7 +663,7 @@ module Sequel
       def set_dataset(ds, opts=OPTS)
         inherited = opts[:inherited]
         @dataset = convert_input_dataset(ds)
-        @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
+        @require_modification = @dataset.provides_accurate_rows_matched? if require_modification.nil?
         if inherited
           self.simple_table = superclass.simple_table
           @columns = superclass.instance_variable_get(:@columns)
