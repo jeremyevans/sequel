@@ -563,9 +563,9 @@ module Sequel
         unless @plugins.include?(m)
           @plugins << m
           m.apply(self, *args, &block) if m.respond_to?(:apply)
-          extend(m::ClassMethods) if plugin_module_defined?(m, :ClassMethods)
-          include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
-          if plugin_module_defined?(m, :DatasetMethods)
+          extend(m::ClassMethods) if m.const_defined?(:ClassMethods, false)
+          include(m::InstanceMethods) if m.const_defined?(:InstanceMethods, false)
+          if m.const_defined?(:DatasetMethods, false)
             dataset_extend(m::DatasetMethods, :create_class_methods=>false)
           end
         end
@@ -950,10 +950,12 @@ module Sequel
         Sequel::Plugins.const_get(module_name)
       end
 
-      # Check if the plugin module +plugin+ defines the constant named by +submod+.
+      # :nocov:
       def plugin_module_defined?(plugin, submod)
+        Sequel::Deprecation.deprecate("Model.plugin_module_defined? (private method)", "Use const_defined?(submod, false)")
         plugin.const_defined?(submod, false)
       end
+      # :nocov:
   
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
