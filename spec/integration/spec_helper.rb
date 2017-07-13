@@ -62,3 +62,5 @@ if ENV['SEQUEL_FREEZE_DATABASE']
   DB.extension(:pg_array) if DB.database_type == :postgres
   DB.freeze
 end
+
+puts "running #{defined?(SEQUEL_ADAPTER_TEST) ? SEQUEL_ADAPTER_TEST : "integration (database type: #{DB.database_type})"} specs on #{RUBY_ENGINE} #{defined?(JRUBY_VERSION) ? JRUBY_VERSION : RUBY_VERSION} with #{DB.adapter_scheme} adapter"
