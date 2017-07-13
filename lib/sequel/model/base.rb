@@ -1697,7 +1697,6 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
-        sh = {:server=>this_server}
         called = false
         around_destroy do
           called = true
@@ -1780,7 +1779,6 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(opts)
-        sh = {:server=>this_server}
         pk = nil
         called_save = false
         called_cu = false

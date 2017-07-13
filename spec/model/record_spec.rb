@@ -88,12 +88,12 @@ describe "Model#save" do
   end
 
   it "should not use dataset's insert_select method if specific columns are selected" do
-    ds = @c.dataset = @c.dataset.select(:y).with_extend{def insert_select(*) raise; end}
+    @c.dataset = @c.dataset.select(:y).with_extend{def insert_select(*) raise; end}
     @c.new(:x => 1).save
   end
 
   it "should use dataset's insert_select method if the dataset uses returning, even if specific columns are selected" do
-    ds = @c.dataset = @c.dataset.select(:y).with_fetch(:y=>2).with_extend do
+    @c.dataset = @c.dataset.select(:y).with_fetch(:y=>2).with_extend do
       def supports_returning?(_) true end
       def supports_insert_select?; true end
       def insert_select(hash)
@@ -187,7 +187,7 @@ describe "Model#save" do
   end
   
   it "should mark all columns as not changed if this is a new record and insert_select was used" do
-    ds = @c.dataset = @c.dataset.with_extend{def insert_select(h) h.merge(:id=>1) end}
+    @c.dataset = @c.dataset.with_extend{def insert_select(h) h.merge(:id=>1) end}
     o = @c.new(:x => 1, :y => nil)
     o.x = 4
     o.changed_columns.must_equal [:x]

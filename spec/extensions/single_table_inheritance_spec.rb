@@ -106,10 +106,7 @@ describe Sequel::Model, "single table inheritance plugin" do
 
   it "should fallback to the main class if the sti_key field is empty or nil without calling constantize" do
     called = false
-    def StiTest.constantize(s)
-      called = true
-      Object
-    end
+    StiTest.define_singleton_method(:constantize){|_| called = true}
     StiTest.plugin :single_table_inheritance, :kind
     StiTest.dataset = StiTest.dataset.with_fetch([{:kind=>''}, {:kind=>nil}])
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTest]

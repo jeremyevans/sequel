@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 begin
   require 'active_model'
-rescue LoadError => e
+rescue LoadError
   warn "Skipping test of active_model plugin: can't load active_model"
 else
 describe "ActiveModel plugin" do

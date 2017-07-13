@@ -2217,7 +2217,7 @@ describe "Database#typecast_value" do
       rescue => e1
         begin
           raise RuntimeError
-        rescue => e2
+        rescue
           @db.send(:raise_error, e1)
         end
       end

@@ -95,7 +95,6 @@ module Sequel
         indexes = {}
         remove_indexes = []
         m = output_identifier_meth
-        im = input_identifier_meth
         schema, table = schema_and_table(table)
 
         table = Sequel::SQL::Identifier.new(table)

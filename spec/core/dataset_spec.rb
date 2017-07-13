@@ -2161,8 +2161,9 @@ describe "Dataset#count" do
   
   it "should work on a graphed_dataset" do
     ds = @dataset.with_extend{ def columns; [:a] end}
-    @dataset.graph(@dataset, [:a], :table_alias=>:test2).count.must_equal 1
-    @db.sqls.must_equal ['SELECT count(*) AS count FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1']
+    ds.graph(@dataset, [:a], :table_alias=>:test2).count.must_equal 1
+    @dataset.graph(ds, [:a], :table_alias=>:test2).count.must_equal 1
+    @db.sqls.must_equal(['SELECT count(*) AS count FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1'] * 2)
   end
 
   it "should not cache the columns value" do
@@ -5365,7 +5366,6 @@ describe "Dataset#where_single_value"  do
 
   it "should return single value" do
     5.times do
-      a = []
       @ds.only_id.where_single_value(:id=>1).must_equal 1
       @ds.db.sqls.must_equal ['SELECT id FROM items WHERE (id = 1) LIMIT 1']
     end

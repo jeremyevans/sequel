@@ -194,7 +194,7 @@ module Sequel
   # For tables, these parts are the schema, table, and alias.
   def self.split_symbol(sym)
     unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym]}
-      if split = split_symbols?
+      if split_symbols?
         v = case s = sym.to_s
         when /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/
           [$1.freeze, $2.freeze, $3.freeze].freeze

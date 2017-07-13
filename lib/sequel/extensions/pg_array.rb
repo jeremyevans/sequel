@@ -87,7 +87,6 @@ module Sequel
         def self.extended(db)
           db.instance_eval do
             @pg_array_schema_types ||= {}
-            procs = conversion_procs
             register_array_type('timestamp without time zone', :oid=>1115, :scalar_oid=>1114, :type_symbol=>:datetime)
             register_array_type('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime)
 

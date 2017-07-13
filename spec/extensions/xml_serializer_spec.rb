@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 begin
   require 'nokogiri'
-rescue LoadError => e
+rescue LoadError
   warn "Skipping test of xml_serializer plugin: can't load nokogiri"
 else
 describe "Sequel::Plugins::XmlSerializer" do

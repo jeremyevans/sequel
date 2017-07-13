@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 asd = begin
   require 'active_support/duration'
   true
-rescue LoadError => e
+rescue LoadError
   warn "Skipping some tests of date_arithmetic extension: can't load active_support/duration"
   false
 end

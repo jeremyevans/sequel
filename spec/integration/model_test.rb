@@ -178,7 +178,6 @@ describe "Sequel::Model with no existing table" do
   it "should not raise an error when setting the dataset" do
     db = DB
     db.drop_table?(:items)
-    c1 = Sequel::Model(db);
     c = Class.new(Sequel::Model)
     proc{c.set_dataset(db[:items])}.must_raise Sequel::Error
     db.transaction do

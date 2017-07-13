@@ -191,7 +191,6 @@ describe Sequel::Model::DatasetMethods, "#where_single_value"  do
 
   it "should return single value" do
     5.times do
-      a = []
       @c.only_id.where_single_value(:id=>1).must_equal 1
       @c.db.sqls.must_equal ['SELECT id FROM items WHERE (id = 1) LIMIT 1']
     end
