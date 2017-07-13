@@ -27,7 +27,7 @@
 module Sequel
   class Dataset
     module ImplicitSubquery
-      exceptions = [:and, :add_graph_aliases, :filter, :from, :from_self, :naked, :or, :order_more,
+      exceptions = [:add_graph_aliases, :filter, :from, :from_self, :naked, :or, :order_more,
                     :qualify, :reverse, :reverse_order, :select_all, :select_more, :server,
                     :set_graph_aliases, :unfiltered, :ungraphed, :ungrouped, :unlimited, :unordered,
                     :with_sql]
