@@ -321,6 +321,7 @@ module Sequel
 
       # Override the databases's autoid setting for this dataset
       def autoid=(v)
+        Sequel::Deprecation.deprecate("Sequel::Mock::Dataset#autoid=", "Use with_autoid to return a modified dataset")
         cache_set(:_autoid, nil)
         @opts[:autoid] = v
       end
@@ -332,6 +333,7 @@ module Sequel
 
       # Override the databases's fetch setting for this dataset
       def _fetch=(v)
+        Sequel::Deprecation.deprecate("Sequel::Mock::Dataset#_fetch=", "Use with_fetch to return a modified dataset")
         cache_set(:_fetch, nil)
         @opts[:fetch] = v
       end
@@ -343,6 +345,7 @@ module Sequel
 
       # Override the databases's numrows setting for this dataset
       def numrows=(v)
+        Sequel::Deprecation.deprecate("Sequel::Mock::Dataset#_numrows=", "Use with_numrows to return a modified dataset")
         cache_set(:_numrows, nil)
         @opts[:numrows] = v
       end
