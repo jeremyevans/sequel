@@ -166,7 +166,7 @@ module Sequel
       #   end
       def def_Model(mod)
         model = self
-        (class << mod; self; end).send(:define_method, :Model) do |source|
+        mod.define_singleton_method(:Model) do |source|
           model.Model(source)
         end
       end
@@ -821,7 +821,7 @@ module Sequel
         if meth.to_s =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/
           instance_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
         else
-          (class << self; self; end).send(:define_method, meth){|*args, &block| dataset.public_send(meth, *args, &block)}
+          define_singleton_method(meth){|*args, &block| dataset.public_send(meth, *args, &block)}
         end
       end
 

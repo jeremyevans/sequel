@@ -134,7 +134,7 @@ describe "Sequel::Plugins::Timestamps" do
 
   it "should set update timestamp to same timestamp as create timestamp when setting creating timestamp" do
     i = 1
-    (class << (Sequel.datetime_class); self end).send(:define_method, :now){"2009-08-0#{i+=1}"}
+    Sequel.datetime_class.define_singleton_method(:now){"2009-08-0#{i+=1}"}
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create
     sqls = @c.db.sqls
@@ -147,7 +147,7 @@ describe "Sequel::Plugins::Timestamps" do
 
   it "should set update timestamp when using not overriding create timestamp" do
     i = 1
-    (class << (Sequel.datetime_class); self end).send(:define_method, :now){"2009-08-0#{i+=1}"}
+    Sequel.datetime_class.define_singleton_method(:now){"2009-08-0#{i+=1}"}
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create(:created_at=>'2009-08-10')
     sqls = @c.db.sqls

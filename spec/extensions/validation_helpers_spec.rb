@@ -19,9 +19,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '1_1'
     @m.must_be :valid?
     o = String.new
-    class << o
-      undef_method :blank?
-    end
+    o.singleton_class.send(:undef_method, :blank?)
     @m.value = o
     @m.must_be :valid?
     o = Object.new

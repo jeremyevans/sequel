@@ -1371,7 +1371,7 @@ describe "A Database adapter with a scheme" do
     Sequel.send(:def_adapter_method, :ccc)
     Sequel.ccc('db', :host=>'localhost', &p).must_equal returnValue
     @ccc::DISCONNECTS.must_equal [z, y, x]
-    class << Sequel; remove_method(:ccc) end
+    Sequel.singleton_class.send(:remove_method, :ccc)
   end
 
   it "should be accessible through Sequel.<adapter>" do
@@ -1396,7 +1396,7 @@ describe "A Database adapter with a scheme" do
     c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
     c.must_be_kind_of(@ccc)
     c.opts.values_at(:adapter, :database, :host, :adapter_class).must_equal [:ccc, 'mydb', 'localhost', @ccc]
-    class << Sequel; remove_method(:ccc) end
+    Sequel.singleton_class.send(:remove_method, :ccc)
   end
   
   it "should be accessible through Sequel.connect with options" do

@@ -307,7 +307,7 @@ describe "Sequel::Model.plugin" do
   it "should try loading plugins from sequel/plugins/:plugin" do
     a = []
     m = Module.new
-    (class << @c; self end).send(:define_method, :require) do |b|
+    @c.define_singleton_method(:require) do |b|
       a << b
       Sequel::Plugins.const_set(:SomethingOrOther, m)
     end

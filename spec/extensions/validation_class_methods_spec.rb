@@ -197,7 +197,7 @@ describe "Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator" do
     @testit = testit = []
     
     @c = model_class.call Sequel::Model do
-      (class << self; self end).send(:define_method, :validates_blah) do
+      singleton_class.send(:define_method, :validates_blah) do
         testit << 1324
       end
     end

@@ -154,7 +154,7 @@ module Sequel
           end
 
           @finder_loaders[meth_name] = loader_proc
-          mod = opts[:mod] || (class << self; self; end)
+          mod = opts[:mod] || singleton_class
           if prepare
             def_prepare_method(mod, meth_name)
           else

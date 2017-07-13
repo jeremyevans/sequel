@@ -8,14 +8,14 @@ module Sequel
   module JDBC
     Sequel.synchronize do
       DATABASE_SETUP[:db2] = proc do |db|
-        (class << db; self; end).class_eval do
+        db.singleton_class.class_eval do
           alias jdbc_schema_parse_table schema_parse_table
           alias jdbc_tables tables
           alias jdbc_views views
           alias jdbc_indexes indexes
-        end
-        db.extend(Sequel::JDBC::DB2::DatabaseMethods)
-        (class << db; self; end).class_eval do
+
+          include Sequel::JDBC::DB2::DatabaseMethods
+
           alias schema_parse_table jdbc_schema_parse_table
           alias tables jdbc_tables
           alias views jdbc_views

@@ -4,12 +4,12 @@ require 'sequel/connection_pool/sharded_threaded'
 
 mock_db = lambda do |*a, &b|
   db = Sequel.mock
-  (class << db; self end).send(:define_method, :connect){|c| b.arity == 1 ? b.call(c) : b.call} if b
+  db.define_singleton_method(:connect){|c| b.arity == 1 ? b.call(c) : b.call} if b
   if b2 = a.shift
-    (class << db; self end).send(:define_method, :disconnect_connection){|c| b2.arity == 1 ? b2.call(c) : b2.call}
+    db.define_singleton_method(:disconnect_connection){|c| b2.arity == 1 ? b2.call(c) : b2.call}
   end
   # Work around JRuby Issue #3854
-  (class << db; self end).send(:public, :connect, :disconnect_connection)
+  db.singleton_class.send(:public, :connect, :disconnect_connection)
   db
 end
 
