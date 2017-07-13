@@ -17,20 +17,8 @@ module Sequel
     #   DB[:table].active.with_id_and_name.by_id
     #   # SELECT id, name FROM table WHERE active ORDER BY id
     class DatasetModule < ::Module
-      %w'where exclude exclude_having having'.map(&:to_sym).each do |meth|
-        define_method(meth) do |name, *args, &block|
-          if block || args.flatten.any?{|arg| arg.is_a?(Proc)}
-            define_method(name){public_send(meth, *args, &block)}
-          else
-            key = :"_#{meth}_#{name}_ds"
-            define_method(name) do
-              cached_dataset(key){public_send(meth, *args)}
-            end
-          end
-        end
-      end
-
       meths = (<<-METHS).split.map(&:to_sym)
+        where exclude exclude_having having
         distinct grep group group_and_count group_append 
         limit offset order order_append order_prepend 
         select select_all select_append select_group server
