@@ -1,5 +1,7 @@
 === master
 
+* Deprecate loading plugins by requiring sequel_#{plugin} (jeremyevans)
+
 * Add Model.sti_class_from_sti_key in the single_table_inheritance plugin to get the appropriate class to use (Aryk) (#1396)
 
 * Make Sequel::Error#cause use #wrapped_exception if it exists on ruby 2.1+ (jeremyevans)

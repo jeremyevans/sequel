@@ -1249,6 +1249,7 @@ module Sequel
           rescue LoadError => e
             begin
               require "sequel_#{plugin}"
+              Sequel::Deprecation.deprecate("requiring 'sequel_#{plugin}' to load a plugin", "Update the #{plugin} plugin to be required via 'sequel/plugins/#{plugin}'")
             rescue LoadError => e2
               e.message << "; #{e2.message}"
               raise e

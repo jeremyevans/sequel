@@ -295,4 +295,38 @@ describe Sequel::Plugins do
     @c.foo.must_equal 1
   end
 end
+
+describe "Sequel::Model.plugin" do
+  before do
+    @c = Class.new(Sequel::Model)
+  end
+  after do
+    Sequel::Plugins.send(:remove_const, :SomethingOrOther)
+  end
+
+  it "should try loading plugins from sequel/plugins/:plugin" do
+    a = []
+    m = Module.new
+    (class << @c; self end).send(:define_method, :require) do |b|
+      a << b
+      Sequel::Plugins.const_set(:SomethingOrOther, m)
+    end
+    @c.plugin :something_or_other
+    @c.plugins.must_include m
+    a.must_equal ['sequel/plugins/something_or_other']
+  end
   
+  deprecated "should try loading plugins from sequel_plugin" do
+    proc{@c.plugin :something_or_other}.must_raise(LoadError)
+    a = []
+    m = Module.new
+    (class << @c; self end).send(:define_method, :require) do |b|
+      a << b
+      raise LoadError if b == 'sequel/plugins/something_or_other'
+      Sequel::Plugins.const_set(:SomethingOrOther, m)
+    end
+    @c.plugin :something_or_other
+    @c.plugins.must_include m
+    a.must_equal ['sequel/plugins/something_or_other', 'sequel_something_or_other']
+  end
+end
