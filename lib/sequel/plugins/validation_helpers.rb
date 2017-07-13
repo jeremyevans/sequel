@@ -122,7 +122,7 @@ module Sequel
 
         # Check that the attribute values length is in the specified range.
         def validates_length_range(range, atts, opts=OPTS)
-          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) if v.nil? || !range.public_send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
+          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) if v.nil? || !range.cover?(v.length)}
         end
     
         # Check that the attribute values are not longer than the given max length.
