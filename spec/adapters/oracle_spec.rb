@@ -2,6 +2,10 @@ SEQUEL_ADAPTER_TEST = :oracle
 
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
+unless DB.opts[:autosequence]
+  warn "Running oracle adapter specs without :autosequence Database option results in many errors, use the :autosequence Database option when testing"
+end
+
 describe "An Oracle database" do
   before(:all) do
     DB.create_table!(:items) do
