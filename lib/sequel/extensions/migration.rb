@@ -41,7 +41,7 @@ module Sequel
     # direction.
     def self.apply(db, direction)
       raise(ArgumentError, "Invalid migration direction specified (#{direction.inspect})") unless [:up, :down].include?(direction)
-      new(db).send(direction)
+      new(db).public_send(direction)
     end
 
     # Returns the list of Migration descendants.
@@ -65,6 +65,7 @@ module Sequel
     
     # Intercepts method calls intended for the database and sends them along.
     def method_missing(method_sym, *args, &block)
+      # Allow calling private methods for backwards compatibility
       @db.send(method_sym, *args, &block)
     end
 
@@ -102,7 +103,7 @@ module Sequel
     # instance using instance_eval.
     def apply(db, direction)
       raise(ArgumentError, "Invalid migration direction specified (#{direction.inspect})") unless [:up, :down].include?(direction)
-      if prok = send(direction)
+      if prok = public_send(direction)
         db.instance_eval(&prok)
       end
     end
@@ -180,12 +181,9 @@ module Sequel
         actions = @actions.reverse
         Proc.new do
           actions.each do |a|
-            if a.last.is_a?(Proc)
-              pr = a.pop
-              send(*a, &pr)
-            else
-              send(*a)
-            end
+            pr = a.last.is_a?(Proc) ? a.pop : nil
+            # Allow calling private methods as the reversing methods are private
+            send(*a, &pr)
           end
         end
       end
@@ -235,6 +233,7 @@ module Sequel
     def reverse(&block)
       instance_eval(&block)
       actions = @actions.reverse
+      # Allow calling private methods as the reversing methods are private
       Proc.new{actions.each{|a| send(*a)}}
     end
 

@@ -95,7 +95,7 @@ module Sequel
         # the beginning of the instance hook's array.  For after hooks, add it
         # to the end.
         def add_instance_hook(hook, &block)
-          instance_hooks(hook).send(hook.to_s.start_with?('before') ? :unshift : :push, block)
+          instance_hooks(hook).public_send(hook.to_s.start_with?('before') ? :unshift : :push, block)
         end
         
         # An array of instance level hook blocks for the given hook type.

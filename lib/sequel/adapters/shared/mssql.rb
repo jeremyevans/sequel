@@ -69,7 +69,7 @@ module Sequel
           method = :each_with_index
         end
 
-        args.send(method) do |v, i|
+        args.public_send(method) do |v, i|
           if named_args
             k = v
             v, type, select = i

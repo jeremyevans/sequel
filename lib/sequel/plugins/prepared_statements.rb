@@ -47,7 +47,7 @@ module Sequel
           meth = type == :insert_select ? :returning : :select
           s = ds.opts[meth]
           if f && f.length == 1 && !ds.opts[:join] && (!s || s.empty?)
-            ds = ds.send(meth, *columns.map{|c| Sequel.identifier(c)})
+            ds = ds.public_send(meth, *columns.map{|c| Sequel.identifier(c)})
           end 
           
           prepare_statement(ds, type, vals)

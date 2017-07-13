@@ -116,7 +116,7 @@ module Sequel
                 if (o = compositions[name]).nil?
                   setter_meths.each{|sm| set_column_value(sm, nil)}
                 else
-                  setters.each{|sm, cm| set_column_value(sm, o.send(cm))}
+                  setters.each{|sm, cm| set_column_value(sm, o.public_send(cm))}
                 end
               end
             end

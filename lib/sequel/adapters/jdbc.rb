@@ -524,7 +524,7 @@ module Sequel
       # Yield the metadata for this database
       def metadata(*args, &block)
         synchronize do |c|
-          result = c.getMetaData.send(*args)
+          result = c.getMetaData.public_send(*args)
           begin
             metadata_dataset.send(:process_result_set, result, &block)
           ensure

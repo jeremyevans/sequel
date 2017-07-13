@@ -160,14 +160,14 @@ module Sequel
       # Convert the identifier to the version used in the database via
       # identifier_input_method.
       def input_identifier(v)
-        (i = identifier_input_method) ? v.to_s.send(i) : v.to_s
+        (i = identifier_input_method) ? v.to_s.public_send(i) : v.to_s
       end
 
       # Modify the identifier returned from the database based on the
       # identifier_output_method.
       def output_identifier(v)
         v = 'untitled' if v == ''
-        (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
+        (i = identifier_output_method) ? v.to_s.public_send(i).to_sym : v.to_sym
       end
 
       def non_sql_option?(key)

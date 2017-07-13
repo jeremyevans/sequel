@@ -149,7 +149,7 @@ module Sequel
           when :types
             @auto_validate_types = false
           else
-            send("auto_validate_#{type}_columns").clear
+            public_send("auto_validate_#{type}_columns").clear
           end
         end
 

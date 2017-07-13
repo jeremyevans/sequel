@@ -34,7 +34,7 @@ module Sequel
       def create(hour, minute, second, usec = 0)
         t = date
         meth = Sequel.application_timezone == :utc ? :utc : :local
-        send(meth, t.year, t.month, t.day, hour, minute, second, usec)
+        public_send(meth, t.year, t.month, t.day, hour, minute, second, usec)
       end
     end
 
@@ -110,12 +110,12 @@ module Sequel
       # Returns true if the receiver is the same expression as the
       # the +other+ expression.
       def eql?(other)
-        other.is_a?(self.class) && !self.class.comparison_attrs.find{|a| send(a) != other.send(a)}
+        other.is_a?(self.class) && !self.class.comparison_attrs.find{|a| public_send(a) != other.public_send(a)}
       end
 
       # Make sure that the hash value is the same if the attributes are the same.
       def hash
-        ([self.class] + self.class.comparison_attrs.map{|x| send(x)}).hash
+        ([self.class] + self.class.comparison_attrs.map{|x| public_send(x)}).hash
       end
 
       # Show the class name and instance variables for the object.

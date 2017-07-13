@@ -432,6 +432,7 @@ module Sequel
     def alter_table_op_sql(table, op)
       meth = "alter_table_#{op[:op]}_sql"
       if respond_to?(meth, true)
+        # Allow calling private methods as alter table op sql methods are private
         send(meth, table, op)
       else
         raise Error, "Unsupported ALTER TABLE operation: #{op[:op]}"
@@ -927,6 +928,7 @@ module Sequel
     def type_literal_generic(column)
       meth = "type_literal_generic_#{column[:type].name.to_s.downcase}"
       if respond_to?(meth, true)
+        # Allow calling private methods as per type literal generic methods are private
         send(meth, column)
       else
         raise Error, "Unsupported ruby class used as database type: #{column[:type]}"

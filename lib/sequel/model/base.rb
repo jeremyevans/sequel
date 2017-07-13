@@ -821,7 +821,7 @@ module Sequel
         if meth.to_s =~ /\A[A-Za-z_][A-Za-z0-9_]*\z/
           instance_eval("def #{meth}(*args, &block); dataset.#{meth}(*args, &block) end", __FILE__, __LINE__)
         else
-          (class << self; self; end).send(:define_method, meth){|*args, &block| dataset.send(meth, *args, &block)}
+          (class << self; self; end).send(:define_method, meth){|*args, &block| dataset.public_send(meth, *args, &block)}
         end
       end
 
@@ -1050,7 +1050,7 @@ module Sequel
       # Define instance method(s) that calls class method(s) of the
       # same name. Replaces the construct:
       #   
-      #   define_method(meth){self.class.send(meth)}
+      #   define_method(meth){self.class.public_send(meth)}
       [:columns, :db, :primary_key, :db_schema].each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
 
       # Define instance method(s) that calls class method(s) of the

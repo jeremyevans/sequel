@@ -105,7 +105,7 @@ module Sequel
     
         # Check attribute value(s) is included in the given set.
         def validates_includes(set, atts, opts=OPTS)
-          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.send(set.respond_to?(:cover?) ? :cover? : :include?, v)}
+          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.public_send(set.respond_to?(:cover?) ? :cover? : :include?, v)}
         end
     
         # Check attribute value(s) string representation is a valid integer.
@@ -122,7 +122,7 @@ module Sequel
 
         # Check that the attribute values length is in the specified range.
         def validates_length_range(range, atts, opts=OPTS)
-          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) if v.nil? || !range.send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
+          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) if v.nil? || !range.public_send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
         end
     
         # Check that the attribute values are not longer than the given max length.
@@ -164,7 +164,7 @@ module Sequel
         # Check attribute value(s) against a specified value and operation, e.g.
         # validates_operator(:>, 3, :value) validates that value > 3.
         def validates_operator(operator, rhs, atts, opts=OPTS)
-          validatable_attributes_for_type(:operator, atts, opts){|a,v,m| validation_error_message(m, operator, rhs) if v.nil? || !v.send(operator, rhs)}
+          validatable_attributes_for_type(:operator, atts, opts){|a,v,m| validation_error_message(m, operator, rhs) if v.nil? || !v.public_send(operator, rhs)}
         end
 
         # Validates for all of the model columns (or just the given columns)
@@ -233,7 +233,7 @@ module Sequel
         #
         #   validates_unique :column, :where=>(proc do |ds, obj, cols|
         #     ds.where(cols.map do |c|
-        #       v = obj.send(c)
+        #       v = obj.public_send(c)
         #       v = v.downcase if v
         #       [Sequel.function(:lower, c), v]
         #     end)

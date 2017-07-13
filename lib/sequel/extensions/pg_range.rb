@@ -354,9 +354,9 @@ module Sequel
       def cover?(value)
         return false if empty?
         b = self.begin
-        return false if b && b.send(exclude_begin? ? :>= : :>, value)
+        return false if b && b.public_send(exclude_begin? ? :>= : :>, value)
         e = self.end
-        return false if e && e.send(exclude_end? ? :<= : :<, value)
+        return false if e && e.public_send(exclude_end? ? :<= : :<, value)
         true
       end
 

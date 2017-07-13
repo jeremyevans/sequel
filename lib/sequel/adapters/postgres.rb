@@ -762,7 +762,7 @@ module Sequel
         cursor_name = quote_identifier(cursor[:cursor_name] || 'sequel_cursor')
         rows_per_fetch = cursor[:rows_per_fetch].to_i
 
-        db.send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 
+        db.public_send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 
           begin
             execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITH#{'OUT' unless hold} HOLD FOR #{sql}", server_opts)
             rows_per_fetch = 1000 if rows_per_fetch <= 0

@@ -127,13 +127,13 @@ module Sequel
           model.touched_associations.each do |assoc, column|
             r = model.association_reflection(assoc)
             next unless r.can_have_associated_objects?(self)
-            ds = send(r.dataset_method)
+            ds = public_send(r.dataset_method)
 
             if ds.send(:joined_dataset?)
               # Can't update all values at once, so update each instance individually.
               # Instead if doing a simple save, update via the instance's dataset,
               # to avoid going into an infinite loop in some cases.
-              send(assoc).each{|x| x.this.update(column=>touch_association_value)}
+              public_send(assoc).each{|x| x.this.update(column=>touch_association_value)}
             else
               # Update all values at once for performance reasons.
               ds.update(column=>touch_association_value)

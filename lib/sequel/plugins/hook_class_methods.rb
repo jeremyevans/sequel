@@ -72,7 +72,8 @@ module Sequel
         def add_hook(hook, tag, &block)
           unless block
             (raise Error, 'No hook method specified') unless tag
-            block = proc {send tag}
+            # Allow calling private hook methods
+            block = proc {send(tag)}
           end
           h = @hooks[hook]
           if tag && (old = h.find{|x| x[0] == tag})

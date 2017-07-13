@@ -46,6 +46,7 @@ module Sequel
     def self.after_set_dataset(mod, meth)
       mod.send(:define_method, :set_dataset) do |*a|
         r = super(*a)
+        # Allow calling private class methods as methods this specifies are usually private
         send(meth)
         r
       end

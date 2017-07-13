@@ -768,21 +768,21 @@ module Sequel
         return naked.as_hash(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
-            send(meth){|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
+            public_send(meth){|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
           else
-            send(meth){|r| h[r[key_column]] = r.values_at(*value_column)}
+            public_send(meth){|r| h[r[key_column]] = r.values_at(*value_column)}
           end
         else
           if key_column.is_a?(Array)
-            send(meth){|r| h[r.values_at(*key_column)] = r[value_column]}
+            public_send(meth){|r| h[r.values_at(*key_column)] = r[value_column]}
           else
-            send(meth){|r| h[r[key_column]] = r[value_column]}
+            public_send(meth){|r| h[r[key_column]] = r[value_column]}
           end
         end
       elsif key_column.is_a?(Array)
-        send(meth){|r| h[key_column.map{|k| r[k]}] = r}
+        public_send(meth){|r| h[key_column.map{|k| r[k]}] = r}
       else
-        send(meth){|r| h[r[key_column]] = r}
+        public_send(meth){|r| h[r[key_column]] = r}
       end
       h
     end
@@ -823,21 +823,21 @@ module Sequel
         return naked.to_hash_groups(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
-            send(meth){|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
+            public_send(meth){|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
           else
-            send(meth){|r| (h[r[key_column]] ||= []) << r.values_at(*value_column)}
+            public_send(meth){|r| (h[r[key_column]] ||= []) << r.values_at(*value_column)}
           end
         else
           if key_column.is_a?(Array)
-            send(meth){|r| (h[r.values_at(*key_column)] ||= []) << r[value_column]}
+            public_send(meth){|r| (h[r.values_at(*key_column)] ||= []) << r[value_column]}
           else
-            send(meth){|r| (h[r[key_column]] ||= []) << r[value_column]}
+            public_send(meth){|r| (h[r[key_column]] ||= []) << r[value_column]}
           end
         end
       elsif key_column.is_a?(Array)
-        send(meth){|r| (h[key_column.map{|k| r[k]}] ||= []) << r}
+        public_send(meth){|r| (h[key_column.map{|k| r[k]}] ||= []) << r}
       else
-        send(meth){|r| (h[r[key_column]] ||= []) << r}
+        public_send(meth){|r| (h[r[key_column]] ||= []) << r}
       end
       h
     end
@@ -1020,7 +1020,7 @@ module Sequel
     # Internals of +select_hash+ and +select_hash_groups+
     def _select_hash(meth, key_column, value_column, opts=OPTS)
       select(*(key_column.is_a?(Array) ? key_column : [key_column]) + (value_column.is_a?(Array) ? value_column : [value_column])).
-        send(meth, hash_key_symbols(key_column), hash_key_symbols(value_column), opts)
+        public_send(meth, hash_key_symbols(key_column), hash_key_symbols(value_column), opts)
     end
     
     # Internals of +select_map+ and +select_order_map+

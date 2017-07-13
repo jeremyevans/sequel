@@ -128,7 +128,7 @@ module Sequel
               ds = if block
                 model.instance_exec(*args, &block)
               else
-                model.send(meth, *args)
+                model.public_send(meth, *args)
               end
               ds = ds.limit(1) if limit1
               model_name = model.name
@@ -144,7 +144,7 @@ module Sequel
               n = argn.call(model)
               block ||= lambda do |pl, model2|
                 args = (0...n).map{pl.arg}
-                ds = model2.send(meth, *args)
+                ds = model2.public_send(meth, *args)
                 ds = ds.limit(1) if limit1
                 ds
               end
@@ -197,7 +197,7 @@ module Sequel
         # Define a finder method in the given module with the given method name that
         # load rows using the finder with the given name.
         def def_finder_method(mod, meth, type)
-          mod.send(:define_method, meth){|*args, &block| finder_for(meth).send(type, *args, &block)}
+          mod.send(:define_method, meth){|*args, &block| finder_for(meth).public_send(type, *args, &block)}
         end
 
         # Define a prepared_finder method in the given module that will call the associated prepared

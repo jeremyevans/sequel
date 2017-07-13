@@ -1122,7 +1122,7 @@ module Sequel
     # dataset methods that modify the SQL to work.
     def with_sql(sql, *args)
       if sql.is_a?(Symbol)
-        sql = send(sql, *args)
+        sql = public_send(sql, *args)
       else
         sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
       end

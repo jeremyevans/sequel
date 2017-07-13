@@ -88,7 +88,7 @@ module Sequel
               rpk = opts.associated_class.primary_key
               opts.associated_dataset.
                 naked.where(cond).
-                select_map(Sequel.send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
+                select_map(Sequel.public_send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
             end
           elsif clpk
             lambda do
@@ -104,7 +104,7 @@ module Sequel
           if !opts[:read_only] && !join_associated_table
             opts[:pks_setter] = lambda do |pks|
               if pks.empty?
-                send(opts.remove_all_method)
+                public_send(opts.remove_all_method)
               else
                 checked_transaction do
                   if clpk
@@ -139,13 +139,13 @@ module Sequel
           key = opts[:key]
 
           opts[:pks_getter] = lambda do
-            send(opts.dataset_method).select_map(opts.associated_class.primary_key)
+            public_send(opts.dataset_method).select_map(opts.associated_class.primary_key)
           end
 
           unless opts[:read_only]
             opts[:pks_setter] = lambda do |pks|
               if pks.empty?
-                send(opts.remove_all_method)
+                public_send(opts.remove_all_method)
               else
                 primary_key = opts.associated_class.primary_key
                 pkh = {primary_key=>pks}
@@ -163,7 +163,7 @@ module Sequel
                 end
 
                 checked_transaction do
-                  ds = send(opts.dataset_method)
+                  ds = public_send(opts.dataset_method)
                   ds.unfiltered.where(pkh).update(h)
                   ds.exclude(pkh).update(nh)
                 end

@@ -35,7 +35,7 @@ module Sequel
       (Dataset::QUERY_METHODS - Dataset::JOIN_METHODS - exceptions + additions).each do |meth|
         define_method(meth) do |*a, &b|
           if opts[:sql]
-            from_self.send(meth, *a, &b)
+            from_self.public_send(meth, *a, &b)
           else
             super(*a, &b)
           end

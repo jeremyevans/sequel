@@ -50,7 +50,7 @@ module Sequel
         if value.is_a?(::Amalgalite::Blob)
           SQL::Blob.new(value.to_s)
         elsif value.is_a?(String) && declared_type
-          (meth = self.class.sql_to_method(declared_type.downcase)) ? send(meth, value) : value
+          (meth = self.class.sql_to_method(declared_type.downcase)) ? public_send(meth, value) : value
         else
           super
         end

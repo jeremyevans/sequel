@@ -59,7 +59,7 @@ module Sequel
             else
               log_connection_yield(sql, c) do
                 r = c.execute(sql)
-                return r.send(m) if m
+                return r.public_send(m) if m
               end
             end
             yield(r) if block_given?

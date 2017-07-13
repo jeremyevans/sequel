@@ -69,6 +69,7 @@ module Sequel
 
       # Replace the query's dataset with dataset returned by the method call.
       def method_missing(method, *args, &block)
+        # Allow calling private methods, so things like raise works
         @dataset = @dataset.send(method, *args, &block)
         raise(Sequel::Error, "method #{method.inspect} did not return a dataset") unless @dataset.is_a?(Dataset)
         self

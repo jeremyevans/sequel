@@ -64,9 +64,11 @@ module Sequel
         args = inspect_args.map do |arg|
           if arg.is_a?(String) && arg =~ /\A\*/
             # Special case string arguments starting with *, indicating that
-            # they should return an array to be splatted as the remaining arguments
+            # they should return an array to be splatted as the remaining arguments.
+            # Allow calling private methods to get inspect output.
             send(arg.sub('*', '')).map{|a| Sequel.eval_inspect(a)}.join(', ')
           else
+            # Allow calling private methods to get inspect output.
             Sequel.eval_inspect(send(arg))
           end
         end

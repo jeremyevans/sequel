@@ -80,11 +80,11 @@ module Sequel
         # is an array method, otherwise call the method on the association's dataset.
         def method_missing(meth, *args, &block)
           v = if @instance.model.association_proxy_to_dataset.call(:method=>meth, :arguments=>args, :block=>block, :instance=>@instance, :reflection=>@reflection, :proxy_argument=>@proxy_argument, :proxy_block=>@proxy_block)
-            @instance.send(@reflection.dataset_method)
+            @instance.public_send(@reflection.dataset_method)
           else
             @instance.send(:load_associated_objects, @reflection, @proxy_argument, &@proxy_block)
           end
-          v.send(meth, *args, &block)
+          v.public_send(meth, *args, &block)
         end
       end
 

@@ -62,7 +62,7 @@ module Sequel
         model.scope_proc = case scope = opts[:scope]
         when Symbol
           model.dataset = model.dataset.order_prepend(scope)
-          proc{|obj| obj.model.where(scope=>obj.send(scope))}
+          proc{|obj| obj.model.where(scope=>obj.public_send(scope))}
         when Array
           model.dataset = model.dataset.order_prepend(*scope)
           proc{|obj| obj.model.where(scope.map{|s| [s, obj.get_column_value(s)]})}

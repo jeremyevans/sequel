@@ -240,6 +240,7 @@ module Sequel
         def validate
           super
           model.constraint_validations.each do |v|
+            # Allow calling private validation methods
             send(*v)
           end
         end

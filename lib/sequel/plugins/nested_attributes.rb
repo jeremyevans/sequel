@@ -175,8 +175,8 @@ module Sequel
           nested_attributes_set_attributes(meta, obj, attributes)
           delay_validate_associated_object(reflection, obj)
           if reflection.returns_array?
-            send(reflection[:name]) << obj
-            after_save_hook{send(reflection.add_method, obj)}
+            public_send(reflection[:name]) << obj
+            after_save_hook{public_send(reflection.add_method, obj)}
           else
             associations[reflection[:name]] = obj
 
@@ -188,9 +188,9 @@ module Sequel
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
             if reflection[:type] == :many_to_one 
-              before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}
+              before_save_hook{public_send(reflection.setter_method, obj.save(:validate=>false))}
             else
-              after_save_hook{send(reflection.setter_method, obj)}
+              after_save_hook{public_send(reflection.setter_method, obj)}
             end
           end
           add_reciprocal_object(reflection, obj)
@@ -218,9 +218,9 @@ module Sequel
           if !opts[:destroy] || reflection.remove_before_destroy?
             before_save_hook do
               if reflection.returns_array?
-                send(reflection.remove_method, obj)
+                public_send(reflection.remove_method, obj)
               else
-                send(reflection.setter_method, nil)
+                public_send(reflection.setter_method, nil)
               end
             end
           end
@@ -264,7 +264,7 @@ module Sequel
           str_keys = sym_keys.map(&:to_s)
           if (pk = attributes.values_at(*sym_keys)).all? || (pk = attributes.values_at(*str_keys)).all?
             pk = pk.map(&:to_s)
-            obj = Array(send(reflection[:name])).find{|x| Array(x.pk).map(&:to_s) == pk}
+            obj = Array(public_send(reflection[:name])).find{|x| Array(x.pk).map(&:to_s) == pk}
           end
           if obj
             attributes = attributes.dup.delete_if{|k,v| str_keys.include? k.to_s}

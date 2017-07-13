@@ -273,7 +273,7 @@ module Sequel
               o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && v.size == i
             end
             if w = opts[:within]
-              o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && w.send(w.respond_to?(:cover?) ? :cover? : :include?, v.size)
+              o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && w.public_send(w.respond_to?(:cover?) ? :cover? : :include?, v.size)
             end
           end
         end
@@ -335,7 +335,7 @@ module Sequel
           reflect_validation(:inclusion, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors.add(a, opts[:message]) unless n.send(n.respond_to?(:cover?) ? :cover? : :include?, v)
+            o.errors.add(a, opts[:message]) unless n.public_send(n.respond_to?(:cover?) ? :cover? : :include?, v)
           end
         end
     

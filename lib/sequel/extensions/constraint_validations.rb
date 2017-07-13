@@ -374,10 +374,10 @@ module Sequel
         when :max_length
           generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.char_length(c) <= arg}))
         when *REVERSE_OPERATOR_MAP.keys
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.identifier(c).send(REVERSE_OPERATOR_MAP[validation_type], arg)}))
+          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.identifier(c).public_send(REVERSE_OPERATOR_MAP[validation_type], arg)}))
         when :length_range
           op = arg.exclude_end? ? :< : :<=
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| (Sequel.char_length(c) >= arg.begin) & Sequel.char_length(c).send(op, arg.end)}))
+          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| (Sequel.char_length(c) >= arg.begin) & Sequel.char_length(c).public_send(op, arg.end)}))
           arg = "#{arg.begin}..#{'.' if arg.exclude_end?}#{arg.end}"
         when :format
           generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| {c => arg}}))
@@ -407,7 +407,7 @@ module Sequel
             raise Error, "validates includes only supports arrays and ranges currently, cannot handle: #{arg.inspect}"
           end
         when :like, :ilike
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.send(validation_type, c, arg)}))
+          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.public_send(validation_type, c, arg)}))
         when :unique
           generator.unique(columns, :name=>constraint)
           columns = [columns.join(',')]

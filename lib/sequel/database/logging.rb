@@ -66,7 +66,7 @@ module Sequel
     # Log the given SQL and then execute it on the connection, used by
     # the transaction code.
     def log_connection_execute(conn, sql)
-      log_connection_yield(sql, conn){conn.send(connection_execute_method, sql)}
+      log_connection_yield(sql, conn){conn.public_send(connection_execute_method, sql)}
     end
 
     # Log message with message prefixed by duration at info level, or
@@ -78,7 +78,7 @@ module Sequel
     # Log message at level (which should be :error, :warn, or :info)
     # to all loggers.
     def log_each(level, message)
-      @loggers.each{|logger| logger.send(level, message)}
+      @loggers.each{|logger| logger.public_send(level, message)}
     end
   end
 end

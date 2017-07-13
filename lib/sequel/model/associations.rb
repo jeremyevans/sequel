@@ -356,6 +356,7 @@ module Sequel
           finalize_settings.each do |meth, key|
             next if has_key?(key)
 
+            # Allow calling private methods to make sure caching is done appropriately
             send(meth)
             self[key] = cache.delete(key) if cache.has_key?(key)
           end
@@ -2260,7 +2261,7 @@ module Sequel
 
         # Return a dataset for the association after applying any dynamic callback.
         def _associated_dataset(opts, dynamic_opts)
-          ds = send(opts.dataset_method)
+          ds = public_send(opts.dataset_method)
           if callback = dynamic_opts[:callback]
             ds = callback.call(ds)
           end
@@ -2340,6 +2341,7 @@ module Sequel
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           ensure_associated_primary_key(opts, o, *args)
           return if run_association_callbacks(opts, :before_add, o) == false
+          # Allow calling private _add method
           return if !send(opts._add_method, o, *args) && opts.handle_silent_modification_failure?
           if array = associations[opts[:name]] and !array.include?(o)
             array.push(o)
@@ -2463,6 +2465,7 @@ module Sequel
         # Remove all associated objects from the given association
         def remove_all_associated_objects(opts, *args)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
+          # Allow calling private _remove_all method
           send(opts._remove_all_method, *args)
           ret = associations[opts[:name]].each{|o| remove_reciprocal_object(opts, o)} if associations.include?(opts[:name])
           associations[opts[:name]] = []
@@ -2476,12 +2479,13 @@ module Sequel
             o = remove_check_existing_object_from_pk(opts, o, *args)
           elsif !o.is_a?(klass)
             raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
-          elsif opts.remove_should_check_existing? && send(opts.dataset_method).where(o.pk_hash).empty?
+          elsif opts.remove_should_check_existing? && public_send(opts.dataset_method).where(o.pk_hash).empty?
             raise(Sequel::Error, "associated object #{o.inspect} is not currently associated to #{inspect}")
           end
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_remove, o) == false
+          # Allow calling private _remove method
           return if !send(opts._remove_method, o, *args) && opts.handle_silent_modification_failure?
           associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
           remove_reciprocal_object(opts, o)
@@ -2495,7 +2499,7 @@ module Sequel
         def remove_check_existing_object_from_pk(opts, o, *args)
           key = o
           pkh = opts.associated_class.qualified_primary_key_hash(key)
-          raise(Sequel::Error, "no object with key(s) #{key.inspect} is currently associated to #{inspect}") unless o = send(opts.dataset_method).first(pkh)
+          raise(Sequel::Error, "no object with key(s) #{key.inspect} is currently associated to #{inspect}") unless o = public_send(opts.dataset_method).first(pkh)
           o
         end
 
@@ -2522,6 +2526,7 @@ module Sequel
           reflection[callback_type].each do |cb|
             res = case cb
             when Symbol
+              # Allow calling private methods in association callbacks
               send(cb, object)
             when Proc
               cb.call(self, object)
@@ -2545,6 +2550,7 @@ module Sequel
           return if a && a == o && !set_associated_object_if_same?
           run_association_callbacks(opts, :before_set, o)
           remove_reciprocal_object(opts, a) if a
+          # Allow calling private _setter method
           send(opts._setter_method, o)
           associations[opts[:name]] = o
           add_reciprocal_object(opts, o) if o
@@ -2953,6 +2959,7 @@ END
         # Return an expression for filtering by the given association reflection and associated object.
         def association_filter_expression(op, ref, obj)
           meth = :"#{ref[:type]}_association_filter_expression"
+          # Allow calling private association specific method to get filter expression
           send(meth, op, ref, obj) if respond_to?(meth, true)
         end
 
@@ -3399,7 +3406,7 @@ END
           records.each do |record|
             dependency_map.each do |ta, deps|
               assoc_name = alias_map[ta]
-              list = record.send(assoc_name)
+              list = record.public_send(assoc_name)
               rec_list = if type_map[ta]
                 list.uniq!
                 if lo = limit_map[ta]

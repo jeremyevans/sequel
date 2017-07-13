@@ -343,7 +343,7 @@ module Sequel
 
           name_proc = model.xml_serialize_name_proc(opts)
           x = model.xml_builder(opts)
-          x.send(name_proc[opts.fetch(:root_name, model.send(:underscore, model.name).gsub('/', '__')).to_s]) do |x1|
+          x.public_send(name_proc[opts.fetch(:root_name, model.send(:underscore, model.name).gsub('/', '__')).to_s]) do |x1|
             cols.each do |c|
               attrs = {}
               if types
@@ -353,7 +353,7 @@ module Sequel
               if v.nil?
                 attrs[:nil] = ''
               end
-              x1.send(name_proc[c.to_s], v, attrs)
+              x1.public_send(name_proc[c.to_s], v, attrs)
             end
             if inc.is_a?(Hash)
               inc.each{|k, v| to_xml_include(x1, k, v)}
@@ -371,15 +371,15 @@ module Sequel
         # the xml.
         def to_xml_include(node, i, opts=OPTS)
           name_proc = model.xml_serialize_name_proc(opts)
-          objs = send(i)
+          objs = public_send(i)
           if objs.is_a?(Array) && objs.all?{|x| x.is_a?(Sequel::Model)}
-            node.send(name_proc[i.to_s]) do |x2|
+            node.public_send(name_proc[i.to_s]) do |x2|
               objs.each{|obj| obj.to_xml(opts.merge(:builder=>x2))}
             end
           elsif objs.is_a?(Sequel::Model)
             objs.to_xml(opts.merge(:builder=>node, :root_name=>i))
           else
-            node.send(name_proc[i.to_s], objs)
+            node.public_send(name_proc[i.to_s], objs)
           end
         end
       end
@@ -399,7 +399,7 @@ module Sequel
           else
             all
           end
-          x.send(name_proc[opts.fetch(:array_root_name, model.send(:pluralize, model.send(:underscore, model.name))).to_s]) do |x1|
+          x.public_send(name_proc[opts.fetch(:array_root_name, model.send(:pluralize, model.send(:underscore, model.name))).to_s]) do |x1|
             array.each do |obj|
               obj.to_xml(opts.merge(:builder=>x1))
             end

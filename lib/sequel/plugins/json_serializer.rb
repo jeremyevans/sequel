@@ -329,7 +329,7 @@ module Sequel
 
                 v = v.empty? ? [] : [v]
 
-                objs = send(k)
+                objs = public_send(k)
 
                 is_array = if r = model.association_reflection(k)
                   r.returns_array?
@@ -351,7 +351,7 @@ module Sequel
                 else
                   key_name = c.to_s
                 end
-                h[key_name] = send(c)
+                h[key_name] = public_send(c)
               end
             end
           end

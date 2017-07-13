@@ -20,11 +20,11 @@ module Sequel
       %w'where exclude exclude_having having'.map(&:to_sym).each do |meth|
         define_method(meth) do |name, *args, &block|
           if block || args.flatten.any?{|arg| arg.is_a?(Proc)}
-            define_method(name){send(meth, *args, &block)}
+            define_method(name){public_send(meth, *args, &block)}
           else
             key = :"_#{meth}_#{name}_ds"
             define_method(name) do
-              cached_dataset(key){send(meth, *args)}
+              cached_dataset(key){public_send(meth, *args)}
             end
           end
         end
@@ -40,11 +40,11 @@ module Sequel
       def self.def_dataset_caching_method(mod, meth)
         mod.send(:define_method, meth) do |name, *args, &block|
           if block
-            define_method(name){send(meth, *args, &block)}
+            define_method(name){public_send(meth, *args, &block)}
           else
             key = :"_#{meth}_#{name}_ds"
             define_method(name) do
-              cached_dataset(key){send(meth, *args)}
+              cached_dataset(key){public_send(meth, *args)}
             end
           end
         end

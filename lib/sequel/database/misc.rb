@@ -290,6 +290,7 @@ module Sequel
       return nil if value.nil?
       meth = "typecast_value_#{column_type}"
       begin
+        # Allow calling private methods as per-type typecasting methods are private
         respond_to?(meth, true) ? send(meth, value) : value
       rescue ArgumentError, TypeError => e
         raise Sequel.convert_exception_class(e, InvalidValue)

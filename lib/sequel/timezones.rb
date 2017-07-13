@@ -54,7 +54,7 @@ module Sequel
             convert_output_datetime_other(v, output_timezone)
           end
         else
-          v.send(output_timezone == :utc ? :getutc : :getlocal)
+          v.public_send(output_timezone == :utc ? :getutc : :getlocal)
         end
       else
         v
@@ -71,7 +71,7 @@ module Sequel
           if datetime_class == DateTime
             DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? (defined?(Rational) ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : Time.local(v.year, v.month, v.day).utc_offset/86400.0) : 0)
           else
-            Time.send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
+            Time.public_send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
           end
         else
           convert_output_timestamp(convert_input_timestamp(v, input_timezone), application_timezone)
@@ -156,7 +156,7 @@ module Sequel
             convert_input_datetime_no_offset(DateTime.civil(y, mo, d, h, mi, s), input_timezone)
           end
         else
-          Time.send(input_timezone == :utc ? :utc : :local, y, mo, d, h, mi, s, (ns ? ns / 1000.0 : 0))
+          Time.public_send(input_timezone == :utc ? :utc : :local, y, mo, d, h, mi, s, (ns ? ns / 1000.0 : 0))
         end
       when Hash
         ary = [:year, :month, :day, :hour, :minute, :second, :nanos].map{|x| (v[x] || v[x.to_s]).to_i}

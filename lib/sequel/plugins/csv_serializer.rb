@@ -148,7 +148,7 @@ module Sequel
           opts = model.process_csv_serializer_opts(opts)
 
           CSV.generate(opts) do |csv|
-            csv << opts[:headers].map{|k| send(k)}
+            csv << opts[:headers].map{|k| public_send(k)}
           end
         end
       end
@@ -167,7 +167,7 @@ module Sequel
 
           CSV.generate(opts) do |csv|
             items.each do |object|
-              csv << opts[:headers].map{|header| object.send(header) }
+              csv << opts[:headers].map{|header| object.public_send(header) }
             end
           end
         end

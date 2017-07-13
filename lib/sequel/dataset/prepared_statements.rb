@@ -190,14 +190,14 @@ module Sequel
           elsif prepared_type == :delete
             delete
           else
-            send(prepared_type, *prepared_modify_values)
+            public_send(prepared_type, *prepared_modify_values)
           end
         when :insert_pk
           fetch_rows(prepared_sql){|r| return r.values.first}
         when Array
           case prepared_type[0]
           when :map, :as_hash, :to_hash, :to_hash_groups
-            send(*prepared_type, &block) 
+            public_send(*prepared_type, &block) 
           end
         else
           raise Error, "unsupported prepared statement type used: #{prepared_type.inspect}"

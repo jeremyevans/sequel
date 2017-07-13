@@ -94,9 +94,9 @@ module Sequel
         # Access the cache using the given method and key, rescuing exceptions if necessary.
         def cache_op(meth, ck)
           if @cache_ignore_exceptions
-            @cache_store.send(meth, ck) rescue nil
+            @cache_store.public_send(meth, ck) rescue nil
           else
-            @cache_store.send(meth, ck)
+            @cache_store.public_send(meth, ck)
           end
         end
     
