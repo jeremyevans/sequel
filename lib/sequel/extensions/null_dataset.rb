@@ -46,6 +46,7 @@ module Sequel
 
       # Nullify the current dataset
       def nullify!
+        Sequel::Deprecation.deprecate("Dataset#nullify! from the null_dataset extension", "Use Dataset#nullify, which returned a modified copy")
         extend NullDataset
       end
     end
