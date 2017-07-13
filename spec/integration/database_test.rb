@@ -37,7 +37,7 @@ describe Sequel::Database do
       @db.drop_table?(:test2, :test)
     end
 
-    cspecify "should raise Sequel::UniqueConstraintViolation when a unique constraint is violated", [:jdbc, :sqlite], [:db2] do
+    cspecify "should raise Sequel::UniqueConstraintViolation when a unique constraint is violated", [:jdbc, :sqlite] do
       @db.create_table!(:test){String :a, :unique=>true, :null=>false}
       @db[:test].insert('1')
       proc{@db[:test].insert('1')}.must_raise(Sequel::UniqueConstraintViolation)
@@ -45,7 +45,7 @@ describe Sequel::Database do
       proc{@db[:test].update(:a=>'1')}.must_raise(Sequel::UniqueConstraintViolation)
     end
 
-    cspecify "should raise Sequel::UniqueConstraintViolation when a unique constraint is violated for composite primary keys", [:jdbc, :sqlite], [:db2] do
+    cspecify "should raise Sequel::UniqueConstraintViolation when a unique constraint is violated for composite primary keys", [:jdbc, :sqlite] do
       @db.create_table!(:test){String :a; String :b; primary_key [:a, :b]}
       @db[:test].insert(:a=>'1', :b=>'2')
       proc{@db[:test].insert(:a=>'1', :b=>'2')}.must_raise(Sequel::UniqueConstraintViolation)
@@ -53,14 +53,14 @@ describe Sequel::Database do
       proc{@db[:test].update(:a=>'1', :b=>'2')}.must_raise(Sequel::UniqueConstraintViolation)
     end
 
-    cspecify "should raise Sequel::CheckConstraintViolation when a check constraint is violated", :mysql, [:db2], [proc{|db| db.sqlite_version < 30802}, :sqlite] do
+    cspecify "should raise Sequel::CheckConstraintViolation when a check constraint is violated", :mysql, [proc{|db| db.sqlite_version < 30802}, :sqlite] do
       @db.create_table!(:test){String :a; check Sequel.~(:a=>'1')}
       proc{@db[:test].insert('1')}.must_raise(Sequel::CheckConstraintViolation)
       @db[:test].insert('2')
       proc{@db[:test].insert('1')}.must_raise(Sequel::CheckConstraintViolation)
     end
 
-    cspecify "should raise Sequel::ForeignKeyConstraintViolation when a foreign key constraint is violated", [:jdbc, :sqlite], [:db2]  do
+    cspecify "should raise Sequel::ForeignKeyConstraintViolation when a foreign key constraint is violated", [:jdbc, :sqlite]  do
       @db.create_table!(:test, :engine=>:InnoDB){primary_key :id}
       @db.create_table!(:test2, :engine=>:InnoDB){foreign_key :tid, :test}
       proc{@db[:test2].insert(:tid=>1)}.must_raise(Sequel::ForeignKeyConstraintViolation)
@@ -70,7 +70,7 @@ describe Sequel::Database do
       proc{@db[:test].where(:id=>1).delete}.must_raise(Sequel::ForeignKeyConstraintViolation)
     end
 
-    cspecify "should raise Sequel::NotNullConstraintViolation when a not null constraint is violated", [:jdbc, :sqlite], [:db2] do
+    cspecify "should raise Sequel::NotNullConstraintViolation when a not null constraint is violated", [:jdbc, :sqlite] do
       @db.create_table!(:test){Integer :a, :null=>false}
       proc{@db[:test].insert(:a=>nil)}.must_raise(Sequel::NotNullConstraintViolation)
       unless @db.database_type == :mysql

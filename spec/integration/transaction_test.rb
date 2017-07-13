@@ -327,7 +327,7 @@ describe "Database transaction retrying" do
     @db.drop_table?(:items)
   end
 
-  cspecify "should be supported using the :retry_on option", [:db2] do
+  it "should be supported using the :retry_on option" do
     @d.insert('b')
     @d.insert('c')
     s = 'a'
@@ -338,7 +338,7 @@ describe "Database transaction retrying" do
     @d.select_order_map(:a).must_equal %w'b c d'
   end
 
-  cspecify "should limit number of retries via the :num_retries option", [:db2] do
+  it "should limit number of retries via the :num_retries option" do
     @d.insert('b')
     @d.insert('c')
     s = 'a'
