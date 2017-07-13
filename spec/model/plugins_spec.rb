@@ -315,18 +315,4 @@ describe "Sequel::Model.plugin" do
     @c.plugins.must_include m
     a.must_equal ['sequel/plugins/something_or_other']
   end
-  
-  deprecated "should try loading plugins from sequel_plugin" do
-    proc{@c.plugin :something_or_other}.must_raise(LoadError)
-    a = []
-    m = Module.new
-    (class << @c; self end).send(:define_method, :require) do |b|
-      a << b
-      raise LoadError if b == 'sequel/plugins/something_or_other'
-      Sequel::Plugins.const_set(:SomethingOrOther, m)
-    end
-    @c.plugin :something_or_other
-    @c.plugins.must_include m
-    a.must_equal ['sequel/plugins/something_or_other', 'sequel_something_or_other']
-  end
 end

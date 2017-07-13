@@ -944,20 +944,8 @@ module Sequel
       # defined, the corresponding plugin required.
       def plugin_module(plugin)
         module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
-        if !Sequel::Plugins.const_defined?(module_name) ||
-           (Sequel.const_defined?(module_name) &&
-            Sequel::Plugins.const_get(module_name) == Sequel.const_get(module_name))
-          begin
-            require "sequel/plugins/#{plugin}"
-          rescue LoadError => e
-            begin
-              require "sequel_#{plugin}"
-              Sequel::Deprecation.deprecate("requiring 'sequel_#{plugin}' to load a plugin", "Update the #{plugin} plugin to be required via 'sequel/plugins/#{plugin}'")
-            rescue LoadError => e2
-              e.message << "; #{e2.message}"
-              raise e
-            end
-          end
+        unless Sequel::Plugins.const_defined?(module_name, false)
+          require "sequel/plugins/#{plugin}"
         end
         Sequel::Plugins.const_get(module_name)
       end
