@@ -143,6 +143,11 @@ describe Sequel::Model, ".dataset_module" do
     @c.return_3.must_equal 3
   end
 
+  it "should add methods that can't be called with normal method syntax as class methods" do
+    @c.dataset_module.module_eval{define_method(:'return 3'){3}}
+    @c.send(:'return 3').must_equal 3
+  end
+
   it "should not add private or protected methods defined in the module to the class" do
     @c.dataset_module{private; def return_3() 3 end}
     @c.dataset_module{protected; def return_4() 4 end}

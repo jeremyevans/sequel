@@ -361,8 +361,15 @@ describe "Dataset#where" do
     @d1 = @dataset.where(:region => 'Asia')
   end
   
-  it "should just clone if given no arguments or block" do
+  it "should raise Error if given no arguments or block" do
     proc{@dataset.where}.must_raise Sequel::Error
+  end
+  
+  it "should raise Error for arrays/multiple arguments that are not condition specifiers" do
+    proc{@dataset.where('a = ?', 1)}.must_raise Sequel::Error
+    proc{@dataset.where(['a = ?', 1])}.must_raise Sequel::Error
+    proc{@dataset.where({:a=>1}, {:b=>2})}.must_raise Sequel::Error
+    proc{@dataset.where([{:a=>1}, {:b=>2}])}.must_raise Sequel::Error
   end
   
   it "should handle nil argument if block is given" do

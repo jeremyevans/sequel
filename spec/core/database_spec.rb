@@ -1780,6 +1780,10 @@ describe "Database#add_servers" do
     @db.synchronize(:server1){|c| c.opts[:host].must_equal 8}
     @db.synchronize(:server2){|c| c.opts[:host].must_equal 4}
   end
+
+  it "should raise error for unsharded pool" do
+    proc{Sequel.mock.add_servers(:server1=>{})}.must_raise Sequel::Error
+  end
 end
 
 describe "Database#remove_servers" do
@@ -1829,6 +1833,10 @@ describe "Database#remove_servers" do
       end
       c1.opts[:host].must_equal 1
     end
+  end
+
+  it "should raise error for unsharded pool" do
+    proc{Sequel.mock.remove_servers(:server1)}.must_raise Sequel::Error
   end
 end
 
