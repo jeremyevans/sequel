@@ -348,7 +348,11 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
 
       include(Module.new do
-        Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order lock')
+        base_methods = %w'with select distinct columns from join where group having compounds order'
+        Dataset.def_sql_method(self, :select, [
+          ['if supports_fetch_next_rows?', base_methods + %w'limit lock'],
+          ['else', base_methods + ['lock']]
+        ])
       end)
 
       def complex_expression_sql_append(sql, op, args)
@@ -421,7 +425,10 @@ module Sequel
       # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
       def select_sql
         return super if @opts[:sql]
-        if o = @opts[:offset]
+        return super if supports_fetch_next_rows?
+
+        o = @opts[:offset]
+        if o && o != 0
           columns = clone(:append_sql=>String.new, :placeholder_literal_null=>true).columns
           dsa1 = dataset_alias(1)
           rn = row_number_column
@@ -437,7 +444,7 @@ module Sequel
           subselect_sql_append(sql, ds)
           sql
         elsif limit = @opts[:limit]
-          ds = clone(:limit=>nil)
+          ds = unlimited
           # Lock doesn't work in subselects, so don't use a subselect when locking.
           # Don't use a subselect if custom SQL is used, as it breaks somethings.
           ds = ds.from_self unless @opts[:lock]
@@ -449,6 +456,19 @@ module Sequel
         end
       end
 
+      def select_limit_sql(sql)
+        if offset = @opts[:offset]
+          sql << " OFFSET "
+          literal_append(sql, offset)
+          sql << " ROWS"
+        end
+
+        if limit = @opts[:limit]
+          sql << " FETCH NEXT "
+          literal_append(sql, limit)
+          sql << " ROWS ONLY"
+        end
+      end
       # Oracle requires recursive CTEs to have column aliases.
       def recursive_cte_requires_column_aliases?
         true
@@ -461,6 +481,11 @@ module Sequel
       # Oracle does not support derived column lists
       def supports_derived_column_lists?
         false
+      end
+
+      # Oracle supports FETCH NEXT ROWS since 12c
+      def supports_fetch_next_rows?
+        server_version >= 12000000 && !(@opts[:lock] || @opts[:skip_locked])
       end
 
       # Oracle supports GROUP BY CUBE
