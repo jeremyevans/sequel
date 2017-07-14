@@ -348,11 +348,7 @@ module Sequel
       Sequel::Deprecation.deprecate_constant(self, :SKIP_LOCKED)
 
       include(Module.new do
-        base_methods = %w'with select distinct columns from join where group having compounds order'
-        Dataset.def_sql_method(self, :select, [
-          ['if supports_fetch_next_rows?', base_methods + %w'limit lock'],
-          ['else', base_methods + ['lock']]
-        ])
+        Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order limit lock')
       end)
 
       def complex_expression_sql_append(sql, op, args)
@@ -457,6 +453,8 @@ module Sequel
       end
 
       def select_limit_sql(sql)
+        return unless supports_fetch_next_rows?
+
         if offset = @opts[:offset]
           sql << " OFFSET "
           literal_append(sql, offset)

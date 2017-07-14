@@ -1,5 +1,7 @@
 === master
 
+* Support native offset syntax on Oracle 12 (timon) (#1397)
+
 * Deprecate Dataset#nullify in the null_dataset extension (jeremyevans)
 
 * Deprecate Dataset#autoid=, #_fetch=, and #numrows= in the mock adapter (jeremyevans)
