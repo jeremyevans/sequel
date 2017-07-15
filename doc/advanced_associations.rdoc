@@ -211,7 +211,7 @@ and the tracks eager loader looks like:
   Album.one_to_many :tracks, :eager_loader=>(proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:tracks] = []}
     id_map = eo_opts[:id_map]
-    Track.where(:id=>id_map.keys).all do |tracks|
+    Track.where(:album_id=>id_map.keys).all do |track|
       if albums = id_map[track.album_id]
         albums.each do |album|
           album.associations[:tracks] << track
