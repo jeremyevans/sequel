@@ -90,7 +90,6 @@ module Sequel
       # :command_timeout :: Sets the time in seconds to wait while attempting
       #                     to execute a command before cancelling the attempt and generating
       #                     an error. Specifically, it sets the ADO CommandTimeout property.
-      #                     If this property is not set, the default of 30 seconds is used.
       # :driver :: The driver to use in the ADO connection string.  If not provided, a default
       #            of "SQL Server" is used.
       # :conn_string :: The full ADO connection string.  If this is provided,
