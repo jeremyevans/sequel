@@ -1,5 +1,7 @@
 === master
 
+* Deprecate model association before callbacks returning false to cancel the action (jeremyevans)
+
 * Support native offset syntax on Oracle 12 (timon) (#1397)
 
 * Deprecate Dataset#nullify in the null_dataset extension (jeremyevans)

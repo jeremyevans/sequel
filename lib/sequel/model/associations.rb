@@ -2555,6 +2555,7 @@ module Sequel
             end
 
             if res == false and stop_on_false
+              Sequel::Deprecation.deprecate("Having #{callback_type} association callback return false to cancel modification", "Instead, call Model#cancel_action inside the association callback")
               raise(HookFailed, "Unable to modify association for #{inspect}: one of the #{callback_type} hooks returned false")
             end
           end
