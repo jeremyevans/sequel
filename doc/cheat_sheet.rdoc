@@ -6,7 +6,7 @@
 
   DB = Sequel.sqlite('my_blog.db')
   DB = Sequel.connect('postgres://user:password@localhost/my_db')
-  DB = Sequel.postgres('my_db', :user => 'user', :password => 'password', :host => 'localhost')
+  DB = Sequel.postgres('my_db', user: 'user', password: 'password', host: 'localhost')
   DB = Sequel.ado('mydb')
 
 == Open an SQLite memory database
@@ -18,7 +18,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Logging SQL statements
 
   require 'logger'
-  DB = Sequel.sqlite '', :loggers => [Logger.new($stdout)]
+  DB = Sequel.sqlite(loggers: [Logger.new($stdout)])
   # or
   DB.loggers << Logger.new($stdout)
 
@@ -38,11 +38,11 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Most dataset methods are chainable
 
-  dataset = DB[:managers].where(:salary => 5000..10000).order(:name, :department)
+  dataset = DB[:managers].where(salary: 5000..10000).order(:name, :department)
 
 == Insert rows
 
-  dataset.insert(:name => 'Sharon', :grade => 50)
+  dataset.insert(name: 'Sharon', grade: 50)
 
 == Retrieve rows
 
@@ -53,7 +53,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Update/Delete rows
 
   dataset.exclude(:active).delete
-  dataset.where('price < ?', 100).update(:active => true)
+  dataset.where{price < 100}.update(:active => true)
 
 == Datasets are Enumerable
 
@@ -67,8 +67,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 === Equality
 
-  dataset.where(:name => 'abc')
-  dataset.where('name = ?', 'abc')
+  dataset.where(name: 'abc')
 
 === Inequality
 
@@ -77,30 +76,27 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 === Inclusion
 
-  dataset.where(:value => 50..100)
+  dataset.where(value: 50..100)
   dataset.where{(value >= 50) & (value <= 100)}
 
-  dataset.where('value IN ?', [50,75,100])
-  dataset.where(:value=>[50,75,100])
-
-  dataset.where(:id=>other_dataset.select(:other_id))
+  dataset.where(value: [50,75,100])
+  dataset.where(id: other_dataset.select(:other_id))
 
 === Subselects as scalar values
 
-  dataset.where('price > (SELECT avg(price) + 100 FROM table)')
   dataset.where{price > dataset.select(avg(price) + 100)}
 
 === LIKE/Regexp
 
   DB[:items].where(Sequel.like(:name, 'AL%'))
-  DB[:items].where(:name => /^AL/)
+  DB[:items].where(name: /^AL/)
 
 === AND/OR/NOT
 
   DB[:items].where{(x > 5) & (y > 10)}.sql 
   # SELECT * FROM items WHERE ((x > 5) AND (y > 10))
 
-  DB[:items].where(Sequel.or(:x => 1, :y => 2) & Sequel.~(:z => 3)).sql 
+  DB[:items].where(Sequel.or(x: 1, y: 2) & Sequel.~(z: 3)).sql 
   # SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))
 
 === Mathematical operators
@@ -110,6 +106,13 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
   DB[:items].where{price - 100 < avg(price)}.sql 
   # SELECT * FROM items WHERE ((price - 100) < avg(price))
+
+=== Raw SQL Fragments
+
+  dataset.where(Sequel.lit('id= 1'))
+  dataset.where(Sequel.lit('name = ?', 'abc'))
+  dataset.where(Sequel.lit('value IN ?', [50,75,100]))
+  dataset.where(Sequel.lit('price > (SELECT avg(price) + 100 FROM table)'))
 
 == Ordering
 
@@ -125,11 +128,12 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Joins
 
-  DB[:items].left_outer_join(:categories, :id => :category_id).sql 
+  DB[:items].left_outer_join(:categories, id: :category_id).sql 
   # SELECT * FROM items
   # LEFT OUTER JOIN categories ON categories.id = items.category_id
 
-  DB[:items].join(:categories, :id => :category_id).join(:groups, :id => Sequel[:items][:group_id]) 
+  DB[:items].join(:categories, id: :category_id).
+    join(:groups, id: Sequel[:items][:group_id]) 
   # SELECT * FROM items
   # INNER JOIN categories ON categories.id = items.category_id
   # INNER JOIN groups ON groups.id = items.group_id
@@ -142,33 +146,34 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.avg(:price)
   dataset.sum(:stock)
 
-  dataset.group_and_count(:category)
+  dataset.group_and_count(:category).all
   dataset.select_group(:category).select_append{avg(:price)}
 
 == SQL Functions / Literals
 
-  dataset.update(:updated_at => Sequel.function(:NOW))
-  dataset.update(:updated_at => Sequel.lit('NOW()'))
+  dataset.update(updated_at: Sequel.function(:NOW))
+  dataset.update(updated_at: Sequel.lit('NOW()'))
 
-  dataset.update(:updated_at => Sequel.lit("DateValue('1/1/2001')"))
-  dataset.update(:updated_at => Sequel.function(:DateValue, '1/1/2001'))
+  dataset.update(updated_at: Sequel.lit("DateValue('1/1/2001')"))
+  dataset.update(updated_at: Sequel.function(:DateValue, '1/1/2001'))
 
 == Schema Manipulation
 
   DB.create_table :items do
     primary_key :id
-    String :name, :unique => true, :null => false
-    TrueClass :active, :default => true
+    String :name, unique: true, null: false
+    TrueClass :active, default: true
     foreign_key :category_id, :categories
-    DateTime :created_at
+    DateTime :created_at, default: Sequel::CURRENT_TIMESTAMP, :index=>true
     
-    index :created_at
+    index [:category_id, :active]
   end
 
   DB.drop_table :items
 
 == Aliasing
 
+  DB[:items].select(Sequel[:name].as(:item_name))
   DB[:items].select(Sequel.as(:name, :item_name))
   DB[:items].select{name.as(:item_name)}
   # SELECT name AS item_name FROM items
@@ -179,44 +184,62 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Transactions
 
   DB.transaction do
-    dataset.insert(:first_name => 'Inigo', :last_name => 'Montoya')
-    dataset.insert(:first_name => 'Farm', :last_name => 'Boy')
-  end # Either both are inserted or neither are inserted
+    # BEGIN
+    dataset.insert(first_name: 'Inigo', last_name: 'Montoya')
+    dataset.insert(first_name: 'Farm', last_name: 'Boy')
+  end
+  # COMMIT
 
-Database#transaction is re-entrant:
 
-  DB.transaction do # BEGIN issued only here
+Transactions are reentrant:
+
+  DB.transaction do
+    # BEGIN
     DB.transaction do
-      dataset << {:first_name => 'Inigo', :last_name => 'Montoya'}
+      dataset.insert(first_name: 'Inigo', last_name: 'Montoya')
     end
-  end # COMMIT issued only here
+  end
+  # COMMIT
 
 Transactions are aborted if an error is raised:
 
   DB.transaction do
+    # BEGIN
     raise "some error occurred"
-  end # ROLLBACK issued and the error is re-raised
+  end
+  # ROLLBACK issued and the error is re-raised
 
 Transactions can also be aborted by raising Sequel::Rollback:
 
   DB.transaction do
-    raise(Sequel::Rollback) if something_bad_happened
-  end # ROLLBACK issued and no error raised
+    # BEGIN
+    raise(Sequel::Rollback)
+  end
+  # ROLLBACK issued and no error raised
 
 Savepoints can be used if the database supports it:
 
   DB.transaction do
-    dataset << {:first_name => 'Farm', :last_name => 'Boy'} # Inserted
-    DB.transaction(:savepoint=>true) do # This savepoint is rolled back
-      dataset << {:first_name => 'Inigo', :last_name => 'Montoya'} # Not inserted
-      raise(Sequel::Rollback) if something_bad_happened
+    dataset.insert(first_name: 'Farm', last_name: 'Boy') # Inserted
+    DB.transaction(savepoint: true) do # This savepoint is rolled back
+      dataset.insert(first_name: 'Inigo', last_name: 'Montoya') # Not inserted
+      raise(Sequel::Rollback)
     end
-    dataset << {:first_name => 'Prince', :last_name => 'Humperdink'} # Inserted
+    dataset.insert(first_name: 'Prince', last_name: 'Humperdink') # Inserted
   end
 
-== Miscellaneous:
+== Retrieving SQL
 
   dataset.sql # "SELECT * FROM items"
+  dataset.insert_sql(a: 1) # "INSERT INTO items (a) VALUES (1)"
+  dataset.update_sql(a: 1) # "UPDATE items SET a = 1"
   dataset.delete_sql # "DELETE FROM items"
-  dataset.columns # => array of columns in the result set, does a SELECT
+
+== Basic introspection
+
+  dataset.columns # => [:id, :name, ...]
+  DB.tables # => [:items, ...]
+  DB.views # => [:new_items, ...]
   DB.schema(:items) # => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]
+  DB.indexes(:items) # => {:index_name => {:columns=>[:a], :unique=>false}, ...}
+  DB.foreign_key_list(:items) # => [{:name=>:items_a_fk, :columns=>[:a], :key=>[:id], :table=>:other_table}, ...]
