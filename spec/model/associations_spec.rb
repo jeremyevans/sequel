@@ -673,21 +673,6 @@ describe Sequel::Model, "many_to_one" do
     p.associations[:parent].must_equal :foo
   end
 
-  deprecated "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
-    p = @c2.new
-    c = @c2.load(:id=>123)
-    p.raise_on_save_failure = false
-    @c2.many_to_one :parent, :class => @c2, :before_set=>:bs
-    def p.bs(x) false end
-    def p._parent=; raise; end
-    proc{p.parent = c}.must_raise(Sequel::HookFailed)
-    
-    p.parent.must_be_nil
-    p.associations[:parent] = c
-    p.parent.must_equal c
-    proc{p.parent = nil}.must_raise(Sequel::HookFailed)
-  end
-
   it "should raise error and not call internal add or remove method if before callback calls cancel_action, even if raise_on_save_failure is false" do
     p = @c2.new
     c = @c2.load(:id=>123)
@@ -1114,21 +1099,6 @@ describe Sequel::Model, "one_to_one" do
     parent = p.parent
     h.must_equal [[10, 20], 20]
     parent.pk.must_equal 20
-  end
-
-  deprecated "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
-    p = @c2.load(:id=>321)
-    c = @c2.load(:id=>123)
-    p.raise_on_save_failure = false
-    @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
-    def p.bs(x) false end
-    def p._parent=; raise; end
-    proc{p.parent = c}.must_raise(Sequel::HookFailed)
-    
-    p.associations[:parent].must_be_nil
-    p.associations[:parent] = c
-    p.parent.must_equal c
-    proc{p.parent = nil}.must_raise(Sequel::HookFailed)
   end
 
   it "should raise error and not call internal add or remove method if before callback calls cancel_action, even if raise_on_save_failure is false" do
@@ -1868,39 +1838,6 @@ describe Sequel::Model, "one_to_many" do
     attributes = p.attributes
     h.must_equal [[10, [20, 30]], 20, 30]
     attributes.collect{|a| a.pk}.must_equal [20, 30]
-  end
-
-  deprecated "should raise error and not call internal add or remove method if before callback returns false if raise_on_save_failure is true" do
-    p = @c2.load(:id=>10)
-    c = @c1.load(:id=>123)
-    @c2.one_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
-    def p.ba(c) false end
-    def p._add_attribute; raise; end
-    def p._remove_attribute; raise; end
-    p.associations[:attributes] = []
-    proc{p.add_attribute(c)}.must_raise(Sequel::HookFailed)
-    p.attributes.must_equal []
-    p.associations[:attributes] = [c]
-    def p.br(c) false end
-    proc{p.remove_attribute(c)}.must_raise(Sequel::HookFailed)
-    p.attributes.must_equal [c]
-  end
-
-  deprecated "should return nil and not call internal add or remove method if before callback returns false if raise_on_save_failure is false" do
-    p = @c2.load(:id=>10)
-    c = @c1.load(:id=>123)
-    p.raise_on_save_failure = false
-    @c2.one_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
-    def p.ba(c) false end
-    def p._add_attribute; raise; end
-    def p._remove_attribute; raise; end
-    p.associations[:attributes] = []
-    p.add_attribute(c).must_be_nil
-    p.attributes.must_equal []
-    p.associations[:attributes] = [c]
-    def p.br(c) false end
-    p.remove_attribute(c).must_be_nil
-    p.attributes.must_equal [c]
   end
 
   it "should raise error and not call internal add or remove method if before callback calls cancel_action if raise_on_save_failure is true" do
@@ -2732,40 +2669,6 @@ describe Sequel::Model, "many_to_many" do
     attributes = p.attributes
     h.must_equal [[10, [20, 30]], 20, 30]
     attributes.collect{|a| a.pk}.must_equal [20, 30]
-  end
-
-  deprecated "should raise error and not call internal add or remove method if before callback returns false if raise_on_save_failure is true" do
-    p = @c2.load(:id=>10)
-    c = @c1.load(:id=>123)
-    @c2.many_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
-    def p.ba(c) false end
-    def p._add_attribute; raise; end
-    def p._remove_attribute; raise; end
-    p.associations[:attributes] = []
-    p.raise_on_save_failure = true
-    proc{p.add_attribute(c)}.must_raise(Sequel::HookFailed)
-    p.attributes.must_equal []
-    p.associations[:attributes] = [c]
-    def p.br(c) false end
-    proc{p.remove_attribute(c)}.must_raise(Sequel::HookFailed)
-    p.attributes.must_equal [c]
-  end
-
-  deprecated "should return nil and not call internal add or remove method if before callback returns false if raise_on_save_failure is false" do
-    p = @c2.load(:id=>10)
-    c = @c1.load(:id=>123)
-    p.raise_on_save_failure = false
-    @c2.many_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
-    def p.ba(c) false end
-    def p._add_attribute; raise; end
-    def p._remove_attribute; raise; end
-    p.associations[:attributes] = []
-    p.add_attribute(c).must_be_nil
-    p.attributes.must_equal []
-    p.associations[:attributes] = [c]
-    def p.br(c) false end
-    p.remove_attribute(c).must_be_nil
-    p.attributes.must_equal [c]
   end
 
   it "should raise error and not call internal add or remove method if before callback calls cancel_action if raise_on_save_failure is true" do
