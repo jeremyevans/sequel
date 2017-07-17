@@ -73,7 +73,7 @@ describe "null_dataset extension" do
     @i.must_equal 1
   end
 
-  it "should have nullify! method modify receiver" do
+  deprecated "should have nullify! method modify receiver" do
     ds = @db[:table]
     # SEQUEL5: Remove
     unless ds.frozen?
