@@ -16,14 +16,13 @@ as it never calls eval on a string that is derived from user input.
 However, some Sequel methods used for creating methods via metaprogramming
 could conceivably be abused to do so:
 
-* Sequel::Schema::CreateTableGenerator.add_type_method
-* Sequel::Dataset.def_mutation_method
 * Sequel::Dataset.def_sql_method
-* Sequel::Model::Plugins.def_dataset_methods
-* Sequel.def_adapter_method (private)
-* Sequel::SQL::Expression.to_s_method (private)
-* Sequel::Plugins::HookClassMethods::ClassMethods#add_hook_type
+* Sequel::JDBC.load_driver
 * Sequel::Plugins.def_dataset_methods
+* Sequel::Schema::CreateTableGenerator.add_type_method
+* Sequel.def_adapter_method (private)
+* Sequel::Dataset.prepared_statements_module (private)
+* Sequel::SQL::Expression.to_s_method (private)
 
 As long as you don't call those with user input, you should not be
 vulnerable to code execution.
@@ -48,6 +47,9 @@ There are basically two kinds of possible SQL injections in Sequel:
 Some Sequel methods are designed to execute raw SQL strings, including:
 
 * Sequel::Database#execute
+* Sequel::Database#execute_ddl
+* Sequel::Database#execute_dui
+* Sequel::Database#execute_insert
 * Sequel::Database#run
 * Sequel::Database#<<
 * Sequel::Dataset#fetch_rows
@@ -61,9 +63,12 @@ Some Sequel methods are designed to execute raw SQL strings, including:
 
 Here are some examples of use:
 
+  DB.execute 'SQL'
+  DB.execute_ddl 'SQL'
+  DB.execute_dui 'SQL'
+  DB.execute_insert 'SQL'
   DB.run 'SQL'
   DB << 'SQL'
-  DB.execute 'SQL'
   DB.fetch_rows('SQL'){|row| }
   DB.dataset.with_sql_all('SQL')
   DB.dataset.with_sql_delete('SQL')
@@ -102,19 +107,16 @@ With these methods you should use placeholders, in which case Sequel automatical
 
 Sequel generally treats ruby strings as SQL strings (escaping them correctly), and
 not as raw SQL.  However, you can convert a ruby string to a literal string, and
-Sequel will then treat it as raw SQL.  This is typically done through String#lit
-if the {core_extensions}[rdoc-ref:doc/core_extensions.rdoc] are in use,
-or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] if they are not in use.
+Sequel will then treat it as raw SQL.  This is typically done through
+Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit].
 
-  'a'.lit
   Sequel.lit('a')
 
-Using String#lit or Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] to turn a ruby string into a literal string results
+Using Sequel.lit[rdoc-ref:Sequel::SQL::Builders#lit] to turn a ruby string into a literal string results
 in SQL injection if the string is derived from user input.  With both of these
 methods, the strings can contain placeholders, which you can use to safely include
 user input inside a literal string:
 
-  'a = ?'.lit(params[:user_id].to_s)
   Sequel.lit('a = ?', params[:user_id].to_s)
 
 Even though they have similar names, note that Sequel::Database#literal operates very differently from
@@ -132,78 +134,30 @@ a ruby string as raw SQL.  For example:
 
 ==== SQL Filter Fragments
 
-The most common way to use raw SQL with Sequel is in filters:
+Starting in Sequel 5, Sequel does not automatically convert plain strings to
+literal strings in typical code.  Instead, you can use Sequel.lit to
+create literal strings:
 
-  DB[:table].where("name > 'M'")
+  Sequel.lit("name > 'A'")
 
-If a filter method is passed a string as the first argument, it treats the rest of
-the arguments (if any) as placeholders to the string.  So you should never do:
+To safely include user input as part of an SQL filter fragment, use Sequel.lit
+with placeholders:
 
-  DB[:table].where("name > #{params[:id].to_s}") # SQL Injection!
+  DB[:table].where(Sequel.lit("name > ?", params[:id].to_s)) # Safe
 
-Instead, you should use a placeholder:
+Be careful to never call Sequel.lit where the first argument is derived from
+user input.
 
-  DB[:table].where("name > ?", params[:id].to_s) # Safe
- 
-Note that for that type of query, Sequel generally encourages the following form:
-
-  DB[:table].where{|o| o.name > params[:id].to_s} # Safe
-
-Sequel's DSL supports a wide variety of SQL concepts, so it's possible to
-code most applications without ever using raw SQL.
-
-A large number of dataset methods ultimately pass down their arguments to a filter
-method, even some you may not expect, so you should be careful.  At least the
-following methods pass their arguments to a filter method:
-
-* Sequel::Dataset#where
-* Sequel::Dataset#having
-* Sequel::Dataset#filter
-* Sequel::Dataset#exclude
-* Sequel::Dataset#exclude_where
-* Sequel::Dataset#exclude_having
-* Sequel::Dataset#and
-* Sequel::Dataset#or
-* Sequel::Dataset#first
-* Sequel::Dataset#last
-* Sequel::Dataset#[]
-
-The Model.find[rdoc-ref:Sequel::Model::ClassMethods#find] and Model.find_or_create[rdoc-ref:Sequel::Model::ClassMethods#find_or_create]
-class methods also call down to the filter methods.
-
-The no_auto_string_literals extension can be used to remove the default support 
-for plain strings as literal strings in filter methods.
-
-==== SQL Fragment passed to Dataset#update
-
-Similar to the filter methods, Sequel::Dataset#update also treats a
-string argument as raw SQL:
-
-  DB[:table].update("column = 1")
-
-So you should not do:
-
-  DB[:table].update("column = #{params[:value].to_s}") # SQL Injection!
-
-Instead, you should do:
-
-  DB[:table].update(:column => params[:value].to_s) # Safe
-
-The no_auto_string_literals extension can also be used to remove the default support
-for plain strings as literal strings in update methods.
+There are a few uncommon cases where Sequel will still convert
+plain strings to literal strings.
 
 ==== SQL Fragment passed to Dataset#lock_style and Model#lock!
 
 The Sequel::Dataset#lock_style and Sequel::Model#lock! methods also treat
 an input string as SQL code. This method should not be called with user input.
 
-==== SQL Fragment passed to Virtual Row #` method
-
-Virtual row blocks currently support a #` method for using literal SQL:
-
-  DB[:table].where{a > `some SQL`}
-
-This method should not be called with user input.
+  DB[:table].lock_style(params[:id]) # SQL injection!
+  Album.first.lock!(params[:id]) # SQL injection!
 
 ==== SQL Type Names
 
@@ -212,11 +166,75 @@ be specified by the user, it allows you to use a ruby string, and that
 string is used verbatim as the SQL type.  You should not use user input
 for type strings.
 
+  DB[:table].select(Sequel.cast(:a, params[:id])) # SQL injection!
+
 ==== SQL Function Names
 
 In most cases, Sequel does not quote SQL function names.  You should not use
 user input for function names.
 
+  DB[:table].select(Sequel.function(params[:id])) # SQL injection!
+
+==== auto_literal_strings extension
+
+If the auto_literal_strings extension is used for backwards compatibility,
+then Sequel will treat plain strings as literal strings if they are used
+as the first argument to a filtering method.  This can lead to SQL
+injection:
+
+  DB[:table].where("name > #{params[:id].to_s}")
+  # SQL injection when using auto_literal_strings extension
+
+If you are using the auto_literal_strings extension, you need to be very careful,
+as the following methods will treat a plain string given as the first arguments
+as a literal strings:
+
+* Sequel::Dataset#where
+* Sequel::Dataset#having
+* Sequel::Dataset#filter
+* Sequel::Dataset#exclude
+* Sequel::Dataset#exclude_having
+* Sequel::Dataset#or
+* Sequel::Dataset#first
+* Sequel::Dataset#last
+* Sequel::Dataset#[]
+
+Even stuff that looks like it may be safe isn't:
+
+  DB[:table].first(params[:num_rows])
+  # SQL injection when using auto_literal_strings extension
+
+The Model.find[rdoc-ref:Sequel::Model::ClassMethods#find] and
+Model.find_or_create[rdoc-ref:Sequel::Model::ClassMethods#find_or_create]
+class methods also will treat string arguments as literal strings if the
+auto_literal_strings extension is used:
+
+  Album.find(params[:id])
+  # SQL injection when using auto_literal_strings extension
+
+Similar to the filter methods, the auto_literal_strings extension
+also makes Sequel::Dataset#update treats a string argument as raw SQL:
+
+  DB[:table].update("column = 1")
+
+So you should not do:
+
+  DB[:table].update(params[:changes])
+  # SQL injection when using auto_literal_strings extension
+
+or:
+
+  DB[:table].update("column = #{params[:value].to_s}")
+  # SQL injection when using auto_literal_strings extension
+
+Instead, you should do:
+
+  DB[:table].update(:column => params[:value].to_s) # Safe
+
+Because using the auto_literal_strings extension makes SQL injection
+so much eaiser, it is recommended to not use it, and instead
+use Sequel.lit with placeholders.
+ 
 === SQL Identifier Injections
 
 Usually, Sequel treats ruby symbols as SQL identifiers, and ruby
@@ -236,7 +254,7 @@ the Sequel::Dataset#insert and Sequel::Dataset#update methods:
   DB[:t].insert('b'=>1) # INSERT INTO "t" ("b") VALUES (1)
 
 Note how the identifier is still quoted in these cases.  Sequel quotes identifiers by default
-on most databases.  However, it does not quote identifiers by default on DB2 and Informix.
+on most databases.  However, it does not quote identifiers by default on DB2.
 On those databases using an identifier derived from user input can lead to SQL injection.
 Similarly, if you turn off identifier quoting manually on other databases, you open yourself
 up to SQL injection if you use identifiers derived from user input.
@@ -293,7 +311,7 @@ if you allow the user to control the alias name:
 
   DB[:table].select(:column.as(params[:alias]))
 
-Then you have a denial of service vulnerability.  In general, such a vulnerability
+Then you can have a denial of service vulnerability.  In general, such a vulnerability
 is unlikely, because you are probably indexing into the returned hash(es) by name,
 and if an alias was used and you didn't expect it, your application wouldn't work.
 
@@ -353,27 +371,16 @@ These two methods iterate over the second argument (+:name+ and +:copies_sold+ i
 this example) instead of iterating over the entries in the first argument
 (<tt>params[:album]</tt> in this example).
 
-In addition to these two methods, you can also use 
-Model#set_only[rdoc-ref:Sequel::Model::InstanceMethods#set_only] or
-Model#update_only[rdoc-ref:Sequel::Model::InstanceMethods#update_only],
-which are similar but iterate over the entries in the first argument, checking
-the second argument to see if setting the entries is allowed.
+If you want to override the columns that Model#set[rdoc-ref:Sequel::Model::InstanceMethods#set]
+allows by default during mass assignment, you can use the whitelist_security plugin, then call
+the set_allowed_columns class method.
 
-  album.set_only(params[:album], [:name, :copies_sold])
-  album.update_only(params[:album], [:name, :copies_sold])
-
-If you expect all entries in the second argument to be present in the first
-argument, use +set_fields+ or +update_fields+.  If you are not sure if all
-arguments in the second argument will be present in the first argument, but
-do not want to allow setting any column other than the ones listed in the
-second argument, use +set_only+ or +update_only+.
-
-You can override the columns to allow by default during mass assignment via
-the Model.set_allowed_columns[rdoc-ref:Sequel::Model::ClassMethods#set_allowed_columns] class method.  This is a good
-practice, though being explicit on a per-call basis is still recommended:
-
+  Album.plugin :whitelist_security
   Album.set_allowed_columns(:name, :copies_sold)
   Album.create(params[:album]) # Only name and copies_sold set
+
+Being explicit on a per-call basis using the set_fields and update_fields methods is recommended
+instead of using the whitelist_security plugin and setting a global whitelist.
 
 For more details on the mass assignment methods, see the {Mass Assignment Guide}[rdoc-ref:doc/mass_assignment.rdoc].
 
@@ -386,7 +393,7 @@ their type.  For example:
   Album.where(:id=>params[:id])
 
 is probably a bad idea.  Assuming you are using a web framework, <tt>params[:id]</tt> could
-be a string, an array, a hash, or nil.
+be a string, an array, a hash, nil, or potentially something else.
 
 Assuming that +id+ is an integer field, you probably want to do:
 
@@ -400,7 +407,7 @@ a string:
 If you are trying to use an IN clause with a list of id values based on input provided
 on a web form:
 
-  Album.where(:id=>params[:ids].to_a.map{|i| i.to_i})
+  Album.where(:id=>params[:ids].to_a.map(&:to_i))
 
 Basically, be as explicit as possible. While there aren't any known security issues
 in Sequel when you do:
