@@ -2626,11 +2626,11 @@ module Sequel
       #   Artist.eager(:albums => {proc{|ds| ds.where{year > 1990}}=>{:tracks => :genre}})
       module DatasetMethods
         %w'inner left right full'.each do |type|
-          class_eval <<END, __FILE__, __LINE__+1
+          class_eval(<<-END, __FILE__, __LINE__+1)
             def association_#{type}_join(*associations)
               _association_join(:#{type}, associations)
             end
-END
+          END
         end
 
         # Adds one or more INNER JOINs to the existing dataset using the keys and conditions

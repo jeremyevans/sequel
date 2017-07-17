@@ -89,7 +89,7 @@ module Sequel
           subclass.instance_variable_set(:@comparison_attrs, comparison_attrs.dup)
         end
 
-          private
+        private
 
         # Create a to_s instance method that takes a dataset, and calls
         # the method provided on the dataset with args as the argument (self by default).
