@@ -22,7 +22,7 @@ For SELECT queries, you should probably use <tt>Database#fetch</tt> with a strin
 
 You can also use named placeholders by starting the placeholder with a colon, and using a hash for the argument:
 
-  DB.fetch("SELECT * FROM albums WHERE name LIKE :pattern", :pattern=>'A%') do |row|
+  DB.fetch("SELECT * FROM albums WHERE name LIKE :pattern", pattern: 'A%') do |row|
     puts row[:name]
   end
 
@@ -121,21 +121,15 @@ As you can see, Sequel quotes identifiers by default.  Depending on your databas
 
   :column # "COLUMN" on some databases
 
-A plain symbol is usually treated as an unqualified identifier.  However, if you are using multiple tables in a query, and you want to reference a column in one of the tables that has the same name as a column in another one of the tables, you need to qualify that reference.  There are two main ways in Sequel to do that.  The first is implicit qualification inside the symbol, using the double underscore:
-
-  :table__column # "table"."column"
-
-This works by default, but it is possible to turn off by setting <tt>Sequel.split_symbols = false</tt>.
-
-Note that you can't use a period to separate them:
+A plain symbol is usually treated as an unqualified identifier.  However, if you are using multiple tables in a query, and you want to reference a column in one of the tables that has the same name as a column in another one of the tables, you need to qualify that reference.  Note that you can't use a period to separate them: 
 
   :table.column # calls the column method on the symbol
 
 Also note that specifying the period inside the symbol doesn't work if you are quoting identifiers:
 
-  :"table.column" # "table.column"
+  :"table.column" # "table.column" instead of "table"."column"
 
-The second way is to explicitly create a qualified identifier either by using <tt>Sequel.[]</tt> to create an identifier and call <tt>[]</tt> or +qualify+ on that, or by using the <tt>Sequel.qualify</tt> method with the table and column symbols:
+There are a few different Sequel methods for creating qualified identifier objects.  The recommended way is to explicitly create a qualified identifier by using <tt>Sequel.[]</tt> to create an identifier and call <tt>[]</tt> or +qualify+ on that, or by using the <tt>Sequel.qualify</tt> method with the table and column symbols:
 
   Sequel[:table][:column]         # "table"."column"
   Sequel[:column].qualify(:table) # "table"."column"
@@ -148,6 +142,7 @@ Another way to generate identifiers is to use Sequel's {virtual row support}[rdo
 
 You can also use the symbol_aref extension for creating qualified identifiers:
 
+  Sequel.extension :symbol_aref
   :table[:column] # "table"."column"
 
 === Numbers
@@ -173,24 +168,16 @@ In general, Ruby strings map directly to SQL strings:
 
 === Aliasing
 
-Sequel allows for implicit aliasing in column symbols using the triple underscore:
-
-  :column___alias # "column" AS "alias"
-
-You can combine this with implicit qualification:
-
-  :table__column___alias # "table"."column" AS "alias"
-
-As with creating qualified identifiers via a double underscore, this works by default, but it is possible to turn off by setting <tt>Sequel.split_symbols = false</tt>.
-
-You can also use the <tt>Sequel.as</tt> method to create an alias, and the +as+ method on most Sequel-specific expression objects:
+You can use the <tt>Sequel.as</tt> method to create an alias, and the +as+ method on most Sequel-specific expression objects:
 
   Sequel.as(:column, :alias)                 # "column" AS "alias"
   Sequel[:column].as(:alias)                 # "column" AS "alias"
   Sequel[:table][:column].as(:alias)         # "table"."column" AS "alias"
+  (Sequel[:column] + 1).as(:alias)           # ("column" + 1) AS "alias"
 
 You can also use the symbol_as extension for creating aliased identifiers:
 
+  Sequel.extension :symbol_as
   :column.as(:alias) # "column" AS "alias"
 
 If you want to use a derived column list, you can provide an array of column aliases:
@@ -215,11 +202,11 @@ Aggregate functions work the same way as normal functions, since they share the 
 
   Sequel.function(:sum, :column) # sum(column)
 
-To use the DISTINCT modifier to an aggregate function, call the +distinct+ method on the function:
+To use the DISTINCT modifier to an aggregate function, call the +distinct+ method on the function expression, which returns a new function expression:
 
   DB[:albums].select{sum(:column).distinct} # SELECT sum(DISTINCT column) FROM albums
 
-If you want to use the wildcard as the sole argument of the aggregate function, use the * method on the Function:
+If you want to use the wildcard as the sole argument of the aggregate function, use the * method on the function expression:
 
   Sequel.function(:count).* # count(*)
   DB[:albums].select{count.function.*} # SELECT count(*) FROM albums
@@ -228,10 +215,10 @@ Note that Sequel provides helper methods for aggregate functions such as +count+
 
 === Window Functions
 
-If the database supports window functions, Sequel can handle them by calling the +over+ method on a Function:
+If the database supports window functions, Sequel can handle them by calling the +over+ method on a function expression:
 
-  DB[:albums].select{function.function.over}
-  # SELECT function() OVER () FROM albums
+  DB[:albums].select{row_number.function.over}
+  # SELECT row_number() OVER () FROM albums
 
   DB[:albums].select{count.function.*.over}
   # SELECT count(*) OVER () FROM albums
@@ -244,12 +231,12 @@ If the database supports window functions, Sequel can handle them by calling the
 
 === Schema Qualified Functions
 
-If the database supports schema qualified functions, Sequel can handle them by calling the +function+ method on a QuailfiedIdentifier:
+If the database supports schema qualified functions, Sequel can handle them by calling the +function+ method on a qualified identifier:
 
   DB[:albums].select{schema[:function].function}
   # SELECT schema.function() FROM albums
   
-  DB[:albums].select{schema[:function].function(col, 2, "a")}
+  DB[:albums].select{schema[:function].function(:col, 2, "a")}
   # SELECT schema.function(col, 2, 'a') FROM albums
 
 === Portable/Emulated Functions
@@ -265,7 +252,7 @@ Some examples are:
 
 Sequel uses hashes to specify equality:
 
-  {:column=>1} # ("column" = 1)
+  {column: 1} # ("column" = 1)
 
 You can also specify this as an array of two element arrays:
 
@@ -279,27 +266,27 @@ For expression objects, you can also use the =~ method:
 
 You can specify a not equals condition by inverting the hash or array of two element arrays using <tt>Sequel.negate</tt> or <tt>Sequel.~</tt>:
 
-  Sequel.negate(:column => 1)   # ("column" != 1)
+  Sequel.negate(column: 1)      # ("column" != 1)
   Sequel.negate([[:column, 1]]) # ("column" != 1)
-  Sequel.~(:column => 1)        # ("column" != 1)
+  Sequel.~(column: 1)           # ("column" != 1)
   Sequel.~([[:column, 1]])      # ("column" != 1)
 
 The difference between the two is that +negate+ only works on hashes and arrays of element arrays, and it negates all entries in the hash or array, while ~ does a general inversion.  This is best shown by an example with multiple entries:
 
-  Sequel.negate(:column => 1, :foo => 2)   # (("column" != 1) AND (foo != 2))
-  Sequel.~(:column => 1, :foo => 2)        # (("column" != 1) OR (foo != 2))
+  Sequel.negate(column: 1, foo: 2)   # (("column" != 1) AND (foo != 2))
+  Sequel.~(column: 1, foo: 2)        # (("column" != 1) OR (foo != 2))
 
 You can also use the ~ method on an equality expression:
 
   where{~(column =~ 1)} # ("column" != 1)
 
-On Ruby 1.9+, you can use the !~ method:
+Or you can use the !~ method:
 
   where{column !~ 1} # ("column" != 1)
 
 The most common need for not equals is in filters, in which case you can use the +exclude+ method:
 
-  DB[:albums].exclude(:column=>1) # SELECT * FROM "albums" WHERE ("column" != 1)
+  DB[:albums].exclude(column: 1) # SELECT * FROM "albums" WHERE ("column" != 1)
 
 Note that +exclude+ does a generalized inversion, similar to <tt>Sequel.~</tt>.
 
@@ -307,19 +294,19 @@ Note that +exclude+ does a generalized inversion, similar to <tt>Sequel.~</tt>.
 
 Sequel also uses hashes to specify inclusion, and inversions of those hashes to specify exclusion:
 
-  {:column=>[1, 2, 3]} # ("column" IN (1, 2, 3))
-  Sequel.~(:column=>[1, 2, 3]) # ("column" NOT IN (1, 2, 3))
+  {column: [1, 2, 3]} # ("column" IN (1, 2, 3))
+  Sequel.~(column: [1, 2, 3]) # ("column" NOT IN (1, 2, 3))
 
 As you may have guessed, Sequel switches from an = to an IN when the hash value is an array.  It also does this for datasets, which easily allows you to test for inclusion and exclusion in a subselect:
 
-  {:column=>DB[:albums].select(:id)} # ("column" IN (SELECT "id" FROM "albums"))
-  Sequel.~(:column=>DB[:albums].select(:id)) # ("column" NOT IN (SELECT "id" FROM "albums"))
+  {column: DB[:albums].select(:id)} # ("column" IN (SELECT "id" FROM "albums"))
+  Sequel.~(column: DB[:albums].select(:id)) # ("column" NOT IN (SELECT "id" FROM "albums"))
 
 Similar to =, you can also use =~ with expressions for inclusion:
 
   where{column =~ [1, 2, 3]} # ("column" IN (1, 2, 3))
 
-and on Ruby 1.9, !~ for exclusion:
+and !~ for exclusion:
 
   where{column !~ [1, 2, 3]} # ("column" NOT IN (1, 2, 3))
 
@@ -331,17 +318,17 @@ Sequel also supports the SQL EXISTS operator using <tt>Dataset#exists</tt>:
 
 Hashes in Sequel use IS if the value is +true+, +false+, or +nil+:
 
-  {:column=>nil} # ("column" IS NULL)
-  {:column=>true} # ("column" IS TRUE)
-  {:column=>false} # ("column" IS FALSE)
+  {column: nil}   # ("column" IS NULL)
+  {column: true}  # ("column" IS TRUE)
+  {column: false} # ("column" IS FALSE)
 
 Negation works the same way as it does for equality and inclusion:
 
-  Sequel.~(:column=>nil) # ("column" IS NOT NULL)
-  Sequel.~(:column=>true) # ("column" IS NOT TRUE)
-  Sequel.~(:column=>false) # ("column" IS NOT FALSE)
+  Sequel.~(column: nil)   # ("column" IS NOT NULL)
+  Sequel.~(column: true)  # ("column" IS NOT TRUE)
+  Sequel.~(column: false) # ("column" IS NOT FALSE)
 
-Likewise, =~ works for identity (and Ruby 1.9, !~ for negative identity):
+Likewise, =~ works for identity and !~ for negative identity on expressions:
 
   where{column =~ nil} # ("column" IS NULL)
   where{column !~ nil} # ("column" IS NOT NULL)
@@ -354,7 +341,7 @@ Sequel's general inversion operator is ~, which works on symbols and most Sequel
 
 Note that ~ will actually apply the inversion operation to the underlying object, which is why
   
-  Sequel.~(:column=>1)
+  Sequel.~(column: 1)
 
 produces <tt>(column != 1)</tt> instead of <tt>NOT (column = 1)</tt>.
 
@@ -367,7 +354,7 @@ Sequel defines the inequality operators directly on most Sequel-specific express
   Sequel.function(:func) >= 1 # (func() >= 1)
   Sequel.function(:func, :column) <= 1 # (func("column") <= 1)
 
-If you want to use them on a symbol, you should call <tt>Sequel.[]</tt> with the symbol:
+If you want to use them on a symbol, you should call <tt>Sequel.[]</tt> with the symbol to get an expression object:
 
   Sequel[:column] > 1 # ("column" > 1)
 
@@ -403,7 +390,7 @@ Note that since Sequel implements support for Ruby's coercion protocol, the foll
 Sequel defines the & and | methods on most Sequel-specific expression objects to handle AND and OR:
 
   Sequel[:column1] & :column2 # ("column1" AND "column2")
-  Sequel[:column1=>1] | {:column2=>2} # (("column1" = 1) OR ("column2" = 2))
+  Sequel[{column1: 1}] | {column2: 2} # (("column1" = 1) OR ("column2" = 2))
   (Sequel.function(:func) > 1) & :column3 # ((func() > 1) AND "column3")
 
 Note the use of parentheses in the last statement.  If you omit them, you won't get what you expect.
@@ -418,28 +405,28 @@ is parsed as:
 You can also use the <tt>Sequel.&</tt> and <tt>Sequel.|</tt> methods:
 
   Sequel.&(:column1, :column2) # ("column1" AND "column2")
-  Sequel.|({:column1=>1}, {:column2=>2}) # (("column1" = 1) OR ("column2" = 2))
+  Sequel.|({column1: 1}, {column2: 2}) # (("column1" = 1) OR ("column2" = 2))
 
 You can use hashes and arrays of two element arrays to specify AND and OR with equality conditions:
 
-  {:column1=>1, :column2=>2} # (("column1" = 1) AND ("column2" = 2))
+  {column1: 1, column2: 2} # (("column1" = 1) AND ("column2" = 2))
   [[:column1, 1], [:column2, 2]] # (("column1" = 1) AND ("column2" = 2))
 
 As you can see, these literalize with ANDs by default.  You can use the <tt>Sequel.or</tt> method to use OR instead:
 
-  Sequel.or(:column1=>1, :column2=>2) # (("column1" = 1) OR ("column2" = 2))
+  Sequel.or(column1: 1, column2: 2) # (("column1" = 1) OR ("column2" = 2))
 
 You've already seen the <tt>Sequel.negate</tt> method, which will use ANDs if multiple entries are used:
 
-  Sequel.negate(:column1=>1, :column2=>2) # (("column1" != 1) AND ("column2" != 2))
+  Sequel.negate(column1: 1, column2: 2) # (("column1" != 1) AND ("column2" != 2))
  
 To negate while using ORs, the <tt>Sequel.~</tt> operator can be used:
 
-  Sequel.~(:column1=>1, :column2=>2) # (("column1" != 1) OR ("column2" != 2))
+  Sequel.~(column1: 1, column2: 2) # (("column1" != 1) OR ("column2" != 2))
 
 Note again that <tt>Dataset#exclude</tt> uses ~, not +negate+:
 
-  DB[:albums].exclude(:column1=>1, :column2=>2) # SELECT * FROM "albums" WHERE (("column" != 1) OR ("column2" != 2))
+  DB[:albums].exclude(column1: 1, column2: 2) # SELECT * FROM "albums" WHERE (("column" != 1) OR ("column2" != 2))
 
 === Casts
 
@@ -521,8 +508,8 @@ Sequel also supports SQL regular expressions on MySQL and PostgreSQL.  You can u
 
   Sequel.like(:name, /^A/) # ("name" ~ '^A')
   ~Sequel.ilike(:name, /^A/) # ("name" !~* '^A')
-  {:name=>/^A/i} # ("name" ~* '^A')
-  Sequel.~(:name=>/^A/) # ("name" !~ '^A')
+  {name: /^A/i} # ("name" ~* '^A')
+  Sequel.~(name: /^A/) # ("name" !~ '^A')
 
 Note that using +ilike+ with a regular expression will always make the regexp case insensitive.  If you use +like+ or the hash with regexp value, it will only be case insensitive if the Regexp itself is case insensitive.
 
@@ -545,21 +532,22 @@ On some databases, you can specify null ordering:
 
 === All Columns (.*)
 
-To select all columns in a table, Sequel supports the * method on identifiers without an argument:
+To select all columns in a table, Sequel supports the * method on identifiers and qualified without an argument:
 
-  Sequel[:table].* # "table".*
+  Sequel[:table].*          # "table".*
+  Sequel[:schema][:table].* # "schema"."table".*
 
 === CASE statements
 
-Sequel allows the easy production of SQL CASE statements using the <tt>Sequel.case</tt> method.  The first argument is a hash or array of two element arrays representing the conditions, the second argument is the default value (ELSE).  The keys of the hash (or first element in each array) is the WHEN condition, and the values of the hash (or second element in each array) is the THEN result.  Here are some examples:
+Sequel supports SQL CASE statements using the <tt>Sequel.case</tt> method.  The first argument is a hash or array of two element arrays representing the conditions, the second argument is the default value (ELSE).  The keys of the hash (or first element in each array) is the WHEN condition, and the values of the hash (or second element in each array) is the THEN result.  Here are some examples:
 
-  Sequel.case({:column=>1}, 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
-  Sequel.case([[column, 1]], 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
-  Sequel.case({{:column=>nil}=>1}, 0) # (CASE WHEN (column IS NULL) THEN 1 ELSE 0 END)
+  Sequel.case({column: 1}, 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
+  Sequel.case([[:column, 1]], 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
+  Sequel.case({{column: nil}=>1}, 0) # (CASE WHEN (column IS NULL) THEN 1 ELSE 0 END)
 
 If the hash or array has multiple arguments, multiple WHEN clauses are used:
 
-  Sequel.case({:c=>1, :d=>2}, 0) # (CASE WHEN "c" THEN 1 WHEN "d" THEN 2 ELSE 0 END)
+  Sequel.case({c: 1, d: 2}, 0) # (CASE WHEN "c" THEN 1 WHEN "d" THEN 2 ELSE 0 END)
   Sequel.case([[:c, 1], [:d, 2]], 0) # (CASE WHEN "c" THEN 1 WHEN "d" THEN 2 ELSE 0 END)
 
 If you provide a 3rd argument to <tt>Sequel.case</tt>, it goes between CASE and WHEN:
