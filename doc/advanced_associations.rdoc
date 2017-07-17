@@ -1,19 +1,22 @@
 = Advanced Associations
 
-Sequel::Model has the most powerful and flexible associations of any ruby ORM.
+Sequel::Model's association support is very powerful and flexible, but using that power and flexibility
+often results in complexity.
+
+You should probably review the {Model Associations Basics and Options guide}[rdoc-ref:doc/association_basics.rdoc]
+before reviewing this guide.
 
 == Background: Sequel::Model association options
 
 There are a bunch of advanced association options that are available to
-handle more complex cases.  First we'll go over some of
-the simpler ones:
+handle more complex cases.  First we'll go over some of the simpler ones:
 
 All associations take a block that can be used to further filter/modify the
 default dataset.  There's also an :eager_block option if you want to use
 a different block when eager loading via <tt>Dataset#eager</tt>. Association blocks are
 useful for things like:
 
-  Artist.one_to_many :gold_albums, :class=>:Album do |ds|
+  Artist.one_to_many :gold_albums, class: :Album do |ds|
     ds.where{copies_sold > 500000}
   end
 
@@ -42,24 +45,23 @@ These can be used like this:
 
   # Makes Artist.eager_graph(:required_albums).all not return artists that
   # don't have any albums
-  Artist.one_to_many :required_albums, :class=>:Album, :graph_join_type=>:inner
+  Artist.one_to_many :required_albums, class: :Album, graph_join_type: :inner
   
   # Makes sure all returned albums have the active flag set
-  Artist.one_to_many :active_albums, :class=>:Album, \
-    :graph_conditions=>{:active=>true}
+  Artist.one_to_many :active_albums, class: :Album, graph_conditions: {active: true}
     
   # Only returns albums that have sold more than 500,000 copies
-  Artist.one_to_many :gold_albums, :class=>:Album, \
-    :graph_block=>proc{|j,lj,js| Sequel[j][:copies_sold] > 500000}
+  Artist.one_to_many :gold_albums, class: :Album,
+    graph_block: proc{|j,lj,js| Sequel[j][:copies_sold] > 500000}
     
   # Handles the case where the tables are associated by a case insensitive name string
-  Artist.one_to_many :albums, :key=>:artist_name, \
-    :graph_only_conditions=>nil, \
-    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel[j][:artist_name])=>Sequel.function(:lower, Sequel[lj][:name])}}
+  Artist.one_to_many :albums, key: :artist_name,
+    graph_only_conditions: nil,
+    graph_block: proc{|j,lj,js| {Sequel.function(:lower, Sequel[j][:artist_name])=>Sequel.function(:lower, Sequel[lj][:name])}}
     
   # Handles the case where both key columns have the name artist_name, and you want to use
   # a JOIN USING
-  Artist.one_to_many :albums, :key=>:artist_name, :graph_only_conditions=>[:artist_name]
+  Artist.one_to_many :albums, key: :artist_name, graph_only_conditions: [:artist_name]
   
 Remember, using +eager_graph+ is generally only necessary when you need to
 filter/order based on columns in an associated table, it is recommended to
@@ -244,7 +246,7 @@ loading.
 
 Sequel supports specifying limits and/or offsets for associations:
 
-  Artist.one_to_many :first_10_albums, :class=>:Album, :order=>:release_date, :limit=>10
+  Artist.one_to_many :first_10_albums, class: :Album, order: :release_date, limit: 10
 
 For retrieving the associated objects for a single object, this just uses
 a LIMIT:
@@ -260,7 +262,7 @@ approach.  Sequel has 4 separate strategies for dealing with such cases.
 The default strategy used on all databases is a UNION-based approach, which
 will submit multiple subqueries in a UNION query:
 
-  Artist.where(:id=>[1,2]).eager(:first_10_albums).all
+  Artist.where(id: [1,2]).eager(:first_10_albums).all
   # SELECT * FROM (SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10) UNION ALL
   # SELECT * FROM (SELECT * FROM albums WHERE (artist_id = 2) LIMIT 10)
 
@@ -272,9 +274,9 @@ index, you'll want to manually specify the :eager_limit_strategy option as shown
 On PostgreSQL, for *_one associations that don't use an offset, you can
 choose to use a the distinct on strategy:
 
-  Artist.one_to_one :first_album, :class=>:Album, :order=>:release_date,
-    :eager_limit_strategy=>:distinct_on
-  Artist.where(:id=>[1,2]).eager(:first_album).all
+  Artist.one_to_one :first_album, class: :Album, order: :release_date,
+    eager_limit_strategy: :distinct_on
+  Artist.where(id: [1,2]).eager(:first_album).all
   # SELECT DISTINCT ON (albums.artist_id) *
   # FROM albums
   # WHERE (albums.artist_id IN (1, 2))
@@ -283,8 +285,8 @@ choose to use a the distinct on strategy:
 Otherwise, if the database supports window functions, you can choose to use
 the window function strategy:
 
-  Artist.one_to_many :first_10_albums, :class=>:Album, :order=>:release_date, :limit=>10,
-    :eager_limit_strategy=>:window_function
+  Artist.one_to_many :first_10_albums, class: :Album, order: :release_date, limit: 10,
+    eager_limit_strategy: :window_function
   Artist.where(:id=>[1,2]).eager(:first_10_albums).all
   # SELECT * FROM (
   #   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x
@@ -304,7 +306,7 @@ known at the time of the association definition), Sequel supports an
 :eager_limit dataset option that can be defined in an eager loading callback:
 
   Artist.one_to_many :albums
-  Artist.where(:id => [1, 2]).eager(:albums => proc{|ds| ds.order(:release_date).clone(:eager_limit => 3)}).all
+  Artist.where(id: [1, 2]).eager(albums: lambda{|ds| ds.order(:release_date).clone(eager_limit: 3)}).all
   # SELECT * FROM (
   #   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x
   #   FROM albums
@@ -314,7 +316,7 @@ known at the time of the association definition), Sequel supports an
 
 You can also customize the :eager_limit_strategy on a case-by-case basis by passing in that option in the same way:
 
-  Artist.where(:id => [1, 2]).eager(:albums => proc{|ds| ds.order(:release_date).clone(:eager_limit => 3, :eager_limit_strategy => :ruby)}).all
+  Artist.where(id: [1, 2]).eager(albums: lambda{|ds| ds.order(:release_date).clone(eager_limit: 3, eager_limit_strategy: :ruby)}).all
   # SELECT * FROM albums WHERE (albums.artist_id IN (1, 2)) ORDER BY release_date
 
 The :eager_limit and :eager_limit_strategy options currently only work when
@@ -333,7 +335,7 @@ eager_graph_with_options method with the :limit_strategy option.
 The :distinct_on strategy uses DISTINCT ON in a subquery and JOINs that
 subquery:
 
-  Artist.eager_graph_with_options(:first_album, :limit_strategy=>true).all
+  Artist.eager_graph_with_options(:first_album, limit_strategy: :distinct_on).all
   # SELECT artists.id, artists.name, first_album.id AS first_album_id,
   #        first_album.name AS first_album_name, first_album.artist_id,
   #        first_album.release_date
@@ -347,7 +349,7 @@ subquery:
 The :window_function approach JOINs to a nested subquery using a window
 function:
 
-  Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>true).all
+  Artist.eager_graph_with_options(:first_10_albums, limit_strategy: :window_function).all
   # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
   #        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,
   #        first_10_albums.release_date
@@ -363,7 +365,7 @@ function:
 The :correlated_subquery approach JOINs to a nested subquery using a correlated
 subquery:
 
-  Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>true).all
+  Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>:correlated_subquery).all
   # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
   #        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,
   #        first_10_albums.release_date
@@ -379,8 +381,6 @@ subquery:
   #     LIMIT 10
   #   )
   # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)
-
-(SELECT * FROM tracks WHERE (tracks.id IN (SELECT t1.id FROM tracks AS t1 WHERE (t1.album_id = tracks.album_id) LIMIT 1)))
 
 The reason that Sequel does not automatically use the :distinct_on, :window function
 or :correlated_subquery strategy for eager_graph is that it can perform much worse than the
@@ -403,7 +403,7 @@ strategy based on the database you are using, and you can override it using the
 
 The :distinct_on strategy:
 
-  Artist.where(:first_album=>Album[1]).all
+  Artist.where(first_album: Album[1]).all
   # SELECT *
   # FROM artists
   # WHERE (artists.id IN (
@@ -417,7 +417,7 @@ The :distinct_on strategy:
 
 The :window_function strategy:
 
-  Artist.where(:first_10_albums=>Album[1]).all
+  Artist.where(first_10_albums: Album[1]).all
   # SELECT *
   # FROM artists
   # WHERE (artists.id IN (
@@ -433,7 +433,7 @@ The :window_function strategy:
 
 The :correlated_subquery strategy:
 
-  Artist.where(:first_10_albums=>Album[1]).all
+  Artist.where(first_10_albums: Album[1]).all
   # SELECT *
   # FROM artists
   # WHERE (artists.id IN (
@@ -447,11 +447,11 @@ The :correlated_subquery strategy:
   #     LIMIT 1
   #   )) AND (albums.id = 1))))
 
-Note that filtering by limited associations does not work on MySQL, as does not support
+Note that filtering by limited associations does not work on MySQL, as MySQL does not support
 any of the strategies.  It's also not supported when using composite keys on databases
 that don't support window functions and don't support multiple columns in IN.
 
-== Additional Association Types
+=== Additional Association Types
 
 While the above examples for limited associations showed one_to_many and one_to_one associations,
 it's just because those are the simplest examples.  Sequel supports all of the same features for
@@ -459,29 +459,7 @@ many_to_many and one_through_one associations that are enabled by default, as we
 many_through_many and one_through_many associations that are added by the many_through_many
 plugin.
 
-== ActiveRecord associations
-
-Sequel supports all of associations that ActiveRecord supports, though some
-require different approaches or custom <tt>:eager_loader</tt> options.
-
-=== Association callbacks
-
-Sequel supports the same callbacks that ActiveRecord does for +one_to_many+ and
-+many_to_many+ associations: <tt>:before_add</tt>, <tt>:before_remove</tt>, <tt>:after_add</tt>, and
-<tt>:after_remove</tt>. For +many_to_one+ associations and +one_to_one+ associations, Sequel
-supports the <tt>:before_set</tt> and <tt>:after_set</tt> callbacks.  On all associations,
-Sequel supports <tt>:after_load</tt>, which is called after the association has been
-loaded.
-
-Each of these options can be a symbol specifying an instance method
-that takes one argument (the associated object), or a proc that takes
-two arguments (the current object and the associated object), or an
-array of symbols and procs.  For <tt>:after_load</tt> with a *_to_many association,
-the associated object argument is an array of associated objects.
-
-If any of the before callbacks return +false+, the adding/removing
-does not happen and it either raises a <tt>Sequel::HookFailed</tt> (the default), or
-returns false (if +raise_on_save_failure+ is false).
+== More advanced association examples 
 
 === Association extensions
 
@@ -504,36 +482,21 @@ the model object that created the association dataset via the dataset's
     end
   end
   class Author < Sequel::Model
-    one_to_many :authorships, :extend=>FindOrCreate
+    one_to_many :authorships, extend: FindOrCreate
   end
-  Author.first.authorships_dataset.find_or_create(:name=>'Blah', :number=>10)
+  Author.first.authorships_dataset.find_or_create(name: 'Blah', number: 10)
 
-=== <tt>has_many :through</tt> associations
+=== many_to_many associations through model tables
 
-+many_to_many+ handles the usual case of a <tt>has_many :through</tt> with a +belongs_to+ in
-the associated model.  It doesn't break on the case where the join table is a
-model table, unlike ActiveRecord's +has_and_belongs_to_many+.
-
-ActiveRecord:
-
-  class Author < ActiveRecord::Base
-    has_many :authorships
-    has_many :books, :through => :authorships
-  end
-
-  class Authorship < ActiveRecord::Base
-    belongs_to :author
-    belongs_to :book
-  end
-
-  @author = Author.find :first
-  @author.books
-
-Sequel::Model:
+The many_to_many association can be used even when the join table is a table used for a
+model.  The only requirement is the join table has foreign keys to both the current
+model and the associated model.  Anytime there is a one_to_many association from model A to
+model B, and model B has a many_to_one association to model C, you can use a many_to_many
+association from model A to model C.
 
   class Author < Sequel::Model
     one_to_many :authorships
-    many_to_many :books, :join_table=>:authorships
+    many_to_many :books, join_table: :authorships
   end
 
   class Authorship < Sequel::Model
@@ -544,33 +507,17 @@ Sequel::Model:
   @author = Author.first
   @author.books
 
-If you use an association other than +belongs_to+ in the associated model, such as a +has_many+,
-you still use a +many_to_many+ association, but you need to use some options:
+=== many_to_many for three-level associations
 
-ActiveRecord:
-
-  class Firm < ActiveRecord::Base
-    has_many :clients
-    has_many :invoices, :through => :clients
-  end
-
-  class Client < ActiveRecord::Base
-    belongs_to :firm
-    has_many :invoices
-  end
-
-  class Invoice < ActiveRecord::Base
-    belongs_to :client
-    has_one :firm, :through => :client
-  end
-
-  Firm.find(:first).invoices
-  
-Sequel::Model:
+You can even use a many_to_many association between model A and model C if model A has a
+one_to_many association to model B, and model B has a one_to_many association to model C.
+You just need to use the appropriate :right_key and :right_primary_key options.  And in
+the reverse direction from model C to model A, you can use a one_through_one association
+using the :left_key and :left_primary_key options.
 
   class Firm < Sequel::Model
     one_to_many :clients
-    many_to_many :invoices, :join_table=>:clients, :right_key=>:id, :right_primary_key=>:client_id
+    many_to_many :invoices, join_table: :clients, right_key: :id, right_primary_key: :client_id
   end 
 
   class Client < Sequel::Model
@@ -580,12 +527,13 @@ Sequel::Model:
 
   class Invoice < Sequel::Model
     many_to_one :client
-    one_through_one :firm, :join_table=>:clients, :left_key=>:id, :left_primary_key=>:client_id, :right_key=>:firm_id
+    one_through_one :firm, join_table: :clients, left_key: :id, left_primary_key: :client_id
   end
 
   Firm.first.invoices
+  Invoice.first.firm
 
-To handle cases where there are multiple join tables, use the many_through_many
+To handle cases where there are multiple join tables, you can use the many_through_many
 plugin that ships with Sequel.
 
 === Polymorphic Associations
@@ -602,38 +550,19 @@ you are stuck with an existing design that uses them.
 If you must use them, look for the sequel_polymorphic external plugin, as it makes using
 polymorphic associations in Sequel about as easy as it is in ActiveRecord.  However,
 here's how they can be done using Sequel's custom associations (the sequel_polymorphic
-plugin is just a generic version of this code):
-
-ActiveRecord:
-
-  class Asset < ActiveRecord::Base
-    belongs_to :attachable, :polymorphic => true
-  end
-
-  class Post < ActiveRecord::Base
-    has_many :assets, :as => :attachable
-  end
-
-  class Note < ActiveRecord::Base
-    has_many :assets, :as => :attachable
-  end
-
-  @asset.attachable = @post
-  @asset.attachable = @note
-
-Sequel::Model:
+external plugin is just a generic version of this code):
 
   class Asset < Sequel::Model
-    many_to_one :attachable, :reciprocal=>:assets,
-      :setter=>(proc do |attachable|
+    many_to_one :attachable, reciprocal: :assets,
+      setter: (lambda do |attachable|
         self[:attachable_id] = (attachable.pk if attachable)
         self[:attachable_type] = (attachable.class.name if attachable)
       end),
-      :dataset=>(proc do
+      dataset: (proc do
         klass = attachable_type.constantize
         klass.where(klass.primary_key=>attachable_id)
       end),
-      :eager_loader=>(proc do |eo|
+      eager_loader: (lambda do |eo|
         id_map = {}
         eo[:rows].each do |asset|
           asset.associations[:attachable] = nil 
@@ -651,23 +580,21 @@ Sequel::Model:
   end 
 
   class Post < Sequel::Model
-    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Post'},
-      :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Post')},
-      :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
-      :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
+    one_to_many :assets, key: :attachable_id, reciprocal: :attachable, conditions: {attachable_type: 'Post'},
+      adder: lambda{|asset| asset.update(attachable_id: pk, attachable_type: 'Post')},
+      remover: lambda{|asset| asset.update(attachable_id: nil, attachable_type: nil)},
+      clearer: lambda{assets_dataset.update(attachable_id: nil, attachable_type: nil)}
   end
 
   class Note < Sequel::Model
-    one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable, :conditions=>{:attachable_type=>'Note'},
-      :adder=>proc{|asset| asset.update(:attachable_id=>pk, :attachable_type=>'Note')},
-      :remover=>proc{|asset| asset.update(:attachable_id=>nil, :attachable_type=>nil)},
-      :clearer=>proc{assets_dataset.update(:attachable_id=>nil, :attachable_type=>nil)}
+    one_to_many :assets, key: :attachable_id, reciprocal: :attachable, conditions: {attachable_type: 'Note'},
+      adder: lambda{|asset| asset.update(attachable_id: pk, attachable_type: 'Note')},
+      remover: lambda{|asset| asset.update(attachable_id: nil, attachable_type: nil)},
+      clearer: lambda{assets_dataset.update(attachable_id: nil, attachable_type: nil)}
   end
 
   @asset.attachable = @post
   @asset.attachable = @note
-
-== Other advanced associations
 
 === Joining on multiple keys
 
@@ -680,10 +607,10 @@ associations:
   # associated favorite track
   
   class Track < Sequel::Model
-    many_to_one :favorite_track, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id]
+    many_to_one :favorite_track, key: [:disc_number, :number, :album_id], primary_key: [:disc_number, :number, :album_id]
   end
   class FavoriteTrack < Sequel::Model
-    one_to_one :tracks, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id]
+    one_to_one :tracks, key: [:disc_number, :number, :album_id], primary_key: [:disc_number, :number, :album_id]
   end
 
 === Tree - All Ancestors and Descendents
@@ -692,24 +619,24 @@ Let's say you want to store a tree relationship in your database, it's pretty
 simple:
 
   class Node < Sequel::Model
-    many_to_one :parent, :class=>self
-    one_to_many :children, :key=>:parent_id, :class=>self
+    many_to_one :parent, class: self
+    one_to_many :children, key: :parent_id, class: self
   end
   
 You can easily get a node's parent with node.parent, and a node's children with
 node.children.  You can even eager load the relationship up to a certain depth:
 
   # Eager load three generations of generations of children for a given node 
-  Node.where(:id=>1).eager(:children=>{:children=>:children}).all.first
+  Node.where(id: 1).eager(children: {children: :children}).all.first
   # Load parents and grandparents for a group of nodes
-  Node.where{id < 10}.eager(:parent=>:parent).all
+  Node.where{id < 10}.eager(parent: :parent).all
 
 What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?
 
   class Node < Sequel::Model
-    many_to_one :ancestors, :class=>self,
-     :eager_loader=>(proc do |eo|
+    many_to_one :ancestors, class: self,
+     eager_loader: (lambda do |eo|
       # Handle cases where the root node has the same parent_id as primary_key
       # and also when it is NULL
       non_root_nodes = eo[:rows].reject do |n| 
@@ -727,13 +654,13 @@ without knowing the depth of the tree?
         non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) << n}
         # Doesn't cause an infinte loop, because when only the root node
         # is left, this is not called.
-        Node.where(Node.primary_key=>id_map.keys).eager(:ancestors).all do |node|
+        Node.where(id: id_map.keys).eager(:ancestors).all do |node|
           # Populate the parent association for each node
           id_map[node.pk].each{|n| n.associations[:parent] = node}
         end 
       end 
     end)
-    many_to_one :descendants, :eager_loader=>(proc do |eo|
+    many_to_one :descendants, eager_loader: (lambda do |eo|
       id_map = {}
       eo[:rows].each do |n| 
         # Initialize an empty array of child associations for each parent node
@@ -745,7 +672,7 @@ without knowing the depth of the tree?
       # if no records are returned.  Exclude id = parent_id to avoid infinite loop
       # if the root note is one of the returned records and it has parent_id = id
       # instead of parent_id = NULL.
-      Node.where(:parent_id=>id_map.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
+      Node.where(parent_id: id_map.keys).exclude(id: :parent_id).eager(:descendants).all do |node|
         # Get the parent from the identity map
         parent = id_map[node.parent_id]
         # Set the child's parent association to the parent 
@@ -756,11 +683,7 @@ without knowing the depth of the tree?
     end)
   end
 
-Note that unlike ActiveRecord, Sequel supports common table expressions, which allows you to use recursive queries.
-The results are not the same as in the above case, as all descendents are stored in a single association,
-but all descendants can be both lazy loaded or eager loaded in a single query (assuming your database
-supports recursive common table expressions).  Sequel ships with an +rcte_tree+ plugin that makes
-this easy:
+Note that Sequel ships with an rcte_tree plugin that does all of the above and more:
 
   class Node < Sequel::Model
     plugin :rcte_tree
@@ -780,15 +703,15 @@ What you want to do is get all songs for a given artist, ordered by the song's
 name, with no duplicates?
 
   class Artist < Sequel::Model
-    one_to_many :songs, :order=>Sequel[:songs][:name], \
-      :dataset=>proc{Song.select_all(:songs).join(Lyric, :id=>:lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])}, \
-      :eager_loader=>(proc do |eo|
+    one_to_many :songs, order: Sequel[:songs][:name],
+      dataset: proc{Song.select_all(:songs).join(:lyrics, id: :lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])},
+      eager_loader: (lambda do |eo|
         h = eo[:id_map]
         ids = h.keys
         eo[:rows].each{|r| r.associations[:songs] = []}
         Song.select_all(:songs).
           select_append{[lyrics[:composer_id], lyrics[:arranger_id], lyrics[:vocalist_id], lyrics[:lyricist_id]}.
-          join(Lyric, :id=>:lyric_id){Sequel.or(:composer_id=>ids, :arranger_id=>ids, :vocalist_id=>ids, :lyricist_id=>ids)}.
+          join(:lyrics, id: :lyric_id){Sequel.or(composer_id: ids, arranger_id: ids, vocalist_id: ids, lyricist_id: ids)}.
           order{songs[:name]}.all do |song|
           [:composer_id, :arranger_id, :vocalist_id, :lyricist_id].each do |x|
             recs = h[song.values.delete(x)]
@@ -811,11 +734,11 @@ associated tickets.
 
   class Project < Sequel::Model
     one_to_many :tickets
-    many_to_one :ticket_hours, :read_only=>true, :key=>:id,
-     :dataset=>proc{Ticket.where(:project_id=>id).select{sum(hours).as(hours)}},
-     :eager_loader=>(proc do |eo|
+    many_to_one :ticket_hours, read_only: true, key: :id,
+     dataset: proc{Ticket.where(:project_id=>id).select{sum(hours).as(hours)}},
+     eager_loader: (lambda do |eo|
       eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
-      Ticket.where(:project_id=>eo[:id_map].keys).
+      Ticket.where(project_id: eo[:id_map].keys).
        select_group(:project_id).
        select_append{sum(hours).as(hours)}.
        all do |t|
@@ -838,4 +761,4 @@ associated tickets.
   end
 
 Note that it is often better to use a sum cache instead of this approach.  You can implement
-a sum cache using +after_create+ and +after_delete+ hooks, or preferrably using a database trigger.
+a sum cache using +after_create+, +after_update+, and +after_delete+ hooks, or preferrably using a database trigger.
