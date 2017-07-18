@@ -9,7 +9,7 @@ call the dataset methods directly:
 
   Album.
     select(:id, :name, :copies_sold).
-    where(:release_year=>params[:year].to_i).
+    where(release_year: params[:year].to_i).
     order(Sequel.desc(:copies_sold)).
     all
 
@@ -19,7 +19,7 @@ One issue with this design is that it ties you to your current database schema, 
     dataset_module do
       def all_albums_released_in_year(year)
         select(:id, :name, :copies_sold).
-        where(:release_year=>year).
+        where(release_year: year).
         order(Sequel.desc(:copies_sold)).
         all
       end
@@ -30,7 +30,7 @@ Then your application code just needs to call your dataset method:
 
   Album.all_albums_released_in_year(params[:year].to_i)
 
-The advantage of this approach is that you can change your schema at any point in the future, and you should only need to change your model code, you should never need to change your application code.
+The advantage of this approach is that you can change your schema at any point in the future, and you should only need to change your model code, you should never need to change other application code.
 
 == Performance
 
@@ -42,16 +42,14 @@ Second, assuming the performance issue is at the Sequel level, you need to under
 
   def all_albums_released_in_year(year)
     select(:id, :name, :copies_sold). # new dataset allocated
-    where(:release_year=>year).       # new dataset allocated
+    where(release_year: year).        # new dataset allocated
     order(Sequel.desc(:copies_sold)). # new dataset allocated
     all
   end
 
-Third, you need to understand that Sequel has optimizations specifically designed to reduce the number of objects allocated, by caching intermediate data structures.  However, these optimizations apply only to frozen datasets, and can only provide a benefit if related methods are called multiple times on the same dataset.  One easy way to do this is to use frozen model datasets is to use the +freeze_datasets+ Database extension before creating your model class:
+Third, you need to understand that Sequel has optimizations specifically designed to reduce the number of objects allocated, by caching intermediate datasets.  Unfortunately, those optimizations do not apply in this case.  The reason for this is that +select+, +where+, and +order+ can potentially receive arbitrary arguments, and enabling caching for them could easily lead to unbounded cache size (denial of service due to memory exhaustion).
 
-  DB.extension :freeze_datasets
-
-Note that freezing datasets is not enough to enable caching in this case.  The reason for this is that +select+, +where+, and +order+ can potentially receive arbitrary arguments, and enabling caching for them could easily lead to unbounded cache size (denial of service due to memory exhaustion).  You need to signal to Sequel that particular arguments to these methods should be cached, and you can do that by calling methods inside +dataset_module+ blocks such as +select+ and +order+.  These methods will add dataset methods to the model that can use caching to optimize performance.  Here is an example using these methods:
+To allow intermediate dataset caching to work, you need to signal to Sequel that particular arguments to these methods should be cached, and you can do that by calling methods inside +dataset_module+ blocks such as +select+ and +order+.  These methods will add dataset methods to the model that can cache the returned dataset to optimize performance.  Here is an example using these methods:
 
   class Album < Sequel::Model
     dataset_module do
@@ -61,7 +59,7 @@ Note that freezing datasets is not enough to enable caching in this case.  The r
       def all_albums_released_in_year(year)
         with_name_and_units.
         by_units_sold.
-        where(:release_year=>year).
+        where(release_year: year).
         all
       end
     end
@@ -74,14 +72,14 @@ By calling +select+ and +order+ here, Sequel expects that the created dataset me
   def all_albums_released_in_year(year)
     with_name_and_units.        # cached dataset returned 
     by_units_sold.              # cached dataset returned
-    where(:release_year=>year). # new dataset allocated
+    where(release_year: year).  # new dataset allocated
     all
   end
 
 Note that the order of methods here is important.  If you instead change the method chain to filter the dataset first, then no caching happens:
 
   def all_albums_released_in_year(year)
-    where(:release_year=>year). # new dataset allocated
+    where(release_year: year).  # new dataset allocated
     with_name_and_units.        # new dataset allocated
     by_units_sold.              # new dataset allocated
     all
@@ -89,7 +87,7 @@ Note that the order of methods here is important.  If you instead change the met
 
 This is because any time a new, uncached dataset is returned by a dataset method, all subsequent methods in the method chain cannot benefit from caching.
 
-Usually, when you are designing methods to process data based on user input, the user input affects the rows selected, and not the columns selected or the order in which the rows are returned.  Sequel is aware of this and has model dataset methods that specifically take user input (arguments), interpret them as a filter condition and either:
+Usually, when you are designing methods to process data based on user input, the user input affects the rows selected, and not the columns selected or the order in which the rows are returned.  Sequel is aware of this and has dataset methods that specifically take user input (arguments), interpret them as a filter condition and either:
 
 * Return all matching rows in an array (+where_all+)
 * Iterate over all matching rows (+where_each+)
@@ -101,14 +99,13 @@ After calling these methods on a cached dataset a number of times (currently 3),
   def all_albums_released_in_year(year)
     with_name_and_units.           # cached dataset returned
     by_units_sold.                 # cached dataset returned
-    where_all(:release_year=>year) # cached loader used
+    where_all(release_year: year)  # cached loader used
   end
 
 This can significantly improve performance, up to 3x for complex method chains that only return a few rows.
 
-So the general advice on designing datasets for performance is:
+So the general advice on designing dataset methods for performance is:
 
-* Use frozen datasets
 * Use +dataset_module+ methods to create named dataset methods that return cached datasets
 * If any filtering is to be done, have it done last using +where_all+, +where_each+, +first+, or +where_single_value+.
 
@@ -120,12 +117,12 @@ The best way to further increase performance at the Sequel level is to switch to
 
   class Album < Sequel::Model
     ALBUMS_RELEASED_IN_YEAR = select(:id, :name, :copies_sold).
-      where(:release_year=>:$year).
+      where(release_year: :$year).
       order(Sequel.desc(:copies_sold)).
       prepare(:all, :all_albums_released_in_year)
 
     def self.all_albums_released_in_year(year)
-      ALBUMS_RELEASED_IN_YEAR.call(:year=>year)
+      ALBUMS_RELEASED_IN_YEAR.call(year: year)
     end
   end
 
