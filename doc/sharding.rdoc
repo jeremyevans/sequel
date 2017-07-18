@@ -13,7 +13,7 @@ option.  Using the :servers database option makes Sequel use a connection pool
 class that supports sharding, and the minimum required to enable sharding
 support is to use the empty hash:
 
-  DB=Sequel.connect('postgres://master_server/database', :servers=>{})
+  DB=Sequel.connect('postgres://master_server/database', servers: {})
 
 In most cases, you are probably not going to want to use an empty hash.  Keys in the server hash are
 not restricted to type, but the general recommendation is to use a symbol
@@ -35,8 +35,8 @@ tables you are accessing, unless you really know what you are doing.
 To use a single, read-only slave that handles SELECT queries, the following
 is the simplest configuration:
 
-  DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:read_only=>{:host=>'slave_server'}})
+  DB=Sequel.connect('postgres://master_server/database', 
+    servers: {read_only: {host: 'slave_server'}})
 
 This will use the slave_server for SELECT queries and master_server for
 other queries.
@@ -48,8 +48,8 @@ the symbol name defined in the connect options. For example:
   # Force the SELECT to run on the master
   DB[:users].server(:default).all
 
-  # Force the SELECT to run on the read-only slave
-  DB[:users].server(:read_only).all
+  # Force the DELETE to run on the read-only slave
+  DB[:users].server(:read_only).delete
 
 === Multiple Read-Only Slaves, Single Master
 
@@ -59,13 +59,13 @@ slave_server1, slave_server2, and slave_server3.
   num_read_only = 4
   read_only_host = rand(num_read_only)
   read_only_proc = proc do |db|
-    {:host=>"slave_server#{(read_only_host+=1) % num_read_only}"}
+    {host: "slave_server#{(read_only_host+=1) % num_read_only}"}
   end
-  DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:read_only=>read_only_proc})
+  DB=Sequel.connect('postgres://master_server/database',
+    servers: {read_only: read_only_proc})
 
 This will use one of the slave servers for SELECT queries and use the
-master_server for other queries.  It's also possible to pick a random host
+master server for other queries.  It's also possible to pick a random host
 instead of using the round robin approach presented above, but that can result
 in less optimal resource usage.
 
@@ -78,15 +78,15 @@ it shows that the master database is named :default.  So for 4 masters and
   num_read_only = 4
   read_only_host = rand(num_read_only)
   read_only_proc = proc do |db|
-    {:host=>"slave_server#{(read_only_host+=1) % num_read_only}"}
+    {host: "slave_server#{(read_only_host+=1) % num_read_only}"}
   end
   num_default = 4
   default_host = rand(num_default)
   default_proc = proc do |db|
-    {:host=>"master_server#{(default_host+=1) % num_default}"}
+    {host: "master_server#{(default_host+=1) % num_default}"}
   end
-  DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:default=>default_proc, :read_only=>read_only_proc})
+  DB=Sequel.connect('postgres://master_server/database',
+    servers: {default: default_proc, read_only: read_only_proc})
   
 == Sharding
 
@@ -100,16 +100,16 @@ of 16 shards).  First, you need to configure the database:
 
   servers = {}
   (('0'..'9').to_a + ('a'..'f').to_a).each do |hex|
-    servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
+    servers[hex.to_sym] = {host: "hash_host_#{hex}"}
   end
-  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers)
+  DB=Sequel.connect('postgres://hash_host/hashes', servers: servers)
   
 This configures 17 servers, the 16 shard servers (/hash_host_[0-9a-f]/), and 1
 default server which will be used if no shard is specified ("hash_host").  If
 you want the default server to be one of the shard servers (e.g. hash_host_a),
 it's easiest to do:
 
-  DB=Sequel.connect('postgres://hash_host_a/hashes', :servers=>servers)
+  DB=Sequel.connect('postgres://hash_host_a/hashes', servers: servers)
 
 That will still set up a second pool of connections for the default server,
 since it considers the default server and shard servers independent.  Note that
@@ -120,7 +120,7 @@ schemas, so you should always have a default server that works.
 
 To set the shard for a given query, you use the Dataset#server method:
 
-  DB[:hashes].server(:a).where(:hash=>/31337/)
+  DB[:hashes].server(:a).where(hash: /31337/)
   
 That will return all matching rows on the hash_host_a shard that have a hash
 column that contains 31337.
@@ -133,7 +133,7 @@ the shard to use.  This is fairly easy using a Sequel::Model:
     dataset_module do
       def plaintext_for_hash(hash)
         raise(ArgumentError, 'Invalid SHA-1 Hash') unless /\A[0-9a-f]{40}\z/.match(hash)
-        server(hash[0...1].to_sym).where(:hash=>hash).get(:plaintext)
+        server(hash[0...1].to_sym).where(hash: hash).get(:plaintext)
       end
     end
   end
@@ -146,24 +146,24 @@ to assume the :default shard.  However, you can specify a
 different shard using the :servers_hash option when connecting
 to the database:
 
-  DB = Sequel.connect('postgres://...', :servers_hash=>Hash.new(:some_shard))
+  DB = Sequel.connect('postgres://...', servers_hash: Hash.new(:some_shard))
 
 You can also use this feature to raise an exception if an
 unconfigured shard is used:
 
-  DB = Sequel.connect('postgres://...', :servers_hash=>Hash.new{raise 'foo'})
+  DB = Sequel.connect('postgres://...', servers_hash: Hash.new{raise 'foo'})
 
 If you specify a :servers_hash option to raise an exception for non configured
 shards you should also explicitly specify a :read_only entry in your :servers option
 for the case where a shard is not specified. In most cases it is sufficient
 to make the :read_only entry the same as the :default shard:
 
-  servers = {:read_only => {}}
+  servers = {read_only: {}}
   (('0'..'9').to_a + ('a'..'f').to_a).each do |hex|
-    servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
+    servers[hex.to_sym] = {host: "hash_host_#{hex}"}
   end
-  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers, 
-    :servers_hash=>Hash.new{raise Exception.new("Invalid Server")}) 
+  DB=Sequel.connect('postgres://hash_host/hashes', servers: servers, 
+    servers_hash: Hash.new{raise "Invalid Server"}) 
 
 === Sharding Plugin
 
@@ -176,7 +176,7 @@ work well with shards.  You just need to remember to set to model to use the plu
     plugin :sharding
   end
 
-  Rainbow.server(:a).first(:id=>1).update(:plaintext=>'VGM')
+  Rainbow.server(:a).first(id: 1).update(plaintext: 'VGM')
 
 If all of your models are sharded, you can set all models to use the plugin via:
 
@@ -186,7 +186,7 @@ If all of your models are sharded, you can set all models to use the plugin via:
 
 By default, you must specify the server/shard you want to use for every dataset/action,
 or Sequel will use the default shard.  If you have a group of queries that should use the
-same shard, it can get a bit redundent to specify the same shard for all of them.
+same shard, it can get a bit redundant to specify the same shard for all of them.
 
 The server_block extension adds a Database#with_server method that scopes all database
 access inside the block to the given shard by default:
@@ -194,7 +194,7 @@ access inside the block to the given shard by default:
   DB.extension :server_block
   DB.with_server(:a) do
     # this SELECT query uses the "a" shard
-    if r = Rainbow.first(:hash=>/31337/)
+    if r = Rainbow.first(hash: /31337/)
       r.count += 1
       # this UPDATE query also uses the "a" shard
       r.save
@@ -209,6 +209,19 @@ you retrieve the models inside the block and save them outside of the block.  If
 need to do that, call the server method explicitly on the dataset used to retrieve the
 model objects.
 
+The with_server method also supports a second argument for the default read_only server
+to use, which can be useful if you are mixing sharding and master/slave servers:
+
+  DB.extension :server_block
+  DB.with_server(:a, :a_read_only) do
+    # this SELECT query uses the "a_read_only" shard
+    if r = Rainbow.first(hash: /31337/)
+      r.count += 1
+      # this UPDATE query also uses the "a" shard
+      r.save
+    end
+  end
+
 === arbitrary_servers Extension
 
 By default, Sequel's sharding support is designed to work with predefined shards.  It ships
@@ -220,13 +233,13 @@ The arbitrary_servers extension allows you to pass a server/shard options hash a
 server to use, and those options will be merged directly into the database's default options:
 
   DB.extension :arbitrary_servers
-  DB[:rainbows].server(:host=>'hash_host_a').all
+  DB[:rainbows].server(host: 'hash_host_a').all
   # or
-  DB[:rainbows].server(:host=>'hash_host_b', :database=>'backup').all
+  DB[:rainbows].server(host: 'hash_host_b', database: 'backup').all
 
 arbitrary_servers is designed to work well in conjunction with the server_block extension:
 
-  DB.with_server(:host=>'hash_host_b', :database=>'backup') do
+  DB.with_server(host: 'hash_host_b', database: 'backup') do
     DB.synchronize do
       # All queries here default to the backup database on hash_host_b
     end
