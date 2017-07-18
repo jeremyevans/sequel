@@ -3,6 +3,7 @@
 Sequel uses autocommit mode by default for all of its database adapters, so in general in Sequel if you want to use database transactions, you need to be explicit about it.  There are a few cases where transactions are used implicitly by default:
 
 * Dataset#import to insert many records at once
+* Dataset#paged_each to iterate over large datasets in batches
 * Model#save
 * Model#destroy
 * Migrations if the database supports transactional schema
@@ -35,16 +36,16 @@ If any other exception is raised, the transaction is rolled back, and the except
   end # ROLLBACK
   # ArgumentError raised
 
-If you want Sequel::Rollback exceptions to be reraised, use the <tt>:rollback => :reraise</tt> option:
+If you want Sequel::Rollback exceptions to be reraised, use the <tt>rollback: :reraise</tt> option:
 
-  DB.transaction(:rollback => :reraise) do # BEGIN
+  DB.transaction(rollback: :reraise) do # BEGIN
     raise Sequel::Rollback
   end # ROLLBACK
   # Sequel::Rollback raised
 
-If you always want to rollback (useful for testing), use the <tt>:rollback => :always</tt> option:
+If you always want to rollback (useful for testing), use the <tt>rollback: :always</tt> option:
 
-  DB.transaction(:rollback => :always) do # BEGIN
+  DB.transaction(rollback: :always) do # BEGIN
     DB[:foo].insert(1) # INSERT
   end # ROLLBACK
   # no exception raised
@@ -86,17 +87,17 @@ You can nest calls to transaction, which by default just reuses the existing tra
     end
   end # COMMIT
 
-You can use the <tt>:savepoint => true</tt> option in the inner transaction to explicitly use a savepoint (if the database supports it):
+You can use the <tt>savepoint: true</tt> option in the inner transaction to explicitly use a savepoint (if the database supports it):
 
   DB.transaction do # BEGIN
-    DB.transaction(:savepoint => true) do # SAVEPOINT
+    DB.transaction(savepoint: true) do # SAVEPOINT
       DB[:foo].insert(1) # INSERT
     end # RELEASE SAVEPOINT
   end # COMMIT
 
-You can use the <tt>:auto_savepoint => true</tt> option in the outer transaction to explicitly use a savepoint in the inner transaction (if the database supports it):
+You can use the <tt>auto_savepoint: true</tt> option in the outer transaction to explicitly use a savepoint in the inner transaction (if the database supports it):
 
-  DB.transaction(:auto_savepoint => true) do # BEGIN
+  DB.transaction(auto_savepoint: true) do # BEGIN
     DB.transaction do # SAVEPOINT
       DB[:foo].insert(1) # INSERT
     end # RELEASE SAVEPOINT
@@ -105,7 +106,7 @@ You can use the <tt>:auto_savepoint => true</tt> option in the outer transaction
 If a Sequel::Rollback exception is raised inside the savepoint block, it will only rollback to the savepoint:
 
   DB.transaction do # BEGIN
-    DB.transaction(:savepoint => true) do # SAVEPOINT
+    DB.transaction(savepoint: true) do # SAVEPOINT
       raise Sequel::Rollback
     end # ROLLBACK TO SAVEPOINT
     # no exception raised
@@ -114,7 +115,7 @@ If a Sequel::Rollback exception is raised inside the savepoint block, it will on
 Other exceptions, unless rescued inside the outer transaction block, will rollback the savepoint and the outer transactions, since they are reraised by the transaction code:
 
   DB.transaction do # BEGIN
-    DB.transaction(:savepoint => true) do # SAVEPOINT
+    DB.transaction(savepoint: true) do # SAVEPOINT
       raise ArgumentError
     end # ROLLBACK TO SAVEPOINT
   end # ROLLBACK
@@ -126,7 +127,7 @@ Sequel supports database prepared transactions on PostgreSQL, MySQL, and H2.  Wi
 
 To use prepared transactions in Sequel, you provide a string as the value of the :prepare option:
 
-  DB.transaction(:prepare => 'foo') do # BEGIN
+  DB.transaction(prepare: 'foo') do # BEGIN
     DB[:foo].insert(1) # INSERT
   end # PREPARE TRANSACTION 'foo'
    
@@ -142,7 +143,7 @@ or roll the prepared transaction back:
 
 The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on most databases, you can specify which transaction isolation level you want to use via the :isolation option to <tt>Database#transaction</tt>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option make Sequel use the correct transaction isolation syntax for your database:
 
-  DB.transaction(:isolation => :serializable) do # BEGIN
+  DB.transaction(isolation: :serializable) do # BEGIN
     # SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
     DB[:foo].insert(1) # INSERT
   end # COMMIT
@@ -151,8 +152,8 @@ The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, 
 
 Sequel offers the ability to automatically restart transactions if specific types of errors are detected.  For example, if you want to automatically restart a transaction if a serialization failure is detected:
 
-  DB.transaction(:isolation => :serializable, :retry_on=>[Sequel::SerializationFailure]) do
-    ModelClass.find_or_create(:name=>'Foo')
+  DB.transaction(isolation: :serializable, retry_on: [Sequel::SerializationFailure]) do
+    ModelClass.find_or_create(name: 'Foo')
   end
 
 At the serializable transaction isolation level, find_or_create may raises a Sequel::SerializationFailure exception if multiple threads simultaneously run that code.  With the :retry_on option set, the transaction will be automatically retried until it succeeds.
@@ -161,9 +162,9 @@ Note that automatic retrying should not be used unless the entire transaction
 block is idempotent, as otherwise it can cause non-idempotent
 behavior to execute multiple times.  For example, with the following code:
 
-  DB.transaction(:isolation => :serializable, :retry_on=>[Sequel::SerializationFailure]) do
+  DB.transaction(isolation: :serializable, retry_on: [Sequel::SerializationFailure]) do
     logger.info 'Ensuring existence of ModelClass with name Foo'
-    ModelClass.find_or_create(:name=>'Foo')
+    ModelClass.find_or_create(name: 'Foo')
   end
 
 The logger.info method will be called multiple times if there is a serialization failure.
