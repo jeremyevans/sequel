@@ -4,7 +4,7 @@ This guide is based on http://guides.rubyonrails.org/activerecord_validations_ca
 
 == Overview
 
-Model hooks, also known as model callbacks, are used to specify actions that occur at a given point in a model instance's lifecycle, such as before or after the model object is saved, created, updated, destroyed, or validated.  There are also around hooks for all types, which wrap the before hooks, the behavior, and the after hooks.
+Model hooks are used to specify actions that occur at a given point in a model instance's lifecycle, such as before or after the model object is saved, created, updated, destroyed, or validated.  There are also around hooks for all types, which wrap the before hooks, the behavior, and the after hooks.
 
 == Basic Usage
 
@@ -51,7 +51,7 @@ Sequel calls hooks in the following order when saving an existing object:
 
 Note that all of the hook calls are the same, except that +around_create+, +before_create+ and +after_create+ are used for a new object, and +around_update+, +before_update+ and +after_update+ are used for an existing object.  Note that +around_save+, +before_save+, and +after_save+ are called in both cases.
 
-Also note that the validation hooks are not called if the <tt>:validate => false</tt> option is passed to save.  However, the validation hooks are called if you call <tt>Model#valid?</tt> manually:
+Note that the validation hooks are still called if <tt>validate: false</tt> option is passed to save.  If you call <tt>Model#valid?</tt> manually, then only the validation hooks are called:
 
 * +around_validation+
   * +before_validation+
@@ -67,26 +67,19 @@ Sequel calls hooks in the following order when destroying an existing object:
 
 Note that these hooks are only called when using <tt>Model#destroy</tt>, they are not called if you use <tt>Model#delete</tt>.
 
-== Special Hook-Related Instance Variables
-
-For after_save hooks, a @was_new instance variable is present that indicates whether the record was a new record that was just inserted, or an existing record that was updated.  Sequel marks a record as existing as soon as it inserts the record, so in an after_save or after_create hook, the instance is no longer considered new.  You have to check @was_new to see if the record was inserted.  This exists so that you don't have to have separate after_create and after_update hooks that are mostly the same and only differ slightly depending on whether the record was a new record.
-
-For after_update hooks, a @columns_updated instance variable is present that is a hash of the values used to update the row (keys are column symbols, values are column values).  This should be used by any code that wants to check what columns and values were used during the update.  You can't just check the current values of the instance, since Sequel offers ways to manually specify which columns to use during the save.
-
 == Transaction-related Hooks
 
-There are four other model hooks that <tt>Sequel::Model</tt> supports, all related to transactions.  These are +after_commit+, +after_rollback+, +after_destroy_commit+, and +after_destroy_rollback+.  +after_commit+ is called after the transaction in which you saved the object commits, only if it commits.  +after_rollback+ is called after the transaction in which you saved the object rolls back, if it rolls back.  +after_destroy_commit+ is called after the transaction in which you destroyed the object commits, if it commits.  +after_destroy_rollback+ is called after the transaction in which you destroyed the object rolls back, if it rolls back.
-
-If you aren't using transactions when saving or destroying model objects, and there isn't a currently open transaction, +after_commit+ and +after_destroy_commit+ will be called after +after_save+ and +after_destroy+, respectively, and +after_rollback+ and +after_destroy_rollback+ won't be called at all.
-
-The purpose of these hooks is dealing with external systems that are interacting with the same database.  For example, let's say you have a model that stores a picture, and you have a background job library that makes thumbnails of all of the pictures.  So when a model object is created, you want to add a background job that will create the thumbnail for the picture.  If you used after_save for this and transactions are being used, you are subject to a race condition where the background job library will check the database table for the record before the transaction that saved the record commits, and it won't be able to see the record's data.  Using after_commit, you are guaranteed that the background job library will not get notified of the record until after the transaction commits and the data is viewable.
-
-Note that when using the after_commit or after_rollback hooks, you don't know whether the saved object was newly created or updated.  If you only want to run an action after commit of a newly created record, you need to use the Database's after_commit inside the model's after_create hook:
+Sequel::Model no longer offers transaction hooks for model instances.  However, you can use the database transaction hooks inside model +before_save+ and +after_save+ hooks:
 
   class Album < Sequel::Model
-    def after_create
+    def before_save
+      db.after_rollback{rollback_action}
       super
-      db.after_commit{update_external_cache}
+    end
+
+    def after_save
+      super
+      db.after_commit{commit_action}
     end
   end
 
@@ -96,13 +89,13 @@ Sequel does not provide a simple way to turn off the running of save/create/upda
 
 However, you should note that there are plenty of ways to modify the database without saving a model object.  One example is by using plain datasets, or one of the model's dataset methods:
 
-  Album.where(:name=>'RF').update(:copies_sold=>Sequel.+(:copies_sold, 1))
+  Album.where(name: 'RF').update(copies_sold: Sequel.+(:copies_sold, 1))
   # UPDATE albums SET copies_sold = copies_sold + 1 WHERE name = 'RF'
 
 In this case, the +update+ method is called on the dataset returned by <tt>Album.where</tt>.  Even if there is only a single object with the name RF, this will not call any hooks.  If you want model hooks to be called, you need to make sure to operate on a model object:
 
-  album = Album.first(:name=>'RF')
-  album.update(:copies_sold=>album.copies_sold + 1)
+  album = Album.first(name: 'RF')
+  album.update(copies_sold: album.copies_sold + 1)
   # UPDATE albums SET copies_sold = 2 WHERE id = 1
 
 For the destroy hooks, you need to make sure you call +destroy+ on the object:
@@ -121,11 +114,11 @@ However, skipping hooks is a bad idea in general and should be avoided.  As ment
 
 The +this+ dataset works just like any other dataset, so you can call +update+ on it to modify it:
 
-  album.this.update(:copies_sold=>album.copies_sold + 1)
+  album.this.update(copies_sold: album.copies_sold + 1)
 
 If you want to insert a row into the model's table without running the creation hooks, you can use <tt>Model.insert</tt> instead of <tt>Model.create</tt>:
 
-  Album.insert(:name=>'RF') # does not run hooks
+  Album.insert(name: 'RF') # does not run hooks
 
 == Canceling Actions in Hooks
 
@@ -137,8 +130,6 @@ Sometimes want to cancel an action in a before hook, so the action is not perfor
       super
     end
   end
-
-For backwards compatibility, Sequel also treats the <tt>before_*</tt> hook methods returning +false+ as an indication that the action should be canceled.  This usage is discouraged in new code, but you should be aware of this behavior so that you do not inadvertently return false.
 
 For around hooks, neglecting to call +super+ halts hook processing in the same way as calling +cancel_action+ in a before hook.  It's probably a bad idea to use +cancel_action+ hook processing in after hooks, or after yielding in around hooks, since by then the main processing has already taken place.
 
@@ -216,7 +207,6 @@ This allows the following general principles to be true:
 
 * before hooks are run in reverse order of inclusion
 * after hooks are run in order of inclusion
-* returning false in any before hook will pass the false value down the hook method chain, halting the hook processing.
 
 So if you define the same before hook in both a model and a plugin that the model uses, the hooks will be called in this order:
 
