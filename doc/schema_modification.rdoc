@@ -25,27 +25,27 @@ type for the given database.  So while you specified +String+, Sequel will actua
 +text+ depending on the underlying database.  Here's a list of all ruby classes that Sequel will
 convert to database types:
 
-  create_table(:columns_types) do       # common database type used
-    Integer :a0                         # integer
-    String :a1                          # varchar(255)
-    String :a2, :size=>50               # varchar(50)
-    String :a3, :fixed=>true            # char(255)
-    String :a4, :fixed=>true, :size=>50 # char(50)
-    String :a5, :text=>true             # text
-    File :b                             # blob
-    Fixnum :c                           # integer
-    Bignum :d                           # bigint
-    Float :e                            # double precision
-    BigDecimal :f                       # numeric
-    BigDecimal :f2, :size=>10           # numeric(10)
-    BigDecimal :f3, :size=>[10, 2]      # numeric(10, 2)
-    Date :g                             # date
-    DateTime :h                         # timestamp
-    Time :i                             # timestamp
-    Time :i2, :only_time=>true          # time
-    Numeric :j                          # numeric
-    TrueClass :k                        # boolean
-    FalseClass :l                       # boolean
+  create_table(:columns_types) do     # common database type used
+    Integer :a0                       # integer
+    String :a1                        # varchar(255)
+    String :a2, size: 50              # varchar(50)
+    String :a3, fixed: true           # char(255)
+    String :a4, fixed: true, size: 50 # char(50)
+    String :a5, text: true            # text
+    File :b                           # blob
+    Fixnum :c                         # integer
+    Bignum :d                         # bigint
+    Float :e                          # double precision
+    BigDecimal :f                     # numeric
+    BigDecimal :f2, size: 10          # numeric(10)
+    BigDecimal :f3, size: [10, 2]     # numeric(10, 2)
+    Date :g                           # date
+    DateTime :h                       # timestamp
+    Time :i                           # timestamp
+    Time :i2, only_time: true         # time
+    Numeric :j                        # numeric
+    TrueClass :k                      # boolean
+    FalseClass :l                     # boolean
   end
 
 Note that in addition to the ruby class name, Sequel also pays attention to the column options when
@@ -89,7 +89,7 @@ method, the fourth argument is the options hash.  The following options are supp
           options for the index.
 :null :: Mark the column as allowing NULL values (if true),
          or not allowing NULL values (if false).  If unspecified, will default
-         to whatever the database default is.
+         to whatever the database default is (usually true).
 :primary_key :: Mark this column as the primary key.  This is used instead of the
                 primary key method if you want a non-autoincrementing primary key.
 :primary_key_constraint_name :: The name to give the primary key constraint.
@@ -98,7 +98,7 @@ method, the fourth argument is the options hash.  The following options are supp
          as +primary_key+ or +foreign_key+.
 :unique :: Mark the column as unique, generally has the same effect as
            creating a unique index on the column.
-:unique_constraint_name :: The name to give the unique key constraint.
+:unique_constraint_name :: The name to give the unique constraint.
 
 === Other methods
 
@@ -112,14 +112,14 @@ You've seen this one used already.  It's used to create an autoincrementing inte
 
 If you want an autoincrementing 64-bit integer:
 
-  create_table(:a0){primary_key :id, :type=>:Bignum}
+  create_table(:a0){primary_key :id, type: :Bignum}
 
 If you want to create a primary key column that doesn't use an autoincrementing integer, you should
 not use this method.  Instead, you should use the :primary_key option to the +column+ method or type
 method:
 
-  create_table(:a1){Integer :id, :primary_key=>true} # Non autoincrementing integer primary key
-  create_table(:a2){String :name, :primary_key=>true} # varchar(255) primary key
+  create_table(:a1){Integer :id, primary_key: true} # Non autoincrementing integer primary key
+  create_table(:a2){String :name, primary_key: true} # varchar(255) primary key
 
 If you want to create a composite primary key, you should call the +primary_key+ method with an
 array of column symbols.  You can provide a specific name to use for the primary key constraint
@@ -128,7 +128,7 @@ via the :name option:
   create_table(:items) do
     Integer :group_id
     Integer :position
-    primary_key [:group_id, :position], :name=>:items_pk
+    primary_key [:group_id, :position], name: :items_pk
   end
 
 If provided with an array, +primary_key+ does not create a column, it just sets up the primary key constraint.
@@ -147,7 +147,7 @@ as its third argument.  A simple example is:
 
 +foreign_key+ accepts the same options as +column+.  For example, to have a unique foreign key with varchar(16) type:
 
-  foreign_key :column_name, :table, :unique=>true, :type=>'varchar(16)'
+  foreign_key :column_name, :table, unique: true, type: 'varchar(16)'
 
 +foreign_key+ also accepts some specific options:
 
@@ -186,7 +186,7 @@ When using an array of symbols, you can also provide a :name option to name the 
     String :artist_name
     String :artist_location
     String :name
-    foreign_key [:artist_name, :artist_location], :artists, :name=>'albums_artist_name_location_fkey'
+    foreign_key [:artist_name, :artist_location], :artists, name: 'albums_artist_name_location_fkey'
   end
 
 If you want to add a foreign key for a single column with a named constraint, you must use
@@ -196,7 +196,7 @@ the array form with a single symbol:
     primary_key :id
     Integer :artist_id
     String :name
-    foreign_key [:artist_id], :artists, :name=>'albums_artist_id_fkey'
+    foreign_key [:artist_id], :artists, name: 'albums_artist_id_fkey'
   end
 
 ==== +index+
@@ -204,18 +204,18 @@ the array form with a single symbol:
 +index+ creates indexes on the table.  For single columns, calling index is the same as using the
 <tt>:index</tt> option when creating the column:
 
-  create_table(:a){Integer :id, :index=>true}
+  create_table(:a){Integer :id, index: true}
   # Same as:
   create_table(:a) do
     Integer :id
     index :id
   end
 
-  create_table(:a){Integer :id, :index=>{:unique=>true}}
+  create_table(:a){Integer :id, index: {unique: true}}
   # Same as:
   create_table(:a) do
     Integer :id
-    index :id, :unique=>true
+    index :id, unique: true
   end
 
 Similar to the +primary_key+ and +foreign_key+ methods, calling +index+ with an array of symbols
@@ -241,11 +241,11 @@ The +unique+ method creates a unique constraint on the table.  A unique constrai
 operates identically to a unique index, so the following three +create_table+ blocks are
 pretty much identical:
 
-  create_table(:a){Integer :a, :unique=>true}
+  create_table(:a){Integer :a, unique: true}
 
   create_table(:a) do
     Integer :a
-    index :a, :unique=>true
+    index :a, unique: true
   end
 
   create_table(:a) do
@@ -304,23 +304,23 @@ constraint, as that makes it easier to drop the constraint later if necessary.
 
 +create_join_table+ is a shortcut that you can use to create simple many-to-many join tables:
 
-  create_join_table(:artist_id=>:artists, :album_id=>:albums)
+  create_join_table(artist_id: :artists, album_id: :albums)
 
 which expands to:
 
   create_table(:albums_artists) do
-    foreign_key :album_id, :albums, :null=>false
-    foreign_key :artist_id, :artists, :null=>false
+    foreign_key :album_id, :albums
+    foreign_key :artist_id, :artists
     primary_key [:album_id, :artist_id]
     index [:artist_id, :album_id]
   end
 
-== <tt>create_table :as=></tt>
+== <tt>create_table :as</tt>
 
 To create a table from the result of a SELECT query, instead of passing a block
 to +create_table+, provide a dataset to the :as option:
 
-  create_table(:older_items, :as=>DB[:items].where{updated_at < Date.today << 6})
+  create_table(:older_items, as: DB[:items].where{updated_at < Date.today << 6})
 
 == +alter_table+
 
@@ -336,7 +336,7 @@ argument is the column name, the second is the type, and the third is an options
 hash:
 
   alter_table(:albums) do
-    add_column :copies_sold, Integer, :default=>0
+    add_column :copies_sold, Integer, default: 0
   end
 
 === +drop_column+
@@ -374,6 +374,12 @@ Sequel will not add a column, but will add a composite primary key constraint:
     add_primary_key [:album_id, :artist_id]
   end
 
+It is possible to specify a name for the primary key constraint: via the :name option:
+
+  alter_table(:albums_artists) do
+    add_primary_key [:album_id, :artist_id], :name=>:albums_artists_pkey
+  end
+
 If you just want to take an existing single column and make it a primary key, call
 +add_primary_key+ with an array with a single symbol:
 
@@ -396,14 +402,14 @@ array with a single element.  It's encouraged to provide a name when adding the 
 via the :name option:
 
   alter_table(:albums) do
-    add_foreign_key [:artist_id], :artists, :name=>:albums_artist_id_fkey
+    add_foreign_key [:artist_id], :artists, name: :albums_artist_id_fkey
   end
 
 To set up a multiple column foreign key constraint, use an array with multiple column
 symbols:
 
   alter_table(:albums) do
-    add_foreign_key [:artist_name, :artist_location], :artists, :name=>:albums_artist_name_location_fkey
+    add_foreign_key [:artist_name, :artist_location], :artists, name: :albums_artist_name_location_fkey
   end
 
 === +drop_foreign_key+
@@ -420,13 +426,13 @@ an array.  It's encouraged to use the :name option to provide the constraint nam
 drop, though on some databases Sequel may be able to find the name through introspection:
 
   alter_table(:albums) do
-    drop_foreign_key [:artist_id], :name=>:albums_artist_id_fkey
+    drop_foreign_key [:artist_id], name: :albums_artist_id_fkey
   end
 
 An array is also used to drop a composite foreign key constraint:
 
   alter_table(:albums) do
-    drop_foreign_key [:artist_name, :artist_location], :name=>:albums_artist_name_location_fkey
+    drop_foreign_key [:artist_name, :artist_location], name: :albums_artist_name_location_fkey
   end
 
 If you do not provide a :name option and Sequel is not able to determine the name
@@ -445,7 +451,7 @@ It accepts the same options as +create_table+'s +index+ method, and you can set 
 a multiple column index using an array:
 
   alter_table(:albums_artists) do
-    add_index [:album_id, :artist_id], :unique=>true
+    add_index [:album_id, :artist_id], unique: true
   end
 
 === +drop_index+
@@ -461,7 +467,7 @@ Just like +drop_column+, it is often used in the +down+ block of a migration.
 To drop an index with a specific name, use the <tt>:name</tt> option:
 
   alter_table(:albums) do
-    drop_index :artist_id, :name=>:artists_id_index
+    drop_index :artist_id, name: :artists_id_index
   end
 
 === +add_full_text_index+, +add_spatial_index+
@@ -480,7 +486,7 @@ method:
 
 There is no method to add an unnamed constraint, but you can pass +nil+ as the first
 argument of +add_constraint+ to do so.  However, it's not recommended to do that
-as it is difficult to drop such a constraint.
+as it is more difficult to drop such a constraint.
 
 === +add_unique_constraint+
 
@@ -489,6 +495,12 @@ method.  This usually has the same effect as adding a unique index.
 
   alter_table(:albums) do
     add_unique_constraint [:artist_id, :name]
+  end
+
+You can also specify a name via the :name option when adding the constraint:
+
+  alter_table(:albums) do
+    add_unique_constraint [:artist_id, :name], name: :albums_artist_id_name_ukey
   end
 
 === +drop_constraint+
@@ -506,9 +518,9 @@ For that reason, you should not add unnamed constraints that you ever might need
 On some databases, you must specify the type of constraint via a <tt>:type</tt> option:
 
   alter_table(:albums) do
-    drop_constraint(:albums_pk, :type=>:primary_key)
-    drop_constraint(:albums_fk, :type=>:foreign_key)
-    drop_constraint(:albums_uk, :type=>:unique)
+    drop_constraint(:albums_pk, type: :primary_key)
+    drop_constraint(:albums_fk, type: :foreign_key)
+    drop_constraint(:albums_uk, type: :unique)
   end
 
 === +set_column_default+
@@ -597,9 +609,6 @@ the table if the table already exists.  On some databases, it uses
 <tt>IF NOT EXISTS</tt>, on others it does a separate query to check for
 existence.
 
-This should not be used inside migrations, as if the table does not
-exist, it may mess up the migration.
-
 === +rename_table+
 
 You can rename an existing table using +rename_table+.  Like +rename_column+,
@@ -623,9 +632,6 @@ is the same as:
     primary_key :id
   end
 
-It should not be used inside migrations, as if the table does not exist, it may
-mess up the migration.
-
 === <tt>create_table?</tt>
 
 <tt>create_table?</tt> only creates the table if it does
@@ -642,8 +648,6 @@ is the same as:
       primary_key :id
     end
   end
-
-Like <tt>create_table!</tt>, it should not be used inside migrations.
 
 === +create_view+ and +create_or_replace_view+
 
@@ -662,4 +666,3 @@ second argument:
 arguments:
 
   drop_view(:gold_albums, :platinum_albums)
-
