@@ -879,3 +879,24 @@ raise an error by default:
       errors.add(:written_on, "should be in the past") if written_on >= Time.now
     end
   end
+
+== Sequel Release Policy
+
+New major versions of Sequel do not have a defined release policy, but historically have
+occurred once ever few years.
+
+New minor versions of Sequel are released around once a month near the start of the month.
+
+New tiny versions of Sequel are only released to address security issues or regressions
+in the most current release.
+
+== Ruby Support Policy
+
+Sequel fully supports the currently supported versions of Ruby (MRI) and JRuby.  It may
+support unsupported versions of Ruby or JRuby, but such support may be dropped in any
+minor version of keeping it becomes a support issue.  The minimum Ruby version
+required to run the current version of Sequel is 1.9.2.
+
+== Maintainer
+
+Jeremy Evans <code@jeremyevans.net>
