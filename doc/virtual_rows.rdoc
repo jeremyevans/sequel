@@ -7,28 +7,16 @@ many Sequel::Dataset methods that take virtual row blocks.
 
 == Why Virtual Rows
 
-Virtual Rows were created to work around the issue that some parts of
-Sequel's standard DSL could not be used on ruby 1.9.  For example, the
-following Sequel code historically worked on ruby 1.8, but not ruby 1.9:
-
-  dataset.where(:a > :b[:c])
-  # WHERE a > b(c)
-  
-This code does not work on ruby 1.9 for two reasons.  First, Symbol#>
-(like other inequality methods) is already defined in ruby 1.9, so Sequel
-does not override it to return an SQL inequality expression.  Second, Symbol#[]
-is already defined on ruby 1.9, so Sequel does not override it to return an
-SQL function expression.
-
-It's possible to use Sequel's DSL to represent such expressions, but it is a
-little verbose:
+Virtual rows offer a less verbose way to express many queries.  For example,
+by default if you want to express an inequality filter in Sequel, you can do:
 
   dataset.where(Sequel[:a] > Sequel.function(:b, :c))
-  # WHERE a > b(c)
+  # WHERE (a > b(c))
 
-The virtual row DSL makes such code more concise:
+With virtual rows, you can use the less verbose:
 
   dataset.where{a > b(c)}
+  # WHERE (a > b(c))
 
 == Regular Procs vs Instance Evaled Procs
 
@@ -38,96 +26,101 @@ of Sequel::SQL::VirtualRow.  If it does not accept an argument, it is
 evaluated in the context of an instance of Sequel::SQL::VirtualRow.
 
   ds = DB[:items]
-  # Regular proc
+  # Regular block
   ds.where{|o| o.column > 1}
-  # WHERE column > 1
+  # WHERE (column > 1)
   
-  # Instance-evaled proc
+  # Instance-evaled block
   ds.where{column > 1}
-  # WHERE column > 1
+  # WHERE (column > 1)
   
 If you aren't familiar with the difference between regular blocks and instance
-evaled blocks, you should probably consult a general ruby reference, but briefly,
-with regular procs, methods called without an explicit receiver inside the
-proc call the method on the receiver in the surrounding scope, while instance
-evaled procs call the method on the receiver of the instance_eval call.  However,
+evaled blocks, inside regular blocks methods called without an explicit receiver call
+the method on the receiver in the surrounding scope, while instance
+evaled blocks call the method on the receiver of the instance_eval call (the
+Sequel::SQL::VirtualRow instance in this case).
+
 in both cases, local variables available in the surrounding scope will be available
-inside the proc.  If that doesn't make sense, maybe this example will help:
+inside the block.  However, instance variables in the surrounding scope will not
+be available inside the block if using an instance evaled block, and methods called
+without an explicit receiver inside an instance evaled block will not call
+methods in the surrounding scope. For example:
 
   def self.a
     42
   end
   b = 32
+  @d = 100
   
-  # Regular proc
-  ds.where{|o| o.c > a - b}
-  # WHERE c > 10
+  # Regular block
+  ds.where{|o| o.c > a - b + @d}
+  # WHERE (c > 100)
   
-  # Instance-evaled proc
-  ds.where{c > a - b}
-  # WHERE c > (a - 32)
+  # Instance-evaled block
+  ds.where{c > a - b + @d}
+  # WHERE (c > ((a - 32) + NULL))
   
-There are two related differences here.  First is the usage of <tt>o.c</tt> vs +c+,
-and second is the difference between the use of +a+.  In the regular proc,
-you couldn't call +c+ without an explicit receiver in the proc, unless the self of the
-surrounding scope responded to it.  For +a+, note how ruby calls the method on
-the receiver of the surrounding scope in the regular proc, which returns an integer,
+There are three related differences here:
+
+* Regular blocks use +o.c+ instead of just +c+
+* +a+ results in 42 in the regular block, but creates an expression object in the instance evaled block
+* @d results in 100 in the regular block, but nil in the instance evaled block
+
+In the regular block, you need to call +c+ with an explicit receiver (the virtual
+row block argument), while in the instance evaled block +c+ can be called directly,
+as the default receiver has changed inside the block.
+
+For +a+, note how ruby calls the method on
+the receiver of the surrounding scope in the regular block, which returns an integer,
 and does the subtraction before Sequel gets access to it.  In the instance evaled
-proc, calling +a+ without a receiver calls the a method on the VirtualRow instance.
+block, calling +a+ without a receiver calls the a method on the VirtualRow instance.
+For @d, note that in a regular block, the value hasn't changed, but in the instance evaled
+block, instance variable access returns nil.
 For +b+, note that it operates the same in both cases, as it is a local variable.
 
-Basically, the choice for whether to use a regular proc or an instance evaled proc is
-completely up to you.  The same things can be accomplished with both.
-Instance evaled procs tend to produce shorter code, but by modifying the scope
-can be more difficult for a new user to understand.  That being said, I usually
-use instance evaled procs unless I need to call methods on the receiver of the
-surrounding scope inside the proc.
+The choice for whether to use a regular block or an instance evaled block is
+up to you.  The same things can be accomplished with both.
+Instance evaled block tend to produce shorter code, but by modifying the scope
+can be more difficult to understand.
+
+If you are not sure which to use, use instance evaled blocks unless you need to
+call methods or access instance variables of the surrounding scope inside the block.
 
 == Local Variables vs Method Calls
 
 If you have a method that accepts 0 arguments and has the same name as a local
 variable, you can call it with () to differentiate the method call from the
-local variable access.  This is mostly useful in instance_evaled procs:
+local variable access.  This is mostly useful in instance evaled blocks:
 
   b = 32
   ds.where{b() > b}
   # WHERE b > 32
 
+It's also possible to use an explicit self receiver in instance evaled blocks:
+
+  b = 32
+  ds.where{self.b > b}
+  # WHERE b > 32
+
+
 == VirtualRow Methods
 
-VirtualRow is a class that returns SQL::Identifiers, SQL::QualifiedIdentifiers, or
-SQL::Functions depending on how it is called.
+VirtualRow is a class that returns SQL::Identifiers or SQL::Functions depending
+on how it is called.
 
 == SQL::Identifiers - Regular columns
 
 SQL::Identifiers can be thought of as regular column references in SQL,
 not qualified by any table. You get an SQL::Identifier if the method is called
-without a block or arguments, and doesn't have a double underscore in the method
-name:
+without arguments:
 
   ds.where{|o| o.column > 1}
   ds.where{column > 1}
-  # WHERE column > 1
+  # WHERE (column > 1)
   
 == SQL::QualifiedIdentifiers - Qualified columns
 
-SQL::QualifiedIdentifiers can be thought of as column references in SQL that
-are qualified to a specific table.  You get an SQL::QualifiedIdentifier if
-the method is called without a block or arguments, and has a double underscore
-in the method name:
-
-  ds.where{|o| o.table__column > 1}
-  ds.where{table__column > 1}
-  # WHERE table.column > 1
-
-Using the double underscore for SQL::QualifiedIdentifiers was done to make
-usage very similar to using symbols, which by default also translate the
-double underscore into a qualified column.
-
-Note that when <tt>Sequel.split_symbols = false</tt> is used, then virtual
-rows do not split symbols either.  If you need to create qualified identifers
-when disabling symbol splitting, it is easy to do by calling #[] on the
-SQL::Identifiers returned by regular methods calls:
+You can qualified identifiers by calling #[] on an identifier:
 
   ds.where{|o| o.table[:column] > 1}
   ds.where{table[:column] > 1}
@@ -136,7 +129,7 @@ SQL::Identifiers returned by regular methods calls:
 == SQL::Functions - SQL function calls
 
 SQL::Functions can be thought of as function calls in SQL.  You get a simple
-function call if you call a method with arguments and without a block:
+function call if you call a method with arguments:
 
   ds.where{|o| o.function(1) > 1}
   ds.where{function(1) > 1}
@@ -176,8 +169,7 @@ distinct method on the returned Function:
   
 == SQL::Functions with windows - SQL window function calls
 
-Not all databases support window functions, but they are very helpful for certain types of
-queries.  To use them, you should just call the over method on the Function
+To create a window function call, just call the over method on the Function
 object returned, with the options for the window:
 
   ds.select{|o| o.rank.function.over}
@@ -188,19 +180,18 @@ object returned, with the options for the window:
   ds.select{count.function.*.over}
   # SELECT count(*) OVER ()
   
-  ds.select{|o| o.sum(o.col1).over(:partition=>o.col2, :order=>o.col3)}
-  ds.select{sum(col1).over(:partition=>col2, :order=>col3)}
+  ds.select{|o| o.sum(o.col1).over(partition: o.col2, order: o.col3)}
+  ds.select{sum(col1).over(partition: col2, order: col3)}
   # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
 
 == Operators
 
 VirtualRows use method_missing to handle almost all method calls.  Since the
-objects given by method_missing are SQL::Identifiers, SQL::QualifiedIdentifiers
-or SQL::Functions, you can use all operators that they provide (see
+objects given by method_missing are SQL::Identifiers or SQL::Functions, you can use all operators that they provide (see
 DatasetFiltering[http://sequel.jeremyevans.net/rdoc/files/doc/dataset_filtering_rdoc.html#label-Filtering+using+expressions]):
 
   ds.select{|o| o.price - 100}
-  ds.select{o.price - 100}
+  ds.select{price - 100}
   # SELECT (price - 100)
 
   ds.where{|o| (o.price < 200) & (o.tax * 100 >= 23)}
@@ -222,14 +213,14 @@ The standard +, -, *, and / mathematical operators are defined:
 
 The & and | methods are defined to use AND and OR:
 
-  ds.where{|o| o.&({:a=>:b}, :c)}
-  ds.where{self.&({:a=>:b}, :c)}
+  ds.where{|o| o.&({a: :b}, :c)}
+  ds.where{self.&({a: :b}, :c)}
   # WHERE ((a = b) AND c)
 
 The ~ method is defined to do inversion:
 
-  ds.where{|o| o.~({:a=>1, :b=>2})}
-  ds.where{self.~({:a=>1, :b=>2})}
+  ds.where{|o| o.~({a: 1, b: 2})}
+  ds.where{self.~({a: 1, b: 2})}
   # WHERE ((a != 1) OR (b != 2))
 
 === Inequality Operators
@@ -239,19 +230,6 @@ The standard >, <, >=, and <= inequality operators are defined:
   ds.where{|o| o.>(1, :c)}
   ds.where{self.>(1, :c)}
   # WHERE (1 > c)
-
-== Literal Strings
-
-The backtick operator can be used inside an instance-evaled
-virtual row block to create a literal string:
-
-  ds.where{a > `some SQL`}
-  # WHERE (a > some SQL)
-
-You can use this on a regular virtual row block too, but it
-doesn't look as nice:
-
-  ds.where{|o| o.>(:a, o.`('some SQL'))}
 
 == Returning multiple values
 
@@ -268,26 +246,20 @@ Note that if you forget the array brackets, you'll end up with a syntax error:
   # Invalid ruby syntax
   ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}
   ds.select{column1, sum(column2).as(sum)}
-  
-== Alternative Description of the VirtualRow method call rules
+ 
+== Split symbols
 
-* If a block is given:
-  * The block is currently not called.  This may change in a future version.
-  * If there are no arguments, an SQL::Function with the name of
-    method used, and no arguments.
-  * If the first argument is :*, an SQL::Function is created with a single
-    wildcard argument (*).
-  * If the first argument is :distinct, an SQL::Function is created with
-    the keyword DISTINCT prefacing all remaining arguments.
-  * If the first argument is :over, the second argument if provided should
-    be a hash of options to pass to SQL::Window.  The options hash can also
-    contain :*=>true to use a wildcard argument as the function argument, or
-    :args=>... to specify an array of arguments to use as the function arguments.
-* If a block is not given:
-  * If there are arguments, an SQL::Function is returned with the
-    name of the method used and the arguments given.
-  * If there are no arguments and the method contains a double
-    underscore, split on the double underscore and return an
-    SQL::QualifiedIdentifier with the table and column.
-  * Otherwise, create an SQL::Identifier with the name of the
-    method.
+Note that if you turn on symbol splitting for backwards compatibility,
+Sequel will split virtual row methods with double underscores and
+return them as qualified identifiers:
+
+  Sequel.split_symbols = true
+  ds.where{|o| o.table__column}
+  ds.where{table__column}
+  WHERE table.column
+
+It's not recommended that you rely on this, it's better to convert the calls
+to the recommended form:
+
+  ds.where{|o| o.table[:column]}
+  ds.where{table[:column]}
