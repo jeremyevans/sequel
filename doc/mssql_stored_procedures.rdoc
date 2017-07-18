@@ -17,7 +17,7 @@ The following stored procedure is used as an example:
 
 Execute it as follows:
 
-  DB.call_mssql_sproc(:SequelTest, {:args => ['Input String', :output]})
+  DB.call_mssql_sproc(:SequelTest, {args: ['Input String', :output]})
 
 Use the +:output+ symbol to denote an output variable. The result will contain a
 hash of the output variables, as well as the result code and number of affected rows:
@@ -27,7 +27,7 @@ hash of the output variables, as well as the result code and number of affected 
 Output variables will be strings by default. To specify their type, include the
 SQL type:
 
-  DB.call_mssql_sproc(:SequelTest, {:args => ['Input String', [:output, 'int']]})
+  DB.call_mssql_sproc(:SequelTest, {args: ['Input String', [:output, 'int']]})
 
 Result:
 
@@ -36,7 +36,7 @@ Result:
 Output variables will be named +var#{n}+ where n is their zero indexed position
 in the parameter list. To name the output variable, include their name:
 
-  DB.call_mssql_sproc(:SequelTest, {:args => ['Input String', [:output, nil, 'Output']]})
+  DB.call_mssql_sproc(:SequelTest, {args: ['Input String', [:output, nil, 'Output']]})
 
 Result:
 
