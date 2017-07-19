@@ -33,7 +33,7 @@ Doing this, only Node and future subclasses of Node will have the tree plugin lo
 Some plugins require arguments and/or support options.  For example, the single_table_inheritance plugin requires an argument containing the column that specifies the class to use, and options:
 
   class Employee < Sequel::Model
-    plugin :single_table_inheritance, :type_id, :model_map=>{1=>:Staff, 2=>:Manager}
+    plugin :single_table_inheritance, :type_id, model_map: {1=>:Staff, 2=>:Manager}
   end
 
 You should read the documentation for the plugin to determine if it requires arguments and what if any options are supported.
@@ -120,7 +120,7 @@ This allows a plugin user to do:
 
 == Calling super to get Previous Behavior
 
-No matter if you are dealing with class, instance, or dataset methods, you can call super inside the method to get the previous behavior.  This makes it easy to hook into the method, add your own behavior, but still (optionally?) get the previous behavior:
+No matter if you are dealing with class, instance, or dataset methods, you can call super inside the method to get the previous behavior.  This makes it easy to hook into the method, add your own behavior, but still get the previous behavior:
 
   module Sequel::Plugins::Foo
     module InstanceMethods
@@ -135,14 +135,14 @@ No matter if you are dealing with class, instance, or dataset methods, you can c
       private
 
       def allow_saving?
-        `pom` =~ /Waxing/
+        moon =~ /Waxing/
       end
     end
   end
 
 == Running Code When the Plugin is Loaded
 
-Some plugins require more than just adding methods.  Any plugin that requires state is going to have to initialize that state and store it somewhere.  If you want to run code when a plugin is loaded (usually to initialize state, but possibly for other reasons), there are two methods you can define to do so.  The first method is apply, and it is called only the first time the plugin is loaded into the class, before it is loaded into the class.  This is generally only used if a plugin depends on another plugin or for initializing state.  You define this method as a singleton method of the plugin module:
+Some plugins require more than just adding methods.  Any plugin that requires state is going to have to initialize that state and store it somewhere (generally in the model class itself).  If you want to run code when a plugin is loaded (usually to initialize state, but possibly for other reasons), there are two methods you can define to do so.  The first method is apply, and it is called only the first time the plugin is loaded into the class, before it is loaded into the class.  This is generally only used if a plugin depends on another plugin or for initializing state.  You define this method as a singleton method of the plugin module:
 
   module Sequel::Plugins::Foo
     def self.apply(model)
@@ -158,7 +158,7 @@ The other method is called configure, and it is called everytime the plugin is l
   module Sequel::Plugins::Foo
     def self.configure(model)
       model.instance_eval do
-        @foo_state[:initial] = :baz
+        @foo_states[:initial] ||= :baz
       end
     end
   end
@@ -177,7 +177,7 @@ If you want your plugin to take arguments and/or support options, you handle tha
 
     def self.configure(model, opts={})
       model.instance_eval do
-        @foo_state[:initial] = opts[:initial_state] || :baz
+        @foo_states[:initial] = opts[:initial_state] || @foo_states[:initial] || :baz
       end
     end
   end
@@ -185,7 +185,7 @@ If you want your plugin to take arguments and/or support options, you handle tha
 This allows a user of the plugin to do either of the following
 
   Bar.plugin :foo
-  Bar.plugin :foo, :initial_state=>:quux
+  Bar.plugin :foo, initial_state: :quux
 
 If you want to require the initial state to be provided as an argument:
 
@@ -199,7 +199,7 @@ If you want to require the initial state to be provided as an argument:
 
     def self.configure(model, initial_state)
       model.instance_eval do
-        @foo_state[:initial] = initial_state
+        @foo_states[:initial] = initial_state
       end
     end
   end
@@ -216,7 +216,7 @@ Sequel::Model uses a copy-on-subclassing approach to model state.  So instead of
 
   module Sequel::Plugins::Foo
     module ClassMethods
-      Sequel::Plugins.inherited_instance_variables(self, :@foo_state=>:dup)
+      Sequel::Plugins.inherited_instance_variables(self, :@foo_states => :dup)
     end
   end
 
@@ -238,7 +238,7 @@ In many plugins, if the model class changes the dataset, you need to change the 
       private
 
       def set_foo_table
-        @foo_state[:table] = table_name
+        @foo_states[:table] = table_name
       end
     end
   end
