@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 # frozen-string-literal: true
 
-require 'rubygems'
 require 'optparse'
 
 code = nil
@@ -133,12 +132,11 @@ connect_proc = lambda do |database|
     db_config = YAML.load_file(database)
     db_config = db_config[env] || db_config[env.to_sym] || db_config
     db_config.keys.each{|k| db_config[k.to_sym] = db_config.delete(k)}
-    Sequel.connect(db_config)
+    Sequel.connect(db_config, :test=>test)
   else
-    Sequel.connect(database)
+    Sequel.connect(database, :test=>test)
   end
   db.loggers = loggers
-  db.test_connection if test
   db
 end
 
