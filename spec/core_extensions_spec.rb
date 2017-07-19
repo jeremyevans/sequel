@@ -1,5 +1,3 @@
-require 'rubygems'
-
 if ENV['COVERAGE']
   require File.join(File.dirname(File.expand_path(__FILE__)), "sequel_coverage")
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/extensions/core_extensions\.rb\z})

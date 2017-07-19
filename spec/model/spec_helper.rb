@@ -1,4 +1,3 @@
-require 'rubygems'
 require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model') 

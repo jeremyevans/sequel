@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'logger'
 require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
 
