@@ -11,7 +11,7 @@ module Sequel
     #
     #   class Item < Sequel::Model(:items)
     #     plugin :list # will use :position field for position
-    #     plugin :list, :field=>:pos # will use :pos field for position
+    #     plugin :list, field: :pos # will use :pos field for position
     #   end
     #   
     #   item = Item[1]
@@ -38,7 +38,7 @@ module Sequel
     # For example, if each item has a +user_id+ field, and you want every user
     # to have their own list:
     #
-    #   Item.plugin :list, :scope=>:user_id
+    #   Item.plugin :list, scope: :user_id
     # 
     # Note that using this plugin modifies the order of the model's dataset to
     # sort by the position and scope fields.  Also note that this plugin is subject to

@@ -24,7 +24,7 @@ module Sequel
     # Inserts the given argument into the database.  Returns self so it
     # can be used safely when chaining:
     # 
-    #   DB[:items] << {:id=>0, :name=>'Zero'} << DB[:old_items].select(:id, name)
+    #   DB[:items] << {id: 0, name: 'Zero'} << DB[:old_items].select(:id, name)
     def <<(arg)
       insert(arg)
       self
@@ -32,8 +32,8 @@ module Sequel
     
     # Returns the first record matching the conditions. Examples:
     #
-    #   DB[:table][:id=>1] # SELECT * FROM table WHERE (id = 1) LIMIT 1
-    #   # => {:id=1}
+    #   DB[:table][id: 1] # SELECT * FROM table WHERE (id = 1) LIMIT 1
+    #   # => {:id=>1}
     def [](*conditions)
       raise(Error, 'You cannot call Dataset#[] with an integer or with no arguments') if (conditions.length == 1 and conditions.first.is_a?(Integer)) or conditions.length == 0
       first(*conditions)
@@ -122,8 +122,7 @@ module Sequel
       end
     end
 
-    # Deletes the records in the dataset.  The returned value should be 
-    # number of records deleted, but that is adapter dependent.
+    # Deletes the records in the dataset, returning the number of records deleted.
     #
     #   DB[:table].delete # DELETE * FROM table
     #   # => 3
@@ -166,10 +165,10 @@ module Sequel
       end.single_value!.nil?
     end
 
+    # Returns the first matching record if no arguments are given.
     # If a integer argument is given, it is interpreted as a limit, and then returns all 
-    # matching records up to that limit.  If no argument is passed,
-    # it returns the first matching record.  If any other type of
-    # argument(s) is passed, it is given to filter and the
+    # matching records up to that limit.  If any other type of
+    # argument(s) is passed, it is treated as a filter and the
     # first matching record is returned.  If a block is given, it is used
     # to filter the dataset before returning anything.
     #
@@ -184,19 +183,19 @@ module Sequel
     #   DB[:table].first(2) # SELECT * FROM table LIMIT 2
     #   # => [{:id=>6}, {:id=>4}]
     #
-    #   DB[:table].first(:id=>2) # SELECT * FROM table WHERE (id = 2) LIMIT 1
+    #   DB[:table].first(id: 2) # SELECT * FROM table WHERE (id = 2) LIMIT 1
     #   # => {:id=>2}
     #
-    #   DB[:table].first("id = 3") # SELECT * FROM table WHERE (id = 3) LIMIT 1
+    #   DB[:table].first(Sequel.lit("id = 3")) # SELECT * FROM table WHERE (id = 3) LIMIT 1
     #   # => {:id=>3}
     #
-    #   DB[:table].first("id = ?", 4) # SELECT * FROM table WHERE (id = 4) LIMIT 1
+    #   DB[:table].first(Sequel.lit("id = ?", 4)) # SELECT * FROM table WHERE (id = 4) LIMIT 1
     #   # => {:id=>4}
     #
     #   DB[:table].first{id > 2} # SELECT * FROM table WHERE (id > 2) LIMIT 1
     #   # => {:id=>5}
     #
-    #   DB[:table].first("id > ?", 4){id < 6} # SELECT * FROM table WHERE ((id > 4) AND (id < 6)) LIMIT 1
+    #   DB[:table].first(Sequel.lit("id > ?", 4)){id < 6} # SELECT * FROM table WHERE ((id > 4) AND (id < 6)) LIMIT 1
     #   # => {:id=>5}
     #
     #   DB[:table].first(2){id < 2} # SELECT * FROM table WHERE (id < 2) LIMIT 2
@@ -356,7 +355,8 @@ module Sequel
     end
 
     # Inserts values into the associated table.  The returned value is generally
-    # the value of the primary key for the inserted row, but that is adapter dependent.
+    # the value of the autoincremented primary key for the inserted row, assuming that
+    # the a single row is inserted and the table has an autoincrementing primary key.
     #
     # +insert+ handles a number of different argument formats:
     # no arguments or single empty hash :: Uses DEFAULT VALUES
@@ -382,7 +382,7 @@ module Sequel
     #   DB[:items].insert([:a, :b], [1,2])
     #   # INSERT INTO items (a, b) VALUES (1, 2)
     #
-    #   DB[:items].insert(:a => 1, :b => 2)
+    #   DB[:items].insert(a: 1, b: 2)
     #   # INSERT INTO items (a, b) VALUES (1, 2)
     #
     #   DB[:items].insert(DB[:old_items])
@@ -414,8 +414,8 @@ module Sequel
       reverse.first(*args, &block)
     end
     
-    # Maps column values for each record in the dataset (if a column name is
-    # given), or performs the stock mapping functionality of +Enumerable+ otherwise. 
+    # Maps column values for each record in the dataset (if an argument is given)
+    # or performs the stock mapping functionality of +Enumerable+ otherwise. 
     # Raises an +Error+ if both an argument and block are given.
     #
     #   DB[:table].map(:id) # SELECT * FROM table
@@ -467,7 +467,7 @@ module Sequel
     # This is a front end for import that allows you to submit an array of
     # hashes instead of arrays of columns and values:
     # 
-    #   DB[:table].multi_insert([{:x => 1}, {:x => 2}])
+    #   DB[:table].multi_insert([{x: 1}, {x: 2}])
     #   # INSERT INTO table (x) VALUES (1)
     #   # INSERT INTO table (x) VALUES (2)
     #
@@ -503,7 +503,7 @@ module Sequel
     #              selecting the columns you are ordering by, and none of the columns can contain
     #              NULLs.  Note that some Sequel adapters have optimized implementations that will
     #              use cursors or streaming regardless of the :strategy option used.
-    # :filter_values :: If the :strategy=>:filter option is used, this option should be a proc
+    # :filter_values :: If the strategy: :filter option is used, this option should be a proc
     #                   that accepts the last retreived row for the previous page and an array of
     #                   ORDER BY expressions, and returns an array of values relating to those
     #                   expressions for the last retrieved row.  You will need to use this option
@@ -523,13 +523,13 @@ module Sequel
     #   # SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100
     #   # ...
     #
-    #   DB[:table].order(:id).paged_each(:strategy=>:filter){|row| }
+    #   DB[:table].order(:id).paged_each(strategy: :filter){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 1000
     #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
     #   # ...
     #
-    #   DB[:table].order(:table__id).paged_each(:strategy=>:filter,
-    #     :filter_values=>proc{|row, exprs| [row[:id]]}){|row| }
+    #   DB[:table].order(:table__id).paged_each(strategy: :filter,
+    #     filter_values: lambda{|row, exprs| [row[:id]]}){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 1000
     #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
     #   # ...
@@ -608,8 +608,7 @@ module Sequel
     #   # {[1, 3]=>['a', 'c'], [2, 4]=>['b', 'd'], ...}
     #
     # When using this method, you must be sure that each expression has an alias
-    # that Sequel can determine.  Usually you can do this by calling the #as method
-    # on the expression and providing an alias.
+    # that Sequel can determine.
     def select_hash(key_column, value_column, opts = OPTS)
       _select_hash(:as_hash, key_column, value_column, opts)
     end
@@ -628,8 +627,7 @@ module Sequel
     #   # {['a', 'b']=>[['c', 1], ['d', 2], ...], ...}
     #
     # When using this method, you must be sure that each expression has an alias
-    # that Sequel can determine.  Usually you can do this by calling the #as method
-    # on the expression and providing an alias.
+    # that Sequel can determine.
     def select_hash_groups(key_column, value_column, opts = OPTS)
       _select_hash(:to_hash_groups, key_column, value_column, opts)
     end
@@ -652,8 +650,7 @@ module Sequel
     #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
     #
     # If you provide an array of expressions, you must be sure that each entry
-    # in the array has an alias that Sequel can determine.  Usually you can do this
-    # by calling the #as method on the expression and providing an alias.
+    # in the array has an alias that Sequel can determine.
     def select_map(column=nil, &block)
       _select_map(column, false, &block)
     end
@@ -672,8 +669,7 @@ module Sequel
     #   # => [[1, 'A'], [2, 'B'], [3, 'C'], ...]
     #
     # If you provide an array of expressions, you must be sure that each entry
-    # in the array has an alias that Sequel can determine.  Usually you can do this
-    # by calling the #as method on the expression and providing an alias.
+    # in the array has an alias that Sequel can determine.
     def select_order_map(column=nil, &block)
       _select_map(column, true, &block)
     end
@@ -850,15 +846,14 @@ module Sequel
       execute_ddl(truncate_sql)
     end
 
-    # Updates values for the dataset.  The returned value is generally the
-    # number of rows updated, but that is adapter dependent. +values+ should
-    # a hash where the keys are columns to set and values are the values to
+    # Updates values for the dataset.  The returned value is the number of rows updated.
+    # +values+ should be a hash where the keys are columns to set and values are the values to
     # which to set the columns.
     #
-    #   DB[:table].update(:x=>nil) # UPDATE table SET x = NULL
+    #   DB[:table].update(x: nil) # UPDATE table SET x = NULL
     #   # => 10
     #
-    #   DB[:table].update(:x=>Sequel[:x]+1, :y=>0) # UPDATE table SET x = (x + 1), y = 0
+    #   DB[:table].update(x: Sequel[:x]+1, y: 0) # UPDATE table SET x = (x + 1), y = 0
     #   # => 10
     def update(values=OPTS, &block)
       sql = update_sql(values)
@@ -873,7 +868,7 @@ module Sequel
     # yielding each row to the given block.  Basically the same as where(cond).all(&block),
     # except it can be optimized to not create an intermediate dataset.
     #
-    #   DB[:table].where_all(:id=>[1,2,3])
+    #   DB[:table].where_all(id: [1,2,3])
     #   # SELECT * FROM table WHERE (id IN (1, 2, 3))
     def where_all(cond, &block)
       if loader = _where_loader
@@ -887,7 +882,7 @@ module Sequel
     # yielding each row to the given block.  Basically the same as where(cond).each(&block),
     # except it can be optimized to not create an intermediate dataset.
     #
-    #   DB[:table].where_each(:id=>[1,2,3]){|row| p row}
+    #   DB[:table].where_each(id: [1,2,3]){|row| p row}
     #   # SELECT * FROM table WHERE (id IN (1, 2, 3))
     def where_each(cond, &block)
       if loader = _where_loader
@@ -902,7 +897,7 @@ module Sequel
     # a single column.  Basically the same as where(cond).single_value,
     # except it can be optimized to not create an intermediate dataset.
     #
-    #   DB[:table].select(:name).where_single_value(:id=>1)
+    #   DB[:table].select(:name).where_single_value(id: 1)
     #   # SELECT name FROM table WHERE (id = 1) LIMIT 1
     def where_single_value(cond)
       if loader = cached_placeholder_literalizer(:_where_single_value_loader) do |pl|

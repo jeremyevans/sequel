@@ -101,8 +101,8 @@ module Sequel
       #
       # Pay special attention to the :provider option, as without specifying a provider,
       # many things will be broken.  The SQLNCLI10 provider appears to work well if you
-      # are connecting to Microsoft SQL Server, but it is not the default as that would
-      # break backwards compatability.
+      # are connecting to Microsoft SQL Server, but it is not the default as that is not
+      # always available and would break backwards compatability.
       def connect(server)
         opts = server_opts(server)
         s = opts[:conn_string] || "driver=#{opts[:driver]};server=#{opts[:host]};database=#{opts[:database]}#{";uid=#{opts[:user]};pwd=#{opts[:password]}" if opts[:user]}"
@@ -266,7 +266,7 @@ module Sequel
         end
       end
       
-      # ADO returns nil for all for delete and update statements.
+      # ADO can return for for delete and update statements, depending on the provider.
       def provides_accurate_rows_matched?
         false
       end

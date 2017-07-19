@@ -4,7 +4,6 @@ Sequel.require 'adapters/utils/unmodified_identifiers'
 
 module Sequel
   module Mock
-    # Connection class for Sequel's mock adapter.
     class Connection
       # Sequel::Mock::Database object that created this connection
       attr_reader :db
@@ -30,7 +29,6 @@ module Sequel
       end
     end
 
-    # Database class for Sequel's mock adapter.
     class Database < Sequel::Database
       set_adapter_scheme :mock
 
@@ -61,9 +59,9 @@ module Sequel
       # Set the columns to set in the dataset when the dataset fetches
       # rows.  Argument types supported:
       # nil :: Set no columns
-      # Array of Symbols: Used for all datasets
-      # Array (otherwise): First retrieval gets the first value in the
-      #                    array, second gets the second value, etc.
+      # Array of Symbols :: Used for all datasets
+      # Array (otherwise) :: First retrieval gets the first value in the
+      #                      array, second gets the second value, etc.
       # Proc :: Called with the select SQL query, uses the value
       #         returned, which should be an array of symbols
       attr_writer :columns

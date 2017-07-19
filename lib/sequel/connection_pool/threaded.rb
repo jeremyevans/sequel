@@ -18,13 +18,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   attr_reader :allocated
 
   # The following additional options are respected:
-  # * :connection_handling - Set how to handle available connections.  By default,
-  #   uses a a queue for fairness.  Can be set to :stack to use a stack, which may
-  #   offer better performance.
-  # * :max_connections - The maximum number of connections the connection pool
-  #   will open (default 4)
-  # * :pool_timeout - The amount of seconds to wait to acquire a connection
-  #   before raising a PoolTimeoutError (default 5)
+  # :max_connections :: The maximum number of connections the connection pool
+  #                     will open (default 4)
+  # :pool_timeout :: The amount of seconds to wait to acquire a connection
+  #                  before raising a PoolTimeoutError (default 5)
   def initialize(db, opts = OPTS)
     super
     @max_size = Integer(opts[:max_connections] || 4)
@@ -57,7 +54,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # being used.  If you want to be able to disconnect connections that are
   # currently in use, use the ShardedThreadedConnectionPool, which can do that.
   # This connection pool does not, for performance reasons. To use the sharded pool,
-  # pass the <tt>:servers=>{}</tt> option when connecting to the database.
+  # pass the <tt>servers: {}</tt> option when connecting to the database.
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
@@ -82,8 +79,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # If no connection is immediately available and the pool is already using the maximum
   # number of connections, Pool#hold will block until a connection
   # is available or the timeout expires.  If the timeout expires before a
-  # connection can be acquired, a Sequel::PoolTimeout is 
-  # raised.
+  # connection can be acquired, a Sequel::PoolTimeout is raised.
   def hold(server=nil)
     t = Thread.current
     if conn = owned_connection(t)

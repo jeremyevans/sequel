@@ -10,7 +10,7 @@ module Sequel
     #   album = Album.new
     #   album.a # => nil
     #   album.b # => 2
-    #   album = Album.new(:a=>1, :b=>3)
+    #   album = Album.new(a: 1, b: 3)
     #   album.a # => 1
     #   album.b # => 3
     #

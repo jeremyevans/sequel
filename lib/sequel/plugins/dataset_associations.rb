@@ -12,7 +12,7 @@ module Sequel
     #     plugin :dataset_associations
     #     one_to_many :albums
     #   end
-    #   Artist.where(id=>1..100).albums
+    #   Artist.where(id: 1..100).albums
     #   # SELECT * FROM albums
     #   # WHERE (albums.artist_id IN (
     #   #   SELECT id FROM artists
@@ -27,7 +27,7 @@ module Sequel
     # As the dataset methods return datasets, you can easily chain the
     # methods to get associated datasets of associated datasets:
     #
-    #   Artist.where(id=>1..100).albums.where{name < 'M'}.tags
+    #   Artist.where(id: 1..100).albums.where{name < 'M'}.tags
     #   # SELECT tags.* FROM tags
     #   # WHERE (tags.id IN (
     #   #   SELECT albums_tags.tag_id FROM albums

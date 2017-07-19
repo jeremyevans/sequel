@@ -76,8 +76,8 @@
 #
 # This feature is mostly useful for a different way to graph tables:
 #
-#   DB[:a].join(:b, :id=>:b_id).select(Sequel.pg_row_op(:a).splat(:a),
-#                                      Sequel.pg_row_op(:b).splat(:b))
+#   DB[:a].join(:b, id: :b_id).select(Sequel.pg_row_op(:a).splat(:a),
+#                                     Sequel.pg_row_op(:b).splat(:b))
 #   # SELECT (a.*)::a, (b.*)::b FROM a INNER JOIN b ON (b.id = a.b_id)
 #   # => {:a=>{:id=>1, :b_id=>2}, :b=>{:id=>2}}
 #

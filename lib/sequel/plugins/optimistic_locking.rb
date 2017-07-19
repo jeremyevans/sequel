@@ -11,11 +11,11 @@ module Sequel
     #   end
     #   p1 = Person[1]
     #   p2 = Person[1]
-    #   p1.update(:name=>'Jim') # works
-    #   p2.update(:name=>'Bob') # raises Sequel::Plugins::OptimisticLocking::Error
+    #   p1.update(name: 'Jim') # works
+    #   p2.update(name: 'Bob') # raises Sequel::Plugins::OptimisticLocking::Error
     #
     # In order for this plugin to work, you need to make sure that the database
-    # table has a lock_version column (or other column you name via the lock_column
+    # table has a +lock_version+ column (or other column you name via the lock_column
     # class level accessor) that defaults to 0.
     #
     # This plugin relies on the instance_filters plugin.

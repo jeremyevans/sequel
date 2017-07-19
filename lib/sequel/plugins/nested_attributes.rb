@@ -13,11 +13,11 @@ module Sequel
     # The nested_attributes call defines a single method, <tt><i>association</i>_attributes=</tt>,
     # (e.g. <tt>albums_attributes=</tt>).  So if you have an Artist instance:
     #
-    #   a = Artist.new(:name=>'YJM')
+    #   a = Artist.new(name: 'YJM')
     #
     # You can create new album instances related to this artist:
     #
-    #   a.albums_attributes = [{:name=>'RF'}, {:name=>'MO'}]
+    #   a.albums_attributes = [{name: 'RF'}, {name: 'MO'}]
     #
     # Note that this doesn't send any queries to the database yet.  That doesn't happen till
     # you save the object:
@@ -33,7 +33,7 @@ module Sequel
     # objects.  You just need to make sure that the primary key field is filled in for the
     # associated object:
     #
-    #   a.update(:albums_attributes => [{:id=>1, :name=>'T'}])
+    #   a.update(:albums_attributes => [{id: 1, name: 'T'}])
     #
     # Since the primary key field is filled in, the plugin will update the album with id 1 instead
     # of creating a new album.
@@ -41,15 +41,15 @@ module Sequel
     # If you would like to delete the associated object instead of updating it, you add a _delete
     # entry to the hash, and also pass the :destroy option when calling +nested_attributes+:
     #
-    #   Artist.nested_attributes :albums, :destroy=>true
-    #   a.update(:albums_attributes => [{:id=>1, :_delete=>true}])
+    #   Artist.nested_attributes :albums, destroy: true
+    #   a.update(:albums_attributes => [{id: 1, _delete: true}])
     #
     # This will delete the related associated object from the database.  If you want to leave the
     # associated object in the database, but just remove it from the association, add a _remove
     # entry in the hash, and also pass the :remove option when calling +nested_attributes+:
     #
-    #   Artist.nested_attributes :albums, :remove=>true
-    #   a.update(:albums_attributes => [{:id=>1, :_remove=>true}])
+    #   Artist.nested_attributes :albums, remove: true
+    #   a.update(:albums_attributes => [{id: 1, _remove: true}])
     #
     # The above example was for a one_to_many association, but the plugin also works similarly
     # for other association types.  For one_to_one and many_to_one associations, you need to
@@ -66,11 +66,11 @@ module Sequel
     #
     # Your web stack will probably parse that into a nested hash similar to:
     #
-    #   {:artist=>{:name=>'Y', :albums_attributes=>{0=>{:name=>'X'}, 1=>{:id=>'2', :name=>'Z'}}}}
+    #   {'artist'=>{'name'=>'Y', 'albums_attributes'=>{'0'=>{'name'=>'X'}, '1'=>{'id'=>'2', 'name'=>'Z'}}}}
     #
     # Then you can do:
     #
-    #   artist.update_fields(params[:artist], [:name, :albums_artists])
+    #   artist.update_fields(params['artist'], %w'name albums_artists')
     #
     # To save changes to the artist, create the first album and associate it to the artist,
     # and update the other existing associated album.

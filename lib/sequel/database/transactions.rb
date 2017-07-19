@@ -264,7 +264,7 @@ module Sequel
       hooks << block
     end
 
-    # Whether the current thread/connection is already inside a transaction
+    # Whether the given connection is already inside a transaction
     def already_in_transaction?(conn, opts)
       _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
     end
@@ -285,7 +285,7 @@ module Sequel
       "SAVEPOINT autopoint_#{depth}"
     end
 
-    # Start a new database connection on the given connection
+    # Start a new database transaction on the given connection
     def begin_new_transaction(conn, opts)
       log_connection_execute(conn, begin_transaction_sql)
       set_transaction_isolation(conn, opts)

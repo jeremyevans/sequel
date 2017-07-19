@@ -45,7 +45,7 @@ module Sequel
     # executives table also stores CEO model objects.
     #
     # When using the class_table_inheritance plugin, subclasses that have additional
-    # columns use joined datasets:
+    # columns use joined datasets in subselects:
     #
     #   Employee.dataset.sql
     #   # SELECT * FROM employees
@@ -99,19 +99,21 @@ module Sequel
     #   a = Executive.first
     #   a.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
     #   
-    # Note that when loading from a subclass, because the subclass dataset uses a JOIN,
-    # if you are referencing the primary key column, you need to disambiguate the reference
-    # by explicitly qualifying it:
+    # Note that when loading from a subclass, because the subclass dataset uses a subquery
+    # that by default uses the same alias at the primary table, any qualified identifiers
+    # should reference the subquery alias (and qualified identifiers should not be needed
+    # unless joining to another table):
     #
-    #   a = Executive.where(:id=>1).first # database error
-    #   a = Executive.where{{executives[:id]=>1}}.first # no error
+    #   a = Executive.where(:id=>1).first # works
+    #   a = Executive.where{{employees[:id]=>1}}.first # works
+    #   a = Executive.where{{executives[:id]=>1}}.first # doesn't work
     #
     # = Usage
     #
     #   # Use the default of storing the class name in the sti_key
     #   # column (:kind in this case)
     #   class Employee < Sequel::Model
-    #     plugin :class_table_inheritance, :key=>:kind
+    #     plugin :class_table_inheritance, key: :kind
     #   end
     #
     #   # Have subclasses inherit from the appropriate class
@@ -123,27 +125,23 @@ module Sequel
     #
     #   # Some examples of using these options:
     #
-    #   # Use a subquery for all subclass datasets, fixing issues with ambiguous
-    #   # column names.
-    #   Employee.plugin :class_table_inheritance, :key=>:kind
-    #
     #   # Specifying the tables with a :table_map hash
     #   Employee.plugin :class_table_inheritance,
-    #     :table_map=>{:Employee  => :employees,
-    #                  :Staff     => :staff,
-    #                  :Cook      => :staff,
-    #                  :Manager   => :managers,
-    #                  :Executive => :executives,
-    #                  :CEO       => :executives }
+    #     table_map: {Employee:  :employees,
+    #                 Staff:     :staff,
+    #                 Cook:      :staff,
+    #                 Manager:   :managers,
+    #                 Executive: :executives,
+    #                 CEO:       ::executives }
     #
     #   # Using integers to store the class type, with a :model_map hash
     #   # and an sti_key of :type
-    #   Employee.plugin :class_table_inheritance, :type,
-    #     :model_map=>{1=>:Staff, 2=>:Cook, 3=>:Manager, 4=>:Executive, 5=>:CEO}
+    #   Employee.plugin :class_table_inheritance, key: :type,
+    #     model_map: {1=>:Staff, 2=>:Cook, 3=>:Manager, 4=>:Executive, 5=>:CEO}
     #
     #   # Using non-class name strings
-    #   Employee.plugin :class_table_inheritance, :key=>:type,
-    #     :model_map=>{'staff'=>:Staff, 'cook staff'=>:Cook, 'supervisor'=>:Manager}
+    #   Employee.plugin :class_table_inheritance, key: :type,
+    #     model_map: {'staff'=>:Staff, 'cook staff'=>:Cook, 'supervisor'=>:Manager}
     #
     #   # By default the plugin sets the respective column value
     #   # when a new instance is created.
@@ -152,26 +150,26 @@ module Sequel
     #
     #   # You can customize this behavior with the :key_chooser option.
     #   # This is most useful when using a non-bijective mapping.
-    #   Employee.plugin :class_table_inheritance, :key=>:type,
-    #     :model_map=>{'cook staff'=>:Cook, 'supervisor'=>:Manager},
-    #     :key_chooser=>proc{|instance| instance.model.sti_key_map[instance.model.to_s].first || 'stranger' }
+    #   Employee.plugin :class_table_inheritance, key: :type,
+    #     model_map: {'cook staff'=>:Cook, 'supervisor'=>:Manager},
+    #     key_chooser: proc{|instance| instance.model.sti_key_map[instance.model.to_s].first || 'stranger' }
     #
     #   # Using custom procs, with :model_map taking column values
     #   # and yielding either a class, string, symbol, or nil,
     #   # and :key_map taking a class object and returning the column
     #   # value to use
-    #   Employee.plugin :single_table_inheritance, :key=>:type,
-    #     :model_map=>proc{|v| v.reverse},
-    #     :key_map=>proc{|klass| klass.name.reverse}
+    #   Employee.plugin :single_table_inheritance, key: :type,
+    #     model_map: proc{|v| v.reverse},
+    #     key_map: proc{|klass| klass.name.reverse}
     #
     #   # You can use the same class for multiple values.
     #   # This is mainly useful when the sti_key column contains multiple values
     #   # which are different but do not require different code.
-    #   Employee.plugin :single_table_inheritance, :key=>:type,
-    #     :model_map=>{'staff' => "Staff",
-    #                  'manager' => "Manager",
-    #                  'overpayed staff' => "Staff",
-    #                  'underpayed staff' => "Staff"}
+    #   Employee.plugin :single_table_inheritance, key: :type,
+    #     model_map: {'staff' => "Staff",
+    #                 'manager' => "Manager",
+    #                 'overpayed staff' => "Staff",
+    #                 'underpayed staff' => "Staff"}
     #
     # One minor issue to note is that if you specify the <tt>:key_map</tt>
     # option as a hash, instead of having it inferred from the <tt>:model_map</tt>,
@@ -196,8 +194,8 @@ module Sequel
       # :key_map :: Hash or proc mapping model class names to key column values.
       #             Each value or return is an array of possible key column values.
       # :key_chooser :: proc returning key for the provided model instance
-      # :table_map :: Hash with class name symbols keys mapping to table name symbol values
-      #               Overrides implicit table names
+      # :table_map :: Hash with class name symbols keys mapping to table name symbol values.
+      #               Overrides implicit table names.
       def self.configure(model, opts = OPTS)
         SingleTableInheritance.configure model, opts[:key], opts
 
@@ -212,7 +210,7 @@ module Sequel
       end
 
       module ClassMethods
-        # An array of each model in the inheritance hierarchy that uses an
+        # An array of each model in the inheritance hierarchy that is
         # backed by a new table.
         attr_reader :cti_models
 

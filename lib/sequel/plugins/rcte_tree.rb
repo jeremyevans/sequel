@@ -36,12 +36,12 @@ module Sequel
     #   
     #   # Eager loading - also populates the :parent and children associations
     #   # for all ancestors and descendants
-    #   Model.where(:id=>[1, 2]).eager(:ancestors, :descendants).all
+    #   Model.where(id: [1, 2]).eager(:ancestors, :descendants).all
     #   
-    #   # Eager loading children and grand children
-    #   Model.where(:id=>[1, 2]).eager(:descendants=>2).all
-    #   # Eager loading children, grand children, and great grand children
-    #   Model.where(:id=>[1, 2]).eager(:descendants=>3).all
+    #   # Eager loading children and grandchildren
+    #   Model.where(id: [1, 2]).eager(descendants: 2).all
+    #   # Eager loading children, grandchildren, and great grandchildren
+    #   Model.where(id: [1, 2]).eager(descendants: 3).all
     #
     # = Options
     #
@@ -56,8 +56,8 @@ module Sequel
     # Note that you can change the name of the above associations by specifying
     # a :name key in the appropriate hash of options above.  For example:
     #
-    #   Model.plugin :rcte_tree, :parent=>{:name=>:mother},
-    #    :children=>{:name=>:daughters}, :descendants=>{:name=>:offspring}
+    #   Model.plugin :rcte_tree, parent: {name: :mother},
+    #    children: {name: :daughters}, descendants: {name: :offspring}
     #
     # Any other keys in the main options hash are treated as options shared by
     # all of the associations.  Here's a few options that affect the plugin:

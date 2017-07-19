@@ -32,7 +32,6 @@ module Sequel
         self << drop_sequence_sql(name)
       end
 
-      # Oracle uses the :oracle database type
       def database_type
         :oracle
       end
@@ -141,7 +140,6 @@ module Sequel
 
       private
 
-      # Handle Oracle specific ALTER TABLE SQL
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -388,7 +386,8 @@ module Sequel
         clone(:sequence=>s)
       end
 
-      # Handle LIMIT by using a unlimited subselect filtered with ROWNUM.
+      # Handle LIMIT by using a unlimited subselect filtered with ROWNUM,
+      # unless Oracle 12 is used.
       def select_sql
         return super if @opts[:sql]
         return super if supports_fetch_next_rows?
@@ -437,6 +436,7 @@ module Sequel
           sql << " ROWS ONLY"
         end
       end
+
       # Oracle requires recursive CTEs to have column aliases.
       def recursive_cte_requires_column_aliases?
         true
@@ -451,7 +451,8 @@ module Sequel
         false
       end
 
-      # Oracle supports FETCH NEXT ROWS since 12c
+      # Oracle supports FETCH NEXT ROWS since 12c, but it doesn't work when
+      # locking or when skipping locked rows.
       def supports_fetch_next_rows?
         server_version >= 12000000 && !(@opts[:lock] || @opts[:skip_locked])
       end
@@ -521,7 +522,7 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
-      # Oracle supports pattern matching via regular expressions
+      # Oracle 10+ supports pattern matching via regular expressions
       def supports_regexp?
         server_version >= 10010002
       end
@@ -535,7 +536,8 @@ module Sequel
       end
 
       # Oracle doesn't support the use of AS when aliasing a dataset.  It doesn't require
-      # the use of AS anywhere, so this disables it in all cases.
+      # the use of AS anywhere, so this disables it in all cases.  Oracle also does not support
+      # derived column lists in aliases.
       def as_sql_append(sql, aliaz, column_aliases=nil)
         raise Error, "oracle does not support derived column lists" if column_aliases
         sql << ' '
@@ -551,7 +553,7 @@ module Sequel
         ' FROM DUAL'
       end
 
-      # There is no function on Microsoft SQL Server that does character length
+      # There is no function on Oracle that does character length
       # and respects trailing spaces (datalength respects trailing spaces, but
       # counts bytes instead of characters).  Use a hack to work around the
       # trailing spaces issue.

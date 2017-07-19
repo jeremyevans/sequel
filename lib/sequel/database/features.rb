@@ -8,7 +8,7 @@ module Sequel
     # database supprots a given feature.
     # ---------------------
     
-    # Whether the database uses a global namespace for the index.  If
+    # Whether the database uses a global namespace for the index, true by default.  If
     # false, the indexes are going to be namespaced per table.
     def global_index_namespace?
       true
@@ -33,7 +33,7 @@ module Sequel
     end
 
     # Whether the database supports DROP TABLE IF EXISTS syntax,
-    # default is the same as #supports_create_table_if_not_exists?.
+    # false by default.
     def supports_drop_table_if_exists?
       supports_create_table_if_not_exists?
     end
@@ -49,7 +49,8 @@ module Sequel
       respond_to?(:indexes)
     end
 
-    # Whether the database supports partial indexes (indexes on a subset of a table).
+    # Whether the database supports partial indexes (indexes on a subset of a table),
+    # false by default.
     def supports_partial_indexes?
       false
     end
@@ -66,7 +67,7 @@ module Sequel
     end
 
     # Whether the database and adapter support savepoints inside prepared transactions
-    # (two-phase commit), default is false.
+    # (two-phase commit), false by default.
     def supports_savepoints_in_prepared_transactions?
       supports_prepared_transactions? && supports_savepoints?
     end

@@ -5,7 +5,7 @@
 #
 # This extension integrates with Sequel's native postgres and jdbc/postgresql
 # adapters, so that when inet/cidr fields are retrieved, they are returned as
-# IPAddr instances
+# IPAddr instances.
 #
 # To use this extension, load it into your database:
 #

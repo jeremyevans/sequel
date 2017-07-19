@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 #
-# The select_remove extension adds Sequel::Dataset#select_remove for removing existing selected
+# The select_remove extension adds select_remove for removing existing selected
 # columns from a dataset.  It's not part of Sequel core as it is rarely needed and has
 # some corner cases where it can't work correctly.
 #
@@ -26,8 +26,8 @@ module Sequel
     #   # Assume columns a, b, and c in items table
     #   DB[:items] # SELECT * FROM items
     #   DB[:items].select_remove(:c) # SELECT a, b FROM items
-    #   DB[:items].select(:a, :b___c, :c___b).select_remove(:c) # SELECT a, c AS b FROM items
-    #   DB[:items].select(:a, :b___c, :c___b).select_remove(:c___b) # SELECT a, b AS c FROM items
+    #   DB[:items].select(:a, Sequel[:b].as(:c), Sequel[:c].as(:b)).select_remove(:c) # SELECT a, c AS b FROM items
+    #   DB[:items].select(:a, Sequel[:b][:c], Sequel[:c][:b]).select_remove(Sequel[:c][:b]) # SELECT a, b AS c FROM items
     #
     # Note that there are a few cases where this method may not work correctly:
     #

@@ -10,24 +10,28 @@
 #
 #   DB.extension :duplicate_columns_handler
 #
+# or into individual datasets:
+#
+#   ds = DB[:items].extension(:duplicate_columns_handler)
+#
 # A database option is introduced: :on_duplicate_columns. It accepts a Symbol
 # or any object that responds to :call.
 #
-#   :on_duplicate_columns => :raise
-#   :on_duplicate_columns => :warn
-#   :on_duplicate_columns => :ignore
-#   :on_duplicate_columns => proc { |columns| arbitrary_condition? ? :raise : :warn }
+#   on_duplicate_columns: :raise
+#   on_duplicate_columns: :warn
+#   on_duplicate_columns: :ignore
+#   on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}
 #
 # You may also configure duplicate columns handling for a specific dataset:
 #
 #   ds.on_duplicate_columns(:warn)
 #   ds.on_duplicate_columns(:raise)
 #   ds.on_duplicate_columns(:ignore)
-#   ds.on_duplicate_columns { |columns| arbitrary_condition? ? :raise : :warn }
-#   ds.on_duplicate_columns(proc { |columns| arbitrary_condition? ? :raise : :warn })
+#   ds.on_duplicate_columns{|columns| arbitrary_condition? ? :raise : :warn}
+#   ds.on_duplicate_columns(lambda{|columns| arbitrary_condition? ? :raise : :warn})
 #
 # If :raise is specified, a Sequel::DuplicateColumnError is raised.
-# If :warn is specified, you will receive a warning via `warn`.
+# If :warn is specified, you will receive a warning via +warn+.
 # If a callable is specified, it will be called.
 # If no on_duplicate_columns is specified, the default is :warn.
 #
@@ -45,8 +49,7 @@ module Sequel
 
     private
 
-    # Override the attr_writer to check for duplicate columns, and call
-    # handle_duplicate_columns if necessary.
+    # Call handle_duplicate_columns if there are duplicate columns.
     def columns=(cols)
       if cols && cols.uniq.size != cols.size
         handle_duplicate_columns(cols)

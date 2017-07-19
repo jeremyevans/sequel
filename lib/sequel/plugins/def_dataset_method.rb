@@ -6,7 +6,7 @@ module Sequel
     # for defining dataset methods:
     #
     #   Album.def_dataset_method(:by_name) do |name|
-    #     where(:name=>name)
+    #     where(name: name)
     #   end
     #
     # Additionally, this adds support for Model.subset, which can also
@@ -41,8 +41,8 @@ module Sequel
         #
         #   # Add new dataset method and class method that calls it
         #   Artist.def_dataset_method(:by_name){order(:name)}
-        #   Artist.where(:name.like('A%')).by_name
-        #   Artist.by_name.where(:name.like('A%'))
+        #   Artist.where(Sequel[:name].like('A%')).by_name
+        #   Artist.by_name.where(Sequel[:name].like('A%'))
         #
         #   # Just add a class method that calls an existing dataset method
         #   Artist.def_dataset_method(:paginate)
@@ -63,7 +63,7 @@ module Sequel
         # they can be chained.
         # For example:
         #
-        #   Topic.subset(:joes, :username.like('%joe%'))
+        #   Topic.subset(:joes, Sequel[:username].like('%joe%'))
         #   Topic.subset(:popular){num_posts > 100}
         #   Topic.subset(:recent){created_on > Date.today - 7}
         #
@@ -75,7 +75,7 @@ module Sequel
         # have more than 100 posts and were created less than
         # 7 days ago.
         #
-        # Both the args given and the block are passed to <tt>Dataset#filter</tt>.
+        # Both the args given and the block are passed to <tt>Dataset#where</tt>.
         #
         # This method creates dataset methods that do not accept arguments.  To create
         # dataset methods that accept arguments, you should use define a

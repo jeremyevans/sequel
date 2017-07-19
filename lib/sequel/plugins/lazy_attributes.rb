@@ -13,7 +13,7 @@ module Sequel
     # get the reviews for all of those albums:
     #
     #   Album.plugin :lazy_attributes, :review
-    #   Album.where{id<100}.all do |a|
+    #   Album.where{id < 100}.all do |a|
     #     a.review
     #   end
     #

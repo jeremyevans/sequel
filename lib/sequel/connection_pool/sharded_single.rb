@@ -66,8 +66,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     1
   end
   
-  # Remove servers from the connection pool. Primarily used in conjunction with master/slave
-  # or shard configurations.  Similar to disconnecting from all given servers,
+  # Remove servers from the connection pool. Similar to disconnecting from all given servers,
   # except that after it is used, future requests for the server will use the
   # :default server instead.
   def remove_servers(servers)

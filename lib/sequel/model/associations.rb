@@ -396,7 +396,7 @@ module Sequel
           end
         end
 
-        # Show which type of reflection this is, and a guess at what line was used to create the
+        # Show which type of reflection this is, and a guess at what code was used to create the
         # association.
         def inspect
           o = self[:orig_opts].dup
@@ -445,9 +445,7 @@ module Sequel
           predicate_key_methods.map{|k| object.get_column_value(k)}
         end
 
-        # Qualify +col+ with the given table name.  If +col+ is an array of columns,
-        # return an array of qualified columns.  Only qualifies Symbols and SQL::Identifier
-        # values, other values are not modified.
+        # Qualify +col+ with the given table name.
         def qualify(table, col)
           transform(col) do |k|
             case k
@@ -551,8 +549,10 @@ module Sequel
         
         private
 
-        # On non-GVL rubies, assume the need to synchronize access.  Store the key
-        # in a special sub-hash that always uses this method to synchronize access.
+        # If the key exists in the reflection hash, return it.
+        # If the key doesn't exist and association reflections are uncached, then yield to get the value.
+        # If the key doesn't exist and association reflection are cached, check the cache and return
+        # the value if present, or yield to get the value, cache the value, and return it.
         def cached_fetch(key)
           fetch(key) do
             return yield unless h = self[:cache]
@@ -562,7 +562,7 @@ module Sequel
           end
         end
 
-        # Cache the value at the given key, synchronizing access.
+        # Cache the value at the given key if caching.
         def cached_set(key, value)
           return unless h = self[:cache]
           Sequel.synchronize{h[key] = value}
@@ -571,10 +571,10 @@ module Sequel
         # The base dataset used for the association, before any order/conditions
         # options have been applied.
         def _associated_dataset
-          associated_class.dataset.clone
+          associated_class.dataset
         end
 
-        # Whether for the reciprocal type for the given association can not be
+        # Whether for the reciprocal type for the given association cannot be
         # known in advantage, false by default.
         def ambiguous_reciprocal_type?
           false
@@ -1101,7 +1101,7 @@ module Sequel
         end
 
         # Support automatic use of correlated subqueries if :ruby option is best available option,
-        # MySQL is not being used, and either the associated class has a non-composite primary key
+        # the database supports them, and either the associated class has a non-composite primary key
         # or the database supports multiple columns in IN.
         def true_eager_graph_limit_strategy
           r = super
@@ -1501,7 +1501,7 @@ module Sequel
       #   Project.associations
       #   => [:portfolio, :milestones]
       #   Project.association_reflection(:portfolio)
-      #   => {:type => :many_to_one, :name => :portfolio, ...}
+      #   => #<Sequel::Model::Associations::ManyToOneAssociationReflection Project.many_to_one :portfolio>
       #
       # Associations should not have the same names as any of the columns in the
       # model's current table they reference. If you are dealing with an existing schema that
@@ -1523,7 +1523,7 @@ module Sequel
 
         # Whether association metadata should be cached in the association reflection.  If not cached, it will be computed
         # on demand.  In general you only want to set this to false when using code reloading.  When using code reloading,
-        # setting this will make sure that if an associated class is removed or modified, this class will not hang on to
+        # setting this will make sure that if an associated class is removed or modified, this class will not have a reference to
         # the previous class.
         attr_accessor :cache_associations
 
@@ -1598,7 +1598,7 @@ module Sequel
         #           singularized unless the type is :many_to_one, :one_to_one, or one_through_one).  If this is specified
         #           as a string or symbol, you must specify the full class name (e.g. "::SomeModule::MyModel"). 
         # :class_namespace :: If :class is given as a string or symbol, sets the default namespace in which to look for
-        #                     the class.  <tt>:class=>'Foo', :class_namespace=>'Bar'</tt> looks for <tt>::Bar::Foo</tt>.)
+        #                     the class.  <tt>class: 'Foo', class_namespace: 'Bar'</tt> looks for <tt>::Bar::Foo</tt>.)
         # :clearer :: Proc used to define the private _remove_all_* method for doing the database work
         #             to remove all objects associated to the current object (*_to_many assocations).
         # :clone :: Merge the current options and block into the options and block used in defining
@@ -1671,8 +1671,7 @@ module Sequel
         # :order_eager_graph :: Whether to add the association's order to the graphed dataset's order when graphing
         #                       via +eager_graph+.  Defaults to true, so set to false to disable.
         # :read_only :: Do not add a setter method (for many_to_one or one_to_one associations),
-        #               or add_/remove_/remove_all_ methods (for one_to_many and many_to_many associations). Always
-        #               true for one_through_one associations.
+        #               or add_/remove_/remove_all_ methods (for one_to_many and many_to_many associations).
         # :reciprocal :: the symbol name of the reciprocal association,
         #                if it exists.  By default, Sequel will try to determine it by looking at the
         #                associated model's assocations for a association that matches
@@ -1703,7 +1702,7 @@ module Sequel
         #                 array of symbols for a composite key association.
         # :primary_key_method :: the method symbol or array of method symbols to call on the associated
         #                        object to get the foreign key values.  Defaults to :primary_key option.
-        # :qualify :: Whether to use qualifier primary keys when loading the association.  The default
+        # :qualify :: Whether to use qualified primary keys when loading the association.  The default
         #             is true, so you must set to false to not qualify.  Qualification rarely causes
         #             problems, but it's necessary to disable in some cases, such as when you are doing
         #             a JOIN USING operation on the column on Oracle.
@@ -1866,7 +1865,7 @@ module Sequel
           associate(:many_to_one, name, opts, &block)
         end
         
-        # Shortcut for adding a one_through_one association, see #associate.
+        # Shortcut for adding a one_through_one association, see #associate
         def one_through_one(name, opts=OPTS, &block)
           associate(:one_through_one, name, opts, &block)
         end
@@ -1876,7 +1875,7 @@ module Sequel
           associate(:one_to_many, name, opts, &block)
         end
 
-        # Shortcut for adding a one_to_one association, see #associate.
+        # Shortcut for adding a one_to_one association, see #associate
         def one_to_one(name, opts=OPTS, &block)
           associate(:one_to_one, name, opts, &block)
         end
@@ -2396,10 +2395,7 @@ module Sequel
           self
         end
 
-        # Handle parsing of options when loading associations.  For historical
-        # reasons, you can pass true/false/nil or a callable argument to
-        # associations.  That will be going away in Sequel 5, but we'll still
-        # support it until then.
+        # If a block is given, assign it as the :callback option in the hash, and return the hash.
         def load_association_objects_options(dynamic_opts, &block)
           dynamic_opts = Hash[dynamic_opts]
 
@@ -2602,28 +2598,28 @@ module Sequel
       #   Album.eager_graph(:artist, :genre).all
       #   Album.eager(:artist).eager(:genre).all
       #   Album.eager_graph(:artist).eager(:genre).all
-      #   Artist.eager(:albums=>:tracks).all
-      #   Artist.eager_graph(:albums=>:tracks).all
-      #   Artist.eager(:albums=>{:tracks=>:genre}).all
-      #   Artist.eager_graph(:albums=>{:tracks=>:genre}).all
+      #   Artist.eager(albums: :tracks).all
+      #   Artist.eager_graph(albums: :tracks).all
+      #   Artist.eager(albums: {tracks: :genre}).all
+      #   Artist.eager_graph(albums: {tracks: :genre}).all
       #
       # You can also pass a callback as a hash value in order to customize the dataset being
       # eager loaded at query time, analogous to the way the :eager_block association option
       # allows you to customize it at association definition time. For example,
       # if you wanted artists with their albums since 1990:
       #
-      #   Artist.eager(:albums => proc{|ds| ds.where{year > 1990}})
+      #   Artist.eager(albums: proc{|ds| ds.where{year > 1990}})
       #
       # Or if you needed albums and their artist's name only, using a single query:
       #
-      #   Albums.eager_graph(:artist => proc{|ds| ds.select(:name)})
+      #   Albums.eager_graph(artist: proc{|ds| ds.select(:name)})
       #
       # To cascade eager loading while using a callback, you substitute the cascaded
       # associations with a single entry hash that has the proc callback as the key and 
       # the cascaded associations as the value.  This will load artists with their albums
       # since 1990, and also the tracks on those albums and the genre for those tracks:
       #
-      #   Artist.eager(:albums => {proc{|ds| ds.where{year > 1990}}=>{:tracks => :genre}})
+      #   Artist.eager(albums: {proc{|ds| ds.where{year > 1990}}=>{tracks: :genre}})
       module DatasetMethods
         %w'inner left right full'.each do |type|
           class_eval(<<-END, __FILE__, __LINE__+1)
@@ -2711,7 +2707,7 @@ module Sequel
         # it avoids problems such as aliasing conflicts and creating cartesian product
         # result sets if multiple one_to_many or many_to_many eager associations are requested.
         #
-        # One limitation of using this method is that you cannot filter the dataset
+        # One limitation of using this method is that you cannot filter the current dataset
         # based on values of columns in an associated table, since the associations are loaded
         # in separate queries.  To do that you need to load all associations in the
         # same query, and extract an object graph from the results of that query. If you
@@ -2728,7 +2724,8 @@ module Sequel
         end
 
         # The secondary eager loading method.  Loads all associations in a single query. This
-        # method should only be used if you need to filter or order based on columns in associated tables.
+        # method should only be used if you need to filter or order based on columns in associated tables,
+        # or if you have done comparative benchmarking it and determined it is faster.
         #
         # This method uses <tt>Dataset#graph</tt> to create appropriate aliases for columns in all the
         # tables.  Then it uses the graph's metadata to build the associations from the single hash, and
@@ -2736,7 +2733,7 @@ module Sequel
         #
         # Be very careful when using this with multiple one_to_many or many_to_many associations, as you can
         # create large cartesian products.  If you must graph multiple one_to_many and many_to_many associations,
-        # make sure your filters are narrow if you have a large database.
+        # make sure your filters are narrow if the datasets are large.
         # 
         # Each association's order, if defined, is respected. +eager_graph+ probably
         # won't work correctly on a limited dataset, unless you are
@@ -3013,10 +3010,9 @@ module Sequel
         # Eagerly load all specified associations 
         def eager_load(a, eager_assoc=@opts[:eager])
           return if a.empty?
-          # Key is foreign/primary key name symbol
+          # Key is foreign/primary key name symbol.
           # Value is hash with keys being foreign/primary key values (generally integers)
-          #  and values being an array of current model objects with that
-          #  specific foreign/primary key
+          # and values being an array of current model objects with that specific foreign/primary key
           key_hash = {}
           # Reflections for all associations to eager load
           reflections = eager_assoc.keys.map{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}

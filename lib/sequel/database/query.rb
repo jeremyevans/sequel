@@ -30,7 +30,7 @@ module Sequel
     # Call the prepared statement with the given name with the given hash
     # of arguments.
     #
-    #   DB[:items].where(:id=>1).prepare(:first, :sa)
+    #   DB[:items].where(id: 1).prepare(:first, :sa)
     #   DB.call(:sa) # SELECT * FROM items WHERE id = 1
     def call(ps_name, hash={}, &block)
       prepared_statement(ps_name).call(hash, &block)
@@ -43,7 +43,7 @@ module Sequel
       execute_dui(sql, opts, &block)
     end
 
-    # Method that should be used when issuing a DELETE, UPDATE, or INSERT
+    # Method that should be used when issuing a DELETE or UPDATE
     # statement.  By default, calls execute.
     # This method should not be called directly by user code.
     def execute_dui(sql, opts=OPTS, &block)
@@ -57,11 +57,11 @@ module Sequel
       execute_dui(sql, opts, &block)
     end
 
-    # Returns a single value from the database, e.g.:
+    # Returns a single value from the database, see Dataset#get.
     #
     #   DB.get(1) # SELECT 1
     #   # => 1
-    #   DB.get{server_version{}} # SELECT server_version()
+    #   DB.get{server_version.function} # SELECT server_version()
     def get(*args, &block)
       @default_dataset.get(*args, &block)
     end

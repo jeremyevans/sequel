@@ -10,7 +10,6 @@ module Sequel
       # Whether to use clob as the generic File type, false by default.
       attr_accessor :use_clob_as_blob
 
-      # DB2 always uses :db2 as it's database type
       def database_type
         :db2
       end
@@ -118,7 +117,6 @@ module Sequel
 
       private
 
-      # Handle DB2 specific alter table operations.
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column

@@ -10,12 +10,12 @@ module Sequel
     # are frozen so they won't be modified unexpectedly, and before hooks disallow
     # saving or destroying instances.
     #
-    # You can use the :frozen=>false option to have this plugin return unfrozen
+    # You can use the frozen: false option to have this plugin return unfrozen
     # instances.  This is slower as it requires creating new objects, but it allows
     # you to make changes to the object and save them.  If you set the option to false,
     # you are responsible for updating the cache manually (the pg_static_cache_updater
     # extension can handle this automatically).  Note that it is not safe to use the
-    # :frozen=>false option if you are mutating column values directly.  If you are
+    # frozen: false option if you are mutating column values directly.  If you are
     # mutating column values, you should also override Model.call to dup each mutable
     # column value to ensure it is not shared by other instances.
     #
@@ -37,9 +37,9 @@ module Sequel
     #
     #   # Cache the AlbumType class statically, but return unfrozen instances
     #   # that can be modified.
-    #   AlbumType.plugin :static_cache, :frozen=>false
+    #   AlbumType.plugin :static_cache, frozen: false
     #
-    # If you would like the speed benefits of keeping :frozen=>true but still need
+    # If you would like the speed benefits of keeping frozen: true but still need
     # to occasionally update objects, you can side-step the before_ hooks by
     # overriding the class method +static_cache_allow_modifications?+ to return true:
     #
@@ -54,7 +54,6 @@ module Sequel
     # Now if you +#dup+ a Model object (the resulting object is not frozen), you
     # will be able to update and save the duplicate.
     # Note the caveats around your responsibility to update the cache still applies.
-    #
     module StaticCache
       # Populate the static caches when loading the plugin. Options:
       # :frozen :: Whether retrieved model objects are frozen.  The default is true,
@@ -216,7 +215,7 @@ module Sequel
           @cache = h.freeze
         end
 
-        # If :frozen=>false is not used, just return the argument. Otherwise,
+        # If frozen: false is not used, just return the argument. Otherwise,
         # create a new instance with the arguments values if the argument is
         # not nil.
         def static_cache_object(o)
@@ -229,13 +228,13 @@ module Sequel
       end
 
       module InstanceMethods
-        # Disallowing destroying the object unless the :frozen=>false option was used.
+        # Disallowing destroying the object unless the frozen: false option was used.
         def before_destroy
           cancel_action("modifying model objects that use the static_cache plugin is not allowed") unless model.static_cache_allow_modifications?
           super
         end
 
-        # Disallowing saving the object unless the :frozen=>false option was used.
+        # Disallowing saving the object unless the frozen: false option was used.
         def before_save
           cancel_action("modifying model objects that use the static_cache plugin is not allowed") unless model.static_cache_allow_modifications?
           super

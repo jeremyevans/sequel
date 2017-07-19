@@ -21,7 +21,7 @@ module Sequel
     #   end
     #  
     #   class Node < Sequel::Model
-    #     plugin :tree, :key=>:parentid, :order=>:position
+    #     plugin :tree, key: :parentid, order: :position
     #   end
     module Tree
       # Create parent and children associations.  Any options

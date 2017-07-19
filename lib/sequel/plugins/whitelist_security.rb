@@ -34,12 +34,12 @@ module Sequel
         # setter methods (methods that end in =) that you want to be used during
         # mass assignment, they need to be listed here as well (without the =).
         #
-        # It may be better to use a method such as +set_only+ or +set_fields+ that lets you specify
+        # It may be better to use +set_fields+ which lets you specify
         # the allowed fields per call.
         #
         #   Artist.set_allowed_columns(:name, :hometown)
-        #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
-        #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
+        #   Artist.set(name: 'Bob', hometown: 'Sactown') # No Error
+        #   Artist.set(name: 'Bob', records_sold: 30000) # Error
         def set_allowed_columns(*cols)
           clear_setter_methods_cache
           @allowed_columns = cols
@@ -62,7 +62,7 @@ module Sequel
         # allowed_columns in the model.
         #
         #   Artist.set_allowed_columns(:num_albums)
-        #   artist.set_all(:name=>'Jim')
+        #   artist.set_all(name: 'Jim')
         #   artist.name # => 'Jim'
         def set_all(hash)
           set_restricted(hash, :all)
@@ -72,10 +72,10 @@ module Sequel
         # is included in only.  It may be a better idea to use +set_fields+
         # instead of this method.
         #
-        #   artist.set_only({:name=>'Jim'}, :name)
+        #   artist.set_only({name: 'Jim'}, :name)
         #   artist.name # => 'Jim'
         #
-        #   artist.set_only({:hometown=>'LA'}, :name) # Raise Error
+        #   artist.set_only({hometown: 'LA'}, :name) # Raise Error
         def set_only(hash, *only)
           set_restricted(hash, only.flatten)
         end
@@ -84,7 +84,7 @@ module Sequel
         # +allowed_columns+ in the model.
         #
         #   Artist.set_allowed_columns(:num_albums)
-        #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
+        #   artist.update_all(name: 'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
         def update_all(hash)
           update_restricted(hash, :all)
         end
@@ -93,10 +93,10 @@ module Sequel
         # is included in only.  It may be a better idea to use +update_fields+
         # instead of this method.
         #
-        #   artist.update_only({:name=>'Jim'}, :name)
+        #   artist.update_only({name: 'Jim'}, :name)
         #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
         #
-        #   artist.update_only({:hometown=>'LA'}, :name) # Raise Error
+        #   artist.update_only({hometown: 'LA'}, :name) # Raise Error
         def update_only(hash, *only)
           update_restricted(hash, only.flatten)
         end

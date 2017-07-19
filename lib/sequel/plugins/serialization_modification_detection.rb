@@ -22,7 +22,7 @@ module Sequel
     #     plugin :serialization, :json, :permissions
     #     plugin :serialization_modification_detection
     #   end
-    #   user = User.create(:permissions => {})
+    #   user = User.create(permissions: {})
     #   user.permissions[:global] = 'read-only'
     #   user.save_changes
     module SerializationModificationDetection

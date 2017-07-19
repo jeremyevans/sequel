@@ -97,15 +97,16 @@ module Sequel
         #
         #   class MyClass < Sequel::Model
         #     validates do
-        #       length_of :name, :minimum => 6
-        #       length_of :password, :minimum => 8
+        #       length_of :name, minimum: 6
+        #       length_of :password, minimum: 8
         #     end
         #   end
         #
         # is equivalent to:
+        #
         #   class MyClass < Sequel::Model
-        #     validates_length_of :name, :minimum => 6
-        #     validates_length_of :password, :minimum => 8
+        #     validates_length_of :name, minimum: 6
+        #     validates_length_of :password, minimum: 8
         #   end
         def validates(&block)
           Generator.new(self, &block)

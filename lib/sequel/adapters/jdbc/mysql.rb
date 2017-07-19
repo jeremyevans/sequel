@@ -13,10 +13,7 @@ module Sequel
       end
     end
 
-    # Database and Dataset instance methods for MySQL specific
-    # support via JDBC.
     module MySQL
-      # Database instance methods for MySQL databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
         

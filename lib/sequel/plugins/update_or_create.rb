@@ -2,21 +2,21 @@
 
 module Sequel
   module Plugins
-    # The update_or_create plugin adds a couple of methods that make it easier
+    # The update_or_create plugin adds methods that make it easier
     # to deal with objects which may or may not yet exist in the database.
     # The first method is update_or_create, which updates an object if it
     # exists in the database, or creates the object if it does not.
     #
     # You can call update_or_create with a block:
     #
-    #   Album.update_or_create(:name=>'Hello') do |album|
+    #   Album.update_or_create(name: 'Hello') do |album|
     #     album.num_copies_sold = 1000
     #   end
     #
     # or provide two hashes, with the second one being the attributes
     # to set.
     #
-    #   Album.update_or_create({:name=>'Hello'}, {:num_copies_sold=>1000})
+    #   Album.update_or_create({name: 'Hello'}, num_copies_sold: 1000)
     #
     # In both cases, this will check the database to find the album with
     # the name "Hello". If such an album exists, it will be updated to set

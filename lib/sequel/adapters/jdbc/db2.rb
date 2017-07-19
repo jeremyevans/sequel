@@ -29,10 +29,7 @@ module Sequel
       end
     end
 
-    # Database and Dataset instance methods for DB2 specific
-    # support via JDBC.
     module DB2
-      # Database instance methods for DB2 databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::DB2::DatabaseMethods
         include Sequel::JDBC::Transactions

@@ -4,9 +4,9 @@
 # array value to consider NULL values if one of the referenced
 # columns is NULL:
 #
-#   DB[:test].where(:name=>[])
+#   DB[:test].where(name: [])
 #   # SELECT * FROM test WHERE (name != name)
-#   DB[:test].exclude(:name=>[])
+#   DB[:test].exclude(name: [])
 #   # SELECT * FROM test WHERE (name = name)
 #
 # The default Sequel behavior is to ignore NULLs, as the above

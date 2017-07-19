@@ -8,7 +8,7 @@
 # PostgreSQL json values that are not arrays or objects, but support
 # is fairly limited and the values do not roundtrip.
 #
-# This extension integrates with Sequel's native postgres adapter, so
+# This extension integrates with Sequel's native postgres and jdbc/postgresql adapters, so
 # that when json fields are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::JSONArray or
 # Sequel::Postgres::JSONHash (or JSONBArray or JSONBHash for jsonb
@@ -35,8 +35,8 @@
 #
 # So if you want to insert an array or hash into an json database column:
 #
-#   DB[:table].insert(:column=>Sequel.pg_json([1, 2, 3]))
-#   DB[:table].insert(:column=>Sequel.pg_json({'a'=>1, 'b'=>2}))
+#   DB[:table].insert(column: Sequel.pg_json([1, 2, 3]))
+#   DB[:table].insert(column: Sequel.pg_json({'a'=>1, 'b'=>2}))
 #
 # To use this extension, please load it into the Database instance:
 #
@@ -181,7 +181,7 @@ module Sequel
         end
       end
 
-      # Handle JSONArray and JSONHash in bound variables
+      # Handle json and jsonb types in bound variables
       def bound_variable_arg(arg, conn)
         case arg
         when JSONArrayBase, JSONHashBase
@@ -193,7 +193,7 @@ module Sequel
 
       private
 
-      # Handle json[] types in bound variables.
+      # Handle json[] and jsonb[] types in bound variables.
       def bound_variable_array(a)
         case a
         when JSONHashBase, JSONArrayBase
@@ -203,7 +203,7 @@ module Sequel
         end
       end
 
-      # Make the column type detection recognize the json type.
+      # Make the column type detection recognize the json types.
       def schema_column_type(db_type)
         case db_type
         when 'json'

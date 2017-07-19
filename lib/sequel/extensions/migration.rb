@@ -111,7 +111,7 @@ module Sequel
 
   # Internal class used by the Sequel.migration DSL, part of the +migration+ extension.
   class MigrationDSL < BasicObject
-    # The underlying Migration instance
+    # The underlying SimpleMigration instance
     attr_reader :migration
 
     def self.create(&block)
@@ -151,7 +151,7 @@ module Sequel
     # the block.
     #
     # There are no guarantees that this will work perfectly
-    # in all cases, but it should work for most common cases.
+    # in all cases, but it works for some simple cases.
     def change(&block)
       migration.up = block
       migration.down = MigrationReverser.new.reverse(&block)
@@ -338,15 +338,15 @@ module Sequel
   #
   # For example, to migrate the database all the way down:
   #
-  #   Sequel::Migrator.run(DB, '.', :target=>0)
+  #   Sequel::Migrator.run(DB, '.', target: 0)
   #
   # For example, to migrate the database to version 4:
   #
-  #   Sequel::Migrator.run(DB, '.', :target=>4)
+  #   Sequel::Migrator.run(DB, '.', target: 4)
   #
   # To migrate the database from version 1 to version 5:
   #
-  #   Sequel::Migrator.run(DB, '.', :target=>5, :current=>1)
+  #   Sequel::Migrator.run(DB, '.', target: 5, current: 1)
   #
   # Part of the +migration+ extension.
   class Migrator
@@ -391,16 +391,15 @@ module Sequel
     #
     # Examples: 
     #   Sequel::Migrator.run(DB, "migrations")
-    #   Sequel::Migrator.run(DB, "migrations", :target=>15, :current=>10)
-    #   Sequel::Migrator.run(DB, "app1/migrations", :column=> :app2_version)
-    #   Sequel::Migrator.run(DB, "app2/migrations", :column => :app2_version, :table=>:schema_info2)
+    #   Sequel::Migrator.run(DB, "migrations", target: 15, current: 10)
+    #   Sequel::Migrator.run(DB, "app1/migrations", column: :app2_version)
+    #   Sequel::Migrator.run(DB, "app2/migrations", column: :app2_version, table: :schema_info2)
     def self.run(db, directory, opts=OPTS)
       migrator_class(directory).new(db, directory, opts).run
     end
 
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
-    # if the version number appears to be a unix time integer for a year
-    # after 2005, otherwise uses the IntegerMigrator.
+    # if the version number is greater than 20000101, otherwise uses the IntegerMigrator.
     def self.migrator_class(directory)
       if self.equal?(Migrator)
         Dir.new(directory).each do |file|
@@ -652,7 +651,7 @@ module Sequel
     end
   end
 
-  # The migrator used if any migration file version appears to be a timestamp.
+  # The migrator used if any migration file version is greater than 20000101.
   # Stores filenames of migration files, and can figure out which migrations
   # have not been applied and apply them, even if earlier migrations are added
   # after later migrations.  If you plan to do that, the responsibility is on

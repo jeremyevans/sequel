@@ -46,6 +46,7 @@ module Sequel
       self == o
     end
 
+    # Return self, as datasets are always frozen.
     def dup
       self
     end
@@ -54,7 +55,7 @@ module Sequel
     # Intended for use in sharded environments where all servers need to be modified
     # with the same data:
     #
-    #   DB[:configs].where(:key=>'setting').each_server{|ds| ds.update(:value=>'new_value')}
+    #   DB[:configs].where(key: 'setting').each_server{|ds| ds.update(value: 'new_value')}
     def each_server
       db.servers.each{|s| yield server(s)}
     end
@@ -97,7 +98,7 @@ module Sequel
     #   DB[:table].first_source_alias
     #   # => :table
     #
-    #   DB[:table___t].first_source_alias
+    #   DB[Sequel[:table].as(:t)].first_source_alias
     #   # => :t
     def first_source_alias
       source = @opts[:from]
@@ -122,7 +123,7 @@ module Sequel
     #   DB[:table].first_source_table
     #   # => :table
     #
-    #   DB[:table___t].first_source_table
+    #   DB[Sequel[:table].as(:t)].first_source_table
     #   # => :table
     def first_source_table
       source = @opts[:from]
@@ -190,7 +191,7 @@ module Sequel
     # SQL identifier that represents the unqualified column for the given value.
     # The given value should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier,
     # or SQL::AliasedExpression containing one of those.  In other cases, this
-    # returns nil
+    # returns nil.
     def unqualified_column_for(v)
       unless v.is_a?(String)
         _unqualified_column_for(v)
@@ -274,8 +275,7 @@ module Sequel
     private
 
     # Check the cache for the given key, returning the value.
-    # Otherwise, yield to get the dataset, and if the current dataset
-    # is frozen, cache the dataset under the given key.
+    # Otherwise, yield to get the dataset and cache the dataset under the given key.
     def cached_dataset(key)
       unless ds = cache_get(key)
         ds = yield

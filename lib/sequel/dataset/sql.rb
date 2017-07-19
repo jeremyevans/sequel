@@ -17,7 +17,7 @@ module Sequel
     
     # Returns an INSERT SQL query string.  See +insert+.
     #
-    #   DB[:items].insert_sql(:a=>1)
+    #   DB[:items].insert_sql(a: 1)
     #   # => "INSERT INTO items (a) VALUES (1)"
     def insert_sql(*values)
       return static_sql(@opts[:sql]) if @opts[:sql]
@@ -112,9 +112,6 @@ module Sequel
     # Returns an array of insert statements for inserting multiple records.
     # This method is used by +multi_insert+ to format insert statements and
     # expects a keys array and and an array of value arrays.
-    #
-    # This method should be overridden by descendants if the support
-    # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
       case multi_insert_sql_strategy
       when :values
@@ -165,7 +162,7 @@ module Sequel
 
     # Formats an UPDATE statement using the given values.  See +update+.
     #
-    #   DB[:items].update_sql(:price => 100, :category => 'software')
+    #   DB[:items].update_sql(price: 100, category: 'software')
     #   # => "UPDATE items SET price = 100, category = 'software'
     #
     # Raises an +Error+ if the dataset is grouped or includes more
@@ -683,9 +680,9 @@ module Sequel
     # Splits table_name into an array of strings.
     #
     #   ds.split_qualifiers(:s) # ['s']
-    #   ds.split_qualifiers(:t__s) # ['t', 's']
-    #   ds.split_qualifiers(Sequel[:d][:t__s]) # ['d', 't', 's']
-    #   ds.split_qualifiers(Sequel[:h__d][:t__s]) # ['h', 'd', 't', 's']
+    #   ds.split_qualifiers(Sequel[:t][:s]) # ['t', 's']
+    #   ds.split_qualifiers(Sequel[:d][:t][:s]) # ['d', 't', 's']
+    #   ds.split_qualifiers(Sequel.qualify(Sequel[:h][:d], Sequel[:t][:s])) # ['h', 'd', 't', 's']
     def split_qualifiers(table_name, *args)
       case table_name
       when SQL::QualifiedIdentifier
@@ -824,14 +821,12 @@ module Sequel
       end
     end
     
-    # Only allow caching the select SQL if the dataset is frozen and hasn't
-    # specifically been marked as not allowing SQL caching.
+    # Don't allow caching SQL if specifically marked not to.
     def cache_sql?
       !@opts[:no_cache_sql] && !cache_get(:_no_cache_sql)
     end
 
-    # Raise an InvalidOperation exception if deletion is not allowed
-    # for this dataset
+    # Raise an InvalidOperation exception if deletion is not allowed for this dataset.
     def check_modification_allowed!
       raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
       raise(InvalidOperation, "Joined datasets cannot be modified") if !supports_modifying_joins? && joined_dataset?
@@ -849,8 +844,7 @@ module Sequel
     end
 
     # Append column list to SQL string.
-    # Converts an array of column names into a comma seperated string of 
-    # column names. If the array is empty, a wildcard (*) is returned.
+    # If the column list is empty, a wildcard (*) is appended.
     def column_list_append(sql, columns)
       if (columns.nil? || columns.empty?)
         sql << '*'
@@ -945,7 +939,8 @@ module Sequel
       false
     end
 
-    # Append literalization of array of expressions to SQL string.
+    # Append literalization of array of expressions to SQL string, separating them
+    # with commas.
     def expression_list_append(sql, columns)
       c = false
       co = ', '
@@ -956,7 +951,7 @@ module Sequel
       end
     end
 
-    # Append literalization of array of grouping elements to SQL string.
+    # Append literalization of array of grouping elements to SQL string, seperating them with commas.
     def grouping_element_list_append(sql, columns)
       c = false
       co = ', '
@@ -984,6 +979,9 @@ module Sequel
       v2 = db.from_application_timestamp(v)
       fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
         if m == '%N'
+          # Ruby 1.9 supports %N in timestamp formats, but Sequel has supported %N
+          # for longer in a different way, where the . is already appended and only 6
+          # decimal places are used by default.
           format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(1000000) : v.usec) if supports_timestamp_usecs?
         else
           if supports_timestamp_timezones?
@@ -1278,7 +1276,7 @@ module Sequel
       end
     end
     
-    # Qualify the given expression e to the given table.
+    # Qualify the given expression to the given table.
     def qualified_expression(e, table)
       Qualifier.new(table).transform(e)
     end
@@ -1301,7 +1299,7 @@ module Sequel
 
     # Modify the sql to add a dataset to the via an EXCEPT, INTERSECT, or UNION clause.
     # This uses a subselect for the compound datasets used, because using parantheses doesn't
-    # work on all databases.  I consider this an ugly hack, but can't I think of a better default.
+    # work on all databases.
     def select_compounds_sql(sql)
       return unless c = @opts[:compounds]
       c.each do |type, dataset, all|
@@ -1433,7 +1431,6 @@ module Sequel
     alias insert_with_sql select_with_sql
     alias update_with_sql select_with_sql
     
-    # The base keyword to use for the SQL WITH clause
     def select_with_sql_base
       "WITH "
     end
@@ -1456,7 +1453,7 @@ module Sequel
     end
 
     # The string that is appended to to create the SQL query, the empty
-    # string by default
+    # string by default.
     def sql_string_origin
       String.new
     end
@@ -1487,7 +1484,7 @@ module Sequel
       end
     end
 
-    # Append literalization of the subselect to SQL String.
+    # Append literalization of the subselect to SQL string.
     def subselect_sql_append(sql, ds)
       ds.clone(:append_sql=>sql).sql
     end

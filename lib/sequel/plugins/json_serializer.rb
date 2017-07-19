@@ -17,37 +17,37 @@ module Sequel
     #
     # In addition, you can provide options to control the JSON output:
     #
-    #   album.to_json(:only=>:name)
-    #   album.to_json(:except=>[:id, :artist_id])
+    #   album.to_json(only: :name)
+    #   album.to_json(except: [:id, :artist_id])
     #   # => '{"json_class"="Album","name"=>"RF"}'
     #   
-    #   album.to_json(:include=>:artist)
+    #   album.to_json(include: :artist)
     #   # => '{"id":1,"name":"RF","artist_id":2,
     #   #      "artist":{"id":2,"name":"YJM"}}'
     # 
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
-    #   album.to_json(:include=>{:artist=>{:only=>:name}})
+    #   album.to_json(include: {artist: {only: :name}})
     #   # => '{"id":1,"name":"RF","artist_id":2,
     #   #      "artist":{"name":"YJM"}}'
     #
-    # You can specify a name for a given association by passing <tt>:name</tt>
-    # to the <tt>:include</tt> hash
+    # You can specify a name for a given association by using an aliased
+    # expression as the key in the <tt>:include</tt> hash
     #
-    #   album.to_json(:include=>{Sequel.as(:artist, :singer)=>{:only=>:name}})
+    #   album.to_json(include: {Sequel.as(:artist, :singer)=>{only: :name}})
     #   # => '{"id":1,"name":"RF","artist_id":2,
     #   #      "singer":{"name":"YJM"}}'
     # 
     # You can specify the <tt>:root</tt> option to nest the JSON under the
     # name of the model:
     #
-    #   album.to_json(:root => true)
+    #   album.to_json(root: true)
     #   # => '{"album":{"id":1,"name":"RF","artist_id":2}}'
     #
     # You can specify JSON serialization options to use later:
     #
-    #   album.json_serializer_opts(:root => true)
+    #   album.json_serializer_opts(root: true)
     #   [album].to_json
     #   # => '[{"album":{"id":1,"name":"RF","artist_id":2}}]'
     #
@@ -55,12 +55,12 @@ module Sequel
     # of which return all objects in the dataset:
     #
     #   Album.to_json
-    #   Album.where(:artist_id=>1).to_json(:include=>:tags)
+    #   Album.where(artist_id: 1).to_json(include: :tags)
     #
     # If you have an existing array of model instances you want to convert to
     # JSON, you can call the class to_json method with the :array option:
     #
-    #   Album.to_json(:array=>[Album[1], Album[2]])
+    #   Album.to_json(array: [Album[1], Album[2]])
     #
     # All to_json methods take blocks, and if a block is given, it will yield
     # the array or hash before serialization, and will serialize the value
@@ -77,7 +77,7 @@ module Sequel
     # The array_from_json class method exists to parse arrays of model instances
     # from json:
     #
-    #   json = Album.where(:artist_id=>1).to_json
+    #   json = Album.where(artist_id: 1).to_json
     #   albums = Album.array_from_json(json)
     #
     # These does not necessarily round trip, since doing so would let users
@@ -86,7 +86,7 @@ module Sequel
     # fields, you can use the :fields option, which will call set_fields with
     # the given fields:
     #
-    #   Album.from_json(album.to_json, :fields=>%w'id name')
+    #   Album.from_json(album.to_json, fields: %w'id name')
     #
     # If you want to update an existing instance, you can use the from_json
     # instance method:
@@ -96,11 +96,11 @@ module Sequel
     # Both of these allow creation of cached associated objects, if you provide
     # the :associations option:
     #
-    #   album.from_json(json, :associations=>:artist)
+    #   album.from_json(json, associations: :artist)
     #
     # You can even provide options when setting up the associated objects:
     #
-    #   album.from_json(json, :associations=>{:artist=>{:fields=>%w'id name', :associations=>:tags}})
+    #   album.from_json(json, associations: {artist: {fields: %w'id name', associations: :tags}})
     #
     # Note that active_support/json makes incompatible changes to the to_json API,
     # and breaks some aspects of the json_serializer plugin.  You can undo the damage
@@ -276,7 +276,7 @@ module Sequel
         #
         # Example:
         #
-        #   obj.json_serializer_opts(:only=>:name)
+        #   obj.json_serializer_opts(only: :name)
         #   [obj].to_json # => '[{"name":"..."}]'
         def json_serializer_opts(opts=OPTS)
           @json_serializer_opts = Hash[@json_serializer_opts||OPTS].merge!(opts)

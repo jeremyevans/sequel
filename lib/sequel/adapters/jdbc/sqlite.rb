@@ -14,9 +14,7 @@ module Sequel
       end
     end
 
-    # Database and Dataset support for SQLite databases accessed via JDBC.
     module SQLite
-      # Instance methods for SQLite Database objects accessed via JDBC.
       module DatabaseMethods
         include Sequel::SQLite::DatabaseMethods
         

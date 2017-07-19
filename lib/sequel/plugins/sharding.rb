@@ -5,10 +5,9 @@ module Sequel
     # The sharding plugin augments Sequel's default model sharding support
     # in the following ways:
     #
-    # * It automatically sets model instances to be saved back to the
+    # * It automatically saves model instances back to the
     #   shard they were retreived from.
-    # * It makes model associations use the same shard as the model
-    #   object.
+    # * It makes model associations use the same shard as the model object.
     # * It adds a slightly nicer API for creating model instances on
     #   specific shards.
     # 

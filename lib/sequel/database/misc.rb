@@ -95,11 +95,16 @@ module Sequel
     # options hash.
     #
     # Accepts the following options:
+    # :cache_schema :: Whether schema should be cached for this Database instance
     # :default_string_column_size :: The default size of string columns, 255 by default.
+    # :keep_reference :: Whether to keep a reference to this instance in Sequel::DATABASES, true by default.
     # :logger :: A specific logger to use.
     # :loggers :: An array of loggers to use.
+    # :log_connection_info :: Whether connection information should be logged when logging queries.
+    # :log_warn_duration :: The number of elapsed seconds after which queries should be logged at warn level.
     # :name :: A name to use for the Database object.
-    # :preconnect :: Whether to automatically connect to the maximum number of servers.
+    # :preconnect :: Whether to automatically connect to the maximum number of servers.  Can use a valid
+    #                of 'concurrently' to preconnect in separate threads.
     # :quote_identifiers :: Whether to quote identifiers.
     # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .
     # :single_threaded :: Whether to use a single-threaded connection pool.
@@ -172,7 +177,7 @@ module Sequel
     # Cast the given type to a literal type
     #
     #   DB.cast_type_literal(Float) # double precision
-    #   DB.cast_type_literal(:foo) # foo
+    #   DB.cast_type_literal(:foo)  # foo
     def cast_type_literal(type)
       type_literal(:type=>type)
     end
@@ -217,8 +222,8 @@ module Sequel
 
     # Proxy the literal call to the dataset.
     #
-    #   DB.literal(1) # 1
-    #   DB.literal(:a) # a
+    #   DB.literal(1)   # 1
+    #   DB.literal(:a)  # a
     #   DB.literal('a') # 'a'
     def literal(v)
       schema_utility_dataset.literal(v)
@@ -252,8 +257,7 @@ module Sequel
       @schema_type_classes[type]
     end
     
-    # Default serial primary key options, used by the table creation
-    # code.
+    # Default serial primary key options, used by the table creation code.
     def serial_primary_key_options
       {:primary_key => true, :type => Integer, :auto_increment => true}
     end
@@ -345,8 +349,7 @@ module Sequel
       database_specific_error_class(exception, opts) || DatabaseError
     end
     
-    # Return the SQLState for the given exception, if one can be
-    # determined
+    # Return the SQLState for the given exception, if one can be determined
     def database_exception_sqlstate(exception, opts)
       nil
     end
@@ -397,7 +400,7 @@ module Sequel
     end
     
     # Convert the given exception to an appropriate Sequel::DatabaseError
-    # subclass, keeping message and traceback.
+    # subclass, keeping message and backtrace.
     def raise_error(exception, opts=OPTS)
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
         raise Sequel.convert_exception_class(exception, database_error_class(exception, opts))

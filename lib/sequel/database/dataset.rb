@@ -53,10 +53,10 @@ module Sequel
     end
     
     # Returns a new dataset with the +from+ method invoked. If a block is given,
-    # it is used as a filter on the dataset.
+    # it acts as a virtual row block
     #
     #   DB.from(:items) # SELECT * FROM items
-    #   DB.from(:items){id > 2} # SELECT * FROM items WHERE (id > 2)
+    #   DB.from{schema[:table]} # SELECT * FROM schema.table
     def from(*args, &block)
       if block
         @default_dataset.from(*args, &block)
@@ -70,7 +70,7 @@ module Sequel
     # Returns a new dataset with the select method invoked.
     #
     #   DB.select(1) # SELECT 1
-    #   DB.select{server_version{}} # SELECT server_version()
+    #   DB.select{server_version.function} # SELECT server_version()
     #   DB.select(:id).from(:items) # SELECT id FROM items
     def select(*args, &block)
       @default_dataset.select(*args, &block)

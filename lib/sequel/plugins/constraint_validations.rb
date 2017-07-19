@@ -19,7 +19,7 @@ module Sequel
     #
     # Then when you went to save an album that uses this plugin:
     #
-    #   Album.create(:name=>'abc')
+    #   Album.create(name: 'abc')
     #   # raises Sequel::ValidationFailed: name is shorter than 5 characters
     # 
     # Usage:

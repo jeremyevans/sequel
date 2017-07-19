@@ -27,8 +27,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     add_servers(opts[:servers].keys) if opts[:servers]
   end
   
-  # Adds new servers to the connection pool. Primarily used in conjunction with master/slave
-  # or shard configurations. Allows for dynamic expansion of the potential slaves/shards
+  # Adds new servers to the connection pool.  Allows for dynamic expansion of the potential slaves/shards
   # at runtime. servers argument should be an array of symbols. 
   def add_servers(servers)
     sync do
@@ -117,8 +116,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # If no connection is immediately available and the pool is already using the maximum
   # number of connections, Pool#hold will block until a connection
   # is available or the timeout expires.  If the timeout expires before a
-  # connection can be acquired, a Sequel::PoolTimeout is 
-  # raised.
+  # connection can be acquired, a Sequel::PoolTimeout is raised.
   def hold(server=:default)
     server = pick_server(server)
     t = Thread.current
@@ -136,8 +134,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     end
   end
 
-  # Remove servers from the connection pool. Primarily used in conjunction with master/slave
-  # or shard configurations.  Similar to disconnecting from all given servers,
+  # Remove servers from the connection pool. Similar to disconnecting from all given servers,
   # except that after it is used, future requests for the server will use the
   # :default server instead.
   def remove_servers(servers)
@@ -244,8 +241,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     conns
   end
 
-  # Disconnect all given connections.  
-  # immediately, and schedules currently allocated connections for disconnection
+  # Disconnect all available connections immediately, and schedule currently allocated connections for disconnection
   # as soon as they are returned to the pool. The calling code should not
   # have the mutex before calling this.
   def disconnect_connections(conns)

@@ -14,7 +14,6 @@ module Sequel
       end
     end
 
-    # Database and Dataset support for Oracle databases accessed via JDBC.
     module Oracle
       JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
 
@@ -29,7 +28,6 @@ module Sequel
         end
       end 
 
-      # Instance methods for Oracle Database objects accessed via JDBC.
       module DatabaseMethods
         include Sequel::Oracle::DatabaseMethods
         include Sequel::JDBC::Transactions
@@ -109,7 +107,6 @@ module Sequel
         end
       end
       
-      # Dataset class for Oracle datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Oracle::DatasetMethods
 

@@ -4,13 +4,7 @@ module Sequel
   module Plugins
     # The unlimited_update plugin is designed to work around a
     # MySQL warning in replicated environments, which occurs if
-    # you issue an UPDATE with a LIMIT clause.  No other
-    # database Sequel supports will create an UPDATE clause with
-    # a LIMIT, and in non-replicated MySQL environments, MySQL
-    # doesn't issue a warning.  Note that even in replicated
-    # environments the MySQL warning is harmless, as Sequel
-    # restricts an update to rows with a matching primary key,
-    # which should be unique.
+    # you issue an UPDATE with a LIMIT clause.
     #
     # Usage:
     #

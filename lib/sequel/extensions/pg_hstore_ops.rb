@@ -57,10 +57,10 @@
 # Here are a couple examples for updating an existing hstore column:
 #
 #   # Add a key, or update an existing key with a new value
-#   DB[:tab].update(:h=>Sequel.hstore_op(:h).concat('c'=>3))
+#   DB[:tab].update(h: Sequel.hstore_op(:h).concat('c'=>3))
 # 
 #   # Delete a key
-#   DB[:tab].update(:h=>Sequel.hstore_op(:h).delete('k1'))
+#   DB[:tab].update(h: Sequel.hstore_op(:h).delete('k1'))
 #  
 # See the PostgreSQL hstore function and operator documentation for more
 # details on what these functions and operators do.

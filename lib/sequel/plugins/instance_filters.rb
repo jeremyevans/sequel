@@ -17,12 +17,12 @@ module Sequel
     #
     #   # These are two separate objects that represent the same
     #   # database row. 
-    #   i1 = Item.first(:id=>1, :delete_allowed=>false)
-    #   i2 = Item.first(:id=>1, :delete_allowed=>false)
+    #   i1 = Item.first(id: 1, delete_allowed: false)
+    #   i2 = Item.first(id: 1, delete_allowed: false)
     #
     #   # Add an instance filter to the object. This filter is in effect
     #   # until the object is successfully updated or deleted.
-    #   i1.instance_filter(:delete_allowed=>true)
+    #   i1.instance_filter(delete_allowed: true)
     #
     #   # Attempting to delete the object where the filter doesn't
     #   # match any rows raises an error.
@@ -30,7 +30,7 @@ module Sequel
     #
     #   # The other object that represents the same row has no
     #   # instance filters, and can be updated normally.
-    #   i2.update(:delete_allowed=>true)
+    #   i2.update(delete_allowed: true)
     #
     #   # Even though the filter is now still in effect, since the
     #   # database row has been updated to allow deleting,

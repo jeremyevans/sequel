@@ -34,10 +34,10 @@ module Sequel
     #   Sequel::Model.plugin :caching, CACHE
     #
     #   # Make the Album class use the cache with a 30 minute time-to-live
-    #   Album.plugin :caching, CACHE, :ttl=>1800
+    #   Album.plugin :caching, CACHE, ttl: 1800
     #
     #   # Make the Artist class use a cache with the memcached protocol
-    #   Artist.plugin :caching, MEMCACHED_CACHE, :ignore_exceptions=>true
+    #   Artist.plugin :caching, MEMCACHED_CACHE, ignore_exceptions: true
     module Caching
       # Set the cache_store and cache_ttl attributes for the given model.
       # If the :ttl option is not given, 3600 seconds is the default.

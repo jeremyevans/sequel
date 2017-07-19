@@ -22,12 +22,12 @@ module Sequel
     #   Sequel::Model.plugin :touch
     #
     #   # Allow touching of Album instances, with a custom column
-    #   Album.plugin :touch, :column=>:updated_on
+    #   Album.plugin :touch, column: :updated_on
     #
     #   # Allow touching of Artist instances, updating the albums and tags
     #   # associations when touching, touching the +updated_on+ column for
     #   # albums and the +updated_at+ column for tags
-    #   Artist.plugin :touch, :associations=>[{:albums=>:updated_on}, :tags]
+    #   Artist.plugin :touch, associations: [{albums: :updated_on}, :tags]
     module Touch
       def self.apply(model, opts=OPTS)
         model.instance_variable_set(:@touched_associations, {})

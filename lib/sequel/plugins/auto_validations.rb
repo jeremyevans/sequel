@@ -33,7 +33,7 @@ module Sequel
     # By default, the plugin uses a not_null validation for NOT NULL columns, but that
     # can be changed to a presence validation using an option:
     #
-    #   Model.plugin :auto_validations, :not_null=>:presence
+    #   Model.plugin :auto_validations, not_null: :presence
     #
     # This is useful if you want to enforce that NOT NULL string columns do not
     # allow empty values.

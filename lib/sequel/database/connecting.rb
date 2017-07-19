@@ -49,7 +49,6 @@ module Sequel
         raise Error, "Sequel::Database.connect takes either a Hash or a String, given: #{conn_string.inspect}"
       end
 
-      # process opts a bit
       opts = opts.inject({}) do |m, (k,v)|
         k = :user if k.to_s == 'username'
         m[k.to_sym] = v
@@ -135,7 +134,6 @@ module Sequel
     #     end
     #
     #     module DatabaseMethods
-    #       extend Sequel::Database::ResetIdentifierMangling
     #       # ...
     #     end
     #
@@ -161,20 +159,20 @@ module Sequel
     # +database_type+ (for native adapters), in others (i.e. adapters with
     # subadapters), it will be different.
     #
-    #   Sequel.connect('jdbc:postgres://...').adapter_scheme # => :jdbc
+    #   Sequel.connect('jdbc:postgres://...').adapter_scheme
+    #   # => :jdbc
     def adapter_scheme
       self.class.adapter_scheme
     end
 
     # Dynamically add new servers or modify server options at runtime. Also adds new
-    # servers to the connection pool. Intended for use with master/slave or shard
-    # configurations where it is useful to add new server hosts at runtime.
+    # servers to the connection pool. Only usable when using a sharded connection pool.
     #
     # servers argument should be a hash with server name symbol keys and hash or
     # proc values.  If a servers key is already in use, it's value is overridden
     # with the value provided.
     #
-    #   DB.add_servers(:f=>{:host=>"hash_host_f"})
+    #   DB.add_servers(f: {host: "hash_host_f"})
     def add_servers(servers)
       unless h = @opts[:servers]
         raise Error, "cannot call Database#add_servers on a Database instance that does not use a sharded connection pool"
@@ -191,7 +189,8 @@ module Sequel
     # type.  Even better, you can tell that two Database objects that are using
     # the same adapter are connecting to different database types.
     #
-    #   Sequel.connect('jdbc:postgres://...').database_type # => :postgres
+    #   Sequel.connect('jdbc:postgres://...').database_type
+    #   # => :postgres
     def database_type
       adapter_scheme
     end
@@ -204,8 +203,8 @@ module Sequel
     # Example:
     #
     #   DB.disconnect # All servers
-    #   DB.disconnect(:server=>:server1) # Single server
-    #   DB.disconnect(:server=>[:server1, :server2]) # Multiple servers
+    #   DB.disconnect(server: :server1) # Single server
+    #   DB.disconnect(server: [:server1, :server2]) # Multiple servers
     def disconnect(opts = OPTS)
       pool.disconnect(opts)
     end
@@ -217,9 +216,8 @@ module Sequel
       conn.close
     end
 
-    # Dynamically remove existing servers from the connection pool. Intended for
-    # use with master/slave or shard configurations where it is useful to remove
-    # existing server hosts at runtime.
+    # Dynamically remove existing servers from the connection pool. Only usable
+    # when using a sharded connection pool
     #
     # servers should be symbols or arrays of symbols.  If a nonexistent server
     # is specified, it is ignored.  If no servers have been specified for

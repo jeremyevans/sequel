@@ -12,8 +12,6 @@ module Sequel
       end
     end
 
-    # Methods shared by Database instances that connect to MySQL,
-    # currently supported by the native and JDBC adapters.
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
       include Sequel::Database::SplitAlterTable
@@ -39,13 +37,10 @@ module Sequel
         CAST_TYPES[type] || super
       end
 
-      # Commit an existing prepared transaction with the given transaction
-      # identifier string.
       def commit_prepared_transaction(transaction_id, opts=OPTS)
         run("XA COMMIT #{literal(transaction_id)}", opts)
       end
 
-      # MySQL uses the :mysql database type
       def database_type
         :mysql
       end
@@ -115,8 +110,6 @@ module Sequel
         indexes.reject{|k,v| remove_indexes.include?(k)}
       end
 
-      # Rollback an existing prepared transaction with the given transaction
-      # identifier string.
       def rollback_prepared_transaction(transaction_id, opts=OPTS)
         run("XA ROLLBACK #{literal(transaction_id)}", opts)
       end
@@ -245,7 +238,6 @@ module Sequel
         end
       end
 
-      # MySQL server requires table names when dropping indexes.
       def alter_table_sql(table, op)
         case op[:op]
         when :drop_index
@@ -300,7 +292,6 @@ module Sequel
         sqls
       end
       
-      # Use MySQL specific AUTO_INCREMENT text.
       def auto_increment_sql
         'AUTO_INCREMENT'
       end
@@ -321,7 +312,6 @@ module Sequel
         end
       end
 
-      # The order of the column definition, as an array of symbols.
       def column_definition_order
         COLUMN_DEFINITION_ORDER
       end
@@ -409,7 +399,6 @@ module Sequel
         metadata_dataset.with_sql('SHOW FULL TABLES').server(opts[:server]).map{|r| m.call(r.values.first) if r.delete(:Table_type) == type}.compact
       end
 
-      # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))
         raise Error, "Partial indexes are not supported for this database" if index[:where] && !supports_partial_indexes?
@@ -441,7 +430,6 @@ module Sequel
         end
       end
 
-      # Recognize MySQL set type.
       def schema_column_type(db_type)
         case db_type
         when /\Aset/io
@@ -561,8 +549,6 @@ module Sequel
       include Sequel::Dataset::Replace
       include UnmodifiedIdentifiers::DatasetMethods
 
-      # MySQL specific syntax for LIKE/REGEXP searches, as well as
-      # string concatenation.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :IN, :"NOT IN"
@@ -630,10 +616,10 @@ module Sequel
       # Sets up the select methods to delete from if deleting from a
       # joined dataset:
       #
-      #   DB[:a].join(:b, :a_id=>:id).delete
+      #   DB[:a].join(:b, a_id: :id).delete
       #   # DELETE a FROM a INNER JOIN b ON (b.a_id = a.id)
       #
-      #   DB[:a].join(:b, :a_id=>:id).delete_from(:a, :b).delete
+      #   DB[:a].join(:b, a_id: :id).delete_from(:a, :b).delete
       #   # DELETE a, b FROM a INNER JOIN b ON (b.a_id = a.id)
       def delete_from(*tables)
         clone(:delete_from=>tables)
@@ -680,7 +666,7 @@ module Sequel
       # inserting rows that violate the unique key restriction.
       #
       #   dataset.insert_ignore.multi_insert(
-      #    [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #     [{name: 'a', value: 1}, {name: 'b', value: 2}]
       #   )
       #   # INSERT IGNORE INTO tablename (name, value) VALUES (a, 1), (b, 2)
       def insert_ignore
@@ -698,21 +684,21 @@ module Sequel
       # inserting rows that violate the unique key restriction.
       #
       #   dataset.on_duplicate_key_update.multi_insert(
-      #    [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #     [{name: 'a', value: 1}, {name: 'b', value: 2}]
       #   )
       #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       #   # ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)
       #
       #   dataset.on_duplicate_key_update(:value).multi_insert(
-      #     [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #     [{name: 'a', value: 1}, {name: 'b', value: 2}]
       #   )
       #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       #   # ON DUPLICATE KEY UPDATE value=VALUES(value)
       #
       #   dataset.on_duplicate_key_update(
-      #     :value => Sequel.lit('value + VALUES(value)')
+      #     value: Sequel.lit('value + VALUES(value)')
       #   ).multi_insert(
-      #     [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #     [{name: 'a', value: 1}, {name: 'b', value: 2}]
       #   )
       #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       #   # ON DUPLICATE KEY UPDATE value=value + VALUES(value)
@@ -757,7 +743,7 @@ module Sequel
       end
 
       # MySQL's DISTINCT ON emulation using GROUP BY does not respect the
-      # queries ORDER BY clause.
+      # query's ORDER BY clause.
       def supports_ordered_distinct_on?
         false
       end
@@ -777,7 +763,7 @@ module Sequel
       # Useful if you have a unique key and want to just skip
       # updating rows that violate the unique key restriction.
       #
-      #   dataset.update_ignore.update({:name => 'a', :value => 1})
+      #   dataset.update_ignore.update(name: 'a', value: 1)
       #   # UPDATE IGNORE tablename SET name = 'a', value = 1
       def update_ignore
         clone(:update_ignore=>true)
@@ -916,7 +902,7 @@ module Sequel
         '1'
       end
       
-      # MySQL supports multiple rows in INSERT.
+      # MySQL supports multiple rows in VALUES in INSERT.
       def multi_insert_sql_strategy
         :values
       end

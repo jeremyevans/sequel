@@ -12,12 +12,10 @@ module Sequel
       end
     end
 
-    # Database and Dataset instance methods for MSSQL specific
-    # support via ODBC.
     module MSSQL
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
-        # Return the last inserted identity value.
+
         def execute_insert(sql, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             begin
@@ -43,7 +41,7 @@ module Sequel
         private
 
         # Use ODBC format, not Microsoft format, as the ODBC layer does
-        # some translation.  MSSQL version is over-ridden to allow 3 millisecond decimal places        
+        # some translation, but allow for millisecond precision.
         def default_timestamp_format
           "{ts '%Y-%m-%d %H:%M:%S%N'}"
         end

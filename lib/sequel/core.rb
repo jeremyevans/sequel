@@ -9,13 +9,16 @@
 #
 #   DB = Sequel.sqlite # Memory database
 #   DB = Sequel.sqlite('blog.db')
-#   DB = Sequel.postgres('database_name', :user=>'user', 
-#          :password=>'password', :host=>'host', :port=>5432, 
-#          :max_connections=>10)
+#   DB = Sequel.postgres('database_name',
+#          user:'user', 
+#          password: 'password',
+#          host: 'host'
+#          port: 5432, 
+#          max_connections: 10)
 #
 # If a block is given to these methods, it is passed the opened Database
 # object, which is closed (disconnected) when the block exits, just
-# like a block passed to connect.  For example:
+# like a block passed to Sequel.connect.  For example:
 #
 #   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
 #
@@ -47,7 +50,7 @@ module Sequel
     # days on +DateTime+).
     attr_accessor :datetime_class
 
-    # Set whether sequel is being used in single threaded mode. by default,
+    # Set whether Sequel is being used in single threaded mode. by default,
     # Sequel uses a thread-safe connection pool, which isn't as fast as the
     # single threaded connection pool, and also has some additional thread
     # safety checks.  If your program will only have one thread,
@@ -89,11 +92,11 @@ module Sequel
   #   DB = Sequel.connect('sqlite://blog.db') # ./blog.db
   #   DB = Sequel.connect('sqlite:///blog.db') # /blog.db
   #   DB = Sequel.connect('postgres://user:password@host:port/database_name')
-  #   DB = Sequel.connect('sqlite:///blog.db', :max_connections=>10)
+  #   DB = Sequel.connect('sqlite:///blog.db', max_connections: 10)
   #
   # You can also pass a single options hash:
   #
-  #   DB = Sequel.connect(:adapter=>'sqlite', :database=>'./blog.db')
+  #   DB = Sequel.connect(adapter: 'sqlite', database: './blog.db')
   #
   # If a block is given, it is passed the opened +Database+ object, which is
   # closed when the block exits.  For example:
@@ -105,7 +108,7 @@ module Sequel
   # design, and used by <tt>Sequel::Model</tt> to pick the default
   # database.  It is recommended to pass a block if you do not want the
   # resulting Database object to remain in memory until the process
-  # terminates.
+  # terminates, or use the <tt>keep_reference: false</tt> Database option.
   #
   # For details, see the {"Connecting to a Database" guide}[rdoc-ref:doc/opening_databases.rdoc].
   # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[rdoc-ref:doc/sharding.rdoc].
@@ -131,9 +134,7 @@ module Sequel
   end
 
   # Load all Sequel extensions given.  Extensions are just files that exist under
-  # <tt>sequel/extensions</tt> in the load path, and are just required.  Generally,
-  # extensions modify the behavior of +Database+ and/or +Dataset+, but Sequel ships
-  # with some extensions that modify other classes that exist for backwards compatibility.
+  # <tt>sequel/extensions</tt> in the load path, and are just required.  
   # In some cases, requiring an extension modifies classes directly, and in others,
   # it just loads a module that you can extend other classes with.  Consult the documentation
   # for each extension you plan on using for usage.
@@ -185,7 +186,7 @@ module Sequel
 
   SPLIT_SYMBOL_CACHE = {}
 
-  # Splits the symbol into three parts, if symbol splitting is enabled.
+  # Splits the symbol into three parts, if symbol splitting is enabled (not the default).
   # Each part will either be a string or nil. If symbol splitting
   # is disabled, returns an array with the first and third parts
   # being nil, and the second part beind a string version of the symbol.
@@ -213,32 +214,28 @@ module Sequel
     v
   end
 
-  # Sequel by default will split symbols, treating:
+  # Setting this to true enables Sequel's historical behavior of splitting
+  # symbols on double or triple underscores:
   #
   #   :table__column         # table.column
   #   :column___alias        # column AS alias
   #   :table__column___alias # table.column AS alias
   #
-  # This can cause problems if any identifiers in the database use a double
-  # or triple underscore.  When Sequel was first created, using symbols with
-  # double or triple underscores was the only way to represent qualified or
-  # aliased identifiers.  Sequel now offers many ways to create qualified and
-  # aliased identifiers, so there is less of a need for this now.  This allows
-  # you to turn off symbol splitting, potentially avoiding problems if you
-  # have identifiers that use double underscores:
+  # It is only recommended to turn this on for backwards compatibility until
+  # such symbols have been converted to use newer Sequel APIs such as:
   #
-  #   Sequel.split_symbols = false
+  #   Sequel[:table][:column]            # table.column
+  #   Sequel[:column].as(:alias)         # column AS alias
+  #   Sequel[:table][:column].as(:alias) # table.column AS alias
   #
-  # Note that Sequel::Database instances do their own caching of literalized
+  # Sequel::Database instances do their own caching of literalized
   # symbols, and changing this setting does not affect those caches.  It is
   # recommended that if you want to change this setting, you do so directly
   # after requiring Sequel, before creating any Sequel::Database instances.
   #
-  # Also note that disabling symbol splitting will also disable the handling
+  # Disabling symbol splitting will also disable the handling
   # of double underscores in virtual row methods, causing such methods to
-  # yield regular identifers instead of qualified identifiers. To make sure
-  # the code works when splitting symbols is both disabled and enabled, you
-  # can use Sequel::SQL::Identifier#[].
+  # yield regular identifers instead of qualified identifiers:
   #
   #   # Sequel.split_symbols = true
   #   Sequel.expr{table__column}  # table.column
@@ -302,6 +299,8 @@ module Sequel
   # Unless in single threaded mode, protects access to any mutable
   # global data structure in Sequel.
   # Uses a non-reentrant mutex, so calling code should be careful.
+  # In general, this should only be used around the minimal possible code
+  # such as Hash#[], Hash#[]=, Hash#delete, Array#<<, and Array#delete.
   def self.synchronize(&block)
     @single_threaded ? yield : @data_mutex.synchronize(&block)
   end
@@ -398,7 +397,7 @@ module Sequel
     #   Sequel[1]     # => Sequel::SQL::NumericExpression: 1
     #   Sequel["a"]   # => Sequel::SQL::StringExpression: 'a'
     #   Sequel[:a]    # => Sequel::SQL::Identifier: "a"
-    #   Sequel[:a=>1] # => Sequel::SQL::BooleanExpression: ("a" = 1)
+    #   Sequel[a: 1]  # => Sequel::SQL::BooleanExpression: ("a" = 1)
     alias_method :[], :expr
   end
 

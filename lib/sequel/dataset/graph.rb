@@ -13,7 +13,7 @@ module Sequel
     # unlike +set_graph_aliases+, which replaces the list (the equivalent
     # of +select_append+ when graphing).  See +set_graph_aliases+.
     #
-    #   DB[:table].add_graph_aliases(:some_alias=>[:table, :column])
+    #   DB[:table].add_graph_aliases(some_alias: [:table, :column])
     #   # SELECT ..., table.column AS some_alias
     def add_graph_aliases(graph_aliases)
       graph = opts[:graph]
@@ -60,7 +60,7 @@ module Sequel
       case dataset
       when Symbol
         # let alias be the same as the table name (sans any optional schema)
-        # unless alias explicitly given in the symbol using ___ notation
+        # unless alias explicitly given in the symbol using ___ notation and symbol splitting is enabled
         table_alias ||= split_symbol(table).compact.last
       when Dataset
         if dataset.simple_select_all?
@@ -209,21 +209,21 @@ module Sequel
     # graphed dataset, and must be used instead of +select+ whenever
     # graphing is used.
     #
-    # graph_aliases :: Should be a hash with keys being symbols of
-    #                  column aliases, and values being either symbols or arrays with one to three elements.
-    #                  If the value is a symbol, it is assumed to be the same as a one element
-    #                  array containing that symbol.
-    #                  The first element of the array should be the table alias symbol.
-    #                  The second should be the actual column name symbol.  If the array only
-    #                  has a single element the column name symbol will be assumed to be the
-    #                  same as the corresponding hash key. If the array
-    #                  has a third element, it is used as the value returned, instead of
-    #                  table_alias.column_name.
+    # graph_aliases should be a hash with keys being symbols of
+    # column aliases, and values being either symbols or arrays with one to three elements.
+    # If the value is a symbol, it is assumed to be the same as a one element
+    # array containing that symbol.
+    # The first element of the array should be the table alias symbol.
+    # The second should be the actual column name symbol.  If the array only
+    # has a single element the column name symbol will be assumed to be the
+    # same as the corresponding hash key. If the array
+    # has a third element, it is used as the value returned, instead of
+    # table_alias.column_name.
     #
-    #   DB[:artists].graph(:albums, :artist_id=>:id).
-    #     set_graph_aliases(:name=>:artists,
-    #                       :album_name=>[:albums, :name],
-    #                       :forty_two=>[:albums, :fourtwo, 42]).first
+    #   DB[:artists].graph(:albums, :artist_id: :id).
+    #     set_graph_aliases(name: :artists,
+    #                       album_name: [:albums, :name],
+    #                       forty_two: [:albums, :fourtwo, 42]).first
     #   # SELECT artists.name, albums.name AS album_name, 42 AS forty_two ...
     def set_graph_aliases(graph_aliases)
       columns, graph_aliases = graph_alias_columns(graph_aliases)
@@ -243,7 +243,7 @@ module Sequel
     private
 
     # Wrap the alias symbol in an SQL::Identifier if the identifier on which is based
-    # is an SQL::Identifier.  This works around cases where the alias symbol contains
+    # is an SQL::Identifier.  This works around cases where symbol splitting is enabled and the alias symbol contains
     # double embedded underscores which would be considered an implicit qualified identifier
     # if not wrapped in an SQL::Identifier.
     def qualifier_from_alias_symbol(aliaz, identifier)

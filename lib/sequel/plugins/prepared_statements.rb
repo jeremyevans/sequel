@@ -3,13 +3,11 @@
 module Sequel
   module Plugins
     # The prepared_statements plugin modifies the model to use prepared statements for
-    # instance level saves (inserts and updates).  It also will use prepared statements for
-    # deletes, refreshes, and class level lookups by primary key, if it thinks that using
-    # a prepared statement will be faster in such cases.
+    # instance level inserts and updates.
     #
     # Note that this plugin is unsafe in some circumstances, as it can allow up to
     # 2^N prepared statements to be created for each type of insert and update query, where
-    # N is the number of colums in the table. It is recommended that you use the
+    # N is the number of columns in the table. It is recommended that you use the
     # +prepared_statements_safe+ plugin in addition to this plugin to reduce the number
     # of prepared statements that can be created, unless you tightly control how your
     # model instances are saved.
@@ -167,7 +165,7 @@ module Sequel
         end
 
         # Whether prepared statements should be used for the given type of query
-        # (:insert, :insert_select, :refresh).  True by default,
+        # (:insert, :insert_select, :update).  True by default,
         # can be overridden in other plugins to disallow prepared statements for
         # specific types of queries.
         def use_prepared_statements_for?(type)

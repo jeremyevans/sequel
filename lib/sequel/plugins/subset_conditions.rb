@@ -14,7 +14,7 @@ module Sequel
     #
     #   # This will now create a published_conditions method
     #   Album.dataset_module do
-    #     subset :published, :published => true
+    #     subset :published, published: true
     #   end
     #
     #   Album.where(Album.published_conditions).sql
@@ -23,7 +23,7 @@ module Sequel
     #   Album.exclude(Album.published_conditions).sql
     #   # SELECT * FROM albums WHERE (published IS NOT TRUE)
     #
-    #   Album.where(Sequel.|(Album.published_conditions, :ready=>true)).sql
+    #   Album.where(Album.published_conditions | {ready: true}).sql
     #   # SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))
     module SubsetConditions
       def self.apply(mod, &block)

@@ -46,18 +46,18 @@ module Sequel
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums_artists, :album_id, :artist_id]]
     #
     #   # All albums by artists that are associated to any album that this artist is associated to
-    #   Artist.many_through_many :artist_albums, [[:albums_artists, :artist_id, :album_id], \
-    #    [:albums_artists, :album_id, :artist_id], [:albums_artists, :artist_id, :album_id]], \
-    #    :class=>:Album
+    #   Artist.many_through_many :artist_albums, [[:albums_artists, :artist_id, :album_id],
+    #    [:albums_artists, :album_id, :artist_id], [:albums_artists, :artist_id, :album_id]],
+    #    class: :Album
     #
     #   # All tracks on albums by this artist (also could be a many_to_many)
-    #   Artist.many_through_many :tracks, [[:albums_artists, :artist_id, :album_id]], \
-    #    :right_primary_key=>:album_id
+    #   Artist.many_through_many :tracks, [[:albums_artists, :artist_id, :album_id]],
+    #    right_primary_key: :album_id
     #
     # Often you don't want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:
     # 
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums_artists, :album_id, :artist_id]],
-    #     :after_load=>proc{|artist, associated_artists| associated_artists.delete(artist)}
+    #     after_load: lambda{|artist, associated_artists| associated_artists.delete(artist)}
     #
     # You can also handle it by adding a dataset block that excludes the current record (so it won't be retrieved at all), but
     # that won't work when eagerly loading, which is why the :after_load proc is recommended instead.
@@ -65,7 +65,7 @@ module Sequel
     # It's also common to not want duplicate records, in which case the :distinct option can be used:
     # 
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
-    #    :distinct=>true
+    #    distinct: true
     # 
     # In addition to many_through_many, this plugin also adds one_through_many, for an association to a single object through multiple join tables.
     # This is useful if there are unique constraints on the foreign keys in the join tables that reference back to the current table, or if you want

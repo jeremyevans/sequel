@@ -14,8 +14,6 @@ module Sequel
       end
     end
 
-    # Database and Dataset instance methods for SQLServer specific
-    # support via JDBC.
     module SQLServer
       def self.MSSQLRubyTime(r, i)
         # MSSQL-Server TIME should be fetched as string to keep the precision intact, see:
@@ -25,7 +23,6 @@ module Sequel
         end
       end
 
-      # Database instance methods for SQLServer databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::JDBC::MSSQL::DatabaseMethods
 

@@ -47,9 +47,6 @@ module Sequel
           conn.prepared_statements = {}
         end
 
-        # Stupid MySQL doesn't use SQLState error codes correctly, mapping
-        # all constraint violations to 23000 even though it recognizes
-        # different types.
         def database_specific_error_class(exception, opts)
           case exception.errno
           when 1048

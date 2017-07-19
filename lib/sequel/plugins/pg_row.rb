@@ -41,16 +41,12 @@ module Sequel
     #
     #   Address.register_row_type
     #
-    # Note that automatic conversion only works with the native postgres adapter.
-    # For other adapters that connect to PostgreSQL, you need to call the conversion
-    # proc manually.
-    #
     # In addition to returning row-valued/composite types as instances of Sequel::Model,
     # this also lets you use model instances in datasets when inserting, updating, and
     # filtering:
     #
-    #   DB[:company].insert(:name=>'MS', :address=>
-    #     Address.load(:street=>'123 Foo St', :city=>'Bar Town', :zip=>'12345'))
+    #   DB[:company].insert(name: 'MS', address:
+    #     Address.load(street: '123 Foo St', city: 'Bar Town', zip: '12345'))
     module PgRow
       # When loading the extension, make sure the database has the pg_row extension
       # loaded, load the custom database extensions, and automatically register the

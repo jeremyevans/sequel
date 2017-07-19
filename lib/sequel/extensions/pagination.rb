@@ -64,7 +64,7 @@ module Sequel
 
   class Dataset
     # Holds methods that only relate to paginated datasets. Paginated dataset
-    # have pages starting at 1 (page 1 is offset 0, page 1 is offset page_size).
+    # have pages starting at 1 (page 1 is offset 0, page 2 is offset 1 * page_size).
     module Pagination
       # The number of records per page (the final page may have fewer than
       # this number of records).

@@ -39,11 +39,11 @@ module Sequel
     #   # Using integers to store the class type, with a :model_map hash
     #   # and an sti_key of :type
     #   Employee.plugin :single_table_inheritance, :type,
-    #     :model_map=>{1=>:Staff, 2=>:Manager}
+    #     model_map: {1=>:Staff, 2=>:Manager}
     #
     #   # Using non-class name strings
     #   Employee.plugin :single_table_inheritance, :type,
-    #     :model_map=>{'line staff'=>:Staff, 'supervisor'=>:Manager}
+    #     model_map: {'line staff'=>:Staff, 'supervisor'=>:Manager}
     #
     #   # By default the plugin sets the respective column value
     #   # when a new instance is created.
@@ -53,22 +53,22 @@ module Sequel
     #   # You can customize this behavior with the :key_chooser option.
     #   # This is most useful when using a non-bijective mapping.
     #   Employee.plugin :single_table_inheritance, :type,
-    #     :model_map=>{'line staff'=>:Staff, 'supervisor'=>:Manager},
-    #     :key_chooser=>proc{|instance| instance.model.sti_key_map[instance.model.to_s].first || 'stranger' }
+    #     model_map: {'line staff'=>:Staff, 'supervisor'=>:Manager},
+    #     key_chooser: lambda{|instance| instance.model.sti_key_map[instance.model.to_s].first || 'stranger'}
     #
     #   # Using custom procs, with :model_map taking column values
     #   # and yielding either a class, string, symbol, or nil, 
     #   # and :key_map taking a class object and returning the column
     #   # value to use
     #   Employee.plugin :single_table_inheritance, :type,
-    #     :model_map=>proc(&:reverse),
-    #     :key_map=>proc{|klass| klass.name.reverse}
+    #     model_map: :reverse.to_proc,
+    #     key_map: lambda{|klass| klass.name.reverse}
     #
     #   # You can use the same class for multiple values.
     #   # This is mainly useful when the sti_key column contains multiple values
     #   # which are different but do not require different code.
     #   Employee.plugin :single_table_inheritance, :type,
-    #     :model_map=>{'staff' => "Staff",
+    #     model_map: {'staff' => "Staff",
     #                  'manager' => "Manager",
     #                  'overpayed staff' => "Staff",
     #                  'underpayed staff' => "Staff"}

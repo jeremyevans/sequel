@@ -4,8 +4,6 @@ require 'sqlite3'
 Sequel.require 'adapters/shared/sqlite'
 
 module Sequel
-  # Top level module for holding all SQLite-related modules and classes
-  # for Sequel.
   module SQLite
     FALSE_VALUES = (%w'0 false f no n' + [0]).freeze
 
@@ -75,8 +73,6 @@ module Sequel
     end
     SQLITE_TYPES.freeze
     
-    # Database class for SQLite databases used with Sequel and the
-    # ruby-sqlite3 driver.
     class Database < Sequel::Database
       include ::Sequel::SQLite::DatabaseMethods
       
@@ -146,7 +142,6 @@ module Sequel
         end
       end
       
-      # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts=OPTS)
         _execute(:insert, sql, opts)
       end
@@ -288,11 +283,9 @@ module Sequel
       #end
     end
     
-    # Dataset class for SQLite datasets that use the ruby-sqlite3 driver.
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
 
-      # SQLite already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
         
@@ -323,7 +316,6 @@ module Sequel
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
       PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 
-      # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |result|
           i = -1

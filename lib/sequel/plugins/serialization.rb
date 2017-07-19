@@ -2,15 +2,15 @@
 
 module Sequel
   module Plugins
-    # Sequel's built in Serialization plugin allows you to keep serialized
+    # The serialization plugin allows you to keep serialized
     # ruby objects in the database, while giving you deserialized objects
     # when you call an accessor.
     #
     # This plugin works by keeping the serialized value in the values, and
     # adding a deserialized_values hash.  The reader method for serialized columns
     # will check the deserialized_values for the value, return it if present,
-    # or deserialized the entry in values and return it.  The writer method will
-    # set the deserialized_values entry.  This plugin adds a before_save hook
+    # or deserialize the entry in values and return it.  The writer method will
+    # set the deserialized_values entry.  This plugin adds a before_validation hook
     # that serializes all deserialized_values to values.
     #
     # You can specify the serialization format as a pair of serializer/deserializer
@@ -53,10 +53,10 @@ module Sequel
     #     serialize_attributes :reverse, :password
     #
     #     # Use a custom serializer/deserializer pair without registering
-    #     serialize_attributes [lambda(&:reverse), lambda(&:reverse)], :password
+    #     serialize_attributes [:reverse.to_proc, :reverse.to_proc], :password
     #   end
     #   user = User.create
-    #   user.permissions = { :global => 'read-only' }
+    #   user.permissions = {global: 'read-only'}
     #   user.save
     #
     # Note that if you mutate serialized column values without reassigning them,

@@ -170,13 +170,10 @@ module Sequel
       
       protected
       
-      # Run the method based on the type of prepared statement, with
-      # :select running #all to get all of the rows, and the other
-      # types running the method with the same name as the type.
+      # Run the method based on the type of prepared statement.
       def run(&block)
         case prepared_type
         when :select, :all
-          # Most common scenario, so listed first
           all(&block)
         when :each
           each(&block)
@@ -216,8 +213,7 @@ module Sequel
         @opts[:bind_vars].has_key?(k)
       end
 
-      # The symbol cache should always be skipped, since placeholders
-      # are symbols.
+      # The symbol cache should always be skipped, since placeholders are symbols.
       def skip_symbol_cache?
         true
       end
@@ -267,7 +263,7 @@ module Sequel
     # already been set for this dataset, they are updated with the contents
     # of bind_vars.
     #
-    #   DB[:table].where(:id=>:$id).bind(:id=>1).call(:first)
+    #   DB[:table].where(id: :$id).bind(id: 1).call(:first)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def bind(bind_vars={})
@@ -288,7 +284,7 @@ module Sequel
     # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
     # insert or update (if one of those types is used), which may contain placeholders.
     #
-    #   DB[:table].where(:id=>:$id).call(:first, :id=>1)
+    #   DB[:table].where(id: :$id).call(:first, id: 1)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def call(type, bind_variables={}, *values, &block)
@@ -304,13 +300,13 @@ module Sequel
     # the associated Database, where it can be called by name.
     # The following usage is identical:
     #
-    #   ps = DB[:table].where(:name=>:$name).prepare(:first, :select_by_name)
+    #   ps = DB[:table].where(name: :$name).prepare(:first, :select_by_name)
     #
-    #   ps.call(:name=>'Blah')
+    #   ps.call(name: 'Blah')
     #   # SELECT * FROM table WHERE name = ? -- ('Blah')
     #   # => {:id=>1, :name=>'Blah'}
     #
-    #   DB.call(:select_by_name, :name=>'Blah') # Same thing
+    #   DB.call(:select_by_name, name: 'Blah') # Same thing
     def prepare(type, name, *values)
       ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules)
       ps.prepared_sql

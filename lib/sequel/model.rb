@@ -6,7 +6,8 @@ module Sequel
   # <tt>Sequel::Model</tt> is an object relational mapper built on top of Sequel core.  Each
   # model class is backed by a dataset instance, and many dataset methods can be
   # called directly on the class.  Model datasets return rows as model instances,
-  # which have fairly standard ORM instance behavior.
+  # which are wrappers around the underlying hash that allow easily updating or
+  # deleting the individual row.
   #
   # <tt>Sequel::Model</tt> is built completely out of plugins.  Plugins can override any class,
   # instance, or dataset method defined by a previous plugin and call super to get the default
@@ -19,9 +20,9 @@ module Sequel
   class Model
     OPTS = Sequel::OPTS
 
-    # Empty instance methods to create that the user can override to get hook/callback behavior.
+    # Empty instance methods to create that the user can override.
     # Just like any other method defined by Sequel, if you override one of these, you should
-    # call +super+ to get the default behavior (while empty by default, they can also be defined
+    # call +super+ to get the default behavior (while empty by default, they are often overridden
     # by plugins).  See the {"Model Hooks" guide}[rdoc-ref:doc/model_hooks.rdoc] for
     # more detail on hooks.
     HOOKS = [

@@ -70,7 +70,7 @@ module Sequel
     end
 
     # Dump foreign key constraints for all tables as a migration. This complements
-    # the :foreign_keys=>false option to dump_schema_migration. This only dumps
+    # the foreign_keys: false option to dump_schema_migration. This only dumps
     # the constraints (not the columns) using alter_table/add_foreign_key with an
     # array of columns.
     #
@@ -88,7 +88,7 @@ END_MIG
     end
 
     # Dump indexes for all tables as a migration.  This complements
-    # the :indexes=>false option to dump_schema_migration. Options:
+    # the indexes: false option to dump_schema_migration. Options:
     # :same_db :: Create a dump for the same database type, so
     #             don't ignore errors if the index statements fail.
     # :index_names :: If set to false, don't record names of indexes. If
@@ -105,7 +105,7 @@ end
 END_MIG
     end
 
-    # Return a string that contains a Sequel::Migration subclass that when
+    # Return a string that contains a Sequel migration that when
     # run would recreate the database structure. Options:
     # :same_db :: Don't attempt to translate database types to ruby types.
     #             If this isn't set to true, all database types will be translated to

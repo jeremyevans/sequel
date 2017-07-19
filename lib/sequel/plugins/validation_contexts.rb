@@ -15,11 +15,11 @@ module Sequel
     #     end
     #   end
     #
-    #   Album.new(:status_id=>1).valid?(:validation_context=>:initial) # => true
-    #   Album.new(:status_id=>2).valid?(:validation_context=>:initial) # => false
+    #   Album.new(status_id: 1).valid?(validation_context: :initial) # => true
+    #   Album.new(status_id: 2).valid?(validation_context: :initial) # => false
     #
-    #   Album.new(:status_id=>1).valid?(:validation_context=>:approve) # => false
-    #   Album.new(:status_id=>2).valid?(:validation_context=>:approve) # => true
+    #   Album.new(status_id: 1).valid?(validation_context: :approve) # => false
+    #   Album.new(status_id: 2).valid?(validation_context: :approve) # => true
     #
     # There is no validation context used by default, so validation_context will be
     # +nil+ if one is not specified.  If you want to differentiate between creating new

@@ -75,7 +75,7 @@ module Sequel
 
   (
   # Error raised on an invalid operation, such as trying to update or delete
-  # a joined or grouped dataset.
+  # a joined or grouped dataset when the database does not support that.
   InvalidOperation = Class.new(Error)
   ).name
 

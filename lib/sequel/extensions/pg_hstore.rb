@@ -30,7 +30,7 @@
 # Since the hstore type only supports strings, non string keys and
 # values are converted to strings
 #
-#   Sequel.hstore(:foo=>1).to_hash # {'foo'=>'1'}
+#   Sequel.hstore(foo: 1).to_hash # {'foo'=>'1'}
 #   v = Sequel.hstore({})
 #   v[:foo] = 1
 #   v # {'foo'=>'1'}
@@ -68,7 +68,7 @@
 #
 # If you want to insert a hash into an hstore database column:
 #
-#   DB[:table].insert(:column=>Sequel.hstore('foo'=>'bar'))
+#   DB[:table].insert(column: Sequel.hstore('foo'=>'bar'))
 #
 # To use this extension, first load it into your Sequel::Database instance:
 #

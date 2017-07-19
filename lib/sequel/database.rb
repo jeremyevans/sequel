@@ -12,7 +12,8 @@ module Sequel
 
   # Array of all databases to which Sequel has connected.  If you are
   # developing an application that can connect to an arbitrary number of 
-  # databases, delete the database objects from this or they will not get
+  # databases, delete the database objects from this (or use the :keep_reference
+  # Database option or a block when connecting) or they will not get
   # garbage collected.
   DATABASES = []
 

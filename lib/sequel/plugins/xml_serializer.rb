@@ -23,15 +23,15 @@ module Sequel
     #
     # You can provide options to control the XML output:
     #
-    #   puts album.to_xml(:only=>:name)
-    #   puts album.to_xml(:except=>[:id, :artist_id])
+    #   puts album.to_xml(only: :name)
+    #   puts album.to_xml(except: [:id, :artist_id])
     #   # Output:
     #   # <?xml version="1.0"?>
     #   # <album>
     #   #   <name>RF</name>
     #   # </album>
     #
-    #   album.to_xml(:include=>:artist)
+    #   album.to_xml(include: :artist)
     #   # Output:
     #   # <?xml version="1.0"?>
     #   # <album>
@@ -47,7 +47,7 @@ module Sequel
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
-    #   album.to_xml(:include=>{:artist=>{:only=>:name}})
+    #   album.to_xml(include: {artist: {only: :name}})
     #   # Output:
     #   # <?xml version="1.0"?>
     #   # <album>
@@ -63,12 +63,12 @@ module Sequel
     # of which return all objects in the dataset:
     #
     #   Album.to_xml
-    #   Album.where(:artist_id=>1).to_xml(:include=>:tags)
+    #   Album.where(artist_id: 1).to_xml(include: :tags)
     #
     # If you have an existing array of model instances you want to convert to
     # XML, you can call the class to_xml method with the :array option:
     #
-    #   Album.to_xml(:array=>[Album[1], Album[2]])
+    #   Album.to_xml(array: [Album[1], Album[2]])
     #
     # In addition to creating XML, this plugin also enables Sequel::Model
     # classes to create instances directly from XML using the from_xml class
@@ -80,7 +80,7 @@ module Sequel
     # The array_from_xml class method exists to parse arrays of model instances
     # from xml:
     #
-    #   xml = Album.where(:artist_id=>1).to_xml
+    #   xml = Album.where(artist_id: 1).to_xml
     #   albums = Album.array_from_xml(xml)
     #
     # These does not necessarily round trip, since doing so would let users
@@ -89,7 +89,7 @@ module Sequel
     # fields, you can use the :fields option, which will call set_fields with
     # the given fields:
     #
-    #   Album.from_xml(album.to_xml, :fields=>%w'id name')
+    #   Album.from_xml(album.to_xml, fields: %w'id name')
     #
     # If you want to update an existing instance, you can use the from_xml
     # instance method:
@@ -99,11 +99,11 @@ module Sequel
     # Both of these allow creation of cached associated objects, if you provide
     # the :associations option:
     #
-    #   album.from_xml(xml, :associations=>:artist)
+    #   album.from_xml(xml, associations: :artist)
     #
     # You can even provide options when setting up the associated objects:
     #
-    #   album.from_xml(xml, :associations=>{:artist=>{:fields=>%w'id name', :associations=>:tags}})
+    #   album.from_xml(xml, associations: {artist: {fields: %w'id name', associations: :tags}})
     #
     # Usage:
     #
@@ -137,21 +137,20 @@ module Sequel
           node.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| from_xml_node(c, opts)}
         end
 
-        # Return an instance of this class based on the provided
-        # XML.
+        # Return an instance of this class based on the provided XML.
         def from_xml(xml, opts=OPTS)
           from_xml_node(Nokogiri::XML(xml).children.first, opts)
         end
 
         # Return an instance of this class based on the given
         # XML node, which should be Nokogiri::XML::Node instance.
-        # This should probably not be used directly by user code.
+        # This should not be used directly by user code.
         def from_xml_node(parent, opts=OPTS)
           new.from_xml_node(parent, opts)
         end
 
         # Return an appropriate Nokogiri::XML::Builder instance
-        # used to create the XML.  This should probably not be used
+        # used to create the XML.  This should not be used
         # directly by user code.
         def xml_builder(opts=OPTS)
           if opts[:builder]
@@ -169,7 +168,7 @@ module Sequel
 
         # Return a proc (or any other object that responds to []),
         # used for formatting XML tag names when serializing to XML.
-        # This should probably not be used directly by user code.
+        # This should not be used directly by user code.
         def xml_deserialize_name_proc(opts=OPTS)
           if opts[:name_proc]
             opts[:name_proc]
@@ -182,7 +181,7 @@ module Sequel
 
         # Return a proc (or any other object that responds to []),
         # used for formatting XML tag names when serializing to XML.
-        # This should probably not be used directly by user code.
+        # This should not be used directly by user code.
         def xml_serialize_name_proc(opts=OPTS)
           pr = if opts[:name_proc]
             opts[:name_proc]

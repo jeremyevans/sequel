@@ -133,7 +133,7 @@ module Sequel
       end
 
       module DatabaseMethods
-        # Reset the conversion procs if using the native postgres adapter,
+        # Add the conversion procs to the database
         # and extend the datasets to correctly literalize ruby Range values.
         def self.extended(db)
           db.instance_eval do

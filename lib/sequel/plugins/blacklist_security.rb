@@ -41,12 +41,12 @@ module Sequel
         # want not to be used during mass assignment, they need to be listed here as well (without the =).
         #
         # It's generally a bad idea to rely on a blacklist approach for security.  Using a whitelist
-        # approach such as set_allowed_columns or the instance level set_only or set_fields methods
+        # approach such as the whitelist_security plugin or the set_fields methods
         # is usually a better choice.  So use of this method is generally a bad idea.
         #
         #   Artist.set_restricted_columns(:records_sold)
-        #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
-        #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
+        #   Artist.set(name: 'Bob', hometown: 'Sactown') # No Error
+        #   Artist.set(name: 'Bob', records_sold: 30000) # Error
         def set_restricted_columns(*cols)
           clear_setter_methods_cache
           @restricted_columns = cols
@@ -68,20 +68,20 @@ module Sequel
 
       module InstanceMethods
         # Set all values using the entries in the hash, except for the keys
-        # given in except.  You should probably use +set_fields+ or +set_only+
+        # given in except.  You should probably use +set_fields+
         # instead of this method, as blacklist approaches to security are a bad idea.
         #
-        #   artist.set_except({:name=>'Jim'}, :hometown)
+        #   artist.set_except({name: 'Jim'}, :hometown)
         #   artist.name # => 'Jim'
         def set_except(hash, *except)
           set_restricted(hash, ExceptionList.new(except.flatten))
         end
     
         # Update all values using the entries in the hash, except for the keys
-        # given in except.  You should probably use +update_fields+ or +update_only+
+        # given in except.  You should probably use +update_fields+
         # instead of this method, as blacklist approaches to security are a bad idea.
         #
-        #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
+        #   artist.update_except({name: 'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
         def update_except(hash, *except)
           update_restricted(hash, ExceptionList.new(except.flatten))
         end

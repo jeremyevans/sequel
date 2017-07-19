@@ -4,10 +4,7 @@ Sequel.require 'adapters/shared/mssql'
 
 module Sequel
   module JDBC
-    # Database and Dataset instance methods for MSSQL specific
-    # support via JDBC.
     module MSSQL
-      # Database instance methods for MSSQL databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
         

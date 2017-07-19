@@ -4,7 +4,7 @@ module Sequel
   module Plugins
     # The tactical_eager_loading plugin allows you to eagerly load
     # an association for all objects retrieved from the same dataset
-    # without calling eager on the dataset.  If you attempt to load
+    # without calling +eager+ on the dataset.  If you attempt to load
     # associated objects for a record and the association for that
     # object is currently not cached, it assumes you want to get
     # the associated objects for all objects retrieved with the dataset that
@@ -40,7 +40,7 @@ module Sequel
     #
     #   # Eagerly reload all artists for these albums
     #   # SELECT * FROM artists WHERE id IN (...)
-    #   albums.first.artists(:eager_reload=>true)
+    #   albums.first.artists(eager_reload: true)
     # 
     # You can also use the :eager option to specify dependent associations
     # to eager load:
@@ -50,7 +50,7 @@ module Sequel
     #   # Eager load all artists for these albums, and all albums for those artists
     #   # SELECT * FROM artists WHERE id IN (...)
     #   # SELECT * FROM albums WHERE artist_id IN (...)
-    #   albums.first.artists(:eager=>:albums)
+    #   albums.first.artists(eager: :albums)
     #
     # You can also use :eager to specify an eager callback. For example:
     #
@@ -58,7 +58,7 @@ module Sequel
     #
     #   # Eagerly load all artists whose name starts with A-M for these albums
     #   # SELECT * FROM artists WHERE name > 'N' AND id IN (...)
-    #   albums.first.artists(:eager=>proc{|ds| ds.where(:name > 'N')})
+    #   albums.first.artists(eager: lambda{|ds| ds.where(Sequel[:name] > 'N')})
     #
     # Usage:
     #

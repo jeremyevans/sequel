@@ -20,7 +20,8 @@ module Sequel
       :date => ::Sequel.method(:string_to_date)
     }.freeze
 
-    # Wraps an underlying connection to DB2 using IBM_DB.
+    # Wraps an underlying connection to DB2 using IBM_DB, to provide a more
+    # rubyish API.
     class Connection
       # A hash with prepared statement name symbol keys, where each value is 
       # a two element array with an sql string and cached Statement value.
@@ -204,7 +205,6 @@ module Sequel
         Connection.new(connection_params)
       end
 
-      # Execute the given SQL on the database.
       def execute(sql, opts=OPTS, &block)
         if sql.is_a?(Symbol)
           execute_prepared_statement(sql, opts, &block)
@@ -215,8 +215,6 @@ module Sequel
         raise_error(e)
       end
 
-      # Execute the given SQL on the database, returning the last inserted
-      # identity value.
       def execute_insert(sql, opts=OPTS)
         synchronize(opts[:server]) do |c|
           if sql.is_a?(Symbol)
@@ -266,7 +264,8 @@ module Sequel
 
       private
 
-      # Execute the given SQL on the database.
+      # Execute the given SQL on the database, yielding the related statement if a block
+      # is given or returning the number of affected rows if not, and ensuring the statement is freed.
       def _execute(conn, sql, opts)
         stmt = log_connection_yield(sql, conn){conn.execute(sql)}
         if block_given?
@@ -371,7 +370,7 @@ module Sequel
       PreparedStatementMethods = prepared_statements_module(:prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)
 
       # Whether to convert smallint to boolean arguments for this dataset.
-      # Defaults to the IBMDB module setting.
+      # Defaults to the Database setting.
       def convert_smallint_to_bool
         opts.has_key?(:convert_smallint_to_bool) ? opts[:convert_smallint_to_bool] : db.convert_smallint_to_bool
       end
@@ -381,7 +380,6 @@ module Sequel
         clone(:convert_smallint_to_bool=>v)
       end
 
-      # Fetch the rows from the database and yield plain hashes.
       def fetch_rows(sql)
         execute(sql) do |stmt|
           columns = []

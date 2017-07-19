@@ -35,14 +35,13 @@ module Sequel
         v != 0 unless r.wasNull
       end
 
-      # Database instance methods for Sybase databases accessed via JDBC.
       module DatabaseMethods
         include Sequel::SqlAnywhere::DatabaseMethods
         include Sequel::JDBC::Transactions
 
         private
 
-        # Get the last inserted id.
+        # Use @@IDENTITY to get the last inserted id
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = 'SELECT @@IDENTITY'
@@ -53,7 +52,6 @@ module Sequel
         end
       end
 
-      #Dataset class for Sybase datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::SqlAnywhere::DatasetMethods
 

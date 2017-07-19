@@ -25,7 +25,7 @@ module Sequel
     # you probably should not use the setter methods.
     #
     # By default, changes to the association will not happen until the object
-    # is saved.  However, using the :delay_pks=>false option, you can have the
+    # is saved.  However, using the delay_pks: false option, you can have the
     # changes made immediately when the association_pks setter method is called.
     #
     # By default, if you pass a nil value to the setter, an exception will be raised.
@@ -212,7 +212,7 @@ module Sequel
 
         # Update which objects are associated to the receiver.
         # If the receiver is a new object, save the pks
-        # so the update can happen after the received has been saved.
+        # so the update can happen after the receiver has been saved.
         def _association_pks_setter(opts, pks)
           if pks.nil?
             case opts[:association_pks_nil]

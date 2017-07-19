@@ -32,7 +32,7 @@
 #
 # So if you want to insert an array into an integer[] database column:
 #
-#   DB[:table].insert(:column=>Sequel.pg_array([1, 2, 3]))
+#   DB[:table].insert(column: Sequel.pg_array([1, 2, 3]))
 #
 # To use this extension, first load it into your Sequel::Database instance:
 #

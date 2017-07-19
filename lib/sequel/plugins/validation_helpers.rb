@@ -38,17 +38,24 @@ module Sequel
     #             that argument is passed as an argument to the proc.
     #
     # The default validation options for all models can be modified by
-    # changing the values of the Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS hash.  You
-    # change change the default options on a per model basis
-    # by overriding a private instance method default_validation_helpers_options.
-    #
+    # overridding the Model#default_validation_helpers_options private method.
     # By changing the default options, you can setup internationalization of the
     # error messages.  For example, you would modify the default options:
     #
-    #   Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS.merge!(
-    #     :exact_length=>{:message=>lambda{|exact| I18n.t("errors.exact_length", :exact => exact)}},
-    #     :integer=>{:message=>lambda{I18n.t("errors.integer")}}
-    #   )
+    #   class Sequel::Model
+    #     private
+    #
+    #     def default_validation_helpers_options(type)
+    #       case type
+    #       when :exact_length
+    #         {message: lambda{|exact| I18n.t("errors.exact_length", exact: exact)}
+    #       when :integer
+    #         {message: lambda{I18n.t("errors.integer")}
+    #       else
+    #         super
+    #       end
+    #     end
+    #   end
     #
     # and then use something like this in your yaml translation file:
     #
@@ -61,20 +68,16 @@ module Sequel
     # you need to override the method.  Here's an example:
     #   
     #   class Sequel::Model::Errors
-    #     ATTRIBUTE_JOINER = I18n.t('errors.joiner').freeze
     #     def full_messages
     #       inject([]) do |m, kv|
     #         att, errors = *kv
     #         att.is_a?(Array) ? Array(att).map!{|v| I18n.t("attributes.#{v}")} : att = I18n.t("attributes.#{att}")
-    #         errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(ATTRIBUTE_JOINER)} #{e}")}
+    #         errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(I18n.t('errors.joiner'))} #{e}")}
     #         m
     #       end
     #     end
     #   end
     module ValidationHelpers
-      # Default validation options used by Sequel.  Can be modified to change the error
-      # messages for all models (e.g. for internationalization), or to set certain
-      # default options for validations (e.g. :allow_nil=>true for all validates_format).
       DEFAULT_OPTIONS = {
         :exact_length=>{:message=>lambda{|exact| "is not #{exact} characters"}},
         :format=>{:message=>lambda{|with| 'is invalid'}},
@@ -231,7 +234,7 @@ module Sequel
         # If you want to do a case insensitive uniqueness validation on a database that
         # is case sensitive by default, you can use:
         #
-        #   validates_unique :column, :where=>(proc do |ds, obj, cols|
+        #   validates_unique :column, where:(lambda do |ds, obj, cols|
         #     ds.where(cols.map do |c|
         #       v = obj.public_send(c)
         #       v = v.downcase if v

@@ -8,10 +8,9 @@ module Sequel
 
         # Executes a prepared statement on an available connection.  If the
         # prepared statement already exists for the connection and has the same
-        # SQL, reuse it, otherwise, prepare the new statement.  Because of the
-        # usual MySQL stupidity, we are forced to name arguments via separate
-        # SET queries.  Use @sequel_arg_N (for N starting at 1) for these
-        # arguments.
+        # SQL, reuse it, otherwise, prepare the new statement.  Issue a SET
+        # query with literalized values for each argument, then an EXECUTE to
+        # execute the query with the arguments.
         def execute_prepared_statement(ps_name, opts, &block)
           args = opts[:arguments]
           ps = prepared_statement(ps_name)
@@ -30,8 +29,6 @@ module Sequel
       end
 
       module DatasetMethods
-        # Methods to add to MySQL prepared statement calls without using a
-        # real database prepared statement and bound variables.
         module CallableStatementMethods
           # Extend given dataset with this module so subselects inside subselects in
           # prepared statements work.

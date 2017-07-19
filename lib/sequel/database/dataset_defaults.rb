@@ -38,7 +38,7 @@ module Sequel
     #
     # Examples:
     #
-    #   # Introspec columns for all of DB's datasets
+    #   # Introspect columns for all of DB's datasets
     #   DB.extend_datasets(Sequel::ColumnsIntrospection)
     #   
     #   # Trace all SELECT queries by printing the SQL and the full backtrace
@@ -79,16 +79,13 @@ module Sequel
       Sequel::Dataset
     end
 
-    # Reset the default dataset used by most Database methods that
-    # create datasets.  Usually done after changes to the identifier
-    # mangling methods.
+    # Reset the default dataset used by most Database methods that create datasets.
     def reset_default_dataset
       Sequel.synchronize{@symbol_literal_cache.clear}
       @default_dataset = dataset
     end
 
-    # Whether to quote identifiers by default for this database, true
-    # by default.
+    # Whether to quote identifiers by default for this database, true by default.
     def quote_identifiers_default
       true
     end

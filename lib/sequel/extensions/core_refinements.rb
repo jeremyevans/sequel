@@ -17,8 +17,8 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, not matching all of the
     # conditions.
     #
-    #   ~[[:a, true]] # SQL: a IS NOT TRUE
-    #   ~[[:a, 1], [:b, [2, 3]]] # SQL: a != 1 OR b NOT IN (2, 3)
+    #   ~[[:a, true]] # SQL: (a IS NOT TRUE)
+    #   ~[[:a, 1], [:b, [2, 3]]] # SQL: ((a != 1) OR (b NOT IN (2, 3)))
     def ~
       Sequel.~(self)
     end
@@ -26,7 +26,7 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::CaseExpression</tt> with this array as the conditions and the given
     # default value and expression.
     #
-    #   [[{:a=>[2,3]}, 1]].case(0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
+    #   [[{a: [2,3]}, 1]].case(0) # SQL: CASE WHEN (a IN (2, 3)) THEN 1 ELSE 0 END
     #   [[:a, 1], [:b, 2]].case(:d, :c) # SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END
     def case(*args)
       ::Sequel::SQL::CaseExpression.new(self, *args)
@@ -38,9 +38,9 @@ module Sequel::CoreRefinements
     # this array as a value in a filter, but may be necessary if you are using it as a
     # value with placeholder SQL:
     #
-    #   DB[:a].where([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
-    #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
-    #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))
+    #   DB[:a].where([:a, :b]=>[[1, 2], [3, 4]]) # SQL: ((a, b) IN ((1, 2), (3, 4)))
+    #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: ((a, b) IN ((1 = 2) AND (3 = 4)))
+    #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: ((a, b) IN ((1, 2), (3, 4)))
     def sql_value_list
       ::Sequel::SQL::ValueList.new(self)
     end
@@ -52,8 +52,8 @@ module Sequel::CoreRefinements
     # and want to use the = operator instead of the IN operator (which is used by default for
     # arrays of two element arrays).
     #
-    #   [[:a, true]].sql_expr # SQL: a IS TRUE
-    #   [[:a, 1], [:b, [2, 3]]].sql_expr # SQL: a = 1 AND b IN (2, 3)
+    #   [[:a, true]].sql_expr # SQL: (a IS TRUE)
+    #   [[:a, 1], [:b, [2, 3]]].sql_expr # SQL: ((a = 1) AND (b IN (2, 3)))
     def sql_expr
       Sequel[self]
     end
@@ -61,8 +61,8 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, matching none
     # of the conditions.
     #
-    #   [[:a, true]].sql_negate # SQL: a IS NOT TRUE
-    #   [[:a, 1], [:b, [2, 3]]].sql_negate # SQL: a != 1 AND b NOT IN (2, 3)
+    #   [[:a, true]].sql_negate # SQL: (a IS NOT TRUE)
+    #   [[:a, 1], [:b, [2, 3]]].sql_negate # SQL: ((a != 1) AND (b NOT IN (2, 3)))
     def sql_negate
       Sequel.negate(self)
     end
@@ -70,8 +70,8 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, matching any of the
     # conditions.
     #
-    #   [[:a, true]].sql_or # SQL: a IS TRUE
-    #   [[:a, 1], [:b, [2, 3]]].sql_or # SQL: a = 1 OR b IN (2, 3)
+    #   [[:a, true]].sql_or # SQL: (a IS TRUE)
+    #   [[:a, 1], [:b, [2, 3]]].sql_or # SQL: ((a = 1) OR (b IN (2, 3)))
     def sql_or
       Sequel.or(self)
     end
@@ -82,9 +82,9 @@ module Sequel::CoreRefinements
     # concatenation.
     #
     #   [:a].sql_string_join # SQL: a
-    #   [:a, :b].sql_string_join # SQL: a || b
-    #   [:a, 'b'].sql_string_join # SQL: a || 'b'
-    #   ['a', :b].sql_string_join(' ') # SQL: 'a' || ' ' || b
+    #   [:a, :b].sql_string_join # SQL: (a || b)
+    #   [:a, 'b'].sql_string_join # SQL: (a || 'b')
+    #   ['a', :b].sql_string_join(' ') # SQL: ('a' || ' ' || b)
     def sql_string_join(joiner=nil)
       Sequel.join(self, joiner)
     end
@@ -95,8 +95,8 @@ module Sequel::CoreRefinements
     # all of the conditions in this hash and the condition specified by
     # the given argument.
     #
-    #   {:a=>1} & :b # SQL: a = 1 AND b
-    #   {:a=>true} & ~:b # SQL: a IS TRUE AND NOT b
+    #   {a: 1} & :b # SQL: ((a = 1) AND b)
+    #   {a: true} & ~:b # SQL: ((a IS TRUE) AND NOT b)
     def &(ce)
       ::Sequel::SQL::BooleanExpression.new(:AND, self, ce)
     end
@@ -105,8 +105,8 @@ module Sequel::CoreRefinements
     # all of the conditions in this hash or the condition specified by
     # the given argument.
     #
-    #   {:a=>1} | :b # SQL: a = 1 OR b
-    #   {:a=>true} | ~:b # SQL: a IS TRUE OR NOT b
+    #   {a: 1} | :b # SQL: ((a = 1) OR b)
+    #   {a: true} | ~:b # SQL: ((a IS TRUE) OR NOT b)
     def |(ce)
       ::Sequel::SQL::BooleanExpression.new(:OR, self, ce)
     end
@@ -114,19 +114,17 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this hash, not matching all of the
     # conditions.
     #
-    #   ~{:a=>true} # SQL: a IS NOT TRUE
-    #   ~{:a=>1, :b=>[2, 3]} # SQL: a != 1 OR b NOT IN (2, 3)
+    #   ~{a: true} # SQL: (a IS NOT TRUE)
+    #   ~{a: 1, b: [2, 3]} # SQL: ((a != 1) OR (b NOT IN (2, 3)))
     def ~
       ::Sequel::SQL::BooleanExpression.from_value_pairs(self, :OR, true)
     end
 
     # Return a <tt>Sequel::SQL::CaseExpression</tt> with this hash as the conditions and the given
-    # default value.  Note that the order of the conditions will be arbitrary on ruby 1.8, so all
-    # conditions should be orthogonal.
+    # default value.
     #
-    #   {{:a=>[2,3]}=>1}.case(0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
-    #   {:a=>1, :b=>2}.case(:d, :c) # SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END
-    #                                 #  or: CASE c WHEN b THEN 2 WHEN a THEN 1 ELSE d END
+    #   {{a: [2,3]}=>1}.case(0) # SQL: CASE WHEN (a IN (2, 3)) THEN 1 ELSE 0 END
+    #   {a: 1, b: 2}.case(:d, :c) # SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END
     def case(*args)
       ::Sequel::SQL::CaseExpression.new(to_a, *args)
     end
@@ -135,8 +133,8 @@ module Sequel::CoreRefinements
     # conditions.  Rarely do you need to call this explicitly, as Sequel generally
     # assumes that hashes specify this type of condition.
     #
-    #   {:a=>true}.sql_expr # SQL: a IS TRUE
-    #   {:a=>1, :b=>[2, 3]}.sql_expr # SQL: a = 1 AND b IN (2, 3)
+    #   {a: true}.sql_expr # SQL: (a IS TRUE)
+    #   {a: 1, b: [2, 3]}.sql_expr # SQL: ((a = 1) AND (b IN (2, 3)))
     def sql_expr
       ::Sequel::SQL::BooleanExpression.from_value_pairs(self)
     end
@@ -144,8 +142,8 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this hash, matching none
     # of the conditions.
     #
-    #   {:a=>true}.sql_negate # SQL: a IS NOT TRUE
-    #   {:a=>1, :b=>[2, 3]}.sql_negate # SQL: a != 1 AND b NOT IN (2, 3)
+    #   {a: true}.sql_negate # SQL: (a IS NOT TRUE)
+    #   {a: 1, b: [2, 3]}.sql_negate # SQL: ((a != 1) AND (b NOT IN (2, 3)))
     def sql_negate
       ::Sequel::SQL::BooleanExpression.from_value_pairs(self, :AND, true)
     end
@@ -153,8 +151,8 @@ module Sequel::CoreRefinements
     # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this hash, matching any of the
     # conditions.
     #
-    #   {:a=>true}.sql_or # SQL: a IS TRUE
-    #   {:a=>1, :b=>[2, 3]}.sql_or # SQL: a = 1 OR b IN (2, 3)
+    #   {a: true}.sql_or # SQL: (a IS TRUE)
+    #   {a: 1, b: [2, 3]}.sql_or # SQL: ((a = 1) OR (b IN (2, 3)))
     def sql_or
       ::Sequel::SQL::BooleanExpression.from_value_pairs(self, :OR)
     end
@@ -167,16 +165,16 @@ module Sequel::CoreRefinements
     # Converts a string into a <tt>Sequel::LiteralString</tt>, in order to override string
     # literalization, e.g.:
     #
-    #   DB[:items].where(:abc => 'def').sql #=>
-    #     "SELECT * FROM items WHERE (abc = 'def')"
+    #   DB[:items].where(abc: 'def')
+    #   # "SELECT * FROM items WHERE (abc = 'def')"
     #
-    #   DB[:items].where(:abc => 'def'.lit).sql #=>
-    #     "SELECT * FROM items WHERE (abc = def)"
+    #   DB[:items].where(abc: 'def'.lit)
+    #   # "SELECT * FROM items WHERE (abc = def)"
     #
     # You can also provide arguments, to create a <tt>Sequel::SQL::PlaceholderLiteralString</tt>:
     #
-    #    DB[:items].select{|o| o.count('DISTINCT ?'.lit(:a))}.sql #=>
-    #      "SELECT count(DISTINCT a) FROM items"
+    #   DB[:items].select{|o| o.count('DISTINCT ?'.lit(:a))}
+    #   # "SELECT count(DISTINCT a) FROM items"
     def lit(*args)
       args.empty? ? Sequel::LiteralString.new(self) : Sequel::SQL::PlaceholderLiteralString.new(self, args)
     end
@@ -199,11 +197,9 @@ module Sequel::CoreRefinements
     include Sequel::SQL::SubscriptMethods
     include Sequel::SQL::ComplexExpressionMethods
 
-    # Returns receiver wrapped in an <tt>Sequel::SQL::Identifier</tt>.  Usually used to
-    # prevent splitting the symbol.
+    # Returns receiver wrapped in an <tt>Sequel::SQL::Identifier</tt>.
     #
-    #   :a__b # SQL: "a"."b"
-    #   :a__b.identifier # SQL: "a__b"
+    #   :ab.identifier # SQL: "a"
     def identifier
       Sequel::SQL::Identifier.new(self)
     end

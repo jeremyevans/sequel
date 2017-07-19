@@ -15,7 +15,7 @@ module Sequel
     # Example:
     #
     #   loader = Sequel::Dataset::PlaceholderLiteralizer.loader(DB[:items]) do |pl, ds|
-    #     ds.where(:id=>pl.arg).exclude(:name=>pl.arg).limit(1)
+    #     ds.where(id: pl.arg).exclude(name: pl.arg).limit(1)
     #   end
     #   loader.first(1, "foo")
     #   # SELECT * FROM items WHERE ((id = 1) AND (name != 'foo')) LIMIT 1
@@ -27,7 +27,7 @@ module Sequel
     # Note that this method does not handle all possible cases.  For example:
     #
     #   loader = Sequel::Dataset::PlaceholderLiteralizer.loader(DB[:items]) do |pl, ds|
-    #     ds.join(pl.arg, :item_id=>:id)
+    #     ds.join(pl.arg, item_id: :id)
     #   end
     #   loader.all(:cart_items)
     #  
@@ -35,7 +35,7 @@ module Sequel
     # best to add a table alias when joining:
     #
     #   loader = Sequel::Dataset::PlaceholderLiteralizer.loader(DB[:items]) do |pl, ds|
-    #     ds.join(Sequel.as(pl.arg, :t), :item_id=>:id)
+    #     ds.join(Sequel.as(pl.arg, :t), item_id: :id)
     #   end
     #   loader.all(:cart_items)
     #
@@ -107,7 +107,7 @@ module Sequel
         end
 
         # Record the offset at which the argument is used in the SQL query, and any
-        # transforming
+        # transforming block.
         def use(sql, arg, transformer)
           @args << [sql, sql.length, arg, transformer]
         end

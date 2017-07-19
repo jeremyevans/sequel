@@ -156,7 +156,7 @@ module Sequel
       # Creates a dataset that uses the VALUES clause:
       #
       #   DB.values([[1, 2], [3, 4]])
-      #   VALUES ((1, 2), (3, 4))
+      #   # VALUES ((1, 2), (3, 4))
       def values(v)
         @default_dataset.clone(:values=>v)
       end
@@ -480,7 +480,6 @@ module Sequel
       end
     end
     
-    # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
       include Dataset::Replace
       include UnmodifiedIdentifiers::DatasetMethods
@@ -512,7 +511,7 @@ module Sequel
       end
 
       # SQLite doesn't support a NOT LIKE b, you need to use NOT (a LIKE b).
-      # It doesn't support xor or the extract function natively, so those have to be emulated.
+      # It doesn't support xor, power, or the extract function natively, so those have to be emulated.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :"NOT LIKE", :"NOT ILIKE"
@@ -615,10 +614,10 @@ module Sequel
       #
       # Examples:
       #
-      #   DB[:table].insert_conflict.insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict.insert(a: 1, b: 2)
       #   # INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)
       #
-      #   DB[:table].insert_conflict(:replace).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(:replace).insert(a: 1, b: 2)
       #   # INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)
       def insert_conflict(resolution = :ignore)
         unless INSERT_CONFLICT_RESOLUTIONS.include?(resolution.to_s.upcase)
@@ -630,7 +629,7 @@ module Sequel
       # Ignore uniqueness/exclusion violations when inserting, using INSERT OR IGNORE.
       # Exists mostly for compatibility to MySQL's insert_ignore. Example:
       #
-      #   DB[:table].insert_ignore.insert(:a=>1, :b=>2)
+      #   DB[:table].insert_ignore.insert(a: 1, b: 2)
       #   # INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)
       def insert_ignore
         insert_conflict(:ignore)

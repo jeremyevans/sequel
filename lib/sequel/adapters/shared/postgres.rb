@@ -129,7 +129,6 @@ module Sequel
     # Error raised when Sequel determines a PostgreSQL exclusion constraint has been violated.
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
 
-    # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
 
@@ -211,8 +210,6 @@ module Sequel
         add_conversion_proc(oid, block)
       end
 
-      # Commit an existing prepared transaction with the given transaction
-      # identifier string.
       def commit_prepared_transaction(transaction_id, opts=OPTS)
         run("COMMIT PREPARED #{literal(transaction_id)}", opts)
       end
@@ -276,7 +273,6 @@ module Sequel
         self << create_trigger_sql(table, name, function, opts)
       end
 
-      # PostgreSQL uses the :postgres database type.
       def database_type
         :postgres
       end
@@ -516,8 +512,6 @@ module Sequel
         get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
       end
 
-      # Rollback an existing prepared transaction with the given transaction
-      # identifier string.
       def rollback_prepared_transaction(transaction_id, opts=OPTS)
         run("ROLLBACK PREPARED #{literal(transaction_id)}", opts)
       end
@@ -620,10 +614,10 @@ module Sequel
       # Creates a dataset that uses the VALUES clause:
       #
       #   DB.values([[1, 2], [3, 4]])
-      #   VALUES ((1, 2), (3, 4))
+      #   # VALUES ((1, 2), (3, 4))
       #
       #   DB.values([[1, 2], [3, 4]]).order(:column2).limit(1, 1)
-      #   VALUES ((1, 2), (3, 4)) ORDER BY column2 LIMIT 1 OFFSET 1
+      #   # VALUES ((1, 2), (3, 4)) ORDER BY column2 LIMIT 1 OFFSET 1
       def values(v)
         @default_dataset.clone(:values=>v)
       end
@@ -647,7 +641,6 @@ module Sequel
         "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
       end
 
-      # Use a PostgreSQL-specific alter table generator
       def alter_table_generator_class
         Postgres::AlterTableGenerator
       end
@@ -923,7 +916,6 @@ module Sequel
         result += " AS #{sql}"
       end
 
-      # Use a PostgreSQL-specific create table generator
       def create_table_generator_class
         Postgres::CreateTableGenerator
       end
@@ -980,8 +972,8 @@ module Sequel
         "DROP #{'MATERIALIZED ' if opts[:materialized]}VIEW#{' IF EXISTS' if opts[:if_exists]} #{quote_schema_table(name)}#{' CASCADE' if opts[:cascade]}"
       end
 
-      # If opts includes a :schema option, or a default schema is used, restrict the dataset to
-      # that schema.  Otherwise, just exclude the default PostgreSQL schemas except for public.
+      # If opts includes a :schema option, use it, otherwise restrict the filter to only the
+      # currently visible schemas.
       def filter_schema(ds, opts)
         expr = if schema = opts[:schema]
           schema.to_s
@@ -991,7 +983,6 @@ module Sequel
         ds.where{{pg_namespace[:nspname]=>expr}}
       end
 
-      # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
@@ -1037,8 +1028,7 @@ module Sequel
         end
       end
 
-      # Use a dollar sign instead of question mark for the argument
-      # placeholder.
+      # Use a dollar sign instead of question mark for the argument placeholder.
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
       end
@@ -1065,8 +1055,7 @@ module Sequel
         Sequel.cast(expr.to_s,:regclass).cast(:oid)
       end
 
-      # Remove the cached entries for primary keys and sequences when a table is
-      # changed.
+      # Remove the cached entries for primary keys and sequences when a table is changed.
       def remove_cached_schema(table)
         tab = quote_schema_table(table)
         Sequel.synchronize do
@@ -1082,7 +1071,6 @@ module Sequel
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
       end
 
-      # Recognize PostgreSQL interval type.
       def schema_column_type(db_type)
         case db_type
         when /\Ainterval\z/io
@@ -1184,7 +1172,7 @@ module Sequel
       # PostgreSQL prefers the text datatype.  If a fixed size is requested,
       # the char type is used.  If the text type is specifically
       # disallowed or there is a size specified, use the varchar type.
-      # Otherwise use the type type.
+      # Otherwise use the text type.
       def type_literal_generic_string(column)
         if column[:fixed]
           "char(#{column[:size]||255})"
@@ -1201,7 +1189,6 @@ module Sequel
       end
     end
 
-    # Instance methods for datasets that connect to a PostgreSQL database.
     module DatasetMethods
       include UnmodifiedIdentifiers::DatasetMethods
 
@@ -1357,28 +1344,28 @@ module Sequel
       #
       # Examples:
       #
-      #   DB[:table].insert_conflict.insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict.insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT DO NOTHING
       #   
-      #   DB[:table].insert_conflict(:constraint=>:table_a_uidx).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(constraint: :table_a_uidx).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT ON CONSTRAINT table_a_uidx DO NOTHING
       #   
-      #   DB[:table].insert_conflict(:target=>:a).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(target: :a).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO NOTHING
       #
-      #   DB[:table].insert_conflict(:target=>:a, :conflict_where=>{:c=>true}).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(target: :a, conflict_where: {c: true}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING
       #   
-      #   DB[:table].insert_conflict(:target=>:a, :update=>{:b=>:excluded__b}).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(target: :a, update: {b: Sequel[:excluded][:b]}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
       #   
-      #   DB[:table].insert_conflict(:constraint=>:table_a_uidx,
-      #     :update=>{:b=>:excluded__b}, :update_where=>{:table__status_id=>1}).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(constraint: :table_a_uidx,
+      #     update: {b: Sequel[:excluded][:b]}, update_where: {Sequel[:table][:status_id] => 1}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT ON CONSTRAINT table_a_uidx
       #   # DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
@@ -1389,7 +1376,7 @@ module Sequel
       # Ignore uniqueness/exclusion violations when inserting, using ON CONFLICT DO NOTHING.
       # Exists mostly for compatibility to MySQL's insert_ignore. Example:
       #
-      #   DB[:table].insert_ignore.insert(:a=>1, :b=>2)
+      #   DB[:table].insert_ignore.insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT DO NOTHING
       def insert_ignore
@@ -1412,7 +1399,7 @@ module Sequel
 
       # Locks all tables in the dataset's FROM clause (but not in JOINs) with
       # the specified mode (e.g. 'EXCLUSIVE').  If a block is given, starts
-      # a new transaction, locks the table, and yields.  If a block is not given
+      # a new transaction, locks the table, and yields.  If a block is not given,
       # just locks the tables.  Note that PostgreSQL will probably raise an error
       # if you lock the table outside of an existing transaction.  Returns nil.
       def lock(mode, opts=OPTS)
@@ -1475,7 +1462,7 @@ module Sequel
         server_version >= 90500
       end
 
-      # PostgreSQL 9.3rc1+ supports lateral subqueries
+      # PostgreSQL 9.3+ supports lateral subqueries
       def supports_lateral_subqueries?
         server_version >= 90300
       end
@@ -1521,10 +1508,11 @@ module Sequel
       # :only and :restart only work correctly on PostgreSQL 8.4+.
       #
       # Usage:
-      #   DB[:table].truncate # TRUNCATE TABLE "table"
-      #   # => nil
-      #   DB[:table].truncate(:cascade => true, :only=>true, :restart=>true) # TRUNCATE TABLE ONLY "table" RESTART IDENTITY CASCADE
-      #   # => nil
+      #   DB[:table].truncate
+      #   # TRUNCATE TABLE "table"
+      #
+      #   DB[:table].truncate(cascade: true, only: true, restart: true)
+      #   # TRUNCATE TABLE ONLY "table" RESTART IDENTITY CASCADE
       def truncate(opts = OPTS)
         if opts.empty?
           super()

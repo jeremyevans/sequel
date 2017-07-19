@@ -46,11 +46,11 @@ module Sequel
       #
       # Examples:
       #
-      #     DB.call_mssql_sproc(:SequelTest, {:args => ['input arg', :output]})
-      #     DB.call_mssql_sproc(:SequelTest, {:args => ['input arg', [:output, 'int', 'varname']]})
+      #     DB.call_mssql_sproc(:SequelTest, {args: ['input arg', :output]})
+      #     DB.call_mssql_sproc(:SequelTest, {args: ['input arg', [:output, 'int', 'varname']]})
       #
       #     named params:
-      #     DB.call_mssql_sproc(:SequelTest, :args => {
+      #     DB.call_mssql_sproc(:SequelTest, args: {
       #       'input_arg1_name' => 'input arg1 value',
       #       'input_arg2_name' => 'input arg2 value',
       #       'output_arg_name' => [:output, 'int', 'varname']
@@ -107,7 +107,6 @@ module Sequel
         ds.first
       end
 
-      # Microsoft SQL Server uses the :mssql type.
       def database_type
         :mssql
       end
@@ -213,7 +212,7 @@ module Sequel
         dataset.send(:is_2008_or_later?)
       end
 
-      # MSSQL supports savepoints, though it doesn't support committing/releasing them savepoint
+      # MSSQL supports savepoints, though it doesn't support releasing them
       def supports_savepoints?
         true
       end
@@ -255,7 +254,6 @@ module Sequel
         'IDENTITY(1,1)'
       end
       
-      # MSSQL specific syntax for altering tables.
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -295,12 +293,10 @@ module Sequel
         end
       end
       
-      # SQL to start a new savepoint
       def begin_savepoint_sql(depth)
         "SAVE TRANSACTION autopoint_#{depth}"
       end
 
-      # SQL to BEGIN a transaction.
       def begin_transaction_sql
         "BEGIN TRANSACTION"
       end
@@ -318,13 +314,11 @@ module Sequel
         super(default, type)
       end
 
-      # Commit the active transaction on the connection, does not commit/release
-      # savepoints.
+      # Commit the active transaction on the connection, does not release savepoints.
       def commit_transaction(conn, opts=OPTS)
         log_connection_execute(conn, commit_transaction_sql) unless savepoint_level(conn) > 1
       end
 
-      # SQL to COMMIT a transaction.
       def commit_transaction_sql
         "COMMIT TRANSACTION"
       end
@@ -368,12 +362,10 @@ module Sequel
         end
       end
 
-      # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
       
-      # support for clustered index type
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         raise Error, "Partial indexes are not supported for this database" if index[:where] && !supports_partial_indexes?
@@ -403,17 +395,14 @@ module Sequel
         "sp_rename #{literal(quote_schema_table(name))}, #{quote_identifier(schema_and_table(new_name).pop)}"
       end
       
-      # SQL to rollback to a savepoint
       def rollback_savepoint_sql(depth)
         "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_#{depth}"
       end
       
-      # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
         "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION"
       end
       
-      # The closest MSSQL equivalent of a boolean datatype is the bit type.
       def schema_column_type(db_type)
         case db_type
         when /\A(?:bit)\z/io
@@ -535,7 +524,6 @@ module Sequel
         clone(:mssql_unicode_strings=>v)
       end
 
-      # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :'||'
@@ -634,8 +622,8 @@ module Sequel
       #
       # Examples:
       #
-      #   dataset.output(:output_table, [:deleted__id, :deleted__name])
-      #   dataset.output(:output_table, :id => :inserted__id, :name => :inserted__name)
+      #   dataset.output(:output_table, [Sequel[:deleted][:id], Sequel[:deleted][:name]])
+      #   dataset.output(:output_table, id: Sequel[:inserted][:id], name: Sequel[:inserted][:name])
       def output(into, values)
         raise(Error, "SQL Server versions 2000 and earlier do not support the OUTPUT clause") unless supports_output_clause?
         output = {}
@@ -780,7 +768,7 @@ module Sequel
         end
       end
 
-      # MSSQL does not allow ordering in sub-clauses unless 'top' (limit) is specified
+      # MSSQL does not allow ordering in sub-clauses unless TOP (limit) is specified
       def aggregate_dataset
         (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
       end
@@ -869,7 +857,7 @@ module Sequel
         end
       end
       
-      # Microsoft SQL Server 2012 has native support for offsets, but only for ordered datasets.
+      # Microsoft SQL Server 2012+ has native support for offsets, but only for ordered datasets.
       def emulate_offset_with_row_number?
         super && !(is_2012_or_later? && @opts[:order])
       end
@@ -902,7 +890,7 @@ module Sequel
         sql << '0x' << v.unpack("H*").first
       end
       
-      # Use YYYYmmdd format, since that's the only want that is
+      # Use YYYYmmdd format, since that's the only format that is
       # multilanguage and not DATEFORMAT dependent.
       def literal_date(v)
         v.strftime("'%Y%m%d'")
@@ -942,7 +930,7 @@ module Sequel
         end
       end
 
-      # MSSQL uses TOP N for limit.  For MSSQL 2005+ TOP (N) is used
+      # MSSQL 2000 uses TOP N for limit.  For MSSQL 2005+ TOP (N) is used
       # to allow the limit to be a bound variable.
       def select_limit_sql(sql)
         if l = @opts[:limit]
@@ -973,7 +961,7 @@ module Sequel
       end
       alias delete_limit_sql update_limit_sql
 
-      # Support different types of locking styles
+      # Handle dirty, skip locked, and for update locking
       def select_lock_sql(sql)
         lock = @opts[:lock]
         skip_locked = @opts[:skip_locked]
@@ -1025,7 +1013,6 @@ module Sequel
         end
       end
 
-      # SQL fragment for MSSQL's OUTPUT clause.
       def output_sql(sql, type)
         return unless supports_output_clause?
         if output = @opts[:output]

@@ -14,7 +14,7 @@ module Sequel
     #   Sequel::Model.plugin :uuid
     #
     #   # Uuid Album instances, with custom column name
-    #   Album.plugin :uuid, :field=>my_uuid
+    #   Album.plugin :uuid, field: :my_uuid
     module Uuid
       # Configure the plugin by setting the available options.  Note that
       # if this method is run more than once, previous settings are ignored,

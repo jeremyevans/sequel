@@ -9,7 +9,6 @@ module Sequel
     module DatabaseMethods
       include UnmodifiedIdentifiers::DatabaseMethods
 
-      # Access uses type :access as the database_type
       def database_type
         :access
       end
@@ -56,7 +55,6 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
-      # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
@@ -90,8 +88,7 @@ module Sequel
       OPS = {:'%'=>' Mod '.freeze, :'||'=>' & '.freeze}.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}.freeze
 
-      # Access doesn't support CASE, but it can be emulated with nested
-      # IIF function calls.
+      # Access doesn't support CASE, so emulate it with nested IIF function calls.
       def case_expression_sql_append(sql, ce)
         literal_append(sql, ce.with_merged_expression.conditions.reverse.inject(ce.default){|exp,(cond,val)| Sequel::SQL::Function.new(:IIF, cond, val, exp)})
       end
@@ -150,7 +147,7 @@ module Sequel
         end
       end
 
-      # Use Date() and Now() for CURRENT_DATE and CURRENT_TIMESTAMP
+      # Use Date(), Now(), and Time() for CURRENT_DATE, CURRENT_TIMESTAMP, and CURRENT_TIME
       def constant_sql_append(sql, constant)
         case constant
         when :CURRENT_DATE
@@ -278,7 +275,8 @@ module Sequel
         end
       end
 
-      # Access uses [] for quoting identifiers
+      # Access uses [] for quoting identifiers, and can't handle
+      # ] inside identifiers.
       def quoted_identifier_append(sql, v)
         sql << '[' << v.to_s << ']'
       end

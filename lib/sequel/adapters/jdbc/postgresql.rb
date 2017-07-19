@@ -13,8 +13,6 @@ module Sequel
       end
     end
 
-    # Adapter, Database, and Dataset support for accessing a PostgreSQL
-    # database via JDBC.
     module Postgres
       # Return PostgreSQL array types as ruby Arrays instead of
       # JDBC PostgreSQL driver-specific array type. Only used if the
@@ -34,8 +32,6 @@ module Sequel
         end
       end 
 
-      # Methods to add to Database instances that access PostgreSQL via
-      # JDBC.
       module DatabaseMethods
         include Sequel::Postgres::DatabaseMethods
 
@@ -186,7 +182,6 @@ module Sequel
         end
       end
       
-      # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
         

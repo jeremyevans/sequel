@@ -13,13 +13,10 @@ module Sequel
       end
     end
 
-    # Database and Dataset support for HSQLDB databases accessed via JDBC.
     module HSQLDB
-      # Instance methods for HSQLDB Database objects accessed via JDBC.
       module DatabaseMethods
         include ::Sequel::JDBC::Transactions
 
-        # HSQLDB uses the :hsqldb database type.
         def database_type
           :hsqldb
         end
@@ -51,7 +48,6 @@ module Sequel
 
         private
         
-        # HSQLDB specific SQL for renaming columns, and changing column types and/or nullity.
         def alter_table_sql(table, op)
           case op[:op]
           when :add_column
@@ -141,7 +137,6 @@ module Sequel
         end
       end
       
-      # Dataset class for HSQLDB datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         # Handle HSQLDB specific case insensitive LIKE and bitwise operator support.
         def complex_expression_sql_append(sql, op, args)

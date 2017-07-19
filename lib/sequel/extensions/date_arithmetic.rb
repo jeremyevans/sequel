@@ -10,8 +10,8 @@
 # Then you can use the Sequel.date_add and Sequel.date_sub methods
 # to return Sequel expressions:
 #
-#   add = Sequel.date_add(:date_column, :years=>1, :months=>2, :days=>3)
-#   sub = Sequel.date_sub(:date_column, :hours=>1, :minutes=>2, :seconds=>3)
+#   add = Sequel.date_add(:date_column, years: 1, months: 2, days: 3)
+#   sub = Sequel.date_sub(:date_column, hours: 1, minutes: 2, seconds: 3)
 #
 # In addition to specifying the interval as a hash, there is also
 # support for specifying the interval as an ActiveSupport::Duration

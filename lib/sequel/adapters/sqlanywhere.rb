@@ -5,7 +5,6 @@ require 'sqlanywhere'
 Sequel.require %w'shared/sqlanywhere', 'adapters'
 
 module Sequel
-  # Module for holding all SqlAnywhere-related classes and modules for Sequel.
   module SqlAnywhere
 
     class SQLAnywhereException < StandardError
@@ -39,7 +38,6 @@ module Sequel
     end
     SQLANYWHERE_TYPES.freeze
 
-    # Database class for SQLAnywhere databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::SqlAnywhere::DatabaseMethods
 
@@ -73,12 +71,10 @@ module Sequel
         conn
       end
 
-      # Closes given database connection.
       def disconnect_connection(c)
         @api.sqlany_disconnect(c)
       end
 
-      # Returns number of rows affected
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           _execute(conn, :rows, sql, opts)
@@ -141,13 +137,9 @@ module Sequel
       end
     end
 
-    # Dataset class for SqlAnywhere datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::SqlAnywhere::DatasetMethods
 
-      # Yield all rows matching this dataset.  If the dataset is set to
-      # split multiple statements, yield arrays of hashes one per statement
-      # instead of yielding results for all statements as hashes.
       def fetch_rows(sql)
         db = @db
         cps = db.conversion_procs

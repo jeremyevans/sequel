@@ -28,7 +28,7 @@ module Sequel
       end
 
       module ClassMethods
-        # A hash with column symbol keys and default values.  Instance's
+        # A hash with column symbol keys and default values.  Instance
         # values are merged into this hash before creating to reduce the
         # number of free columns (columns that may or may not be present
         # in the INSERT statement), as the number of prepared statements

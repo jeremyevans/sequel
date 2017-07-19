@@ -15,11 +15,11 @@ module Sequel
     #   Sequel::Model.plugin :timestamps
     #
     #   # Timestamp Album instances, with custom column names
-    #   Album.plugin :timestamps, :create=>:created_on, :update=>:updated_on
+    #   Album.plugin :timestamps, create: :created_on, update: :updated_on
     #
     #   # Timestamp Artist instances, forcing an overwrite of the create
     #   # timestamp, and setting the update timestamp when creating
-    #   Album.plugin :timestamps, :force=>true, :update_on_create=>true
+    #   Album.plugin :timestamps, force: true, update_on_create: true
     module Timestamps
       # Configure the plugin by setting the available options.  Note that
       # if this method is run more than once, previous settings are ignored,
@@ -57,7 +57,6 @@ module Sequel
           :@create_timestamp_overwrite=>nil,
           :@set_update_timestamp_on_create=>nil,
           :@update_timestamp_field=>nil)
-        
         
         # Whether to allow manual setting of the update timestamp when creating
         def allow_manual_timestamp_update?

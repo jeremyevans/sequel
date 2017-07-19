@@ -64,12 +64,12 @@
 #
 # You can also use a hash:
 #
-#   DB.row_type(:address, :street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345')
+#   DB.row_type(:address, street: '123 Sesame St.', city: 'Some City', zip: '12345')
 #
 # So if you have a person table that has an address column, here's how you
 # could insert into the column:
 #
-#   DB[:table].insert(:address=>DB.row_type(:address, :street=>'123 Sesame St.', :city=>'Some City', :zip=>'12345'))
+#   DB[:table].insert(address: DB.row_type(:address, street: '123 Sesame St.', city: 'Some City', zip: '12345'))
 #
 # Note that registering row types without providing an explicit :converter option
 # creates anonymous classes.  This results in ruby being unable to Marshal such

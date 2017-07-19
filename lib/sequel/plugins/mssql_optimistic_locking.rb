@@ -12,15 +12,15 @@ module Sequel
     #   end
     #   p1 = Person[1]
     #   p2 = Person[1]
-    #   p1.update(:name=>'Jim') # works
-    #   p2.update(:name=>'Bob') # raises Sequel::NoExistingObject
+    #   p1.update(name: 'Jim') # works
+    #   p2.update(name: 'Bob') # raises Sequel::NoExistingObject
     #
     # In order for this plugin to work, you need to make sure that the database
     # table has a column of timestamp or rowversion.  The plugin uses a default
     # name of timestamp for this columns, but you can override that using the
     # :lock_column option:
     #
-    #     plugin :mssql_optimistic_locking, :lock_column=>:column_name
+    #     plugin :mssql_optimistic_locking, lock_column: :column_name
     #
     # This plugin relies on the instance_filters plugin.
     module MssqlOptimisticLocking

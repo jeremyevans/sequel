@@ -4,7 +4,6 @@ require 'java'
 Sequel.require 'adapters/utils/stored_procedures'
 
 module Sequel
-  # Houses Sequel's JDBC support when running on JRuby.
   module JDBC
     # Make it accesing the java.sql hierarchy more ruby friendly.
     module JavaSQL
@@ -128,8 +127,6 @@ module Sequel
       freeze
     end
 
-    # JDBC Databases offer a fairly uniform interface that does not change
-    # much based on the sub adapter.
     class Database < Sequel::Database
       set_adapter_scheme :jdbc
       
@@ -179,7 +176,8 @@ module Sequel
         end
       end
          
-      # Connect to the database using JavaSQL::DriverManager.getConnection.
+      # Connect to the database using JavaSQL::DriverManager.getConnection, and falling back
+      # to driver.new.connect if the driver is known.
       def connect(server)
         opts = server_opts(server)
         conn = if jndi?
@@ -222,8 +220,6 @@ module Sequel
         c.close
       end
       
-      # Execute the given SQL.  If a block is given, if should be a SELECT
-      # statement or something else that returns rows.
       def execute(sql, opts=OPTS, &block)
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
@@ -250,16 +246,12 @@ module Sequel
       end
       alias execute_dui execute
 
-      # Execute the given DDL SQL, which should not return any
-      # values or rows.
       def execute_ddl(sql, opts=OPTS)
         opts = Hash[opts]
         opts[:type] = :ddl
         execute(sql, opts)
       end
       
-      # Execute the given INSERT SQL, returning the last inserted
-      # row id.
       def execute_insert(sql, opts=OPTS)
         opts = Hash[opts]
         opts[:type] = :insert
@@ -508,15 +500,13 @@ module Sequel
         ts
       end 
       
-      # Log the given SQL and then execute it on the connection, used by
-      # the transaction code.
       def log_connection_execute(conn, sql)
         statement(conn){|s| log_connection_yield(sql, conn){s.execute(sql)}}
       end
 
       # By default, there is no support for determining the last inserted
       # id, so return nil.  This method should be overridden in
-      # sub adapters.
+      # subadapters.
       def last_insert_id(conn, opts)
         nil
       end
@@ -586,8 +576,7 @@ module Sequel
         cps.setString(i, nil)
       end
       
-      # Return the connection.  Used to do configuration on the
-      # connection object before adding it to the connection pool.
+      # Return the connection.  Can be overridden in subadapters for database specific setup.
       def setup_connection(conn)
         conn
       end
@@ -605,7 +594,6 @@ module Sequel
         end
       end
       
-      # Parse the table schema for the given table.
       def schema_parse_table(table, opts=OPTS)
         m = output_identifier_meth(opts[:dataset])
         schema, table = metadata_schema_and_table(table, opts)
@@ -644,8 +632,7 @@ module Sequel
         ts
       end
       
-      # Whether schema_parse_table should skip the given row when
-      # parsing the schema.
+      # Skip tables in the INFORMATION_SCHEMA when parsing columns.
       def schema_parse_table_skip?(h, schema)
         h[:table_schem] == 'INFORMATION_SCHEMA'
       end
@@ -689,7 +676,6 @@ module Sequel
         %w"execute execute_dui") do
           private
 
-          # Same as execute, explicit due to intricacies of alias and super.
           def execute_insert(sql, opts=OPTS)
             sql = self
             opts = Hash[opts]
@@ -705,7 +691,6 @@ module Sequel
         %w"execute execute_dui") do
           private
 
-          # Same as execute, explicit due to intricacies of alias and super.
           def execute_insert(sql, opts=OPTS)
             sql = @opts[:sproc_name]
             opts = Hash[opts]
@@ -716,7 +701,6 @@ module Sequel
           end
       end
       
-      # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
         execute(sql){|result| process_result_set(result, &block)}
         self

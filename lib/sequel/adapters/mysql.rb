@@ -10,7 +10,6 @@ raise(LoadError, "require 'mysql' did not define Mysql::CLIENT_MULTI_RESULTS!\n 
 Sequel.require %w'utils/mysql_mysql2 utils/mysql_prepared_statements', 'adapters'
 
 module Sequel
-  # Module for holding all MySQL-related classes and modules for Sequel.
   module MySQL
     TYPE_TRANSLATOR = tt = Class.new do
       def boolean(s) s.to_i != 0 end
@@ -30,7 +29,6 @@ module Sequel
     end
     MYSQL_TYPES.freeze
 
-    # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
       include Sequel::MySQL::MysqlMysql2::DatabaseMethods
@@ -113,7 +111,6 @@ module Sequel
         conn
       end
       
-      # Closes given database connection.
       def disconnect_connection(c)
         c.close
       rescue Mysql::Error
@@ -141,12 +138,10 @@ module Sequel
         @convert_tinyint_to_bool = v
       end
 
-      # Return the number of matched rows when executing a delete/update statement.
       def execute_dui(sql, opts=OPTS)
         execute(sql, opts){|c| return affected_rows(c)}
       end
 
-      # Return the last inserted id when executing an insert statement.
       def execute_insert(sql, opts=OPTS)
         execute(sql, opts){|c| return c.insert_id}
       end
@@ -157,7 +152,7 @@ module Sequel
         super
       end
 
-      # Return the version of the MySQL server two which we are connecting.
+      # Return the version of the MySQL server to which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
       end
@@ -252,7 +247,6 @@ module Sequel
         end
       end
     
-      # The MySQL adapter main error class is Mysql::Error
       def database_error_classes
         [Mysql::Error]
       end
@@ -265,8 +259,6 @@ module Sequel
         Dataset
       end
 
-      # Raise a disconnect error if the exception message matches the list
-      # of recognized exceptions.
       def disconnect_error?(e, opts)
         super || (e.is_a?(::Mysql::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
       end
@@ -277,7 +269,6 @@ module Sequel
       end
     end
     
-    # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
       include Sequel::MySQL::MysqlMysql2::DatasetMethods
@@ -339,7 +330,6 @@ module Sequel
         field.length != 1
       end
       
-      # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts=OPTS)
         opts = Hash[opts]
         opts[:type] = :select

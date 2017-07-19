@@ -14,8 +14,6 @@ module Sequel
       end
     end
 
-    # Database and Dataset instance methods for JTDS specific
-    # support via JDBC.
     module JTDS
       module DatabaseMethods
         include Sequel::JDBC::MSSQL::DatabaseMethods
@@ -37,7 +35,6 @@ module Sequel
         end
       end
 
-      # Dataset class for JTDS datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::MSSQL::DatasetMethods
       end

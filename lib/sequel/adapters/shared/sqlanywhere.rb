@@ -10,7 +10,6 @@ module Sequel
       # Set whether to convert smallint type to boolean for this Database instance
       attr_accessor :convert_smallint_to_bool
 
-      # Sysbase Server uses the :sqlanywhere type.
       def database_type
         :sqlanywhere
       end
@@ -137,22 +136,18 @@ module Sequel
         false
       end
 
-      # SQL fragment for marking a table as temporary
       def temporary_table_sql
         "GLOBAL TEMPORARY "
       end
 
-      # SQL to BEGIN a transaction.
       def begin_transaction_sql
         "BEGIN TRANSACTION"
       end
 
-      # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
         "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION"
       end
 
-      # SQL to COMMIT a transaction.
       def commit_transaction_sql
         "COMMIT TRANSACTION"
       end
@@ -179,7 +174,6 @@ module Sequel
         :image
       end
 
-      # Sybase specific syntax for altering tables.
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -296,7 +290,6 @@ module Sequel
         true
       end
 
-      # SQLAnywhere uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :'||'
@@ -353,7 +346,7 @@ module Sequel
         string.gsub(/[\\%_\[]/){|m| "\\#{m}"}
       end
 
-      # Use today() and Now() for CURRENT_DATE and CURRENT_TIMESTAMP
+      # Use today() for CURRENT_DATE and now() for CURRENT_TIMESTAMP and CURRENT_TIME
       def constant_sql_append(sql, constant)
         case constant
         when :CURRENT_DATE
@@ -408,8 +401,7 @@ module Sequel
         end
       end
 
-      # Sybase uses TOP N for limit.  For Sybase TOP (N) is used
-      # to allow the limit to be a bound variable.
+      # Sybase uses TOP N for limit.
       def select_limit_sql(sql)
         l = @opts[:limit]
         o = @opts[:offset]

@@ -7,7 +7,7 @@ module Sequel
     # that represents a model class method that returns a dataset:
     #
     #   def Artist.by_name(name)
-    #     where(:name=>name)
+    #     where(name: name)
     #   end
     #
     #   Artist.finder :by_name
@@ -18,7 +18,7 @@ module Sequel
     #
     # The alternative way to use this to pass your own block:
     #
-    #   Artist.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
+    #   Artist.finder(name: :first_by_name){|pl, ds| ds.where(name: pl.arg).limit(1)}
     #
     # Additionally, there is a Model.prepared_finder method.  This works similarly
     # to Model.finder, but uses a prepared statement.  This limits the types of
@@ -50,7 +50,7 @@ module Sequel
         # that represents a model class method that returns a dataset:
         #
         #   def Artist.by_name(name)
-        #     where(:name=>name)
+        #     where(name: name)
         #   end
         #
         #   Artist.finder :by_name
@@ -61,7 +61,7 @@ module Sequel
         #
         # The alternative way to use this to pass your own block:
         #
-        #   Artist.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
+        #   Artist.finder(name: :first_by_name){|pl, ds| ds.where(name: pl.arg).limit(1)}
         #
         # Note that if you pass your own block, you are responsible for manually setting
         # limits if necessary (as shown above).
@@ -86,7 +86,7 @@ module Sequel
         # This doesn't handle all possible cases.  For example, if you have a method such as:
         #
         #   def Artist.by_name(name)
-        #     name ? where(:name=>name) : exclude(:name=>nil)
+        #     name ? where(name: name) : exclude(name: nil)
         #   end
         #
         # Then calling a finder without an argument will not work as you expect.

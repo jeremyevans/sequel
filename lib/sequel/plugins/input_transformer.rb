@@ -7,14 +7,14 @@ module Sequel
     #
     #   Album.plugin :input_transformer
     #   Album.add_input_transformer(:reverser){|v| v.is_a?(String) ? v.reverse : v}
-    #   album = Album.new(:name=>'foo')
+    #   album = Album.new(name: 'foo')
     #   album.name # => 'oof'
     #
     # You can specifically set some columns to skip some input
     # input transformers:
     #
     #   Album.skip_input_transformer(:reverser, :foo)
-    #   Album.new(:foo=>'bar').foo # => 'bar'
+    #   Album.new(foo: 'bar').foo # => 'bar'
     # 
     # Usage:
     #

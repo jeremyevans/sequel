@@ -37,8 +37,6 @@ module Sequel
       array.join("\n")
     end
 
-    ### Private Module Methods ###
-
     # Hash of the maximum size of the value for each column 
     def self.column_sizes(records, columns) # :nodoc:
       sizes = Hash.new {0}

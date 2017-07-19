@@ -18,10 +18,10 @@ module Sequel
     # and dependency action values.  You can provide the hash to the plugin call itself or
     # to the add_association_dependencies method:
     #
-    #   Business.plugin :association_dependencies, :address=>:delete
+    #   Business.plugin :association_dependencies, address: :delete
     #   # or:
     #   Artist.plugin :association_dependencies
-    #   Artist.add_association_dependencies :albums=>:destroy, :reviews=>:delete, :tags=>:nullify
+    #   Artist.add_association_dependencies albums: :destroy, reviews: :delete, tags: :nullify
     module AssociationDependencies
       # Mapping of association types to when the dependency calls should be made (either
       # :before for in before_destroy or :after for in after_destroy)
@@ -50,7 +50,7 @@ module Sequel
         attr_reader :association_dependencies
 
         # Add association dependencies to this model.  The hash should have association name
-        # symbol keys and dependency action symbol values (e.g. :albums=>:destroy).
+        # symbol keys and dependency action symbol values (e.g. albums: :destroy).
         def add_association_dependencies(hash)
           hash.each do |association, action|
             raise(Error, "Nonexistent association: #{association}") unless r = association_reflection(association)

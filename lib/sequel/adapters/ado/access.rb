@@ -129,7 +129,7 @@ module Sequel
           ado_schema_views.map {|tbl| m.call(tbl['TABLE_NAME'])}
         end
         
-        # Note OpenSchema returns compound indexes as multiple rows
+        # OpenSchema returns compound indexes as multiple rows
         def indexes(table_name,opts=OPTS)
           m = output_identifier_meth
           idxs = ado_schema_indexes(table_name).inject({}) do |memo, idx|
@@ -144,7 +144,7 @@ module Sequel
           idxs
         end
 
-        # Note OpenSchema returns compound foreign key relationships as multiple rows
+        # OpenSchema returns compound foreign key relationships as multiple rows
         def foreign_key_list(table, opts=OPTS)
           m = output_identifier_meth
           fks = ado_schema_foreign_keys(table).inject({}) do |memo, fk|
@@ -307,7 +307,6 @@ module Sequel
         # This is like execute() in that it yields an ADO RecordSet, except
         # instead of an SQL interface there's this OpenSchema call
         # cf. http://msdn.microsoft.com/en-us/library/ee275721(v=bts.10)
-        #
         def execute_open_ado_schema(type, criteria=[])
           ado_schema = AdoSchema.new(type, criteria)
           synchronize(opts[:server]) do |conn|
