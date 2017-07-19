@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module UnmodifiedIdentifiers
     module DatabaseMethods
