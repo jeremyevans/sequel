@@ -10,9 +10,7 @@ This is very useful for quick testing of ideas, and does not affect the environm
 
 If you've installed the sequel gem, then just running "sequel" should load the program, since rubygems should place the sequel binary in your load path.  However, if you want to run bin/sequel from the root of a repository checkout, you should probably do:
 
-  ruby -I lib bin/sequel
-
-The -I lib makes sure that you are using the repository checkout's code.
+  ruby bin/sequel
 
 == Choosing the Database to Connect to
 
