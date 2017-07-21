@@ -172,10 +172,11 @@ module Sequel
     #
     #   DB.add_servers(f: {host: "hash_host_f"})
     def add_servers(servers)
-      unless h = @opts[:servers]
+      unless sharded?
         raise Error, "cannot call Database#add_servers on a Database instance that does not use a sharded connection pool"
       end
 
+      h = @opts[:servers]
       Sequel.synchronize{h.merge!(servers)}
       @pool.add_servers(servers.keys)
     end
@@ -224,10 +225,11 @@ module Sequel
     #
     #   DB.remove_servers(:f1, :f2)
     def remove_servers(*servers)
-      unless h = @opts[:servers]
+      unless sharded?
         raise Error, "cannot call Database#remove_servers on a Database instance that does not use a sharded connection pool"
       end
 
+      h = @opts[:servers]
       servers.flatten.each{|s| Sequel.synchronize{h.delete(s)}}
       @pool.remove_servers(servers)
     end
