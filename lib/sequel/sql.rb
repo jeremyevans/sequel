@@ -989,11 +989,6 @@ module Sequel
       # The alias to use for the expression
       attr_reader :alias
 
-      def aliaz
-        Sequel::Deprecation.deprecate("Sequel::SQL::AliasedExpression#aliaz", "Use #alias instead")
-        self.alias
-      end
-
       # The columns aliases to use, for when the aliased expression is
       # a record or set of records (such as a dataset). 
       attr_reader :columns
