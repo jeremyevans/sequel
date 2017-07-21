@@ -137,13 +137,6 @@ module Sequel
           define_serialized_attribute_accessor(serializer, deserializer, *columns)
         end
         
-        # The columns that will be serialized.  This is only for
-        # backwards compatibility, use serialization_map in new code.
-        def serialized_columns
-          Sequel::Deprecation.deprecate("#{self}.serialized_columns in the serialization plugin", "Use #{self}.serialization_map.keys instead")
-          serialization_map.keys
-        end
-
         private
 
         # Add serializated attribute acessor methods to the serialization_module
