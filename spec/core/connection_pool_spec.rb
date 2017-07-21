@@ -26,10 +26,6 @@ describe "An empty ConnectionPool" do
     @cpool.allocated.must_equal({})
   end
 
-  deprecated "should have a created_count of zero" do
-    @cpool.created_count.must_equal 0
-  end
-
   it "should have a size of zero" do
     @cpool.size.must_equal 0
   end

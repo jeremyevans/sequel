@@ -99,12 +99,6 @@ class Sequel::ConnectionPool
     @error_classes = db.send(:database_error_classes).dup.freeze
   end
   
-  # Alias for +size+, not aliased directly for ease of subclass implementation
-  def created_count(*args)
-    Sequel::Deprecation.deprecate("Sequel::ConnectionPool#created_count", "Use #size instead")
-    size(*args)
-  end
-  
   # An array of symbols for all shards/servers, which is a single <tt>:default</tt> by default.
   def servers
     [:default]
