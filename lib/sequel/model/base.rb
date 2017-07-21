@@ -1929,7 +1929,6 @@ module Sequel
         @values = Hash[@values]
         @changed_columns = @changed_columns.dup if @changed_columns
         @errors = @errors.dup if @errors
-        @this = @this.dup if @this
         self
       end
 
