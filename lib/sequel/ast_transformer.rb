@@ -55,7 +55,7 @@ module Sequel
         end
         SQL::Function.new!(o.name, v(o.args), h)
       when SQL::Subscript
-        SQL::Subscript.new(v(o.f), v(o.sub))
+        SQL::Subscript.new(v(o.expression), v(o.sub))
       when SQL::Window
         opts = o.opts.dup
         opts[:partition] = v(opts[:partition]) if opts[:partition]

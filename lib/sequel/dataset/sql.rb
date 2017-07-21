@@ -695,9 +695,10 @@ module Sequel
 
     # Append literalization of subscripts (SQL array accesses) to SQL string.
     def subscript_sql_append(sql, s)
-      literal_append(sql, s.f)
+      literal_append(sql, s.expression)
       sql << '['
-      if s.sub.length == 1 && (range = s.sub.first).is_a?(Range)
+      sub = s.sub
+      if sub.length == 1 && (range = sub.first).is_a?(Range)
         literal_append(sql, range.begin)
         sql << ':'
         e = range.end

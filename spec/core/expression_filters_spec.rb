@@ -1012,6 +1012,10 @@ describe "Sequel core extension replacements" do
     l(Sequel.subscript(:a, 1...3), 'a[1:2]')
   end
 
+  it "Sequel.subscript.f should be subscript expression for backwards compatibility" do
+    Sequel.subscript(:a, 1).f.must_equal :a
+  end
+
   it "Sequel.function should return an SQL function" do
     l(Sequel.function(:a), 'a()')
     l(Sequel.function(:a, 1), 'a(1)')

@@ -1724,14 +1724,15 @@ module Sequel
     # Represents an SQL array access, with multiple possible arguments.
     class Subscript < GenericExpression
       # The SQL array column
-      attr_reader :f
+      attr_reader :expression
+      alias f expression
 
       # The array of subscripts to use (should be an array of numbers)
       attr_reader :sub
 
       # Set the array column and subscripts to the given arguments
-      def initialize(f, sub)
-        @f = f
+      def initialize(expression, sub)
+        @expression = expression
         @sub = sub
         freeze
       end
@@ -1742,7 +1743,7 @@ module Sequel
       #   Sequel[:a].sql_subscript(2) # a[2]
       #   Sequel[:a].sql_subscript(2) | 1 # a[2, 1]
       def |(sub)
-        Subscript.new(@f, @sub + Array(sub))
+        Subscript.new(@expression, @sub + Array(sub))
       end
 
       # Create a new +Subscript+ by accessing a subarray of a multidimensional
