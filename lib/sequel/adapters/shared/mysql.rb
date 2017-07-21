@@ -667,17 +667,6 @@ module Sequel
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
       end
 
-      # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
-      # Raises an error on use of :full_outer type, since MySQL doesn't support it.
-      def join_table(type, table, expr=nil, opts=OPTS, &block)
-        if (type == :cross) && !expr.nil?
-           Sequel::Deprecation.deprecate(":cross join type with conditions being converted to INNER JOIN on MySQL", "Use :inner join type instead")
-          type = :inner
-        end
-        raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN or NATURAL FULL JOIN") if type == :full_outer || type == :natural_full
-        super(type, table, expr, opts, &block)
-      end
-      
       # Transforms :straight to STRAIGHT_JOIN.
       def join_type_sql(join_type)
         if join_type == :straight

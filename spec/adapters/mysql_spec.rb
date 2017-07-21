@@ -294,30 +294,6 @@ describe "MySQL join expressions" do
     @ds = DB[:nodes]
   end
 
-  it "should raise error for :full_outer join requests." do
-    lambda{@ds.join_table(:full_outer, :nodes)}.must_raise(Sequel::Error)
-  end
-  it "should raise error for :natural_full join requests." do
-    lambda{@ds.join_table(:natural_full, :nodes)}.must_raise(Sequel::Error)
-  end
-  it "should support natural left joins" do
-    @ds.join_table(:natural_left, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL LEFT JOIN `nodes`'
-  end
-  it "should support natural right joins" do
-    @ds.join_table(:natural_right, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL RIGHT JOIN `nodes`'
-  end
-  it "should support natural left outer joins" do
-    @ds.join_table(:natural_left_outer, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL LEFT OUTER JOIN `nodes`'
-  end
-  it "should support natural right outer joins" do
-    @ds.join_table(:natural_right_outer, :nodes).sql.must_equal 'SELECT * FROM `nodes` NATURAL RIGHT OUTER JOIN `nodes`'
-  end
-  it "should support cross joins" do
-    @ds.join_table(:cross, :nodes).sql.must_equal 'SELECT * FROM `nodes` CROSS JOIN `nodes`'
-  end
-  deprecated "should support cross joins as inner joins if conditions are used" do
-    @ds.join_table(:cross, :nodes, :id=>:id).sql.must_equal 'SELECT * FROM `nodes` INNER JOIN `nodes` ON (`nodes`.`id` = `nodes`.`id`)'
-  end
   it "should support straight joins (force left table to be read before right)" do
     @ds.join_table(:straight, :nodes).sql.must_equal 'SELECT * FROM `nodes` STRAIGHT_JOIN `nodes`'
   end
