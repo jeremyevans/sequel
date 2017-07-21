@@ -69,7 +69,7 @@ module Sequel
         if v.is_a?(Date) && !v.is_a?(DateTime)
           # Dates handled specially as they are assumed to already be in the application_timezone
           if datetime_class == DateTime
-            DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? (defined?(Rational) ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : Time.local(v.year, v.month, v.day).utc_offset/86400.0) : 0)
+            DateTime.civil(v.year, v.month, v.day, 0, 0, 0, application_timezone == :local ? Rational(Time.local(v.year, v.month, v.day).utc_offset, 86400) : 0)
           else
             Time.public_send(application_timezone == :utc ? :utc : :local, v.year, v.month, v.day)
           end
@@ -149,7 +149,7 @@ module Sequel
       when Array
         y, mo, d, h, mi, s, ns, off = v
         if datetime_class == DateTime
-          s += (defined?(Rational) ? Rational(ns, 1000000000) : ns/1000000000.0) if ns
+          s += Rational(ns, 1000000000) if ns
           if off
             DateTime.civil(y, mo, d, h, mi, s, off)
           else
@@ -203,7 +203,7 @@ module Sequel
     # Caches offset conversions to avoid excess Rational math.
     def time_offset_to_datetime_offset(offset_secs)
       @local_offsets ||= {}
-      @local_offsets[offset_secs] ||= respond_to?(:Rational, true) ? Rational(offset_secs, 60*60*24) : offset_secs/60/60/24.0
+      @local_offsets[offset_secs] ||= Rational(offset_secs, 86400)
     end
   end
 
