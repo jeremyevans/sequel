@@ -14,9 +14,7 @@ module Sequel
     # Raises Sequel::AdapterNotFound if the adapter
     # could not be loaded.
     def self.adapter_class(scheme)
-      return scheme if scheme.is_a?(Class)
-      scheme = scheme.to_sym
-      load_adapter(scheme)
+      scheme.is_a?(Class) ? scheme : load_adapter(scheme.to_sym)
     end
 
     # Returns the scheme symbol for the Database class.
