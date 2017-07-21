@@ -2043,11 +2043,6 @@ describe Sequel::Model, "many_to_many" do
     @c2.new(:id => 1234).attributes_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
   end
   
-  deprecated "should respect :eager_loading_predicate_key when lazily loading" do
-    @c2.many_to_many :attributes, :class => @c1, :eager_loading_predicate_key=>Sequel.subscript(Sequel[:attributes_nodes][:node_id], 0)
-    @c2.new(:id => 1234).attributes_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id[0] = 1234)'
-  end
-  
   it "should respect :predicate_key when lazily loading" do
     @c2.many_to_many :attributes, :class => @c1, :predicate_key=>Sequel.subscript(Sequel[:attributes_nodes][:node_id], 0)
     @c2.new(:id => 1234).attributes_dataset.sql.must_equal 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id[0] = 1234)'
