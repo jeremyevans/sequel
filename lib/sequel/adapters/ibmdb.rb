@@ -26,11 +26,6 @@ module Sequel
       # a two element array with an sql string and cached Statement value.
       attr_reader :prepared_statements
 
-      def prepared_statements=(v)
-        Sequel::Deprecation.deprecate("Sequel::IBMDB::Connection#prepared_statements=", "Use replace on the hash instead of reassigning it")
-        @prepared_statements = v
-      end
-
       # Error class for exceptions raised by the connection.
       class Error < StandardError
         attr_reader :sqlstate
