@@ -242,6 +242,7 @@ module Sequel
         # giving the columns to update in each backing database table.
         # For backwards compatibility.
         def cti_columns
+          Sequel::Deprecation.deprecate("#{self}.cti_columns", "Use #{self}.cti_models to get the models, cti_table_name to get the name for the model, and cti_table_columns to get the columns for the model")
           h = {}
           cti_models.each { |m| h[m.cti_table_name] = m.cti_table_columns }
           h

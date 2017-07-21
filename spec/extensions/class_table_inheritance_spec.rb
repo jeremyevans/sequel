@@ -585,7 +585,7 @@ describe "class_table_inheritance plugin with :alias option" do
     Executive.cti_models.first.must_equal Employee
   end
 
-  it "#cti_columns should be a mapping of table names to columns" do
+  deprecated "#cti_columns should be a mapping of table names to columns" do
     Executive.cti_columns.must_equal(:employees=>[:id, :name, :kind], :managers=>[:id, :num_staff], :executives=>[:id, :num_managers])
   end
 
@@ -1117,7 +1117,7 @@ describe "class_table_inheritance plugin with :alias option" do
     Executive.cti_models.first.must_equal Employee
   end
 
-  it "#cti_columns should be a mapping of table names to columns" do
+  deprecated "#cti_columns should be a mapping of table names to columns" do
     Executive.cti_columns.must_equal(:employees=>[:id, :name, :kind], :managers=>[:id, :num_staff], :executives=>[:id, :num_managers])
   end
 
