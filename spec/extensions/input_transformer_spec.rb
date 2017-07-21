@@ -56,7 +56,6 @@ describe "Sequel::Plugins::InputTransformer" do
     @c.skip_input_transformer :reverser, :name
     @c.freeze
     @c.input_transformers.frozen?.must_equal true
-    @c.input_transformer_order.frozen?.must_equal true
     skip = @c.instance_variable_get(:@skip_input_transformer_columns)
     skip.frozen?.must_equal true
     skip.values.all?(&:frozen?).must_equal true

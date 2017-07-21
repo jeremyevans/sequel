@@ -27,7 +27,6 @@ module Sequel
       def self.apply(model, *)
         model.instance_exec do
           @input_transformers = {}
-          @input_transformer_order = []
           @skip_input_transformer_columns = {}
         end
       end
@@ -42,23 +41,23 @@ module Sequel
         # Hash of input transformer name symbols to transformer callables.
         attr_reader :input_transformers
 
-        # The order in which to call the input transformers.
-        attr_reader :input_transformer_order
+        # The order in which to call the input transformers. For backwards compatibility only.
+        def input_transformer_order
+          input_transformers.keys.reverse
+        end
 
-        Plugins.inherited_instance_variables(self, :@skip_input_transformer_columns=>:hash_dup, :@input_transformers=>:dup, :@input_transformer_order=>:dup)
+        Plugins.inherited_instance_variables(self, :@skip_input_transformer_columns=>:hash_dup, :@input_transformers=>:dup)
 
         # Add an input transformer to this model.
         def add_input_transformer(transformer_name, &block)
           raise(Error, 'must provide both transformer name and block when adding input transformer') unless transformer_name && block
           @input_transformers[transformer_name] = block
-          @input_transformer_order.unshift(transformer_name)
           @skip_input_transformer_columns[transformer_name] = []
         end
 
         # Freeze input transformers when freezing model class
         def freeze
           @input_transformers.freeze
-          @input_transformer_order.freeze
           @skip_input_transformer_columns.freeze.each_value(&:freeze)
 
           super
@@ -79,8 +78,8 @@ module Sequel
         # Transform the input using all of the transformers, except those explicitly
         # skipped, before setting the value in the model object.
         def []=(k, v)
-          model.input_transformer_order.each do |transformer_name|
-            v = model.input_transformers[transformer_name].call(v) unless model.skip_input_transformer?(transformer_name, k)
+          model.input_transformers.reverse_each do |name, transformer|
+            v = transformer.call(v) unless model.skip_input_transformer?(name, k)
           end
           super
         end
