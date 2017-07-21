@@ -1,5 +1,7 @@
 === master
 
+* Deprecate DEFAULT_OPTIONS in validation_helpers, override default_validation_helpers_options private method instead (jeremyevans)
+
 * Deprecate model association before callbacks returning false to cancel the action (jeremyevans)
 
 * Support native offset syntax on Oracle 12 (timon) (#1397)

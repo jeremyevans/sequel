@@ -86,7 +86,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.must_be :valid?
   end
   
-  it "should support modifying default options for all models" do
+  deprecated "should support modifying default options for all models" do
     @c.set_validations{validates_presence(:value)}
     @m.wont_be :valid?
     @m.errors.must_equal(:value=>['is not present'])
@@ -104,7 +104,6 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.wont_be :valid?
     @m.errors.must_equal(:value=>["was not entered"])
 
-    
     c = Class.new(Sequel::Model)
     c.class_eval do
       plugin :validation_helpers
