@@ -318,7 +318,7 @@ describe "MySQL join expressions" do
   it "should support cross joins" do
     @ds.join_table(:cross, :nodes).sql.must_equal 'SELECT * FROM `nodes` CROSS JOIN `nodes`'
   end
-  it "should support cross joins as inner joins if conditions are used" do
+  deprecated "should support cross joins as inner joins if conditions are used" do
     @ds.join_table(:cross, :nodes, :id=>:id).sql.must_equal 'SELECT * FROM `nodes` INNER JOIN `nodes` ON (`nodes`.`id` = `nodes`.`id`)'
   end
   it "should support straight joins (force left table to be read before right)" do
