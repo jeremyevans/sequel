@@ -2398,9 +2398,8 @@ module Sequel
 
         # If a block is given, assign it as the :callback option in the hash, and return the hash.
         def load_association_objects_options(dynamic_opts, &block)
-          dynamic_opts = Hash[dynamic_opts]
-
-          if block_given?
+          if block
+            dynamic_opts = Hash[dynamic_opts]
             dynamic_opts[:callback] = block
           end
 
@@ -2408,7 +2407,7 @@ module Sequel
         end
 
         # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
-        def load_associated_objects(opts, dynamic_opts=nil, &block)
+        def load_associated_objects(opts, dynamic_opts, &block)
           dynamic_opts = load_association_objects_options(dynamic_opts, &block)
           name = opts[:name]
           if associations.include?(name) && !dynamic_opts[:callback] && !dynamic_opts[:reload]
