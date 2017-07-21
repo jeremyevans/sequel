@@ -57,5 +57,5 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
     hold{}
   end
 
-  CONNECTION_POOL_MAP[[true, false]] = self
+  CONNECTION_POOL__MAP[[true, false]] = self
 end

@@ -1100,7 +1100,7 @@ AllConnectionPoolClassesSpecs = shared_description do
   end
 end
 
-Sequel::ConnectionPool::CONNECTION_POOL_MAP.keys.each do |k, v|
+Sequel::ConnectionPool::CONNECTION_POOL__MAP.keys.each do |k, v|
   opts = {:single_threaded=>k, :servers=>(v ? {} : nil)}
   describe "Connection pool with #{opts.inspect}" do
     before(:all) do

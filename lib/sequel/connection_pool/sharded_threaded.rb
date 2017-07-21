@@ -353,5 +353,5 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     disconnect_connection(conn)
   end
   
-  CONNECTION_POOL_MAP[[false, true]] = self
+  CONNECTION_POOL__MAP[[false, true]] = self
 end

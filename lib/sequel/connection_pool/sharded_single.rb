@@ -111,5 +111,5 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     servers.each{|s| hold(s){}}
   end
   
-  CONNECTION_POOL_MAP[[true, true]] = self
+  CONNECTION_POOL__MAP[[true, true]] = self
 end

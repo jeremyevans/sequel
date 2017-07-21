@@ -36,6 +36,8 @@ class Sequel::ConnectionPool
     [true, true] => :sharded_single,
     [false, false] => :threaded,
     [false, true] => :sharded_threaded}
+  CONNECTION_POOL__MAP = CONNECTION_POOL_MAP
+  Sequel::Deprecation.deprecate_constant(self, :CONNECTION_POOL_MAP)
   
   # Class methods used to return an appropriate pool subclass, separated
   # into a module for easier overridding by extensions.
@@ -58,7 +60,7 @@ class Sequel::ConnectionPool
     
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
-      CONNECTION_POOL_MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL_MAP[[!!opts[:single_threaded], !!opts[:servers]]]
+      CONNECTION_POOL__MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL__MAP[[!!opts[:single_threaded], !!opts[:servers]]]
     end
   end
   extend ClassMethods

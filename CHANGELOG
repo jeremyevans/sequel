@@ -1,5 +1,7 @@
 === master
 
+* Deprecate ConnectionPool::CONNECTION_POOL_MAP, use the :pool_class option to specify a non-default connection pool (jeremyevans)
+
 * Deprecate Sequel::IBMDB::Connection#prepared_statements= in the ibmdb adapter (jeremyevans)
 
 * Deprecate DEFAULT_OPTIONS in validation_helpers, override default_validation_helpers_options private method instead (jeremyevans)
