@@ -26,8 +26,12 @@ describe "An empty ConnectionPool" do
     @cpool.allocated.must_equal({})
   end
 
-  it "should have a created_count of zero" do
+  deprecated "should have a created_count of zero" do
     @cpool.created_count.must_equal 0
+  end
+
+  it "should have a size of zero" do
+    @cpool.size.must_equal 0
   end
 end
 
@@ -54,11 +58,11 @@ describe "A connection pool handling connections" do
     @cpool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| msp.call}){:got_connection}, CONNECTION_POOL_DEFAULTS.merge(:max_connections=>@max_size))
   end
 
-  it "#hold should increment #created_count" do
+  it "#hold should increment #size" do
     @cpool.hold do
-      @cpool.created_count.must_equal 1
-      @cpool.hold {@cpool.hold {@cpool.created_count.must_equal 1}}
-      Thread.new{@cpool.hold {_(@cpool.created_count).must_equal 2}}.join
+      @cpool.size.must_equal 1
+      @cpool.hold {@cpool.hold {@cpool.size.must_equal 1}}
+      Thread.new{@cpool.hold {_(@cpool.size).must_equal 2}}.join
     end
   end
 
@@ -100,7 +104,7 @@ describe "A connection pool handling connections" do
     q = Queue.new
     50.times{Thread.new{@cpool.hold{q.pop}}}
     50.times{q.push nil}
-    @cpool.created_count.must_be :<=,  @max_size
+    @cpool.size.must_be :<=,  @max_size
   end
 
   it "database's disconnect connection method should be called when a disconnect is detected" do
@@ -110,16 +114,16 @@ describe "A connection pool handling connections" do
   end
 
   it "#hold should remove the connection if a DatabaseDisconnectError is raised" do
-    @cpool.created_count.must_equal 0
+    @cpool.size.must_equal 0
     q, q1 = Queue.new, Queue.new
     @cpool.hold{Thread.new{@cpool.hold{q1.pop; q.push nil}; q1.pop; q.push nil}; q1.push nil; q.pop; q1.push nil; q.pop}
-    @cpool.created_count.must_equal 2
+    @cpool.size.must_equal 2
     proc{@cpool.hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::DatabaseDisconnectError)
-    @cpool.created_count.must_equal 1
+    @cpool.size.must_equal 1
     proc{@cpool.hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::DatabaseDisconnectError)
-    @cpool.created_count.must_equal 0
+    @cpool.size.must_equal 0
     proc{@cpool.hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::DatabaseDisconnectError)
-    @cpool.created_count.must_equal 0
+    @cpool.size.must_equal 0
   end
 end
 
@@ -127,13 +131,13 @@ describe "A connection pool handling connection errors" do
   it "#hold should raise a Sequel::DatabaseConnectionError if an exception is raised by the connection_proc" do
     cpool = Sequel::ConnectionPool.get_pool(mock_db.call{raise Interrupt}, CONNECTION_POOL_DEFAULTS)
     proc{cpool.hold{:block_return}}.must_raise(Sequel::DatabaseConnectionError)
-    cpool.created_count.must_equal 0
+    cpool.size.must_equal 0
   end
 
   it "#hold should raise a Sequel::DatabaseConnectionError if nil is returned by the connection_proc" do
     cpool = Sequel::ConnectionPool.get_pool(mock_db.call{nil}, CONNECTION_POOL_DEFAULTS)
     proc{cpool.hold{:block_return}}.must_raise(Sequel::DatabaseConnectionError)
-    cpool.created_count.must_equal 0
+    cpool.size.must_equal 0
   end
 end
 

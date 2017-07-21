@@ -92,6 +92,7 @@ class Sequel::ConnectionPool
   
   # Alias for +size+, not aliased directly for ease of subclass implementation
   def created_count(*args)
+    Sequel::Deprecation.deprecate("Sequel::ConnectionPool#created_count", "Use #size instead")
     size(*args)
   end
   
