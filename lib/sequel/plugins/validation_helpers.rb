@@ -89,9 +89,8 @@ module Sequel
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
         :presence=>{:message=>lambda{"is not present"}},
         :unique=>{:message=>lambda{'is already taken'}}
-      }
-      DEFAULT__OPTIONS = DEFAULT_OPTIONS
-      Sequel::Deprecation.deprecate_constant(self, :DEFAULT_OPTIONS)
+      }.freeze
+      DEFAULT_OPTIONS.each_value(&:freeze)
 
       module InstanceMethods 
         # Check that the attribute values are the given exact length.
@@ -276,7 +275,7 @@ module Sequel
         # The hash return must include a :message option that is either a
         # proc or string.
         def default_validation_helpers_options(type)
-          DEFAULT__OPTIONS[type]
+          DEFAULT_OPTIONS[type]
         end
 
         # Skip validating any attribute that matches one of the allow_* options.

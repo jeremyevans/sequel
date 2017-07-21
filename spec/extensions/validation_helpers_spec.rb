@@ -86,38 +86,6 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.must_be :valid?
   end
   
-  deprecated "should support modifying default options for all models" do
-    @c.set_validations{validates_presence(:value)}
-    @m.wont_be :valid?
-    @m.errors.must_equal(:value=>['is not present'])
-    o = Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence].dup
-    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence][:message] = lambda{"was not entered"}
-    @m.wont_be :valid?
-    @m.errors.must_equal(:value=>["was not entered"])
-    @m.value = 1
-    @m.must_be :valid?
-    
-    @m.values.clear
-    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence][:allow_missing] = true
-    @m.must_be :valid?
-    @m.value = nil
-    @m.wont_be :valid?
-    @m.errors.must_equal(:value=>["was not entered"])
-
-    c = Class.new(Sequel::Model)
-    c.class_eval do
-      plugin :validation_helpers
-      set_columns([:value])
-      def validate
-        validates_presence(:value)
-      end
-    end
-    m = c.new(:value=>nil)
-    m.wont_be :valid?
-    m.errors.must_equal(:value=>["was not entered"])
-    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence] = o
-  end
-  
   it "should support modifying default validation options for a particular model" do
     @c.set_validations{validates_presence(:value)}
     @m.wont_be :valid?
