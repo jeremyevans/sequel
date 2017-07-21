@@ -59,7 +59,7 @@ describe "Serialization plugin" do
     DB.sqls.map{|s| s.sub("...\n", '')}.must_equal ["INSERT INTO items (abc) VALUES ('--- 1\n')", "INSERT INTO items (abc) VALUES ('--- hello\n')"]
   end
 
-  it "serialized_columns should be the columns serialized" do
+  deprecated "serialized_columns should be the columns serialized" do
     @c.plugin :serialization, :yaml, :abc
     @c.serialized_columns.must_equal [:abc]
   end
