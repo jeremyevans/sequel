@@ -57,12 +57,17 @@ module Sequel
       # with that type as a constant.  Types given should either already
       # be constants/classes or a capitalized string/symbol with the same name
       # as a constant/class.
-      #
-      # Do not call this method with untrusted input, as that can result in
-      # arbitrary code execution.
       def self.add_type_method(*types)
         types.each do |type|
-          class_eval("def #{type}(name, opts={}); column(name, #{type}, opts); end", __FILE__, __LINE__)
+          case type
+          when Symbol, String
+            method = type
+            type = Object.const_get(type)
+          else
+            method = type.to_s
+          end
+
+          define_method(method){|name, opts={}| column(name, type, opts)}
         end
         nil
       end

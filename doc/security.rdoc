@@ -19,7 +19,6 @@ could conceivably be abused to do so:
 * Sequel::Dataset.def_sql_method
 * Sequel::JDBC.load_driver
 * Sequel::Plugins.def_dataset_methods
-* Sequel::Schema::CreateTableGenerator.add_type_method
 * Sequel::Dataset.prepared_statements_module (private)
 * Sequel::SQL::Expression.to_s_method (private)
 
