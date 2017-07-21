@@ -17,7 +17,7 @@ module Sequel
       
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
-        :clob=>lambda(&:read)
+        :clob=>:read.to_proc
       }.freeze
 
       # Hash of conversion procs for this database.

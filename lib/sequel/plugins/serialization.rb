@@ -37,9 +37,7 @@ module Sequel
     #
     #   # Register custom serializer/deserializer pair, if desired
     #   require 'sequel/plugins/serialization'
-    #   Sequel::Plugins::Serialization.register_format(:reverse,
-    #     lambda(&:reverse),
-    #     lambda(&:reverse))
+    #   Sequel::Plugins::Serialization.register_format(:reverse, :reverse.to_proc, :reverse.to_proc)
     #
     #   class User < Sequel::Model
     #     # Built-in format support when loading the plugin
@@ -101,8 +99,8 @@ module Sequel
           v = v.unpack('m')[0] unless v[0..1] == "\x04\x08"
           Marshal.load(v)
         end)
-      register_format(:yaml, lambda(&:to_yaml), lambda{|v| YAML.load(v)})
-      register_format(:json, lambda{|v| Sequel.object_to_json(v)}, lambda{|v| Sequel.parse_json(v)})
+      register_format(:yaml, :to_yaml.to_proc, lambda{|s| YAML.load(s)})
+      register_format(:json, Sequel.method(:object_to_json), Sequel.method(:parse_json))
 
       module ClassMethods
         # A hash with column name symbols and callable values, with the value

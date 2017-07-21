@@ -115,17 +115,17 @@ module Sequel
     module XmlSerializer
       module ClassMethods
         # Proc that camelizes the input string, used for the :camelize option
-        CAMELIZE = proc(&:camelize)
+        CAMELIZE = :camelize.to_proc
 
         # Proc that dasherizes the input string, used for the :dasherize option
-        DASHERIZE = proc(&:dasherize)
+        DASHERIZE = :dasherize.to_proc
 
         # Proc that returns the input string as is, used if
         # no :name_proc, :dasherize, or :camelize option is used.
         IDENTITY = proc{|s| s}
 
         # Proc that underscores the input string, used for the :underscore option
-        UNDERSCORE = proc(&:underscore)
+        UNDERSCORE = :underscore.to_proc
 
         # Return an array of instances of this class based on
         # the provided XML.
