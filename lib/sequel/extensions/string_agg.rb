@@ -147,6 +147,7 @@ module Sequel
       def initialize(expr, separator=nil)
         @expr = expr
         @separator = separator
+        freeze
       end
 
       # Whether the current expression uses distinct expressions 
@@ -158,14 +159,14 @@ module Sequel
       def distinct
         sa = dup
         sa.instance_variable_set(:@distinct, true)
-        sa
+        sa.freeze
       end
 
       # Return a modified StringAgg with the given order
       def order(*o)
         sa = dup
-        sa.instance_variable_set(:@order_expr, o.empty? ? nil : o)
-        sa
+        sa.instance_variable_set(:@order_expr, o.empty? ? nil : o.freeze)
+        sa.freeze
       end
 
       to_s_method :string_agg_sql

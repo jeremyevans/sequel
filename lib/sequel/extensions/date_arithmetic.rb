@@ -178,12 +178,15 @@ module Sequel
                raise Sequel::InvalidValue, "cannot provide String value as interval part: #{v.inspect}"
              end
           end
-          interval
+          Hash[interval]
         else
           h = Hash.new(0)
           interval.parts.each{|unit, value| h[unit] += value}
           Hash[h]
         end
+
+        @interval.freeze
+        freeze
       end
 
       to_s_method :date_add_sql
