@@ -151,7 +151,7 @@ class String
   # Example
   #   "puni_puni".dasherize #=> "puni-puni"
   def dasherize
-    gsub(/_/, '-')
+    gsub('_', '-')
   end
 
   # Removes the module part from the expression in the string
@@ -181,7 +181,7 @@ class String
   #   "employee_salary" #=> "Employee salary"
   #   "author_id" #=> "Author"
   def humanize
-    gsub(/_id$/, "").gsub(/_/, " ").capitalize
+    gsub(/_id$/, "").gsub('_', " ").capitalize
   end
 
   # Returns the plural form of the word in the string.

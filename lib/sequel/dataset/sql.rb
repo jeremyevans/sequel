@@ -1213,7 +1213,7 @@ module Sequel
 
     # Append literalization of string to SQL string.
     def literal_string_append(sql, v)
-      sql << "'" << v.gsub(/'/, "''") << "'"
+      sql << "'" << v.gsub("'", "''") << "'"
     end
 
     # Append literalization of symbol to SQL string.
