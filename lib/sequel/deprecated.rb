@@ -20,7 +20,7 @@ module Sequel
   module Deprecation
     @backtrace_filter = 10
     @output = $stderr
-    @prefix = "SEQUEL DEPRECATION WARNING: "
+    @prefix = "SEQUEL DEPRECATION WARNING: ".freeze
 
     class << self
       # How to filter backtraces.  +false+ does not include backtraces, +true+ includes
