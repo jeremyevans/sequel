@@ -1319,11 +1319,6 @@ module Sequel
       # The SQL function to call
       attr_reader :name
 
-      def f
-        Sequel::Deprecation.deprecate("Sequel::SQL::Function#f", "Use #name instead")
-        name
-      end
-      
       # The array of arguments to pass to the function (may be blank)
       attr_reader :args
 
