@@ -110,6 +110,4 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   def preconnect(concurrent = nil)
     servers.each{|s| hold(s){}}
   end
-  
-  CONNECTION_POOL__MAP[[true, true]] = self
 end

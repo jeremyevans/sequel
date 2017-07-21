@@ -18,16 +18,6 @@ describe "An empty ConnectionPool" do
     @cpool = Sequel::ConnectionPool.get_pool(mock_db.call, CONNECTION_POOL_DEFAULTS)
   end
 
-  deprecated "should support :pool_class option with string" do
-    begin
-      c = Class.new(Sequel::ConnectionPool)
-      Sequel::ConnectionPool::CONNECTION_POOL__MAP[:foo] = c
-      Sequel::ConnectionPool.get_pool(mock_db.call, :pool_class=>:foo).must_be_instance_of c
-    ensure
-      Sequel::ConnectionPool::CONNECTION_POOL__MAP.delete(c)
-    end
-  end
-
   it "should have no available connections" do
     @cpool.available_connections.must_equal []
   end
@@ -1101,16 +1091,18 @@ AllConnectionPoolClassesSpecs = shared_description do
   end
 end
 
-Sequel::ConnectionPool::CONNECTION_POOL__MAP.keys.each do |k, v|
-  opts = {:single_threaded=>k, :servers=>(v ? {} : nil)}
-  describe "Connection pool with #{opts.inspect}" do
-    before(:all) do
-      Sequel::ConnectionPool.send(:get_pool, mock_db.call, opts)
-    end
-    before do
-      @class = Sequel::ConnectionPool.send(:connection_pool_class, opts)
-    end
+[true, false].each do |k|
+  [true, false].each do |v|
+    opts = {:single_threaded=>k, :servers=>(v ? {} : nil)}
+    describe "Connection pool with #{opts.inspect}" do
+      before(:all) do
+        Sequel::ConnectionPool.send(:get_pool, mock_db.call, opts)
+      end
+      before do
+        @class = Sequel::ConnectionPool.send(:connection_pool_class, opts)
+      end
 
-    include AllConnectionPoolClassesSpecs
+      include AllConnectionPoolClassesSpecs
+    end
   end
 end

@@ -281,6 +281,4 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   def sync
     @mutex.synchronize{yield}
   end
-  
-  CONNECTION_POOL__MAP[[false, false]] = self
 end

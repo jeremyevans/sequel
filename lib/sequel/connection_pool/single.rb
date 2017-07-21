@@ -56,6 +56,4 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   def preconnect(concurrent = nil)
     hold{}
   end
-
-  CONNECTION_POOL__MAP[[true, false]] = self
 end

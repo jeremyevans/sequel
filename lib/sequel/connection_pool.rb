@@ -27,14 +27,6 @@
 class Sequel::ConnectionPool
   OPTS = Sequel::OPTS
 
-  # A map of [single threaded, sharded] values to symbols or ConnectionPool subclasses.
-  CONNECTION_POOL_MAP = {[true, false] => :single, 
-    [true, true] => :sharded_single,
-    [false, false] => :threaded,
-    [false, true] => :sharded_threaded}
-  CONNECTION_POOL__MAP = CONNECTION_POOL_MAP
-  Sequel::Deprecation.deprecate_constant(self, :CONNECTION_POOL_MAP)
-  
   # Class methods used to return an appropriate pool subclass, separated
   # into a module for easier overridding by extensions.
   module ClassMethods
@@ -43,23 +35,41 @@ class Sequel::ConnectionPool
     # use a new instance of an appropriate pool subclass based on the
     # <tt>:single_threaded</tt> and <tt>:servers</tt> options.
     def get_pool(db, opts = OPTS)
-      case v = connection_pool_class(opts)
-      when Class
-        v.new(db, opts)
-      when Symbol
-        require("sequel/connection_pool/#{v}")
-        connection_pool_class(opts).new(db, opts) || raise(Sequel::Error, "No connection pool class found")
-      end
+      connection_pool_class(opts).new(db, opts)
     end
     
     private
     
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
-      if opts[:pool_class] && !opts[:pool_class].is_a?(Class) && ![:threaded, :single, :sharded_threaded, :sharded_single].include?(opts[:pool_class])
-        Sequel::Deprecation.deprecate("Using an unrecognized :pool_class option", "Use a class for the :pool_class option to select a custom pool class, or one of the following symbols for one of the default pool classes: :threaded, :single, :sharded_threaded, :sharded_single")
+      if pc = opts[:pool_class]
+        unless pc.is_a?(Class)
+          require("sequel/connection_pool/#{pc}")
+
+          pc = case pc
+          when :threaded
+            Sequel::ThreadedConnectionPool
+          when :single
+            Sequel::SingleConnectionPool
+          when :sharded_threaded
+            Sequel::ShardedThreadedConnectionPool
+          when :sharded_single
+            Sequel::ShardedSingleConnectionPool
+          else
+            raise Sequel::Error, "unsupported connection pool type, please pass appropriate class as the :pool_class option"
+          end
+        end
+
+        pc
+      else
+        pc = if opts[:single_threaded]
+          opts[:servers] ? :sharded_single : :single
+        else
+          opts[:servers] ? :sharded_threaded : :threaded
+        end
+
+        connection_pool_class(:pool_class=>pc)
       end
-      CONNECTION_POOL__MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL__MAP[[!!opts[:single_threaded], !!opts[:servers]]]
     end
   end
   extend ClassMethods

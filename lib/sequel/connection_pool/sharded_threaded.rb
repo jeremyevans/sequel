@@ -352,6 +352,4 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     allocated(server).delete(thread) if @servers.include?(server)
     disconnect_connection(conn)
   end
-  
-  CONNECTION_POOL__MAP[[false, true]] = self
 end
