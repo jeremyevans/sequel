@@ -1199,17 +1199,17 @@ module Sequel
 
       # Return a BooleanExpression with the same op and args.
       def sql_boolean
-        BooleanExpression.new(self.op, *self.args)
+        BooleanExpression.new(op, *args)
       end
 
       # Return a NumericExpression with the same op and args.
       def sql_number
-        NumericExpression.new(self.op, *self.args)
+        NumericExpression.new(op, *args)
       end
 
       # Return a StringExpression with the same op and args.
       def sql_string
-        StringExpression.new(self.op, *self.args)
+        StringExpression.new(op, *args)
       end
     end
 
