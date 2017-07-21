@@ -62,7 +62,7 @@ module Sequel
   module SQL
     # Base class for all SQL expression objects.
     class Expression
-      @comparison_attrs = []
+      @comparison_attrs = [].freeze
 
       class << self
         # All attributes used for equality and hash methods.
@@ -94,6 +94,7 @@ module Sequel
         # arbitrary code execution.
         def to_s_method(meth, args=:self) # :nodoc:
           class_eval("def to_s_append(ds, sql) ds.#{meth}_append(sql, #{args}) end", __FILE__, __LINE__)
+          @comparison_attrs.freeze
         end
       end
 
