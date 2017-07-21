@@ -14,6 +14,7 @@ module Sequel
           @association_reflections = {}
           @autoreloading_associations = {}
           @cache_associations = true
+          @default_eager_limit_strategy = true
           @default_association_options = {}
           @default_association_type_options = {}
           @dataset_module_class = DatasetModule
