@@ -73,12 +73,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     @available_connections[server]
   end
   
-  # The total number of connections opened for the given server, should
-  # be equal to available_connections.length + allocated.length.  Nonexistent
-  # servers will return the created count of the default server.
+  # The total number of connections opened for the given server.
+  # Nonexistent servers will return the created count of the default server.
+  # The calling code should not have the mutex before calling this.
   def size(server=:default)
-    server = @servers[server]
-    @allocated[server].length + @available_connections[server].length
+    @mutex.synchronize{_size(server)}
   end
   
   # Removes all connections currently available on all servers, optionally
@@ -177,6 +176,13 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     end
   end
   
+  # The total number of connections opened for the given server.
+  # The calling code should already have the mutex before calling this.
+  def _size(server)
+    server = @servers[server]
+    @allocated[server].length + @available_connections[server].length
+  end
+  
   # Assigns a connection to the supplied thread, if one
   # is available. The calling code should NOT already have the mutex when
   # calling this.
@@ -252,11 +258,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # the server is less than the maximum size of the pool. The calling code
   # should already have the mutex before calling this.
   def make_new(server)
-    if (n = size(server)) >= @max_size
+    if (n = _size(server)) >= @max_size
       allocated(server).to_a.each{|t, c| release(t, c, server) unless t.alive?}
       n = nil
     end
-    default_make_new(server) if (n || size(server)) < @max_size
+    default_make_new(server) if (n || _size(server)) < @max_size
   end
 
   # Return the next available connection in the pool for the given server, or nil
@@ -284,7 +290,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   
   # Create the maximum number of connections to each server immediately.
   def preconnect(concurrent = false)
-    conn_servers = @servers.keys.map{|s| Array.new(max_size - size(s), s)}.flatten
+    conn_servers = @servers.keys.map{|s| Array.new(max_size - _size(s), s)}.flatten
 
     if concurrent
       conn_servers.map{|s| Thread.new{[s, make_new(s)]}}.map(&:join).each{|t| checkin_connection(*t.value)}

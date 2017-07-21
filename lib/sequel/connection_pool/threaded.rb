@@ -106,12 +106,18 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   end
   
   # The total number of connections opened, either available or allocated.
-  # This may not be completely accurate as it isn't protected by the mutex.
+  # The calling code should not have the mutex before calling this.
   def size
-    @allocated.length + @available_connections.length
+    @mutex.synchronize{_size}
   end
   
   private
+
+  # The total number of connections opened, either available or allocated.
+  # The calling code should already have the mutex before calling this.
+  def _size
+    @allocated.length + @available_connections.length
+  end
 
   # Assigns a connection to the supplied thread, if one
   # is available. The calling code should already have the mutex when
@@ -184,11 +190,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # the server is less than the maximum size of the pool. The calling code
   # should already have the mutex before calling this.
   def make_new(server)
-    if (n = size) >= @max_size
+    if (n = _size) >= @max_size
       @allocated.keys.each{|t| release(t) unless t.alive?}
       n = nil
     end
-    super if (n || size) < @max_size
+    super if (n || _size) < @max_size
   end
 
   # Return the next available connection in the pool, or nil if there
@@ -211,7 +217,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   
   # Create the maximum number of connections immediately.
   def preconnect(concurrent = false)
-    enum = (max_size - size).times
+    enum = (max_size - _size).times
 
     if concurrent
       enum.map{Thread.new{make_new(nil)}}.map(&:join).each{|t| checkin_connection(t.value)}
