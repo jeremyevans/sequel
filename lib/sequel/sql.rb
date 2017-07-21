@@ -1030,10 +1030,13 @@ module Sequel
       # The expression to alias
       attr_reader :expression
 
-      # The alias to use for the expression, not +alias+ since that is
-      # a keyword in ruby.
-      attr_reader :aliaz
-      alias_method :alias, :aliaz
+      # The alias to use for the expression
+      attr_reader :alias
+
+      def aliaz
+        Sequel::Deprecation.deprecate("Sequel::SQL::AliasedExpression#aliaz", "Use #alias instead")
+        self.alias
+      end
 
       # The columns aliases to use, for when the aliased expression is
       # a record or set of records (such as a dataset). 
@@ -1042,7 +1045,7 @@ module Sequel
       # Create an object with the given expression and alias.
       def initialize(expression, aliaz, columns=nil)
         @expression = expression
-        @aliaz = aliaz
+        @alias = aliaz
         @columns = columns
         freeze
       end

@@ -1,5 +1,7 @@
 === master
 
+* Deprecate SQL::AliasedExpression#aliaz, use #alias instead (jeremyevans)
+
 * Deprecate SQL::Function#f, use #name instead (jeremyevans)
 
 * Deprecate treating cross join with conditions as inner join on MySQL (jeremyevans)

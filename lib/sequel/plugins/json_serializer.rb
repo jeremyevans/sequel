@@ -321,7 +321,7 @@ module Sequel
             if inc.is_a?(Hash)
               inc.each do |k, v|
                 if k.is_a?(Sequel::SQL::AliasedExpression)
-                  key_name = k.aliaz.to_s
+                  key_name = k.alias.to_s
                   k = k.expression
                 else
                   key_name = k.to_s
@@ -346,7 +346,7 @@ module Sequel
             else
               Array(inc).each do |c|
                 if c.is_a?(Sequel::SQL::AliasedExpression)
-                  key_name = c.aliaz.to_s
+                  key_name = c.alias.to_s
                   c = c.expression
                 else
                   key_name = c.to_s
