@@ -80,7 +80,7 @@ module Sequel
     module SingleTableInheritance
       # Setup the necessary STI variables, see the module RDoc for SingleTableInheritance
       def self.configure(model, key, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @sti_key_array = nil
           @sti_key = key 
           @sti_dataset = dataset
@@ -171,7 +171,7 @@ module Sequel
           sti_subclass_added(key)
           rp = dataset.row_proc
           subclass.set_dataset(sti_subclass_dataset(key), :inherited=>true)
-          subclass.instance_eval do
+          subclass.instance_exec do
             @dataset = @dataset.with_row_proc(rp)
             @sti_key_array = key
             self.simple_table = nil

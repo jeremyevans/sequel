@@ -37,7 +37,7 @@ module Sequel
         @indexes = []
         @constraints = []
         @primary_key = nil
-        instance_eval(&block) if block
+        instance_exec(&block) if block
         @columns.unshift(@primary_key) if @primary_key && !has_column?(primary_key_name)
       end
 
@@ -339,7 +339,7 @@ module Sequel
       def initialize(db, &block)
         @db = db
         @operations = []
-        instance_eval(&block) if block
+        instance_exec(&block) if block
       end
       
       # Add a column with the given name, type, and opts.

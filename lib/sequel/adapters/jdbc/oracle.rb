@@ -33,7 +33,7 @@ module Sequel
         include Sequel::JDBC::Transactions
 
         def self.extended(db)
-          db.instance_eval do
+          db.instance_exec do
             @autosequence = opts[:autosequence]
             @primary_key_sequences = {}
           end

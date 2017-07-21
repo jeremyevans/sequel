@@ -85,7 +85,7 @@ module Sequel
         # Create the local hash of database type strings to schema type symbols,
         # used for array types local to this database.
         def self.extended(db)
-          db.instance_eval do
+          db.instance_exec do
             @pg_array_schema_types ||= {}
             register_array_type('timestamp without time zone', :oid=>1115, :scalar_oid=>1114, :type_symbol=>:datetime)
             register_array_type('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime)

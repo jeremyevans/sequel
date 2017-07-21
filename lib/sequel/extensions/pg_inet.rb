@@ -39,7 +39,7 @@ module Sequel
       # it will pick up the inet/cidr converter.  Also, extend the datasets
       # with support for literalizing the IPAddr types.
       def self.extended(db)
-        db.instance_eval do
+        db.instance_exec do
           extend_datasets(InetDatasetMethods)
           meth = IPAddr.method(:new)
           add_conversion_proc(869, meth)

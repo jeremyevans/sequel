@@ -60,7 +60,7 @@ module Sequel
       #            for better performance as the shared frozen objects can be used
       #            directly.  If set to false, new instances are created.
       def self.configure(model, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @static_cache_frozen = opts.fetch(:frozen, true)
           load_cache
         end

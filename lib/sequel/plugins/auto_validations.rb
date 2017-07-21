@@ -60,7 +60,7 @@ module Sequel
       UNIQUE_OPTIONS = NOT_NULL_OPTIONS
 
       def self.apply(model, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           plugin :validation_helpers
           @auto_validate_presence = false
           @auto_validate_not_null_columns = []
@@ -81,7 +81,7 @@ module Sequel
 
       # Setup auto validations for the model if it has a dataset.
       def self.configure(model, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           setup_auto_validations if @dataset
           if opts[:not_null] == :presence
             @auto_validate_presence = true

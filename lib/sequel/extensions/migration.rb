@@ -100,11 +100,11 @@ module Sequel
     end
 
     # Apply the appropriate block on the +Database+
-    # instance using instance_eval.
+    # instance using instance_exec.
     def apply(db, direction)
       raise(ArgumentError, "Invalid migration direction specified (#{direction.inspect})") unless [:up, :down].include?(direction)
       if prok = public_send(direction)
-        db.instance_eval(&prok)
+        db.instance_exec(&prok)
       end
     end
   end
@@ -118,11 +118,11 @@ module Sequel
       new(&block).migration
     end
 
-    # Create a new migration class, and instance_eval the block.
+    # Create a new migration class, and instance_exec the block.
     def initialize(&block)
       @migration = SimpleMigration.new
       Migration.descendants << migration
-      instance_eval(&block)
+      instance_exec(&block)
     end
 
     # Defines the migration's down action.
@@ -171,7 +171,7 @@ module Sequel
     # the given block.
     def reverse(&block)
       begin
-        instance_eval(&block)
+        instance_exec(&block)
       rescue
         just_raise = true
       end
@@ -231,7 +231,7 @@ module Sequel
     end
 
     def reverse(&block)
-      instance_eval(&block)
+      instance_exec(&block)
       actions = @actions.reverse
       # Allow calling private methods as the reversing methods are private
       Proc.new{actions.each{|a| send(*a)}}

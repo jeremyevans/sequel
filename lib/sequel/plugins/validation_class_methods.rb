@@ -56,7 +56,7 @@ module Sequel
           # Initializes a new generator.
           def initialize(receiver ,&block)
             @receiver = receiver
-            instance_eval(&block)
+            instance_exec(&block)
           end
       
           # Delegates method calls to the receiver by calling receiver.validates_xxx.
@@ -188,7 +188,7 @@ module Sequel
         #                   Sequel will attempt to insert a NULL value into the database, instead of using the
         #                   database's default.
         # :allow_nil :: Whether to skip the validation if the value is nil.
-        # :if :: A symbol (indicating an instance_method) or proc (which is instance_evaled)
+        # :if :: A symbol (indicating an instance_method) or proc (which is instance_execed)
         #        skipping this validation if it returns nil or false.
         # :tag :: The tag to use for this validation.
         def validates_each(*atts, &block)
@@ -435,7 +435,7 @@ module Sequel
           when Symbol
             o.get_column_value(i)
           when Proc
-            o.instance_eval(&i)
+            o.instance_exec(&i)
           else
             raise(::Sequel::Error, "invalid value for :if validation option")
           end

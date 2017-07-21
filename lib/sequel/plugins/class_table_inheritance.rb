@@ -199,7 +199,7 @@ module Sequel
       def self.configure(model, opts = OPTS)
         SingleTableInheritance.configure model, opts[:key], opts
 
-        model.instance_eval do
+        model.instance_exec do
           @cti_models = [self]
           @cti_tables = [table_name]
           @cti_instance_dataset = @instance_dataset
@@ -248,7 +248,7 @@ module Sequel
           ds = sti_dataset
 
           # Prevent inherited in model/base.rb from setting the dataset
-          subclass.instance_eval { @dataset = nil }
+          subclass.instance_exec { @dataset = nil }
 
           super
 
@@ -269,7 +269,7 @@ module Sequel
           return unless table
 
           pk = primary_key
-          subclass.instance_eval do
+          subclass.instance_exec do
             if cti_tables.length == 1
               ds = ds.select(*self.columns.map{|cc| Sequel.qualify(cti_table_name, Sequel.identifier(cc))})
             end

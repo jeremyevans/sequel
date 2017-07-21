@@ -89,9 +89,9 @@ module Sequel
       end
 
       module InstanceMethods
-        [:before_create, :before_update, :before_validation, :before_save, :before_destroy].each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; super end", __FILE__, __LINE__)}
+        [:before_create, :before_update, :before_validation, :before_save, :before_destroy].each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| instance_exec(&b)}; super end", __FILE__, __LINE__)}
 
-        [:after_create, :after_update, :after_validation, :after_save, :after_destroy].each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
+        [:after_create, :after_update, :after_validation, :after_save, :after_destroy].each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_exec(&b)}; end", __FILE__, __LINE__)}
       end
     end
   end

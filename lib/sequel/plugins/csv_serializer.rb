@@ -70,7 +70,7 @@ module Sequel
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values
       def self.configure(model, opts = OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @csv_serializer_opts = (@csv_serializer_opts || OPTS).merge(opts)
         end
       end

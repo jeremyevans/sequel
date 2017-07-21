@@ -22,7 +22,7 @@
 # generally want to create it first, before creating any other application
 # tables.
 #
-# Because migrations instance_eval the up and down blocks on a database,
+# Because migrations instance_exec the up and down blocks on a database,
 # using this extension in a migration can be done via:
 #
 #   Sequel.migration do
@@ -43,7 +43,7 @@
 # similar to the validation_helpers model plugin API.  However,
 # instead of having separate validates_* methods, it just adds a validate
 # method that accepts a block to the schema generators.  Like the
-# create_table and alter_table blocks, this block is instance_evaled and
+# create_table and alter_table blocks, this block is instance_execed and
 # offers its own DSL. Example:
 #
 #   DB.create_table(:table) do
@@ -56,8 +56,8 @@
 #     end
 #   end
 #
-# instance_eval is used in this case because create_table and alter_table
-# already use instance_eval, so losing access to the surrounding receiver
+# instance_exec is used in this case because create_table and alter_table
+# already use instance_exec, so losing access to the surrounding receiver
 # is not an issue.
 #
 # Here's a breakdown of the constraints created for each constraint validation
@@ -196,9 +196,9 @@ module Sequel
         @generator.validation({:type=>:drop, :name=>constraint})
       end
 
-      # Alias of instance_eval for a nicer API.
+      # Alias of instance_exec for a nicer API.
       def process(&block)
-        instance_eval(&block)
+        instance_exec(&block)
       end
     end
 
@@ -260,7 +260,7 @@ module Sequel
       super do
         extend CreateTableGeneratorMethods
         @validations = []
-        instance_eval(&block) if block
+        instance_exec(&block) if block
       end
     end
 
@@ -308,7 +308,7 @@ module Sequel
       super do
         extend AlterTableGeneratorMethods
         @validations = []
-        instance_eval(&block) if block
+        instance_exec(&block) if block
       end
     end
 

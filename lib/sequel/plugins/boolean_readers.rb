@@ -28,7 +28,7 @@ module Sequel
       # Add the boolean_attribute? class method to the model, and create
       # attribute? boolean reader methods for the class's columns if the class has a dataset.
       def self.configure(model, &block)
-        model.instance_eval do
+        model.instance_exec do
           define_singleton_method(:boolean_attribute?, &(block || DEFAULT_BOOLEAN_ATTRIBUTE_PROC))
           send(:create_boolean_readers) if @dataset
         end

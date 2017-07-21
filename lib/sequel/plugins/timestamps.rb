@@ -30,7 +30,7 @@ module Sequel
       # :update :: The field to hold the update timestamp (default: :updated_at)
       # :update_on_create :: Whether to set the update timestamp to the create timestamp when creating (default: false)
       def self.configure(model, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @allow_manual_timestamp_update = opts[:allow_manual_update]||false
           @create_timestamp_field = opts[:create]||:created_at
           @update_timestamp_field = opts[:update]||:updated_at

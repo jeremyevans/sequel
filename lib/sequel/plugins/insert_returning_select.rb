@@ -21,7 +21,7 @@ module Sequel
       # Modify the current model's dataset selection, if the model
       # has a dataset.
       def self.configure(model)
-        model.instance_eval do
+        model.instance_exec do
           self.dataset = dataset if @dataset && @dataset.opts[:select]
         end
       end

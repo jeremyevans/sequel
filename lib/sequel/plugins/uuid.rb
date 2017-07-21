@@ -22,7 +22,7 @@ module Sequel
       # :field :: The field to hold the uuid (default: :uuid)
       # :force :: Whether to overwrite an existing uuid (default: false)
       def self.configure(model, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @uuid_field = opts[:field]||:uuid
           @uuid_overwrite = opts[:force]||false
         end

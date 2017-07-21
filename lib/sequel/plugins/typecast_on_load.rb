@@ -23,7 +23,7 @@ module Sequel
     module TypecastOnLoad
       # Call add_typecast_on_load_columns on the passed column arguments.
       def self.configure(model, *columns)
-        model.instance_eval do
+        model.instance_exec do
           @typecast_on_load_columns ||= []
           add_typecast_on_load_columns(*columns)
         end

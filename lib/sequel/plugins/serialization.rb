@@ -75,7 +75,7 @@ module Sequel
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values.
       def self.apply(model, *args)
-        model.instance_eval do
+        model.instance_exec do
           @deserialization_map = {}
           @serialization_map = {}
         end

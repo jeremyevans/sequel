@@ -7,7 +7,7 @@ module Sequel
     Sequel::Database.set_shared_adapter_scheme(:mysql, self)
 
     def self.mock_adapter_setup(db)
-      db.instance_eval do
+      db.instance_exec do
         @server_version = 50617
       end
     end

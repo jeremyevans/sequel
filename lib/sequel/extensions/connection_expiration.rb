@@ -40,7 +40,7 @@ module Sequel
 
     # Initialize the data structures used by this extension.
     def self.extended(pool)
-      pool.instance_eval do
+      pool.instance_exec do
         sync do
           @connection_expiration_timestamps ||= {}
           @connection_expiration_timeout ||= 14400

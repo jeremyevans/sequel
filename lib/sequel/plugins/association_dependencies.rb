@@ -32,7 +32,7 @@ module Sequel
 
       # Initialize the association_dependencies hash for this model.
       def self.apply(model, hash=OPTS)
-        model.instance_eval{@association_dependencies = {:before_delete=>[], :before_destroy=>[], :before_nullify=>[], :after_delete=>[], :after_destroy=>[]}}
+        model.instance_exec{@association_dependencies = {:before_delete=>[], :before_destroy=>[], :before_nullify=>[], :after_delete=>[], :after_destroy=>[]}}
       end
 
       # Call add_association_dependencies with any dependencies given in the plugin call.
@@ -97,7 +97,7 @@ module Sequel
         def before_destroy
           model.association_dependencies[:before_delete].each{|m| public_send(m).delete}
           model.association_dependencies[:before_destroy].each{|m| public_send(m).destroy}
-          model.association_dependencies[:before_nullify].each{|p| instance_eval(&p)}
+          model.association_dependencies[:before_nullify].each{|p| instance_exec(&p)}
           super
         end
       end

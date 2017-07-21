@@ -92,7 +92,7 @@ module Sequel
       (@uncountables << words).flatten!
     end
 
-    instance_eval(&DEFAULT_INFLECTIONS_PROC)
+    instance_exec(&DEFAULT_INFLECTIONS_PROC)
 
     private
 

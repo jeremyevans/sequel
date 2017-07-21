@@ -30,7 +30,7 @@ module Sequel
     module BooleanSubsets
       # Create boolean subset methods for each boolean column.
       def self.configure(model, &block)
-        model.instance_eval do
+        model.instance_exec do
           define_singleton_method(:boolean_subset_args, &block) if block
           create_boolean_subsets if @dataset
         end

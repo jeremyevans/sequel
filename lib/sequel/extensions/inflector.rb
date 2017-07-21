@@ -96,7 +96,7 @@ class String
     end
 
     Sequel.require('default_inflections', 'model')
-    instance_eval(&Sequel::DEFAULT_INFLECTIONS_PROC)
+    instance_exec(&Sequel::DEFAULT_INFLECTIONS_PROC)
   end
 
   # Yield the Inflections module if a block is given, and return

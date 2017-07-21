@@ -370,7 +370,7 @@ module Sequel
 
         # Do some setup for the data structures the module uses.
         def self.extended(db)
-          db.instance_eval do
+          db.instance_exec do
             @row_types = {}
             @row_schema_types = {}
             extend(@row_type_method_module = Module.new)

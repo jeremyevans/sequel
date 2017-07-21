@@ -38,7 +38,7 @@ module Sequel
       # Set the specific columns to refresh, if the :columns option
       # is provided.
       def self.configure(model, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @update_refresh_columns = Array(opts[:columns]) || []
         end
       end

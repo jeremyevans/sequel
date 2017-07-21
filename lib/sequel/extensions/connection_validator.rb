@@ -60,7 +60,7 @@ module Sequel
 
     # Initialize the data structures used by this extension.
     def self.extended(pool)
-      pool.instance_eval do
+      pool.instance_exec do
         sync do
           @connection_timestamps ||= {}
           @connection_validation_timeout ||= 3600

@@ -51,7 +51,7 @@ module Sequel
     #   Album.plugin :association_proxies
     module AssociationProxies
       def self.configure(model, &block)
-        model.instance_eval do
+        model.instance_exec do
           @association_proxy_to_dataset = block if block
           @association_proxy_to_dataset ||= AssociationProxy::DEFAULT_PROXY_TO_DATASET
         end

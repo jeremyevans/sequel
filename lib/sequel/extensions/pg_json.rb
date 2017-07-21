@@ -128,7 +128,7 @@ module Sequel
     # Methods enabling Database object integration with the json type.
     module JSONDatabaseMethods
       def self.extended(db)
-        db.instance_eval do
+        db.instance_exec do
           add_conversion_proc(114, JSONDatabaseMethods.method(:db_parse_json))
           add_conversion_proc(3802, JSONDatabaseMethods.method(:db_parse_jsonb))
           if respond_to?(:register_array_type)

@@ -7,7 +7,7 @@ module Sequel
     Sequel::Database.set_shared_adapter_scheme(:sqlite, self)
 
     def self.mock_adapter_setup(db)
-      db.instance_eval do
+      db.instance_exec do
         @sqlite_version = 30903
       end
     end

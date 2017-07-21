@@ -1796,7 +1796,7 @@ module Sequel
     #   # Argument yielded to block
     #   ds.where{|r| r.name < 2} # SELECT * FROM t WHERE (name < 2)
     #
-    #   # Block without argument (instance_eval)
+    #   # Block without argument (instance_exec)
     #   ds.where{name < 2} # SELECT * FROM t WHERE (name < 2)
     #
     #   # Functions

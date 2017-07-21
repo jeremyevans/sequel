@@ -42,7 +42,7 @@ module Sequel
       # Set the cache_store and cache_ttl attributes for the given model.
       # If the :ttl option is not given, 3600 seconds is the default.
       def self.configure(model, store, opts=OPTS)
-        model.instance_eval do
+        model.instance_exec do
           @cache_store = store
           @cache_ttl = opts[:ttl] || 3600
           @cache_ignore_exceptions = opts[:ignore_exceptions]

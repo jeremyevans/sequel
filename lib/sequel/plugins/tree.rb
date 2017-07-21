@@ -33,7 +33,7 @@ module Sequel
         opts = opts.dup
         opts[:class] = model
 
-        model.instance_eval do
+        model.instance_exec do
           @parent_column = (opts[:key] ||= :parent_id)
           @tree_order = opts[:order]
         end

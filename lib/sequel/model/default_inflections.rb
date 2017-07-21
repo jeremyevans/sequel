@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 module Sequel
-  # Proc that is instance evaled to create the default inflections for both the
+  # Proc that is instance_execed to create the default inflections for both the
   # model inflector and the inflector extension.
   DEFAULT_INFLECTIONS_PROC = proc do
     plural(/$/, 's')

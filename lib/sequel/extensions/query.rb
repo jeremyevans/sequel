@@ -39,7 +39,7 @@ module Sequel
   module DatasetQuery
     # Translates a query block into a dataset. Query blocks are an
     # alternative to Sequel's usual method chaining, by using
-    # instance_eval with a proxy object:
+    # instance_exec with a proxy object:
     #
     #   dataset = DB[:items].query do
     #     select :x, :y, :z
@@ -52,7 +52,7 @@ module Sequel
     #  dataset = DB[:items].select(:x, :y, :z).where{(x > 1) & (y > 2)}.reverse(:z)
     def query(&block)
       query = Dataset::Query.new(self)
-      query.instance_eval(&block)
+      query.instance_exec(&block)
       query.dataset
     end
   end

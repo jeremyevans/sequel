@@ -28,7 +28,7 @@ module Sequel
         model.plugin(:input_transformer, :string_stripper){|v| (v.is_a?(String) && !v.is_a?(SQL::Blob)) ? v.strip : v}
       end
       def self.configure(model)
-        model.instance_eval{set_skipped_string_stripping_columns if @dataset}
+        model.instance_exec{set_skipped_string_stripping_columns if @dataset}
       end
 
       module ClassMethods

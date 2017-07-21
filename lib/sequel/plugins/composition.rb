@@ -32,9 +32,9 @@ module Sequel
     #
     # The :mapping option is just a shortcut that works in particular
     # cases.  To handle any case, you can define a custom :composer
-    # and :decomposer procs.  The :composer proc will be instance_evaled
+    # and :decomposer procs.  The :composer proc will be instance_execed
     # the first time the getter is called, and the :decomposer proc
-    # will be instance_evaled before saving.  The above example could
+    # will be instance_execed before saving.  The above example could
     # also be implemented as:
     #
     #   Album.composition :date,
@@ -58,7 +58,7 @@ module Sequel
     module Composition
       # Define the necessary class instance variables.
       def self.apply(model)
-        model.instance_eval do
+        model.instance_exec do
           @compositions = {}
           include(@composition_module ||= Module.new)
         end
@@ -74,9 +74,9 @@ module Sequel
         #
         # Options:
         # :class :: if using the :mapping option, the class to use, as a Class, String or Symbol.
-        # :composer :: A proc that is instance evaled when the composition getter method is called
+        # :composer :: A proc that is instance_execed when the composition getter method is called
         #              to create the composition.
-        # :decomposer :: A proc that is instance evaled before saving the model object,
+        # :decomposer :: A proc that is instance_execed before saving the model object,
         #                if the composition object exists, which sets the columns in the model object
         #                based on the value of the composition object.
         # :mapping :: An array where each element is either a symbol or an array of two symbols.
@@ -135,9 +135,9 @@ module Sequel
               if compositions.has_key?(name)
                 compositions[name]
               elsif frozen?
-                instance_eval(&composer)
+                instance_exec(&composer)
               else
-                compositions[name] = instance_eval(&composer)
+                compositions[name] = instance_exec(&composer)
               end
             end
             define_method("#{name}=") do |v|
@@ -171,7 +171,7 @@ module Sequel
         # For each composition, set the columns in the model class based
         # on the composition object.
         def before_validation
-          @compositions.keys.each{|n| instance_eval(&model.compositions[n][:decomposer])} if @compositions
+          @compositions.keys.each{|n| instance_exec(&model.compositions[n][:decomposer])} if @compositions
           super
         end
         

@@ -30,7 +30,7 @@ module Sequel
     #   Album.plugin :column_conflicts
     module ColumnConflicts
       def self.apply(model)
-        model.instance_eval do
+        model.instance_exec do
           @get_column_conflicts = {}
           @set_column_conflicts = {}
         end
@@ -38,7 +38,7 @@ module Sequel
 
       # Check for column conflicts on the current model if the model has a dataset.
       def self.configure(model)
-        model.instance_eval do
+        model.instance_exec do
           check_column_conflicts if @dataset
         end
       end

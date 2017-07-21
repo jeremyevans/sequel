@@ -10,7 +10,7 @@ module Sequel
 
       # Set an empty association reflection hash in the model
       def self.apply(model)
-        model.instance_eval do
+        model.instance_exec do
           @association_reflections = {}
           @autoreloading_associations = {}
           @cache_associations = true

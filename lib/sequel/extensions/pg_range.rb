@@ -136,7 +136,7 @@ module Sequel
         # Add the conversion procs to the database
         # and extend the datasets to correctly literalize ruby Range values.
         def self.extended(db)
-          db.instance_eval do
+          db.instance_exec do
             @pg_range_schema_types ||= {}
             extend_datasets(DatasetMethods)
             register_range_type('int4range', :oid=>3904, :subtype_oid=>23)

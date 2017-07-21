@@ -25,7 +25,7 @@ module Sequel
     #   Album.plugin :input_transformer
     module InputTransformer
       def self.apply(model, *)
-        model.instance_eval do
+        model.instance_exec do
           @input_transformers = {}
           @input_transformer_order = []
           @skip_input_transformer_columns = {}
