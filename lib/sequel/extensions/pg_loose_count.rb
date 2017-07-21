@@ -8,7 +8,7 @@
 #
 # It can also support schema qualified tables:
 #
-#   DB.loose_count(:schema__table) # => 123456
+#   DB.loose_count(Sequel[:schema][:table]) # => 123456
 #
 # How accurate this count is depends on the number of rows
 # added/deleted from the table since the last time it was

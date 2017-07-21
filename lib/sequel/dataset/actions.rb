@@ -528,7 +528,7 @@ module Sequel
     #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
     #   # ...
     #
-    #   DB[:table].order(:table__id).paged_each(strategy: :filter,
+    #   DB[:table].order(:id).paged_each(strategy: :filter,
     #     filter_values: lambda{|row, exprs| [row[:id]]}){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 1000
     #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
