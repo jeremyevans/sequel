@@ -26,9 +26,8 @@ module Sequel
       # (default: not set, so all columns not otherwise restricted are allowed).
       attr_reader :allowed_columns # SEQUEL5: Deprecate after release
 
-      # Whether to cache the anonymous models created by Sequel::Model().  This is
-      # required for reloading them correctly (avoiding the superclass mismatch).  True
-      # by default for backwards compatibility.
+      # Whether to cache the anonymous models created by Sequel::Model(), true by default.  This is
+      # required for reloading them correctly (avoiding the superclass mismatch).
       attr_accessor :cache_anonymous_models
 
       # Array of modules that extend this model's dataset.  Stored
@@ -716,7 +715,7 @@ module Sequel
         pluralize(underscore(demodulize(name))).to_sym
       end
   
-      # Calls #call with the values hash.  Only for backwards compatibility.
+      # Calls #call with the values hash.
       def load(values)
         call(values)
       end
