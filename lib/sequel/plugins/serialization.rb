@@ -91,7 +91,7 @@ module Sequel
       # models to pick this format by name.  Both serializer and deserializer
       # should be callable objects.
       def self.register_format(format, serializer, deserializer)
-        REGISTERED_FORMATS[format] = [serializer, deserializer]
+        Sequel.synchronize{REGISTERED_FORMATS[format] = [serializer, deserializer].freeze}
       end
       register_format(:marshal, lambda{|v| [Marshal.dump(v)].pack('m')},
         lambda do |v|
@@ -126,8 +126,8 @@ module Sequel
         # and instance level writer that stores new deserialized values.
         def serialize_attributes(format, *columns)
           if format.is_a?(Symbol)
-            unless format = REGISTERED_FORMATS[format]
-              raise(Error, "Unsupported serialization format: #{format} (valid formats: #{REGISTERED_FORMATS.keys.map(&:inspect).join})")
+            unless format = Sequel.synchronize{REGISTERED_FORMATS[format]}
+              raise(Error, "Unsupported serialization format: #{format} (valid formats: #{Sequel.synchronize{REGISTERED_FORMATS.keys}.map(&:inspect).join})")
             end
           end
           serializer, deserializer = format
