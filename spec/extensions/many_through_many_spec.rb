@@ -59,10 +59,10 @@ describe Sequel::Model, "many_through_many" do
     DB.sqls.must_equal []
   end
 
-  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup" do
+  it "should handle a :predicate_key option to change the SQL used in the lookup" do
     @c1.dataset = @c1.dataset.with_fetch(:id=>1)
     @c2.dataset = @c2.dataset.with_fetch(:id=>4, :x_foreign_key_x=>1)
-    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>(Sequel[:albums_artists][:artist_id] / 3)
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :predicate_key=>(Sequel[:albums_artists][:artist_id] / 3)
     a = @c1.eager(:tags).all
     a.must_equal [@c1.load(:id => 1)]
     DB.sqls.must_equal ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((albums_artists.artist_id / 3) IN (1))"]
@@ -1231,10 +1231,10 @@ describe Sequel::Model, "one_through_many" do
     DB.sqls.must_equal []
   end
 
-  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup" do
+  it "should handle a :predicate_key option to change the SQL used in the lookup" do
     @c1.dataset = @c1.dataset.with_fetch(:id=>1)
     @c2.dataset = @c2.dataset.with_fetch(:id=>4, :x_foreign_key_x=>1)
-    @c1.one_through_many :tag, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>(Sequel[:albums_artists][:artist_id] / 3)
+    @c1.one_through_many :tag, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :predicate_key=>(Sequel[:albums_artists][:artist_id] / 3)
     a = @c1.eager(:tag).all
     a.must_equal [@c1.load(:id => 1)]
     DB.sqls.must_equal ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((albums_artists.artist_id / 3) IN (1))"]

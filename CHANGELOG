@@ -1,5 +1,7 @@
 === master
 
+* Deprecate :eager_loading_predicate_key association option and association reflection method (jeremyevans)
+
 * Deprecate Model.serialized_columns in the serialization plugin (jeremyevans)
 
 * Deprecate Model.cti_columns in the class_table_inheritance plugin (jeremyevans)

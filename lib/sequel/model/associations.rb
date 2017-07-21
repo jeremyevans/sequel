@@ -327,6 +327,7 @@ module Sequel
 
         # Alias of predicate_key, only for backwards compatibility.
         def eager_loading_predicate_key
+          Sequel::Deprecation.deprecate("AssociationReflection#eager_loading_predicate_key", "Use #predicate_key instead")
           predicate_key
         end
 
@@ -1803,6 +1804,7 @@ module Sequel
 
           opts[:eager_block] = opts[:block] unless opts.include?(:eager_block)
           if !opts.has_key?(:predicate_key) && opts.has_key?(:eager_loading_predicate_key)
+            Sequel::Deprecation.deprecate("The :eager_loading_predicate_key association option", "Use the :predicate_key option instead")
             opts[:predicate_key] = opts[:eager_loading_predicate_key]
           end
           opts[:graph_join_type] ||= :left_outer

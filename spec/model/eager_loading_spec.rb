@@ -380,8 +380,8 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
 
-  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for many_to_one associations" do
-    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loading_predicate_key=>(Sequel[:bands][:id] / 3), :primary_key_method=>:id3
+  it "should handle a :predicate_key option to change the SQL used in the lookup, for many_to_one associations" do
+    EagerAlbum.many_to_one :sband, :clone=>:band, :predicate_key=>(Sequel[:bands][:id] / 3), :primary_key_method=>:id3
     EagerBand.dataset = EagerBand.dataset.with_fetch(:id=>6)
     a = EagerAlbum.eager(:sband).all
     DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE ((bands.id / 3) IN (2))']
@@ -390,8 +390,8 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
-  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for one_to_many associations" do
-    EagerBand.one_to_many :salbums, :clone=>:albums, :eager_loading_predicate_key=>(Sequel[:albums][:band_id] * 3), :key_method=>:band_id3, :eager=>nil, :reciprocal=>nil
+  it "should handle a :predicate_key option to change the SQL used in the lookup, for one_to_many associations" do
+    EagerBand.one_to_many :salbums, :clone=>:albums, :predicate_key=>(Sequel[:albums][:band_id] * 3), :key_method=>:band_id3, :eager=>nil, :reciprocal=>nil
     EagerBand.dataset = EagerBand.dataset.with_fetch(:id=>6)
     a = EagerBand.eager(:salbums).all
     DB.sqls.must_equal ['SELECT * FROM bands', 'SELECT * FROM albums WHERE ((albums.band_id * 3) IN (6))']
@@ -400,8 +400,8 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
-  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for many_to_many associations" do
-    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loading_predicate_key=>(Sequel[:ag][:album_id] * 1)
+  it "should handle a :predicate_key option to change the SQL used in the lookup, for many_to_many associations" do
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :predicate_key=>(Sequel[:ag][:album_id] * 1)
     a = EagerAlbum.eager(:sgenres).all
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.must_equal ['SELECT * FROM albums', "SELECT genres.*, (ag.album_id * 1) AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE ((ag.album_id * 1) IN (1))"]
@@ -409,8 +409,8 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
 
-  it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup, for one_through_one associations" do
-    EagerAlbum.one_through_one :sgenre, :clone=>:genre, :eager_loading_predicate_key=>(Sequel[:ag][:album_id] * 1)
+  it "should handle a :predicate_key option to change the SQL used in the lookup, for one_through_one associations" do
+    EagerAlbum.one_through_one :sgenre, :clone=>:genre, :predicate_key=>(Sequel[:ag][:album_id] * 1)
     a = EagerAlbum.eager(:sgenre).all
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.must_equal ['SELECT * FROM albums', "SELECT genres.*, (ag.album_id * 1) AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE ((ag.album_id * 1) IN (1))"]

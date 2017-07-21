@@ -286,7 +286,7 @@ describe Sequel::Model::Associations::AssociationReflection do
     def @c.name() "C" end
   end
 
-  it "#eager_loading_predicate_key should be an alias of predicate_key for backwards compatibility" do
+  deprecated "#eager_loading_predicate_key should be an alias of predicate_key for backwards compatibility" do
     @c.one_to_many :cs, :class=>@c
     @c.dataset.literal(@c.association_reflection(:cs).eager_loading_predicate_key).must_equal 'foo.c_id'
   end
