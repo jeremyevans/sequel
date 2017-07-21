@@ -10,6 +10,7 @@ module Sequel
     module JavaLang
       include_package 'java.lang'
     end
+    Sequel::Deprecation.deprecate_constant(self, :JavaLang)
     
     # Make it accesing the java.sql hierarchy more ruby friendly.
     module JavaSQL
@@ -20,6 +21,7 @@ module Sequel
     module JavaxNaming
       include_package 'javax.naming'
     end
+    Sequel::Deprecation.deprecate_constant(self, :JavaxNaming)
 
     # Used to identify a jndi connection and to extract the jndi
     # resource name.
@@ -488,7 +490,7 @@ module Sequel
       # Gets the connection from JNDI.
       def get_connection_from_jndi
         jndi_name = JNDI_URI_REGEXP.match(uri)[1]
-        JavaxNaming::InitialContext.new.lookup(jndi_name).connection
+        javax.naming.InitialContext.new.lookup(jndi_name).connection
       end
             
       # Gets the JDBC connection uri from the JNDI resource.
