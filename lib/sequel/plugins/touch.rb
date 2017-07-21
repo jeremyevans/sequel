@@ -31,6 +31,7 @@ module Sequel
     module Touch
       # The default column to update when touching
       TOUCH_COLUMN_DEFAULT = :updated_at
+      Sequel::Deprecation.deprecate_constant(self, :TOUCH_COLUMN_DEFAULT)
 
       def self.apply(model, opts=OPTS)
         model.instance_variable_set(:@touched_associations, {})
@@ -46,7 +47,7 @@ module Sequel
       #                  If a hash is used, the value is used as the column to update.
       # :column :: The column to modify when touching a model instance.
       def self.configure(model, opts=OPTS)
-        model.touch_column = opts[:column] || TOUCH_COLUMN_DEFAULT if opts[:column] || !model.touch_column
+        model.touch_column = opts[:column] || :updated_at if opts[:column] || !model.touch_column
         model.touch_associations(opts[:associations]) if opts[:associations]
       end
 
