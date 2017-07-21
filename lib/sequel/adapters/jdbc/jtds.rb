@@ -8,7 +8,7 @@ module Sequel
     Sequel.synchronize do
       DATABASE_SETUP[:jtds] = proc do |db|
         db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::JTDS::Dataset
+        db.extend_datasets Sequel::MSSQL::DatasetMethods
         db.send(:set_mssql_unicode_strings)
         Java::net.sourceforge.jtds.jdbc.Driver
       end
@@ -33,10 +33,6 @@ module Sequel
         def set_ps_arg_nil(cps, i)
           cps.setNull(i, cps.getParameterMetaData.getParameterType(i))
         end
-      end
-
-      class Dataset < JDBC::Dataset
-        include Sequel::MSSQL::DatasetMethods
       end
     end
   end

@@ -24,7 +24,7 @@ module Sequel
             remove_method(:"jdbc_#{s}")
           end
         end
-        db.dataset_class = Sequel::JDBC::DB2::Dataset
+        db.extend_datasets Sequel::DB2::DatasetMethods
         com.ibm.db2.jcc.DB2Driver
       end
     end
@@ -77,10 +77,6 @@ module Sequel
             v
           end
         end
-      end
-
-      class Dataset < JDBC::Dataset
-        include Sequel::DB2::DatasetMethods
       end
     end
   end
