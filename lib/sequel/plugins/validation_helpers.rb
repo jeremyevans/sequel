@@ -131,7 +131,13 @@ module Sequel
         # Accepts a :nil_message option that is the error message to use when the
         # value is nil instead of being too long.
         def validates_max_length(max, atts, opts=OPTS)
-          validatable_attributes_for_type(:max_length, atts, opts){|a,v,m| v ? validation_error_message(m, max) : validation_error_message(opts[:nil_message] || DEFAULT_OPTIONS[:max_length][:nil_message]) if v.nil? || v.length > max}
+          validatable_attributes_for_type(:max_length, atts, opts) do |a,v,m|
+            if v.nil?
+              validation_error_message(opts[:nil_message] || default_validation_helpers_options(:max_length)[:nil_message])
+            elsif v.length > max
+              validation_error_message(m, max)
+            end
+          end
         end
 
         # Check that the attribute values are not shorter than the given min length.
