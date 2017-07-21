@@ -278,6 +278,10 @@ uses symbols as identifiers.  However, if you are creating symbols from user inp
 you at least have a denial of service vulnerability in ruby <2.2, and possibly a
 more serious vulnerability.
 
+Note that many Database schema modification methods (e.g. create_table, add_column)
+also allow for SQL identifier injections, and possibly also SQL code injections.
+These methods should never be called with user input.
+
 == Denial of Service
 
 Sequel converts some strings to symbols.  Because symbols in ruby <2.2 are not
