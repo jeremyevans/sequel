@@ -37,7 +37,7 @@ module Sequel
           end
         END
         
-        [:before_create, :before_update, :before_validation].each{|h| class_eval("def #{h}; (@instance_hooks && run_before_instance_hooks(:#{h}) == false) ? false : super end", __FILE__, __LINE__)}
+        [:before_create, :before_update, :before_validation].each{|h| class_eval("def #{h}; run_before_instance_hooks(:#{h}) if @instance_hooks; super end", __FILE__, __LINE__)}
         [:after_create, :after_update].each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
           def #{h}
             super
