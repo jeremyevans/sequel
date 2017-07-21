@@ -25,10 +25,10 @@ module Sequel
     module AssociationDependencies
       # Mapping of association types to when the dependency calls should be made (either
       # :before for in before_destroy or :after for in after_destroy)
-      ASSOCIATION_MAPPING = {:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before, :one_to_one=>:before}
+      ASSOCIATION_MAPPING = {:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before, :one_to_one=>:before}.freeze
 
       # The valid dependence actions
-      DEPENDENCE_ACTIONS = [:delete, :destroy, :nullify]
+      DEPENDENCE_ACTIONS = [:delete, :destroy, :nullify].freeze
 
       # Initialize the association_dependencies hash for this model.
       def self.apply(model, hash=OPTS)
