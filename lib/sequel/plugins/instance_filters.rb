@@ -123,7 +123,7 @@ module Sequel
         # Only use prepared statements for update and delete queries
         # if there are no instance filters.
         def use_prepared_statements_for?(type)
-          if (type == :update || type == :delete) && !instance_filters.empty?
+          if type == :update && !instance_filters.empty?
             false
           else
             super if defined?(super)
