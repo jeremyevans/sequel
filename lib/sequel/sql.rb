@@ -135,49 +135,49 @@ module Sequel
         :'NOT LIKE' => :LIKE, :~ => :'!~', :'!~' => :~, :IN => :'NOT IN',
         :'NOT IN' => :IN, :IS => :'IS NOT', :'IS NOT' => :IS, :'~*' => :'!~*',
         :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT, :ILIKE => :'NOT ILIKE',
-        :'NOT ILIKE'=>:ILIKE}
+        :'NOT ILIKE'=>:ILIKE}.freeze
 
       # Standard mathematical operators used in +NumericMethods+
-      MATHEMATICAL_OPERATORS = [:+, :-, :/, :*, :**]
+      MATHEMATICAL_OPERATORS = [:+, :-, :/, :*, :**].freeze
 
       # Bitwise mathematical operators used in +BitwiseMethods+
-      BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>, :%]
+      BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>, :%].freeze
 
       # Operators that check for equality
-      EQUALITY_OPERATORS = [:'=', :'!=']
+      EQUALITY_OPERATORS = [:'=', :'!='].freeze
 
       # Inequality operators used in +InequalityMethods+
-      INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
+      INEQUALITY_OPERATORS = [:<, :>, :<=, :>=].freeze
 
       # Hash of ruby operator symbols to SQL operators, used in +BooleanMethods+
-      BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
+      BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}.freeze
 
       # Operators that use IN/NOT IN for inclusion/exclusion
-      IN_OPERATORS = [:IN, :'NOT IN']
+      IN_OPERATORS = [:IN, :'NOT IN'].freeze
 
       # Operators that use IS, used for special casing to override literal true/false values
-      IS_OPERATORS = [:IS, :'IS NOT']
+      IS_OPERATORS = [:IS, :'IS NOT'].freeze
 
       # Operators that do pattern matching via regular expressions
-      REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
+      REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*'].freeze
       
       # Operators that do pattern matching via LIKE
-      LIKE_OPERATORS = [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE']
+      LIKE_OPERATORS = [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'].freeze
 
       # Operator symbols that take exactly two arguments
-      TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS + REGEXP_OPERATORS + LIKE_OPERATORS + [:**]
+      TWO_ARITY_OPERATORS = (EQUALITY_OPERATORS + INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS + REGEXP_OPERATORS + LIKE_OPERATORS + [:**]).freeze
 
       # Operator symbols that take one or more arguments
-      N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS - [:**]
+      N_ARITY_OPERATORS = ([:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS - [:**]).freeze
 
       # Operator symbols that are associative
-      ASSOCIATIVE_OPERATORS = [:AND, :OR, :'||', :+, :*, :&, :|]
+      ASSOCIATIVE_OPERATORS = [:AND, :OR, :'||', :+, :*, :&, :|].freeze
 
       # Operator symbols that take only a single argument
-      ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~']
+      ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~'].freeze
 
       # Custom expressions that may have different syntax on different databases
-      CUSTOM_EXPRESSIONS = [:extract]
+      CUSTOM_EXPRESSIONS = [:extract].freeze
 
       # The operator symbol for this object
       attr_reader :op
@@ -1255,7 +1255,7 @@ module Sequel
     class ComplexExpression
       # A hash of the opposite for each constant, used for inverting constants.
       CONSTANT_INVERSIONS = {Constants::TRUE=>Constants::FALSE, Constants::FALSE=>Constants::TRUE,
-                             Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}
+                             Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}.freeze
     end
 
     # Represents a delayed evaluation, encapsulating a callable
@@ -1669,7 +1669,8 @@ module Sequel
       include InequalityMethods
 
       # Map of [regexp, case_insenstive] to +ComplexExpression+ operator symbol
-      LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}
+      LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}.freeze
+      LIKE_MAP.each_key(&:freeze)
       
       # Creates a SQL pattern match exprssion. left (l) is the SQL string we
       # are matching against, and ces are the patterns we are matching.
