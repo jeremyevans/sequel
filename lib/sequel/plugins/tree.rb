@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The Tree plugin adds additional associations and methods that allow you to 
+    # The tree plugin adds additional associations and methods that allow you to 
     # treat a Model as a tree.  
     #
     # A column for holding the parent key is required and is :parent_id by default.  

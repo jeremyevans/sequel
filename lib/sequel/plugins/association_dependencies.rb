@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The AssociationDependencies plugin allows you do easily set up before and/or after destroy hooks
+    # The association_dependencies plugin allows you do easily set up before and/or after destroy hooks
     # for destroying, deleting, or nullifying associated model objects.  The following
     # association types support the following dependency actions:
     # 

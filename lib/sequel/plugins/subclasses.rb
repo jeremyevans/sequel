@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The Subclasses plugin keeps track of all subclasses of the
+    # The subclasses plugin keeps track of all subclasses of the
     # current model class.  Direct subclasses are available via the
     # subclasses method, and all descendent classes are available via the
     # descendents method:

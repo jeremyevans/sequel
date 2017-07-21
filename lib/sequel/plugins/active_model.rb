@@ -3,7 +3,7 @@
 require 'active_model'
 module Sequel
   module Plugins
-    # The ActiveModel plugin makes Sequel::Model objects
+    # The active_model plugin makes Sequel::Model objects
     # pass the ActiveModel::Lint tests, which should
     # hopefully mean full ActiveModel compliance.  This should
     # allow the full support of Sequel::Model objects in Rails 3+.
@@ -79,7 +79,7 @@ module Sequel
           end
         end
 
-        # With the ActiveModel plugin, Sequel model objects are already
+        # With the active_model plugin, Sequel model objects are already
         # compliant, so this returns self.
         def to_model
           self

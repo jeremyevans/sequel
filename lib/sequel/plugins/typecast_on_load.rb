@@ -2,7 +2,7 @@
 
 module Sequel
   module Plugins
-    # The TypecastOnLoad plugin exists because most of Sequel's database adapters don't
+    # The typecast_on_load plugin exists because most of Sequel's database adapters don't
     # have complete control over typecasting, and may return columns that aren't
     # typecast correctly (with correct being defined as how the model object
     # would typecast the same column values).
