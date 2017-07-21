@@ -21,12 +21,7 @@ module Sequel
       # strings.  True by default for compatibility, can be set to false for a possible
       # performance increase.  This sets the default for all datasets created from this
       # Database object.
-      attr_reader :mssql_unicode_strings
-
-      def mssql_unicode_strings=(v)
-        @mssql_unicode_strings = v
-        reset_default_dataset
-      end
+      attr_accessor :mssql_unicode_strings
 
       # Execute the given stored procedure with the given name.
       #
