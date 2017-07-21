@@ -198,7 +198,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # available, tries to create a new connection. The calling code should already
   # have the mutex before calling this.
   def available
-    next_available || make_new(DEFAULT_SERVER)
+    next_available || make_new(:default)
   end
 
   # Return a connection to the pool of available connections, returns the connection.

@@ -26,7 +26,7 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   def hold(server=nil)
     begin
       unless c = @conn.first
-        @conn.replace([c = make_new(DEFAULT_SERVER)])
+        @conn.replace([c = make_new(:default)])
       end
       yield c
     rescue Sequel::DatabaseDisconnectError, *@error_classes => e

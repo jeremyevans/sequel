@@ -29,6 +29,7 @@ class Sequel::ConnectionPool
 
   # The default server to use
   DEFAULT_SERVER = :default
+  Sequel::Deprecation.deprecate_constant(self, :DEFAULT_SERVER)
   
   # A map of [single threaded, sharded] values to symbols or ConnectionPool subclasses.
   CONNECTION_POOL_MAP = {[true, false] => :single, 
@@ -94,7 +95,7 @@ class Sequel::ConnectionPool
   
   # An array of symbols for all shards/servers, which is a single <tt>:default</tt> by default.
   def servers
-    [DEFAULT_SERVER]
+    [:default]
   end
   
   private
