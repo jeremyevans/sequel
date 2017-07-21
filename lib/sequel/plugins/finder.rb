@@ -234,6 +234,12 @@ module Sequel
             s
           end
         end
+
+        # Clear any finders when reseting the instance dataset
+        def reset_instance_dataset
+          Sequel.synchronize{@finders.clear} if @finders && !@finders.frozen?
+          super
+        end
       end
     end
   end

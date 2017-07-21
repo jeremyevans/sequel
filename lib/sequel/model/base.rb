@@ -977,7 +977,6 @@ module Sequel
       # Reset the instance dataset to a modified copy of the current dataset,
       # should be used whenever the model's dataset is modified.
       def reset_instance_dataset
-        Sequel.synchronize{@finders.clear} if @finders && !@finders.frozen?
         @instance_dataset = @dataset.limit(1).naked.skip_limit_check if @dataset
       end
   
