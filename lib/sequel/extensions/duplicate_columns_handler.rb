@@ -43,6 +43,8 @@ module Sequel
       clone(:on_duplicate_columns=>handler||block)
     end
 
+    private
+
     # Override the attr_writer to check for duplicate columns, and call
     # handle_duplicate_columns if necessary.
     def columns=(cols)
@@ -51,8 +53,6 @@ module Sequel
       end
       super
     end
-
-    private
 
     # Invoke the appropriate behavior when duplicate columns are present.
     def handle_duplicate_columns(cols)
