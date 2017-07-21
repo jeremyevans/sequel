@@ -967,10 +967,10 @@ module Sequel
       # are used, or set it to nil if not used.
       def reset_fast_pk_lookup_sql
         @fast_pk_lookup_sql = if @simple_table && @simple_pk
-          "SELECT * FROM #@simple_table WHERE #@simple_pk = ".freeze
+          "SELECT * FROM #{@simple_table} WHERE #{@simple_pk} = ".freeze
         end
         @fast_instance_delete_sql = if @simple_table && @simple_pk
-          "DELETE FROM #@simple_table WHERE #@simple_pk = ".freeze
+          "DELETE FROM #{@simple_table} WHERE #{@simple_pk} = ".freeze
         end
       end
 
