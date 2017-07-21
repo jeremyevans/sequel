@@ -3880,6 +3880,15 @@ describe "Dataset prepared statements and bound variables " do
     ]*2)
   end
 
+  it "Dataset#prepare with a delayed evaluation should raise an error" do
+    proc{@ds.where(Sequel.delay{{:n=>1}}).prepare(:select, :select_n)}.must_raise Sequel::Error
+  end
+
+  it "Dataset#call with a delayed evaluation should work" do
+    @ds.where(Sequel.delay{{:n=>1}}).call(:select).must_equal []
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (n = 1)"]
+  end
+
   it "PreparedStatement#prepare should raise an error" do
     ps = @ds.prepare(:select, :select_n)
     proc{ps.prepare(:select, :select_n2)}.must_raise Sequel::Error

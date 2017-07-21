@@ -123,6 +123,12 @@ module Sequel
         orig_dataset.columns
       end
       
+      # Disallow use of delayed evaluations in prepared statements.
+      def delayed_evaluation_sql_append(sql, delay)
+        raise Error, "delayed evaluations cannot be used in prepared statements" if @opts[:no_delayed_evaluations]
+        super
+      end
+
       # Returns the SQL for the prepared statement, depending on
       # the type of the statement and the prepared_modify_values.
       def prepared_sql
@@ -308,7 +314,7 @@ module Sequel
     #
     #   DB.call(:select_by_name, name: 'Blah') # Same thing
     def prepare(type, name, *values)
-      ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules)
+      ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules, :no_delayed_evaluations=>true)
       ps.prepared_sql
       db.set_prepared_statement(name, ps)
       ps
@@ -323,7 +329,7 @@ module Sequel
       mods += [PreparedStatementMethods]
 
       bind.
-        clone(:prepared_statement_name=>opts[:name], :prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :no_cache_sql=>true, :prepared_args=>@opts[:prepared_args]||[]).
+        clone(:prepared_statement_name=>opts[:name], :prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :no_cache_sql=>true, :prepared_args=>@opts[:prepared_args]||[], :no_delayed_evaluations=>opts[:no_delayed_evaluations]).
         with_extend(*mods)
     end
 
