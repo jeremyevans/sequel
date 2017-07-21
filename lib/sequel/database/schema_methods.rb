@@ -807,8 +807,12 @@ module Sequel
           args = nil
         elsif arg.is_a?(String)
           args = [Sequel.lit(*args)]
-        elsif arg.is_a?(Array) && arg.first.is_a?(String)
-          args = [Sequel.lit(*arg)]
+        elsif arg.is_a?(Array)
+          if arg.first.is_a?(String)
+            args = [Sequel.lit(*arg)]
+          elsif arg.length > 1
+            args = [Sequel.&(*arg)]
+          end
         end
       end
       schema_utility_dataset.literal(schema_utility_dataset.send(:filter_expr, *args, &block))
