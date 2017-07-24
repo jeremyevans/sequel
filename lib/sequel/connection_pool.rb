@@ -26,6 +26,12 @@
 #                                     specified by the array of symbols.
 class Sequel::ConnectionPool
   OPTS = Sequel::OPTS
+  POOL_CLASS_MAP = {
+    :threaded => :ThreadedConnectionPool,
+    :single => :SingleConnectionPool,
+    :sharded_threaded => :ShardedThreadedConnectionPool,
+    :sharded_single => :ShardedSingleConnectionPool
+  }.freeze
 
   # Class methods used to return an appropriate pool subclass, separated
   # into a module for easier overridding by extensions.
@@ -44,20 +50,12 @@ class Sequel::ConnectionPool
     def connection_pool_class(opts)
       if pc = opts[:pool_class]
         unless pc.is_a?(Class)
-          require("sequel/connection_pool/#{pc}")
-
-          pc = case pc
-          when :threaded
-            Sequel::ThreadedConnectionPool
-          when :single
-            Sequel::SingleConnectionPool
-          when :sharded_threaded
-            Sequel::ShardedThreadedConnectionPool
-          when :sharded_single
-            Sequel::ShardedSingleConnectionPool
-          else
+          unless name = POOL_CLASS_MAP[pc]
             raise Sequel::Error, "unsupported connection pool type, please pass appropriate class as the :pool_class option"
           end
+
+          require("sequel/connection_pool/#{pc}")
+          pc = Sequel.const_get(name)
         end
 
         pc

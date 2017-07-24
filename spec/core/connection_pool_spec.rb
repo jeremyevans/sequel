@@ -31,6 +31,10 @@ describe "An empty ConnectionPool" do
   it "should have a size of zero" do
     @cpool.size.must_equal 0
   end
+
+  it "should raise Error for bad pool class" do
+    proc{Sequel::ConnectionPool.get_pool(mock_db.call, :pool_class=>:foo)}.must_raise Sequel::Error
+  end
 end
 
 describe "ConnectionPool options" do
