@@ -127,7 +127,7 @@ module Sequel
           model.touched_associations.each do |assoc, column|
             r = model.association_reflection(assoc)
             next unless r.can_have_associated_objects?(self)
-            ds = public_send(r.dataset_method)
+            ds = public_send(r[:dataset_method])
 
             if ds.send(:joined_dataset?)
               # Can't update all values at once, so update each instance individually.

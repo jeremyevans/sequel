@@ -1937,23 +1937,23 @@ module Sequel
 
           if opts[:setter] && opts[:_setter]
             # This is backwards due to backwards compatibility
-            association_module_private_def(opts._setter_method, opts, &opts[:setter])
-            association_module_def(opts.setter_method, opts, &opts[:_setter])
+            association_module_private_def(opts[:_setter_method], opts, &opts[:setter])
+            association_module_def(opts[:setter_method], opts, &opts[:_setter])
           end
 
           if adder = opts[:adder]
-            association_module_private_def(opts._add_method, opts, &adder)
-            association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
+            association_module_private_def(opts[:_add_method], opts, &adder)
+            association_module_def(opts[:add_method], opts){|o,*args| add_associated_object(opts, o, *args)}
           end
 
           if remover = opts[:remover]
-            association_module_private_def(opts._remove_method, opts, &remover)
-            association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
+            association_module_private_def(opts[:_remove_method], opts, &remover)
+            association_module_def(opts[:remove_method], opts){|o,*args| remove_associated_object(opts, o, *args)}
           end
 
           if clearer = opts[:clearer]
-            association_module_private_def(opts._remove_all_method, opts, &clearer)
-            association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
+            association_module_private_def(opts[:_remove_all_method], opts, &clearer)
+            association_module_def(opts[:remove_all_method], opts){|*args| remove_all_associated_objects(opts, *args)}
           end
         end
         
@@ -2358,7 +2358,7 @@ module Sequel
           ensure_associated_primary_key(opts, o, *args)
           return if run_association_callbacks(opts, :before_add, o) == false
           # Allow calling private _add method
-          return if !send(opts._add_method, o, *args) && opts.handle_silent_modification_failure?
+          return if !send(opts[:_add_method], o, *args) && opts.handle_silent_modification_failure?
           if array = associations[opts[:name]] and !array.include?(o)
             array.push(o)
           end
@@ -2478,7 +2478,7 @@ module Sequel
         def remove_all_associated_objects(opts, *args)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           # Allow calling private _remove_all method
-          send(opts._remove_all_method, *args)
+          send(opts[:_remove_all_method], *args)
           ret = associations[opts[:name]].each{|o| remove_reciprocal_object(opts, o)} if associations.include?(opts[:name])
           associations[opts[:name]] = []
           ret
@@ -2498,7 +2498,7 @@ module Sequel
           raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_remove, o) == false
           # Allow calling private _remove method
-          return if !send(opts._remove_method, o, *args) && opts.handle_silent_modification_failure?
+          return if !send(opts[:_remove_method], o, *args) && opts.handle_silent_modification_failure?
           associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
           remove_reciprocal_object(opts, o)
           run_association_callbacks(opts, :after_remove, o)
@@ -2556,7 +2556,7 @@ module Sequel
           run_association_callbacks(opts, :before_set, o)
           remove_reciprocal_object(opts, a) if a
           # Allow calling private _setter method
-          send(opts._setter_method, o)
+          send(opts[:_setter_method], o)
           associations[opts[:name]] = o
           add_reciprocal_object(opts, o) if o
           run_association_callbacks(opts, :after_set, o)

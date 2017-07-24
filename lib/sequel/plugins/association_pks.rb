@@ -104,7 +104,7 @@ module Sequel
           if !opts[:read_only] && !join_associated_table
             opts[:pks_setter] = lambda do |pks|
               if pks.empty?
-                public_send(opts.remove_all_method)
+                public_send(opts[:remove_all_method])
               else
                 checked_transaction do
                   if clpk
@@ -139,13 +139,13 @@ module Sequel
           key = opts[:key]
 
           opts[:pks_getter] = lambda do
-            public_send(opts.dataset_method).select_map(opts.associated_class.primary_key)
+            public_send(opts[:dataset_method]).select_map(opts.associated_class.primary_key)
           end
 
           unless opts[:read_only]
             opts[:pks_setter] = lambda do |pks|
               if pks.empty?
-                public_send(opts.remove_all_method)
+                public_send(opts[:remove_all_method])
               else
                 primary_key = opts.associated_class.primary_key
                 pkh = {primary_key=>pks}

@@ -60,15 +60,15 @@ module Sequel
             association_dependencies[:"#{time}_#{action}"] << if action == :nullify
               case type
               when :one_to_many , :many_to_many
-                proc{public_send(r.remove_all_method)}
+                proc{public_send(r[:remove_all_method])}
               when :one_to_one
-                proc{public_send(r.setter_method, nil)}
+                proc{public_send(r[:setter_method], nil)}
               else
                 raise(Error, "Can't nullify many_to_one associated objects: association: #{association}")
               end
             else
               raise(Error, "Can only nullify many_to_many associations: association: #{association}") if type == :many_to_many
-              r.dataset_method
+              r[:dataset_method]
             end
           end
         end
