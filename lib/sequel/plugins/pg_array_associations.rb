@@ -328,7 +328,10 @@ module Sequel
           opts[:key] = opts.default_key unless opts.has_key?(:key)
           key = opts[:key]
           key_column = opts[:key_column] ||= opts[:key]
-          opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
+          if opts[:uniq]
+            opts[:after_load] ||= []
+            opts[:after_load].unshift(:array_uniq!)
+          end
           opts[:dataset] ||= lambda do
             opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(Sequel.pg_array([get_column_value(pk)], opts.array_type)))
           end
@@ -408,7 +411,10 @@ module Sequel
           key = opts[:key]
           key_column = opts[:key_column] ||= key
           opts[:eager_loader_key] = nil
-          opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
+          if opts[:uniq]
+            opts[:after_load] ||= []
+            opts[:after_load].unshift(:array_uniq!)
+          end
           opts[:dataset] ||= lambda do
             opts.associated_dataset.where(opts.predicate_key=>get_column_value(key).to_a)
           end

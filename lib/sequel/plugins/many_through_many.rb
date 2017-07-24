@@ -228,7 +228,10 @@ module Sequel
         def def_many_through_many(opts)
           one_through_many = opts[:type] == :one_through_many
           opts[:read_only] = true
-          opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
+          if opts[:uniq]
+            opts[:after_load] ||= []
+            opts[:after_load].unshift(:array_uniq!)
+          end
           opts[:cartesian_product_number] ||= one_through_many ? 0 : 2
           opts[:through] = opts[:through].map do |e|
             case e

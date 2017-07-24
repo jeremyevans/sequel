@@ -82,9 +82,10 @@ module Sequel
 
         # Apply all non-instance specific changes to the given dataset and return it.
         def apply_dataset_changes(ds)
-          ds = ds.with_extend(AssociationDatasetMethods).
-            clone(:association_reflection => self)
-          self[:extend].each{|m| ds = ds.with_extend(m)}
+          ds = ds.with_extend(AssociationDatasetMethods).clone(:association_reflection => self)
+          if exts = self[:reverse_extend]
+            ds = ds.with_extend(*exts)
+          end
           ds = ds.select(*select) if select
           if c = self[:conditions]
             ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
@@ -1803,9 +1804,15 @@ module Sequel
           opts[:graph_conditions] = conds if !opts.include?(:graph_conditions) and Sequel.condition_specifier?(conds)
           opts[:graph_conditions] = opts.fetch(:graph_conditions, []).to_a
           opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
-          [:before_add, :before_remove, :after_add, :after_remove, :after_load, :before_set, :after_set, :extend].each do |cb_type|
-            opts[cb_type] = Array(opts[cb_type])
+          [:before_add, :before_remove, :after_add, :after_remove, :after_load, :before_set, :after_set].each do |cb_type|
+            opts[cb_type] = Array(opts[cb_type]) if opts[cb_type]
           end
+
+          if opts[:extend]
+            opts[:extend] = Array(opts[:extend])
+            opts[:reverse_extend] = opts[:extend].reverse
+          end
+
           late_binding_class_option(opts, opts.returns_array? ? singularize(name) : name)
           
           # Remove :class entry if it exists and is nil, to work with cached_fetch
@@ -1980,7 +1987,10 @@ module Sequel
           join_table = (opts[:join_table] ||= opts.default_join_table)
           opts[:left_key_alias] ||= opts.default_associated_key_alias
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
-          opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
+          if opts[:uniq]
+            opts[:after_load] ||= []
+            opts[:after_load].unshift(:array_uniq!)
+          end
           opts[:dataset] ||= opts.association_dataset_proc
           opts[:eager_loader] ||= opts.method(:default_eager_loader)
           
@@ -2529,24 +2539,28 @@ module Sequel
 
         # Run the callback for the association with the object.
         def run_association_callbacks(reflection, callback_type, object)
-          reflection[callback_type].each do |cb|
-            res = case cb
-            when Symbol
-              # Allow calling private methods in association callbacks
-              send(cb, object)
-            when Proc
-              cb.call(self, object)
-            else
-              raise Error, "callbacks should either be Procs or Symbols"
+          return unless cbs = reflection[callback_type]
+
+          begin
+            cbs.each do |cb|
+              res = case cb
+              when Symbol
+                # Allow calling private methods in association callbacks
+                send(cb, object)
+              when Proc
+                cb.call(self, object)
+              else
+                raise Error, "callbacks should either be Procs or Symbols"
+              end
             end
+          rescue HookFailed
+            # The reason we automatically set raise_error for singular associations is that
+            # assignment in ruby always returns the argument instead of the result of the
+            # method, so we can't return nil to signal that the association callback prevented
+            # the modification
+            return false unless raise_on_save_failure || !reflection.returns_array?
+            raise
           end
-        rescue HookFailed
-          # The reason we automatically set raise_error for singular associations is that
-          # assignment in ruby always returns the argument instead of the result of the
-          # method, so we can't return nil to signal that the association callback prevented
-          # the modification
-          return false unless raise_on_save_failure || !reflection.returns_array?
-          raise
         end
 
         # Set the given object as the associated object for the given *_to_one association reflection
@@ -3071,7 +3085,7 @@ module Sequel
               eager_block, associations = pr_assoc
             end
             loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block, :id_map=>id_map)
-            a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
+            a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} if r[:after_load]
           end 
         end
 
@@ -3203,7 +3217,7 @@ module Sequel
           after_load_map = @after_load_map = {}
           reflection_map.each do |k, v|
             alias_map[k] = v[:name]
-            after_load_map[k] = v[:after_load] unless v[:after_load].empty?
+            after_load_map[k] = v[:after_load] if v[:after_load]
             type_map[k] = if v.returns_array?
               true
             elsif (limit_and_offset = limit_map[k]) && !limit_and_offset.last.nil?
