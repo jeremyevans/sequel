@@ -964,6 +964,11 @@ module Sequel
       type_literal_generic_numeric(column)
     end
 
+    # Sequel uses the bigint type by default for Bignums.
+    def type_literal_generic_bignum(column)
+      :bigint
+    end
+    
     # Sequel uses the bigint type by default for :Bignum symbol.
     def type_literal_generic_bignum_symbol(column)
       :bigint
