@@ -15,6 +15,12 @@ describe "Sequel::Plugins::InputTransformer" do
     @o.name.must_equal [1, 2, 3]
   end
 
+  it "should have working .input_transformer_order" do
+    @c.input_transformer_order.must_equal [:reverser]
+    @c.plugin(:input_transformer, :reverser2){|v| v.is_a?(String) ? v.reverse : v}
+    @c.input_transformer_order.must_equal [:reverser2, :reverser]
+  end
+
   it "should not apply any transformers by default" do
     c = Class.new(Sequel::Model)
     c.columns :name, :b

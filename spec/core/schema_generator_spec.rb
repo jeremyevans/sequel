@@ -23,6 +23,18 @@ describe Sequel::Schema::CreateTableGenerator do
     @generator.respond_to?(:foo).must_equal true
   end
 
+  it "should respond adding types" do
+    c = Class.new(Sequel::Schema::CreateTableGenerator)
+    c2 = Class.new
+    def c2.to_s; 'Foo' end
+    c.add_type_method(c2)
+    gen = c.new(Sequel.mock) do
+      Foo :bar
+    end
+
+    gen.columns.first.values_at(:name, :type).must_equal [:bar, c2]
+  end
+
   it "should primary key column first" do
     @columns.first[:name].must_equal :id
     @columns.first[:primary_key].must_equal true

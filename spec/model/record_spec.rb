@@ -33,7 +33,7 @@ end
 
 describe "Model#save server use" do
   before do
-    @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :servers=>{:blah=>{}, :read_only=>{}})
+    @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :numrows=>1, :servers=>{:blah=>{}, :read_only=>{}})
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.columns :id, :x, :y
     @c.dataset.columns(:id, :x, :y)
@@ -49,6 +49,19 @@ describe "Model#save server use" do
     @c.dataset = @c.dataset.server(:blah)
     @c.new(:x=>1).save.must_equal @c.load(:x=>1, :id=>10)
     @db.sqls.must_equal ["INSERT INTO items (x) VALUES (1) -- blah", 'SELECT * FROM items WHERE (id = 10) LIMIT 1 -- blah']
+  end
+
+  it "should use transactions on the correct server"  do
+    @c.use_transactions = true
+    @c.dataset = @c.dataset.server(:blah)
+    @c.new(:x=>1).save.must_equal @c.load(:x=>1, :id=>10)
+    @db.sqls.must_equal ["BEGIN -- blah", "INSERT INTO items (x) VALUES (1) -- blah", 'SELECT * FROM items WHERE (id = 10) LIMIT 1 -- blah', 'COMMIT -- blah']
+
+    o = @c.load(:id=>1)
+    o.x = 2
+    o.this
+    o.save
+    @db.sqls.must_equal ["BEGIN -- blah", "UPDATE items SET x = 2 WHERE (id = 1) -- blah", 'COMMIT -- blah']
   end
 end
 

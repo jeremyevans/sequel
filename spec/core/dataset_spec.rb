@@ -50,6 +50,7 @@ describe "Dataset#clone" do
   it "should create an exact copy of the dataset" do
     @dataset = @dataset.with_row_proc(Proc.new{|r| r})
     clone = @dataset.clone
+    @dataset.dup.must_be_same_as @dataset
 
     if RUBY_VERSION >= '2.4'
       clone.must_be_same_as @dataset
