@@ -14,6 +14,12 @@ describe "Blockless Ruby Filters" do
   end
   
   it "should support boolean columns directly" do
+    x = Sequel[:x]
+    x.dup.must_be_same_as x
+    x.clone.must_be_same_as x
+  end
+  
+  it "should support boolean columns directly" do
     @d.l(:x).must_equal 'x'
   end
   

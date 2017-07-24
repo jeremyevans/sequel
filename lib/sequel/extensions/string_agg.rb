@@ -147,6 +147,7 @@ module Sequel
       def initialize(expr, separator=nil)
         @expr = expr
         @separator = separator
+        yield self if block_given?
         freeze
       end
 
@@ -157,16 +158,18 @@ module Sequel
 
       # Return a modified StringAgg that uses distinct expressions
       def distinct
-        sa = dup
-        sa.instance_variable_set(:@distinct, true)
-        sa.freeze
+        self.class.new(@expr, @separator) do |sa|
+          sa.instance_variable_set(:@order_expr, @order_expr) if @order_expr
+          sa.instance_variable_set(:@distinct, true)
+        end
       end
 
       # Return a modified StringAgg with the given order
       def order(*o)
-        sa = dup
-        sa.instance_variable_set(:@order_expr, o.empty? ? nil : o.freeze)
-        sa.freeze
+        self.class.new(@expr, @separator) do |sa|
+          sa.instance_variable_set(:@distinct, @distinct) if @distinct
+          sa.instance_variable_set(:@order_expr, o.empty? ? nil : o.freeze)
+        end
       end
 
       to_s_method :string_agg_sql

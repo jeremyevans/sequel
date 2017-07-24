@@ -98,6 +98,13 @@ module Sequel
         end
       end
 
+      # Make clone/dup return self, since Expression objects are supposed to
+      # be frozen value objects
+      def clone
+        self
+      end
+      alias dup clone
+
       # Alias of <tt>eql?</tt>
       def ==(other)
         eql?(other)
