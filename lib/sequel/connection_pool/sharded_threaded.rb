@@ -167,15 +167,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   
   private
 
-  # Assigns a connection to the supplied thread for the given server, if one
-  # is available. The calling code should already have the mutex when
-  # calling this.
-  def _acquire(thread, server)
-    if conn = available(server)
-      allocated(server)[thread] = conn
-    end
-  end
-  
   # The total number of connections opened for the given server.
   # The calling code should already have the mutex before calling this.
   def _size(server)
@@ -190,37 +181,75 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # This should return a connection is one is available within the timeout,
   # or nil if a connection could not be acquired within the timeout.
   def acquire(thread, server)
+    if conn = assign_connection(thread, server)
+      return conn
+    end
+
+    time = Time.now
+
     sync do
-      if conn = _acquire(thread, server)
+      @waiters[server].wait(@mutex, @timeout)
+      if conn = next_available(server)
+        return(allocated(server)[thread] = conn)
+      end
+    end
+
+    until conn = assign_connection(thread, server)
+      deadline ||= time + @timeout
+      current_time = Time.now
+      raise_pool_timeout(current_time - time, server) if current_time > deadline
+      # :nocov:
+      # It's difficult to get to this point, it can only happen if there is a race condition
+      # where a connection cannot be acquired even after the thread is signalled by the condition
+      sync do
+        @waiters[server].wait(@mutex, deadline - current_time)
+        if conn = next_available(server)
+          return(allocated(server)[thread] = conn)
+        end
+      end
+      # :nocov:
+    end
+
+    conn
+  end
+
+  # Assign a connection to the thread, or return nil if one cannot be assigned.
+  # The caller should NOT have the mutex before calling this.
+  def assign_connection(thread, server)
+    alloc = allocated(server)
+
+    do_make_new = false
+    sync do
+      if conn = next_available(server)
+        alloc[thread] = conn
         return conn
       end
 
-      time = Time.now
-      @waiters[server].wait(@mutex, @timeout)
-      Thread.pass
-
-      until conn = _acquire(thread, server)
-        deadline ||= time + @timeout
-        current_time = Time.now
-        raise_pool_timeout(current_time - time, server) if current_time > deadline
-        # :nocov:
-        # It's difficult to get to this point, it can only happen if there is a race condition
-        # where a connection cannot be acquired even after the thread is signalled by the condition
-        # variable that a connection is ready.
-        @waiters[server].wait(@mutex, deadline - current_time)
-        Thread.pass
-        # :nocov:
+      if (n = _size(server)) >= (max = @max_size)
+        alloc.to_a.each{|t,c| release(t, c, server) unless t.alive?}
+        n = nil
       end
 
-      conn
+      if (n || _size(server)) < max
+        do_make_new = alloc[thread] = true
+      end
     end
-  end
 
-  # Returns an available connection to the given server. If no connection is
-  # available, tries to create a new connection. The calling code should already
-  # have the mutex before calling this.
-  def available(server)
-    next_available(server) || make_new(server)
+    # Connect to the database outside of the connection pool mutex,
+    # as that can take a long time and the connection pool mutex
+    # shouldn't be locked while the connection takes place.
+    if do_make_new
+      begin
+        conn = make_new(server)
+        sync{alloc[thread] = conn}
+      ensure
+        unless conn
+          sync{alloc.delete(thread)}
+        end
+      end
+    end
+
+    conn
   end
 
   # Return a connection to the pool of available connections for the server,
@@ -229,7 +258,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def checkin_connection(server, conn)
     available_connections(server) << conn
     @waiters[server].signal
-    Thread.pass
     conn
   end
 
@@ -243,6 +271,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     if dis_conns = available_connections(server)
       conns = dis_conns.dup
       dis_conns.clear
+      @waiters[server].signal
     end
     conns
   end
@@ -252,17 +281,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # have the mutex before calling this.
   def disconnect_connections(conns)
     conns.each{|conn| disconnect_connection(conn)}
-  end
-
-  # Creates a new connection to the given server if the size of the pool for
-  # the server is less than the maximum size of the pool. The calling code
-  # should already have the mutex before calling this.
-  def make_new(server)
-    if (n = _size(server)) >= @max_size
-      allocated(server).to_a.each{|t, c| release(t, c, server) unless t.alive?}
-      n = nil
-    end
-    default_make_new(server) if (n || _size(server)) < @max_size
   end
 
   # Return the next available connection in the pool for the given server, or nil
@@ -288,17 +306,20 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     sync{@servers[server]}
   end
   
-  # Create the maximum number of connections to each server immediately.
+  # Create the maximum number of connections immediately.  The calling code should
+  # NOT have the mutex before calling this.
   def preconnect(concurrent = false)
-    conn_servers = @servers.keys.map{|s| Array.new(max_size - _size(s), s)}.flatten
+    conn_servers = @servers.keys.map!{|s| Array.new(max_size - _size(s), s)}.flatten!
 
     if concurrent
-      conn_servers.map{|s| Thread.new{[s, make_new(s)]}}.map(&:join).each{|t| checkin_connection(*t.value)}
+      conn_servers.map!{|s| Thread.new{[s, make_new(s)]}}.map!(&:value)
     else
-      conn_servers.each{|s| checkin_connection(s, make_new(s))}
+      conn_servers.map!{|s| [s, make_new(s)]}
     end
+
+    sync{conn_servers.each{|s, conn| checkin_connection(s, conn)}}
   end
-  
+
   # Raise a PoolTimeout error showing the current timeout, the elapsed time, the server
   # the connection attempt was made to, and the database's name (if any).
   def raise_pool_timeout(elapsed, server)
@@ -321,6 +342,10 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       else
         checkin_connection(server, conn)
       end
+    end
+
+    if waiter = @waiters[server]
+      waiter.signal
     end
   end
 
