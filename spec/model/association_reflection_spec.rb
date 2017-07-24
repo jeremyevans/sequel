@@ -15,6 +15,27 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     @c.association_reflection(:c).associated_class.must_equal ParParent
   end
 
+  it "should use the :class value if present" do
+    @c.many_to_one :c, :class=>@c
+    @c.one_to_many :cs, :class=>@c
+    c = @c.association_reflection(:c)
+    cs = @c.association_reflection(:cs)
+
+    c.association_method.must_equal :c
+    c.dataset_method.must_equal :c_dataset
+    c.setter_method.must_equal :c=
+    c._setter_method.must_equal :_c=
+
+    cs.association_method.must_equal :cs
+    cs.dataset_method.must_equal :cs_dataset
+    cs.add_method.must_equal :add_c
+    cs._add_method.must_equal :_add_c
+    cs.remove_method.must_equal :remove_c
+    cs._remove_method.must_equal :_remove_c
+    cs.remove_all_method.must_equal :remove_all_cs
+    cs._remove_all_method.must_equal :_remove_all_cs
+  end
+
   it "should have inspect include association class and representation of association definition " do
     ParParent.many_to_one :c
     ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c>"

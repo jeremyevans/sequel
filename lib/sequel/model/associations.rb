@@ -34,27 +34,27 @@ module Sequel
 
         # Name symbol for the _add internal association method
         def _add_method
-          :"_add_#{singularize(self[:name])}"
+          self[:_add_method]
         end
       
         # Name symbol for the _remove_all internal association method
         def _remove_all_method
-          :"_remove_all_#{self[:name]}"
+          self[:_remove_all_method]
         end
       
         # Name symbol for the _remove internal association method
         def _remove_method
-          :"_remove_#{singularize(self[:name])}"
+          self[:_remove_method]
         end
       
         # Name symbol for the _setter association method
         def _setter_method
-          :"_#{self[:name]}="
+          self[:_setter_method]
         end
       
         # Name symbol for the add association method
         def add_method
-          :"add_#{singularize(self[:name])}"
+          self[:add_method]
         end
       
         # Name symbol for association method, the same as the name of the association.
@@ -192,7 +192,7 @@ module Sequel
 
         # Name symbol for the dataset association method
         def dataset_method
-          :"#{self[:name]}_dataset"
+          self[:dataset_method]
         end
       
         # Whether the dataset needs a primary key to function, true by default.
@@ -499,7 +499,7 @@ module Sequel
     
         # Name symbol for the remove_all_ association method
         def remove_all_method
-          :"remove_all_#{self[:name]}"
+          self[:remove_all_method]
         end
       
         # Whether associated objects need to be removed from the association before
@@ -510,7 +510,7 @@ module Sequel
     
         # Name symbol for the remove_ association method
         def remove_method
-          :"remove_#{singularize(self[:name])}"
+          self[:remove_method]
         end
       
         # Whether to check that an object to be disassociated is already associated to this object, false by default.
@@ -537,7 +537,7 @@ module Sequel
     
         # Name symbol for the setter association method
         def setter_method
-          :"#{self[:name]}="
+          self[:setter_method]
         end
         
         # The range used for slicing when using the :ruby eager limit strategy.
@@ -1914,6 +1914,22 @@ module Sequel
       
         # Define all of the association instance methods for this association.
         def def_association_instance_methods(opts)
+          # Always set the method names in the association reflection, even if they
+          # are not used, for backwards compatibility.
+          opts[:dataset_method] = :"#{opts[:name]}_dataset"
+          if opts.returns_array?
+            sname = singularize(opts[:name])
+            opts[:_add_method] = :"_add_#{sname}"
+            opts[:add_method] = :"add_#{sname}"
+            opts[:_remove_method] = :"_remove_#{sname}"
+            opts[:remove_method] = :"remove_#{sname}"
+            opts[:_remove_all_method] = :"_remove_all_#{opts[:name]}"
+            opts[:remove_all_method] = :"remove_all_#{opts[:name]}"
+          else
+            opts[:_setter_method] = :"_#{opts[:name]}="
+            opts[:setter_method] = :"#{opts[:name]}="
+          end
+
           association_module_def(opts.dataset_method, opts){_dataset(opts)}
           def_association_method(opts)
 
