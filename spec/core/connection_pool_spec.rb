@@ -18,6 +18,16 @@ describe "An empty ConnectionPool" do
     @cpool = Sequel::ConnectionPool.get_pool(mock_db.call, CONNECTION_POOL_DEFAULTS)
   end
 
+  deprecated "should support :pool_class option with string" do
+    begin
+      c = Class.new(Sequel::ConnectionPool)
+      Sequel::ConnectionPool::CONNECTION_POOL__MAP[:foo] = c
+      Sequel::ConnectionPool.get_pool(mock_db.call, :pool_class=>:foo).must_be_instance_of c
+    ensure
+      Sequel::ConnectionPool::CONNECTION_POOL__MAP.delete(c)
+    end
+  end
+
   it "should have no available connections" do
     @cpool.available_connections.must_equal []
   end

@@ -60,6 +60,9 @@ class Sequel::ConnectionPool
     
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
+      if opts[:pool_class] && !opts[:pool_class].is_a?(Class) && ![:threaded, :single, :sharded_threaded, :sharded_single].include?(opts[:pool_class])
+        Sequel::Deprecation.deprecate("Using an unrecognized :pool_class option", "Use a class for the :pool_class option to select a custom pool class, or one of the following symbols for one of the default pool classes: :threaded, :single, :sharded_threaded, :sharded_single")
+      end
       CONNECTION_POOL__MAP[opts[:pool_class]] || opts[:pool_class] || CONNECTION_POOL__MAP[[!!opts[:single_threaded], !!opts[:servers]]]
     end
   end

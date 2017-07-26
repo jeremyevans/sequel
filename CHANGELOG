@@ -1,5 +1,7 @@
 === master
 
+* Deprecate using a :pool_class Database that is not a class or a symbol for a supported pool class (jeremyevans)
+
 * Deprecate :eager_loading_predicate_key association option and association reflection method (jeremyevans)
 
 * Deprecate Model.serialized_columns in the serialization plugin (jeremyevans)
