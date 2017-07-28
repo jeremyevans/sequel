@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
-Sequel.require %w'emulate_offset_with_reverse_and_count unmodified_identifiers', 'adapters/utils'
+require_relative '../utils/emulate_offset_with_reverse_and_count'
+require_relative '../utils/unmodified_identifiers'
 
 module Sequel
   module Access

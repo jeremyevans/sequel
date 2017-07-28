@@ -33,7 +33,6 @@
 # Related module: Sequel::Postgres::IntervalDatabaseMethods
 
 require 'active_support/duration'
-Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres

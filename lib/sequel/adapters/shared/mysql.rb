@@ -1,6 +1,8 @@
 # frozen-string-literal: true
 
-Sequel.require %w'replace split_alter_table unmodified_identifiers', 'adapters/utils'
+require_relative '../utils/replace'
+require_relative '../utils/split_alter_table'
+require_relative '../utils/unmodified_identifiers'
 
 module Sequel
   module MySQL

@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/shared/mssql'
+require_relative '../shared/mssql'
 
 module Sequel
   module JDBC

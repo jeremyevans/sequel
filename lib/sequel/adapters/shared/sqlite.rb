@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
-Sequel.require %w'replace unmodified_identifiers', 'adapters/utils'
+require_relative '../utils/replace'
+require_relative '../utils/unmodified_identifiers'
 
 module Sequel
   module SQLite

@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/shared/postgres'
+require_relative 'shared/postgres'
 
 begin 
   require 'pg' 

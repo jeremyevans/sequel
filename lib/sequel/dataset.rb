@@ -42,5 +42,13 @@ module Sequel
     include SQL::StringMethods
   end
   
-  require(%w"query actions features graph prepared_statements misc sql placeholder_literalizer dataset_module", 'dataset')
+  require_relative "dataset/query"
+  require_relative "dataset/actions"
+  require_relative "dataset/features"
+  require_relative "dataset/graph"
+  require_relative "dataset/prepared_statements"
+  require_relative "dataset/misc"
+  require_relative "dataset/sql"
+  require_relative "dataset/placeholder_literalizer"
+  require_relative "dataset/dataset_module"
 end

@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/utils/unmodified_identifiers'
+require_relative 'utils/unmodified_identifiers'
 
 module Sequel
   module Mock

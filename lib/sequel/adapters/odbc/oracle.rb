@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/shared/oracle'
+require_relative '../shared/oracle'
 
 Sequel.synchronize do
   Sequel::ODBC::DATABASE_SETUP[:oracle] = proc do |db|

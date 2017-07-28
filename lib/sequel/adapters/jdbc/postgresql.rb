@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 Sequel::JDBC.load_driver('org.postgresql.Driver', :Postgres)
-Sequel.require 'adapters/shared/postgres'
+require_relative '../shared/postgres'
 
 module Sequel
   module JDBC

@@ -1,8 +1,7 @@
 # frozen-string-literal: true
 
 require 'sqlanywhere'
-
-Sequel.require %w'shared/sqlanywhere', 'adapters'
+require_relative 'shared/sqlanywhere'
 
 module Sequel
   module SqlAnywhere

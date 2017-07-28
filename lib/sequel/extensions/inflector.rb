@@ -95,7 +95,7 @@ class String
       (@uncountables << words).flatten!
     end
 
-    Sequel.require('default_inflections', 'model')
+    require_relative '../model/default_inflections'
     instance_exec(&Sequel::DEFAULT_INFLECTIONS_PROC)
   end
 

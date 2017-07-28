@@ -7,7 +7,8 @@ rescue LoadError
 end
 raise(LoadError, "require 'mysql' did not define Mysql::CLIENT_MULTI_RESULTS!\n  You are probably using the pure ruby mysql.rb driver,\n  which Sequel does not support. You need to install\n  the C based adapter, and make sure that the mysql.so\n  file is loaded instead of the mysql.rb file.\n") unless defined?(Mysql::CLIENT_MULTI_RESULTS)
 
-Sequel.require %w'utils/mysql_mysql2 utils/mysql_prepared_statements', 'adapters'
+require_relative 'utils/mysql_mysql2'
+require_relative 'utils/mysql_prepared_statements'
 
 module Sequel
   module MySQL

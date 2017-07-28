@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'connection_pool/threaded'
+require_relative 'threaded'
 
 # The slowest and most advanced connection, dealing with both multi-threaded
 # access and configurations with multiple shards/servers.

@@ -1,14 +1,14 @@
 # frozen-string-literal: true
 
 require 'mysql2'
-Sequel.require %w'utils/mysql_mysql2', 'adapters'
+require_relative 'utils/mysql_mysql2'
 
 module Sequel
   module Mysql2
     NativePreparedStatements = if ::Mysql2::VERSION >= '0.4'
       true
     else
-      Sequel.require %w'utils/mysql_prepared_statements', 'adapters'
+      require_relative 'utils/mysql_prepared_statements'
       false
     end
 

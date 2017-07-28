@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/shared/sqlanywhere'
-Sequel.require 'adapters/jdbc/transactions'
+require_relative '../shared/sqlanywhere'
+require_relative 'transactions'
 
 module Sequel
   module JDBC

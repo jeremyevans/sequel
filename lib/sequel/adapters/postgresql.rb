@@ -1,3 +1,3 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/postgres'
+require_relative 'postgres'

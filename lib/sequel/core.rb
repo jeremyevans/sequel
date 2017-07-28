@@ -176,12 +176,9 @@ module Sequel
     end
   end
 
-  # Require all given +files+ which should be in the same or a subdirectory of
-  # this file.  If a +subdir+ is given, assume all +files+ are in that subdir.
-  # This is used to ensure that the files loaded are from the same version of
-  # Sequel as this file.
+  # For backwards compatibility only.  require_relative should be used instead.
   def self.require(files, subdir=nil)
-    Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
+    Array(files).each{|f| require_relative "#{"#{subdir}/" if subdir}#{f}"}
   end
 
   SPLIT_SYMBOL_CACHE = {}
@@ -386,7 +383,15 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
 
-  require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
+  require_relative "deprecated"
+  require_relative "sql"
+  require_relative "connection_pool"
+  require_relative "exceptions"
+  require_relative "dataset"
+  require_relative "database"
+  require_relative "timezones"
+  require_relative "ast_transformer"
+  require_relative "version"
 
   class << self
     # Allow nicer syntax for creating Sequel expressions:

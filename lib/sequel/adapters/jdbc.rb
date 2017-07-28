@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'java'
-Sequel.require 'adapters/utils/stored_procedures'
+require_relative 'utils/stored_procedures'
 
 module Sequel
   module JDBC

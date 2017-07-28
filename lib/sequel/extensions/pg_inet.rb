@@ -29,7 +29,6 @@
 # Related module: Sequel::Postgres::InetDatabaseMethods
 
 require 'ipaddr'
-Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres

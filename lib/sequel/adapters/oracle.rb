@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'oci8'
-Sequel.require 'adapters/shared/oracle'
+require_relative 'shared/oracle'
 
 module Sequel
   module Oracle

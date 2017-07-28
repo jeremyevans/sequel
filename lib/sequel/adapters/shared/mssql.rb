@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
-Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/utils'
+require_relative '../utils/emulate_offset_with_row_number'
+require_relative '../utils/split_alter_table'
 
 module Sequel
   module MSSQL

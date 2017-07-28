@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/shared/access'
-Sequel.require 'adapters/utils/split_alter_table'
+require_relative '../shared/access'
+require_relative '../utils/split_alter_table'
 
 module Sequel
   module ADO

@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'amalgalite'
-Sequel.require 'adapters/shared/sqlite'
+require_relative 'shared/sqlite'
 
 module Sequel
   module Amalgalite

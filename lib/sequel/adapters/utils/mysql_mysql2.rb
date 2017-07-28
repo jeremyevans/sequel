@@ -1,6 +1,7 @@
 # frozen-string-literal: true
 
-Sequel.require %w'shared/mysql utils/stored_procedures', 'adapters'
+require_relative '../shared/mysql'
+require_relative 'stored_procedures'
 
 module Sequel
   module MySQL

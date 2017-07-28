@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'tiny_tds'
-Sequel.require 'adapters/shared/mssql'
+require_relative 'shared/mssql'
 
 module Sequel
   module TinyTDS

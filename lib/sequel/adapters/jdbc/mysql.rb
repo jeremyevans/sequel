@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 Sequel::JDBC.load_driver('com.mysql.jdbc.Driver', :MySQL)
-Sequel.require 'adapters/shared/mysql'
+require_relative '../shared/mysql'
 
 module Sequel
   module JDBC

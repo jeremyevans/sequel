@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require %w'adapters/utils/unmodified_identifiers'
+require_relative '../utils/unmodified_identifiers'
 
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes

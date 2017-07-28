@@ -70,8 +70,6 @@
 #
 # Related module: Sequel::Postgres::PGRange
 
-Sequel.require 'adapters/shared/postgres'
-
 module Sequel
   module Postgres
     class PGRange

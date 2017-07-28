@@ -71,7 +71,6 @@
 
 require 'delegate'
 require 'strscan'
-Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres

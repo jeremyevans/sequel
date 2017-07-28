@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 Sequel::JDBC.load_driver('org.sqlite.JDBC', :SQLite3)
-Sequel.require 'adapters/shared/sqlite'
+require_relative '../shared/sqlite'
 
 module Sequel
   module JDBC

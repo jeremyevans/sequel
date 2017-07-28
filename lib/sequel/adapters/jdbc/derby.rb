@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 Sequel::JDBC.load_driver('org.apache.derby.jdbc.EmbeddedDriver', :Derby)
-Sequel.require 'adapters/jdbc/transactions'
+require_relative 'transactions'
 
 module Sequel
   module JDBC

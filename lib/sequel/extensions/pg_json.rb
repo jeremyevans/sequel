@@ -62,7 +62,6 @@
 
 require 'delegate'
 require 'json'
-Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   module Postgres

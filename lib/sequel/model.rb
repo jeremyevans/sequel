@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-require 'sequel/core'
+require_relative 'core'
 
 module Sequel
   # <tt>Sequel::Model</tt> is an object relational mapper built on top of Sequel core.  Each
@@ -62,9 +62,15 @@ module Sequel
     @typecast_on_assignment = true
     @use_transactions = true
 
-    Sequel.require %w"default_inflections inflections plugins dataset_module base exceptions errors", "model"
+    require_relative "model/default_inflections"
+    require_relative "model/inflections"
+    require_relative "model/plugins"
+    require_relative "model/dataset_module"
+    require_relative "model/base"
+    require_relative "model/exceptions"
+    require_relative "model/errors"
     if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
-      Sequel.require 'associations', 'model'
+      require_relative 'model/associations'
       plugin Model::Associations
     end
 

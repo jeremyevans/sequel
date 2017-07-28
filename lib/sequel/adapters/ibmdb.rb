@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'ibm_db'
-Sequel.require 'adapters/shared/db2'
+require_relative 'shared/db2'
 
 module Sequel
 

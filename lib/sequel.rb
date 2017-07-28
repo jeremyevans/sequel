@@ -1,3 +1,3 @@
 # frozen-string-literal: true
 
-require 'sequel/model'
+require_relative 'sequel/model'
