@@ -1,11 +1,11 @@
 if ENV['COVERAGE']
-  require File.join(File.dirname(File.expand_path(__FILE__)), "sequel_coverage")
+  require_relative "sequel_coverage"
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/extensions/core_extensions\.rb\z})
 end
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../lib/"))
-  require 'sequel'
+  require_relative '../lib/sequel'
 end
 
 Regexp.send(:include, Sequel::SQL::StringMethods)
@@ -18,7 +18,7 @@ gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 
-require File.expand_path("#{File.dirname(__FILE__)}/deprecation_helper.rb")
+require_relative "deprecation_helper.rb"
 
 describe "Sequel core extensions" do
   it "should have Sequel.core_extensions? be true if enabled" do

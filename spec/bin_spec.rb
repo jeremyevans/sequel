@@ -16,8 +16,7 @@ else
 end
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
-  $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
-  require 'sequel'
+  require_relative '../lib/sequel'
 end
 
 File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)

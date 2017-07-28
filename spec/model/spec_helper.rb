@@ -1,8 +1,8 @@
-require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
+require_relative "../sequel_warning"
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model') 
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel'
+  require_relative "../../lib/sequel"
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
@@ -10,7 +10,7 @@ gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 
-require "#{File.dirname(File.dirname(__FILE__))}/deprecation_helper.rb"
+require_relative '../deprecation_helper'
 
 class << Sequel::Model
   attr_writer :db_schema

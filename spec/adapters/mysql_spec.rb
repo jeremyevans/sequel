@@ -1,6 +1,6 @@
 SEQUEL_ADAPTER_TEST = :mysql
 
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative 'spec_helper'
 
 unless defined?(MYSQL_SOCKET_FILE)
   MYSQL_SOCKET_FILE = '/tmp/mysql.sock'

@@ -1,6 +1,6 @@
 SEQUEL_ADAPTER_TEST = :sqlite
 
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative 'spec_helper'
 
 describe "An SQLite database" do
   before do

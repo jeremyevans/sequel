@@ -1,7 +1,7 @@
-require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
+require_relative "../sequel_warning"
 
 if ENV['COVERAGE']
-  require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
+  require_relative "../sequel_coverage"
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(extensions|plugins)/\w+\.rb\z})
 end
 
@@ -12,10 +12,10 @@ require 'minitest/shared_description'
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel'
+  require_relative "../../lib/sequel"
 end
 
-require "#{File.dirname(File.dirname(__FILE__))}/deprecation_helper.rb"
+require_relative '../deprecation_helper'
 
 begin
   # Attempt to load ActiveSupport blank extension and inflector first, so Sequel

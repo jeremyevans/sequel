@@ -1,2 +1,2 @@
-require './spec/core_spec'
-require './spec/model_spec'
+require_relative 'core_spec'
+require_relative 'model_spec'

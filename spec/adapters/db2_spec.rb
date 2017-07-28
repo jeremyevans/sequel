@@ -1,6 +1,6 @@
 SEQUEL_ADAPTER_TEST = :db2
 
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative 'spec_helper'
 
 if DB.table_exists?(:test)
   DB.drop_table(:test)

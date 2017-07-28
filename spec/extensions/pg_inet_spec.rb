@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+require_relative "spec_helper"
 
 describe "pg_inet extension" do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true

@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+require_relative "spec_helper"
 
 with_server_specs = shared_description do
   it "should set the default server to use in the block" do

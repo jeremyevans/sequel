@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative "spec_helper"
 
 OneToOneEagerLimitStrategies = shared_description do
   it "eager loading one_to_one associations should work correctly" do

@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+require_relative "spec_helper"
 
 mod = shared_description do
   it "should take action depending on :on_duplicate_columns if 2 or more columns have the same name" do

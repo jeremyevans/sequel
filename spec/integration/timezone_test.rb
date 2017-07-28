@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative "spec_helper"
 
 describe "Sequel timezone support" do
   def _test_timezone(timezone=Sequel.application_timezone)

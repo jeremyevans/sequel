@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
+require_relative "spec_helper"
 
 require 'yaml'
 require 'json'
@@ -190,7 +190,7 @@ describe "Serialization plugin" do
 
   it "should handle registration of custom serializer/deserializer pairs" do
     @c.set_primary_key :id
-    require 'sequel/plugins/serialization'
+    require_relative '../../lib/sequel/plugins/serialization'
     Sequel::Plugins::Serialization.register_format(:reverse, proc{|s| s.reverse}, proc{|s| s.reverse})
     @c.plugin :serialization, :reverse, :abc, :def
     @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => 'cba', :def => 'olleh')

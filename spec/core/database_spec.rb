@@ -1,4 +1,4 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
+require_relative "spec_helper"
 
 describe "A new Database" do
   before do
@@ -1317,7 +1317,7 @@ end
 
 describe "A Database adapter with a scheme" do
   before do
-    require 'sequel/adapters/mock'
+    require_relative '../../lib/sequel/adapters/mock'
     @ccc = Class.new(Sequel::Mock::Database)
     @ccc.send(:set_adapter_scheme, :ccc)
   end

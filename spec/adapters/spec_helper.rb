@@ -1,17 +1,17 @@
 require 'logger'
-require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
+require_relative "../sequel_warning"
 
 if ENV['COVERAGE']
-  require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
+  require_relative "../sequel_coverage"
   SimpleCov.sequel_coverage(:group=>%r{lib/sequel/adapters})
 end
 
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel'
+  require_relative "../../lib/sequel"
 end
 begin
-  require File.join(File.dirname(File.dirname(File.expand_path(__FILE__))), 'spec_config.rb')
+  require_relative "../spec_config"
 rescue LoadError
 end
 
@@ -28,7 +28,7 @@ class Sequel::Database
   end
 end
 
-require './spec/guards_helper'
+require_relative '../guards_helper'
 
 class Minitest::HooksSpec
   def check_sqls

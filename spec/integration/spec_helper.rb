@@ -1,17 +1,17 @@
 require 'logger'
-require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
+require_relative "../sequel_warning"
 
 if ENV['COVERAGE']
-  require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
+  require_relative "../sequel_coverage"
   SimpleCov.sequel_coverage(:group=>%r{lib/sequel/adapters})
 end
 
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require 'sequel'
+  require_relative "../../lib/sequel"
 end
 begin
-  require File.join(File.dirname(File.dirname(__FILE__)), 'spec_config.rb') unless defined?(DB)
+  require_relative "../spec_config" unless defined?(DB)
 rescue LoadError
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_(spec|test)\.rb/}
@@ -23,7 +23,7 @@ Sequel::Model.plugin :prepared_statements if ENV['SEQUEL_MODEL_PREPARED_STATEMEN
 Sequel::Model.use_transactions = false
 Sequel::Model.cache_anonymous_models = false
 
-require './spec/guards_helper'
+require_relative '../guards_helper'
 
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 

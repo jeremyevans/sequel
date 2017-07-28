@@ -1,6 +1,6 @@
 SEQUEL_ADAPTER_TEST = :oracle
 
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative 'spec_helper'
 
 unless DB.opts[:autosequence]
   warn "Running oracle adapter specs without :autosequence Database option results in many errors, use the :autosequence Database option when testing"

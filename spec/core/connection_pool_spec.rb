@@ -1,6 +1,6 @@
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
+require_relative "spec_helper"
+require_relative '../../lib/sequel/connection_pool/sharded_threaded'
 
-require 'sequel/connection_pool/sharded_threaded'
 connection_pool_defaults = {:pool_timeout=>5, :max_connections=>4}
 st_connection_pool_defaults = connection_pool_defaults.merge(:single_threaded=>true)
 

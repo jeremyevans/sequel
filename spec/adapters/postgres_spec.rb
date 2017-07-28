@@ -1,6 +1,6 @@
 SEQUEL_ADAPTER_TEST = :postgres
 
-require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require_relative 'spec_helper'
 
 uses_pg = Sequel::Postgres::USES_PG if DB.adapter_scheme == :postgres
 uses_pg_or_jdbc = uses_pg || DB.adapter_scheme == :jdbc
@@ -3716,8 +3716,6 @@ end
 
 describe "PostgreSQL stored procedures for datasets" do
   before do
-    require 'sequel/adapters/utils/stored_procedures'
-
     @db = DB
     @db.create_table!(:items) do
       primary_key :id
