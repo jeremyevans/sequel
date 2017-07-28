@@ -93,22 +93,34 @@ module Sequel
               where(r.qualify(r.join_table_alias, r[:left_keys])=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
             ds.where(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
           when :many_through_many, :one_through_many
-            fe, *edges = r.edges
-            edges << r.final_edge
-            if fre = r.reverse_edges.first
-              table = fre[:table]
-              left = fre[:left]
-              mds = model.join(fe[:table], Array(fe[:right]).zip(Array(fe[:left])), :implicit_qualifier=>model.table_name)
-            else
-              table = fe[:table]
-              left = edges.first[:left]
-              edges = []
+            if r.reverse_edges.empty?
               mds = r.associated_dataset
+              fe = r.edges.first
+              selection = Array(r.qualify(fe[:table], r.final_edge[:left]))
+              predicate_key = r.qualify(fe[:table], fe[:right])
+            else
+              mds = model.dataset
+              iq = model.table_name
+              edges = r.edges.map(&:dup)
+              edges << r.final_edge.dup
+              edges.each do |e|
+                alias_expr = e[:table]
+                aliaz = mds.unused_table_alias(e[:table])
+                unless aliaz == alias_expr
+                  alias_expr = Sequel.as(e[:table], aliaz)
+                end
+                e[:alias] = aliaz
+                mds = mds.join(alias_expr, Array(e[:right]).zip(Array(e[:left])), :implicit_qualifier=>iq)
+                iq = nil
+              end
+              fe, f1e, f2e = edges.values_at(0, -1, -2)
+              selection = Array(r.qualify(f2e[:alias], f1e[:left]))
+              predicate_key = r.qualify(fe[:alias], fe[:right])
             end
+
             mds = mds.
-              select(*Array(r.qualify(table, left))).
-              where(r.qualify(fe[:table], fe[:right])=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
-            edges.each{|e| mds = mds.join(e[:table], Array(e[:right]).zip(Array(e[:left])))}
+              select(*selection).
+              where(predicate_key=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
             ds.where(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
           when :pg_array_to_many
             ds.where(Sequel[r.primary_key=>sds.select{Sequel.pg_array_op(r.qualify(r[:model].table_name, r[:key])).unnest}])

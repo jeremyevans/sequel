@@ -1,5 +1,7 @@
 === master
 
+* Make dataset_associations plugin automatically alias tables when using many_through_many associations that join the same table multiple times (jeremyevans)
+
 * Deprecate using a :pool_class Database that is not a class or a symbol for a supported pool class (jeremyevans)
 
 * Deprecate :eager_loading_predicate_key association option and association reflection method (jeremyevans)

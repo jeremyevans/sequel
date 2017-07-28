@@ -13,14 +13,17 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Artist = Class.new(@Base)
     @Album = Class.new(@Base)
     @Tag = Class.new(@Base)
+    @Track = Class.new(@Base)
 
     def @Artist.name; 'Artist' end
     def @Album.name; 'Album' end
     def @Tag.name; 'Tag' end
+    def @Track.name; 'Track' end
 
     @Artist.dataset = @db[:artists]
     @Album.dataset = @db[:albums]
     @Tag.dataset = @db[:tags]
+    @Track.dataset = @db[:tracks]
 
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
@@ -28,6 +31,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
 
     @Album.plugin :many_through_many
     @Artist.plugin :many_through_many
+    @Track.plugin :many_through_many
     @Artist.plugin :pg_array_associations
     @Tag.plugin :pg_array_associations
     @Artist.one_to_many :albums, :class=>@Album
@@ -41,6 +45,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Tag.many_to_pg_array :artists, :class=>@Artist
     @Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :class=>@Tag
     @Artist.one_through_many :otag, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :class=>@Tag
+    @Track.many_through_many :artist_tracks, [[:albums, :id, :artist_id], [:albums, :artist_id, :id]], :class=>@Track, :left_primary_key=>:album_id, :right_primary_key=>:album_id
   end
 
   it "should work for many_to_one associations" do
@@ -83,6 +88,13 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds.must_be_kind_of(Sequel::Dataset)
     ds.model.must_equal @Tag
     ds.sql.must_equal "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
+  end
+
+  it "should work for self referential many_through_many associations" do
+    ds = @Track.artist_tracks
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Track
+    ds.sql.must_equal "SELECT tracks.* FROM tracks WHERE (tracks.album_id IN (SELECT albums_0.id FROM tracks INNER JOIN albums ON (albums.id = tracks.album_id) INNER JOIN albums AS albums_0 ON (albums_0.artist_id = albums.artist_id) INNER JOIN tracks AS tracks_0 ON (tracks_0.album_id = albums_0.id) WHERE (albums.id IN (SELECT tracks.album_id FROM tracks))))"
   end
 
   it "should work for many_through_many associations with a single join table" do

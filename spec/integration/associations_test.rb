@@ -1621,6 +1621,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
       Album.first_tags.all.must_equal []
       Artist.tags.all.must_equal []
       Artist.first_tags.all.must_equal []
+      Tag.tags.all.must_equal []
     end
     Artist.albums.tags.all.must_equal []
 
@@ -1637,6 +1638,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
       Album.first_tags.all.must_equal [@tag]
       Artist.tags.all.must_equal [@tag]
       Artist.first_tags.all.must_equal [@tag]
+      Tag.tags.all.must_equal [@tag]
     end
     Artist.albums.tags.all.must_equal [@tag]
 
@@ -1652,6 +1654,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
       Album.first_tags.order(:name).all.must_equal [@tag, tag]
       Artist.tags.order(:name).all.must_equal [@tag, tag]
       Artist.first_tags.order(:name).all.must_equal [@tag, tag]
+      Tag.tags.order(:name).all.must_equal [@tag, tag]
     end
     Artist.albums.tags.order(:name).all.must_equal [@tag, tag]
 
@@ -1664,6 +1667,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
       Album.filter(Album.qualified_primary_key_hash(album.pk)).first_tags.all.must_equal [tag]
       Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).tags.all.must_equal [tag]
       Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).first_tags.all.must_equal [tag]
+      Tag.filter(Tag.qualified_primary_key_hash(tag.pk)).tags.all.must_equal [tag]
     end
     Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.tags.all.must_equal [tag]
 
@@ -1891,6 +1895,8 @@ describe "Sequel::Model Simple Associations" do
     class ::Tag < Sequel::Model(@db)
       plugin :dataset_associations
       many_to_many :albums
+      plugin :many_through_many
+      many_through_many :tags, [[:albums_tags, :tag_id, :album_id], [:albums, :id, :artist_id], [:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :class=>:Tag
     end
     @album = Album.create(:name=>'Al')
     @artist = Artist.create(:name=>'Ar')
@@ -2184,6 +2190,8 @@ describe "Sequel::Model Composite Key Associations" do
       set_primary_key [:id1, :id2]
       unrestrict_primary_key
       many_to_many :albums, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2]
+      plugin :many_through_many
+      many_through_many :tags, [[:albums_tags, [:tag_id1, :tag_id2], [:album_id1, :album_id2]], [:albums, [:id1, :id2], [:artist_id1, :artist_id2]], [:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :class=>:Tag
     end
     @album = Album.create(:name=>'Al', :id1=>1, :id2=>2)
     @artist = Artist.create(:name=>'Ar', :id1=>3, :id2=>4)
