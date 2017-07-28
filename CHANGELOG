@@ -1,4 +1,4 @@
-=== master
+=== 4.49.0 (2017-08-01)
 
 * Make dataset_associations plugin automatically alias tables when using many_through_many associations that join the same table multiple times (jeremyevans)
 
@@ -28,7 +28,7 @@
 
 * Support native offset syntax on Oracle 12 (timon) (#1397)
 
-* Deprecate Dataset#nullify in the null_dataset extension (jeremyevans)
+* Deprecate Dataset#nullify! in the null_dataset extension (jeremyevans)
 
 * Deprecate Dataset#autoid=, #_fetch=, and #numrows= in the mock adapter (jeremyevans)
 
