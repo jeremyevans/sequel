@@ -54,7 +54,7 @@ class Sequel::ConnectionPool
             raise Sequel::Error, "unsupported connection pool type, please pass appropriate class as the :pool_class option"
           end
 
-          require("sequel/connection_pool/#{pc}")
+          Sequel.require("connection_pool/#{pc}")
           pc = Sequel.const_get(name)
         end
 
