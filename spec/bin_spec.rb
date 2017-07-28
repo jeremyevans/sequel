@@ -16,14 +16,14 @@ else
 end
 
 unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+  $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
   require 'sequel'
 end
 
-DB = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB}")
-DB2 = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB2}")
 File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
 File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
+DB = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB}", :test=>false)
+DB2 = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB2}", :test=>false)
 
 require 'minitest/autorun'
 
@@ -157,7 +157,7 @@ END
   end
 
   it "-L should load all *.rb files in given directory" do
-    bin(:args=>'-L ./lib/sequel/connection_pool -c "p [Sequel::SingleConnectionPool, Sequel::ThreadedConnectionPool, Sequel::ShardedSingleConnectionPool, Sequel::ShardedThreadedConnectionPool].length"').must_equal "4\n"
+    bin(:args=>'-r ./lib/sequel/extensions/migration -L ./spec/files/integer_migrations -c "p Sequel::Migration.descendants.length"').must_equal "3\n"
   end
 
   it "-m should migrate database up" do
