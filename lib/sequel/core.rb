@@ -178,7 +178,8 @@ module Sequel
 
   # For backwards compatibility only.  require_relative should be used instead.
   def self.require(files, subdir=nil)
-    Array(files).each{|f| require_relative "#{"#{subdir}/" if subdir}#{f}"}
+    # Use Kernel.require_relative to work around JRuby 9.0 bug
+    Array(files).each{|f| Kernel.require_relative "#{"#{subdir}/" if subdir}#{f}"}
   end
 
   SPLIT_SYMBOL_CACHE = {}
