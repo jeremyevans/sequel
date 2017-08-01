@@ -419,6 +419,12 @@ ThreadedConnectionPoolSpecs = shared_description do
   end
 
   it "should block threads until a connection becomes available, when assign connection returns nil" do
+    # Shorten pool timeout, as making assign_connection return nil when there are
+    # connections in the pool can make the pool later block until the timeout expires,
+    # since then the pool will not be signalled correctly.
+    # This spec is only added for coverage purposes, to ensure that fallback code is tested.
+    @pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:pool_timeout=>0.25))
+
     cc = {}
     threads = []
     q, q1 = Queue.new, Queue.new
