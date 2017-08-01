@@ -1,3 +1,67 @@
+=== master
+
+* Make threaded connection pools not block while connections are being made (jeremyevans)
+
+* SQL::Expression#clone and #dup now return self, since all expressions should be frozen value objects (jeremyevans)
+
+* Don't create empty arrays for unused association callbacks (jeremyevans)
+
+* Cache association method name symbols instead of recomputing them everytime (jeremyevans)
+
+* Raise an exception if attempting to create a prepared statement using a dataset with a delayed evaluation (jeremyevans)
+
+* Make ConnectionPool#size thread safe by using the pool mutex (jeremyevans)
+
+* Use instance_exec instead of instance_eval when passing a block, to work with lambdas that accept no arguments (jeremyevans)
+
+* Freeze SQL::StringAgg instances in string_agg extension (jeremyevans)
+
+* Freeze SQL::DateAdd instances in date_arithmetic extension (jeremyevans)
+
+* Freeze SQL::Expression.comparison_attrs (jeremyevans)
+
+* Rename SQL::Subscript#f to #expression, keeping #f as an alias (jeremyevans)
+
+* Require the :pool_class Database option be a class to use a custom connection pool (jeremyevans)
+
+* Make the class_table_inheritance plugin raise an Error during update if any UPDATE query does not affect a single row (jeremyevans)
+
+* Change most send calls to public_send unless calling private methods is expected (jeremyevans)
+
+* Database schema and schema generator methods now return nil (jeremyevans)
+
+* Model#validates_unique in the validation helpers plugin now defaults to only checking on new or modified values (jeremyevans)
+
+* Deprecate Model#_before_validation (private_method), use Model#before_validation now (jeremyevans)
+
+* Always run before/after/around validation hooks when saving, even when not validating the object (jeremyevans)
+
+* Deprecate Model use_after_commit_rollback class and instance accessors (jeremyevans)
+
+* Deprecate Model.allowed_columns reader (jeremyevans)
+
+* Freeze internal constants that shouldn't be modified at runtime (jeremyevans)
+
+* Attempt to connect to the database immediately when creating the Database instance (jeremyevans)
+
+* Make association_pks plugin delay the setting of associated objects until the current object is saved by default (jeremyevans)
+
+* Joined datasets used as model datasets are now automatically wrapped in a subquery (jeremyevans)
+
+* Setting an invalid dataset for a model class now raises an exception by default (jeremyevans)
+
+* Getting all values for newly created models now happens before calling after_create, instead of after (jeremyevans)
+
+* Remove use of @was_new/@columns_updated instance variables when saving model objects (jeremyevans)
+
+* Disable symbol splitting by default (jeremyevans)
+
+* Make datasets frozen by default (jeremyevans)
+
+* Drop support for ruby 1.8.7, minimum now is 1.9.2 (jeremyevans) 
+
+* Remove deprecated adapters, extensions, plugins, constants, and features (jeremyevans)
+
 === 4.49.0 (2017-08-01)
 
 * Make dataset_associations plugin automatically alias tables when using many_through_many associations that join the same table multiple times (jeremyevans)
