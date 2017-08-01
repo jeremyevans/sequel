@@ -49,6 +49,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#method-i-cause">cause</a></li>
               <li><a href="#attribute-i-wrapped_exception">wrapped_exception</a></li>
             </ol>
           </div>
@@ -113,6 +114,27 @@
                     </td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-cause'>
+                <a name='method-i-cause'></a>
+                <div class='synopsis'>
+                  <span class='name'>cause</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returned the wrapped exception if one exists, otherwise use ruby&#39;s
+                  default behavior.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cause-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-cause-source'><span class="ruby-comment"># File lib/sequel/exceptions.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cause</span>&#x000A;  <span class="ruby-identifier">wrapped_exception</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

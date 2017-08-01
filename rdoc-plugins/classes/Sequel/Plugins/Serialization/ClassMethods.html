@@ -167,7 +167,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-serialized_columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-serialized_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 150</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serialized_columns</span>&#x000A;  <span class="ruby-identifier">serialization_map</span>.<span class="ruby-identifier">keys</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-serialized_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 150</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serialized_columns</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;#{self}.serialized_columns in the serialization plugin&quot;</span>, <span class="ruby-node">&quot;Use #{self}.serialization_map.keys instead&quot;</span>)&#x000A;  <span class="ruby-identifier">serialization_map</span>.<span class="ruby-identifier">keys</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

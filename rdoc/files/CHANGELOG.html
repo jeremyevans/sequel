@@ -29,12 +29,94 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-06-30 14:44:21 -0700</span>
+          <span class='datetime'>2017-08-01 07:59:40 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.49.0+-282017-08-01-29">4.49.0 (2017-08-01)<span><a href="#label-4.49.0+-282017-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make dataset_associations plugin automatically alias tables when using
+            many_through_many associations that join the same table multiple times
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate using a :pool_class Database that is not a class or a symbol for
+            a supported pool class (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate :eager_loading_predicate_key association option and association
+            reflection method (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model.serialized_columns in the serialization plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model.cti_columns in the class_table_inheritance plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate SQL::AliasedExpression#aliaz, use alias instead (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate SQL::Function#f, use name instead (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate treating cross join with conditions as inner join on MySQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate ConnectionPool#created_count, use size instead (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate ConnectionPool::CONNECTION_POOL_MAP, use the :pool_class option
+            to specify a non-default connection pool (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Sequel::IBMDB::Connection#prepared_statements= in the ibmdb
+            adapter (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate DEFAULT_OPTIONS in validation_helpers, override
+            default_validation_helpers_options private method instead (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate model association before callbacks returning false to cancel the
+            action (jeremyevans)</p>
+            </li><li>
+            <p>Support native offset syntax on Oracle 12 (timon) (#1397)</p>
+            </li><li>
+            <p>Deprecate Dataset#nullify! in the null_dataset extension (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Dataset#autoid=, #_fetch=, and numrows= in the mock adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate loading plugins by requiring sequel_#{plugin} (jeremyevans)</p>
+            </li><li>
+            <p>Add Model.sti_class_from_sti_key in the single_table_inheritance plugin to
+            get the appropriate class to use (Aryk) (#1396)</p>
+            </li><li>
+            <p>Make <a
+            href="../classes/Sequel/Error.html#method-i-cause">Sequel::Error#cause</a>
+            use wrapped_exception if it exists on ruby 2.1+ (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#where_all, where_each, where_single_value core dataset methods
+            instead of just model dataset methods (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#extend_datasets and Dataset#with_extend now use a
+            Dataset::DatasetModule instance if given a block (jeremyevans)</p>
+            </li><li>
+            <p>Add <a
+            href="../classes/Sequel/Dataset/DatasetModule.html">Sequel::Dataset::DatasetModule</a>,
+            now a superclass of <a
+            href="../classes/Sequel/Model/DatasetModule.html">Sequel::Model::DatasetModule</a>
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make composition plugin with :mapping option work correctly if
+            Model#get_column_value is overridden (jeremyevans)</p>
+            </li><li>
+            <p>Support Dataset#paged_each :stream =&gt; false option on mysql2 to disable
+            streaming (Aryk) (#1395)</p>
+            </li><li>
+            <p>Make datetimeoffset handling in the jdbc/sqlserver adapter work on more
+            drivers (jeremyevans)</p>
+            </li><li>
+            <p>Make alter_table add_primary_key work correctly on H2 1.4+ (jeremyevans)</p>
+            </li><li>
+            <p>Support :sslrootcert Database option in the postgres adapter (dleavitt)
+            (#1391)</p>
+            </li></ul>
             
             <h3 id="label-4.48.0+-282017-07-01-29">4.48.0 (2017-07-01)<span><a href="#label-4.48.0+-282017-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

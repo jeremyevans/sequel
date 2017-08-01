@@ -62,6 +62,7 @@
               <li><a href="#method-i-execute_prepared">execute_prepared</a></li>
               <li><a href="#method-i-prepare">prepare</a></li>
               <li><a href="#attribute-i-prepared_statements">prepared_statements</a></li>
+              <li><a href="#method-i-prepared_statements-3D">prepared_statements=</a></li>
               <li><a href="#method-i-rollback">rollback</a></li>
             </ol>
           </div>
@@ -82,7 +83,7 @@
                     <td class='context-item-name'>
                       <a name='attribute-i-prepared_statements'>prepared_statements</a>
                     </td>
-                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
                       <p>A hash with prepared statement name symbol keys, where each value is  a two
@@ -109,7 +110,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">connection_param</span>)&#x000A;  <span class="ruby-ivar">@conn</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">connection_param</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">connection_param</span>, <span class="ruby-string">&#39;&#39;</span>, <span class="ruby-string">&#39;&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>  <span class="ruby-comment"># connect using catalog </span>&#x000A;    <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">connection_param</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">autocommit</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-ivar">@prepared_statements</span> = {}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">connection_param</span>)&#x000A;  <span class="ruby-ivar">@conn</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">connection_param</span>.<span class="ruby-identifier">class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">connection_param</span>, <span class="ruby-string">&#39;&#39;</span>, <span class="ruby-string">&#39;&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>  <span class="ruby-comment"># connect using catalog </span>&#x000A;    <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">connection_param</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">autocommit</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-ivar">@prepared_statements</span> = {}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -127,7 +128,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-autocommit-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-autocommit-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autocommit</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">autocommit</span>(<span class="ruby-ivar">@conn</span>) <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-autocommit-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autocommit</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">autocommit</span>(<span class="ruby-ivar">@conn</span>) <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-autocommit-3D'>
@@ -144,7 +145,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-autocommit-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-autocommit-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autocommit=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">autocommit</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-identifier">value</span> <span class="ruby-operator">?</span> <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_AUTOCOMMIT_ON</span> <span class="ruby-operator">:</span> <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_AUTOCOMMIT_OFF</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-autocommit-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autocommit=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">autocommit</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-identifier">value</span> <span class="ruby-operator">?</span> <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_AUTOCOMMIT_ON</span> <span class="ruby-operator">:</span> <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL_AUTOCOMMIT_OFF</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-close'>
@@ -161,7 +162,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-close-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-close-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">close</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">close</span>(<span class="ruby-ivar">@conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-close-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">close</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">close</span>(<span class="ruby-ivar">@conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-commit'>
@@ -178,7 +179,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-commit-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-commit-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">commit</span>(<span class="ruby-ivar">@conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-commit-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">commit</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">commit</span>(<span class="ruby-ivar">@conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-error_msg'>
@@ -195,7 +196,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-error_msg-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-error_msg-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">error_msg</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">getErrormsg</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">DB_CONN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-error_msg-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">error_msg</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">getErrormsg</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">DB_CONN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-error_sqlstate'>
@@ -212,7 +213,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-error_sqlstate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-error_sqlstate-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">error_sqlstate</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">getErrorstate</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">DB_CONN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-error_sqlstate-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">error_sqlstate</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">getErrorstate</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-constant">IBM_DB</span><span class="ruby-operator">::</span><span class="ruby-constant">DB_CONN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute'>
@@ -230,7 +231,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 95</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">stmt</span> = <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">error_msg</span>, <span class="ruby-identifier">error_sqlstate</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">stmt</span>&#x000A;  <span class="ruby-constant">Statement</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">stmt</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">stmt</span> = <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">exec</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">error_msg</span>, <span class="ruby-identifier">error_sqlstate</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">stmt</span>&#x000A;  <span class="ruby-constant">Statement</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">stmt</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_prepared'>
@@ -248,7 +249,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_prepared-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_prepared-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 103</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_prepared</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">stmt</span> = <span class="ruby-ivar">@prepared_statements</span>[<span class="ruby-identifier">ps_name</span>].<span class="ruby-identifier">last</span>&#x000A;  <span class="ruby-identifier">res</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">res</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Error executing statement #{ps_name}: #{error_msg}&quot;</span>, <span class="ruby-identifier">error_sqlstate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">stmt</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_prepared-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_prepared</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">stmt</span> = <span class="ruby-ivar">@prepared_statements</span>[<span class="ruby-identifier">ps_name</span>].<span class="ruby-identifier">last</span>&#x000A;  <span class="ruby-identifier">res</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">res</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Error executing statement #{ps_name}: #{error_msg}&quot;</span>, <span class="ruby-identifier">error_sqlstate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">stmt</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepare'>
@@ -266,7 +267,23 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ps_name</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span> = <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-identifier">sql</span>)&#x000A;    <span class="ruby-identifier">ps_name</span> = <span class="ruby-identifier">ps_name</span>.<span class="ruby-identifier">to_sym</span>&#x000A;    <span class="ruby-identifier">stmt</span> = <span class="ruby-constant">Statement</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">stmt</span>)&#x000A;    <span class="ruby-ivar">@prepared_statements</span>[<span class="ruby-identifier">ps_name</span>] = [<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">stmt</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">err</span> = <span class="ruby-identifier">error_msg</span>&#x000A;    <span class="ruby-identifier">err</span> = <span class="ruby-node">&quot;Error preparing #{ps_name} with SQL: #{sql}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">error_msg</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">error_msg</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">err</span>, <span class="ruby-identifier">error_sqlstate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ps_name</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span> = <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-ivar">@conn</span>, <span class="ruby-identifier">sql</span>)&#x000A;    <span class="ruby-identifier">ps_name</span> = <span class="ruby-identifier">ps_name</span>.<span class="ruby-identifier">to_sym</span>&#x000A;    <span class="ruby-identifier">stmt</span> = <span class="ruby-constant">Statement</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">stmt</span>)&#x000A;    <span class="ruby-ivar">@prepared_statements</span>[<span class="ruby-identifier">ps_name</span>] = [<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">stmt</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">err</span> = <span class="ruby-identifier">error_msg</span>&#x000A;    <span class="ruby-identifier">err</span> = <span class="ruby-node">&quot;Error preparing #{ps_name} with SQL: #{sql}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">error_msg</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">error_msg</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">err</span>, <span class="ruby-identifier">error_sqlstate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-prepared_statements-3D'>
+                <a name='method-i-prepared_statements-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>prepared_statements=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepared_statements-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-prepared_statements-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepared_statements=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Sequel::IBMDB::Connection#prepared_statements=&quot;</span>, <span class="ruby-string">&quot;Use replace on the hash instead of reassigning it&quot;</span>)&#x000A;  <span class="ruby-ivar">@prepared_statements</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-rollback'>
@@ -283,7 +300,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-rollback-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-rollback-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 127</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rollback</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">rollback</span>(<span class="ruby-ivar">@conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-rollback-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rollback</span>&#x000A;  <span class="ruby-constant">IBM_DB</span>.<span class="ruby-identifier">rollback</span>(<span class="ruby-ivar">@conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

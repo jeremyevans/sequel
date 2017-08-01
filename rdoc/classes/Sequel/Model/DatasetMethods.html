@@ -54,9 +54,6 @@
               <li><a href="#method-i-model">model</a></li>
               <li><a href="#method-i-paged_each">paged_each</a></li>
               <li><a href="#method-i-to_hash">to_hash</a></li>
-              <li><a href="#method-i-where_all">where_all</a></li>
-              <li><a href="#method-i-where_each">where_each</a></li>
-              <li><a href="#method-i-where_single_value">where_single_value</a></li>
               <li><a href="#method-i-with_pk">with_pk</a></li>
               <li><a href="#method-i-with_pk-21">with_pk!</a></li>
             </ol>
@@ -268,73 +265,6 @@
                   <pre id='method-i-to_hash-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2682</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;  <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-method-i-where_all'>
-                <a name='method-i-where_all'></a>
-                <div class='synopsis'>
-                  <span class='name'>where_all</span>
-                  <span class='arguments'>(cond, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return an array of all rows matching the given filter condition, also
-                  yielding each row to the given block.  Basically the same as
-                  where(cond).all(&amp;block), except it can be optimized to not create an
-                  intermediate dataset.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where_all</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id IN (1, 2, 3))</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where_all-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-where_all-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2692</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where_all</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_model_where_loader</span>&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">all</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-where_each'>
-                <a name='method-i-where_each'></a>
-                <div class='synopsis'>
-                  <span class='name'>where_each</span>
-                  <span class='arguments'>(cond, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Iterate over all rows matching the given filter condition,  yielding each
-                  row to the given block.  Basically the same as
-                  where(cond).each(&amp;block), except it can be optimized to not create an
-                  intermediate dataset.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where_each</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">row</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id IN (1, 2, 3))</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where_each-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-where_each-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2706</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where_each</span>(<span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_model_where_loader</span>&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">each</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-where_single_value'>
-                <a name='method-i-where_single_value'></a>
-                <div class='synopsis'>
-                  <span class='name'>where_single_value</span>
-                  <span class='arguments'>(cond)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Filter the datasets using the given filter condition, then return a single
-                  value. This assumes that the dataset has already been setup to limit the
-                  selection to a single column.  Basically the same as
-                  where(cond).single_value, except it can be optimized to not create an
-                  intermediate dataset.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where_single_value</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists WHERE (id = 1) LIMIT 1</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where_single_value-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-where_single_value-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2721</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where_single_value</span>(<span class="ruby-identifier">cond</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_placeholder_literalizer</span>(<span class="ruby-value">:_model_where_single_value_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">single_value_ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">filter_expr</span>(<span class="ruby-identifier">cond</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-identifier">cond</span>).<span class="ruby-identifier">single_value</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-with_pk'>
                 <a name='method-i-with_pk'></a>
                 <div class='synopsis'>
@@ -352,7 +282,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_pk-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_pk-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2742</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_with_pk_loader</span>)&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_pk-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2696</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_with_pk_loader</span>)&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_pk-21'>
@@ -371,7 +301,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_pk-21-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_pk-21-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2752</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_pk!</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NoMatchingRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_pk-21-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2706</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_pk!</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NoMatchingRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -92,7 +92,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1334</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">callable</span>)&#x000A;  <span class="ruby-ivar">@callable</span> = <span class="ruby-identifier">callable</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1337</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">callable</span>)&#x000A;  <span class="ruby-ivar">@callable</span> = <span class="ruby-identifier">callable</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -111,7 +111,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1342</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1345</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

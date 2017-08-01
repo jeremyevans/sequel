@@ -131,7 +131,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_types-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-convert_types-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 751</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_types</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Sequel::JDBC::Dataset#convert_types&quot;</span>, <span class="ruby-node">&quot;The private #convert_types? method returns whether to convert types for this dataset&quot;</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:convert_types</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-convert_types-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 753</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_types</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Sequel::JDBC::Dataset#convert_types&quot;</span>, <span class="ruby-node">&quot;The private #convert_types? method returns whether to convert types for this dataset&quot;</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:convert_types</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-convert_types-3D'>
@@ -147,7 +147,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_types-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-convert_types-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 755</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_types=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Sequel::JDBC::Dataset#convert_types=&quot;</span>, <span class="ruby-node">&quot;Switch to using #with_convert_types, which returns a modified copy&quot;</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:convert_types</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-convert_types-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 757</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_types=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Sequel::JDBC::Dataset#convert_types=&quot;</span>, <span class="ruby-node">&quot;Switch to using #with_convert_types, which returns a modified copy&quot;</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:convert_types</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -164,7 +164,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 761</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span> <span class="ruby-identifier">process_result_set</span>(<span class="ruby-identifier">result</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 763</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span> <span class="ruby-identifier">process_result_set</span>(<span class="ruby-identifier">result</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_convert_types'>
@@ -182,7 +182,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_convert_types-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_convert_types-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 772</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_convert_types</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:convert_types=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_convert_types-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 774</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_convert_types</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:convert_types=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_fetch_size'>
@@ -200,7 +200,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_fetch_size-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_fetch_size-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 767</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch_size=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">size</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_fetch_size-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 769</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch_size=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">size</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -40,7 +40,6 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a href="#method-i-columns-3D">columns=</a></li>
               <li><a href="#method-i-on_duplicate_columns">on_duplicate_columns</a></li>
             </ol>
           </div>
@@ -63,24 +62,6 @@
             </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-columns-3D'>
-                <a name='method-i-columns-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>columns=</span>
-                  <span class='arguments'>(cols)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Override the attr_writer to check for duplicate columns, and call
-                  handle_duplicate_columns if necessary.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-columns-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns=</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">uniq</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>&#x000A;    <span class="ruby-identifier">handle_duplicate_columns</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-on_duplicate_columns'>
                 <a name='method-i-on_duplicate_columns'></a>
                 <div class='synopsis'>

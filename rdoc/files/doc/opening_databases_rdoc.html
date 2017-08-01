@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-03-21 12:22:17 -0700</span>
+          <span class='datetime'>2017-07-13 15:05:07 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -392,7 +392,7 @@
             
             <h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>Requires: pg (or postgres if pg is not available)</p>
+            <p>Requires: pg (or postgres-pr/postgres-compat if pg is not available)</p>
             
             <p>The <a href="../../classes/Sequel.html">Sequel</a> postgres adapter works
             with the pg, postgres, and postgres-pr ruby libraries. The pg library is
@@ -431,8 +431,10 @@
             respected if using the pg library).</p>
             </td></tr><tr><td class='label'>:sslmode </td><td>
             <p>Set to &#39;disable&#39;, &#39;allow&#39;, &#39;prefer&#39;,
-            &#39;require&#39; to choose how to treat SSL (only respected if using the
-            pg library)</p>
+            &#39;require&#39;, &#39;verify-ca&#39;, or &#39;verify-full&#39; to choose
+            how to treat SSL (only respected if using the pg library)</p>
+            </td></tr><tr><td class='label'>:sslrootcert </td><td>
+            <p>Specify the path to the root SSL certificate to use.</p>
             </td></tr><tr><td class='label'>:search_path </td><td>
             <p>Set to the schema search_path.  This can either be a single string
             containing the schemas separated by commas (for use via a URL:
