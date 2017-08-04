@@ -25,12 +25,11 @@ Sequel::Model.cache_anonymous_models = false
 
 require_relative '../guards_helper'
 
-IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 
-unless defined?(DB)
-  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])
-  DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
-end
+DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL']) unless defined?(DB)
+
+IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
+DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 
 if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type == :access)
   def DB.drop_table(*tables)

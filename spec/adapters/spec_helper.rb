@@ -39,14 +39,14 @@ class Minitest::HooksSpec
   end
 end
 
-IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
-
 unless defined?(DB)
   env_var = "SEQUEL_#{SEQUEL_ADAPTER_TEST.to_s.upcase}_URL"
   env_var = ENV.has_key?(env_var) ? env_var : 'SEQUEL_INTEGRATION_URL'
   DB = Sequel.connect(ENV[env_var])
-  DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 end
+
+IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
+DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 
 if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
   DB.extension :duplicate_columns_handler
