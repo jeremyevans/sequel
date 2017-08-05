@@ -668,6 +668,11 @@ describe "A PostgreSQL dataset" do
     end
   end if DB.server_version >= 90200
 
+  it "should support creating indexes only if they do not exist" do
+    @db.add_index :test, [:name, :value], :name=>'tnv3'
+    @db.add_index :test, [:name, :value], :if_not_exists=>true, :name=>'tnv3'
+  end if DB.server_version >= 90500
+
   it "#lock should lock table if inside a transaction" do
     @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
