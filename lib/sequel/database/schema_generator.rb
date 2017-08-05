@@ -443,6 +443,7 @@ module Sequel
       # :opclass :: Set an opclass to use for all columns (per-column opclasses require
       #             custom SQL).
       # :type :: Set the index type (e.g. full_text, spatial, hash, gin, gist, btree).
+      # :if_not_exists :: Only create the index if an index of the same name doesn't already exists
       #
       # MySQL specific options:
       #
