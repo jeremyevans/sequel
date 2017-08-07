@@ -1,5 +1,7 @@
 === master
 
+* Support :if_not_exists option when creating indexes on PostgreSQL 9.5+ (DyegoCosta) (#1405)
+
 * Make threaded connection pools not block while connections are being made (jeremyevans)
 
 * SQL::Expression#clone and #dup now return self, since all expressions should be frozen value objects (jeremyevans)

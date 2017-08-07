@@ -670,6 +670,7 @@ describe "A PostgreSQL dataset" do
 
   it "should support creating indexes only if they do not exist" do
     @db.add_index :test, [:name, :value], :name=>'tnv3'
+    proc{@db.add_index :test, [:name, :value], :name=>'tnv3'}.must_raise Sequel::DatabaseError
     @db.add_index :test, [:name, :value], :if_not_exists=>true, :name=>'tnv3'
   end if DB.server_version >= 90500
 
