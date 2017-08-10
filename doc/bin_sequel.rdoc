@@ -89,6 +89,8 @@ To save this information to a file, use a standard shell redirection:
 
 The -d option dumps the migration in database-independent format, the -D option dumps it in database-specific format.
 
+Note that the support for dumping schema is fairly limited.  It doesn't handle database views, functions, triggers, schemas, partial indexes, functional indexes, and many other things.  You should probably use the database specific tools to handle those.
+
 The -S option dumps the schema cache for all tables in the database, which can speed up the usage of Sequel with models when using the schema_caching extension.  You should provide this option with the path to which to dump the schema:
 
   sequel -S /path/to/schema_cache.db postgres://host/database
@@ -100,6 +102,8 @@ Using the -C option, Sequel can copy the contents of one database to another, ev
   sequel -C mysql://host1/database postgres://host2/database2
 
 This copies the table structure, table data, indexes, and foreign keys from the MySQL database to the PostgreSQL database.
+
+Note that the support for copying is fairly limited.  It doesn't handle database views, functions, triggers, schemas, partial indexes, functional indexes, and many other things. Also, the data type conversion may not be exactly what you want.  It is best designed for quick conversions and testing.  For serious production use, use the database's tools to copy databases for the same database type, and for different database types, use the Sequel API.
 
 == Other Options
 
