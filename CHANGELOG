@@ -1,5 +1,7 @@
 === master
 
+* Don't use savepoints when creating indexes inside a transaction on databases that don't support transactional schema modifications (jeremyevans) (#1407)
+
 * Support :if_not_exists option when creating indexes on PostgreSQL 9.5+ (DyegoCosta) (#1405)
 
 * Make threaded connection pools not block while connections are being made (jeremyevans)
