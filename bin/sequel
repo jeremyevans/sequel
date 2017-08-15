@@ -83,7 +83,7 @@ options = OptionParser.new do |opts|
   end
   
   opts.on("-M", "--migrate-version VER", "migrate the database to version given") do |v|
-    migrate_ver = Integer(v)
+    migrate_ver = Integer(v, 10)
   end
 
   opts.on("-N", "--no-test-connection", "do not test the connection") do
