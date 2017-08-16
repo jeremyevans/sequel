@@ -1666,11 +1666,11 @@ describe "Database#inspect" do
   end
 
   it "should include the class name and the connection options if an options hash was given" do
-    Sequel.connect(:adapter=>:mock).inspect.must_match(/#<Sequel::Mock::Database: \{:adapter=>:mock\}>/)
+    Sequel.connect(:adapter=>:mock).inspect.must_equal '#<Sequel::Mock::Database: {:adapter=>:mock}>'
   end
 
   it "should include the class name, uri, and connection options if uri and options hash was given" do
-    Sequel.connect('mock://foo', :database=>'bar').inspect.must_match(/#<Sequel::Mock::Database: "mock:\/\/foo" \{:database=>"bar"\}>/)
+    Sequel.connect('mock://foo', :database=>'bar').inspect.must_equal '#<Sequel::Mock::Database: "mock://foo" {:database=>"bar"}>'
   end
 end
 
@@ -2231,7 +2231,7 @@ describe "Database#typecast_value" do
       @db.typecast_value(:date, 'a')
       true.must_equal false
     rescue Sequel::InvalidValue => e
-      e.inspect.must_match(/\A#<Sequel::InvalidValue: ArgumentError: .*>\z/)
+      e.inspect.must_equal '#<Sequel::InvalidValue: ArgumentError: invalid date>'
     end
   end
 end

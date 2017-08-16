@@ -179,15 +179,12 @@ describe "A simple dataset" do
   end
   
   it "should format an insert statement with hash" do
-    @dataset.insert_sql(:name => 'wxyz', :price => 342).
-      must_match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
-
-      @dataset.insert_sql({}).must_equal "INSERT INTO test DEFAULT VALUES"
+    @dataset.insert_sql(:name => 'wxyz', :price => 342).must_equal 'INSERT INTO test (name, price) VALUES (\'wxyz\', 342)'
+    @dataset.insert_sql({}).must_equal "INSERT INTO test DEFAULT VALUES"
   end
 
   it "should format an insert statement with string keys" do
-    @dataset.insert_sql('name' => 'wxyz', 'price' => 342).
-      must_match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
+    @dataset.insert_sql('name' => 'wxyz', 'price' => 342).must_equal 'INSERT INTO test (name, price) VALUES (\'wxyz\', 342)'
   end
   
   it "should format an insert statement with an arbitrary value" do
@@ -400,8 +397,7 @@ describe "Dataset#where" do
   end
   
   it "should work with hashes" do
-    @dataset.where(:name => 'xyz', :price => 342).select_sql.
-      must_match(/WHERE \(\(name = 'xyz'\) AND \(price = 342\)\)|WHERE \(\(price = 342\) AND \(name = 'xyz'\)\)/)
+    @dataset.where(:name => 'xyz', :price => 342).select_sql.must_equal 'SELECT * FROM test WHERE ((name = \'xyz\') AND (price = 342))'
   end
   
   it "should work with a placeholder literal string" do
@@ -683,9 +679,7 @@ describe "Dataset#exclude" do
   end
 
   it "should take multiple conditions as a hash and express the logic correctly in SQL" do
-    @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
-      must_match(Regexp.union(/WHERE \(\(region != 'Asia'\) OR \(name != 'Japan'\)\)/,
-                                /WHERE \(\(name != 'Japan'\) OR \(region != 'Asia'\)\)/))
+    @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.must_equal 'SELECT * FROM test WHERE ((region != \'Asia\') OR (name != \'Japan\'))'
   end
 
   it "should parenthesize a single literal string condition correctly" do
@@ -3024,7 +3018,7 @@ describe "Dataset#single_value!" do
   
   it "should call each and return the first value of the first record" do
     @db.fetch = [{:a=>1, :b=>2}, {:a=>3, :b=>4}]
-    @db[:test].single_value!.to_s.must_match(/\A(1|2)\z/)
+    @db[:test].single_value!.must_equal 1
     @db.sqls.must_equal ['SELECT * FROM test']
   end
   
@@ -3465,10 +3459,7 @@ describe "Dataset#multi_insert" do
   
   it "should accept string keys as column names" do
     @ds.multi_insert([{'x'=>1, 'y'=>2}, {'x'=>3, 'y'=>4}])
-    sqls = @db.sqls
-    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].must_include(sqls.slice!(1))
-    ["INSERT INTO items (x, y) VALUES (3, 4)", "INSERT INTO items (y, x) VALUES (4, 3)"].must_include(sqls.slice!(1))
-    sqls.must_equal ['BEGIN', 'COMMIT']
+    @db.sqls.must_equal ['BEGIN', "INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (x, y) VALUES (3, 4)", 'COMMIT']
   end
 
   it "should not do anything if no hashes are provided" do

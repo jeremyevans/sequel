@@ -252,48 +252,28 @@ describe Sequel::Dataset, "graphing" do
     it "should specify the graph mapping" do
       ds = @ds1.graph(:lines, :x=>:id)
       ds.sql.must_equal 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ds = ds.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
-      ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-      'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ].must_include(ds.sql)
+      ds.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y]).sql.must_equal 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
 
     it "should allow a third entry to specify an expression to use other than the default" do
-      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, Sequel.function(:random)])
-      ['SELECT 1 AS x, random() AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-      'SELECT random() AS y, 1 AS x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ].must_include(ds.sql)
+      @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, Sequel.function(:random)]).sql.must_equal 'SELECT 1 AS x, random() AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
 
     it "should allow a single array entry to specify a table, assuming the same column as the key" do
-      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines])
-      ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-      'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ].must_include(ds.sql)
+      @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines]).sql.must_equal 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
 
     it "should allow hash values to be symbols specifying table, assuming the same column as the key" do
-      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines)
-      ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-      'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ].must_include(ds.sql)
+      @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines).sql.must_equal 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
 
     it "should only alias columns if necessary" do
-      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
-      ds.sql.must_equal 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+      @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y]).sql.must_equal 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
 
     it "should only alias columns if necessary" do
-      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
-      ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-      'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ].must_include(ds.sql)
-
-      ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x1=>[:points, :x], :y=>[:lines, :y])
-      ['SELECT points.x AS x1, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-      'SELECT lines.y, points.x AS x1 FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-      ].must_include(ds.sql)
+      @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y]).sql.must_equal 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+      @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x1=>[:points, :x], :y=>[:lines, :y]).sql.must_equal 'SELECT points.x AS x1, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
   end
 

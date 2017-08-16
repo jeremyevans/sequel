@@ -129,9 +129,8 @@ describe Sequel::Schema::CreateTableGenerator do
   end
   
   it "creates indexes" do
-    @indexes[0][:columns].must_include(:title)
-    @indexes[1][:columns].must_include(:title)
-    @indexes[1][:columns].must_include(:body)
+    @indexes[0][:columns].must_equal [:title]
+    @indexes[1][:columns].must_equal [:title, :body]
   end
 end
 
