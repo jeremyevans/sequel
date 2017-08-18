@@ -122,52 +122,64 @@ end if false
 describe "MSSQL Dataset#join_table" do
   it "should emulate the USING clause with ON" do
     DB[:items].join(:categories, [:id]).sql.must_equal 'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON ([CATEGORIES].[ID] = [ITEMS].[ID])'
-    ['SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))',
-      'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID2] = [ITEMS].[ID2]) AND ([CATEGORIES].[ID1] = [ITEMS].[ID1]))'].
-      must_include(DB[:items].join(:categories, [:id1, :id2]).sql)
+    DB[:items].join(:categories, [:id1, :id2]).sql.must_equal 'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))'
     DB[Sequel[:items].as(:i)].join(Sequel[:categories].as(:c), [:id]).sql.must_equal 'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
   end
 end
 
 describe "MSSQL Dataset#output" do
-  before do
+  before(:all) do
     @db = DB
     @db.create_table!(:items){String :name; Integer :value}
     @db.create_table!(:out){String :name; Integer :value}
     @ds = @db[:items]
   end
   after do
+    @ds.delete
+    @db[:out].delete
+  end
+  after(:all) do
     @db.drop_table?(:items, :out)
   end
 
-  it "should format OUTPUT clauses without INTO for DELETE statements" do
-    @ds.output(nil, [Sequel[:deleted][:name], Sequel[:deleted][:value]]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/)
-    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/)
+  it "should handle OUTPUT clauses without INTO for DELETE statements" do
+    @ds.insert(:name=>'a', :value=>1)
+    @ds.output(nil, [Sequel[:deleted][:name], Sequel[:deleted][:value]]).with_sql(:delete_sql).all.must_equal [{:name=>"a", :value=>1}]
+    @ds.insert(:name=>'a', :value=>1)
+    @ds.output(nil, [Sequel[:deleted][:name]]).with_sql(:delete_sql).all.must_equal [{:name=>"a"}]
+    @ds.insert(:name=>'a', :value=>1)
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).with_sql(:delete_sql).all.must_equal [{:name=>"a", :value=>1}]
   end
   
-  it "should format OUTPUT clauses with INTO for DELETE statements" do
-    @ds.output(:out, [Sequel[:deleted][:name], Sequel[:deleted][:value]]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/)
-    @ds.output(:out, {:name => Sequel[:deleted][:name], :value => Sequel[:deleted][:value]}).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
+  it "should handle OUTPUT clauses with INTO for DELETE statements" do
+    @ds.insert(:name=>'a', :value=>1)
+    @ds.output(:out, {:name => Sequel[:deleted][:name], :value => Sequel[:deleted][:value]}).delete
+    @db[:out].all.must_equal [{:name=>"a", :value=>1}]
   end
 
-  it "should format OUTPUT clauses without INTO for INSERT statements" do
-    @ds.output(nil, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/)
-    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].* VALUES \((N'name'|1), (N'name'|1)\)/)
+  it "should handle OUTPUT clauses without INTO for INSERT statements" do
+    @ds.output(nil, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).with_sql(:insert_sql, :name => "name", :value => 1).all.must_equal [{:name=>"name", :value=>1}]
+    @ds.all.must_equal [{:name=>"name", :value=>1}]
   end
 
-  it "should format OUTPUT clauses with INTO for INSERT statements" do
-    @ds.output(:out, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \((\[NAME\]|\[VALUE\]), (\[NAME\]|\[VALUE\])\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] VALUES \((N'name'|1), (N'name'|1)\)/)
-    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:inserted][:value]}).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) VALUES \((N'name'|1), (N'name'|1)\)/)
+  it "should handle OUTPUT clauses with INTO for INSERT statements" do
+    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:inserted][:value]}).insert(:name => "name", :value => 1)
+    @db[:out].all.must_equal [{:name=>"name", :value=>1}]
   end
 
-  it "should format OUTPUT clauses without INTO for UPDATE statements" do
-    @ds.output(nil, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/)
-    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[INSERTED\].*/)
+  it "should handle OUTPUT clauses without INTO for UPDATE statements" do
+    @ds.insert(:name=>'a', :value=>1)
+    @ds.output(nil, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).with_sql(:update_sql, :value => 2).all.must_equal [{:name=>"a", :value=>1}]
+    @ds.all.must_equal [{:name=>"a", :value=>2}]
+    @ds.output(nil, [Sequel[:inserted][:name]]).with_sql(:update_sql, :value => 3).all.must_equal [{:name=>"a"}]
+    @ds.all.must_equal [{:name=>"a", :value=>3}]
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).with_sql(:update_sql, :value => 4).all.must_equal [{:name=>"a", :value=>4}]
   end
 
-  it "should format OUTPUT clauses with INTO for UPDATE statements" do
-    @ds.output(:out, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\]/)
-    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:deleted][:value]}).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
+  it "should handle OUTPUT clauses with INTO for UPDATE statements" do
+    @ds.insert(:name=>'a', :value=>1)
+    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:deleted][:value]}).update(:value => 2)
+    @db[:out].all.must_equal [{:name=>"a", :value=>1}]
   end
 
   it "should execute OUTPUT clauses in DELETE statements" do
@@ -196,31 +208,53 @@ describe "MSSQL Dataset#output" do
 end
 
 describe "MSSQL dataset using #with and #with_recursive" do
-  before do
+  before(:all) do
     @db = DB
-    @ds = DB[:t]
-      @ds1 = @ds.with(:t, @db[:x])
-      @ds2 = @ds.with_recursive(:t, @db[:x], @db[:t])
+    @ds = DB[:x]
+    @ds1 = @ds.with(:t, @db[:x])
+    @ds2 = @ds.with_recursive(:t, @db[:x], @db[:t].where(false))
+    @db.create_table!(:x){Integer :v; Integer :y}
+  end
+  before do
+    @db[:x].insert(:v=>1, :y=>2)
+  end
+  after do
+    @db[:x].delete
+  end
+  after(:all) do
+    @db.drop_table?(:x)
   end
 
-  it "should prepend UPDATE statements with WITH clause" do
-    @ds1.update_sql(:x => :y).must_equal 'WITH [T] AS (SELECT * FROM [X]) UPDATE [T] SET [X] = [Y]'
-    @ds2.update_sql(:x => :y).must_equal 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) UPDATE [T] SET [X] = [Y]'
+  it "should handle CTEs in UPDATE queries" do
+    @ds1.update(:v => @db[:t].select(:y))
+    @ds.all.must_equal [{:v=>2, :y=>2}]
+    @ds2.update(:v => Sequel.+(@db[:t].select(:y), 1))
+    @ds.all.must_equal [{:v=>3, :y=>2}]
   end
 
-  it "should prepend DELETE statements with WITH clause" do
-    @ds1.filter(:y => 1).delete_sql.must_equal 'WITH [T] AS (SELECT * FROM [X]) DELETE FROM [T] WHERE ([Y] = 1)'
-    @ds2.filter(:y => 1).delete_sql.must_equal 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) DELETE FROM [T] WHERE ([Y] = 1)'
+  it "should handle CTEs in DELETE queries" do
+    @ds1.where(@db[:t].select(:y)=>1).delete
+    @ds.all.must_equal [{:v=>1, :y=>2}]
+    @ds1.where(@db[:t].select(:y)=>2).delete
+    @ds.all.must_equal []
+
+    @db[:x].insert(:v=>1, :y=>2)
+    @ds2.where(@db[:t].select(:y)=>1).delete
+    @ds.all.must_equal [{:v=>1, :y=>2}]
+    @ds2.where(@db[:t].select(:y)=>2).delete
+    @ds.all.must_equal []
   end
 
-  it "should prepend INSERT statements with WITH clause" do
-    @ds1.insert_sql(@db[:t]).must_equal 'WITH [T] AS (SELECT * FROM [X]) INSERT INTO [T] SELECT * FROM [T]'
-    @ds2.insert_sql(@db[:t]).must_equal 'WITH [T] AS (SELECT * FROM [X] UNION ALL SELECT * FROM [T]) INSERT INTO [T] SELECT * FROM [T]'
+  it "should handle CTEs in INSERT queries" do
+    @ds1.insert(:v => @db[:t].select(:y), :y => @db[:t].select(:v))
+    @ds.select_order_map([:v, :y]).must_equal [[1, 2], [2, 1]]
+    @ds1.insert(:v => Sequel.+(@db[:t].where(:v=>1).select(:y), 2), :y => Sequel.+(@db[:t].where(:y=>1).select(:v), 3))
+    @ds.select_order_map([:v, :y]).must_equal [[1, 2], [2, 1], [4, 5]]
   end
 
-  it "should move WITH clause on joined dataset to top level" do
-    @db[:s].inner_join(@ds1).sql.must_equal "WITH [T] AS (SELECT * FROM [X]) SELECT * FROM [S] INNER JOIN (SELECT * FROM [T]) AS [T1]"
-    @ds1.inner_join(@db[:s].with(:s, @db[:y])).sql.must_equal "WITH [T] AS (SELECT * FROM [X]), [S] AS (SELECT * FROM [Y]) SELECT * FROM [T] INNER JOIN (SELECT * FROM [S]) AS [T1]"
+  it "should handle WITH clause on joined dataset" do
+    @ds.cross_join(@ds1.select(Sequel[:v].as(:v1), Sequel[:y].as(:y1))).all.must_equal [{:v=>1, :y=>2, :v1=>1, :y1=>2}]
+    @ds.cross_join(@ds2.select(Sequel[:v].as(:v1), Sequel[:y].as(:y1))).all.must_equal [{:v=>1, :y=>2, :v1=>1, :y1=>2}]
   end
 end
 
@@ -250,14 +284,21 @@ end
 describe "MSSQL joined datasets" do
   before do
     @db = DB
+    @db.create_table!(:a){Integer :v}
+    @db[:a].insert(:v=>1)
+  end
+  after do
+    @db.drop_table?(:a)
   end
 
-  it "should format DELETE statements" do
-    @db[:t1].inner_join(:t2, Sequel[:t1][:pk] => Sequel[:t2][:pk]).delete_sql.must_equal "DELETE FROM [T1] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
+  it "should handle DELETE statements" do
+    @db[:a].inner_join(Sequel[:a].as(:b), :v=>:v).delete.must_equal 1
+    @db[:a].empty?.must_equal true
   end
 
-  it "should format UPDATE statements" do
-    @db[:t1].inner_join(:t2, Sequel[:t1][:pk] => Sequel[:t2][:pk]).update_sql(:pk => Sequel[:t2][:pk]).must_equal "UPDATE [T1] SET [PK] = [T2].[PK] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
+  it "should handle UPDATE statements" do
+    @db[:a].inner_join(Sequel[:a].as(:b), :v=>:v).update(:v=>2).must_equal 1
+    @db[:a].all.must_equal [{:v=>2}]
   end
 end
 
@@ -437,14 +478,10 @@ describe "MSSSQL::Dataset#into" do
     @db = DB
   end
 
-  it "should format SELECT statement" do
-    @db[:t].into(:new).select_sql.must_equal "SELECT * INTO [NEW] FROM [T]"
-  end
-
   it "should select rows into a new table" do
     @db.create_table!(:t) {Integer :id; String :value}
     @db[:t].insert(:id => 1, :value => "test")
-    @db << @db[:t].into(:new).select_sql
+    @db[:t].into(:new).all
     @db[:new].all.must_equal [{:id => 1, :value => "test"}]
     @db.drop_table?(:t, :new)
   end
@@ -564,7 +601,7 @@ describe "A MSSQL database adds index with include" do
     @db.alter_table @table_name do
       add_index [:col1], :include => [:col2,:col3]
     end
-    @db.indexes(@table_name).keys.must_include("#{@table_name}_col1_index".to_sym)
+    @db.indexes(@table_name).keys.must_include(:"#{@table_name}_col1_index")
   end
 end
 
