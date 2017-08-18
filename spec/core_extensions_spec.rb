@@ -232,8 +232,7 @@ describe "Array#case and Hash#case" do
   it "should return SQL CASE expression" do
     @d.literal({:x=>:y}.case(:z)).must_equal '(CASE WHEN x THEN y ELSE z END)'
     @d.literal({:x=>:y}.case(:z, :exp)).must_equal '(CASE exp WHEN x THEN y ELSE z END)'
-    ['(CASE WHEN x THEN y WHEN a THEN b ELSE z END)',
-     '(CASE WHEN a THEN b WHEN x THEN y ELSE z END)'].must_include(@d.literal({:x=>:y, :a=>:b}.case(:z)))
+    @d.literal({:x=>:y, :a=>:b}.case(:z)).must_equal '(CASE WHEN x THEN y WHEN a THEN b ELSE z END)'
     @d.literal([[:x, :y]].case(:z)).must_equal '(CASE WHEN x THEN y ELSE z END)'
     @d.literal([[:x, :y], [:a, :b]].case(:z)).must_equal '(CASE WHEN x THEN y WHEN a THEN b ELSE z END)'
     @d.literal([[:x, :y], [:a, :b]].case(:z, :exp)).must_equal '(CASE exp WHEN x THEN y WHEN a THEN b ELSE z END)'
