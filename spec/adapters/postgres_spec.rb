@@ -33,9 +33,9 @@ describe "PostgreSQL", '#create_table' do
 
   it "should create a temporary table" do
     @db.create_table(:tmp_dolls, :temp => true){text :name}
-    check_sqls do
-      @db.sqls.must_equal ['CREATE TEMPORARY TABLE "tmp_dolls" ("name" text)']
-    end
+    @db.table_exists?(:tmp_dolls).must_equal true
+    @db.disconnect
+    @db.table_exists?(:tmp_dolls).must_equal false
   end
 
   it "temporary table should support :on_commit option" do
@@ -416,35 +416,6 @@ describe "A PostgreSQL dataset" do
     @db.drop_table?(:test)
   end
 
-  it "should quote columns and tables using double quotes if quoting identifiers" do
-    check_sqls do
-      @d.select(:name).sql.must_equal 'SELECT "name" FROM "test"'
-      @d.select(Sequel.lit('COUNT(*)')).sql.must_equal 'SELECT COUNT(*) FROM "test"'
-      @d.select(Sequel.function(:max, :value)).sql.must_equal 'SELECT max("value") FROM "test"'
-      @d.select(Sequel.function(:NOW)).sql.must_equal 'SELECT NOW() FROM "test"'
-      @d.select(Sequel.function(:max, Sequel[:items][:value])).sql.must_equal 'SELECT max("items"."value") FROM "test"'
-      @d.order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC'
-      @d.select(Sequel.lit('test.name AS item_name')).sql.must_equal 'SELECT test.name AS item_name FROM "test"'
-      @d.select(Sequel.lit('"name"')).sql.must_equal 'SELECT "name" FROM "test"'
-      @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.must_equal 'SELECT max(test."name") AS "max_name" FROM "test"'
-      @d.insert_sql(:x => :y).must_match(/\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/)
-
-      @d.select(Sequel.function(:test, :abc, 'hello')).sql.must_equal "SELECT test(\"abc\", 'hello') FROM \"test\""
-      @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello')).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
-      @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello').as(:x2)).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
-      @d.insert_sql(:value => 333).must_match(/\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/)
-    end
-  end
-
-  it "should quote fields correctly when reversing the order if quoting identifiers" do
-    check_sqls do
-      @d.reverse_order(:name).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC'
-      @d.reverse_order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" ASC'
-      @d.reverse_order(:name, Sequel.desc(:test)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
-      @d.reverse_order(Sequel.desc(:name), :test).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
-    end
-  end
-
   it "should support regexps" do
     @d.insert(:name => 'abc', :value => 1)
     @d.insert(:name => 'bcd', :value => 2)
@@ -642,21 +613,18 @@ describe "A PostgreSQL dataset" do
   end
 
   it "should support dropping indexes only if they already exist" do
-    @db.add_index :test, [:name, :value], :name=>'tnv1'
-    @db.sqls.clear
+    proc{@db.drop_index :test, [:name, :value], :name=>'tnv1'}.must_raise Sequel::DatabaseError
     @db.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
-    check_sqls do
-      @db.sqls.must_equal ['DROP INDEX IF EXISTS "tnv1"']
-    end
+    @db.add_index :test, [:name, :value], :name=>'tnv1'
+    @db.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
   end
 
   it "should support CASCADE when dropping indexes" do
-    @db.add_index :test, [:name, :value], :name=>'tnv2'
-    @db.sqls.clear
+    @db.add_index :test, [:name, :value], :name=>'tnv2', :unique=>true
+    @db.create_table(:atest){text :name; integer :value; foreign_key [:name, :value], :test, :key=>[:name, :value]}
+    @db.foreign_key_list(:atest).length.must_equal 1
     @db.drop_index :test, [:name, :value], :cascade=>true, :name=>'tnv2'
-    check_sqls do
-      @db.sqls.must_equal ['DROP INDEX "tnv2" CASCADE']
-    end
+    @db.foreign_key_list(:atest).length.must_equal 0
   end
 
   it "should support dropping indexes concurrently" do
@@ -989,12 +957,7 @@ describe "A PostgreSQL database" do
 
   it "should support opclass specification" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
-    check_sqls do
-      @db.sqls.must_equal [
-      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
-      'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)'
-      ]
-    end
+    proc{@db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :bogus_opclass, :type => :btree)}}.must_raise Sequel::DatabaseError
   end
 
   it "should support fulltext indexes and searching" do
@@ -1039,32 +1002,18 @@ describe "A PostgreSQL database" do
 
   it "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}
-    check_sqls do
-      @db.sqls.must_equal [
-        'CREATE TABLE "posts" ("geom" box)',
-        'CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")'
-      ]
-    end
+    @db.indexes(:posts).length.must_equal 1
   end
 
   it "should support indexes with index type" do
     @db.create_table(:posts){point :p; index :p, :type => 'gist'}
-    check_sqls do
-      @db.sqls.must_equal [
-        'CREATE TABLE "posts" ("p" point)',
-        'CREATE INDEX "posts_p_index" ON "posts" USING gist ("p")'
-      ]
-    end
+    @db.indexes(:posts).length.must_equal 1
   end
 
   it "should support unique indexes with index type" do
-    @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true}
-    check_sqls do
-      @db.sqls.must_equal [
-        'CREATE TABLE "posts" ("title" varchar(5))',
-        'CREATE UNIQUE INDEX "posts_title_index" ON "posts" USING btree ("title")'
-      ]
-    end
+    @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true, :name=>:post_index_foo}
+    @db.indexes(:posts).length.must_equal 1
+    @db.indexes(:posts)[:post_index_foo][:unique].must_equal true
   end
 
   it "should support partial indexes" do
@@ -1077,14 +1026,9 @@ describe "A PostgreSQL database" do
     end
   end
 
-  it "should support identifiers for table names in indicies" do
-    @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
-    check_sqls do
-      @db.sqls.must_equal [
-        'CREATE TABLE "posts" ("title" varchar(5))',
-        'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
-      ]
-    end
+  it "should support identifiers for table names when creating indexes" do
+    @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title}
+    @db.indexes(:posts).length.must_equal 1
   end
 
   it "should support renaming tables" do
@@ -1113,9 +1057,6 @@ describe "Postgres::Dataset#import" do
 
   it "#import should a single insert statement" do
     @ds.import([:x, :y], [[1, 2], [3, 4]])
-    check_sqls do
-      @db.sqls.must_equal ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
-    end
     @ds.all.must_equal [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 
@@ -1238,7 +1179,7 @@ describe "Postgres::Database schema qualified tables" do
     @db.create_table(Sequel[:schema_test][:domains]){integer :i}
     sch = @db.schema(Sequel[:schema_test][:domains])
     cs = sch.map{|x| x.first}
-    cs.must_include(:i)
+    cs.first.must_equal :i
     cs.wont_include(:data_type)
   end
 
@@ -1247,7 +1188,7 @@ describe "Postgres::Database schema qualified tables" do
     @db.create_table(Sequel[:schema_test][:domains]){integer :i}
     sch = @db.schema(:domains, :schema=>:schema_test)
     cs = sch.map{|x| x.first}
-    cs.must_include(:i)
+    cs.first.must_equal :i
     cs.wont_include(:d)
     @db.drop_table(:domains)
   end
@@ -1523,19 +1464,19 @@ if DB.server_version >= 80300
     it "should search by indexed column" do
       record =  {:title => "oopsla conference", :body => "test"}
       @ds.insert(record)
-      @ds.full_text_search(:title, "oopsla").all.must_include(record)
+      @ds.full_text_search(:title, "oopsla").all.must_equal [record]
     end
 
     it "should join multiple coumns with spaces to search by last words in row" do
       record = {:title => "multiple words", :body => "are easy to search"}
       @ds.insert(record)
-      @ds.full_text_search([:title, :body], "words").all.must_include(record)
+      @ds.full_text_search([:title, :body], "words").all.must_equal [record]
     end
 
     it "should return rows with a NULL in one column if a match in another column" do
       record = {:title => "multiple words", :body =>nil}
       @ds.insert(record)
-      @ds.full_text_search([:title, :body], "words").all.must_include(record)
+      @ds.full_text_search([:title, :body], "words").all.must_equal [record]
     end
   end
 end
