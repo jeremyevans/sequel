@@ -310,12 +310,4 @@ describe "An Oracle database" do
 
     DB[:books].select(:title).group_by(:title).count.must_equal 2
   end
-
-  it "#for_update should use FOR UPDATE" do
-    DB[:books].for_update.sql.must_equal 'SELECT * FROM "BOOKS" FOR UPDATE'
-  end
-
-  it "#lock_style should accept symbols" do
-    DB[:books].lock_style(:update).sql.must_equal 'SELECT * FROM "BOOKS" FOR UPDATE'
-  end
 end
