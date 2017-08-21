@@ -7,56 +7,34 @@ unless defined?(MYSQL_SOCKET_FILE)
 end
 MYSQL_URI = URI.parse(DB.uri)
 
-def DB.sqls
-  (@sqls ||= [])
-end
-logger = Object.new
-def logger.method_missing(m, msg)
-  DB.sqls << msg
-end
-DB.loggers = [logger]
-DB.drop_table?(:items, :dolls, :booltest)
-
-SQL_BEGIN = 'BEGIN'
-SQL_ROLLBACK = 'ROLLBACK'
-SQL_COMMIT = 'COMMIT'
+#DB.drop_table?(:items, :dolls, :booltest)
 
 describe "MySQL", '#create_table' do
   before do
     @db = DB
     @db.test_connection
-    DB.sqls.clear
   end
   after do
     @db.drop_table?(:dolls)
   end
 
-  it "should allow to specify options for MySQL" do
-    @db.create_table(:dolls, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `dolls` (`name` text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
-    end
-  end
-
   it "should create a temporary table" do
     @db.create_table(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TEMPORARY TABLE `tmp_dolls` (`name` text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
-    end
+    @db.table_exists?(:tmp_dolls).must_equal true
+    @db.disconnect
+    @db.table_exists?(:tmp_dolls).must_equal false
   end
 
   it "should not use a default for a String :text=>true type" do
     @db.create_table(:dolls){String :name, :text=>true, :default=>'blah'}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `dolls` (`name` text)"]
-    end
+    @db[:dolls].insert
+    @db[:dolls].all.must_equal [{:name=>nil}]
   end
 
   it "should not use a default for a File type" do
     @db.create_table(:dolls){File :name, :default=>'blah'}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `dolls` (`name` blob)"]
-    end
+    @db[:dolls].insert
+    @db[:dolls].all.must_equal [{:name=>nil}]
   end
 
   it "should respect the size option for File type" do
@@ -166,36 +144,9 @@ describe "A MySQL dataset" do
   before do
     DB.create_table(:items){String :name; Integer :value}
     @d = DB[:items]
-    DB.sqls.clear
   end
   after do
     DB.drop_table?(:items)
-  end
-
-  it "should quote columns and tables using back-ticks if quoting identifiers" do
-    @d = @d.with_quote_identifiers(true)
-    @d.select(:name).sql.must_equal 'SELECT `name` FROM `items`'
-    @d.select(Sequel.lit('COUNT(*)')).sql.must_equal 'SELECT COUNT(*) FROM `items`'
-    @d.select(Sequel.function(:max, :value)).sql.must_equal 'SELECT max(`value`) FROM `items`'
-    @d.select(Sequel.function(:NOW)).sql.must_equal 'SELECT NOW() FROM `items`'
-    @d.select(Sequel.function(:max, Sequel[:items][:value])).sql.must_equal 'SELECT max(`items`.`value`) FROM `items`'
-    @d.order(Sequel.expr(:name).desc).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` DESC'
-    @d.select(Sequel.lit('items.name AS item_name')).sql.must_equal 'SELECT items.name AS item_name FROM `items`'
-    @d.select(Sequel.lit('`name`')).sql.must_equal 'SELECT `name` FROM `items`'
-    @d.select(Sequel.lit('max(items.`name`) AS `max_name`')).sql.must_equal 'SELECT max(items.`name`) AS `max_name` FROM `items`'
-    @d.select(Sequel.function(:test, :abc, 'hello')).sql.must_equal "SELECT test(`abc`, 'hello') FROM `items`"
-    @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello')).sql.must_equal "SELECT test(`abc`.`def`, 'hello') FROM `items`"
-    @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello').as(:x2)).sql.must_equal "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
-    @d.insert_sql(:value => 333).must_equal 'INSERT INTO `items` (`value`) VALUES (333)'
-    @d.insert_sql(:x => :y).must_equal 'INSERT INTO `items` (`x`) VALUES (`y`)'
-  end
-
-  it "should quote fields correctly when reversing the order" do
-    @d = @d.with_quote_identifiers(true)
-    @d.reverse_order(:name).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` DESC'
-    @d.reverse_order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` ASC'
-    @d.reverse_order(:name, Sequel.desc(:test)).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` DESC, `test` ASC'
-    @d.reverse_order(Sequel.desc(:name), :test).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` ASC, `test` DESC'
   end
 
   it "should support ORDER clause in UPDATE statements" do
@@ -250,22 +201,6 @@ describe "A MySQL dataset" do
   end
 end
 
-describe "MySQL datasets" do
-  before do
-    @d = DB[:orders]
-  end
-
-  it "should correctly quote column references" do
-    @d = @d.with_quote_identifiers(true)
-    market = 'ICE'
-    ack_stamp = Time.now - 15 * 60 # 15 minutes ago
-    @d.select(:market, Sequel.function(:minute, Sequel.function(:from_unixtime, :ack)).as(:minute)).
-      where{(ack > ack_stamp) & {:market => market}}.
-      group_by(Sequel.function(:minute, Sequel.function(:from_unixtime, :ack))).sql.must_equal \
-      "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
-  end
-end
-
 describe "Dataset#distinct" do
   before do
     @db = DB
@@ -290,32 +225,27 @@ describe "Dataset#distinct" do
 end
 
 describe "MySQL join expressions" do
-  before do
+  before(:all) do
     @ds = DB[:nodes]
+    DB.create_table!(:nodes){Integer :id; Integer :y}
+    DB.create_table!(:n1){Integer :id}
+    DB.create_table!(:n2){Integer :y}
+    @ds.insert(:id=>1, :y=>2)
+    DB[:n1].insert(1)
+    DB[:n2].insert(2)
+  end
+  after(:all) do
+    DB.drop_table?(:n2, :n1, :nodes)
   end
 
   it "should support straight joins (force left table to be read before right)" do
-    @ds.join_table(:straight, :nodes).sql.must_equal 'SELECT * FROM `nodes` STRAIGHT_JOIN `nodes`'
+    @ds.join_table(:straight, :n1).all.must_equal [{:id=>1, :y=>2}]
   end
   it "should support natural joins on multiple tables." do
-    @ds.join_table(:natural_left_outer, [:nodes, :branches]).sql.must_equal 'SELECT * FROM `nodes` NATURAL LEFT OUTER JOIN (`nodes`, `branches`)'
+    @ds.join_table(:natural_left_outer, [:n1, :n2]).all.must_equal [{:id=>1, :y=>2}]
   end
   it "should support straight joins on multiple tables." do
-    @ds.join_table(:straight, [:nodes,:branches]).sql.must_equal 'SELECT * FROM `nodes` STRAIGHT_JOIN (`nodes`, `branches`)'
-  end
-end
-
-describe "Joined MySQL dataset" do
-  before do
-    @ds = DB[:nodes]
-  end
-
-  it "should quote fields correctly" do
-    @ds.with_quote_identifiers(true).join(:attributes, :node_id => :id).sql.must_equal "SELECT * FROM `nodes` INNER JOIN `attributes` ON (`attributes`.`node_id` = `nodes`.`id`)"
-  end
-
-  it "should put a having clause before an order by clause" do
-    @ds.order(:aaa).having(:bbb => :ccc).sql.must_equal "SELECT * FROM `nodes` HAVING (`bbb` = `ccc`) ORDER BY `aaa`"
+    @ds.join_table(:straight, [:n1, :n2]).all.must_equal [{:id=>1, :y=>2}]
   end
 end
 
@@ -348,14 +278,6 @@ describe "A MySQL database" do
 
   it "should provide the server version" do
     @db.server_version.must_be :>=,  40000
-  end
-
-  it "should cache the server version" do
-    # warm cache:
-    @db.server_version
-    @db.sqls.clear
-    3.times{@db.server_version}
-    @db.sqls.must_be :empty?
   end
 
   it "should support for_share" do
@@ -422,8 +344,6 @@ describe "A MySQL database with table options" do
     @db.default_charset = 'utf8'
     @db.default_collate = 'utf8_general_ci'
     @db.drop_table?(:items)
-
-    DB.sqls.clear
   end
   after do
     @db.drop_table?(:items)
@@ -435,23 +355,23 @@ describe "A MySQL database with table options" do
 
   it "should allow to pass custom options (engine, charset, collate) for table creation" do
     @db.create_table(:items, @options){Integer :size; text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=MyISAM DEFAULT CHARSET=latin1 DEFAULT COLLATE=latin1_swedish_ci"]
+    @db.transaction(:rollback=>:always) do
+      @db[:items].insert(:size=>1)
     end
+    @db[:items].all.must_equal [{:size=>1, :name=>nil}]
   end
 
   it "should use default options if specified (engine, charset, collate) for table creation" do
     @db.create_table(:items){Integer :size; text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`size` integer, `name` text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8_general_ci"]
+    @db.transaction(:rollback=>:always) do
+      @db[:items].insert(:size=>1)
     end
+    @db[:items].all.must_equal []
   end
 
   it "should not use default if option has a nil value" do
+    @db.default_engine = 'non_existent_engine'
     @db.create_table(:items, :engine=>nil, :charset=>nil, :collate=>nil){Integer :size; text :name}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`size` integer, `name` text)"]
-    end
   end
 end
 
@@ -459,7 +379,6 @@ describe "A MySQL database" do
   before do
     @db = DB
     @db.drop_table?(:items)
-    DB.sqls.clear
   end
   after do
     @db.drop_table?(:items, :users)
@@ -467,45 +386,45 @@ describe "A MySQL database" do
 
   it "should support defaults for boolean columns" do
     @db.create_table(:items){TrueClass :active1, :default=>true; FalseClass :active2, :default => false}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`active1` tinyint(1) DEFAULT 1, `active2` tinyint(1) DEFAULT 0)"]
-    end
+    @db[:items].insert
+    @db[:items].get([:active1, :active2]).must_equal [true, false]
+    @db[:items].get([Sequel.cast(:active1, Integer).as(:v1), Sequel.cast(:active2, Integer).as(:v2)]).must_equal [1, 0]
   end
 
-  it "should correctly format CREATE TABLE statements with foreign keys" do
+  it "should correctly handle CREATE TABLE statements with foreign keys" do
     @db.create_table(:items){primary_key :id; foreign_key :p_id, :items, :key => :id, :null => false, :on_delete => :cascade}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer PRIMARY KEY AUTO_INCREMENT, `p_id` integer NOT NULL, UNIQUE (`id`), FOREIGN KEY (`p_id`) REFERENCES `items`(`id`) ON DELETE CASCADE)"]
-    end
+    @db[:items].insert(:id=>1, :p_id=>1)
+    @db[:items].insert(:id=>2, :p_id=>1)
+    @db[:items].where(:id=>1).delete
+    @db[:items].count.must_equal 0
   end
 
-  it "should correctly format CREATE TABLE statements with foreign keys, when :key != the default (:id)" do
+  it "should correctly handle CREATE TABLE statements with foreign keys, when :key != the default (:id)" do
     @db.create_table(:items){primary_key :id; Integer :other_than_id; foreign_key :p_id, :items, :key => :other_than_id, :null => false, :on_delete => :cascade}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer PRIMARY KEY AUTO_INCREMENT, `other_than_id` integer, `p_id` integer NOT NULL, UNIQUE (`other_than_id`), FOREIGN KEY (`p_id`) REFERENCES `items`(`other_than_id`) ON DELETE CASCADE)"]
-    end
+    @db[:items].insert(:id=>1, :other_than_id=>2, :p_id=>2)
+    @db[:items].insert(:id=>2, :other_than_id=>3, :p_id=>2)
+    @db[:items].where(:id=>1).delete
+    @db[:items].count.must_equal 0
   end
 
-  it "should correctly format ALTER TABLE statements with foreign keys" do
+  it "should correctly handle ALTER TABLE statements with foreign keys" do
     @db.create_table(:items){Integer :id}
     @db.create_table(:users){primary_key :id}
     @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer)",
-        "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
-        "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL, ADD FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
-    end
+    @db[:users].insert(:id=>1)
+    @db[:items].insert(:id=>2, :p_id=>1)
+    @db[:users].where(:id=>1).delete
+    @db[:items].count.must_equal 0
   end
 
   it "should correctly format ALTER TABLE statements with named foreign keys" do
     @db.create_table(:items){Integer :id}
     @db.create_table(:users){primary_key :id}
     @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade, :foreign_key_constraint_name => :pk_items__users }
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer)",
-        "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
-        "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL, ADD CONSTRAINT `pk_items__users` FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
-    end
+    @db[:users].insert(:id=>1)
+    @db[:items].insert(:id=>2, :p_id=>1)
+    @db[:users].where(:id=>1).delete
+    @db[:items].count.must_equal 0
   end
 
   it "should correctly handle add_column :after option" do
@@ -529,9 +448,6 @@ describe "A MySQL database" do
   it "should have rename_column support keep existing options" do
     @db.create_table(:items){String :id, :null=>false, :default=>'blah'}
     @db.alter_table(:items){rename_column :id, :nid}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` varchar(255) NOT NULL DEFAULT 'blah')", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `nid` varchar(255) NOT NULL DEFAULT 'blah'"]
-    end
     @db[:items].insert
     @db[:items].all.must_equal [{:nid=>'blah'}]
     proc{@db[:items].insert(:nid=>nil)}.must_raise(Sequel::NotNullConstraintViolation)
@@ -540,9 +456,6 @@ describe "A MySQL database" do
   it "should have set_column_type support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
     @db.alter_table(:items){set_column_type :id, :Bignum}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` bigint NOT NULL DEFAULT 5"]
-    end
     @db[:items].insert
     @db[:items].all.must_equal [{:id=>5}]
     proc{@db[:items].insert(:id=>nil)}.must_raise(Sequel::NotNullConstraintViolation)
@@ -554,17 +467,12 @@ describe "A MySQL database" do
   it "should have set_column_type pass through options" do
     @db.create_table(:items){integer :id; enum :list, :elements=>%w[one]}
     @db.alter_table(:items){set_column_type :id, :int, :unsigned=>true, :size=>8; set_column_type :list, :enum, :elements=>%w[two]}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer, `list` enum('one'))", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(8) UNSIGNED NULL, CHANGE COLUMN `list` `list` enum('two') NULL"]
-    end
+    @db.schema(:items)[1][1][:db_type].must_equal "enum('two')"
   end
 
   it "should have set_column_default support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
     @db.alter_table(:items){set_column_default :id, 6}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(11) NOT NULL DEFAULT 6"]
-    end
     @db[:items].insert
     @db[:items].all.must_equal [{:id=>6}]
     proc{@db[:items].insert(:id=>nil)}.must_raise(Sequel::NotNullConstraintViolation)
@@ -573,9 +481,6 @@ describe "A MySQL database" do
   it "should have set_column_allow_null support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
     @db.alter_table(:items){set_column_allow_null :id, true}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` int(11) NULL DEFAULT 5"]
-    end
     @db[:items].insert
     @db[:items].all.must_equal [{:id=>5}]
     @db[:items].insert(:id=>nil)
@@ -705,7 +610,6 @@ describe "A MySQL database" do
   before do
     @db = DB
     @db.drop_table?(:posts)
-    @db.sqls.clear
   end
   after do
     @db.drop_table?(:posts)
@@ -713,28 +617,14 @@ describe "A MySQL database" do
 
   it "should support fulltext indexes and full_text_search" do
     @db.create_table(:posts, :engine=>:MyISAM){text :title; text :body; full_text_index :title; full_text_index [:title, :body]}
-    check_sqls do
-      @db.sqls.must_equal [
-        "CREATE TABLE `posts` (`title` text, `body` text) ENGINE=MyISAM",
-        "CREATE FULLTEXT INDEX `posts_title_index` ON `posts` (`title`)",
-        "CREATE FULLTEXT INDEX `posts_title_body_index` ON `posts` (`title`, `body`)"
-      ]
-    end
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'y')
     @db[:posts].insert(:title=>'sequel', :body=>'ruby')
     @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
-    @db.sqls.clear
 
     @db[:posts].full_text_search(:title, 'rails').all.must_equal [{:title=>'ruby rails', :body=>'y'}]
     @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.must_equal [{:title=>'sequel', :body=>'ruby'}]
     @db[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).all.must_equal [{:title=>'ruby scooby', :body=>'x'}]
-    check_sqls do
-      @db.sqls.must_equal [
-        "SELECT * FROM `posts` WHERE (MATCH (`title`) AGAINST ('rails'))",
-        "SELECT * FROM `posts` WHERE (MATCH (`title`, `body`) AGAINST ('sequel ruby'))",
-        "SELECT * FROM `posts` WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"]
-    end
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').must_equal [{:title=>'ruby rails', :body=>'y'}]
     @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').must_equal [{:title=>'ruby rails', :body=>'y'}]
@@ -742,32 +632,20 @@ describe "A MySQL database" do
 
   it "should support spatial indexes" do
     @db.create_table(:posts, :engine=>:MyISAM){point :geom, :null=>false; spatial_index [:geom]}
-    check_sqls do
-      @db.sqls.must_equal [
-        "CREATE TABLE `posts` (`geom` point NOT NULL) ENGINE=MyISAM",
-        "CREATE SPATIAL INDEX `posts_geom_index` ON `posts` (`geom`)"
-      ]
-    end
+    @db[:posts].insert(Sequel.function(:ST_GeomFromText, 'Point(1 1)'))
+    @db[:posts].where(:geom=>Sequel.function(:ST_GeomFromText, 'Point(1 1)')).count.must_equal 1
   end
 
   it "should support indexes with index type" do
     @db.create_table(:posts){Integer :id; index :id, :type => :btree}
-    check_sqls do
-      @db.sqls.must_equal [
-        "CREATE TABLE `posts` (`id` integer)",
-        "CREATE INDEX `posts_id_index` USING btree ON `posts` (`id`)"
-      ]
-    end
+    @db[:posts].insert(1)
+    @db[:posts].where(:id=>1).count.must_equal 1
   end
 
   it "should support unique indexes with index type" do
     @db.create_table(:posts){Integer :id; index :id, :type => :btree, :unique => true}
-    check_sqls do
-      @db.sqls.must_equal [
-        "CREATE TABLE `posts` (`id` integer)",
-        "CREATE UNIQUE INDEX `posts_id_index` USING btree ON `posts` (`id`)"
-      ]
-    end
+    @db[:posts].insert(1)
+    proc{@db[:posts].insert(1)}.must_raise Sequel::UniqueConstraintViolation
   end
 
   it "should not dump partial indexes" do
@@ -785,9 +663,8 @@ end
 
 describe "MySQL::Dataset#insert and related methods" do
   before do
-    DB.create_table(:items){String :name; Integer :value}
-    @d = DB[:items]
-    DB.sqls.clear
+    DB.create_table(:items){String :name, :unique=>true; Integer :value}
+    @d = DB[:items].order(:name)
   end
   after do
     DB.drop_table?(:items)
@@ -795,245 +672,93 @@ describe "MySQL::Dataset#insert and related methods" do
 
   it "#insert should insert record with default values when no arguments given" do
     @d.insert
-    check_sqls do
-      DB.sqls.must_equal ["INSERT INTO `items` () VALUES ()"]
-    end
     @d.all.must_equal [{:name => nil, :value => nil}]
   end
 
   it "#insert  should insert record with default values when empty hash given" do
     @d.insert({})
-    check_sqls do
-      DB.sqls.must_equal ["INSERT INTO `items` () VALUES ()"]
-    end
     @d.all.must_equal [{:name => nil, :value => nil}]
   end
 
   it "#insert should insert record with default values when empty array given" do
     @d.insert []
-    check_sqls do
-      DB.sqls.must_equal ["INSERT INTO `items` () VALUES ()"]
-    end
     @d.all.must_equal [{:name => nil, :value => nil}]
   end
 
   it "#on_duplicate_key_update should work with regular inserts" do
     DB.add_index :items, :name, :unique=>true
-    DB.sqls.clear
     @d.insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'def', :value => 2)
-
-    check_sqls do
-      DB.sqls.length.must_equal 3
-      DB.sqls[0].must_match(/\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/)
-      DB.sqls[1].must_match(/\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/)
-      DB.sqls[2].must_match(/\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/)
-    end
-
     @d.all.must_equal [{:name => 'abc', :value => 6}, {:name => 'def', :value => 2}]
   end
 
-  it "#multi_replace should insert multiple records in a single statement" do
+  it "#multi_replace should replace multiple records in a single statement" do
     @d.multi_replace([{:name => 'abc'}, {:name => 'def'}])
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "REPLACE INTO `items` (`name`) VALUES ('abc'), ('def')",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
-    ]
+    @d.all.must_equal [ {:name => 'abc', :value => nil}, {:name => 'def', :value => nil} ]
+    @d.multi_replace([{:name => 'abc', :value=>1}, {:name => 'ghi', :value=>3}])
+    @d.all.must_equal [ {:name => 'abc', :value => 1}, {:name => 'def', :value => nil}, {:name => 'ghi', :value=>3} ]
   end
 
-  it "#multi_replace should split the list of records into batches if :commit_every option is given" do
-    @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
-      :commit_every => 2)
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "REPLACE INTO `items` (`value`) VALUES (1), (2)",
-        SQL_COMMIT,
-        SQL_BEGIN,
-        "REPLACE INTO `items` (`value`) VALUES (3), (4)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => nil, :value => 1}, 
-      {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
-      {:name => nil, :value => 4}
-    ]
+  it "#multi_replace should support :commit_every option" do
+    @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}], :commit_every => 2)
+    @d.all.must_equal [ {:name => nil, :value => 1}, {:name => nil, :value => 2}, {:name => nil, :value => 3}, {:name => nil, :value => 4} ]
   end
 
-  it "#multi_replace should split the list of records into batches if :slice option is given" do
-    @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
-      :slice => 2)
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "REPLACE INTO `items` (`value`) VALUES (1), (2)",
-        SQL_COMMIT,
-        SQL_BEGIN,
-        "REPLACE INTO `items` (`value`) VALUES (3), (4)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => nil, :value => 1}, 
-      {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
-      {:name => nil, :value => 4}
-    ]
+  it "#multi_replace should support :slice option" do
+    @d.multi_replace([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}], :slice => 2)
+    @d.all.must_equal [ {:name => nil, :value => 1}, {:name => nil, :value => 2}, {:name => nil, :value => 3}, {:name => nil, :value => 4} ]
   end
 
   it "#multi_insert should insert multiple records in a single statement" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "INSERT INTO `items` (`name`) VALUES ('abc'), ('def')",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
-    ]
+    @d.all.must_equal [ {:name => 'abc', :value => nil}, {:name => 'def', :value => nil} ]
   end
 
-  it "#multi_insert should split the list of records into batches if :commit_every option is given" do
-    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
-      :commit_every => 2)
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "INSERT INTO `items` (`value`) VALUES (1), (2)",
-        SQL_COMMIT,
-        SQL_BEGIN,
-        "INSERT INTO `items` (`value`) VALUES (3), (4)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => nil, :value => 1}, 
-      {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
-      {:name => nil, :value => 4}
-    ]
+  it "#multi_insert should support :commit_every option" do
+    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}], :commit_every => 2)
+    @d.all.must_equal [ {:name => nil, :value => 1}, {:name => nil, :value => 2}, {:name => nil, :value => 3}, {:name => nil, :value => 4} ]
   end
 
-  it "#multi_insert should split the list of records into batches if :slice option is given" do
-    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
-      :slice => 2)
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "INSERT INTO `items` (`value`) VALUES (1), (2)",
-        SQL_COMMIT,
-        SQL_BEGIN,
-        "INSERT INTO `items` (`value`) VALUES (3), (4)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => nil, :value => 1}, 
-      {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
-      {:name => nil, :value => 4}
-    ]
+  it "#multi_insert should support :slice option" do
+    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}], :slice => 2)
+    @d.all.must_equal [ {:name => nil, :value => 1}, {:name => nil, :value => 2}, {:name => nil, :value => 3}, {:name => nil, :value => 4} ]
   end
 
   it "#import should support inserting using columns and values arrays" do
     @d.import([:name, :value], [['abc', 1], ['def', 2]])
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => 'abc', :value => 1}, 
-      {:name => 'def', :value => 2}
-    ]
+    @d.all.must_equal [ {:name => 'abc', :value => 1}, {:name => 'def', :value => 2} ]
   end
 
-  it "#insert_ignore should add the IGNORE keyword when inserting" do
+  it "#insert_ignore should ignore existing records when used with multi_insert" do
     @d.insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "INSERT IGNORE INTO `items` (`name`) VALUES ('abc'), ('def')",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
-    ]
+    @d.all.must_equal [ {:name => 'abc', :value => nil}, {:name => 'def', :value => nil} ]
+    @d.insert_ignore.multi_insert([{:name => 'abc', :value=>1}, {:name => 'ghi', :value=>3}])
+    @d.all.must_equal [ {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}, {:name => 'ghi', :value=>3} ]
   end
 
-  it "#insert_ignore should add the IGNORE keyword for single inserts" do
+  it "#insert_ignore should ignore single records when used with insert" do
     @d.insert_ignore.insert(:name => 'ghi')
-    check_sqls do
-      DB.sqls.must_equal ["INSERT IGNORE INTO `items` (`name`) VALUES ('ghi')"]
-    end
+    @d.all.must_equal [{:name => 'ghi', :value => nil}]
+    @d.insert_ignore.insert(:name => 'ghi', :value=>2)
     @d.all.must_equal [{:name => 'ghi', :value => nil}]
   end
 
-  it "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
+  it "#on_duplicate_key_update should handle inserts with duplicate keys" do
     @d.on_duplicate_key_update.import([:name,:value], [['abc', 1], ['def',2]])
-
-    check_sqls do
-      DB.sqls.must_equal [
-        "SELECT * FROM `items` LIMIT 1",
-        SQL_BEGIN,
-        "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `name`=VALUES(`name`), `value`=VALUES(`value`)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
-    ]
+    @d.all.must_equal [ {:name => 'abc', :value => 1}, {:name => 'def', :value => 2} ]
+    @d.on_duplicate_key_update.import([:name,:value], [['abc', 2], ['ghi',3]])
+    @d.all.must_equal [ {:name => 'abc', :value => 2}, {:name => 'def', :value => 2}, {:name => 'ghi', :value=>3} ]
   end
 
   it "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
-    @d.on_duplicate_key_update(:value).import([:name,:value], 
-      [['abc', 1], ['def',2]]
-    )
-
-    check_sqls do
-      DB.sqls.must_equal [
-        SQL_BEGIN,
-        "INSERT INTO `items` (`name`, `value`) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE `value`=VALUES(`value`)",
-        SQL_COMMIT
-      ]
-    end
-
-    @d.all.must_equal [
-      {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
-    ]
+    @d.on_duplicate_key_update(:value).import([:name,:value], [['abc', 1], ['def',2]])
+    @d.all.must_equal [ {:name => 'abc', :value => 1}, {:name => 'def', :value => 2} ]
+    @d.on_duplicate_key_update(:value).import([:name,:value], [['abc', 2], ['ghi',3]])
+    @d.all.must_equal [ {:name => 'abc', :value => 2}, {:name => 'def', :value => 2}, {:name => 'ghi', :value=>3} ]
+    @d.on_duplicate_key_update(:name).import([:name,:value], [['abc', 5], ['ghi',6]])
+    @d.all.must_equal [ {:name => 'abc', :value => 2}, {:name => 'def', :value => 2}, {:name => 'ghi', :value=>3} ]
   end
-
 end
 
 describe "MySQL::Dataset#update and related methods" do
@@ -1049,11 +774,7 @@ describe "MySQL::Dataset#update and related methods" do
     @d.insert(:name => 'cow', :value => 0)
     @d.insert(:name => 'cat', :value => 1)
     proc{@d.where(:value => 1).update(:name => 'cow')}.must_raise(Sequel::UniqueConstraintViolation)
-    DB.sqls.clear
     @d.update_ignore.where(:value => 1).update(:name => 'cow')
-    check_sqls do
-      DB.sqls.must_equal ["UPDATE IGNORE `items` SET `name` = 'cow' WHERE (`value` = 1)"]
-    end
     @d.order(:name).all.must_equal [{:name => 'cat', :value => 1}, {:name => 'cow', :value => 0}]
   end
 end
@@ -1062,7 +783,6 @@ describe "MySQL::Dataset#replace" do
   before do
     DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
     @d = DB[:items]
-    DB.sqls.clear
   end
   after do
     DB.drop_table?(:items)
@@ -1104,25 +824,12 @@ describe "MySQL::Dataset#calc_found_rows" do
     DB.drop_table?(:items)
   end
 
-  it "should add the SQL_CALC_FOUND_ROWS keyword when selecting" do
-    DB[:items].select(:a).calc_found_rows.limit(1).sql.must_equal \
-      'SELECT SQL_CALC_FOUND_ROWS `a` FROM `items` LIMIT 1'
-  end
-
   it "should count matching rows disregarding LIMIT clause" do
     DB[:items].multi_insert([{:a => 1}, {:a => 1}, {:a => 2}])
-    DB.sqls.clear
 
     DB.synchronize do
       DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.must_equal [{:a => 1}]
       DB.dataset.select(Sequel.function(:FOUND_ROWS).as(:rows)).all.must_equal [{:rows => 2 }]
-    end
-
-    check_sqls do
-      DB.sqls.must_equal [
-        'SELECT SQL_CALC_FOUND_ROWS * FROM `items` WHERE (`a` = 1) LIMIT 1',
-        'SELECT FOUND_ROWS() AS `rows`',
-      ]
     end
   end
 end
@@ -1132,7 +839,6 @@ if DB.adapter_scheme == :mysql or DB.adapter_scheme == :jdbc or DB.adapter_schem
     before do
       DB.create_table(:items){Integer :id; Integer :value}
       @d = DB[:items]
-      DB.sqls.clear
     end
     after do
       DB.drop_table?(:items)
