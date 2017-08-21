@@ -44,7 +44,7 @@ describe "An SQLite database" do
     @db.tables.must_include(:fk)
   end
 
-  cspecify "should support timestamps and datetimes and respect datetime_class", [:do], [:jdbc], [:swift] do
+  cspecify "should support timestamps and datetimes and respect datetime_class", [:jdbc] do
     @db.create_table!(:fk){timestamp :t; datetime :d}
     @db.use_timestamp_timezones = true
     t1 = Time.at(1)

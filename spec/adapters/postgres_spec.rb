@@ -340,7 +340,7 @@ describe "A PostgreSQL database" do
     @db.get(Sequel.cast('10 20', :int2vector)).wont_equal 10
   end
 
-  cspecify "should not typecast the money type incorrectly", [:do] do
+  it "should not typecast the money type incorrectly" do
     @db.get(Sequel.cast('10.01', :money)).wont_equal 0
   end
 
@@ -775,7 +775,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.drop_table?(:test3)
   end
 
-  cspecify "should store milliseconds in time fields for Time objects", [:do], [:swift] do
+  it "should store milliseconds in time fields for Time objects" do
     t = Time.now
     @d.insert(:time=>t)
     t2 = @d.get(:time)
@@ -784,7 +784,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).must_equal t.usec
   end
 
-  cspecify "should store milliseconds in time fields for DateTime objects", [:do], [:swift] do
+  it "should store milliseconds in time fields for DateTime objects" do
     t = DateTime.now
     @d.insert(:time=>t)
     t2 = @d.get(:time)
