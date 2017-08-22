@@ -632,8 +632,6 @@ describe "A MySQL database" do
 
   it "should support spatial indexes" do
     @db.create_table(:posts, :engine=>:MyISAM){point :geom, :null=>false; spatial_index [:geom]}
-    @db[:posts].insert(Sequel.function(:ST_GeomFromText, 'Point(1 1)'))
-    @db[:posts].where(:geom=>Sequel.function(:ST_GeomFromText, 'Point(1 1)')).count.must_equal 1
   end
 
   it "should support indexes with index type" do
