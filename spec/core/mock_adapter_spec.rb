@@ -483,3 +483,175 @@ describe "Sequel Mock Adapter" do
     Sequel.mock(:host=>'oracle').create_table(:a){String :b}
   end
 end
+
+describe "PostgreSQL support" do
+  before do
+    @db = Sequel.mock(:host=>'postgres')
+  end
+
+  it "should create an unlogged table" do
+    @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
+    @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+  end
+
+  it "should support spatial indexes" do
+    @db.alter_table(:posts){add_spatial_index [:geom]}
+    @db.sqls.must_equal ['CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")']
+  end
+
+  it "should support indexes with index type" do
+    @db.alter_table(:posts){add_index :p, :type => 'gist'}
+    @db.sqls.must_equal ['CREATE INDEX "posts_p_index" ON "posts" USING gist ("p")']
+  end
+
+  it "should have #transaction support various types of synchronous options" do
+    @db.transaction(:synchronous=>:on){}
+    @db.transaction(:synchronous=>true){}
+    @db.transaction(:synchronous=>:off){}
+    @db.transaction(:synchronous=>false){}
+    @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = off", "SET LOCAL synchronous_commit = off"]
+
+    @db.transaction(:synchronous=>nil){}
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+
+    if @db.server_version >= 90100
+      @db.transaction(:synchronous=>:local){}
+      @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = local"]
+
+      if @db.server_version >= 90200
+        @db.transaction(:synchronous=>:remote_write){}
+        @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = remote_write"]
+      end
+    end
+  end
+
+  it "should have #transaction support read only transactions" do
+    @db.transaction(:read_only=>true){}
+    @db.transaction(:read_only=>false){}
+    @db.transaction(:isolation=>:serializable, :read_only=>true){}
+    @db.transaction(:isolation=>:serializable, :read_only=>false){}
+    @db.sqls.grep(/READ/).must_equal ["SET TRANSACTION READ ONLY", "SET TRANSACTION READ WRITE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE"]
+  end
+
+  it "should have #transaction support deferrable transactions" do
+    @db.transaction(:deferrable=>true){}
+    @db.transaction(:deferrable=>false){}
+    @db.transaction(:deferrable=>true, :read_only=>true){}
+    @db.transaction(:deferrable=>false, :read_only=>false){}
+    @db.transaction(:isolation=>:serializable, :deferrable=>true, :read_only=>true){}
+    @db.transaction(:isolation=>:serializable, :deferrable=>false, :read_only=>false){}
+    @db.sqls.grep(/DEF/).must_equal ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
+  end
+
+  it "should support creating indexes concurrently" do
+    @db.add_index :test, [:name, :value], :concurrently=>true
+    @db.sqls.must_equal ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")']
+  end
+
+  it "should support dropping indexes concurrently" do
+    @db.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
+    @db.sqls.must_equal ['DROP INDEX CONCURRENTLY "tnv2"']
+  end
+
+  it "should use INSERT RETURNING for inserts" do
+    @db[:test5].insert(:value=>10)
+    @db.sqls.must_equal ['INSERT INTO "test5" ("value") VALUES (10) RETURNING "id"']
+  end
+
+  it "should support opclass specification" do
+    @db.alter_table(:posts){add_index(:user_id, :opclass => :int4_ops, :type => :btree)}
+    @db.sqls.must_equal ['CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)']
+  end
+
+  it 'should quote NaN' do
+    nan = 0.0/0.0
+    @db[:test5].insert_sql(:value => nan).must_equal %q{INSERT INTO "test5" ("value") VALUES ('NaN')}
+  end
+
+  it 'should quote +Infinity' do
+    inf = 1.0/0.0
+    @db[:test5].insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('Infinity')}
+  end
+
+  it 'should quote -Infinity' do
+    inf = -1.0/0.0
+    @db[:test5].insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('-Infinity')}
+  end
+end
+
+describe "MySQL support" do
+  before do
+    @db = Sequel.mock(:host=>'mysql')
+  end
+
+  it "should support spatial indexes" do
+    @db.alter_table(:posts){add_spatial_index [:geom]}
+    @db.sqls.must_equal ['CREATE SPATIAL INDEX `posts_geom_index` ON `posts` (`geom`)']
+  end
+
+  it "should support fulltext indexes and full_text_search" do
+    @db.alter_table(:posts){add_full_text_index :title; add_full_text_index [:title, :body]}
+    @db.sqls.must_equal [ "CREATE FULLTEXT INDEX `posts_title_index` ON `posts` (`title`)", "CREATE FULLTEXT INDEX `posts_title_body_index` ON `posts` (`title`, `body`)" ]
+  end
+
+  it "should support indexes with index type" do
+    @db.alter_table(:posts){add_index :id, :type => :btree}
+    @db.sqls.must_equal ["CREATE INDEX `posts_id_index` USING btree ON `posts` (`id`)"]
+  end
+end
+
+describe "SQLite support" do
+  before do
+    @db = Sequel.mock(:host=>'sqlite')
+  end
+
+  it "should use a string literal for Sequel[:col].as(:alias)" do
+    @db.literal(Sequel[:c].as(:a)).must_equal "`c` AS 'a'"
+  end
+
+  it "should use a string literal for Sequel[:table][:col].as(:alias)" do
+    @db.literal(Sequel[:t][:c].as(:a)).must_equal "`t`.`c` AS 'a'"
+  end
+
+  it "should use a string literal for :column.as(:alias)" do
+    @db.literal(Sequel.as(:c, :a)).must_equal "`c` AS 'a'"
+  end
+
+  it "should use a string literal in the SELECT clause" do
+    @db[:t].select(Sequel[:c].as(:a)).sql.must_equal "SELECT `c` AS 'a' FROM `t`"
+  end
+
+  it "should use a string literal in the FROM clause" do
+    @db[Sequel[:t].as(:a)].sql.must_equal "SELECT * FROM `t` AS 'a'"
+  end
+
+  it "should use a string literal in the JOIN clause" do
+    @db[:t].join_table(:natural, :j, nil, :table_alias=>:a).sql.must_equal "SELECT * FROM `t` NATURAL JOIN `j` AS 'a'"
+  end
+
+  it "should have support for various #transaction modes" do
+    @db.transaction{}
+    @db.transaction(:mode => :immediate){}
+    @db.transaction(:mode => :exclusive){}
+    @db.transaction(:mode => :deferred){}
+    @db.sqls.must_equal ["BEGIN", "COMMIT", "BEGIN IMMEDIATE TRANSACTION", "COMMIT", "BEGIN EXCLUSIVE TRANSACTION", "COMMIT", "BEGIN DEFERRED TRANSACTION", "COMMIT"]
+
+    @db.transaction_mode.must_be_nil
+    @db.transaction_mode = :immediate
+    @db.transaction_mode.must_equal :immediate
+    @db.transaction{}
+    @db.transaction(:mode => :exclusive){}
+    @db.sqls.must_equal ["BEGIN IMMEDIATE TRANSACTION", "COMMIT", "BEGIN EXCLUSIVE TRANSACTION", "COMMIT"]
+  end
+
+  it "should choose a temporary table name that isn't already used when dropping or renaming columns" do
+    exists = [true, true, false]
+    @db.define_singleton_method(:table_exists?){|x| exists.shift}
+    @db.drop_column(:test3, :i)
+    @db.sqls.grep(/ALTER/).must_equal ["ALTER TABLE `test3` RENAME TO `test3_backup2`"]
+
+    exists = [true, true, true, false]
+    @db.rename_column(:test3, :h, :i)
+    @db.sqls.grep(/ALTER/).must_equal ["ALTER TABLE `test3` RENAME TO `test3_backup3`"]
+  end
+end

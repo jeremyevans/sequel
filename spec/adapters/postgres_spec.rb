@@ -5,15 +5,6 @@ require_relative 'spec_helper'
 uses_pg = Sequel::Postgres::USES_PG if DB.adapter_scheme == :postgres
 uses_pg_or_jdbc = uses_pg || DB.adapter_scheme == :jdbc
 
-def DB.sqls
-  (@sqls ||= [])
-end
-logger = Object.new
-def logger.method_missing(m, msg)
-  DB.sqls << msg
-end
-DB.loggers << logger
-
 DB.extension :pg_array, :pg_range, :pg_row, :pg_inet, :pg_json, :pg_enum
 begin
   DB.extension :pg_interval
@@ -25,7 +16,6 @@ describe "PostgreSQL", '#create_table' do
   before do
     @db = DB
     @db.test_connection
-    DB.sqls.clear
   end
   after do
     @db.drop_table?(:tmp_dolls, :unlogged_dolls)
@@ -80,9 +70,6 @@ describe "PostgreSQL", '#create_table' do
 
   it "should create an unlogged table" do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
-    check_sqls do
-      @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
-    end
   end
 
   it "should create a table inheriting from another table" do
@@ -407,7 +394,6 @@ describe "A PostgreSQL dataset" do
   end
   before do
     @d.delete
-    @db.sqls.clear
   end
   after do
     @db.drop_table?(:atest)
@@ -562,27 +548,13 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:synchronous=>true){}
     @db.transaction(:synchronous=>:off){}
     @db.transaction(:synchronous=>false){}
-    @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = off", "SET LOCAL synchronous_commit = off"]
 
-    @db.sqls.clear
     @db.transaction(:synchronous=>nil){}
-    check_sqls do
-      @db.sqls.must_equal ['BEGIN', 'COMMIT']
-    end
-
     if @db.server_version >= 90100
-      @db.sqls.clear
       @db.transaction(:synchronous=>:local){}
-      check_sqls do
-        @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = local"]
-      end
 
       if @db.server_version >= 90200
-        @db.sqls.clear
         @db.transaction(:synchronous=>:remote_write){}
-        check_sqls do
-          @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = remote_write"]
-        end
       end
     end
   end
@@ -592,7 +564,6 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:read_only=>false){}
     @db.transaction(:isolation=>:serializable, :read_only=>true){}
     @db.transaction(:isolation=>:serializable, :read_only=>false){}
-    @db.sqls.grep(/READ/).must_equal ["SET TRANSACTION READ ONLY", "SET TRANSACTION READ WRITE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE"]
   end
 
   it "should have #transaction support deferrable transactions" do
@@ -602,14 +573,10 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:deferrable=>false, :read_only=>false){}
     @db.transaction(:isolation=>:serializable, :deferrable=>true, :read_only=>true){}
     @db.transaction(:isolation=>:serializable, :deferrable=>false, :read_only=>false){}
-    @db.sqls.grep(/DEF/).must_equal ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
   end if DB.server_version >= 90100
 
   it "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true
-    check_sqls do
-      @db.sqls.must_equal ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")']
-    end
   end
 
   it "should support dropping indexes only if they already exist" do
@@ -629,11 +596,7 @@ describe "A PostgreSQL dataset" do
 
   it "should support dropping indexes concurrently" do
     @db.add_index :test, [:name, :value], :name=>'tnv2'
-    @db.sqls.clear
     @db.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
-    check_sqls do
-      @db.sqls.must_equal ['DROP INDEX CONCURRENTLY "tnv2"']
-    end
   end if DB.server_version >= 90200
 
   it "should support creating indexes only if they do not exist" do
@@ -924,7 +887,6 @@ describe "A PostgreSQL database" do
   before do
     @db = DB
     @db.drop_table?(:posts)
-    @db.sqls.clear
   end
   after do
     @db.drop_table?(:posts)
@@ -1002,12 +964,10 @@ describe "A PostgreSQL database" do
 
   it "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}
-    @db.indexes(:posts).length.must_equal 1
   end
 
   it "should support indexes with index type" do
     @db.create_table(:posts){point :p; index :p, :type => 'gist'}
-    @db.indexes(:posts).length.must_equal 1
   end
 
   it "should support unique indexes with index type" do
@@ -1018,12 +978,6 @@ describe "A PostgreSQL database" do
 
   it "should support partial indexes" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
-    check_sqls do
-      @db.sqls.must_equal [
-        'CREATE TABLE "posts" ("title" varchar(5))',
-        'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
-      ]
-    end
   end
 
   it "should support identifiers for table names when creating indexes" do
@@ -1048,7 +1002,6 @@ describe "Postgres::Dataset#import" do
   before do
     @db = DB
     @db.create_table!(:test){primary_key :x; Integer :y}
-    @db.sqls.clear
     @ds = @db[:test]
   end
   after do
@@ -1080,7 +1033,6 @@ describe "Postgres::Dataset#insert" do
   before do
     @db = DB
     @db.create_table!(:test5){primary_key :xid; Integer :value}
-    @db.sqls.clear
     @ds = @db[:test5]
   end
   after do
@@ -1098,11 +1050,8 @@ describe "Postgres::Dataset#insert" do
     @ds.all.must_equal [{:xid=>1, :value=>10}]
   end
 
-  it "should use INSERT RETURNING" do
+  it "should have insert return primary key value" do
     @ds.insert(:value=>10).must_equal 1
-    check_sqls do
-      @db.sqls.last.must_equal 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
-    end
   end
 
   it "should have insert_select insert the record and return the inserted record" do
@@ -1608,7 +1557,6 @@ if DB.adapter_scheme == :postgres
     before(:all) do
       @db = DB
       @db.create_table!(:test_cursor){Integer :x}
-      @db.sqls.clear
       @ds = @db[:test_cursor]
       @db.transaction{1001.times{|i| @ds.insert(i)}}
     end
@@ -1632,23 +1580,19 @@ if DB.adapter_scheme == :postgres
     end
 
     it "should respect the :rows_per_fetch option" do
-      @db.sqls.clear
+      i = 0
+      @ds = @ds.with_extend{define_method(:execute){|*a, &block| i+=1; super(*a, &block);}}
       @ds.use_cursor.all
-      check_sqls do
-        @db.sqls.length.must_equal 6
-        @db.sqls.clear
-      end
+      i.must_equal 2
+
+      i = 0
       @ds.use_cursor(:rows_per_fetch=>100).all
-      check_sqls do
-        @db.sqls.length.must_equal 15
-      end
+      i.must_equal 11
     end
 
     it "should respect the :hold=>true option for creating the cursor WITH HOLD and not using a transaction" do
       @ds.use_cursor.each{@db.in_transaction?.must_equal true}
-      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.must_equal false}
       @ds.use_cursor(:hold=>true).each{@db.in_transaction?.must_equal false}
-      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.must_equal true}
     end
 
     it "should support updating individual rows based on a cursor" do
@@ -1988,50 +1932,30 @@ describe 'PostgreSQL special float handling' do
   before do
     @db = DB
     @db.create_table!(:test5){Float :value}
-    @db.sqls.clear
     @ds = @db[:test5]
   end
   after do
     @db.drop_table?(:test5)
   end
 
-  check_sqls do
-    it 'should quote NaN' do
-      nan = 0.0/0.0
-      @ds.insert_sql(:value => nan).must_equal %q{INSERT INTO "test5" ("value") VALUES ('NaN')}
-    end
-
-    it 'should quote +Infinity' do
-      inf = 1.0/0.0
-      @ds.insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('Infinity')}
-    end
-
-    it 'should quote -Infinity' do
-      inf = -1.0/0.0
-      @ds.insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('-Infinity')}
-    end
+  it 'inserts NaN' do
+    nan = 0.0/0.0
+    @ds.insert(:value=>nan)
+    @ds.all[0][:value].nan?.must_equal true
   end
 
-  if DB.adapter_scheme == :postgres
-    it 'inserts NaN' do
-      nan = 0.0/0.0
-      @ds.insert(:value=>nan)
-      @ds.all[0][:value].nan?.must_equal true
-    end
-
-    it 'inserts +Infinity' do
-      inf = 1.0/0.0
-      @ds.insert(:value=>inf)
-      @ds.all[0][:value].infinite?.must_be :>,  0
-    end
-
-    it 'inserts -Infinity' do
-      inf = -1.0/0.0
-      @ds.insert(:value=>inf)
-      @ds.all[0][:value].infinite?.must_be :<,  0
-    end
+  it 'inserts +Infinity' do
+    inf = 1.0/0.0
+    @ds.insert(:value=>inf)
+    @ds.all[0][:value].infinite?.must_be :>,  0
   end
-end
+
+  it 'inserts -Infinity' do
+    inf = -1.0/0.0
+    @ds.insert(:value=>inf)
+    @ds.all[0][:value].infinite?.must_be :<,  0
+  end
+end if DB.adapter_scheme == :postgres
 
 describe 'PostgreSQL array handling' do
   before(:all) do

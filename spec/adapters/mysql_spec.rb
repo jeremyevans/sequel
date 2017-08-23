@@ -495,7 +495,8 @@ end
 # Socket tests should only be run if the MySQL server is on localhost
 if DB.adapter_scheme == :mysql && %w'localhost 127.0.0.1 ::1'.include?(URI.parse(DB.uri).host)
   describe "A MySQL database" do
-    socket_file = '/tmp/mysql.sock'
+    socket_file = defined?(MYSQL_SOCKET_FILE) ? MYSQL_SOCKET_FILE : '/tmp/mysql.sock'
+
     it "should accept a socket option" do
       Sequel.mysql(DB.opts[:database], :host => 'localhost', :user => DB.opts[:user], :password => DB.opts[:password], :socket => socket_file, :keep_reference=>false)
     end

@@ -30,15 +30,6 @@ end
 
 require_relative '../guards_helper'
 
-class Minitest::HooksSpec
-  def check_sqls
-    yield unless ENV['SEQUEL_NO_CHECK_SQLS']
-  end
-  def self.check_sqls
-    yield unless ENV['SEQUEL_NO_CHECK_SQLS']
-  end
-end
-
 unless defined?(DB)
   env_var = "SEQUEL_#{SEQUEL_ADAPTER_TEST.to_s.upcase}_URL"
   env_var = ENV.has_key?(env_var) ? env_var : 'SEQUEL_INTEGRATION_URL'
