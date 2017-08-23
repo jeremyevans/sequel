@@ -10,10 +10,8 @@ require 'minitest/autorun'
 require 'minitest/hooks/default'
 require 'minitest/shared_description'
 
-unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require_relative "../../lib/sequel"
-end
+$:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+require_relative "../../lib/sequel"
 
 require_relative '../deprecation_helper'
 

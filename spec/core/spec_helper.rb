@@ -5,10 +5,8 @@ if ENV['COVERAGE']
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(\w+\.rb|(dataset|database|model|connection_pool)/\w+\.rb|adapters/mock\.rb)\z})
 end
 
-unless Object.const_defined?('Sequel')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require_relative "../../lib/sequel/core"
-end
+$:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+require_relative "../../lib/sequel/core"
 
 gem 'minitest'
 require 'minitest/autorun'

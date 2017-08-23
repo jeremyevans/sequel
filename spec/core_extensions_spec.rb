@@ -3,10 +3,8 @@ if ENV['COVERAGE']
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/extensions/core_extensions\.rb\z})
 end
 
-unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../lib/"))
-  require_relative '../lib/sequel'
-end
+$:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../lib/"))
+require_relative '../lib/sequel'
 
 Regexp.send(:include, Sequel::SQL::StringMethods)
 String.send(:include, Sequel::SQL::StringMethods)

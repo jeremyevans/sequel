@@ -15,9 +15,7 @@ else
   CONN_HASH = {:adapter=>'sqlite', :database=>BIN_SPEC_DB}
 end
 
-unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
-  require_relative '../lib/sequel'
-end
+require_relative '../lib/sequel'
 
 File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
 File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)

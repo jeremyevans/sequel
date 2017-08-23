@@ -6,10 +6,9 @@ if ENV['COVERAGE']
   SimpleCov.sequel_coverage(:group=>%r{lib/sequel/adapters})
 end
 
-unless Object.const_defined?('Sequel')
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require_relative "../../lib/sequel"
-end
+$:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+require_relative "../../lib/sequel"
+
 begin
   require_relative "../spec_config" unless defined?(DB)
 rescue LoadError
@@ -24,7 +23,6 @@ Sequel::Model.use_transactions = false
 Sequel::Model.cache_anonymous_models = false
 
 require_relative '../guards_helper'
-
 
 DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL']) unless defined?(DB)
 

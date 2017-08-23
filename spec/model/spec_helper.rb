@@ -1,9 +1,8 @@
 require_relative "../sequel_warning"
 
-unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model') 
-  $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
-  require_relative "../../lib/sequel"
-end
+$:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
+require_relative "../../lib/sequel"
+
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
 gem 'minitest'
