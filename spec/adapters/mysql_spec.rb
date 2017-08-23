@@ -2,13 +2,6 @@ SEQUEL_ADAPTER_TEST = :mysql
 
 require_relative 'spec_helper'
 
-unless defined?(MYSQL_SOCKET_FILE)
-  MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
-end
-MYSQL_URI = URI.parse(DB.uri)
-
-#DB.drop_table?(:items, :dolls, :booltest)
-
 describe "MySQL", '#create_table' do
   before do
     @db = DB
@@ -500,14 +493,15 @@ describe "A MySQL database" do
 end  
 
 # Socket tests should only be run if the MySQL server is on localhost
-if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and DB.adapter_scheme == :mysql
+if DB.adapter_scheme == :mysql && %w'localhost 127.0.0.1 ::1'.include?(URI.parse(DB.uri).host)
   describe "A MySQL database" do
+    socket_file = '/tmp/mysql.sock'
     it "should accept a socket option" do
-      Sequel.mysql(DB.opts[:database], :host => 'localhost', :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE, :keep_reference=>false)
+      Sequel.mysql(DB.opts[:database], :host => 'localhost', :user => DB.opts[:user], :password => DB.opts[:password], :socket => socket_file, :keep_reference=>false)
     end
 
     it "should accept a socket option without host option" do
-      Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket => MYSQL_SOCKET_FILE, :keep_reference=>false)
+      Sequel.mysql(DB.opts[:database], :user => DB.opts[:user], :password => DB.opts[:password], :socket => socket_file, :keep_reference=>false)
     end
 
     it "should fail to connect with invalid socket" do
