@@ -2,15 +2,6 @@ SEQUEL_ADAPTER_TEST = :mssql
 
 require_relative 'spec_helper'
 
-def DB.sqls
-  (@sqls ||= [])
-end
-logger = Object.new
-def logger.method_missing(m, msg)
-  DB.sqls << msg
-end
-DB.loggers = [logger]
-
 describe "A MSSQL database" do
   before do
     @db = DB
@@ -118,14 +109,6 @@ describe "MSSQL full_text_search" do
     end
   end
 end if false
-
-describe "MSSQL Dataset#join_table" do
-  it "should emulate the USING clause with ON" do
-    DB[:items].join(:categories, [:id]).sql.must_equal 'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON ([CATEGORIES].[ID] = [ITEMS].[ID])'
-    DB[:items].join(:categories, [:id1, :id2]).sql.must_equal 'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))'
-    DB[Sequel[:items].as(:i)].join(Sequel[:categories].as(:c), [:id]).sql.must_equal 'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
-  end
-end
 
 describe "MSSQL Dataset#output" do
   before(:all) do
@@ -261,7 +244,6 @@ end
 describe "MSSQL::Dataset#import" do
   before do
     @db = DB
-    @db.sqls.clear
     @ds = @db[:test]
   end
   after do
@@ -436,7 +418,6 @@ describe "MSSSQL::Dataset#insert" do
       String :name, :size => 20
       column :value, 'varbinary(max)'
     end
-    @db.sqls.clear
     @ds = @db[:test5]
   end
   after do
