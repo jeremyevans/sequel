@@ -729,16 +729,10 @@ describe "Model datasets #with_pk with #with_pk!" do
   it "should handle an array for composite primary keys" do
     @c.set_primary_key [:id1, :id2]
     @ds.with_pk([1, 2])
-    sqls = DB.sqls
-    ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
-    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].must_include(sqls.pop)
-    sqls.must_equal []
+    DB.sqls.must_equal ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1"]
 
     @ds.with_pk!([1, 2])
-    sqls = DB.sqls
-    ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
-    "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].must_include(sqls.pop)
-    sqls.must_equal []
+    DB.sqls.must_equal ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1"]
   end
 
   it "should work with composite primary keys when called repeatedly on a frozen dataset with" do
@@ -746,10 +740,7 @@ describe "Model datasets #with_pk with #with_pk!" do
     @ds.freeze
     5.times do
       @ds.with_pk([1,2])
-      sqls = DB.sqls
-      ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1",
-      "SELECT * FROM a WHERE ((a.id2 = 2) AND (a.id1 = 1)) LIMIT 1"].must_include(sqls.pop)
-      sqls.must_equal []
+      DB.sqls.must_equal ["SELECT * FROM a WHERE ((a.id1 = 1) AND (a.id2 = 2)) LIMIT 1"]
     end
   end
 
