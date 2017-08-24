@@ -786,6 +786,7 @@ describe "Model::include" do
     including_class = Class.new(Sequel::Model(:items)) do
       include(mod1, mod2)
     end
-    including_class.included_modules.must_include(mod1, mod2)
+    including_class.included_modules.must_include(mod1)
+    including_class.included_modules.must_include(mod2)
   end
 end
