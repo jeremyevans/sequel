@@ -565,31 +565,31 @@ describe Sequel::Model, "many_to_one" do
 
   it "should not create the setter method if :read_only option is used" do
     @c2.many_to_one :parent, :class => @c2, :read_only=>true
-    @c2.instance_methods.collect{|x| x.to_s}.must_include('parent')
-    @c2.instance_methods.collect{|x| x.to_s}.wont_include('parent=')
+    @c2.instance_methods.must_include(:parent)
+    @c2.instance_methods.wont_include(:parent=)
   end
 
   it "should not add associations methods directly to class" do
     @c2.many_to_one :parent, :class => @c2
-    @c2.instance_methods.collect{|x| x.to_s}.must_include('parent')
-    @c2.instance_methods.collect{|x| x.to_s}.must_include('parent=')
-    @c2.instance_methods(false).collect{|x| x.to_s}.wont_include('parent')
-    @c2.instance_methods(false).collect{|x| x.to_s}.wont_include('parent=')
+    @c2.instance_methods.must_include(:parent)
+    @c2.instance_methods.must_include(:parent=)
+    @c2.instance_methods(false).wont_include(:parent)
+    @c2.instance_methods(false).wont_include(:parent=)
   end
 
   it "should add associations methods to the :methods_module option" do
     m = Module.new
     @c2.many_to_one :parent, :class => @c2, :methods_module=>m
-    m.instance_methods.collect{|x| x.to_s}.must_include('parent')
-    m.instance_methods.collect{|x| x.to_s}.must_include('parent=')
-    @c2.instance_methods.collect{|x| x.to_s}.wont_include('parent')
-    @c2.instance_methods.collect{|x| x.to_s}.wont_include('parent=')
+    m.instance_methods.must_include(:parent)
+    m.instance_methods.must_include(:parent=)
+    @c2.instance_methods.wont_include(:parent)
+    @c2.instance_methods.wont_include(:parent=)
   end
 
   it "should add associations methods directly to class if :methods_module is the class itself" do
     @c2.many_to_one :parent, :class => @c2, :methods_module=>@c2
-    @c2.instance_methods(false).collect{|x| x.to_s}.must_include('parent')
-    @c2.instance_methods(false).collect{|x| x.to_s}.must_include('parent=')
+    @c2.instance_methods(false).must_include(:parent)
+    @c2.instance_methods(false).must_include(:parent=)
   end
 
   it "should raise an error if trying to set a model object that doesn't have a valid primary key" do
@@ -601,7 +601,7 @@ describe Sequel::Model, "many_to_one" do
 
   it "should make the change to the foreign_key value inside a _association= method" do
     @c2.many_to_one :parent, :class => @c2
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_parent=")
+    @c2.private_instance_methods.must_include(:_parent=)
     p = @c2.new
     c = @c2.load(:id=>123)
     def p._parent=(x)
@@ -730,9 +730,9 @@ describe Sequel::Model, "one_to_one" do
 
   it "should not add a setter method if the :read_only option is true" do
     @c2.one_to_one :attribute, :class => @c1, :read_only=>true
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attribute')
-    im.wont_include('attribute=')
+    im = @c2.instance_methods
+    im.must_include(:attribute)
+    im.wont_include(:attribute=)
   end
 
   it "should add a setter method" do
@@ -740,10 +740,9 @@ describe Sequel::Model, "one_to_one" do
     attrib = @c1.new(:id=>3)
     @c1.dataset = @c1.dataset.with_fetch(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    sqls = DB.sqls
-    ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].must_include(sqls.slice! 1)
-    sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)', "SELECT * FROM attributes WHERE id = 3"]
+    DB.sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)',
+      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)',
+      "SELECT * FROM attributes WHERE id = 3"]
 
     @c2.new(:id => 1234).attribute.must_equal attrib
     attrib = @c1.load(:id=>3)
@@ -779,10 +778,9 @@ describe Sequel::Model, "one_to_one" do
     attrib = @c1.new(:id=>3)
     @c1.dataset = @c1.dataset.with_fetch(:id=>3)
     @c2.new(:id => 1234, :xxx=>5).attribute = attrib
-    sqls = DB.sqls
-    ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].must_include(sqls.slice! 1)
-    sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 5)', "SELECT * FROM attributes WHERE id = 3"]
+    DB.sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 5)',
+      'INSERT INTO attributes (id, node_id) VALUES (3, 5)',
+      "SELECT * FROM attributes WHERE id = 3"]
 
     @c2.new(:id => 321, :xxx=>5).attribute.must_equal attrib
     attrib = @c1.load(:id=>3)
@@ -797,10 +795,8 @@ describe Sequel::Model, "one_to_one" do
     attrib = @c1.load(:id=>3, :y=>6)
     @c1.dataset = @c1.dataset.with_fetch(:id=>3, :y=>6)
     @c2.load(:id => 1234, :x=>5).attribute = attrib
-    sqls = DB.sqls
-    sqls.last.must_match(/UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/)
-    sqls.first.must_match(/UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/)
-    sqls.length.must_equal 2
+    DB.sqls.must_equal ["UPDATE attributes SET node_id = NULL, y = NULL WHERE ((node_id = 1234) AND (y = 5) AND (id != 3))",
+      "UPDATE attributes SET y = 5, node_id = 1234 WHERE (id = 3)"]
   end
 
   it "should use implicit key if omitted" do
@@ -925,10 +921,9 @@ describe Sequel::Model, "one_to_one" do
     @c2.dataset = @c2.dataset.with_fetch(:id => 4321, :blah => 3)
     d.parent = e
     e.values.must_equal(:id => 4321, :blah => 3)
-    sqls = DB.sqls
-    ["INSERT INTO nodes (blah, id) VALUES (3, 4321)",
-     "INSERT INTO nodes (id, blah) VALUES (4321, 3)"].must_include(sqls.slice! 1)
-    sqls.must_equal ["UPDATE nodes SET blah = NULL WHERE (blah = 3)", "SELECT * FROM nodes WHERE id = 4321"]
+    DB.sqls.must_equal ["UPDATE nodes SET blah = NULL WHERE (blah = 3)",
+      "INSERT INTO nodes (id, blah) VALUES (4321, 3)",
+      "SELECT * FROM nodes WHERE id = 4321"]
   end
   
   it "should persist changes to associated object when the setter is called" do
@@ -1029,10 +1024,10 @@ describe Sequel::Model, "one_to_one" do
 
   it "should not add associations methods directly to class" do
     @c2.one_to_one :parent, :class => @c2
-    @c2.instance_methods.collect{|x| x.to_s}.must_include('parent')
-    @c2.instance_methods.collect{|x| x.to_s}.must_include('parent=')
-    @c2.instance_methods(false).collect{|x| x.to_s}.wont_include('parent')
-    @c2.instance_methods(false).collect{|x| x.to_s}.wont_include('parent=')
+    @c2.instance_methods.must_include(:parent)
+    @c2.instance_methods.must_include(:parent=)
+    @c2.instance_methods(false).wont_include(:parent)
+    @c2.instance_methods(false).wont_include(:parent=)
   end
 
   it "should raise an error if the current model object that doesn't have a valid primary key" do
@@ -1044,7 +1039,7 @@ describe Sequel::Model, "one_to_one" do
 
   it "should make the change to the foreign_key value inside a _association= method" do
     @c2.one_to_one :parent, :class => @c2
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_parent=")
+    @c2.private_instance_methods.must_include(:_parent=)
     c = @c2.new
     p = @c2.load(:id=>123)
     def p._parent=(x)
@@ -1254,9 +1249,8 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.new(:id => 234)
     @c1.dataset = @c1.dataset.with_fetch(:id=>234, :node_id=>1234)
     a.must_equal n.add_attribute(a)
-    sqls = DB.sqls
-    sqls.shift.must_match(/INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/)
-    sqls.must_equal ["SELECT * FROM attributes WHERE id = 234"]
+    DB.sqls.must_equal ["INSERT INTO attributes (id, node_id) VALUES (234, 1234)",
+      "SELECT * FROM attributes WHERE id = 234"]
     a.values.must_equal(:node_id => 1234, :id => 234)
   end
 
@@ -1286,9 +1280,8 @@ describe Sequel::Model, "one_to_many" do
     DB.reset
     @c1.dataset = @c1.dataset.with_fetch(:node_id => 1234, :id => 234)
     n.add_attribute(:id => 234).must_equal @c1.load(:node_id => 1234, :id => 234)
-    sqls = DB.sqls
-    sqls.shift.must_match(/INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/)
-    sqls.must_equal ["SELECT * FROM attributes WHERE id = 234"]
+    DB.sqls.must_equal ["INSERT INTO attributes (id, node_id) VALUES (234, 1234)",
+      "SELECT * FROM attributes WHERE id = 234"]
   end
 
   it "should accept a primary key for the add_ method" do
@@ -1354,9 +1347,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.load(:id => 1234, :x=>5)
     a = @c1.load(:id => 2345)
     n.add_attribute(a).must_equal a
-    sqls = DB.sqls
-    sqls.shift.must_match(/UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 2345\)/)
-    sqls.must_equal []
+    DB.sqls.must_equal ["UPDATE attributes SET node_id = 1234, y = 5 WHERE (id = 2345)"]
   end
 
   it "should have add_ method accept a composite key" do
@@ -1367,10 +1358,8 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.load(:id => 1234, :x=>5)
     a = @c1.load(:id => 2345, :z => 8, :node_id => 1234, :y=>5)
     n.add_attribute([2345, 8]).must_equal a
-    sqls = DB.sqls
-    sqls.shift.must_match(/SELECT \* FROM attributes WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\) LIMIT 1/)
-    sqls.shift.must_match(/UPDATE attributes SET (node_id|y) = (1234|5), (node_id|y) = (1234|5) WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\)/)
-    sqls.must_equal []
+    DB.sqls.must_equal ["SELECT * FROM attributes WHERE ((id = 2345) AND (z = 8)) LIMIT 1",
+      "UPDATE attributes SET node_id = 1234, y = 5 WHERE ((id = 2345) AND (z = 8))"]
   end
   
   it "should have remove_ method respect composite keys" do
@@ -1379,9 +1368,8 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.load(:id => 1234, :x=>5)
     a = @c1.load(:id => 2345, :node_id=>1234, :y=>5)
     n.remove_attribute(a).must_equal a
-    sqls = DB.sqls
-    sqls.pop.must_match(/UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(id = 2345\)/)
-    sqls.must_equal ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.y = 5) AND (id = 2345)) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.y = 5) AND (id = 2345)) LIMIT 1",
+      "UPDATE attributes SET node_id = NULL, y = NULL WHERE (id = 2345)"]
   end
   
   it "should accept a array of composite primary key values for the remove_ method and remove an existing record" do
@@ -1390,10 +1378,8 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :key=>:node_id, :primary_key=>:id
     n = @c2.new(:id => 123)
     n.remove_attribute([234, 5]).must_equal @c1.load(:node_id => nil, :y => 5, :id => 234)
-    sqls = DB.sqls
-    sqls.length.must_equal 2
-    sqls.first.must_match(/SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \(attributes\.(id|y) = (234|5)\) AND \(attributes\.(id|y) = (234|5)\)\) LIMIT 1/)
-    sqls.last.must_match(/UPDATE attributes SET node_id = NULL WHERE \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)/)
+    DB.sqls.must_equal ["SELECT * FROM attributes WHERE ((attributes.node_id = 123) AND (attributes.id = 234) AND (attributes.y = 5)) LIMIT 1",
+      "UPDATE attributes SET node_id = NULL WHERE ((id = 234) AND (y = 5))"]
   end
   
   it "should raise an error in add_ and remove_ if the passed object returns false to save (is not valid)" do
@@ -1582,28 +1568,28 @@ describe Sequel::Model, "one_to_many" do
 
   it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
     @c2.one_to_many :attributes, :class => @c1, :read_only=>true
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attributes')
-    im.must_include('attributes_dataset')
-    im.wont_include('add_attribute')
-    im.wont_include('remove_attribute')
-    im.wont_include('remove_all_attributes')
+    im = @c2.instance_methods
+    im.must_include(:attributes)
+    im.must_include(:attributes_dataset)
+    im.wont_include(:add_attribute)
+    im.wont_include(:remove_attribute)
+    im.wont_include(:remove_all_attributes)
   end
 
   it "should not add associations methods directly to class" do
     @c2.one_to_many :attributes, :class => @c1
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attributes')
-    im.must_include('attributes_dataset')
-    im.must_include('add_attribute')
-    im.must_include('remove_attribute')
-    im.must_include('remove_all_attributes')
-    im2 = @c2.instance_methods(false).collect{|x| x.to_s}
-    im2.wont_include('attributes')
-    im2.wont_include('attributes_dataset')
-    im2.wont_include('add_attribute')
-    im2.wont_include('remove_attribute')
-    im2.wont_include('remove_all_attributes')
+    im = @c2.instance_methods
+    im.must_include(:attributes)
+    im.must_include(:attributes_dataset)
+    im.must_include(:add_attribute)
+    im.must_include(:remove_attribute)
+    im.must_include(:remove_all_attributes)
+    im2 = @c2.instance_methods(false)
+    im2.wont_include(:attributes)
+    im2.wont_include(:attributes_dataset)
+    im2.wont_include(:add_attribute)
+    im2.wont_include(:remove_attribute)
+    im2.wont_include(:remove_all_attributes)
   end
 
   it "should populate the reciprocal many_to_one cache when loading the one_to_many association" do
@@ -1652,9 +1638,7 @@ describe Sequel::Model, "one_to_many" do
   it "should have the remove_all_ method respect composite keys" do
     @c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :y], :primary_key=>[:id, :x]
     @c2.new(:id => 1234, :x=>5).remove_all_attributes
-    sqls = DB.sqls
-    sqls.pop.must_match(/UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\)\)/)
-    sqls.must_equal []
+    DB.sqls.must_equal ["UPDATE attributes SET node_id = NULL, y = NULL WHERE ((node_id = 1234) AND (y = 5))"]
   end
 
   it "remove_all should set the cache to []" do
@@ -1697,7 +1681,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should call an _add_ method internally to add attributes" do
     @c2.one_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_add_attribute")
+    @c2.private_instance_methods.must_include(:_add_attribute)
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._add_attribute(x)
@@ -1733,7 +1717,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should call a _remove_ method internally to remove attributes" do
     @c2.one_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_remove_attribute")
+    @c2.private_instance_methods.must_include(:_remove_attribute)
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._remove_attribute(x)
@@ -1781,7 +1765,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should call a _remove_all_ method internally to remove attributes" do
     @c2.one_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_remove_all_attributes")
+    @c2.private_instance_methods.must_include(:_remove_all_attributes)
     p = @c2.load(:id=>10)
     def p._remove_all_attributes
       @x = :foo
@@ -2115,12 +2099,9 @@ describe Sequel::Model, "many_to_many" do
     a.must_equal n.add_attribute(a)
     a.must_equal n.remove_attribute(a)
     n.remove_all_attributes
-    sqls = DB.sqls
-    ['INSERT INTO attribute2node (node_id, attribute_id) VALUES (1234, 2345)',
-     'INSERT INTO attribute2node (attribute_id, node_id) VALUES (2345, 1234)'].must_include(sqls.shift)
-    ["DELETE FROM attribute2node WHERE ((node_id = 1234) AND (attribute_id = 2345))", 
-     "DELETE FROM attribute2node WHERE ((attribute_id = 2345) AND (node_id = 1234))"].must_include(sqls.shift)
-    sqls.must_equal ["DELETE FROM attribute2node WHERE (node_id = 1234)"]
+    DB.sqls.must_equal ["INSERT INTO attribute2node (node_id, attribute_id) VALUES (1234, 2345)",
+      "DELETE FROM attribute2node WHERE ((node_id = 1234) AND (attribute_id = 2345))",
+      "DELETE FROM attribute2node WHERE (node_id = 1234)"]
   end
   
   with_symbol_splitting "should handle an aliased symbol join table" do
@@ -2131,12 +2112,9 @@ describe Sequel::Model, "many_to_many" do
     a.must_equal n.add_attribute(a)
     a.must_equal n.remove_attribute(a)
     n.remove_all_attributes
-    sqls = DB.sqls
-    ['INSERT INTO attribute2node (node_id, attribute_id) VALUES (1234, 2345)',
-     'INSERT INTO attribute2node (attribute_id, node_id) VALUES (2345, 1234)'].must_include(sqls.shift)
-    ["DELETE FROM attribute2node WHERE ((node_id = 1234) AND (attribute_id = 2345))", 
-     "DELETE FROM attribute2node WHERE ((attribute_id = 2345) AND (node_id = 1234))"].must_include(sqls.shift)
-    sqls.must_equal ["DELETE FROM attribute2node WHERE (node_id = 1234)"]
+    DB.sqls.must_equal ["INSERT INTO attribute2node (node_id, attribute_id) VALUES (1234, 2345)",
+      "DELETE FROM attribute2node WHERE ((node_id = 1234) AND (attribute_id = 2345))",
+      "DELETE FROM attribute2node WHERE (node_id = 1234)"]
   end
   
   it "should define an add_ method that works on existing records" do
@@ -2145,10 +2123,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.load(:id => 1234)
     a = @c1.load(:id => 2345)
     n.add_attribute(a).must_equal a
-    sqls = DB.sqls
-    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)',
-     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'].must_include(sqls.shift)
-    sqls.must_equal []
+    DB.sqls.must_equal ["INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)"]
   end
 
   it "should define an add_ method that works with a primary key" do
@@ -2158,10 +2133,8 @@ describe Sequel::Model, "many_to_many" do
     a = @c1.load(:id => 2345)
     @c1.dataset = @c1.dataset.with_fetch(:id=>2345)
     n.add_attribute(2345).must_equal a
-    sqls = DB.sqls
-    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)',
-     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'].must_include(sqls.pop)
-    sqls.must_equal ["SELECT * FROM attributes WHERE id = 2345"]
+    DB.sqls.must_equal ["SELECT * FROM attributes WHERE id = 2345",
+      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)"]
   end
 
   it "should raise an error if the primary key passed to the add_ method does not match an existing record" do
@@ -2179,11 +2152,9 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.load(:id => 1234)
     @c1.dataset = @c1.dataset.with_fetch(:id=>1)
     n.add_attribute(:id => 1).must_equal @c1.load(:id => 1)
-    sqls = DB.sqls
-    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 1)',
-     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (1, 1234)'
-    ].must_include(sqls.pop)
-    sqls.must_equal ['INSERT INTO attributes (id) VALUES (1)', "SELECT * FROM attributes WHERE id = 1"]
+    DB.sqls.must_equal ['INSERT INTO attributes (id) VALUES (1)',
+      "SELECT * FROM attributes WHERE id = 1",
+      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 1)"]
   end
 
   it "should define a remove_ method that works on existing records" do
@@ -2220,11 +2191,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.load(:id => 1234).set(:xxx=>5)
     a = @c1.load(:id => 2345).set(:yyy=>8)
     n.add_attribute(a).must_equal a
-    sqls = DB.sqls
-    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 8)',
-     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (8, 5)'
-    ].must_include(sqls.pop)
-    sqls.must_equal []
+    DB.sqls.must_equal ["INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 8)"]
   end
   
   it "should have add_ method not add the same object to the cached association array if the object is already in the array" do
@@ -2267,10 +2234,8 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.load(:id => 1234, :x=>5)
     a = @c1.load(:id => 2345, :z=>8)
     n.add_attribute([2345, 8]).must_equal a
-    sqls = DB.sqls
-    sqls.shift.must_match(/SELECT \* FROM attributes WHERE \(\((id|z) = (8|2345)\) AND \((id|z) = (8|2345)\)\) LIMIT 1/)
-    sqls.pop.must_match(/INSERT INTO attributes_nodes \([lr][12], [lr][12], [lr][12], [lr][12]\) VALUES \((1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8)\)/)
-    sqls.must_equal []
+    DB.sqls.must_equal ["SELECT * FROM attributes WHERE ((id = 2345) AND (z = 8)) LIMIT 1",
+      "INSERT INTO attributes_nodes (l1, l2, r1, r2) VALUES (1234, 5, 2345, 8)"]
   end
 
   it "should have the remove_ method respect the :left_primary_key and :right_primary_key options" do
@@ -2296,10 +2261,8 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
     @c1.load(:id => 234, :y=>8).must_equal n.remove_attribute([234, 8])
-    sqls = DB.sqls
-    ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (attributes.id = 234) AND (attributes.y = 8)) LIMIT 1",
-      "SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (attributes.y = 8) AND (attributes.id = 234)) LIMIT 1"].must_include(sqls.shift)
-    sqls.must_equal ["DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"]
+    DB.sqls.must_equal ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (attributes.id = 234) AND (attributes.y = 8)) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"]
   end
     
   it "should raise an error if the model object doesn't have a valid primary key" do
@@ -2436,28 +2399,28 @@ describe Sequel::Model, "many_to_many" do
 
   it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
     @c2.many_to_many :attributes, :class => @c1, :read_only=>true
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attributes')
-    im.must_include('attributes_dataset')
-    im.wont_include('add_attribute')
-    im.wont_include('remove_attribute')
-    im.wont_include('remove_all_attributes')
+    im = @c2.instance_methods
+    im.must_include(:attributes)
+    im.must_include(:attributes_dataset)
+    im.wont_include(:add_attribute)
+    im.wont_include(:remove_attribute)
+    im.wont_include(:remove_all_attributes)
   end
 
   it "should not add associations methods directly to class" do
     @c2.many_to_many :attributes, :class => @c1
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attributes')
-    im.must_include('attributes_dataset')
-    im.must_include('add_attribute')
-    im.must_include('remove_attribute')
-    im.must_include('remove_all_attributes')
-    im2 = @c2.instance_methods(false).collect{|x| x.to_s}
-    im2.wont_include('attributes')
-    im2.wont_include('attributes_dataset')
-    im2.wont_include('add_attribute')
-    im2.wont_include('remove_attribute')
-    im2.wont_include('remove_all_attributes')
+    im = @c2.instance_methods
+    im.must_include(:attributes)
+    im.must_include(:attributes_dataset)
+    im.must_include(:add_attribute)
+    im.must_include(:remove_attribute)
+    im.must_include(:remove_all_attributes)
+    im2 = @c2.instance_methods(false)
+    im2.wont_include(:attributes)
+    im2.wont_include(:attributes_dataset)
+    im2.wont_include(:add_attribute)
+    im2.wont_include(:remove_attribute)
+    im2.wont_include(:remove_all_attributes)
   end
 
   it "should have an remove_all_ method that removes all associations" do
@@ -2530,7 +2493,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "should call an _add_ method internally to add attributes" do
     @c2.many_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_add_attribute")
+    @c2.private_instance_methods.must_include(:_add_attribute)
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._add_attribute(x)
@@ -2565,7 +2528,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "should call a _remove_ method internally to remove attributes" do
     @c2.many_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_remove_attribute")
+    @c2.private_instance_methods.must_include(:_remove_attribute)
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._remove_attribute(x)
@@ -2610,7 +2573,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "should call a _remove_all_ method internally to remove attributes" do
     @c2.many_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_remove_all_attributes")
+    @c2.private_instance_methods.must_include(:_remove_all_attributes)
     p = @c2.load(:id=>10)
     def p._remove_all_attributes
       @x = :foo
@@ -2952,12 +2915,12 @@ describe Sequel::Model, "one_through_one" do
 
   it "should not add associations methods directly to class" do
     @c2.one_through_one :attribute, :class => @c1
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attribute')
-    im.must_include('attribute_dataset')
-    im2 = @c2.instance_methods(false).collect{|x| x.to_s}
-    im2.wont_include('attribute')
-    im2.wont_include('attribute_dataset')
+    im = @c2.instance_methods
+    im.must_include(:attribute)
+    im.must_include(:attribute_dataset)
+    im2 = @c2.instance_methods(false)
+    im2.wont_include(:attribute)
+    im2.wont_include(:attribute_dataset)
   end
 
   it "should support after_load association callback" do
@@ -2983,9 +2946,9 @@ describe Sequel::Model, "one_through_one" do
 
   it "should not add a setter method if the :read_only option is true" do
     @c2.one_through_one :attribute, :class => @c1, :read_only=>true
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.must_include('attribute')
-    im.wont_include('attribute=')
+    im = @c2.instance_methods
+    im.must_include(:attribute)
+    im.wont_include(:attribute=)
   end
 
   it "should add a setter method" do
@@ -2997,10 +2960,8 @@ describe Sequel::Model, "one_through_one" do
     DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1"]
 
     o.attribute = attrib
-    sqls = DB.sqls
-    ["INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (3, 1234)",
-      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 3)"].must_include(sqls.slice! 1)
-    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1",
+      "INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (3, 1234)"]
 
     DB.fetch = {:node_id=>1234, :attribute_id=>5}
     o.attribute = nil
@@ -3035,10 +2996,8 @@ describe Sequel::Model, "one_through_one" do
     DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1"]
 
     o.attribute = attrib
-    sqls = DB.sqls
-    ["INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (3, 1234)",
-      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 3)"].must_include(sqls.slice! 1)
-    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1",
+      "INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (3, 1234)"]
 
     DB.fetch = {:node_id=>1234, :attribute_id=>5}
     o.attribute = nil
@@ -3059,10 +3018,8 @@ describe Sequel::Model, "one_through_one" do
     DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1"]
 
     o.attribute = attrib
-    sqls = DB.sqls
-    ["INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (7, 5)",
-      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 7)"].must_include(sqls.slice! 1)
-    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1",
+      "INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (7, 5)"]
 
     DB.fetch = {:node_id=>1234, :attribute_id=>9}
     o.attribute = nil
@@ -3084,9 +3041,8 @@ describe Sequel::Model, "one_through_one" do
     DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1"]
 
     o.attribute = attrib
-    sqls = DB.sqls
-    sqls.slice!(1).must_match(/\AINSERT INTO attributes_nodes \((attribute_id|z|node_id|y), (attribute_id|z|node_id|y), (attribute_id|z|node_id|y), (attribute_id|z|node_id|y)\) VALUES \((3|7|1234|5), (3|7|1234|5), (3|7|1234|5), (3|7|1234|5)\)\z/)
-    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1",
+      "INSERT INTO attributes_nodes (attribute_id, z, node_id, y) VALUES (3, 7, 1234, 5)"]
 
     DB.fetch = {:node_id=>1234, :attribute_id=>10, :y=>6, :z=>8}
     o.attribute = nil
@@ -3094,10 +3050,8 @@ describe Sequel::Model, "one_through_one" do
       "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))"]
 
     o.attribute = attrib
-    sqls = DB.sqls
-    ["UPDATE attributes_nodes SET attribute_id = 3, z = 7 WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))",
-     "UPDATE attributes_nodes SET z = 7, attribute_id = 3 WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))"].must_include(sqls.slice!(1))
-    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1",
+      "UPDATE attributes_nodes SET attribute_id = 3, z = 7 WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))"]
   end
 
   it "should raise an error if the current model object that doesn't have a valid primary key" do
@@ -3116,7 +3070,7 @@ describe Sequel::Model, "one_through_one" do
 
   it "should make the change to the foreign_key value inside a _association= method" do
     @c2.one_through_one :attribute, :class => @c1
-    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_attribute=")
+    @c2.private_instance_methods.must_include(:_attribute=)
     attrib = @c1.new(:id=>3)
     o = @c2.new(:id => 1234)
     def o._attribute=(x)
