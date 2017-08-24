@@ -42,8 +42,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     ParParent.many_to_one :c, :class=>ParParent
     ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :class=>ParParent>"
     ParParent.many_to_one :c, :class=>ParParent, :key=>:c_id
-    ["#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :key=>:c_id, :class=>ParParent>",
-     "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :class=>ParParent, :key=>:c_id>"].must_include ParParent.association_reflection(:c).inspect
+    ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :key=>:c_id, :class=>ParParent>"
 
     @c.one_to_many :foos do |ds| ds end
     @c.association_reflection(:foos).inspect.must_equal "#<Sequel::Model::Associations::OneToManyAssociationReflection #{@c.to_s}.one_to_many :foos, :block=>#{@c.association_reflection(:foos)[:block].inspect}>"
@@ -532,7 +531,7 @@ describe Sequel::Model, " association reflection methods" do
     c.associate :many_to_one, :parent2, :class => @c1
     @c1.associations.must_equal [:parent]
     c.associations.sort_by{|x| x.to_s}.must_equal [:parent, :parent2]
-    c.instance_methods.map{|x| x.to_s}.must_include('parent')
+    c.instance_methods.must_include(:parent)
   end
 end
 
