@@ -457,14 +457,17 @@ end
 describe "MSSSQL::Dataset#into" do
   before do
     @db = DB
+    @db.drop_table?(:t, :new)
+  end
+  after do
+    @db.drop_table?(:t, :new)
   end
 
   it "should select rows into a new table" do
     @db.create_table!(:t) {Integer :id; String :value}
     @db[:t].insert(:id => 1, :value => "test")
-    @db[:t].into(:new).all
+    @db[:t].into(:new).with_sql(:select_sql).insert
     @db[:new].all.must_equal [{:id => 1, :value => "test"}]
-    @db.drop_table?(:t, :new)
   end
 end
 
