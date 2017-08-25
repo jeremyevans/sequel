@@ -34,16 +34,15 @@ describe "bin/sequel" do
   after do
     DB.disconnect
     DB2.disconnect
-    File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
-    File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
-    if File.file?(TMP_FILE)
-      begin
-        File.delete(TMP_FILE)
-      rescue Errno::ENOENT
-        nil
+    [BIN_SPEC_DB, BIN_SPEC_DB2, TMP_FILE, OUTPUT].each do |file|
+      if File.file?(file)
+        begin
+          File.delete(file)
+        rescue Errno::ENOENT
+          nil
+        end
       end
     end
-    File.delete(OUTPUT) if File.file?(OUTPUT)
   end
   
   it "-h should print the help" do
