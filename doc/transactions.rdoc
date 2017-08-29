@@ -141,7 +141,7 @@ or roll the prepared transaction back:
 
 == Transaction Isolation Levels
 
-The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on most databases, you can specify which transaction isolation level you want to use via the :isolation option to <tt>Database#transaction</tt>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option make Sequel use the correct transaction isolation syntax for your database:
+The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement the levels as specified in the standard (or implement the levels at all), but on most databases, you can specify which transaction isolation level you want to use via the :isolation option to <tt>Database#transaction</tt>.  The isolation level is specified as one of the following symbols: :uncommitted, :committed, :repeatable, and :serializable.  Using this option makes Sequel use the correct transaction isolation syntax for your database:
 
   DB.transaction(isolation: :serializable) do # BEGIN
     # SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
