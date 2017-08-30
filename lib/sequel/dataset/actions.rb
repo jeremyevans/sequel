@@ -320,6 +320,10 @@ module Sequel
     #   # INSERT INTO table (x, y) VALUES (1, 2) 
     #   # INSERT INTO table (x, y) VALUES (3, 4) 
     #
+    # Or if the database supports multiple inserts into a single query:
+    #
+    #   # INSERT INTO table (x, y) VALUES (1, 2), (3, 4)
+    #
     # This method also accepts a dataset instead of an array of value arrays:
     #
     #   DB[:table].import([:x, :y], DB[:table2].select(:a, :b))
@@ -470,6 +474,10 @@ module Sequel
     #   DB[:table].multi_insert([{x: 1}, {x: 2}])
     #   # INSERT INTO table (x) VALUES (1)
     #   # INSERT INTO table (x) VALUES (2)
+    #
+    # Or if the database supports multiple inserts into a single query
+    #
+    #   # INSERT INTO table (x) VALUES (1), (2)
     #
     # Be aware that all hashes should have the same keys if you use this calling method,
     # otherwise some columns could be missed or set to null instead of to default
