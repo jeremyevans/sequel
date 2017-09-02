@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -56,11 +56,10 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">named_timezones</span></pre>
             
-            <p>What this does is require the relevent extension from
+            <p>All this does is require the relevent extension from
             <code>sequel/extensions/named_timezones</code> somewhere in the ruby path. 
-            Actually, that is all that does.  Global extensions are just a simpler,
-            consistent way to require code that modifies <a
-            href="../../classes/Sequel.html">Sequel</a>.</p>
+            Global extensions are just a simpler, consistent way to require code that
+            modifies <a href="../../classes/Sequel.html">Sequel</a>.</p>
             
             <h2 id="label-Database+Extensions">Database Extensions<span><a href="#label-Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -89,27 +88,18 @@
             
             <p>Dataset extensions should add or modify the behavior of a single
             <code>Sequel::Dataset</code> instance.  They are loaded via
-            <code>Sequel::Dataset#extension</code> or
-            <code>Sequel::Dataset#extension!</code>. 
+            <code>Sequel::Dataset#extension</code>. 
             <code>Sequel::Dataset#extension</code> returns a modifies copy of the
             dataset that includes the extension (similar to how most dataset query
             methods work):</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
             
-            <p><code>Sequel::Dataset#extension!</code> modifies a dataset to include the
-            extension (similar to how dataset mutation methods work):</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension!</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
-            
-            <p>It is recommended you only use <code>Sequel::Dataset#extension!</code> if
-            you have good reasons to.</p>
-            
             <p>The first thing loading a Dataset extension does is load the relevent
             extension globally.  Similar to Database extensions, loading a Dataset
             extension globally should not affect state other than maybe adding a
-            module.  After loading the extension globally, it modifies the related
-            <code>Sequel::Dataset</code> instance to modify its behavior.</p>
+            module.  After loading the extension globally, it returned a modified copy
+            of the <code>Sequel::Dataset</code> with the extension loaded into it.</p>
             
             <p>If you want to load an extension into all future datasets for a given
             <code>Sequel::Database</code> instance, you can also load it as a Database

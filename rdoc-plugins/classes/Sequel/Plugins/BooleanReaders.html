@@ -37,12 +37,12 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The <a href="BooleanReaders.html">BooleanReaders</a> plugin allows for the
-            creation of attribute? methods for boolean columns, which provides a nicer
-            API.  By default, the accessors are created for all columns of type
-            :boolean.  However, you can provide a block to the plugin to change the
-            criteria used to determine if a column is boolean.  The block is yielded
-            with the column symbol for each column in the models dataset.</p>
+            <p>The boolean_readers plugin allows for the creation of attribute? methods
+            for boolean columns, which provides a nicer API.  By default, the accessors
+            are created for all columns of type :boolean.  However, you can provide a
+            block to the plugin to change the criteria used to determine if a column is
+            boolean.  The block is yielded with the column symbol for each column in
+            the models dataset.</p>
             
             <p>Usage:</p>
             
@@ -100,7 +100,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/boolean_readers.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    (<span class="ruby-keyword">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">self</span>; <span class="ruby-keyword">self</span>; <span class="ruby-keyword">end</span>).<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:boolean_attribute?</span>, <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_BOOLEAN_ATTRIBUTE_PROC</span>))&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-value">:create_boolean_readers</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/boolean_readers.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_attribute?</span>, <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_BOOLEAN_ATTRIBUTE_PROC</span>))&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-value">:create_boolean_readers</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

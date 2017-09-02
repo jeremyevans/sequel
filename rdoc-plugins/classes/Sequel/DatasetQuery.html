@@ -57,7 +57,7 @@
                 <div class='description'>
                   
                   <p>Translates a query block into a dataset. Query blocks are an alternative to
-                  Sequel&#39;s usual method chaining, by using instance_eval with a proxy
+                  Sequel&#39;s usual method chaining, by using instance_exec with a proxy
                   object:</p>
                   
                   <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">select</span> :<span class="ruby-identifier">x</span>, :<span class="ruby-identifier">y</span>, :<span class="ruby-identifier">z</span>&#x000A;  <span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}&#x000A;  <span class="ruby-identifier">reverse</span> :<span class="ruby-identifier">z</span>&#x000A;<span class="ruby-keyword">end</span></pre>
@@ -70,7 +70,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-query-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-query-source'><span class="ruby-comment"># File lib/sequel/extensions/query.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">query</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">query</span> = <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Query</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-identifier">query</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">query</span>.<span class="ruby-identifier">dataset</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-query-source'><span class="ruby-comment"># File lib/sequel/extensions/query.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">query</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">query</span> = <span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Query</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-identifier">query</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">query</span>.<span class="ruby-identifier">dataset</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

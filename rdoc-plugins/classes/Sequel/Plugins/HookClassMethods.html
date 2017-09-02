@@ -71,30 +71,6 @@
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DEPRECATION_REPLACEMENTS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      {
-                      :after_commit=>"Use after_save{db.after_commit{}} instead",
-                      :after_destroy_commit=>"Use after_destroy{db.after_commit{}} instead",
-                      :after_destroy_rollback=>"Use before_destroy{db.after_rollback{}} instead",
-                      :after_rollback=>"Use before_save{db.after_rollback{}} instead"
-                      }.freeze
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>SEQUEL5: Remove</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
               <div class='method public-class' id='method-method-c-apply'>
@@ -111,7 +87,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">hooks</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@hooks</span>, {})&#x000A;  <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hooks</span>[<span class="ruby-identifier">h</span>] = []}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">hooks</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@hooks</span>, {})&#x000A;  <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hooks</span>[<span class="ruby-identifier">h</span>] = []}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

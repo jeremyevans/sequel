@@ -62,7 +62,7 @@
                   <p>Set all values using the entries in the hash, ignoring any setting of
                   allowed_columns in the model.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">num_albums</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_all</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">num_albums</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_all</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_all-source'); return false">
@@ -83,7 +83,7 @@
                   in only.  It may be a better idea to use <code>set_fields</code> instead of
                   this method.</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({:<span class="ruby-identifier">hometown=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;LA&#39;</span>}, :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># Raise Error</span></pre>
+                  <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_only</span>({<span class="ruby-identifier">hometown</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;LA&#39;</span>}, :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># Raise Error</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_only-source'); return false">
@@ -103,7 +103,7 @@
                   <p>Update all values using the entries in the hash, ignoring any setting of
                   <code>allowed_columns</code> in the model.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">num_albums</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_all</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">num_albums</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_all</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-update_all-source'); return false">
@@ -124,7 +124,7 @@
                   included in only.  It may be a better idea to use
                   <code>update_fields</code> instead of this method.</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({:<span class="ruby-identifier">hometown=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;LA&#39;</span>}, :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># Raise Error</span></pre>
+                  <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_only</span>({<span class="ruby-identifier">hometown</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;LA&#39;</span>}, :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># Raise Error</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-update_only-source'); return false">

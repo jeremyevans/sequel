@@ -52,24 +52,6 @@
             </div>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ROWS_AFFECTED</td>
-                    <td>=</td>
-                    <td class='context-item-value'>"SELECT @@ROWCOUNT AS AffectedRows"</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Query to use to get the number of rows affected by an update or delete
-                      query.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-execute_dui'>
@@ -82,14 +64,14 @@
                   
                   <p>Issue a separate query to get the rows modified.  <a
                   href="../../ADO.html">ADO</a> appears to use pass by reference with an
-                  integer variable, which is obviously not supported directly in ruby, and
-                  I&#39;m not aware of a workaround.</p>
+                  integer variable, which is not supported directly in ruby, and I&#39;m not
+                  aware of a workaround.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/mssql.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:provider</span>]&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-constant">Execute</span>(<span class="ruby-identifier">sql</span>)}&#x000A;      <span class="ruby-identifier">rows_affected_sql</span> = <span class="ruby-string">&quot;SELECT @@ROWCOUNT AS AffectedRows&quot;</span>&#x000A;      <span class="ruby-identifier">res</span> = <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">rows_affected_sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-constant">Execute</span>(<span class="ruby-identifier">rows_affected_sql</span>)}&#x000A;      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">getRows</span>.<span class="ruby-identifier">transpose</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">shift</span>}&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-operator">::</span><span class="ruby-constant">WIN32OLERuntimeError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/mssql.rb, line 12</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:provider</span>]&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-constant">Execute</span>(<span class="ruby-identifier">sql</span>)}&#x000A;      <span class="ruby-identifier">rows_affected_sql</span> = <span class="ruby-string">&quot;SELECT @@ROWCOUNT AS AffectedRows&quot;</span>&#x000A;      <span class="ruby-identifier">res</span> = <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">rows_affected_sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-constant">Execute</span>(<span class="ruby-identifier">rows_affected_sql</span>)}&#x000A;      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">getRows</span>.<span class="ruby-identifier">transpose</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">shift</span>}&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-operator">::</span><span class="ruby-constant">WIN32OLERuntimeError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

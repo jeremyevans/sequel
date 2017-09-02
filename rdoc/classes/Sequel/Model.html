@@ -60,7 +60,8 @@
             <a href="../Sequel.html">Sequel</a> core.  Each model class is backed by a
             dataset instance, and many dataset methods can be called directly on the
             class.  <a href="Model.html">Model</a> datasets return rows as model
-            instances, which have fairly standard ORM instance behavior.</p>
+            instances, which are wrappers around the underlying hash that allow easily
+            updating or deleting the individual row.</p>
             
             <p><code>Sequel::Model</code> is built completely out of plugins.  <a
             href="Plugins.html">Plugins</a> can override any class, instance, or
@@ -93,88 +94,32 @@
               <div class='name-list'>
                 <table summary='Constants'>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AFTER_HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[:after_create, :after_update, :after_save, :after_destroy, :after_validation, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>@Model_cache = {}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES_MUTEX</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Mutex.new</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AROUND_HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[:around_create, :around_update, :around_save, :around_destroy, :around_validation]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BEFORE_HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[:before_create, :before_update, :before_save, :before_destroy, :before_validation]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BOOLEAN_SETTINGS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions, :use_after_commit_rollback]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DATASET_METHODS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>(Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>HOOKS</td>
                     <td>=</td>
                     <td class='context-item-value'>
-                      [:before_create, :before_update, :before_save, :before_destroy, :before_validation,
-                      :after_create, :after_update, :after_save, :after_destroy, :after_validation,
-                      :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback # SEQUEL5: Remove commit/rollback hooks
-                      ]
+                      [
+                      :after_create,
+                      :after_destroy,
+                      :after_save,
+                      :after_update,
+                      :after_validation,
+                      :before_create,
+                      :before_destroy,
+                      :before_save,
+                      :before_update,
+                      :before_validation
+                      ].freeze
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Empty instance methods to create that the user can override to get
-                      hook/callback behavior. Just like any other method defined by <a
-                      href="../Sequel.html">Sequel</a>, if you override one of these, you should
-                      call <code>super</code> to get the default behavior (while empty by
-                      default, they can also be defined by plugins).  See the <a
-                      href="../../files/doc/model_hooks_rdoc.html">“Model Hooks” guide</a> for
-                      more detail on hooks.</p>
+                      <p>Empty instance methods to create that the user can override. Just like any
+                      other method defined by <a href="../Sequel.html">Sequel</a>, if you
+                      override one of these, you should call <code>super</code> to get the
+                      default behavior (while empty by default, they are often overridden by
+                      plugins).  See the <a href="../../files/doc/model_hooks_rdoc.html">“Model
+                      Hooks” guide</a> for more detail on hooks.</p>
                     </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>INHERITED_INSTANCE_VARIABLES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{ :@allowed_columns=>:dup, :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil, :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil, :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil, :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil, :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil, :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil, :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup, :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil, :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>NORMAL_METHOD_NAME_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\A[A-Za-z_][A-Za-z0-9_]*\z/</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>OPTS</td>
@@ -186,7 +131,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>RESTRICTED_SETTER_METHODS</td>
                     <td>=</td>
-                    <td class='context-item-value'>instance_methods.map(&:to_s).select{|l| l.end_with?('=')}</td>
+                    <td class='context-item-value'>instance_methods.map(&:to_s).select{|l| l.end_with?('=')}.freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -194,13 +139,6 @@
                       called automatically via
                       <code>set</code>/<code>update</code>/<code>new</code>/etc..</p>
                     </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>SETTER_METHOD_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/=\z/</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
                   </tr>
                 </table>
               </div>

@@ -29,12 +29,6 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a href="../../files/lib/sequel/adapters/do/postgres_rb.html">lib/sequel/adapters/do/postgres.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/jdbc/postgresql_rb.html">lib/sequel/adapters/jdbc/postgresql.rb</a>
-          </li>
-          <li class='other'>
             <a href="../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
           </li>
           <li class='other'>
@@ -71,14 +65,8 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a href="#method-c-client_min_messages">client_min_messages</a></li>
-              <li><a href="#method-c-client_min_messages-3D">client_min_messages=</a></li>
-              <li><a href="#method-c-force_standard_strings">force_standard_strings</a></li>
-              <li><a href="#method-c-force_standard_strings-3D">force_standard_strings=</a></li>
               <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
               <li><a href="#method-c-sequel_pg_version_supported-3F">sequel_pg_version_supported?</a></li>
-              <li><a href="#method-c-use_iso_date_format">use_iso_date_format</a></li>
-              <li><a href="#method-c-use_iso_date_format-3D">use_iso_date_format=</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -103,16 +91,9 @@
               <div class='name-list'>
                 <table summary='Constants'>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONVERTED_EXCEPTIONS</td>
+                    <td class='context-item-name'>CONVERSION_PROCS</td>
                     <td>=</td>
-                    <td class='context-item-value'>[]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DASH_STR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'-'.freeze</td>
+                    <td class='context-item-value'>{}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -124,13 +105,6 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>MINUS_INFINITY_STR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'-Infinity'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>NAN</td>
                     <td>=</td>
                     <td class='context-item-value'>0.0/0.0</td>
@@ -138,52 +112,9 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>NAN_STR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'NaN'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>PGError</td>
                     <td>=</td>
                     <td class='context-item-value'>PG::Error if defined?(PG::Error)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PG_NAMED_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{} unless defined?(PG_NAMED_TYPES)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hash with type name strings/symbols and callable values for converting
-                      PostgreSQL types. Non-builtin types that don&#39;t have fixed numbers
-                      should use this to register conversion procs.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PG_NAMED__TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>PG_NAMED_TYPES</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PG_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{} unless defined?(PG_TYPES)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hash with integer keys and callable values for converting PostgreSQL types.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PG__TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>PG_TYPES</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -207,46 +138,6 @@
                     <td class='context-item-value'>1.0/0.0</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PLUS_INFINITY_STR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Infinity'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>STRING_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[18, 19, 25, 1042, 1043]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Type OIDs for string types used by PostgreSQL.  These types don&#39;t have
-                      conversion procs associated with them (since the data is already in the
-                      form of a string).</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRUE_STR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'t'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TYPE_CONVERTOR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      Class.new do
-                      def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
-                      end.new
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>SEQUEL5: Remove</p>
-                    </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>TYPE_TRANSLATOR</td>
@@ -280,7 +171,7 @@
                       end
                       ::Sequel::SQL::Blob.new(str)
                       end
-                      end.new
+                      end.new.freeze
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
@@ -297,70 +188,6 @@
             </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-client_min_messages'>
-                <a name='method-c-client_min_messages'></a>
-                <div class='synopsis'>
-                  <span class='name'>client_min_messages</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-client_min_messages-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-client_min_messages-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">client_min_messages</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.client_min_messages&quot;</span>, <span class="ruby-string">&quot;Use the :client_min_messages Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@client_min_messages</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-client_min_messages-3D'>
-                <a name='method-c-client_min_messages-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>client_min_messages=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-client_min_messages-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-client_min_messages-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">client_min_messages=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.client_min_messages=&quot;</span>, <span class="ruby-string">&quot;Use the :client_min_messages Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@client_min_messages</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-force_standard_strings'>
-                <a name='method-c-force_standard_strings'></a>
-                <div class='synopsis'>
-                  <span class='name'>force_standard_strings</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-force_standard_strings-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-force_standard_strings-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 137</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">force_standard_strings</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.force_standard_strings&quot;</span>, <span class="ruby-string">&quot;Use the :force_standard_strings Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@force_standard_strings</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-force_standard_strings-3D'>
-                <a name='method-c-force_standard_strings-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>force_standard_strings=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-force_standard_strings-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-force_standard_strings-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">force_standard_strings=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.force_standard_strings=&quot;</span>, <span class="ruby-string">&quot;Use the :force_standard_strings Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@force_standard_strings</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-class' id='method-method-c-mock_adapter_setup'>
                 <a name='method-c-mock_adapter_setup'></a>
                 <div class='synopsis'>
@@ -374,7 +201,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-mock_adapter_setup-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 113</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-sequel_pg_version_supported-3F'>
@@ -391,39 +218,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-sequel_pg_version_supported-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-use_iso_date_format'>
-                <a name='method-c-use_iso_date_format'></a>
-                <div class='synopsis'>
-                  <span class='name'>use_iso_date_format</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_iso_date_format-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-use_iso_date_format-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_iso_date_format</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.use_iso_date_format&quot;</span>, <span class="ruby-string">&quot;Use the :use_iso_date_format Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@use_iso_date_format</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-use_iso_date_format-3D'>
-                <a name='method-c-use_iso_date_format-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>use_iso_date_format=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_iso_date_format-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-use_iso_date_format-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_iso_date_format=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Postgres.use_iso_date_format=&quot;</span>, <span class="ruby-string">&quot;Use the :use_iso_date_format Database option instead&quot;</span>)&#x000A;  <span class="ruby-ivar">@use_iso_date_format</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

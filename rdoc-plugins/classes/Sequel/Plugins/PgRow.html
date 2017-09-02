@@ -72,15 +72,11 @@
             
             <pre class="ruby"><span class="ruby-constant">Address</span>.<span class="ruby-identifier">register_row_type</span></pre>
             
-            <p>Note that automatic conversion only works with the native postgres adapter.
-            For other adapters that connect to PostgreSQL, you need to call the
-            conversion proc manually.</p>
-            
             <p>In addition to returning row-valued/composite types as instances of <a
             href="../Model.html">Sequel::Model</a>, this also lets you use model
             instances in datasets when inserting, updating, and filtering:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">company</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;MS&#39;</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span>&#x000A;  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(:<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;123 Foo St&#39;</span>, :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar Town&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;12345&#39;</span>))</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">company</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;MS&#39;</span>, <span class="ruby-identifier">address</span><span class="ruby-operator">:</span>&#x000A;  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">street</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;123 Foo St&#39;</span>, <span class="ruby-identifier">city</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bar Town&#39;</span>, <span class="ruby-identifier">zip</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;12345&#39;</span>))</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -100,27 +96,6 @@
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CAST</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'::'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ROW</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'ROW'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
               <div class='method public-class' id='method-method-c-configure'>
@@ -139,7 +114,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_row.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_row</span>, <span class="ruby-value">:_model_pg_row</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">register_row_type</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@dataset</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_row.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_row</span>, <span class="ruby-value">:_model_pg_row</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">register_row_type</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@dataset</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -38,18 +38,7 @@
           <div id='description'>
             
             <p>Adds methods that allow you to treat an object as an instance of a specific
-            <code>ComplexExpression</code> subclass.  This is useful if another library
-            overrides the methods defined by <a href="../../Sequel.html">Sequel</a>.</p>
-            
-            <p>For example, if <code>Symbol#/</code> is overridden to produce a string
-            (for example, to make file system path creation easier), the following code
-            will not do what you want:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">price</span><span class="ruby-operator">/</span><span class="ruby-value">10</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span></pre>
-            
-            <p>In that case, you need to do the following:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">price</span>.<span class="ruby-identifier">sql_number</span><span class="ruby-operator">/</span><span class="ruby-value">10</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span></pre>
+            <code>ComplexExpression</code> subclass.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -76,7 +65,7 @@
                   
                   <p>Extract a datetime part (e.g. year, month) from self:</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">date</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>) <span class="ruby-comment"># extract(year FROM &quot;date&quot;)</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">date</span>].<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>) <span class="ruby-comment"># extract(year FROM &quot;date&quot;)</span></pre>
                   
                   <p>Also has the benefit of returning the result as a <a
                   href="NumericExpression.html">NumericExpression</a> instead of a generic <a
@@ -86,7 +75,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-extract-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-extract-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 754</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract</span>(<span class="ruby-identifier">datetime_part</span>)&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:extract</span>, <span class="ruby-identifier">datetime_part</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-extract-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 703</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">extract</span>(<span class="ruby-identifier">datetime_part</span>)&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:extract</span>, <span class="ruby-identifier">datetime_part</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_boolean'>
@@ -104,7 +93,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_boolean-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 759</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 708</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_number'>
@@ -118,13 +107,13 @@
                   <p>Return a <a href="NumericExpression.html">NumericExpression</a>
                   representation of <code>self</code>.</p>
                   
-                  <pre class="ruby"><span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span> <span class="ruby-comment"># NOT &quot;a&quot;</span>&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-comment"># ~&quot;a&quot;</span></pre>
+                  <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-comment"># NOT &quot;a&quot;</span>&#x000A;<span class="ruby-operator">~</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_number</span>) <span class="ruby-comment"># ~&quot;a&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_number-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_number-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 767</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_number</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_number-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 716</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_number</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_string'>
@@ -138,13 +127,13 @@
                   <p>Return a <a href="StringExpression.html">StringExpression</a>
                   representation of <code>self</code>.</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; + &quot;b&quot;</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; || &quot;b&quot;</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; + &quot;b&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; || &quot;b&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 775</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 724</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

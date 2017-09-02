@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-02-09 12:56:18 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -39,10 +39,11 @@
             <h1 id="label-Code+Order">Code Order<span><a href="#label-Code+Order">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>In <a href="../../classes/Sequel.html">Sequel</a>, the order in which code
-            is executed is important.  This guide provides the recommended way to order
-            your <a href="../../classes/Sequel.html">Sequel</a> code.  Some of these
-            guidelines are not strictly necessary, but others are, and this guide will
-            be specific about which are strictly necessary.</p>
+            is executed during initialization is important.  This guide provides the
+            recommended way to order your <a
+            href="../../classes/Sequel.html">Sequel</a> code.  Some of these guidelines
+            are not strictly necessary, but others are, and this guide will be specific
+            about which are strictly necessary.</p>
             
             <h2 id="label-Require+Sequel">Require <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-Require+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -58,14 +59,7 @@
             href="../../classes/Sequel.html#method-c-extension">Sequel.extension</a>,
             and affect other parts of <a href="../../classes/Sequel.html">Sequel</a> or
             the general ruby environment.  It&#39;s not necessary to load them first,
-            but it is a recommended practice.</p>
-            
-            <p>The exception to this is global extensions that integrate with
-            Database-specific extensions, where the Database-specific extension should
-            be loaded first (such as some of the pg_* extensions).  In those cases, the
-            global extensions should be loaded after the Database-specific extensions.</p>
-            
-            <p>Example:</p>
+            but it is a recommended practice. Example:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">blank</span></pre>
             

@@ -42,7 +42,7 @@
             methods allow for easily returning the primary keys of the associated
             objects, and easily modifying which objects are associated:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [1, 2, 3]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> = [<span class="ruby-value">2</span>, <span class="ruby-value">4</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [2, 4]</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [1, 2, 3]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> = [<span class="ruby-value">2</span>, <span class="ruby-value">4</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [2, 4]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-comment"># Persist changes</span></pre>
             
             <p>Note that it uses the singular form of the association name. Also note that
             the setter both associates to new primary keys not in the assocation and
@@ -53,20 +53,9 @@
             callbacks.  If you have any association callbacks, you probably should not
             use the setter methods.</p>
             
-            <p>If an association uses the :delay_pks option, you can set the associated
-            pks for new objects, and the setting will not be persisted until after the
-            object has been created in the database.  Additionally, if an association
-            uses the :delay_pks=&gt;:always option, you can set the associated pks for
-            existing objects, and the setting will not be persisted until after the
-            object has been saved.</p>
-            
-            <p>SEQUEL5: Starting in <a href="../../Sequel.html">Sequel</a> 5, the
-            :delay_pks association option will default to :delay_pks=&gt;:always.  If
-            you would like to use the <a href="../../Sequel.html">Sequel</a> 4 behavior
-            of having the setter make modifications immediately, explicitly use the
-            :delay_pks=&gt;false option.  Additionally, <a
-            href="../../Sequel.html">Sequel</a> 5 will not support the current
-            :delay_pks=&gt;true behavior, treating it as :delay_pks=&gt;:always.</p>
+            <p>By default, changes to the association will not happen until the object is
+            saved.  However, using the delay_pks: false option, you can have the
+            changes made immediately when the association_pks setter method is called.</p>
             
             <p>By default, if you pass a nil value to the setter, an exception will be
             raised. You can change this behavior by using the :association_pks_nil

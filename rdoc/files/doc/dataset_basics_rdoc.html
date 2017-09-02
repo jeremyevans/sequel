@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,23 +43,9 @@
             <p>Datasets are the primary way <a href="../../classes/Sequel.html">Sequel</a>
             uses to access the database. While most database libraries have specific
             support for updating all records or only a single record, Sequel&#39;s
-            ability to represent SQL queries themselves as objects is what gives <a
-            href="../../classes/Sequel.html">Sequel</a> most of its power.  However, if
-            you haven&#39;t been exposed to the dataset concept before, it can be a
-            little disorienting.  This document aims to give a basic introduction to
-            datasets and how to use them.</p>
-            
-            <h2 id="label-What+a+Dataset+Represents">What a Dataset Represents<span><a href="#label-What+a+Dataset+Represents">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>A Dataset can be thought of representing one of two concepts:</p>
-            <ul><li>
-            <p>An SQL query</p>
-            </li><li>
-            <p>An abstract set of rows and some related behavior</p>
-            </li></ul>
-            
-            <p>The first concept is more easily understood, so you should probably start
-            with that assumption.</p>
+            ability to represent SQL queries themselves as datasets is what gives <a
+            href="../../classes/Sequel.html">Sequel</a> most of its power.  This
+            document aims to give a basic introduction to datasets and how to use them.</p>
             
             <h2 id="label-Basics">Basics<span><a href="#label-Basics">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -72,17 +58,17 @@
             ds is your dataset, with the SQL query it represents below it.</p>
             
             <p>One of the core dataset ideas that should be understood is that datasets
-            use a functional style of modification, in which methods called on the
-            dataset return modified copies of the dataset, they don&#39;t modify the
-            dataset themselves:</p>
+            are frozen and use a functional style of modification, in which methods
+            called on the dataset return modified copies of the dataset, they don&#39;t
+            modify the dataset themselves:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">ds2</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts WHERE id = 1</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">ds2</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts WHERE id = 1</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span></pre>
             
             <p>Note how ds itself is not modified.  This is because ds.where returns a
             modified copy of ds, instead of modifying ds itself.  This makes using
             datasets both thread safe and easy to chain:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Thread safe:</span>&#x000A;<span class="ruby-value">100</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">i</span>).<span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Easy to chain:</span>&#x000A;<span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-comment"># SELECT id, name FROM posts WHERE id &lt; 100 ORDER BY name</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Thread safe:</span>&#x000A;<span class="ruby-value">100</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">i</span>).<span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Easy to chain:</span>&#x000A;<span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-comment"># SELECT id, name FROM posts WHERE id &lt; 100 ORDER BY name</span></pre>
             
             <p>Thread safety you don&#39;t really need to worry about, but chainability is
             core to how <a href="../../classes/Sequel.html">Sequel</a> is generally
@@ -129,7 +115,7 @@
             natural_right_join, natural_full_join, cross_join, inner_join,
             left_outer_join, right_outer_join, full_outer_join, join_table</p>
             </td></tr><tr><td class='label'>WHERE</td><td>
-            <p>where, filter, exclude, exclude_where, and, or, grep, invert, unfiltered</p>
+            <p>where, filter, exclude, or, grep, invert, unfiltered</p>
             </td></tr><tr><td class='label'>GROUP</td><td>
             <p>group, group_by, group_and_count, group_append, select_group, ungrouped</p>
             </td></tr><tr><td class='label'>HAVING</td><td>
@@ -146,7 +132,7 @@
             </td></tr><tr><td class='label'>common table expressions</td><td>
             <p>with, with_recursive</p>
             </td></tr><tr><td class='label'>other</td><td>
-            <p>clone, distinct, naked, qualify, server, with_sql</p>
+            <p>distinct, naked, qualify, server, with_sql</p>
             </td></tr></tbody></table>
             
             <h3 id="label-Methods+that+execute+code+on+the+database">Methods that execute code on the database<span><a href="#label-Methods+that+execute+code+on+the+database">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -154,14 +140,14 @@
             <p>Most other dataset methods commonly used will execute the dataset&#39;s SQL
             on the database:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>SELECT (All Records)</td><td>
-            <p>all, each, map, to_hash, to_hash_groups, select_map, select_order_map,
+            <p>all, each, map, as_hash, to_hash_groups, select_map, select_order_map,
             select_hash, select_hash_groups</p>
             </td></tr><tr><td class='label'>SELECT (First Record)</td><td>
             <p>first, last, [], single_record</p>
             </td></tr><tr><td class='label'>SELECT (Single Value)</td><td>
             <p>get, single_value</p>
             </td></tr><tr><td class='label'>SELECT (Aggregates)</td><td>
-            <p>count, avg, max, min, sum, range, interval</p>
+            <p>count, avg, max, min, sum</p>
             </td></tr><tr><td class='label'>INSERT</td><td>
             <p>insert, &lt;&lt;, import, multi_insert</p>
             </td></tr><tr><td class='label'>UPDATE</td><td>

@@ -110,25 +110,17 @@
             deprecated unless the identifier_mangling extension is explicitly loaded
             into the Database instance.</p>
             </li><li>
-            <p>The <a
-            href="../../../classes/Sequel/Database.html#method-c-single_threaded">Sequel::Database.single_threaded</a>
-            accessor is now deprecated. Switch to using Sequel.single_threaded= and
-            Sequel.single_threaded?.</p>
+            <p>The Sequel::Database.single_threaded accessor is now deprecated. Switch to
+            using Sequel.single_threaded= and Sequel.single_threaded?.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel/Database.html#attribute-c-identifier_input_method">Sequel::Database.identifier_input_method</a>,
-            <a
-            href="../../../classes/Sequel/Database.html#attribute-c-identifier_output_method">Sequel::Database.identifier_output_method</a>,
-            and <a
+            <p>Sequel::Database.identifier_input_method,
+            Sequel::Database.identifier_output_method, and <a
             href="../../../classes/Sequel/Database.html#method-i-quote_identifier">Sequel::Database#quote_identifier</a>
             accessors are now deprecated. Switch to modifying the setting for each
             Database instance.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel.html#method-c-identifier_input_method-3D">Sequel.identifier_input_method=</a>,
-            <a
-            href="../../../classes/Sequel.html#method-c-identifier_output_method-3D">Sequel.identifier_output_method=</a>,
-            and Sequel.quote_identifer= setter methods are now deprecated. Switch to
+            <p>Sequel.identifier_input_method=, Sequel.identifier_output_method=, and
+            Sequel.quote_identifer= setter methods are now deprecated. Switch to
             modifying the setting for each Database instance.</p>
             </li><li>
             <p>Calling Dataset#delete/update/truncate on datasets with limits or offsets
@@ -183,19 +175,15 @@
             <p>The prepared_statements_associations and prepared_statements_with_pk
             plugins are now deprecated.  These plugins generally make things slower.</p>
             </li><li>
-            <p>Dataset#unbind, <a
-            href="../../../classes/Sequel/Unbinder.html">Sequel::Unbinder</a>, and
-            Sequel::UnbindDuplicate are now deprecated.  This mostly existed to support
-            the prepared_statements_associations and prepared_statements_with_pk
-            plugins.</p>
+            <p>Dataset#unbind, Sequel::Unbinder, and Sequel::UnbindDuplicate are now
+            deprecated.  This mostly existed to support the
+            prepared_statements_associations and prepared_statements_with_pk plugins.</p>
             </li><li>
             <p>Sequel::Error::* exception class aliases are now deprecated. Switch to
             using the exception classes in the <a
             href="../../../classes/Sequel.html">Sequel</a> namespace.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel/HookFailed.html">Sequel::BeforeHookFailed</a>
-            is now deprecated.  Switch to using <a
+            <p>Sequel::BeforeHookFailed is now deprecated.  Switch to using <a
             href="../../../classes/Sequel/HookFailed.html">Sequel::HookFailed</a>.</p>
             </li><li>
             <p>Calling <a
@@ -215,17 +203,13 @@
             after_update hooks is deprecated.  Switch to using the new columns_updated
             plugin and calling the columns_updated method.</p>
             </li><li>
-            <p>The <a
-            href="../../../classes/Sequel.html#method-c-cache_anonymous_models">Sequel.cache_anonymous_models</a>
-            accessor has been deprecated. Switch to using
-            Sequel::Model.cache_anonymous_models.</p>
+            <p>The Sequel.cache_anonymous_models accessor has been deprecated. Switch to
+            using Sequel::Model.cache_anonymous_models.</p>
             </li><li>
             <p>Sequel::Model::ANONYMOUS_MODEL_CLASSES and
             Sequel::Model::ANONYMOUS_MODEL_CLASSES_MUTEX have been deprecated.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel/Database/ResetIdentifierMangling.html">Sequel::Database::ResetIdentifierMangling</a>
-            has been deprecated.</p>
+            <p>Sequel::Database::ResetIdentifierMangling has been deprecated.</p>
             </li></ul>
             
             <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>

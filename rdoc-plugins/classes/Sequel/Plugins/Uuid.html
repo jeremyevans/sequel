@@ -38,14 +38,11 @@
           <div id='description'>
             
             <p>The uuid plugin creates hooks that automatically create a uuid for every
-            instance.  Note that this uses SecureRandom.uuid to create UUIDs, and that
-            method is not defined on ruby 1.8.7.  If you would like to use this on ruby
-            1.8.7, you need to override the Model#create_uuid private method to return
-            a valid uuid.</p>
+            instance.</p>
             
             <p>Usage:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Uuid all model instances using +uuid+</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">uuid</span>&#x000A;&#x000A;<span class="ruby-comment"># Uuid Album instances, with custom column name</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">uuid</span>, :<span class="ruby-identifier">field=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">my_uuid</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Uuid all model instances using +uuid+</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">uuid</span>&#x000A;&#x000A;<span class="ruby-comment"># Uuid Album instances, with custom column name</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">uuid</span>, <span class="ruby-identifier">field</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">my_uuid</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -87,7 +84,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/uuid.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@uuid_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>]<span class="ruby-operator">||</span><span class="ruby-value">:uuid</span>&#x000A;    <span class="ruby-ivar">@uuid_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/uuid.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@uuid_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>]<span class="ruby-operator">||</span><span class="ruby-value">:uuid</span>&#x000A;    <span class="ruby-ivar">@uuid_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -47,11 +47,11 @@
             <code><em>association</em>_attributes=</code>, (e.g.
             <code>albums_attributes=</code>).  So if you have an Artist instance:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;YJM&#39;</span>)</pre>
             
             <p>You can create new album instances related to this artist:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">albums_attributes</span> = [{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>}, {:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;MO&#39;</span>}]</pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">albums_attributes</span> = [{<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;RF&#39;</span>}, {<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;MO&#39;</span>}]</pre>
             
             <p>Note that this doesn&#39;t send any queries to the database yet.  That
             doesn&#39;t happen till you save the object:</p>
@@ -67,7 +67,7 @@
             existing associated objects.  You just need to make sure that the primary
             key field is filled in for the associated object:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;T&#39;</span>}])</pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;T&#39;</span>}])</pre>
             
             <p>Since the primary key field is filled in, the plugin will update the album
             with id 1 instead of creating a new album.</p>
@@ -76,14 +76,14 @@
             you add a _delete entry to the hash, and also pass the :destroy option when
             calling <code>nested_attributes</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">destroy=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_delete=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">destroy</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">_delete</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>}])</pre>
             
             <p>This will delete the related associated object from the database.  If you
             want to leave the associated object in the database, but just remove it
             from the association, add a _remove entry in the hash, and also pass the
             :remove option when calling <code>nested_attributes</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">remove</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">_remove</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>}])</pre>
             
             <p>The above example was for a one_to_many association, but the plugin also
             works similarly for other association types.  For one_to_one and
@@ -99,11 +99,11 @@
             
             <p>Your web stack will probably parse that into a nested hash similar to:</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Y&#39;</span>, :<span class="ruby-identifier">albums_attributes=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-value">0</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;X&#39;</span>}, <span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;2&#39;</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Z&#39;</span>}}}}</pre>
+            <pre class="ruby">{<span class="ruby-string">&#39;artist&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;name&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Y&#39;</span>, <span class="ruby-string">&#39;albums_attributes&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;0&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;name&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;X&#39;</span>}, <span class="ruby-string">&#39;1&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;id&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;2&#39;</span>, <span class="ruby-string">&#39;name&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Z&#39;</span>}}}}</pre>
             
             <p>Then you can do:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">artist</span>], [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">albums_artists</span>])</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>(<span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-node">%w&#39;name albums_artists&#39;</span>)</pre>
             
             <p>To save changes to the artist, create the first album and associate it to
             the artist, and update the other existing associated album.</p>

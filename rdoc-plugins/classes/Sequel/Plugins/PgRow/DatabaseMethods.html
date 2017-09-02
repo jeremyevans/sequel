@@ -47,34 +47,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>COMMA</td>
-                    <td>=</td>
-                    <td class='context-item-value'>','</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ESCAPE_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/("|\\)/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ESCAPE_REPLACEMENT</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'\\\\\1'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-bound_variable_arg'>
@@ -92,7 +64,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-bound_variable_arg-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb, line 14</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;    <span class="ruby-node">&quot;(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(&#39;,&#39;)})&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb, line 7</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;    <span class="ruby-node">&quot;(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(&#39;,&#39;)})&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-row_type'>
@@ -110,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-row_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-row_type-source'><span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">row_type</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-row_type-source'><span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">row_type</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

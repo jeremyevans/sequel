@@ -41,9 +41,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-identifier_input_method">identifier_input_method</a></li>
-              <li><a href="#method-i-identifier_input_method-3D">identifier_input_method=</a></li>
               <li><a href="#method-i-identifier_output_method">identifier_output_method</a></li>
-              <li><a href="#method-i-identifier_output_method-3D">identifier_output_method=</a></li>
               <li><a href="#method-i-quote_identifiers-3F">quote_identifiers?</a></li>
               <li><a href="#method-i-with_identifier_input_method">with_identifier_input_method</a></li>
               <li><a href="#method-i-with_identifier_output_method">with_identifier_output_method</a></li>
@@ -69,25 +67,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier_input_method-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-identifier_input_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier_input_method</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:identifier_input_method</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">identifier_input_method</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-identifier_input_method-3D'>
-                <a name='method-i-identifier_input_method-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>identifier_input_method=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the method to call on identifiers going into the database for this
-                  dataset</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier_input_method-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-identifier_input_method-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier_input_method=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">raise_if_frozen!</span>(<span class="ruby-node">%w&quot;identifier_input_method= with_identifier_input_method&quot;</span>)&#x000A;  <span class="ruby-identifier">skip_symbol_cache!</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:identifier_input_method</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-identifier_input_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier_input_method</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:identifier_input_method</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">identifier_input_method</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-identifier_output_method'>
@@ -105,24 +85,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier_output_method-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-identifier_output_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 146</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier_output_method</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:identifier_output_method</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">identifier_output_method</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-identifier_output_method-3D'>
-                <a name='method-i-identifier_output_method-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>identifier_output_method=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the method to call on identifiers coming the database for this dataset</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier_output_method-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-identifier_output_method-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 151</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier_output_method=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">raise_if_frozen!</span>(<span class="ruby-node">%w&quot;identifier_output_method= with_identifier_output_method&quot;</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:identifier_output_method</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-identifier_output_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier_output_method</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:identifier_output_method</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">identifier_output_method</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-quote_identifiers-3F'>
@@ -139,7 +102,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-quote_identifiers-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-quote_identifiers-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 157</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">quote_identifiers?</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:quote_identifiers</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">quote_identifiers?</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-quote_identifiers-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">quote_identifiers?</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:quote_identifiers</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">quote_identifiers?</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_identifier_input_method'>
@@ -158,7 +121,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_identifier_input_method-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_identifier_input_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 162</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_identifier_input_method</span>(<span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:identifier_input_method=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">meth</span>, <span class="ruby-value">:skip_symbol_cache=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_identifier_input_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 148</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_identifier_input_method</span>(<span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:identifier_input_method=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">meth</span>, <span class="ruby-value">:skip_symbol_cache=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_identifier_output_method'>
@@ -177,7 +140,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_identifier_output_method-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_identifier_output_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 167</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_identifier_output_method</span>(<span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:identifier_output_method=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">meth</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_identifier_output_method-source'><span class="ruby-comment"># File lib/sequel/extensions/identifier_mangling.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_identifier_output_method</span>(<span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:identifier_output_method=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">meth</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

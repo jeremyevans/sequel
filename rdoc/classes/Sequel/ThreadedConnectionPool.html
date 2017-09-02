@@ -73,7 +73,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>USE_WAITER</td>
                     <td>=</td>
-                    <td class='context-item-value'>RUBY_VERSION >= '1.9'</td>
+                    <td class='context-item-value'>true</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -130,26 +130,18 @@
                 <div class='description'>
                   
                   <p>The following additional options are respected:</p>
-                  <ul><li>
-                  <p>:connection_handling - Set how to handle available connections.  By
-                  default, uses a a queue for fairness.  Can be set to :stack to use a stack,
-                  which may offer better performance.</p>
-                  </li><li>
-                  <p>:max_connections - The maximum number of connections the connection pool
-                  will open (default 4)</p>
-                  </li><li>
-                  <p>:pool_sleep_time - The amount of time to sleep before attempting to acquire
-                  a connection again, only used on ruby 1.8. (default 0.001)</p>
-                  </li><li>
-                  <p>:pool_timeout - The amount of seconds to wait to acquire a connection
-                  before raising a PoolTimeoutError (default 5)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:max_connections </td><td>
+                  <p>The maximum number of connections the connection pool will open (default 4)</p>
+                  </td></tr><tr><td class='label'>:pool_timeout </td><td>
+                  <p>The amount of seconds to wait to acquire a connection before raising a
+                  PoolTimeoutError (default 5)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@max_size</span> = <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;:max_connections must be positive&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@max_size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-ivar">@mutex</span> = <span class="ruby-constant">Mutex</span>.<span class="ruby-identifier">new</span>  &#x000A;  <span class="ruby-ivar">@connection_handling</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connection_handling</span>]&#x000A;  <span class="ruby-ivar">@available_connections</span> = []&#x000A;  <span class="ruby-ivar">@allocated</span> = {}&#x000A;  <span class="ruby-ivar">@timeout</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">USE_WAITER</span>&#x000A;    <span class="ruby-ivar">@waiter</span> = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># :nocov:</span>&#x000A;    <span class="ruby-ivar">@sleep_time</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_sleep_time</span>] <span class="ruby-operator">||</span> <span class="ruby-value">0.001</span>)&#x000A;    <span class="ruby-comment"># :nocov:</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@max_size</span> = <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;:max_connections must be positive&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@max_size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-ivar">@mutex</span> = <span class="ruby-constant">Mutex</span>.<span class="ruby-identifier">new</span>  &#x000A;  <span class="ruby-ivar">@connection_handling</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connection_handling</span>]&#x000A;  <span class="ruby-ivar">@available_connections</span> = []&#x000A;  <span class="ruby-ivar">@allocated</span> = {}&#x000A;  <span class="ruby-ivar">@timeout</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5</span>)&#x000A;  <span class="ruby-ivar">@waiter</span> = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -171,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-all_connections-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-all_connections-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">all_connections</span>&#x000A;  <span class="ruby-identifier">hold</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-all_connections-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">all_connections</span>&#x000A;  <span class="ruby-identifier">hold</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-disconnect'>
@@ -188,7 +180,7 @@
                   If you want to be able to disconnect connections that are currently in use,
                   use the ShardedThreadedConnectionPool, which can do that. This connection
                   pool does not, for performance reasons. To use the sharded pool, pass the
-                  <code>:servers=&gt;{}</code> option when connecting to the database.</p>
+                  <code>servers: {}</code> option when connecting to the database.</p>
                   
                   <p>Once a connection is requested using <a
                   href="ThreadedConnectionPool.html#method-i-hold">hold</a>, the connection
@@ -198,7 +190,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">conns</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">conns</span> = <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">conns</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">conn</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">conns</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">conns</span> = <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">clear</span>&#x000A;    <span class="ruby-ivar">@waiter</span>.<span class="ruby-identifier">signal</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">conns</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">conn</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hold'>
@@ -220,13 +212,13 @@
                   <p>If no connection is immediately available and the pool is already using the
                   maximum number of connections, Pool#hold will block until a connection is
                   available or the timeout expires.  If the timeout expires before a
-                  connection can be acquired, a Sequel::PoolTimeout is  raised.</p>
+                  connection can be acquired, a Sequel::PoolTimeout is raised.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hold-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-hold-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 99</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">acquire</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;      <span class="ruby-identifier">oconn</span> = <span class="ruby-identifier">conn</span>&#x000A;      <span class="ruby-identifier">conn</span> = <span class="ruby-keyword">nil</span>&#x000A;      <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">oconn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">oconn</span>&#x000A;      <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">sync</span>{<span class="ruby-identifier">release</span>(<span class="ruby-identifier">t</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-hold-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">acquire</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;      <span class="ruby-identifier">oconn</span> = <span class="ruby-identifier">conn</span>&#x000A;      <span class="ruby-identifier">conn</span> = <span class="ruby-keyword">nil</span>&#x000A;      <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">oconn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">oconn</span>&#x000A;      <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span> &#x000A;        <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">t</span>)&#x000A;        <span class="ruby-ivar">@waiter</span>.<span class="ruby-identifier">signal</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">sync</span>{<span class="ruby-identifier">release</span>(<span class="ruby-identifier">t</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pool_type'>
@@ -242,7 +234,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pool_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pool_type-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pool_type</span>&#x000A;  <span class="ruby-value">:threaded</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pool_type-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pool_type</span>&#x000A;  <span class="ruby-value">:threaded</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-size'>
@@ -253,14 +245,14 @@
                 </div>
                 <div class='description'>
                   
-                  <p>The total number of connections opened, either available or allocated. This
-                  may not be completely accurate as it isn&#39;t protected by the mutex.</p>
+                  <p>The total number of connections opened, either available or allocated. The
+                  calling code should not have the mutex before calling this.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-size-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-size-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 126</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">size</span>&#x000A;  <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">length</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-size-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 113</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">size</span>&#x000A;  <span class="ruby-ivar">@mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">_size</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

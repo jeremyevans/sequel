@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-21 11:51:18 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -47,21 +47,25 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">duplicate_columns_handler</span></pre>
             
+            <p>or into individual datasets:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">duplicate_columns_handler</span>)</pre>
+            
             <p>A database option is introduced: :on_duplicate_columns. It accepts a <a
             href="../../../../classes/Symbol.html">Symbol</a> or any object that
             responds to :call.</p>
             
-            <pre>:on_duplicate_columns =&gt; :raise&#x000A;:on_duplicate_columns =&gt; :warn&#x000A;:on_duplicate_columns =&gt; :ignore&#x000A;:on_duplicate_columns =&gt; proc { |columns| arbitrary_condition? ? :raise : :warn }</pre>
+            <pre>on_duplicate_columns: :raise&#x000A;on_duplicate_columns: :warn&#x000A;on_duplicate_columns: :ignore&#x000A;on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</pre>
             
             <p>You may also configure duplicate columns handling for a specific dataset:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">warn</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">raise</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">ignore</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">raise</span> <span class="ruby-operator">:</span> :<span class="ruby-identifier">warn</span> }&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">proc</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">raise</span> <span class="ruby-operator">:</span> :<span class="ruby-identifier">warn</span> })</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">warn</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">raise</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">ignore</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">raise</span> <span class="ruby-operator">:</span> :<span class="ruby-identifier">warn</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">raise</span> <span class="ruby-operator">:</span> :<span class="ruby-identifier">warn</span>})</pre>
             
             <p>If :raise is specified, a <a
             href="../../../../classes/Sequel/DuplicateColumnError.html">Sequel::DuplicateColumnError</a>
-            is raised. If :warn is specified, you will receive a warning via `warn`. If
-            a callable is specified, it will be called. If no on_duplicate_columns is
-            specified, the default is :warn.</p>
+            is raised. If :warn is specified, you will receive a warning via
+            <code>warn</code>. If a callable is specified, it will be called. If no
+            on_duplicate_columns is specified, the default is :warn.</p>
             
             <p>Related module: <a
             href="../../../../classes/Sequel/DuplicateColumnsHandler.html">Sequel::DuplicateColumnsHandler</a></p>

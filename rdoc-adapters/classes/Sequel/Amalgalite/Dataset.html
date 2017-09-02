@@ -39,11 +39,7 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p><a href="Dataset.html">Dataset</a> class for <a
-            href="../SQLite.html">SQLite</a> datasets that use the amalgalite driver.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
@@ -70,13 +66,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Yield a hash for each row in the dataset.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 165</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">result_fields</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>)}&#x000A;    <span class="ruby-identifier">col_count</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>&#x000A;    <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">row</span> = {}&#x000A;      <span class="ruby-identifier">col_count</span>.<span class="ruby-identifier">times</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[<span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]] = <span class="ruby-identifier">result</span>[<span class="ruby-identifier">i</span>]}&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 150</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">result_fields</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>)}&#x000A;    <span class="ruby-identifier">col_count</span> = <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>&#x000A;    <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">row</span> = {}&#x000A;      <span class="ruby-identifier">col_count</span>.<span class="ruby-identifier">times</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[<span class="ruby-identifier">cols</span>[<span class="ruby-identifier">i</span>]] = <span class="ruby-identifier">result</span>[<span class="ruby-identifier">i</span>]}&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

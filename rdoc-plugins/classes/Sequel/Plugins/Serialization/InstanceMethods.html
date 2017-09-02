@@ -40,6 +40,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#method-i-before_validation">before_validation</a></li>
               <li><a href="#method-i-deserialized_values">deserialized_values</a></li>
               <li><a href="#method-i-freeze">freeze</a></li>
             </ol>
@@ -49,6 +50,23 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-before_validation'>
+                <a name='method-i-before_validation'></a>
+                <div class='synopsis'>
+                  <span class='name'>before_validation</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Serialize deserialized values before saving</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_validation-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_validation</span>&#x000A;  <span class="ruby-identifier">serialize_deserialized_values</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-deserialized_values'>
                 <a name='method-i-deserialized_values'></a>
                 <div class='synopsis'>
@@ -64,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-deserialized_values-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-deserialized_values-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 190</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">deserialized_values</span>&#x000A;  <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-deserialized_values-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 172</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">deserialized_values</span>&#x000A;  <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-freeze'>
@@ -81,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 195</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

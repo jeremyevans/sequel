@@ -35,12 +35,7 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Methods to add to <a href="../../../MySQL.html">MySQL</a> prepared
-            statement calls without using a real database prepared statement and bound
-            variables.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
@@ -68,7 +63,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-subselect_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-subselect_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_args=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">prepared_args</span>, <span class="ruby-value">:bind_vars=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]).&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-value">:to_prepared_statement</span>, <span class="ruby-value">:select</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-value">:extend=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">bound_variable_modules</span>).&#x000A;    <span class="ruby-identifier">prepared_sql</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-subselect_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_args=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">prepared_args</span>, <span class="ruby-value">:bind_vars=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]).&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-value">:to_prepared_statement</span>, <span class="ruby-value">:select</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-value">:extend=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">bound_variable_modules</span>).&#x000A;    <span class="ruby-identifier">prepared_sql</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

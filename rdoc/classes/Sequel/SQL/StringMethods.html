@@ -67,13 +67,13 @@
                   the receiver with the given patterns.  See
                   <code>StringExpression.like</code>.</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">ilike</span>(<span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-ilike-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-ilike-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 985</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">ilike</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span>(<span class="ruby-identifier">ces</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:case_insensitive=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-ilike-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 930</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">ilike</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span>(<span class="ruby-identifier">ces</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:case_insensitive=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-like'>
@@ -88,13 +88,13 @@
                   supports it) pattern match of the receiver with the given patterns.  See
                   <code>StringExpression.like</code>.</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-like-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-like-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 993</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">like</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-like-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 938</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">like</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">like</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

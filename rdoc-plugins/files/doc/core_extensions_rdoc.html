@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -53,11 +53,15 @@
             defines, which could cause problems.  Also, some rubyists do not like using
             libraries that add methods to the core classes.</p>
             
-            <p>Alternatives for the core extension methods where added to <a
+            <p>Alternatives for the core extension methods were added to <a
             href="../../classes/Sequel.html">Sequel</a>, so the query above could be
             written as:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-constant">Integer</span>)).&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-string">&#39;A%&#39;</span>)).&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}, <span class="ruby-value">0</span>, :<span class="ruby-identifier">a</span>))</pre>
+            
+            <p>or with virtual rows:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(<span class="ruby-constant">Integer</span>)}.&#x000A;  <span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)}.&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}, <span class="ruby-value">0</span>, :<span class="ruby-identifier">a</span>))</pre>
             
             <p>Almost all of the core extension methods have a replacement on the <a
             href="../../classes/Sequel.html">Sequel</a> module.  So it is now up to the
@@ -134,9 +138,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)  <span class="ruby-comment"># SQL: a AS b</span>&#x000A;<span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SQL: &#39;a&#39; AS b</span></pre>
             
-            <p>Alternative: Sequel.as:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)</pre>
             
             <h4 id="label-cast">cast<span><a href="#label-cast">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -146,9 +150,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)  <span class="ruby-comment"># SQL: CAST(a AS integer)</span>&#x000A;<span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>) <span class="ruby-comment"># SQL: CAST(&#39;a&#39; AS integer)</span></pre>
             
-            <p>Alternative: Sequel.cast:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">Integer</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">Integer</span>)</pre>
             
             <h4 id="label-cast_numeric">cast_numeric<span><a href="#label-cast_numeric">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -159,9 +163,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">cast_numeric</span>         <span class="ruby-comment"># SQL: CAST(a AS integer)</span>&#x000A;<span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># SQL: CAST(&#39;a&#39; AS double precision)</span></pre>
             
-            <p>Alternative: Sequel.cast_numeric:</p>
+            <p>Alternative:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(:<span class="ruby-identifier">a</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">cast_numeric</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(:<span class="ruby-identifier">a</span>)</pre>
             
             <h4 id="label-cast_string">cast_string<span><a href="#label-cast_string">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -172,9 +176,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">cast_string</span>         <span class="ruby-comment"># SQL: CAST(a AS varchar(255))</span>&#x000A;<span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">text</span>) <span class="ruby-comment"># SQL: CAST(&#39;a&#39; AS text)</span></pre>
             
-            <p>Alternative: Sequel.cast_string:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">a</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">cast_string</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">a</span>)</pre>
             
             <h3 id="label-Symbol"><a href="../../classes/Symbol.html">Symbol</a><span><a href="#label-Symbol">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -182,15 +186,16 @@
             
             <p><a
             href="../../classes/Symbol.html#method-i-identifier">Symbol#identifier</a>
-            wraps the symbol in a single identifier that will not be split.  By
-            default, <a href="../../classes/Sequel.html">Sequel</a> will split symbols
-            with double or triple underscores to do qualifying and aliasing.</p>
+            wraps the symbol in an <a href="../../classes/Sequel.html">Sequel</a>
+            identifier object.  If symbol splitting is enabled (no longer the default),
+            it also makes sure the symbol will not be split.  If symbol splitting is
+            disabled (the default), there is little reason to use this).</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">table__column</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># SQL: table__column</span></pre>
+            <pre class="ruby">:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># SQL: column</span></pre>
             
-            <p>Alternative: Sequel.identifier:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">table__column</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">column</span>)</pre>
             
             <h4 id="label-asc">asc<span><a href="#label-asc">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -199,9 +204,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">asc</span> <span class="ruby-comment"># SQL: a ASC</span></pre>
             
-            <p>Alternative: Sequel.asc:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">a</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">asc</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">a</span>)</pre>
             
             <h4 id="label-desc">desc<span><a href="#label-desc">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -210,9 +215,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">desc</span> <span class="ruby-comment"># SQL: a DESC</span></pre>
             
-            <p>Alternative: Sequel.desc:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">a</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">desc</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">a</span>)</pre>
             
             <h4 id="label-2B-2C+--2C+-2A-2C+-2F">+, -, *, /<span><a href="#label-2B-2C+--2C+-2A-2C+-2F">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -231,7 +236,7 @@
             
             <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">-</span> :<span class="ruby-identifier">b</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">*</span> :<span class="ruby-identifier">b</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">/</span> :<span class="ruby-identifier">b</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">**</span> :<span class="ruby-identifier">b</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)</pre>
             
             <h4 id="label-2A">*<span><a href="#label-2A">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -241,7 +246,7 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-operator">*</span> <span class="ruby-comment"># SQL: a.*</span></pre>
             
-            <p>Alternative: Sequel.[].*:</p>
+            <p>Alternative:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-operator">*</span></pre>
             
@@ -252,7 +257,7 @@
             
             <pre class="ruby">:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># SQL: table.column</span></pre>
             
-            <p>Alternative: <a href="">Sequel[]</a>:</p>
+            <p>Alternative:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]</pre>
             
@@ -267,9 +272,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;b%&#39;</span>) <span class="ruby-comment"># SQL: a LIKE &#39;b%&#39; ESCAPE &#39;\&#39;</span></pre>
             
-            <p>Alternative: Sequel.like:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b%&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;b%&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b%&#39;</span>)</pre>
             
             <h4 id="label-ilike">ilike<span><a href="#label-ilike">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -278,9 +283,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-string">&#39;b%&#39;</span>) <span class="ruby-comment"># SQL: a ILIKE &#39;b%&#39; ESCAPE &#39;\&#39;</span></pre>
             
-            <p>Alternative: Sequel.ilike:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b%&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">ilike</span>(<span class="ruby-string">&#39;b%&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b%&#39;</span>)</pre>
             
             <h4 id="label-sql_subscript">sql_subscript<span><a href="#label-sql_subscript">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -290,9 +295,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># SQL: a[1]</span></pre>
             
-            <p>Alternative: Sequel.subscript:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>)</pre>
             
             <h4 id="label-extract">extract<span><a href="#label-extract">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -300,13 +305,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>) <span class="ruby-comment"># SQL: extract(year FROM a)</span></pre>
             
-            <p>Alternative: Sequel.extract:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">a</span>)</pre>
-            
-            <p>Note the reversed order of the arguments.  In Symbol#extract, the datetime
-            part is the argument, while in Sequel.extract, the datetime part is the
-            first argument.</p>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">a</span>)</pre>
             
             <h4 id="label-sql_boolean-2C+sql_number-2C+sql_string">sql_boolean, sql_number, sql_string<span><a href="#label-sql_boolean-2C+sql_number-2C+sql_string">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -316,7 +317,7 @@
             
             <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_boolean</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>  <span class="ruby-comment"># NoMethodError</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">1</span>  <span class="ruby-comment"># SQL: a &lt;&lt; 1</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;a&#39;</span> <span class="ruby-comment"># SQL: a || &#39;a&#39;</span></pre>
             
-            <p>Alternative: Sequel.[]:</p>
+            <p>Alternatives:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_boolean</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_number</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_string</span></pre>
             
@@ -328,9 +329,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">now</span>.<span class="ruby-identifier">sql_function</span> <span class="ruby-comment"># SQL: now()</span>&#x000A;:<span class="ruby-identifier">sum</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># SQL: sum(a)</span>&#x000A;:<span class="ruby-identifier">concat</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SQL: concat(a, b)</span></pre>
             
-            <p>Alternative: Sequel.function:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">sum</span>, :<span class="ruby-identifier">a</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">sum</span>].<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">sum</span>, :<span class="ruby-identifier">a</span>)</pre>
             
             <h3 id="label-String"><a href="../../classes/String.html">String</a><span><a href="#label-String">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -343,9 +344,9 @@
             
             <pre class="ruby"><span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">lit</span>          <span class="ruby-comment"># SQL: a</span>&#x000A;<span class="ruby-string">&#39;&quot;a&quot; = ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># SQL: &quot;a&quot; = 1</span></pre>
             
-            <p>Alternative: Sequel.lit:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = ?&#39;</span>, <span class="ruby-value">1</span>)</pre>
             
             <h4 id="label-to_sequel_blob">to_sequel_blob<span><a href="#label-to_sequel_blob">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -357,7 +358,7 @@
             
             <pre class="ruby"><span class="ruby-string">&quot;a\0&quot;</span>.<span class="ruby-identifier">to_sequel_blob</span> <span class="ruby-comment"># SQL: X&#39;6100&#39;</span></pre>
             
-            <p>Alternative: Sequel.blob:</p>
+            <p>Alternative:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">blob</span>(<span class="ruby-string">&quot;a\0&quot;</span>)</pre>
             
@@ -368,11 +369,11 @@
             <p>Array#~, Hash#~, and Symbol#~ treat the receiver as a conditions specifier,
             not matching all of the conditions:</p>
             
-            <pre class="ruby"><span class="ruby-operator">~</span>{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}     <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span>&#x000A;<span class="ruby-operator">~</span>[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]] <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (1, 2)</span></pre>
+            <pre class="ruby"><span class="ruby-operator">~</span>{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}       <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span>&#x000A;<span class="ruby-operator">~</span>[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]] <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (1, 2)</span></pre>
             
-            <p>Alternative: <a href="../../classes/Sequel.html">Sequel</a>.~:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
             
             <h3 id="label-Hash+-26+Array"><a href="../../classes/Hash.html">Hash</a> &amp; <a href="../../classes/Array.html">Array</a><span><a href="#label-Hash+-26+Array">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -382,11 +383,11 @@
             href="../../classes/Hash.html#method-i-case">Hash#case</a> return an SQL
             CASE expression, where the keys are conditions and the values are results:</p>
             
-            <pre class="ruby">{{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>)   <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span>&#x000A;[[{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}, <span class="ruby-value">1</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span></pre>
+            <pre class="ruby">{{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]} =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span>&#x000A;[[{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}, <span class="ruby-value">1</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span></pre>
             
-            <p>Alternative: Sequel.case:</p>
+            <p>Alternative:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>)</pre>
             
             <h4 id="label-sql_expr">sql_expr<span><a href="#label-sql_expr">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -395,11 +396,11 @@
             the receiver as a conditions specifier, matching all of the conditions in
             the array.</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_expr</span>     <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span></pre>
+            <pre class="ruby">{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_expr</span>     <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span></pre>
             
-            <p>Alternative: Sequel.[]:</p>
+            <p>Alternative:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]</pre>
             
             <h4 id="label-sql_negate">sql_negate<span><a href="#label-sql_negate">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -409,11 +410,11 @@
             treat the receiver as a conditions specifier, matching none of the
             conditions in the array:</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_negate</span>     <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_negate</span> <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span></pre>
+            <pre class="ruby">{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_negate</span>       <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_negate</span> <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span></pre>
             
-            <p>Alternative: Sequel.negate:</p>
+            <p>Alternative:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
             
             <h4 id="label-sql_or">sql_or<span><a href="#label-sql_or">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -422,11 +423,11 @@
             receiver as a conditions specifier, matching any of the conditions in the
             array:</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_or</span>     <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span></pre>
+            <pre class="ruby">{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_or</span>       <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span></pre>
             
-            <p>Alternative: Sequel.or:</p>
+            <p>Alternative:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">:</span> [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
             
             <h3 id="label-Array"><a href="../../classes/Array.html">Array</a><span><a href="#label-Array">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -440,9 +441,9 @@
             href="../../classes/Sequel.html">Sequel</a> treats arrays of two element
             arrays as a conditions specifier.</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1 = 2) AND (3 = 4))</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_value_list</span>) <span class="ruby-comment"># SQL: (a, b) IN ((1, 2), (3, 4))</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])                <span class="ruby-comment"># SQL: (a, b) IN ((1 = 2) AND (3 = 4))</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_value_list</span>) <span class="ruby-comment"># SQL: (a, b) IN ((1, 2), (3, 4))</span></pre>
             
-            <p>Alternative: Sequel.value_list:</p>
+            <p>Alternative:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">value_list</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])</pre>
             
@@ -453,9 +454,9 @@
             joins all of the elements in the array in an SQL string concatentation
             expression:</p>
             
-            <pre class="ruby">[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_string_join</span> <span class="ruby-comment"># SQL: a</span>&#x000A;[:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>].<span class="ruby-identifier">sql_string_join</span> <span class="ruby-comment"># SQL: a || b</span>&#x000A;[:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b&#39;</span>].<span class="ruby-identifier">sql_string_join</span> <span class="ruby-comment"># SQL: a || &#39;b&#39;</span>&#x000A;[<span class="ruby-string">&#39;a&#39;</span>, :<span class="ruby-identifier">b</span>].<span class="ruby-identifier">sql_string_join</span>(<span class="ruby-string">&#39; &#39;</span>) <span class="ruby-comment"># SQL: &#39;a&#39; || &#39; &#39; || b</span></pre>
+            <pre class="ruby">[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_string_join</span>           <span class="ruby-comment"># SQL: a</span>&#x000A;[:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>].<span class="ruby-identifier">sql_string_join</span>       <span class="ruby-comment"># SQL: a || b</span>&#x000A;[:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b&#39;</span>].<span class="ruby-identifier">sql_string_join</span>      <span class="ruby-comment"># SQL: a || &#39;b&#39;</span>&#x000A;[<span class="ruby-string">&#39;a&#39;</span>, :<span class="ruby-identifier">b</span>].<span class="ruby-identifier">sql_string_join</span>(<span class="ruby-string">&#39; &#39;</span>) <span class="ruby-comment"># SQL: &#39;a&#39; || &#39; &#39; || b</span></pre>
             
-            <p>Alternative: Sequel.join:</p>
+            <p>Alternative:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-string">&#39;a&#39;</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-string">&#39; &#39;</span>)</pre>
             
@@ -468,11 +469,11 @@
             the condition specified by the receiver and the condition specified by the
             given argument:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span>         <span class="ruby-comment"># SQL: a AND b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>} <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span>    <span class="ruby-comment"># SQL: a = 1 AND b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE AND b</span></pre>
+            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span>        <span class="ruby-comment"># SQL: a AND b</span>&#x000A;{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>} <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span>    <span class="ruby-comment"># SQL: a = 1 AND b</span>&#x000A;{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>} <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE AND b</span></pre>
             
-            <p>Alternative: <a href="../../classes/Sequel.html">Sequel</a>.&amp;:</p>
+            <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">&amp;</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>] <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">&amp;</span>({<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)</pre>
             
             <h4 id="label-7C">|<span><a href="#label-7C">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -480,11 +481,11 @@
             expression, matching the condition specified by the receiver or the
             condition specified by the given argument:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>         <span class="ruby-comment"># SQL: a OR b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>    <span class="ruby-comment"># SQL: a = 1 OR b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE OR b</span></pre>
+            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>        <span class="ruby-comment"># SQL: a OR b</span>&#x000A;{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>    <span class="ruby-comment"># SQL: a = 1 OR b</span>&#x000A;{<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>} <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE OR b</span></pre>
             
-            <p>Alternative: <a href="../../classes/Sequel.html">Sequel</a>.|:</p>
+            <p>Alternative:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>] <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>({<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>}, :<span class="ruby-identifier">b</span>)</pre>
           </div>
           <div id='context'>
           </div>

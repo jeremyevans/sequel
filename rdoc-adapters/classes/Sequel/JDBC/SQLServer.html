@@ -35,12 +35,7 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p><a href="Database.html">Database</a> and <a href="Dataset.html">Dataset</a>
-            instance methods for <a href="SQLServer.html">SQLServer</a> specific
-            support via <a href="../JDBC.html">JDBC</a>.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Class</h3>
@@ -72,7 +67,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-MSSQLRubyTime-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-MSSQLRubyTime-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">MSSQLRubyTime</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-comment"># MSSQL-Server TIME should be fetched as string to keep the precision intact, see:</span>&#x000A;  <span class="ruby-comment"># https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getString</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-MSSQLRubyTime-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">MSSQLRubyTime</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-comment"># MSSQL-Server TIME should be fetched as string to keep the precision intact, see:</span>&#x000A;  <span class="ruby-comment"># https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getString</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:07 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -224,28 +224,25 @@
             the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_ERROR_SQL </td><td>
             <p>Use the error_sql extension when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_FREEZE_DATASETS </td><td>
-            <p>Use the freeze_datasets extension when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_FREEZE_DATABASE </td><td>
             <p>Freeze the database before running the integration specs</p>
             </td></tr><tr><td class='label'>SEQUEL_IDENTIFIER_MANGLING </td><td>
             <p>Use the identifier_mangling extension when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_MODEL_PREPARED_STATEMENTS </td><td>
-            <p>Use the <a href="prepared_statements_rdoc.html">prepared_statements</a> and
-            prepared_statements_associations plugins when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_NO_AUTO_LITERAL_STRINGS </td><td>
-            <p>Use the no_auto_string_literals extension when running the specs</p>
+            <p>Use the <a href="prepared_statements_rdoc.html">prepared_statements</a>
+            plugin when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_CACHE_ASSOCIATIONS </td><td>
             <p>Don&#39;t cache association metadata when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_CHECK_SQLS </td><td>
             <p>Don&#39;t check for specific SQL syntax when running the specs</p>
+            </td></tr><tr><td class='label'>SEQUEL_CHECK_PENDING </td><td>
+            <p>Try running all specs (note, can cause lockups for some adapters), and
+            raise errors for skipped specs that don&#39;t fail</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_PENDING </td><td>
             <p>Don&#39;t skip any specs, try running all specs (note, can cause lockups
             for some adapters)</p>
-            </td></tr><tr><td class='label'>SEQUEL_NO_SPLIT_SYMBOLS </td><td>
-            <p>Turn off symbol splitting when running the specs</p>
-            </td></tr><tr><td class='label'>SKIPPED_TEST_WARN </td><td>
-            <p>Warn when skipping any tests because libraries aren&#39;t available</p>
+            </td></tr><tr><td class='label'>SEQUEL_SPLIT_SYMBOLS </td><td>
+            <p>Turn on symbol splitting when running the adapter and integration specs</p>
             </td></tr></tbody></table>
           </div>
           <div id='context'>

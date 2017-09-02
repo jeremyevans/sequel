@@ -40,13 +40,13 @@
             <p><a href="StringStripper.html">StringStripper</a> is a plugin that strips
             all input strings when assigning to the model&#39;s values. Example:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39; A &#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;A&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39; A &#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;A&#39;</span></pre>
             
             <p>SQL::Blob instances and all non-strings are not modified by this plugin. 
             Additionally, strings passed to a blob column setter are also not modified.
             You can explicitly set other columns to skip the stripping:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">skip_string_stripping</span> :<span class="ruby-identifier">foo</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">foo=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39; A &#39;</span>).<span class="ruby-identifier">foo</span> <span class="ruby-comment"># =&gt; &#39; A &#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">skip_string_stripping</span> :<span class="ruby-identifier">foo</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">foo</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39; A &#39;</span>).<span class="ruby-identifier">foo</span> <span class="ruby-comment"># =&gt; &#39; A &#39;</span></pre>
             
             <p>Usage:</p>
             
@@ -100,7 +100,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span>{<span class="ruby-identifier">set_skipped_string_stripping_columns</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-identifier">set_skipped_string_stripping_columns</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

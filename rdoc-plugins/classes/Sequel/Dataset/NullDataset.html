@@ -73,7 +73,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">_columns</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">cols</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-ivar">@opts</span>).<span class="ruby-identifier">columns</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">_columns</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">cols</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-ivar">@opts</span>).<span class="ruby-identifier">columns</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-delete'>
@@ -90,7 +90,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-delete-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-delete-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-delete-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-each'>
@@ -107,7 +107,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-each-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -124,7 +124,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-insert'>
@@ -141,7 +141,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-truncate'>
@@ -158,7 +158,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-truncate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-truncate-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">truncate</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-truncate-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">truncate</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-update'>
@@ -175,7 +175,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-update-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-update-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update</span>(<span class="ruby-identifier">v</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-update-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update</span>(<span class="ruby-identifier">v</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Protected Instance methods</h2>
@@ -193,7 +193,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-_import-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-_import-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-_import-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -41,7 +41,6 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-nullify">nullify</a></li>
-              <li><a href="#method-i-nullify-21">nullify!</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -63,24 +62,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-nullify-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-nullify-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nullify</span>&#x000A;  <span class="ruby-identifier">clone</span>.<span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">NullDataset</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-nullify-21'>
-                <a name='method-i-nullify-21'></a>
-                <div class='synopsis'>
-                  <span class='name'>nullify!</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Nullify the current dataset</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-nullify-21-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-nullify-21-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nullify!</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Dataset#nullify! from the null_dataset extension&quot;</span>, <span class="ruby-node">&quot;Use Dataset#nullify, which returned a modified copy&quot;</span>)&#x000A;  <span class="ruby-identifier">extend</span> <span class="ruby-constant">NullDataset</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-nullify-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nullify</span>&#x000A;  <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">NullDataset</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

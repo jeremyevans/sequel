@@ -37,11 +37,10 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The <a href="TypecastOnLoad.html">TypecastOnLoad</a> plugin exists because
-            most of Sequel&#39;s database adapters don&#39;t have complete control over
-            typecasting, and may return columns that aren&#39;t typecast correctly
-            (with correct being defined as how the model object would typecast the same
-            column values).</p>
+            <p>The typecast_on_load plugin exists because most of Sequel&#39;s database
+            adapters don&#39;t have complete control over typecasting, and may return
+            columns that aren&#39;t typecast correctly (with correct being defined as
+            how the model object would typecast the same column values).</p>
             
             <p>This plugin makes model loading call the setter methods (which typecast by
             default) for all columns given.  You can either specify the columns to
@@ -87,7 +86,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@typecast_on_load_columns</span> <span class="ruby-operator">||=</span> []&#x000A;    <span class="ruby-identifier">add_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@typecast_on_load_columns</span> <span class="ruby-operator">||=</span> []&#x000A;    <span class="ruby-identifier">add_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:08 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -49,7 +49,7 @@
             
             <p>Usage:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">nullify</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># =&gt; &quot;SELECT c FROM items WHERE (a = b)&quot;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># =&gt; [] # no query sent to the database</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">nullify</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">b</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># =&gt; &quot;SELECT c FROM items WHERE (a = b)&quot;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># =&gt; [] # no query sent to the database</span></pre>
             
             <p>Note that there is one case where a null dataset will sent a query to the
             database.  If you call columns on a nulled dataset and the dataset

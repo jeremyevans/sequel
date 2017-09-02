@@ -35,11 +35,7 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Module for holding all Mysql2-related classes and modules for <a
-            href="../Sequel.html">Sequel</a>.</p>
-          </div>
+          <div id='description'></div>
           <div id='context'>
           </div>
           <div id='class-list'>
@@ -61,7 +57,7 @@
                       if ::Mysql2::VERSION >= '0.4'
                       true
                       else
-                      Sequel.require %w'utils/mysql_prepared_statements', 'adapters'
+                      require_relative 'utils/mysql_prepared_statements'
                       false
                       end
                     </td>

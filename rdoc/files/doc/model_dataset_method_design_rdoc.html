@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-02-13 14:46:24 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -52,14 +52,14 @@
             way to do this is in your application code (outside the model), you can
             call the dataset methods directly:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.&#x000A;  <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>).&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">year</span>].<span class="ruby-identifier">to_i</span>).&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)).&#x000A;  <span class="ruby-identifier">all</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.&#x000A;  <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>).&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">year</span>].<span class="ruby-identifier">to_i</span>).&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)).&#x000A;  <span class="ruby-identifier">all</span></pre>
             
             <p>One issue with this design is that it ties you to your current database
             schema, and will make it necessary to change your application code if your
             schema changes.  In general, it is better to encapsulate your code into a
             dataset method (or a class method, but a dataset method is more flexible):</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;      <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>).&#x000A;      <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>).&#x000A;      <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)).&#x000A;      <span class="ruby-identifier">all</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;      <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>).&#x000A;      <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>).&#x000A;      <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)).&#x000A;      <span class="ruby-identifier">all</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Then your application code just needs to call your dataset method:</p>
             
@@ -67,7 +67,7 @@
             
             <p>The advantage of this approach is that you can change your schema at any
             point in the future, and you should only need to change your model code,
-            you should never need to change your application code.</p>
+            you should never need to change other application code.</p>
             
             <h2 id="label-Performance">Performance<span><a href="#label-Performance">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -89,32 +89,26 @@
             reduce the number of objects allocated.  Here is the above code with
             comments showing datasets allocated:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>). <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>).       <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)). <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>). <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>).        <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)). <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Third, you need to understand that <a
             href="../../classes/Sequel.html">Sequel</a> has optimizations specifically
             designed to reduce the number of objects allocated, by caching intermediate
-            data structures.  However, these optimizations apply only to frozen
-            datasets, and can only provide a benefit if related methods are called
-            multiple times on the same dataset.  One easy way to do this is to use
-            frozen model datasets is to use the <code>freeze_datasets</code> Database
-            extension before creating your model class:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">freeze_datasets</span></pre>
-            
-            <p>Note that freezing datasets is not enough to enable caching in this case. 
+            datasets.  Unfortunately, those optimizations do not apply in this case. 
             The reason for this is that <code>select</code>, <code>where</code>, and
             <code>order</code> can potentially receive arbitrary arguments, and
             enabling caching for them could easily lead to unbounded cache size (denial
-            of service due to memory exhaustion).  You need to signal to <a
+            of service due to memory exhaustion).</p>
+            
+            <p>To allow intermediate dataset caching to work, you need to signal to <a
             href="../../classes/Sequel.html">Sequel</a> that particular arguments to
             these methods should be cached, and you can do that by calling methods
             inside <code>dataset_module</code> blocks such as <code>select</code> and
             <code>order</code>.  These methods will add dataset methods to the model
-            that can use caching to optimize performance.  Here is an example using
-            these methods:</p>
+            that can cache the returned dataset to optimize performance.  Here is an
+            example using these methods:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">select</span> :<span class="ruby-identifier">with_name_and_units</span>, :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>&#x000A;    <span class="ruby-identifier">order</span> :<span class="ruby-identifier">by_units_sold</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)&#x000A;&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;      <span class="ruby-identifier">with_name_and_units</span>.&#x000A;      <span class="ruby-identifier">by_units_sold</span>.&#x000A;      <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>).&#x000A;      <span class="ruby-identifier">all</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">select</span> :<span class="ruby-identifier">with_name_and_units</span>, :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>&#x000A;    <span class="ruby-identifier">order</span> :<span class="ruby-identifier">by_units_sold</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)&#x000A;&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;      <span class="ruby-identifier">with_name_and_units</span>.&#x000A;      <span class="ruby-identifier">by_units_sold</span>.&#x000A;      <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>).&#x000A;      <span class="ruby-identifier">all</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Performance aside, this does provide a slightly nicer and more readable
             internal API, though naming such methods can be problematic.</p>
@@ -126,12 +120,12 @@
             <code>order</code> methods are fixed, so it can cache the resulting
             datasets.  Let&#39;s comment the above example with dataset allocations:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">with_name_and_units</span>.        <span class="ruby-comment"># cached dataset returned </span>&#x000A;  <span class="ruby-identifier">by_units_sold</span>.              <span class="ruby-comment"># cached dataset returned</span>&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>). <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">with_name_and_units</span>.        <span class="ruby-comment"># cached dataset returned </span>&#x000A;  <span class="ruby-identifier">by_units_sold</span>.              <span class="ruby-comment"># cached dataset returned</span>&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>).  <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that the order of methods here is important.  If you instead change
             the method chain to filter the dataset first, then no caching happens:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>). <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">with_name_and_units</span>.        <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">by_units_sold</span>.              <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>).  <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">with_name_and_units</span>.        <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">by_units_sold</span>.              <span class="ruby-comment"># new dataset allocated</span>&#x000A;  <span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This is because any time a new, uncached dataset is returned by a dataset
             method, all subsequent methods in the method chain cannot benefit from
@@ -140,7 +134,7 @@
             <p>Usually, when you are designing methods to process data based on user
             input, the user input affects the rows selected, and not the columns
             selected or the order in which the rows are returned.  <a
-            href="../../classes/Sequel.html">Sequel</a> is aware of this and has model
+            href="../../classes/Sequel.html">Sequel</a> is aware of this and has
             dataset methods that specifically take user input (arguments), interpret
             them as a filter condition and either:</p>
             <ul><li>
@@ -159,15 +153,13 @@
             automatically build an optimized loader, cache it, and use it for future
             loads.  So the above example changes to:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">with_name_and_units</span>.           <span class="ruby-comment"># cached dataset returned</span>&#x000A;  <span class="ruby-identifier">by_units_sold</span>.                 <span class="ruby-comment"># cached dataset returned</span>&#x000A;  <span class="ruby-identifier">where_all</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>) <span class="ruby-comment"># cached loader used</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-identifier">with_name_and_units</span>.           <span class="ruby-comment"># cached dataset returned</span>&#x000A;  <span class="ruby-identifier">by_units_sold</span>.                 <span class="ruby-comment"># cached dataset returned</span>&#x000A;  <span class="ruby-identifier">where_all</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>)  <span class="ruby-comment"># cached loader used</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This can significantly improve performance, up to 3x for complex method
             chains that only return a few rows.</p>
             
-            <p>So the general advice on designing datasets for performance is:</p>
+            <p>So the general advice on designing dataset methods for performance is:</p>
             <ul><li>
-            <p>Use frozen datasets</p>
-            </li><li>
             <p>Use <code>dataset_module</code> methods to create named dataset methods
             that return cached datasets</p>
             </li><li>
@@ -186,7 +178,7 @@
             prepared statements.  This does require more significant changes to the
             API.  Here&#39;s an example using prepared statements:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-constant">ALBUMS_RELEASED_IN_YEAR</span> = <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>).&#x000A;    <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">release_year=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$year</span>).&#x000A;    <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)).&#x000A;    <span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">all</span>, :<span class="ruby-identifier">all_albums_released_in_year</span>)&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;    <span class="ruby-constant">ALBUMS_RELEASED_IN_YEAR</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">year=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-constant">ALBUMS_RELEASED_IN_YEAR</span> = <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>).&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-identifier">release_year</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">$year</span>).&#x000A;    <span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">copies_sold</span>)).&#x000A;    <span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">all</span>, :<span class="ruby-identifier">all_albums_released_in_year</span>)&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">all_albums_released_in_year</span>(<span class="ruby-identifier">year</span>)&#x000A;    <span class="ruby-constant">ALBUMS_RELEASED_IN_YEAR</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">year</span><span class="ruby-operator">:</span> <span class="ruby-identifier">year</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that when using prepared statements, you need to use a class method
             instead of a dataset method, as the SQL for the prepared statement must be

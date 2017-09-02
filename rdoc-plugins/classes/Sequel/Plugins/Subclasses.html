@@ -37,10 +37,9 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The <a href="Subclasses.html">Subclasses</a> plugin keeps track of all
-            subclasses of the current model class.  Direct subclasses are available via
-            the subclasses method, and all descendent classes are available via the
-            descendents method:</p>
+            <p>The subclasses plugin keeps track of all subclasses of the current model
+            class.  Direct subclasses are available via the subclasses method, and all
+            descendent classes are available via the descendents method:</p>
             
             <pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subclasses</span>&#x000A;<span class="ruby-identifier">sc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">sc2</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ssc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sc1</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">subclasses</span>    <span class="ruby-comment"># [sc1, sc2]</span>&#x000A;<span class="ruby-identifier">sc1</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># [ssc1]</span>&#x000A;<span class="ruby-identifier">sc2</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">ssc1</span>.<span class="ruby-identifier">subclasses</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">descendents</span>   <span class="ruby-comment"># [sc1, ssc1, sc2]</span></pre>
             

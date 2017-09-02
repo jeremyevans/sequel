@@ -76,7 +76,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/mssql.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;  <span class="ruby-identifier">with_sql</span>(<span class="ruby-node">&quot;SET NOCOUNT ON; #{insert_sql(*values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)&quot;</span>).<span class="ruby-identifier">single_value</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/mssql.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;  <span class="ruby-identifier">with_sql</span>(<span class="ruby-node">&quot;SET NOCOUNT ON; #{insert_sql(*values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)&quot;</span>).<span class="ruby-identifier">single_value</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-provides_accurate_rows_matched-3F'>
@@ -94,7 +94,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-provides_accurate_rows_matched-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-provides_accurate_rows_matched-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/mssql.rb, line 65</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">provides_accurate_rows_matched?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:provider</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-provides_accurate_rows_matched-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/mssql.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">provides_accurate_rows_matched?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:provider</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

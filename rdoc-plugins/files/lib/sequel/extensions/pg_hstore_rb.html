@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:08 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -75,7 +75,7 @@
             <p>Since the hstore type only supports strings, non string keys and values are
             converted to strings</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">foo=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>({})&#x000A;<span class="ruby-identifier">v</span>[:<span class="ruby-identifier">foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">foo</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>({})&#x000A;<span class="ruby-identifier">v</span>[:<span class="ruby-identifier">foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
             
             <p>However, to make life easier, lookups by key are converted to strings (even
             when accessing the underlying hash directly):</p>
@@ -127,11 +127,9 @@
             
             <p>If you want to insert a hash into an hstore database column:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>))</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">column</span><span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>))</pre>
             
-            <p>To use this extension, first load it into your <a
-            href="../../../../classes/Sequel/Database.html">Sequel::Database</a>
-            instance:</p>
+            <p>To use this extension, first load it into your Sequel::Database instance:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_hstore</span></pre>
             

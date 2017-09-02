@@ -59,50 +59,8 @@
                       {:uncommitted=>JavaSQL::Connection::TRANSACTION_READ_UNCOMMITTED,
                       :committed=>JavaSQL::Connection::TRANSACTION_READ_COMMITTED,
                       :repeatable=>JavaSQL::Connection::TRANSACTION_REPEATABLE_READ,
-                      :serializable=>JavaSQL::Connection::TRANSACTION_SERIALIZABLE}
+                      :serializable=>JavaSQL::Connection::TRANSACTION_SERIALIZABLE}.freeze
                     </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRANSACTION_BEGIN</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Transaction.begin'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRANSACTION_COMMIT</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Transaction.commit'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRANSACTION_RELEASE_SP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Transaction.release_savepoint'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRANSACTION_ROLLBACK</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Transaction.rollback'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRANSACTION_ROLLBACK_SP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Transaction.rollback_savepoint'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TRANSACTION_SAVEPOINT</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'Transaction.savepoint'.freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -124,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 5</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
@@ -142,7 +100,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_savepoints-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_savepoints</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_savepoints</span>)&#x000A;  <span class="ruby-ivar">@supports_savepoints</span> = <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supports_savepoints</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_savepoints</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_savepoints</span>)&#x000A;  <span class="ruby-ivar">@supports_savepoints</span> = <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supports_savepoints</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_transaction_isolation_levels-3F'>
@@ -160,7 +118,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_transaction_isolation_levels-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supportsTransactionIsolationLevel</span>(<span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">TRANSACTION_SERIALIZABLE</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supportsTransactionIsolationLevel</span>(<span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">TRANSACTION_SERIALIZABLE</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

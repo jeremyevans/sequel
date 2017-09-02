@@ -35,32 +35,8 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>The before_after_save plugin reorders some internal <a
-            href="../../Sequel.html">Sequel</a> operations so they happen before
-            after_create, after_update, and after_save are called, instead of after. 
-            These operations are:</p>
-            <ul><li>
-            <p>Resetting the explicit modified flag</p>
-            </li><li>
-            <p>Refreshing the model or clearing changed columns after creation</p>
-            </li></ul>
-            
-            <p>This behavior will become the default in <a
-            href="../../Sequel.html">Sequel</a> 5.</p>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Make all model subclasses perform the operations before after_save</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">before_after_save</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class perform the operations before after_save</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">before_after_save</span></pre>
-          </div>
+          <div id='description'></div>
           <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="BeforeAfterSave/InstanceMethods.html">Sequel::Plugins::BeforeAfterSave::InstanceMethods</a></li>
-            </ol>
           </div>
           <div id='section'>
           </div>

@@ -36,86 +36,9 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-after_destroy">after_destroy</a></li>
-              <li><a href="#method-i-after_save">after_save</a></li>
-              <li><a href="#method-i-before_destroy">before_destroy</a></li>
-              <li><a href="#method-i-before_save">before_save</a></li>
-            </ol>
-          </div>
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-after_destroy'>
-                <a name='method-i-after_destroy'></a>
-                <div class='synopsis'>
-                  <span class='name'>after_destroy</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_destroy-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 155</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:after_destroy</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>)}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">has_hooks?</span>(<span class="ruby-value">:after_destroy_commit</span>)&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:after_destroy_commit</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-after_save'>
-                <a name='method-i-after_save'></a>
-                <div class='synopsis'>
-                  <span class='name'>after_save</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_save-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 163</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:after_save</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>)}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">has_hooks?</span>(<span class="ruby-value">:after_commit</span>)&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:after_commit</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-before_destroy'>
-                <a name='method-i-before_destroy'></a>
-                <div class='synopsis'>
-                  <span class='name'>before_destroy</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_destroy-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-before_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_destroy</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:before_destroy</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;      <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Having before_destory hook block return false to stop evaluation of further before_destroy hook blocks&quot;</span>, <span class="ruby-string">&quot;Instead, call cancel_action inside before_destroy hook block&quot;</span>)&#x000A;      <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">has_hooks?</span>(<span class="ruby-value">:after_destroy_rollback</span>)&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:after_destroy_rollback</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-before_save'>
-                <a name='method-i-before_save'></a>
-                <div class='synopsis'>
-                  <span class='name'>before_save</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_save-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 184</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:before_save</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;      <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Having before_save hook block return false to stop evaluation of further before_save hook blocks&quot;</span>, <span class="ruby-string">&quot;Instead, call cancel_action inside before_save hook block&quot;</span>)&#x000A;      <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">has_hooks?</span>(<span class="ruby-value">:after_rollback</span>)&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">model</span>.<span class="ruby-identifier">hook_blocks</span>(<span class="ruby-value">:after_rollback</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">b</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

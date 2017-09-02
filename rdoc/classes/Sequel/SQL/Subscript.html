@@ -53,7 +53,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-5B-5D">[]</a></li>
-              <li><a href="#attribute-i-f">f</a></li>
+              <li><a href="#attribute-i-expression">expression</a></li>
               <li><a href="#attribute-i-sub">sub</a></li>
               <li><a href="#method-i-7C">|</a></li>
             </ol>
@@ -65,6 +65,16 @@
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
                 <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-expression'>expression</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The <a href="../SQL.html">SQL</a> array column</p>
+                    </td>
+                  </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>
                       <a name='attribute-i-f'>f</a>
@@ -94,7 +104,7 @@
                 <a name='method-c-new'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(f, sub)</span>
+                  <span class='arguments'>(expression, sub)</span>
                 </div>
                 <div class='description'>
                   
@@ -104,7 +114,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1808</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, <span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-ivar">@f</span> = <span class="ruby-identifier">f</span>&#x000A;  <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1742</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -119,13 +129,13 @@
                   <p>Create a new <code>Subscript</code> by accessing a subarray of a
                   multidimensional array.</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># a[2]</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>)[<span class="ruby-value">1</span>] <span class="ruby-comment"># a[2][1]</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># a[2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>)[<span class="ruby-value">1</span>] <span class="ruby-comment"># a[2][1]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1828</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1762</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-7C'>
@@ -139,13 +149,13 @@
                   <p>Create a new <code>Subscript</code> appending the given subscript(s) to the
                   current array of subscripts.</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># a[2]</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-operator">|</span> <span class="ruby-value">1</span> <span class="ruby-comment"># a[2, 1]</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># a[2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-operator">|</span> <span class="ruby-value">1</span> <span class="ruby-comment"># a[2, 1]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7C-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1819</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1753</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

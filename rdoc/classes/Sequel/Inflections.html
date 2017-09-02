@@ -66,97 +66,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CAMELIZE_CONVERT_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/(^|_)(.)/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CAMELIZE_MODULE_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\/(.?)/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DASH</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'-'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DEMODULIZE_CONVERT_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/^.*::/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>EMPTY_STRING</td>
-                    <td>=</td>
-                    <td class='context-item-value'>''.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>SLASH</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'/'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>UNDERSCORE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'_'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>UNDERSCORE_CONVERT_REGEXP1</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/([A-Z]+)([A-Z][a-z])/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>UNDERSCORE_CONVERT_REGEXP2</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/([a-z\d])([A-Z])/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>UNDERSCORE_CONVERT_REPLACE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'\1_\2'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>UNDERSCORE_MODULE_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/::/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>VALID_CONSTANT_NAME_REGEXP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -219,7 +128,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-clear-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-clear-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">clear</span>(<span class="ruby-identifier">scope</span> = <span class="ruby-value">:all</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>&#x000A;    <span class="ruby-ivar">@plurals</span>, <span class="ruby-ivar">@singulars</span>, <span class="ruby-ivar">@uncountables</span> = [], [], []&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{scope}&quot;</span>, [])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-clear-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">clear</span>(<span class="ruby-identifier">scope</span> = <span class="ruby-value">:all</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">scope</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>&#x000A;    <span class="ruby-ivar">@plurals</span>, <span class="ruby-ivar">@singulars</span>, <span class="ruby-ivar">@uncountables</span> = [], [], []&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{scope}&quot;</span>, [])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-irregular'>
@@ -243,7 +152,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-irregular-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-irregular-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">irregular</span>(<span class="ruby-identifier">singular</span>, <span class="ruby-identifier">plural</span>)&#x000A;  <span class="ruby-identifier">plural</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{singular[0,1]})#{singular[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">plural</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])&#x000A;  <span class="ruby-identifier">singular</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{plural[0,1]})#{plural[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">singular</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-irregular-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">irregular</span>(<span class="ruby-identifier">singular</span>, <span class="ruby-identifier">plural</span>)&#x000A;  <span class="ruby-identifier">plural</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{singular[0,1]})#{singular[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">plural</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])&#x000A;  <span class="ruby-identifier">singular</span>(<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;(#{plural[0,1]})#{plural[1..-1]}$&quot;</span>, <span class="ruby-string">&quot;i&quot;</span>), <span class="ruby-string">&#39;\1&#39;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">singular</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-plural'>
@@ -266,7 +175,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-plural-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-plural-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">plural</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)&#x000A;  <span class="ruby-ivar">@plurals</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-plural-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">plural</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)&#x000A;  <span class="ruby-ivar">@plurals</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-singular'>
@@ -289,7 +198,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-singular-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-singular-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">singular</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)&#x000A;  <span class="ruby-ivar">@singulars</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-singular-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">singular</span>(<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>)&#x000A;  <span class="ruby-ivar">@singulars</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">0</span>, [<span class="ruby-identifier">rule</span>, <span class="ruby-identifier">replacement</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-uncountable'>
@@ -310,7 +219,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-uncountable-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-uncountable-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 115</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">uncountable</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">words</span>)&#x000A;  (<span class="ruby-ivar">@uncountables</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">words</span>).<span class="ruby-identifier">flatten!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-uncountable-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">uncountable</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">words</span>)&#x000A;  (<span class="ruby-ivar">@uncountables</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">words</span>).<span class="ruby-identifier">flatten!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

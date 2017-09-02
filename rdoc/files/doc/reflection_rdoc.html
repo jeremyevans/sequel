@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -45,7 +45,7 @@
             
             <p>You can get the adapter in use using Database#adapter_scheme:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-comment"># e.g. :postgres, :jdbc, :odbc</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-comment"># :postgres, :jdbc, :odbc</span></pre>
             
             <h2 id="label-Database+Connected+To">Database Connected To<span><a href="#label-Database+Connected+To">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -176,19 +176,19 @@
             
             <p>You can get the association reflection for a single association via the
             Model.association_reflection.  Association reflections are subclasses of
-            hash, for ease of use and introspection (and backwards compatibility):</p>
+            hash:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">association1</span>) <span class="ruby-comment"># {:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">association1</span>) <span class="ruby-comment"># #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;</span></pre>
             
             <p>You can get an array of all association reflections via
             Model.all_association_reflections:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">all_association_reflections</span> <span class="ruby-comment"># [{:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}, ...]</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">all_association_reflections</span> <span class="ruby-comment"># [#&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;, ...]</span></pre>
             
             <p>Finally, you can get a hash of association reflections via
             Model.association_reflections:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflections</span> <span class="ruby-comment"># {:association1=&gt;{:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}, ...}</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflections</span> <span class="ruby-comment"># {:association1=&gt;#&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Model.many_to_one :association1&gt;, ...}</span></pre>
             
             <h2 id="label-Validations+Defined">Validations Defined<span><a href="#label-Validations+Defined">&para;</a> <a href="#top">&uarr;</a></span></h2>
             

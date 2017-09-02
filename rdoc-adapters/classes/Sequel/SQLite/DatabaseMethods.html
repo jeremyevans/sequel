@@ -46,29 +46,18 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a href="#method-i-auto_vacuum">auto_vacuum</a></li>
-              <li><a href="#method-i-auto_vacuum-3D">auto_vacuum=</a></li>
-              <li><a href="#method-i-case_sensitive_like-3D">case_sensitive_like=</a></li>
               <li><a href="#method-i-database_type">database_type</a></li>
               <li><a href="#method-i-foreign_key_list">foreign_key_list</a></li>
-              <li><a href="#method-i-foreign_keys">foreign_keys</a></li>
-              <li><a href="#method-i-foreign_keys-3D">foreign_keys=</a></li>
               <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-indexes">indexes</a></li>
               <li><a href="#attribute-i-integer_booleans">integer_booleans</a></li>
-              <li><a href="#method-i-pragma_get">pragma_get</a></li>
-              <li><a href="#method-i-pragma_set">pragma_set</a></li>
               <li><a href="#method-i-set_integer_booleans">set_integer_booleans</a></li>
               <li><a href="#method-i-sqlite_version">sqlite_version</a></li>
               <li><a href="#method-i-supports_create_table_if_not_exists-3F">supports_create_table_if_not_exists?</a></li>
               <li><a href="#method-i-supports_deferrable_foreign_key_constraints-3F">supports_deferrable_foreign_key_constraints?</a></li>
               <li><a href="#method-i-supports_partial_indexes-3F">supports_partial_indexes?</a></li>
               <li><a href="#method-i-supports_savepoints-3F">supports_savepoints?</a></li>
-              <li><a href="#method-i-synchronous">synchronous</a></li>
-              <li><a href="#method-i-synchronous-3D">synchronous=</a></li>
               <li><a href="#method-i-tables">tables</a></li>
-              <li><a href="#method-i-temp_store">temp_store</a></li>
-              <li><a href="#method-i-temp_store-3D">temp_store=</a></li>
               <li><a href="#attribute-i-transaction_mode">transaction_mode</a></li>
               <li><a href="#method-i-transaction_mode-3D">transaction_mode=</a></li>
               <li><a href="#attribute-i-use_timestamp_timezones">use_timestamp_timezones</a></li>
@@ -114,23 +103,9 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PRIMARY_KEY_INDEX_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\Asqlite_autoindex_/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>SYNCHRONOUS</td>
                     <td>=</td>
                     <td class='context-item-value'>[:off, :normal, :full].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TABLES_FILTER</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -152,13 +127,6 @@
                       nil => "BEGIN".freeze
                       }.freeze
                     </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>VIEWS_FILTER</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{:type => 'view'.freeze}.freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -209,55 +177,6 @@
             </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-auto_vacuum'>
-                <a name='method-i-auto_vacuum'></a>
-                <div class='synopsis'>
-                  <span class='name'>auto_vacuum</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>SEQUEL5: Remove</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-auto_vacuum-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-auto_vacuum-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">auto_vacuum</span>&#x000A;  <span class="ruby-constant">AUTO_VACUUM</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:auto_vacuum</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-auto_vacuum-3D'>
-                <a name='method-i-auto_vacuum-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>auto_vacuum=</span>
-                  <span class='arguments'>(value)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-auto_vacuum-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-auto_vacuum-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">auto_vacuum=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">AUTO_VACUUM</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:auto_vacuum</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-case_sensitive_like-3D'>
-                <a name='method-i-case_sensitive_like-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>case_sensitive_like=</span>
-                  <span class='arguments'>(value)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-case_sensitive_like-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-case_sensitive_like-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">case_sensitive_like=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:case_sensitive_like</span>, <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-identifier">value</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39;on&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;off&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30203</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-database_type'>
                 <a name='method-i-database_type'></a>
                 <div class='synopsis'>
@@ -272,7 +191,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:sqlite</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:sqlite</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-foreign_key_list'>
@@ -291,39 +210,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_key_list-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-foreign_key_list-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">h</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;PRAGMA foreign_key_list(?)&quot;</span>, <span class="ruby-identifier">input_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:id</span>]]&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:from</span>])&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:to</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:id</span>]] = {<span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:from</span>])], <span class="ruby-value">:table=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>]), <span class="ruby-value">:key=</span><span class="ruby-operator">&gt;</span>([<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:to</span>])] <span class="ruby-keyword">if</span> <span class="ruby-identifier">row</span>[<span class="ruby-value">:to</span>]), <span class="ruby-value">:on_update=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">on_delete_sql_to_sym</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_update</span>]), <span class="ruby-value">:on_delete=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">on_delete_sql_to_sym</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_delete</span>])}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-foreign_keys'>
-                <a name='method-i-foreign_keys'></a>
-                <div class='synopsis'>
-                  <span class='name'>foreign_keys</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_keys-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-foreign_keys-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">foreign_keys</span>&#x000A;  <span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:foreign_keys</span>).<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30619</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-foreign_keys-3D'>
-                <a name='method-i-foreign_keys-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>foreign_keys=</span>
-                  <span class='arguments'>(value)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_keys-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-foreign_keys-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">foreign_keys=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:foreign_keys</span>, <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-identifier">value</span> <span class="ruby-operator">?</span> <span class="ruby-string">&#39;on&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;off&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30619</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-foreign_key_list-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">h</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;PRAGMA foreign_key_list(?)&quot;</span>, <span class="ruby-identifier">input_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:id</span>]]&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:from</span>])&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:to</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:id</span>]] = {<span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:from</span>])], <span class="ruby-value">:table=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>]), <span class="ruby-value">:key=</span><span class="ruby-operator">&gt;</span>([<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:to</span>])] <span class="ruby-keyword">if</span> <span class="ruby-identifier">row</span>[<span class="ruby-value">:to</span>]), <span class="ruby-value">:on_update=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">on_delete_sql_to_sym</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_update</span>]), <span class="ruby-value">:on_delete=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">on_delete_sql_to_sym</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:on_delete</span>])}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-freeze'>
@@ -339,7 +226,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span>&#x000A;  <span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span>&#x000A;  <span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-indexes'>
@@ -357,39 +244,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 126</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;PRAGMA index_list(?)&quot;</span>, <span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:only_autocreated</span>]&#x000A;      <span class="ruby-comment"># If specifically asked for only autocreated indexes, then return those an only those</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Asqlite_autoindex_/</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:origin</span>)&#x000A;      <span class="ruby-comment"># If origin is set, then only exclude primary key indexes and partial indexes</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:origin</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;pk&#39;</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:partial</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-comment"># When :origin key not present, assume any autoindex could be a primary key one and exclude it</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Asqlite_autoindex_/</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>])] = {<span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:unique</span>].<span class="ruby-identifier">to_i</span><span class="ruby-operator">==</span><span class="ruby-value">1</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">v</span>[<span class="ruby-value">:columns</span>] = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;PRAGMA index_info(?)&quot;</span>, <span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">k</span>)).<span class="ruby-identifier">map</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">x</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pragma_get'>
-                <a name='method-i-pragma_get'></a>
-                <div class='synopsis'>
-                  <span class='name'>pragma_get</span>
-                  <span class='arguments'>(name)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pragma_get-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pragma_get-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pragma_get</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&#39;Database#{pragma_get,auto_vacuum,case_sensitive_like,foreign_keys,synchronous,temp_store} on SQLite&#39;</span>, <span class="ruby-node">&quot;These methods may not be safe when using multiple connections, call fetch(#{&quot;PRAGMA #{name}&quot;.inspect}).single_value if you really want to get the pragma value&quot;</span>)&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-node">&quot;PRAGMA #{name}&quot;</span>].<span class="ruby-identifier">single_value</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pragma_set'>
-                <a name='method-i-pragma_set'></a>
-                <div class='synopsis'>
-                  <span class='name'>pragma_set</span>
-                  <span class='arguments'>(name, value)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pragma_set-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pragma_set-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pragma_set</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&#39;Database#{pragma_set,auto_vacuum=,case_sensitive_like=,foreign_keys=,synchronous=,temp_store=} on SQLite&#39;</span>, <span class="ruby-string">&quot;These methods are not thread safe or safe when using multiple connections, pass the appropriate option when connecting to set the pragma correctly for all connections&quot;</span>)&#x000A;  <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-node">&quot;PRAGMA #{name} = #{value}&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;PRAGMA index_list(?)&quot;</span>, <span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:only_autocreated</span>]&#x000A;      <span class="ruby-comment"># If specifically asked for only autocreated indexes, then return those an only those</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Asqlite_autoindex_/</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:origin</span>)&#x000A;      <span class="ruby-comment"># If origin is set, then only exclude primary key indexes and partial indexes</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:origin</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;pk&#39;</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:partial</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-comment"># When :origin key not present, assume any autoindex could be a primary key one and exclude it</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\Asqlite_autoindex_/</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:name</span>])] = {<span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:unique</span>].<span class="ruby-identifier">to_i</span><span class="ruby-operator">==</span><span class="ruby-value">1</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">v</span>[<span class="ruby-value">:columns</span>] = <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;PRAGMA index_info(?)&quot;</span>, <span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">k</span>)).<span class="ruby-identifier">map</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">x</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_integer_booleans'>
@@ -408,7 +263,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_integer_booleans-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_integer_booleans-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 99</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_integer_booleans</span>&#x000A;  <span class="ruby-ivar">@integer_booleans</span> = <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:integer_booleans</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:integer_booleans</span>]) <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_integer_booleans-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_integer_booleans</span>&#x000A;  <span class="ruby-ivar">@integer_booleans</span> = <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:integer_booleans</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:integer_booleans</span>]) <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sqlite_version'>
@@ -426,7 +281,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sqlite_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sqlite_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqlite_version</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@sqlite_version</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@sqlite_version</span>)&#x000A;  <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT sqlite_version()&#39;</span>).<span class="ruby-identifier">single_value</span>&#x000A;    [<span class="ruby-value">10000</span>, <span class="ruby-value">100</span>, <span class="ruby-value">1</span>].<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;.&#39;</span>)).<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">*</span> <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>])}&#x000A;  <span class="ruby-keyword">rescue</span>&#x000A;    <span class="ruby-value">0</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sqlite_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqlite_version</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@sqlite_version</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@sqlite_version</span>)&#x000A;  <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT sqlite_version()&#39;</span>).<span class="ruby-identifier">single_value</span>&#x000A;    [<span class="ruby-value">10000</span>, <span class="ruby-value">100</span>, <span class="ruby-value">1</span>].<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;.&#39;</span>)).<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">*</span> <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>])}&#x000A;  <span class="ruby-keyword">rescue</span>&#x000A;    <span class="ruby-value">0</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>
@@ -444,7 +299,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_create_table_if_not_exists-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_create_table_if_not_exists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 164</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_create_table_if_not_exists?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30300</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_create_table_if_not_exists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 118</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_create_table_if_not_exists?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30300</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_deferrable_foreign_key_constraints-3F'>
@@ -462,7 +317,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_deferrable_foreign_key_constraints-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_deferrable_foreign_key_constraints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 169</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_deferrable_foreign_key_constraints?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30619</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_deferrable_foreign_key_constraints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_deferrable_foreign_key_constraints?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30619</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_partial_indexes-3F'>
@@ -479,7 +334,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_partial_indexes-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_partial_indexes-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 174</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_partial_indexes?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30800</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_partial_indexes-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_partial_indexes?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30800</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
@@ -496,39 +351,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_savepoints-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 179</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30608</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-synchronous'>
-                <a name='method-i-synchronous'></a>
-                <div class='synopsis'>
-                  <span class='name'>synchronous</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-synchronous-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-synchronous-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">synchronous</span>&#x000A;  <span class="ruby-constant">SYNCHRONOUS</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:synchronous</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-synchronous-3D'>
-                <a name='method-i-synchronous-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>synchronous=</span>
-                  <span class='arguments'>(value)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-synchronous-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-synchronous-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">synchronous=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">SYNCHRONOUS</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for synchronous option. Please specify one of :off, :normal, :full.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:synchronous</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30608</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-tables'>
@@ -550,39 +373,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-tables-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 198</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(<span class="ruby-value">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;sqlite_sequence&#39;</span>) <span class="ruby-operator">&amp;</span> {<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;table&#39;</span>}, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-temp_store'>
-                <a name='method-i-temp_store'></a>
-                <div class='synopsis'>
-                  <span class='name'>temp_store</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-temp_store-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-temp_store-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">temp_store</span>&#x000A;  <span class="ruby-constant">TEMP_STORE</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:temp_store</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-temp_store-3D'>
-                <a name='method-i-temp_store-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>temp_store=</span>
-                  <span class='arguments'>(value)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-temp_store-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-temp_store-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">temp_store=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">TEMP_STORE</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for temp_store option. Please specify one of :default, :file, :memory.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:temp_store</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(<span class="ruby-value">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;sqlite_sequence&#39;</span>) <span class="ruby-operator">&amp;</span> {<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;table&#39;</span>}, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-transaction_mode-3D'>
@@ -599,7 +390,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-transaction_mode-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-transaction_mode-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">transaction_mode=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">TRANSACTION_MODE</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">value</span>)&#x000A;    <span class="ruby-ivar">@transaction_mode</span> = <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for transaction_mode.  Please specify one of :deferred, :immediate, :exclusive, nil&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-transaction_mode-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">transaction_mode=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">TRANSACTION_MODE</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">value</span>)&#x000A;    <span class="ruby-ivar">@transaction_mode</span> = <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for transaction_mode.  Please specify one of :deferred, :immediate, :exclusive, nil&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-use_timestamp_timezones-3F'>
@@ -618,7 +409,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-use_timestamp_timezones-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-use_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 190</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@use_timestamp_timezones</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@use_timestamp_timezones</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@use_timestamp_timezones</span> = <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-use_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 144</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@use_timestamp_timezones</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@use_timestamp_timezones</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@use_timestamp_timezones</span> = <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-values'>
@@ -631,13 +422,13 @@
                   
                   <p>Creates a dataset that uses the VALUES clause:</p>
                   
-                  <pre>DB.values([[1, 2], [3, 4]])&#x000A;VALUES ((1, 2), (3, 4))</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])&#x000A;<span class="ruby-comment"># VALUES ((1, 2), (3, 4))</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-values-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-values-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 206</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">values</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-values-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 160</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">values</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-views'>
@@ -659,7 +450,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-views-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 214</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>({<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;view&#39;</span>}, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 168</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>({<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;view&#39;</span>}, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

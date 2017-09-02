@@ -58,7 +58,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>CAMELIZE</td>
                     <td>=</td>
-                    <td class='context-item-value'>proc(&:camelize)</td>
+                    <td class='context-item-value'>:camelize.to_proc</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -68,7 +68,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DASHERIZE</td>
                     <td>=</td>
-                    <td class='context-item-value'>proc(&:dasherize)</td>
+                    <td class='context-item-value'>:dasherize.to_proc</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -89,7 +89,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>UNDERSCORE</td>
                     <td>=</td>
-                    <td class='context-item-value'>proc(&:underscore)</td>
+                    <td class='context-item-value'>:underscore.to_proc</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -132,7 +132,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-from_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span>(<span class="ruby-identifier">xml</span>).<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-from_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 140</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span>(<span class="ruby-identifier">xml</span>).<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-from_xml_node'>
@@ -144,14 +144,14 @@
                 <div class='description'>
                   
                   <p>Return an instance of this class based on the given XML node, which should
-                  be Nokogiri::XML::Node instance. This should probably not be used directly
-                  by user code.</p>
+                  be Nokogiri::XML::Node instance. This should not be used directly by user
+                  code.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml_node-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-from_xml_node-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 148</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">new</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-from_xml_node-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 147</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">new</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-xml_builder'>
@@ -163,13 +163,13 @@
                 <div class='description'>
                   
                   <p>Return an appropriate Nokogiri::XML::Builder instance used to create the
-                  XML.  This should probably not be used directly by user code.</p>
+                  XML.  This should not be used directly by user code.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-xml_builder-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-xml_builder-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 155</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_builder</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">builder_opts</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder_opts</span>]&#x000A;      <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder_opts</span>]]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      {}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">builder_opts</span>[<span class="ruby-value">:encoding</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:encoding</span>)&#x000A;    <span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Builder</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">builder_opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-xml_builder-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_builder</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">builder_opts</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder_opts</span>]&#x000A;      <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>[<span class="ruby-value">:builder_opts</span>]]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      {}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">builder_opts</span>[<span class="ruby-value">:encoding</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:encoding</span>)&#x000A;    <span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Builder</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">builder_opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-xml_deserialize_name_proc'>
@@ -181,14 +181,14 @@
                 <div class='description'>
                   
                   <p>Return a proc (or any other object that responds to []), used for
-                  formatting XML tag names when serializing to XML. This should probably not
-                  be used directly by user code.</p>
+                  formatting XML tag names when serializing to XML. This should not be used
+                  directly by user code.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-xml_deserialize_name_proc-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-xml_deserialize_name_proc-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 172</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_deserialize_name_proc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:underscore</span>]&#x000A;    <span class="ruby-constant">UNDERSCORE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">IDENTITY</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-xml_deserialize_name_proc-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_deserialize_name_proc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:underscore</span>]&#x000A;    <span class="ruby-constant">UNDERSCORE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">IDENTITY</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-xml_serialize_name_proc'>
@@ -200,14 +200,14 @@
                 <div class='description'>
                   
                   <p>Return a proc (or any other object that responds to []), used for
-                  formatting XML tag names when serializing to XML. This should probably not
-                  be used directly by user code.</p>
+                  formatting XML tag names when serializing to XML. This should not be used
+                  directly by user code.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-xml_serialize_name_proc-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-xml_serialize_name_proc-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 185</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_serialize_name_proc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:dasherize</span>]&#x000A;    <span class="ruby-constant">DASHERIZE</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:camelize</span>]&#x000A;    <span class="ruby-constant">CAMELIZE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">IDENTITY</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{pr[s]}_&quot;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-xml_serialize_name_proc-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 184</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">xml_serialize_name_proc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:name_proc</span>]&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:dasherize</span>]&#x000A;    <span class="ruby-constant">DASHERIZE</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:camelize</span>]&#x000A;    <span class="ruby-constant">CAMELIZE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">IDENTITY</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{pr[s]}_&quot;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:08 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -59,7 +59,7 @@
             generally want to create it first, before creating any other application
             tables.</p>
             
-            <p>Because migrations instance_eval the up and down blocks on a database,
+            <p>Because migrations instance_exec the up and down blocks on a database,
             using this extension in a migration can be done via:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">constraint_validations</span>)&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">constraint_validations</span>)&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
@@ -71,12 +71,12 @@
             to the validation_helpers model plugin API.  However, instead of having
             separate validates_* methods, it just adds a validate method that accepts a
             block to the schema generators.  Like the create_table and alter_table
-            blocks, this block is instance_evaled and offers its own DSL. Example:</p>
+            blocks, this block is instance_execed and offers its own DSL. Example:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">presence</span> :<span class="ruby-identifier">id</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>instance_eval is used in this case because create_table and alter_table
-            already use instance_eval, so losing access to the surrounding receiver is
+            <p>instance_exec is used in this case because create_table and alter_table
+            already use instance_exec, so losing access to the surrounding receiver is
             not an issue.</p>
             
             <p>Here&#39;s a breakdown of the constraints created for each constraint

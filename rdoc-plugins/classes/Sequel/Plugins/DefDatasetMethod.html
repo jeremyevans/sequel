@@ -40,7 +40,7 @@
             <p>The def_dataset_method plugin adds Model.def_dataset_method for defining
             dataset methods:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">def_dataset_method</span>(:<span class="ruby-identifier">by_name</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">def_dataset_method</span>(:<span class="ruby-identifier">by_name</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Additionally, this adds support for Model.subset, which can also be used to
             define dataset methods that add specific filters:</p>

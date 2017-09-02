@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -44,7 +44,7 @@
             
             <p>It can also support schema qualified tables:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(:<span class="ruby-identifier">schema__table</span>) <span class="ruby-comment"># =&gt; 123456</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">schema</span>][:<span class="ruby-identifier">table</span>]) <span class="ruby-comment"># =&gt; 123456</span></pre>
             
             <p>How accurate this count is depends on the number of rows added/deleted from
             the table since the last time it was analyzed.</p>

@@ -29,61 +29,12 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:08 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>The no_auto_literal_strings extension removes Sequel&#39;s automatic
-            conversion of strings to literal strings in the dataset filter methods.  By
-            default, <a href="../../../../classes/Sequel.html">Sequel</a> considers a
-            string passed to a filter method as a literal string:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;A&#39;&quot;</span>)</pre>
-            
-            <p>This is fine, except when the string is derived from user input:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-node">&quot;name &gt; &#39;#{params[:user]}&#39;&quot;</span>) <span class="ruby-comment"># SQL Injection!</span></pre>
-            
-            <p><a href="../../../../classes/Sequel.html">Sequel</a> does support using
-            placeholders for such strings:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span></pre>
-            
-            <p>However, if you forget to user placeholders, and pass a string to a filter
-            method that is derived from user input, you open yourself up to SQL
-            injection. With this extension, using a plain string in a filter method
-            will result in an exception being raised.  You either need to explicitly
-            use a literal string:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user</span>].<span class="ruby-identifier">to_s</span>))</pre>
-            
-            <p>or you need to construct the same SQL using a non-string based approach:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user</span>].<span class="ruby-identifier">to_s</span>}</pre>
-            
-            <p>Note that as listed in Sequel&#39;s security guide, a large number of
-            dataset methods call down to a filtering method, and this protects all of
-            those cases.</p>
-            
-            <p>This extension also protects the use of a plain string passed to
-            Dataset#update:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;column = column + 1&quot;</span>)</pre>
-            
-            <p>Again, you either need to explicitly use a literal string:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;column = column + 1&quot;</span>))</pre>
-            
-            <p>or construct the same SQL using a non-string based approach:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/Dataset/NoAutoLiteralStrings.html">Sequel::Dataset::NoAutoLiteralStrings</a></p>
-          </div>
+          <div id='description'></div>
           <div id='context'>
           </div>
         </div>

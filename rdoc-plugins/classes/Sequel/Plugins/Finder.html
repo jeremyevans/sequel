@@ -41,7 +41,7 @@
             There are two ways to use this.  The recommended way is to pass a symbol
             that represents a model class method that returns a dataset:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">by_name</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> :<span class="ruby-identifier">by_name</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">by_name</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> :<span class="ruby-identifier">by_name</span></pre>
             
             <p>This creates an optimized first_by_name method, which you can call
             normally:</p>
@@ -50,7 +50,7 @@
             
             <p>The alternative way to use this to pass your own block:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}</pre>
             
             <p>Additionally, there is a Model.prepared_finder method.  This works
             similarly to Model.finder, but uses a prepared statement.  This limits the

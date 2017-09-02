@@ -37,14 +37,13 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The <a href="ForceEncoding.html">ForceEncoding</a> plugin allows you force
-            specific encodings for all strings that are used by the model.  When model
-            instances are loaded from the database, all values in the hash that are
-            strings are forced to the given encoding.  Whenever you update a model
-            column attribute, the resulting value is forced to a given encoding if the
-            value is a string.  There are two ways to specify the encoding.  You can
-            either do so in the plugin call itself, or via the forced_encoding class
-            accessor.</p>
+            <p>The force_encoding plugin allows you force specific encodings for all
+            strings that are used by the model.  When model instances are loaded from
+            the database, all values in the hash that are strings are forced to the
+            given encoding.  Whenever you update a model column attribute, the
+            resulting value is forced to a given encoding if the value is a string. 
+            There are two ways to specify the encoding.  You can either do so in the
+            plugin call itself, or via the forced_encoding class accessor.</p>
             
             <p>Usage:</p>
             
@@ -86,7 +85,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/force_encoding.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">encoding</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">forced_encoding</span> = <span class="ruby-identifier">encoding</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/force_encoding.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">encoding</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">forced_encoding</span> = <span class="ruby-identifier">encoding</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -185,10 +185,8 @@
             <p>Many internal Database and Dataset regexp and string constants that were
             previously used internally have been deprecated. Additionally, some
             historical aliases for existing constants have also been deprecated, such
-            as <a
-            href="../../../classes/Sequel/Schema/CreateTableGenerator.html">Sequel::Schema::Generator</a>.
-            Ruby 2.3+ is required to receive deprecation warnings related to these
-            constants.</p>
+            as Sequel::Schema::Generator. Ruby 2.3+ is required to receive deprecation
+            warnings related to these constants.</p>
             </li><li>
             <p>Passing model classes as the first argument to Dataset#join_table and
             Dataset#graph is now deprecated.  Pass the model&#39;s table name or the
@@ -229,10 +227,8 @@
             already has a dataset, you must now use set_dataset or dataset= to change
             the dataset, not db=.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel/SQL/Expression.html#method-i-sql_literal">Sequel::SQL::Expression#sql_literal</a>
-            and lit are now deprecated. These aren&#39;t used internally and aren&#39;t
-            expected to be used externally.</p>
+            <p>Sequel::SQL::Expression#sql_literal and lit are now deprecated. These
+            aren&#39;t used internally and aren&#39;t expected to be used externally.</p>
             </li><li>
             <p>{Integer,Timestamp}Migrator::DEFAULT_SCHEMA_{COLUMN,TABLE} are now
             deprecated.  They have been replaced by default_schema_column and
@@ -244,9 +240,8 @@
             </li><li>
             <p>Passing a second argument to Database#alter_table is now deprecated.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel/BasicObject.html#method-c-remove_methods-21">Sequel::BasicObject.remove_methods!</a>
-            is now deprecated. It has always been a no-op on ruby 1.9+.</p>
+            <p>Sequel::BasicObject.remove_methods! is now deprecated. It has always been a
+            no-op on ruby 1.9+.</p>
             </li><li>
             <p>Referencing the PG_NAMED_TYPES constant in your code is now deprecated. 
             Previously, adding entries to the PG_NAMED_TYPES was deprecated, but no

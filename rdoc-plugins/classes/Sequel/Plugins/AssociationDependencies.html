@@ -37,10 +37,10 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The <a href="AssociationDependencies.html">AssociationDependencies</a>
-            plugin allows you do easily set up before and/or after destroy hooks for
-            destroying, deleting, or nullifying associated model objects.  The
-            following association types support the following dependency actions:</p>
+            <p>The association_dependencies plugin allows you do easily set up before
+            and/or after destroy hooks for destroying, deleting, or nullifying
+            associated model objects.  The following association types support the
+            following dependency actions:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>:many_to_many </td><td>
             <p>:nullify (removes all related entries in join table)</p>
             </td></tr><tr><td class='label'>:many_to_one </td><td>
@@ -61,7 +61,7 @@
             hash to the plugin call itself or to the add_association_dependencies
             method:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> :<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">destroy</span>, :<span class="ruby-identifier">reviews=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">delete</span>, :<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">nullify</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>, <span class="ruby-identifier">address</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> <span class="ruby-identifier">albums</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">destroy</span>, <span class="ruby-identifier">reviews</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">delete</span>, <span class="ruby-identifier">tags</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">nullify</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -88,7 +88,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ASSOCIATION_MAPPING</td>
                     <td>=</td>
-                    <td class='context-item-value'>{:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before, :one_to_one=>:before}</td>
+                    <td class='context-item-value'>{:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before, :one_to_one=>:before}.freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -99,7 +99,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DEPENDENCE_ACTIONS</td>
                     <td>=</td>
-                    <td class='context-item-value'>[:delete, :destroy, :nullify]</td>
+                    <td class='context-item-value'>[:delete, :destroy, :nullify].freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -125,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span>{<span class="ruby-ivar">@association_dependencies</span> = {<span class="ruby-value">:before_delete=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:before_destroy=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:before_nullify=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:after_delete=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:after_destroy=</span><span class="ruby-operator">&gt;</span>[]}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">hash</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-ivar">@association_dependencies</span> = {<span class="ruby-value">:before_delete=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:before_destroy=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:before_nullify=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:after_delete=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:after_destroy=</span><span class="ruby-operator">&gt;</span>[]}}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>

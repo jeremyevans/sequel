@@ -45,15 +45,15 @@
             All of these instances are frozen so they won&#39;t be modified
             unexpectedly, and before hooks disallow saving or destroying instances.</p>
             
-            <p>You can use the :frozen=&gt;false option to have this plugin return
-            unfrozen instances.  This is slower as it requires creating new objects,
-            but it allows you to make changes to the object and save them.  If you set
-            the option to false, you are responsible for updating the cache manually
-            (the pg_static_cache_updater extension can handle this automatically). 
-            Note that it is not safe to use the :frozen=&gt;false option if you are
-            mutating column values directly.  If you are mutating column values, you
-            should also override Model.call to dup each mutable column value to ensure
-            it is not shared by other instances.</p>
+            <p>You can use the frozen: false option to have this plugin return unfrozen
+            instances.  This is slower as it requires creating new objects, but it
+            allows you to make changes to the object and save them.  If you set the
+            option to false, you are responsible for updating the cache manually (the
+            pg_static_cache_updater extension can handle this automatically).  Note
+            that it is not safe to use the frozen: false option if you are mutating
+            column values directly.  If you are mutating column values, you should also
+            override Model.call to dup each mutable column value to ensure it is not
+            shared by other instances.</p>
             
             <p>The caches this plugin creates are used for the following things:</p>
             <ul><li>
@@ -76,10 +76,10 @@
             
             <p>Usage:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Cache the AlbumType class statically, disallowing any changes.</span>&#x000A;<span class="ruby-constant">AlbumType</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">static_cache</span>&#x000A;&#x000A;<span class="ruby-comment"># Cache the AlbumType class statically, but return unfrozen instances</span>&#x000A;<span class="ruby-comment"># that can be modified.</span>&#x000A;<span class="ruby-constant">AlbumType</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">static_cache</span>, :<span class="ruby-identifier">frozen=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Cache the AlbumType class statically, disallowing any changes.</span>&#x000A;<span class="ruby-constant">AlbumType</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">static_cache</span>&#x000A;&#x000A;<span class="ruby-comment"># Cache the AlbumType class statically, but return unfrozen instances</span>&#x000A;<span class="ruby-comment"># that can be modified.</span>&#x000A;<span class="ruby-constant">AlbumType</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">static_cache</span>, <span class="ruby-identifier">frozen</span><span class="ruby-operator">:</span> <span class="ruby-keyword">false</span></pre>
             
-            <p>If you would like the speed benefits of keeping :frozen=&gt;true but still
-            need to occasionally update objects, you can side-step the before_ hooks by
+            <p>If you would like the speed benefits of keeping frozen: true but still need
+            to occasionally update objects, you can side-step the before_ hooks by
             overriding the class method <code>static_cache_allow_modifications?</code>
             to return true:</p>
             
@@ -128,7 +128,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@static_cache_frozen</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:frozen</span>, <span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">load_cache</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@static_cache_frozen</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:frozen</span>, <span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">load_cache</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

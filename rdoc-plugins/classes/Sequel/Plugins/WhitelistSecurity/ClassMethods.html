@@ -100,10 +100,10 @@
                   in =) that you want to be used during mass assignment, they need to be
                   listed here as well (without the =).</p>
                   
-                  <p>It may be better to use a method such as <code>set_only</code> or
-                  <code>set_fields</code> that lets you specify the allowed fields per call.</p>
+                  <p>It may be better to use <code>set_fields</code> which lets you specify the
+                  allowed fields per call.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">hometown</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>, :<span class="ruby-identifier">hometown=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>, :<span class="ruby-identifier">records_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">hometown</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-identifier">hometown</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-identifier">records_sold</span><span class="ruby-operator">:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_allowed_columns-source'); return false">

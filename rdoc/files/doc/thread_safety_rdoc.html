@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-09-29 15:34:03 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,8 +43,7 @@
             default.  Specifically, multiple threads can operate on Database instances,
             Dataset instances, and Model classes concurrently without problems.  In
             general, Database instance and Model classes are not modified after
-            application startup, and modifying Dataset instances returns modified
-            copies of the dataset instead of mutating it.</p>
+            application startup, and Dataset instances are always frozen.</p>
             
             <h2 id="label-Connection+Pool">Connection Pool<span><a href="#label-Connection+Pool">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -56,8 +55,8 @@
             and the pool does not have an available connection, a new connection will
             be created.  If the maximum number of connections in the pool has already
             been reached, the thread will block until a connection is available or the
-            connection pool timeout has elapsed (in which case a PoolTimeout error will
-            be raised).</p>
+            connection pool timeout has elapsed (in which case a Sequel::PoolTimeout
+            error will be raised).</p>
             
             <h2 id="label-Exceptions">Exceptions<span><a href="#label-Exceptions">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -73,11 +72,6 @@
             should not modify a class in one thread if any other thread can
             concurrently access it.  Model subclassing is designed to be thread-safe,
             so you create a model subclass in a thread and modify it safely.</p>
-            
-            <p>3) Dataset mutation methods: Dataset mutation methods are not thread safe,
-            you should not call them on datasets that could be accessed by other
-            threads.  It is safe to clone the dataset first inside a thread and call
-            mutation methods on the cloned dataset.</p>
           </div>
           <div id='context'>
           </div>

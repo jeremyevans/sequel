@@ -41,18 +41,9 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Module for holding all SqlAnywhere-related classes and modules for <a
-            href="../Sequel.html">Sequel</a>.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-convert_smallint_to_bool">convert_smallint_to_bool</a></li>
-              <li><a href="#method-c-convert_smallint_to_bool-3D">convert_smallint_to_bool=</a></li>
-            </ol>
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-blob">blob</a></li>
@@ -86,50 +77,10 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TYPE_TRANSLATOR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>tt</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
                 </table>
               </div>
             </div>
             <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-convert_smallint_to_bool'>
-                <a name='method-c-convert_smallint_to_bool'></a>
-                <div class='synopsis'>
-                  <span class='name'>convert_smallint_to_bool</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_smallint_to_bool-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-convert_smallint_to_bool-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlanywhere.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_smallint_to_bool</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::SqlAnywhere.convert_smallint_to_bool&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_smallint_to_bool</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-convert_smallint_to_bool-3D'>
-                <a name='method-c-convert_smallint_to_bool-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>convert_smallint_to_bool=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_smallint_to_bool-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-convert_smallint_to_bool-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlanywhere.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_smallint_to_bool=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::SqlAnywhere.convert_smallint_to_bool=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_smallint_to_bool</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-blob'>
                 <a name='method-i-blob'></a>
@@ -144,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-blob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-boolean'>
@@ -160,7 +111,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-boolean-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">!=</span> <span class="ruby-value">0</span> <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">!=</span> <span class="ruby-value">0</span> <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-date'>
@@ -176,7 +127,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-date-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Date</span>.<span class="ruby-identifier">strptime</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Date</span>.<span class="ruby-identifier">strptime</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-decimal'>
@@ -192,7 +143,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-decimal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-decimal-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">decimal</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-decimal-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">decimal</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-time'>
@@ -208,7 +159,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-time-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -29,12 +29,107 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-08-01 07:59:40 -0700</span>
+          <span class='datetime'>2017-09-01 16:52:42 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-5.0.0+-282017-09-01-29">5.0.0 (2017-09-01)<span><a href="#label-5.0.0+-282017-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make bin/sequel -M option always use base 10 (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t use savepoints when creating indexes inside a transaction on
+            databases that don&#39;t support transactional schema modifications
+            (jeremyevans) (#1407)</p>
+            </li><li>
+            <p>Support :if_not_exists option when creating indexes on PostgreSQL 9.5+
+            (DyegoCosta) (#1405)</p>
+            </li><li>
+            <p>Make threaded connection pools not block while connections are being made
+            (jeremyevans)</p>
+            </li><li>
+            <p>SQL::Expression#clone and dup now return self, since all expressions should
+            be frozen value objects (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t create empty arrays for unused association callbacks
+            (jeremyevans)</p>
+            </li><li>
+            <p>Cache association method name symbols instead of recomputing them everytime
+            (jeremyevans)</p>
+            </li><li>
+            <p>Raise an exception if attempting to create a prepared statement using a
+            dataset with a delayed evaluation (jeremyevans)</p>
+            </li><li>
+            <p>Make ConnectionPool#size thread safe by using the pool mutex (jeremyevans)</p>
+            </li><li>
+            <p>Use instance_exec instead of instance_eval when passing a block, to work
+            with lambdas that accept no arguments (jeremyevans)</p>
+            </li><li>
+            <p>Freeze SQL::StringAgg instances in string_agg extension (jeremyevans)</p>
+            </li><li>
+            <p>Freeze SQL::DateAdd instances in date_arithmetic extension (jeremyevans)</p>
+            </li><li>
+            <p>Freeze SQL::Expression.comparison_attrs (jeremyevans)</p>
+            </li><li>
+            <p>Rename SQL::Subscript#f to expression, keeping f as an alias (jeremyevans)</p>
+            </li><li>
+            <p>Require the :pool_class Database option be a class to use a custom
+            connection pool (jeremyevans)</p>
+            </li><li>
+            <p>Make the class_table_inheritance plugin raise an Error during update if any
+            UPDATE query does not affect a single row (jeremyevans)</p>
+            </li><li>
+            <p>Change most send calls to public_send unless calling private methods is
+            expected (jeremyevans)</p>
+            </li><li>
+            <p>Database schema and schema generator methods now return nil (jeremyevans)</p>
+            </li><li>
+            <p>Model#validates_unique in the validation helpers plugin now defaults to
+            only checking on new or modified values (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model#_before_validation (private_method), use
+            Model#before_validation now (jeremyevans)</p>
+            </li><li>
+            <p>Always run before/after/around validation hooks when saving, even when not
+            validating the object (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model use_after_commit_rollback class and instance accessors
+            (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Model.allowed_columns reader (jeremyevans)</p>
+            </li><li>
+            <p>Freeze internal constants that shouldn&#39;t be modified at runtime
+            (jeremyevans)</p>
+            </li><li>
+            <p>Attempt to connect to the database immediately when creating the Database
+            instance (jeremyevans)</p>
+            </li><li>
+            <p>Make association_pks plugin delay the setting of associated objects until
+            the current object is saved by default (jeremyevans)</p>
+            </li><li>
+            <p>Joined datasets used as model datasets are now automatically wrapped in a
+            subquery (jeremyevans)</p>
+            </li><li>
+            <p>Setting an invalid dataset for a model class now raises an exception by
+            default (jeremyevans)</p>
+            </li><li>
+            <p>Getting all values for newly created models now happens before calling
+            after_create, instead of after (jeremyevans)</p>
+            </li><li>
+            <p>Remove use of @was_new/@columns_updated instance variables when saving
+            model objects (jeremyevans)</p>
+            </li><li>
+            <p>Disable symbol splitting by default (jeremyevans)</p>
+            </li><li>
+            <p>Make datasets frozen by default (jeremyevans)</p>
+            </li><li>
+            <p>Drop support for ruby 1.8.7, minimum now is 1.9.2 (jeremyevans)</p>
+            </li><li>
+            <p>Remove deprecated adapters, extensions, plugins, constants, and features
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.49.0+-282017-08-01-29">4.49.0 (2017-08-01)<span><a href="#label-4.49.0+-282017-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -373,9 +468,7 @@
             </li><li>
             <p>Remove use of Fixnum in sqlanywhere shared adapter (jeremyevans)</p>
             </li><li>
-            <p>Deprecate <a
-            href="../classes/Sequel/Schema/CreateTableGenerator.html">Sequel::Schema::Generator</a>
-            constant, use <a
+            <p>Deprecate Sequel::Schema::Generator constant, use <a
             href="../classes/Sequel/Schema/CreateTableGenerator.html">Sequel::Schema::CreateTableGenerator</a>
             instead (jeremyevans)</p>
             </li><li>
@@ -446,9 +539,7 @@
             <p>Deprecate passing blocks to virtual row methods, move to
             virtual_row_method_block extension (jeremyevans)</p>
             </li><li>
-            <p>Deprecate <a
-            href="../classes/Sequel/SQL/Expression.html#method-i-sql_literal">Sequel::SQL::Expression#sql_literal</a>
-            and lit (jeremyevans)</p>
+            <p>Deprecate Sequel::SQL::Expression#sql_literal and lit (jeremyevans)</p>
             </li><li>
             <p>Don&#39;t issue deprecation warnings on ruby 1.8.7, as <a
             href="../classes/Sequel.html">Sequel</a> 5 is dropping support for it
@@ -534,9 +625,7 @@
             <p>Handle Model#cancel_action correctly in before hooks when Model#valid? is
             called (jeremyevans)</p>
             </li><li>
-            <p>Deprecate <a
-            href="../classes/Sequel/HookFailed.html">Sequel::BeforeHookFailed</a>
-            (jeremyevans)</p>
+            <p>Deprecate Sequel::BeforeHookFailed (jeremyevans)</p>
             </li><li>
             <p>Deprecate passing multiple arguments as filter arguments when not using a
             conditions specifier (jeremyevans)</p>
@@ -549,8 +638,8 @@
             <p>Deprecate prepared_statements_associations and prepared_statements_with_pk
             plugins (jeremyevans)</p>
             </li><li>
-            <p>Deprecate <a href="../classes/Sequel/Unbinder.html">Sequel::Unbinder</a>,
-            Sequel::UnbindDuplicate, and Dataset#unbind (jeremyevans)</p>
+            <p>Deprecate Sequel::Unbinder, Sequel::UnbindDuplicate, and Dataset#unbind
+            (jeremyevans)</p>
             </li><li>
             <p>Deprecating calling <a
             href="../classes/Sequel/Qualifier.html">Sequel::Qualifier</a> with two
@@ -559,9 +648,7 @@
             <p>Add validation_contexts plugin for supporting custom contexts when
             validating (jeremyevans)</p>
             </li><li>
-            <p>Deprecate <a
-            href="../classes/Sequel/Database.html#method-c-single_threaded">Sequel::Database.single_threaded</a>
-            singleton accessor (jeremyevans)</p>
+            <p>Deprecate Sequel::Database.single_threaded singleton accessor (jeremyevans)</p>
             </li><li>
             <p>Deprecate treating unrecognized prepared statement type as :select
             (jeremyevans)</p>
@@ -617,10 +704,7 @@
             </li><li>
             <p>Deprecate Sequel::Model::ANONYMOUS_MODEL_CLASSES{,_MUTEX} (jeremyevans)</p>
             </li><li>
-            <p>Deprecate <a
-            href="../classes/Sequel.html#method-c-cache_anonymous_models">Sequel.cache_anonymous_models</a>
-            and <a
-            href="../classes/Sequel.html#method-c-cache_anonymous_models-3D">Sequel.cache_anonymous_models=</a>
+            <p>Deprecate Sequel.cache_anonymous_models and Sequel.cache_anonymous_models=
             (jeremyevans)</p>
             </li><li>
             <p>Automatically use from_self when using a dataset as part of a compound if
@@ -2968,9 +3052,7 @@
             <p>Deprecate creating Model class methods automatically from plugin public
             dataset methods (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Sequel.html#method-c-cache_anonymous_models">Sequel.cache_anonymous_models</a>
-            accessor (jeremyevans)</p>
+            <p>Add Sequel.cache_anonymous_models accessor (jeremyevans)</p>
             </li><li>
             <p>Deprecate Sequel::Model.cache_anonymous_models accessor (jeremyevans)</p>
             </li><li>
@@ -5673,11 +5755,9 @@
             href="../classes/Sequel/BasicObject.html">Sequel::BasicObject</a> on ruby
             1.8 (i.e. most Kernel methods) (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Sequel/BasicObject.html#method-c-remove_methods-21">Sequel::BasicObject.remove_methods!</a>,
-            useful on 1.8 if libraries required after <a
-            href="../classes/Sequel.html">Sequel</a> add methods to Object
-            (jeremyevans)</p>
+            <p>Add Sequel::BasicObject.remove_methods!, useful on 1.8 if libraries
+            required after <a href="../classes/Sequel.html">Sequel</a> add methods to
+            Object (jeremyevans)</p>
             </li><li>
             <p>Change <a href="../classes/Sequel.html#method-c-connect">Sequel.connect</a>
             with a block to return the block&#39;s value (jonas11235)</p>
@@ -7082,10 +7162,8 @@
             href="../classes/Sequel/Model.html">Sequel::Model</a> before setting up a
             database connection (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Sequel/HookFailed.html">Sequel::BeforeHookFailed</a>
-            exception to be raised when a record fails because a before hook fails
-            (bougyman)</p>
+            <p>Add Sequel::BeforeHookFailed exception to be raised when a record fails
+            because a before hook fails (bougyman)</p>
             </li><li>
             <p>Add <a
             href="../classes/Sequel/ValidationFailed.html">Sequel::ValidationFailed</a>

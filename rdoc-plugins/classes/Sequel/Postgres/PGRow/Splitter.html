@@ -56,76 +56,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CLOSE_PAREN</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\)/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>OPEN_PAREN</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\(/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>QUOTED_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/(\\.|""|[^"])*/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>QUOTE_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/"/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>QUOTE_SEP_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/"[,)]/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>REPLACE_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\\(.)|"(")/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>REPLACE_WITH</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'\1\2'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>SEP_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/[,)]/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>UNQUOTED_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/[^,)]*/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-parse'>
@@ -143,7 +73,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-parse-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-parse-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 248</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">parse</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@result</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@result</span>&#x000A;  <span class="ruby-identifier">values</span> = []&#x000A;  <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/\(/</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/\)/</span>)&#x000A;    <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">until</span> <span class="ruby-identifier">eos?</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/&quot;/</span>)&#x000A;        <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/(\.|&quot;&quot;|[^&quot;])*/</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\(.)|&quot;(&quot;)/</span>, <span class="ruby-string">&#39;\1\2&#39;</span>)&#x000A;        <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/&quot;[,)]/</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">v</span> = <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/[^,)]*/</span>)&#x000A;        <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>)&#x000A;        <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/[,)]/</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">values</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-parse-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 223</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">parse</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@result</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@result</span>&#x000A;  <span class="ruby-identifier">values</span> = []&#x000A;  <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/\(/</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/\)/</span>)&#x000A;    <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">until</span> <span class="ruby-identifier">eos?</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/&quot;/</span>)&#x000A;        <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/(\.|&quot;&quot;|[^&quot;])*/</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/\(.)|&quot;(&quot;)/</span>, <span class="ruby-string">&#39;\1\2&#39;</span>)&#x000A;        <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/&quot;[,)]/</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">v</span> = <span class="ruby-identifier">scan</span>(<span class="ruby-regexp">/[^,)]*/</span>)&#x000A;        <span class="ruby-identifier">values</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>)&#x000A;        <span class="ruby-identifier">skip</span>(<span class="ruby-regexp">/[,)]/</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">values</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

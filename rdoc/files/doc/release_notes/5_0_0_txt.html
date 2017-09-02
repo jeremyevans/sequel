@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>5.0.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>5.0.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/5.0.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2017-09-01 17:57:51 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Major+Changes">Major Changes<span><a href="#label-Major+Changes">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Datasets are now frozen by default.  Since Sequel&#39;s inception, datasets
+            have used a method-chaining API that returned modified copies, but
+            previously they still supported direct mutation.  Now, datasets are always
+            frozen and cannot be mutated. This allows many additional default
+            optimizations related to caching, and provides greater thread safety.</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;&#x000A;<span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">row_proc</span> = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>}&#x000A;&#x000A;<span class="ruby-comment"># Now</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">with_row_proc</span>(<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>})</pre>
+            </li><li>
+            <p>Symbol splitting to create qualified and/or aliased identifiers is now
+            disabled by default.  While symbol splitting allowed for shorter code, it
+            was not obvious and caused significant issues when using column names with
+            embedded double or triple underscores.  <a
+            href="../../../classes/Sequel.html">Sequel</a> now offers many ways to
+            create qualified and/or aliased identifiers.</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;:<span class="ruby-identifier">table__column</span>          <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;&#x000A;<span class="ruby-comment"># Now</span>&#x000A;:<span class="ruby-identifier">table__column</span>          <span class="ruby-comment"># &quot;table__column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>] <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;&#x000A;<span class="ruby-comment"># To get back historical behavior</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">true</span></pre>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer allows the use
+            of plain ruby strings as SQL code fragments in the dataset filtering
+            methods, as that makes it easier to introduce SQL injection
+            vulnerabilities.  You can use Sequel.lit to create literal strings (SQL
+            code fragments), which makes it easier to do security auditing of
+            applications using <a href="../../../classes/Sequel.html">Sequel</a>.</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;column = 1&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Now </span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;column = 1&quot;</span>)).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># or better</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-identifier">column</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># To get back historical behavior</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">auto_literal_strings</span></pre>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>All adapters, extensions, plugins, features, and constants deprecated in
+            4.49.0 have been removed.  Before upgrading to <a
+            href="../../../classes/Sequel.html">Sequel</a> 5.0.0, upgrade to 4.49.0 and
+            fix all deprecation warnings.</p>
+            </li><li>
+            <p>Support for ruby 1.8.7 has been dropped, the minimum ruby version is now
+            1.9.2.</p>
+            </li><li>
+            <p>The {before,after,around}_validation hooks are now always called when
+            saving, even if the validate: false option is used.  This allows you to use
+            the before_validation hook to make changes to the model instance that are
+            required before validation and before saving even if not validating.</p>
+            </li><li>
+            <p>Getting column values for newly created model instances after insertion now
+            happens before after_create is called, instead of after.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now immediately attempts
+            to the connect to the database when a Database instance is created, in
+            order to fail fast if the connection parameters are invalid.</p>
+            </li><li>
+            <p>The validates_unique method in the validation_helpers plugin now only
+            checks for uniqueness by default if the record is new or one of the related
+            columns has been modified by default.</p>
+            </li><li>
+            <p>Database schema modification methods and schema generator methods now
+            return nil instead of some internal value.</p>
+            </li><li>
+            <p>Many cases where <a href="../../../classes/Sequel.html">Sequel</a> used
+            Kernel#send internally have been switched to Kernel#public_send so they
+            only call public methods.</p>
+            </li><li>
+            <p>Model association hooks are now nil instead of empty arrays by default.</p>
+            </li><li>
+            <p>Internal uses of instance_eval with a block have been changed to
+            instance_exec.  This allows them to be used with lambdas that take no
+            arguments.</p>
+            </li><li>
+            <p>Most internal constants are now frozen, unless there is a requirement that
+            they be modified at runtime.</p>
+            </li><li>
+            <p>The Model @was_new instance variable is now no longer set when saving new
+            model instances.</p>
+            </li><li>
+            <p>The private Sequel::Postgres::PGArray::Parser#new_entry_buffer method in
+            the pg_array extension has been removed.</p>
+            </li><li>
+            <p>Modifying Model.input_transformer_order in the input_transformer plugin no
+            longer has an effect.</p>
+            </li></ul>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Database#add_index :if_not_exists option is now supported on PostgreSQL
+            9.5+.</p>
+            </li><li>
+            <p>SQL::Subscript#expression has been added to retrieve the expression that is
+            subscripted.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Threaded connection pools no longer block while new connections are being
+            made.  Previously, attempting to establish a new connection blocked all
+            connection pool activity until the new connection was made.</p>
+            </li><li>
+            <p>Many minor performance improvements have been made.</p>
+            </li><li>
+            <p>The class_table_inheritance plugin now raises an error during Model#update
+            if a query does not modify a single row, just as the default Model#update
+            does.</p>
+            </li><li>
+            <p>ConnectionPool#size is now thread-safe in both threaded connection pools.
+            Internal callers that already have the connection pool mutex should switch
+            to using #_size (a new private method).</p>
+            </li><li>
+            <p>Registration of new serialization formats in the serialization plugin is
+            now thread-safe.</p>
+            </li><li>
+            <p>If transactional schema modifications are not supported, a savepoint will
+            not automatically be created when adding indexes for new tables inside
+            transactions.  This fixes issues when making schema changes inside
+            transactions on MySQL.</p>
+            </li><li>
+            <p>Attempting to create a prepared statement using a dataset that uses a
+            delayed evaluation now raises an error, because the prepared statement
+            would not respect the delayed evaluation.</p>
+            </li><li>
+            <p>The bin/sequel -M option now uses base 10.  Previously, it used the
+            Kernel#Integer default, which was base 8 if there was a preceding 0.</p>
+            </li></ul>
+            
+            <h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            
+            <p>These deprecated features will be removed in <a
+            href="../../../classes/Sequel.html">Sequel</a> 5.1.0.</p>
+            <ul><li>
+            <p>Model.allowed_columns in the base plugin is now deprecated. Use the
+            whitelist_security plugin if you want to call it.</p>
+            </li><li>
+            <p>Model use_after_commit_rollback class and instance accessors are now
+            deprecated.</p>
+            </li><li>
+            <p>Defining the Model#_before_validation method is now deprecated. You can
+            change to using before_validation.</p>
+            </li><li>
+            <p>The private Model.plugin_module_defined? method is now deprecated.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

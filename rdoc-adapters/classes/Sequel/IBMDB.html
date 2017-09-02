@@ -38,11 +38,6 @@
           <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-convert_smallint_to_bool">convert_smallint_to_bool</a></li>
-              <li><a href="#method-c-convert_smallint_to_bool-3D">convert_smallint_to_bool=</a></li>
-            </ol>
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-boolean">boolean</a></li>
@@ -75,7 +70,7 @@
                       :blob => ::Sequel::SQL::Blob.method(:new),
                       :time => ::Sequel.method(:string_to_time),
                       :date => ::Sequel.method(:string_to_date)
-                      }
+                      }.freeze
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
@@ -88,39 +83,6 @@
               </div>
             </div>
             <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-convert_smallint_to_bool'>
-                <a name='method-c-convert_smallint_to_bool'></a>
-                <div class='synopsis'>
-                  <span class='name'>convert_smallint_to_bool</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_smallint_to_bool-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-convert_smallint_to_bool-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_smallint_to_bool</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::IBMDB.convert_smallint_to_bool&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_smallint_to_bool</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-convert_smallint_to_bool-3D'>
-                <a name='method-c-convert_smallint_to_bool-3D'></a>
-                <div class='synopsis'>
-                  <span class='name'>convert_smallint_to_bool=</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-convert_smallint_to_bool-3D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-convert_smallint_to_bool-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 15</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_smallint_to_bool=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::IBMDB.convert_smallint_to_bool=&quot;</span>, <span class="ruby-string">&quot;Call this method on the Database instance&quot;</span>)&#x000A;  <span class="ruby-ivar">@convert_smallint_to_bool</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-boolean'>
                 <a name='method-i-boolean'></a>
@@ -135,7 +97,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-boolean-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-int'>
@@ -151,7 +113,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-int-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-int-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">int</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-int-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">int</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

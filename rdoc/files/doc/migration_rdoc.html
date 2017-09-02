@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-12-29 09:44:49 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -63,10 +63,10 @@
             
             <pre>sequel -m path/to/migrations postgres://host/database</pre>
             
-            <p>Migrations in <a href="../../classes/Sequel.html">Sequel</a> use a very
-            simple DSL via the <code>Sequel.migration</code> method, and inside the
-            DSL, use the <code>Sequel::Database</code> schema modification methods such
-            as <code>create_table</code> and <code>alter_table</code>. See the <a
+            <p>Migrations in <a href="../../classes/Sequel.html">Sequel</a> use a DSL via
+            the <code>Sequel.migration</code> method, and inside the DSL, use the
+            <code>Sequel::Database</code> schema modification methods such as
+            <code>create_table</code> and <code>alter_table</code>. See the <a
             href="schema_modification_rdoc.html">schema modification guide</a> for
             details on the schema modification methods you can use.</p>
             
@@ -75,22 +75,22 @@
             <p>Here is a fairly basic <a href="../../classes/Sequel.html">Sequel</a>
             migration:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(:<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, <span class="ruby-identifier">null</span><span class="ruby-operator">:</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(:<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This migration has an <code>up</code> block which adds an artist table with
             an integer primary key named id, and a varchar or text column (depending on
             the database) named <code>name</code> that doesn&#39;t accept
             <code>NULL</code> values. Migrations should include both up and
             <code>down</code> blocks, with the <code>down</code> block reversing the
-            change made by up.  However, if you never need to be able to migrate down
-            (i.e. you are one of the people that doesn&#39;t make mistakes), you can
-            leave out the <code>down</code> block.  In this case, the <code>down</code>
-            block just reverses the changes made by up, dropping the table.</p>
+            change made by up.  However, if you never need to be able to migrate down,
+            you can leave out the <code>down</code> block.  In this case, the
+            <code>down</code> block just reverses the changes made by up, dropping the
+            table.</p>
             
             <p>You can simplify the migration given above by using a reversible migration
             with a <code>change</code> block:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, <span class="ruby-identifier">null</span><span class="ruby-operator">:</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>The <code>change</code> block acts exactly like an <code>up</code> block. 
             The only difference is that it will attempt to create a <code>down</code>
@@ -148,7 +148,7 @@
             originally only included artists from Sacramento, CA, USA, but now you want
             to branch out and include artists in any city:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">location</span>, <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-identifier">from</span>(:<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">location=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Sacramento&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_column</span> :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">location</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">location</span>, <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-identifier">from</span>(:<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">location</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Sacramento&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_column</span> :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">location</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This migration adds a <code>location</code> column to the
             <code>artists</code> table, and sets the <code>location</code> column to
@@ -159,8 +159,8 @@
             the actions of the up block.</p>
             
             <p>Note that when updating the <code>artists</code> table in the update, a
-            plain dataset is used, <code>from(:artists)</code>. This looks a little
-            weird, but you need to be aware that inside an up or <code>down</code>
+            plain dataset is used, <code>from(:artists)</code>. This may look a little
+            strange, but you need to be aware that inside an up or <code>down</code>
             block in a migration, self always refers to the
             <code>Sequel::Database</code> object that the migration is being applied
             to. Since <code>Database#from</code> creates datasets, using
@@ -170,12 +170,6 @@
             column to <code>&#39;Sacramento&#39;</code>.  You should avoid referencing
             the <code>Sequel::Database</code> object directly in your migration, and
             always use self to reference it, otherwise you may run into problems.</p>
-            
-            <p>It is possible to use model classes inside migrations, as long as they are
-            loaded into the ruby interpreter, but it&#39;s a bad habit as changes to
-            your model classes can then break old migrations, and this breakage is
-            often not caught until much later, such as when a new developer joins the
-            team and wants to run all migrations to create their development database.</p>
             
             <h2 id="label-The+migration+extension">The <code>migration</code> extension<span><a href="#label-The+migration+extension">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -314,7 +308,7 @@
             
             <h3 id="label-TimeStampMigrator"><code>TimeStampMigrator</code><span><a href="#label-TimeStampMigrator">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
-            <p>More complex, use migration versions where the version should represent a
+            <p>More complex, uses migration versions where the version should represent a
             timestamp</p>
             </li><li>
             <p>Allows duplicate migrations (since you could have multiple in a given
@@ -439,8 +433,9 @@
             <p>In some cases, you may want to allow a migration in the database that does
             not exist in the filesystem (deploying to an older version of code without
             running a down migration when deploy auto-migrates, for example). If
-            required, you can pass <code>:allow_missing_migration_files =&gt;&#x000A;true</code> as an option. This will stop errors from being raised if there
-            are migrations in the database that do not exist in the filesystem.</p>
+            required, you can pass <code>allow_missing_migration_files: true</code> as
+            an option. This will stop errors from being raised if there are migrations
+            in the database that do not exist in the filesystem.</p>
             
             <h2 id="label-Modifying+existing+migrations">Modifying existing migrations<span><a href="#label-Modifying+existing+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -451,7 +446,7 @@
             migration contains an error that causes data loss.  As long as it is
             possible to undo the migration without losing data, you should just add
             another migration that undoes the actions of the previous bad migration,
-            and maybe does the correct action afterward.</p>
+            and does the correct action afterward.</p>
             
             <p>The main problem with modifying existing migrations is that you will have
             to manually modify any databases that ran the migration before it was
@@ -490,7 +485,7 @@
             Here&#39;s an example where you are switching from having a single artist
             per album to multiple artists per album:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># Create albums_artists table</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">albums</span>&#x000A;      <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>&#x000A;      <span class="ruby-identifier">index</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-comment"># Insert one row in the albums_artists table</span>&#x000A;    <span class="ruby-comment"># for each row in the albums table where there</span>&#x000A;    <span class="ruby-comment"># is an associated artist</span>&#x000A;    <span class="ruby-keyword">self</span>[:<span class="ruby-identifier">albums_artists</span>].<span class="ruby-identifier">insert</span>([:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>],&#x000A;     <span class="ruby-keyword">self</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>))&#x000A;&#x000A;    <span class="ruby-comment"># Drop the now unnecesssary column from the albums table</span>&#x000A;    <span class="ruby-identifier">drop_column</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artist_id</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># Add the foreign key column back to the artists table</span>&#x000A;    <span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>){<span class="ruby-identifier">add_foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>}&#x000A;&#x000A;    <span class="ruby-comment"># If possible, associate each album with one of the artists</span>&#x000A;    <span class="ruby-comment"># it was associated with.  This loses information, but</span>&#x000A;    <span class="ruby-comment"># there&#39;s no way around that.</span>&#x000A;    <span class="ruby-keyword">self</span>[:<span class="ruby-identifier">albums_artists</span>].&#x000A;     <span class="ruby-identifier">group</span>(:<span class="ruby-identifier">album_id</span>).&#x000A;     <span class="ruby-identifier">select</span>{[<span class="ruby-identifier">album_id</span>, <span class="ruby-identifier">max</span>(<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">artist_id</span>)]}.&#x000A;     <span class="ruby-identifier">having</span>{<span class="ruby-identifier">artist_id</span> <span class="ruby-operator">&gt;</span>  <span class="ruby-value">0</span>}.&#x000A;     <span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;       <span class="ruby-keyword">self</span>[:<span class="ruby-identifier">artists</span>].&#x000A;        <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[:<span class="ruby-identifier">album_id</span>]).&#x000A;        <span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[:<span class="ruby-identifier">artist_id</span>])&#x000A;     <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-comment"># Drop the albums_artists table</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(:<span class="ruby-identifier">albums_artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># Create albums_artists table</span>&#x000A;    <span class="ruby-identifier">create_join_table</span>(<span class="ruby-identifier">album_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">artist_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artists</span>)&#x000A;&#x000A;    <span class="ruby-comment"># Insert one row in the albums_artists table</span>&#x000A;    <span class="ruby-comment"># for each row in the albums table where there</span>&#x000A;    <span class="ruby-comment"># is an associated artist</span>&#x000A;    <span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums_artists</span>).<span class="ruby-identifier">insert</span>([:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>],&#x000A;     <span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">artist_id</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>))&#x000A;&#x000A;    <span class="ruby-comment"># Drop the now unnecesssary column from the albums table</span>&#x000A;    <span class="ruby-identifier">drop_column</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artist_id</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># Add the foreign key column back to the artists table</span>&#x000A;    <span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>){<span class="ruby-identifier">add_foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>}&#x000A;&#x000A;    <span class="ruby-comment"># If possible, associate each album with one of the artists</span>&#x000A;    <span class="ruby-comment"># it was associated with.  This loses information, but</span>&#x000A;    <span class="ruby-comment"># there&#39;s no way around that.</span>&#x000A;    <span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">artist_id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums_artists</span>).&#x000A;      <span class="ruby-identifier">select</span>{<span class="ruby-identifier">max</span>(<span class="ruby-identifier">artist_id</span>)}.&#x000A;      <span class="ruby-identifier">where</span>(<span class="ruby-identifier">album_id</span><span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">albums</span>][:<span class="ruby-identifier">id</span>])&#x000A;    )&#x000A;&#x000A;    <span class="ruby-comment"># Drop the albums_artists table</span>&#x000A;    <span class="ruby-identifier">drop_join_table</span>(<span class="ruby-identifier">album_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">artist_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that the operations performed in the <code>down</code> block are
             performed in the reverse order of how they are performed in the

@@ -41,9 +41,7 @@
         <div id='text'>
           <div id='description'>
             
-            <p>Represents an identifier (column or table). Can be used to specify a
-            <code>Symbol</code> with multiple underscores should not be split, or for
-            creating an identifier without using a symbol.</p>
+            <p>Represents an identifier (column, table, schema, etc.).</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -77,7 +75,7 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      <p>The table or column to reference</p>
+                      <p>The identifier to reference</p>
                     </td>
                   </tr>
                 </table>
@@ -93,13 +91,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Set the value to the given argument</p>
+                  <p>Set the identifier to the given argument</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1517</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-ivar">@value</span> = <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1449</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-ivar">@value</span> = <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -118,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-function-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-function-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1524</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-function-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1456</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

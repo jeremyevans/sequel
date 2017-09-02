@@ -104,11 +104,11 @@
                   =).</p>
                   
                   <p>It&#39;s generally a bad idea to rely on a blacklist approach for security.
-                  Using a whitelist approach such as set_allowed_columns or the instance
-                  level set_only or set_fields methods is usually a better choice.  So use of
-                  this method is generally a bad idea.</p>
+                  Using a whitelist approach such as the whitelist_security plugin or the
+                  set_fields methods is usually a better choice.  So use of this method is
+                  generally a bad idea.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_restricted_columns</span>(:<span class="ruby-identifier">records_sold</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>, :<span class="ruby-identifier">hometown=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>, :<span class="ruby-identifier">records_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_restricted_columns</span>(:<span class="ruby-identifier">records_sold</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-identifier">hometown</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-identifier">records_sold</span><span class="ruby-operator">:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_restricted_columns-source'); return false">

@@ -37,18 +37,18 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The update_or_create plugin adds a couple of methods that make it easier to
-            deal with objects which may or may not yet exist in the database. The first
-            method is update_or_create, which updates an object if it exists in the
-            database, or creates the object if it does not.</p>
+            <p>The update_or_create plugin adds methods that make it easier to deal with
+            objects which may or may not yet exist in the database. The first method is
+            update_or_create, which updates an object if it exists in the database, or
+            creates the object if it does not.</p>
             
             <p>You can call update_or_create with a block:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Hello&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_copies_sold</span> = <span class="ruby-value">1000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>or provide two hashes, with the second one being the attributes to set.</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>}, {:<span class="ruby-identifier">num_copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>})</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Hello&#39;</span>}, <span class="ruby-identifier">num_copies_sold</span><span class="ruby-operator">:</span> <span class="ruby-value">1000</span>)</pre>
             
             <p>In both cases, this will check the database to find the album with the name
             “Hello”. If such an album exists, it will be updated to set num_copies_sold

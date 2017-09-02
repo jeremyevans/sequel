@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:08 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -110,7 +110,7 @@
             
             <p>This feature is mostly useful for a different way to graph tables:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">b_id</span>).<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">splat</span>(:<span class="ruby-identifier">a</span>),&#x000A;                                   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">splat</span>(:<span class="ruby-identifier">b</span>))&#x000A;<span class="ruby-comment"># SELECT (a.*)::a, (b.*)::b FROM a INNER JOIN b ON (b.id = a.b_id)</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;{:id=&gt;1, :b_id=&gt;2}, :b=&gt;{:id=&gt;2}}</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">b</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">b_id</span>).<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">splat</span>(:<span class="ruby-identifier">a</span>),&#x000A;                                  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">splat</span>(:<span class="ruby-identifier">b</span>))&#x000A;<span class="ruby-comment"># SELECT (a.*)::a, (b.*)::b FROM a INNER JOIN b ON (b.id = a.b_id)</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;{:id=&gt;1, :b_id=&gt;2}, :b=&gt;{:id=&gt;2}}</span></pre>
             
             <p>Related module: <a
             href="../../../../classes/Sequel/Postgres/PGRowOp.html">Sequel::Postgres::PGRowOp</a></p>

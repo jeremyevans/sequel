@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-11-22 08:26:57 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -68,7 +68,7 @@
             underlying database.  Here&#39;s a list of all ruby classes that <a
             href="../../classes/Sequel.html">Sequel</a> will convert to database types:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">columns_types</span>) <span class="ruby-keyword">do</span>       <span class="ruby-comment"># common database type used</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a0</span>                         <span class="ruby-comment"># integer</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a1</span>                          <span class="ruby-comment"># varchar(255)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a2</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">50</span>               <span class="ruby-comment"># varchar(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a3</span>, :<span class="ruby-identifier">fixed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>            <span class="ruby-comment"># char(255)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a4</span>, :<span class="ruby-identifier">fixed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">50</span> <span class="ruby-comment"># char(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a5</span>, :<span class="ruby-identifier">text=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>             <span class="ruby-comment"># text</span>&#x000A;  <span class="ruby-constant">File</span> :<span class="ruby-identifier">b</span>                             <span class="ruby-comment"># blob</span>&#x000A;  <span class="ruby-constant">Fixnum</span> :<span class="ruby-identifier">c</span>                           <span class="ruby-comment"># integer</span>&#x000A;  <span class="ruby-constant">Bignum</span> :<span class="ruby-identifier">d</span>                           <span class="ruby-comment"># bigint</span>&#x000A;  <span class="ruby-constant">Float</span> :<span class="ruby-identifier">e</span>                            <span class="ruby-comment"># double precision</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f</span>                       <span class="ruby-comment"># numeric</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f2</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>           <span class="ruby-comment"># numeric(10)</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f3</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">10</span>, <span class="ruby-value">2</span>]      <span class="ruby-comment"># numeric(10, 2)</span>&#x000A;  <span class="ruby-constant">Date</span> :<span class="ruby-identifier">g</span>                             <span class="ruby-comment"># date</span>&#x000A;  <span class="ruby-constant">DateTime</span> :<span class="ruby-identifier">h</span>                         <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">i</span>                             <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">i2</span>, :<span class="ruby-identifier">only_time=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>          <span class="ruby-comment"># time</span>&#x000A;  <span class="ruby-constant">Numeric</span> :<span class="ruby-identifier">j</span>                          <span class="ruby-comment"># numeric</span>&#x000A;  <span class="ruby-constant">TrueClass</span> :<span class="ruby-identifier">k</span>                        <span class="ruby-comment"># boolean</span>&#x000A;  <span class="ruby-constant">FalseClass</span> :<span class="ruby-identifier">l</span>                       <span class="ruby-comment"># boolean</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">columns_types</span>) <span class="ruby-keyword">do</span>     <span class="ruby-comment"># common database type used</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a0</span>                       <span class="ruby-comment"># integer</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a1</span>                        <span class="ruby-comment"># varchar(255)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a2</span>, <span class="ruby-identifier">size</span><span class="ruby-operator">:</span> <span class="ruby-value">50</span>              <span class="ruby-comment"># varchar(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a3</span>, <span class="ruby-identifier">fixed</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>           <span class="ruby-comment"># char(255)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a4</span>, <span class="ruby-identifier">fixed</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>, <span class="ruby-identifier">size</span><span class="ruby-operator">:</span> <span class="ruby-value">50</span> <span class="ruby-comment"># char(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a5</span>, <span class="ruby-identifier">text</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>            <span class="ruby-comment"># text</span>&#x000A;  <span class="ruby-constant">File</span> :<span class="ruby-identifier">b</span>                           <span class="ruby-comment"># blob</span>&#x000A;  <span class="ruby-constant">Fixnum</span> :<span class="ruby-identifier">c</span>                         <span class="ruby-comment"># integer</span>&#x000A;  <span class="ruby-constant">Bignum</span> :<span class="ruby-identifier">d</span>                         <span class="ruby-comment"># bigint</span>&#x000A;  <span class="ruby-constant">Float</span> :<span class="ruby-identifier">e</span>                          <span class="ruby-comment"># double precision</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f</span>                     <span class="ruby-comment"># numeric</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f2</span>, <span class="ruby-identifier">size</span><span class="ruby-operator">:</span> <span class="ruby-value">10</span>          <span class="ruby-comment"># numeric(10)</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f3</span>, <span class="ruby-identifier">size</span><span class="ruby-operator">:</span> [<span class="ruby-value">10</span>, <span class="ruby-value">2</span>]     <span class="ruby-comment"># numeric(10, 2)</span>&#x000A;  <span class="ruby-constant">Date</span> :<span class="ruby-identifier">g</span>                           <span class="ruby-comment"># date</span>&#x000A;  <span class="ruby-constant">DateTime</span> :<span class="ruby-identifier">h</span>                       <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">i</span>                           <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">i2</span>, <span class="ruby-identifier">only_time</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>         <span class="ruby-comment"># time</span>&#x000A;  <span class="ruby-constant">Numeric</span> :<span class="ruby-identifier">j</span>                        <span class="ruby-comment"># numeric</span>&#x000A;  <span class="ruby-constant">TrueClass</span> :<span class="ruby-identifier">k</span>                      <span class="ruby-comment"># boolean</span>&#x000A;  <span class="ruby-constant">FalseClass</span> :<span class="ruby-identifier">l</span>                     <span class="ruby-comment"># boolean</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that in addition to the ruby class name, <a
             href="../../classes/Sequel.html">Sequel</a> also pays attention to the
@@ -109,7 +109,7 @@
             </td></tr><tr><td class='label'>:null </td><td>
             <p>Mark the column as allowing NULL values (if true), or not allowing NULL
             values (if false).  If unspecified, will default to whatever the database
-            default is.</p>
+            default is (usually true).</p>
             </td></tr><tr><td class='label'>:primary_key </td><td>
             <p>Mark this column as the primary key.  This is used instead of the primary
             key method if you want a non-autoincrementing primary key.</p>
@@ -123,7 +123,7 @@
             <p>Mark the column as unique, generally has the same effect as creating a
             unique index on the column.</p>
             </td></tr><tr><td class='label'>:unique_constraint_name </td><td>
-            <p>The name to give the unique key constraint.</p>
+            <p>The name to give the unique constraint.</p>
             </td></tr></tbody></table>
             
             <h3 id="label-Other+methods">Other methods<span><a href="#label-Other+methods">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -140,21 +140,21 @@
             
             <p>If you want an autoincrementing 64-bit integer:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a0</span>){<span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Bignum</span>}</pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a0</span>){<span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">:</span> :<span class="ruby-constant">Bignum</span>}</pre>
             
             <p>If you want to create a primary key column that doesn&#39;t use an
             autoincrementing integer, you should not use this method.  Instead, you
             should use the :primary_key option to the <code>column</code> method or
             type method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a1</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">primary_key=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-comment"># Non autoincrementing integer primary key</span>&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a2</span>){<span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">primary_key=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-comment"># varchar(255) primary key</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a1</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>, <span class="ruby-identifier">primary_key</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>} <span class="ruby-comment"># Non autoincrementing integer primary key</span>&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a2</span>){<span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>, <span class="ruby-identifier">primary_key</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>} <span class="ruby-comment"># varchar(255) primary key</span></pre>
             
             <p>If you want to create a composite primary key, you should call the
             <code>primary_key</code> method with an array of column symbols.  You can
             provide a specific name to use for the primary key constraint via the :name
             option:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">group_id</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">position</span>&#x000A;  <span class="ruby-identifier">primary_key</span> [:<span class="ruby-identifier">group_id</span>, :<span class="ruby-identifier">position</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">items_pk</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">group_id</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">position</span>&#x000A;  <span class="ruby-identifier">primary_key</span> [:<span class="ruby-identifier">group_id</span>, :<span class="ruby-identifier">position</span>], <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">items_pk</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>If provided with an array, <code>primary_key</code> does not create a
             column, it just sets up the primary key constraint.</p>
@@ -171,7 +171,7 @@
             <p><code>foreign_key</code> accepts the same options as <code>column</code>. 
             For example, to have a unique foreign key with varchar(16) type:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">column_name</span>, :<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;varchar(16)&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">column_name</span>, :<span class="ruby-identifier">table</span>, <span class="ruby-identifier">unique</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;varchar(16)&#39;</span></pre>
             
             <p><code>foreign_key</code> also accepts some specific options:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>:deferrable </td><td>
@@ -203,12 +203,12 @@
             <p>When using an array of symbols, you can also provide a :name option to name
             the constraint:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">artist_name</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">artist_location</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> [:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_location</span>], :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;albums_artist_name_location_fkey&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">artist_name</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">artist_location</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> [:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_location</span>], :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;albums_artist_name_location_fkey&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>If you want to add a foreign key for a single column with a named
             constraint, you must use the array form with a single symbol:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">artist_id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;albums_artist_id_fkey&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">artist_id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;albums_artist_id_fkey&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-index"><code>index</code><span><a href="#label-index">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -216,7 +216,7 @@
             calling index is the same as using the <code>:index</code> option when
             creating the column:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">index=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-comment"># Same as:</span>&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">id</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">index=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}}&#x000A;<span class="ruby-comment"># Same as:</span>&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-comment"># Same as:</span>&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">id</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>, <span class="ruby-identifier">index</span><span class="ruby-operator">:</span> {<span class="ruby-identifier">unique</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>}}&#x000A;<span class="ruby-comment"># Same as:</span>&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">id</span>, <span class="ruby-identifier">unique</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Similar to the <code>primary_key</code> and <code>foreign_key</code>
             methods, calling <code>index</code> with an array of symbols will create a
@@ -242,7 +242,7 @@
             unique constraint generally operates identically to a unique index, so the
             following three <code>create_table</code> blocks are pretty much identical:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}&#x000A;&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>&#x000A;  <span class="ruby-identifier">unique</span> :<span class="ruby-identifier">a</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>, <span class="ruby-identifier">unique</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>}&#x000A;&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">a</span>, <span class="ruby-identifier">unique</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>&#x000A;  <span class="ruby-identifier">unique</span> :<span class="ruby-identifier">a</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Just like <code>index</code>, <code>unique</code> can set up a multiple
             column unique constraint, where the combination of the columns must be
@@ -282,18 +282,18 @@
             <p><code>create_join_table</code> is a shortcut that you can use to create
             simple many-to-many join tables:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_join_table</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">album_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">create_join_table</span>(<span class="ruby-identifier">artist_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">album_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums</span>)</pre>
             
             <p>which expands to:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">null=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-identifier">primary_key</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>]&#x000A;  <span class="ruby-identifier">index</span> [:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">albums</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>&#x000A;  <span class="ruby-identifier">primary_key</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>]&#x000A;  <span class="ruby-identifier">index</span> [:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h2 id="label-create_table+-3Aas-3D-3E"><code>create_table :as=&gt;</code><span><a href="#label-create_table+-3Aas-3D-3E">&para;</a> <a href="#top">&uarr;</a></span></h2>
+            <h2 id="label-create_table+-3Aas"><code>create_table :as</code><span><a href="#label-create_table+-3Aas">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>To create a table from the result of a SELECT query, instead of passing a
             block to <code>create_table</code>, provide a dataset to the :as option:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">older_items</span>, :<span class="ruby-identifier">as=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">updated_at</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">6</span>})</pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">older_items</span>, <span class="ruby-identifier">as</span><span class="ruby-operator">:</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">updated_at</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">6</span>})</pre>
             
             <h2 id="label-alter_table"><code>alter_table</code><span><a href="#label-alter_table">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -310,7 +310,7 @@
             argument is the column name, the second is the type, and the third is an
             options hash:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">copies_sold</span>, <span class="ruby-constant">Integer</span>, :<span class="ruby-identifier">default=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">copies_sold</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-identifier">default</span><span class="ruby-operator">:</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-drop_column"><code>drop_column</code><span><a href="#label-drop_column">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -343,6 +343,11 @@
             
             <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_primary_key</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             
+            <p>It is possible to specify a name for the primary key constraint: via the
+            :name option:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_primary_key</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums_artists_pkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
             <p>If you just want to take an existing single column and make it a primary
             key, call <code>add_primary_key</code> with an array with a single symbol:</p>
             
@@ -360,12 +365,12 @@
             provide an array with a single element.  It&#39;s encouraged to provide a
             name when adding the constraint, via the :name option:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums_artist_id_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_id_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>To set up a multiple column foreign key constraint, use an array with
             multiple column symbols:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> [:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_location</span>], :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums_artist_name_location_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> [:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_location</span>], :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_name_location_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-drop_foreign_key"><code>drop_foreign_key</code><span><a href="#label-drop_foreign_key">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -381,11 +386,11 @@
             href="../../classes/Sequel.html">Sequel</a> may be able to find the name
             through introspection:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums_artist_id_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_id_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>An array is also used to drop a composite foreign key constraint:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_foreign_key</span> [:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_location</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums_artist_name_location_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_foreign_key</span> [:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_location</span>], <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_name_location_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>If you do not provide a :name option and <a
             href="../../classes/Sequel.html">Sequel</a> is not able to determine the
@@ -403,7 +408,7 @@
             <code>index</code> method, and you can set up a multiple column index using
             an array:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_index</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums_artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_index</span> [:<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>], <span class="ruby-identifier">unique</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-drop_index"><code>drop_index</code><span><a href="#label-drop_index">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -416,7 +421,7 @@
             
             <p>To drop an index with a specific name, use the <code>:name</code> option:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_index</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artists_id_index</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_index</span> :<span class="ruby-identifier">artist_id</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artists_id_index</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-add_full_text_index-2C+add_spatial_index"><code>add_full_text_index</code>, <code>add_spatial_index</code><span><a href="#label-add_full_text_index-2C+add_spatial_index">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -433,8 +438,8 @@
             
             <p>There is no method to add an unnamed constraint, but you can pass
             <code>nil</code> as the first argument of <code>add_constraint</code> to do
-            so.  However, it&#39;s not recommended to do that as it is difficult to
-            drop such a constraint.</p>
+            so.  However, it&#39;s not recommended to do that as it is more difficult
+            to drop such a constraint.</p>
             
             <h3 id="label-add_unique_constraint"><code>add_unique_constraint</code><span><a href="#label-add_unique_constraint">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -443,6 +448,11 @@
             has the same effect as adding a unique index.</p>
             
             <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_unique_constraint</span> [:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>You can also specify a name via the :name option when adding the
+            constraint:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_unique_constraint</span> [:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">name</span>], <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_id_name_ukey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-drop_constraint"><code>drop_constraint</code><span><a href="#label-drop_constraint">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -458,7 +468,7 @@
             <p>On some databases, you must specify the type of constraint via a
             <code>:type</code> option:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">albums_pk</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">primary_key</span>)&#x000A;  <span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">albums_fk</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">foreign_key</span>)&#x000A;  <span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">albums_uk</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">unique</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">albums_pk</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">primary_key</span>)&#x000A;  <span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">albums_fk</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">foreign_key</span>)&#x000A;  <span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">albums_uk</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">unique</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-set_column_default"><code>set_column_default</code><span><a href="#label-set_column_default">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -544,9 +554,6 @@
             <code>IF NOT EXISTS</code>, on others it does a separate query to check for
             existence.</p>
             
-            <p>This should not be used inside migrations, as if the table does not exist,
-            it may mess up the migration.</p>
-            
             <h3 id="label-rename_table"><code>rename_table</code><span><a href="#label-rename_table">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>You can rename an existing table using <code>rename_table</code>.  Like
@@ -566,9 +573,6 @@
             
             <pre class="ruby"><span class="ruby-identifier">drop_table?</span>(:<span class="ruby-identifier">artists</span>)&#x000A;<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>It should not be used inside migrations, as if the table does not exist, it
-            may mess up the migration.</p>
-            
             <h3 id="label-create_table-3F"><code>create_table?</code><span><a href="#label-create_table-3F">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><code>create_table?</code> only creates the table if it does not already
@@ -579,8 +583,6 @@
             <p>is the same as:</p>
             
             <pre class="ruby"><span class="ruby-keyword">unless</span> <span class="ruby-identifier">table_exists?</span>(:<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>Like <code>create_table!</code>, it should not be used inside migrations.</p>
             
             <h3 id="label-create_view+and+create_or_replace_view"><code>create_view</code> and <code>create_or_replace_view</code><span><a href="#label-create_view+and+create_or_replace_view">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

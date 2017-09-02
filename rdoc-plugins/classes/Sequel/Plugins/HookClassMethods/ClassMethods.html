@@ -40,7 +40,6 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a href="#method-i-add_hook_type">add_hook_type</a></li>
               <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-has_hooks-3F">has_hooks?</a></li>
               <li><a href="#method-i-hook_blocks">hook_blocks</a></li>
@@ -57,45 +56,6 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-add_hook_type'>
-                <a name='method-i-add_hook_type'></a>
-                <div class='synopsis'>
-                  <span class='name'>add_hook_type</span>
-                  <span class='arguments'>(*hooks)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>This adds a new hook type. It will define both a class method that you can
-                  use to add hooks, as well as an instance method that you can use to call
-                  all hooks of that type.  The class method can be called with a symbol or a
-                  block or both.  If a block is given and and symbol is not, it adds the hook
-                  block to the hook type.  If a block and symbol are both given, it replaces
-                  the hook block associated with that symbol for a given hook type, or adds
-                  it if there is no hook block with that symbol for that hook type.  If no
-                  block is given, it assumes the symbol specifies an instance method to call
-                  and adds it to the hook type.</p>
-                  
-                  <p>If any before hook block returns false, the instance method will return
-                  false immediately without running the rest of the hooks of that type.</p>
-                  
-                  <p>It is recommended that you always provide a symbol to this method, for
-                  descriptive purposes.  It&#39;s only necessary to do so when you  are using
-                  a system that reloads code.</p>
-                  
-                  <p>Example of usage:</p>
-                  
-                  <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">MyModel</span>&#x000A; <span class="ruby-identifier">add_hook_type</span> :<span class="ruby-identifier">before_move_to</span>&#x000A; <span class="ruby-identifier">before_move_to</span>(:<span class="ruby-identifier">check_move_allowed</span>, <span class="ruby-operator">&amp;</span>:<span class="ruby-identifier">allow_move?</span>)&#x000A; <span class="ruby-keyword">def</span> <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">there</span>)&#x000A;   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">before_move_to</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;   <span class="ruby-comment"># move MyModel object to there</span>&#x000A; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                  
-                  <p>Do not call this method with untrusted input, as that can result in
-                  arbitrary code execution.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_hook_type-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-add_hook_type-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_hook_type</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">hooks</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Model.add_hook_type&quot;</span>, <span class="ruby-string">&quot;You should add your own hook types manually&quot;</span>)&#x000A;  <span class="ruby-identifier">hooks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hook</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>] = []&#x000A;    <span class="ruby-identifier">instance_eval</span>(<span class="ruby-node">&quot;def #{hook}(method = nil, &amp;block); add_hook(:#{hook}, method, &amp;block) end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;    <span class="ruby-identifier">class_eval</span>(<span class="ruby-node">&quot;def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&amp;b) == false} end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-freeze'>
                 <a name='method-i-freeze'></a>
                 <div class='synopsis'>
@@ -110,7 +70,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@hooks</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@hooks</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-has_hooks-3F'>
@@ -127,7 +87,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-has_hooks-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-has_hooks-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_hooks?</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-has_hooks-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 55</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_hooks?</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hook_blocks'>
@@ -144,7 +104,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hook_blocks-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-hook_blocks-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-hook_blocks-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

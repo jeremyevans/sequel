@@ -66,13 +66,13 @@
                   
                   <p>Do the bitwise compliment of the self</p>
                   
-                  <pre class="ruby"><span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-comment"># ~&quot;a&quot;</span></pre>
+                  <pre class="ruby"><span class="ruby-operator">~</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">sql_number</span>) <span class="ruby-comment"># ~&quot;a&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7E-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 305</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">~</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;B~&#39;</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 266</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">~</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;B~&#39;</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -78,7 +78,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -96,7 +96,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-blob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-datetime'>
@@ -113,7 +113,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-datetime-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-datetime-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">datetime</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-datetime-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">datetime</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-decimal'>
@@ -130,7 +130,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-decimal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-decimal-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">decimal</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-decimal-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">decimal</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-result_value_of'>
@@ -148,7 +148,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-result_value_of-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-result_value_of-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">result_value_of</span>(<span class="ruby-identifier">declared_type</span>, <span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>)&#x000A;    <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">declared_type</span>&#x000A;    (<span class="ruby-identifier">meth</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">sql_to_method</span>(<span class="ruby-identifier">declared_type</span>.<span class="ruby-identifier">downcase</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">value</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-result_value_of-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">result_value_of</span>(<span class="ruby-identifier">declared_type</span>, <span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>)&#x000A;    <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">declared_type</span>&#x000A;    (<span class="ruby-identifier">meth</span> = <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">sql_to_method</span>(<span class="ruby-identifier">declared_type</span>.<span class="ruby-identifier">downcase</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">value</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-time'>
@@ -164,7 +164,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-time-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

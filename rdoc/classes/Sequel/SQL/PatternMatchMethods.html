@@ -45,9 +45,9 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">=~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a = 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NULL)</span></pre>
             
-            <p>On Ruby 1.9+, this also adds the !~ method, for easily setting up not
-            equals, exclusion, and inverse pattern matching.  This is the same as as
-            inverting the result of the =~ method</p>
+            <p>This also adds the !~ method, for easily setting up not equals, exclusion,
+            and inverse pattern matching.  This is the same as as inverting the result
+            of the =~ method</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">!~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a NOT IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NOT NULL)</span></pre>
           </div>
@@ -55,6 +55,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#method-i-21-7E">!~</a></li>
               <li><a href="#method-i-3D-7E">=~</a></li>
             </ol>
           </div>
@@ -63,6 +64,22 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-21-7E'>
+                <a name='method-i-21-7E'></a>
+                <div class='synopsis'>
+                  <span class='name'>!~</span>
+                  <span class='arguments'>(other)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-21-7E-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-21-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 810</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">!~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-operator">~</span>(<span class="ruby-keyword">self</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-3D-7E'>
                 <a name='method-i-3D-7E'></a>
                 <div class='synopsis'>
@@ -78,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-3D-7E-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-3D-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 857</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-3D-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 806</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

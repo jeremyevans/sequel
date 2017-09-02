@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-04-05 14:25:55 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -63,24 +63,16 @@
             so:</p>
             <ul><li>
             <p><a
-            href="../../classes/Sequel/Schema/CreateTableGenerator.html#method-c-add_type_method">Sequel::Schema::CreateTableGenerator.add_type_method</a></p>
-            </li><li>
-            <p><a
-            href="../../classes/Sequel/Dataset.html#method-c-def_mutation_method">Sequel::Dataset.def_mutation_method</a></p>
-            </li><li>
-            <p><a
             href="../../classes/Sequel/Dataset.html#method-c-def_sql_method">Sequel::Dataset.def_sql_method</a></p>
             </li><li>
-            <p>Sequel::Model::Plugins.def_dataset_methods</p>
-            </li><li>
-            <p>Sequel.def_adapter_method (private)</p>
-            </li><li>
-            <p>Sequel::SQL::Expression.to_s_method (private)</p>
-            </li><li>
-            <p>Sequel::Plugins::HookClassMethods::ClassMethods#add_hook_type</p>
+            <p>Sequel::JDBC.load_driver</p>
             </li><li>
             <p><a
             href="../../classes/Sequel/Plugins.html#method-c-def_dataset_methods">Sequel::Plugins.def_dataset_methods</a></p>
+            </li><li>
+            <p>Sequel::Dataset.prepared_statements_module (private)</p>
+            </li><li>
+            <p>Sequel::SQL::Expression.to_s_method (private)</p>
             </li></ul>
             
             <p>As long as you don&#39;t call those with user input, you should not be
@@ -110,6 +102,15 @@
             execute raw SQL strings, including:</p>
             <ul><li>
             <p>Sequel::Database#execute</p>
+            </li><li>
+            <p><a
+            href="../../classes/Sequel/Database.html#method-i-execute_ddl">Sequel::Database#execute_ddl</a></p>
+            </li><li>
+            <p><a
+            href="../../classes/Sequel/Database.html#method-i-execute_dui">Sequel::Database#execute_dui</a></p>
+            </li><li>
+            <p><a
+            href="../../classes/Sequel/Database.html#method-i-execute_insert">Sequel::Database#execute_insert</a></p>
             </li><li>
             <p><a
             href="../../classes/Sequel/Database.html#method-i-run">Sequel::Database#run</a></p>
@@ -143,7 +144,7 @@
             
             <p>Here are some examples of use:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">execute</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch_rows</span>(<span class="ruby-string">&#39;SQL&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_all</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_delete</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_each</span>(<span class="ruby-string">&#39;SQL&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_insert</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_update</span>(<span class="ruby-string">&#39;SQL&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">execute</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">execute_ddl</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">execute_dui</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">execute_insert</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch_rows</span>(<span class="ruby-string">&#39;SQL&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_all</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_delete</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_each</span>(<span class="ruby-string">&#39;SQL&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_insert</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-string">&#39;SQL&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql_update</span>(<span class="ruby-string">&#39;SQL&#39;</span>)</pre>
             
             <p>If you pass a string to these methods that is derived from user input, you
             open yourself up to SQL injection.  These methods are not designed to work
@@ -185,21 +186,19 @@
             strings as SQL strings (escaping them correctly), and not as raw SQL. 
             However, you can convert a ruby string to a literal string, and <a
             href="../../classes/Sequel.html">Sequel</a> will then treat it as raw SQL. 
-            This is typically done through String#lit if the <a
-            href="core_extensions_rdoc.html">core_extensions</a> are in use, or <a
-            href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
-            if they are not in use.</p>
+            This is typically done through <a
+            href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>.</p>
             
-            <pre class="ruby"><span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">lit</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)</pre>
             
-            <p>Using String#lit or <a
+            <p>Using <a
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
             to turn a ruby string into a literal string results in SQL injection if the
             string is derived from user input.  With both of these methods, the strings
             can contain placeholders, which you can use to safely include user input
             inside a literal string:</p>
             
-            <pre class="ruby"><span class="ruby-string">&#39;a = ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user_id</span>].<span class="ruby-identifier">to_s</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = ?&#39;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user_id</span>].<span class="ruby-identifier">to_s</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = ?&#39;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user_id</span>].<span class="ruby-identifier">to_s</span>)</pre>
             
             <p>Even though they have similar names, note that <a
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>
@@ -216,33 +215,64 @@
             
             <h4 id="label-SQL+Filter+Fragments">SQL Filter Fragments<span><a href="#label-SQL+Filter+Fragments">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>The most common way to use raw SQL with <a
-            href="../../classes/Sequel.html">Sequel</a> is in filters:</p>
+            <p>Starting in <a href="../../classes/Sequel.html">Sequel</a> 5, <a
+            href="../../classes/Sequel.html">Sequel</a> does not automatically convert
+            plain strings to literal strings in typical code.  Instead, you can use
+            Sequel.lit to create literal strings:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;M&#39;&quot;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; &#39;A&#39;&quot;</span>)</pre>
             
-            <p>If a filter method is passed a string as the first argument, it treats the
-            rest of the arguments (if any) as placeholders to the string.  So you
-            should never do:</p>
+            <p>To safely include user input as part of an SQL filter fragment, use
+            Sequel.lit with placeholders:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-node">&quot;name &gt; #{params[:id].to_s}&quot;</span>) <span class="ruby-comment"># SQL Injection!</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_s</span>)) <span class="ruby-comment"># Safe</span></pre>
             
-            <p>Instead, you should use a placeholder:</p>
+            <p>Be careful to never call Sequel.lit where the first argument is derived
+            from user input.</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span></pre>
+            <p>There are a few uncommon cases where <a
+            href="../../classes/Sequel.html">Sequel</a> will still convert plain
+            strings to literal strings.</p>
             
-            <p>Note that for that type of query, <a
-            href="../../classes/Sequel.html">Sequel</a> generally encourages the
-            following form:</p>
+            <h4 id="label-SQL+Fragment+passed+to+Dataset-23lock_style+and+Model-23lock-21">SQL Fragment passed to Dataset#lock_style and Model#lock!<span><a href="#label-SQL+Fragment+passed+to+Dataset-23lock_style+and+Model-23lock-21">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_s</span>} <span class="ruby-comment"># Safe</span></pre>
+            <p>The <a
+            href="../../classes/Sequel/Dataset.html#method-i-lock_style">Sequel::Dataset#lock_style</a>
+            and Sequel::Model#lock! methods also treat an input string as SQL code.
+            This method should not be called with user input.</p>
             
-            <p>Sequel&#39;s DSL supports a wide variety of SQL concepts, so it&#39;s
-            possible to code most applications without ever using raw SQL.</p>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">lock_style</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>]) <span class="ruby-comment"># SQL injection!</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">lock!</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>]) <span class="ruby-comment"># SQL injection!</span></pre>
             
-            <p>A large number of dataset methods ultimately pass down their arguments to a
-            filter method, even some you may not expect, so you should be careful.  At
-            least the following methods pass their arguments to a filter method:</p>
+            <h4 id="label-SQL+Type+Names">SQL Type Names<span><a href="#label-SQL+Type+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>In general, most places where <a
+            href="../../classes/Sequel.html">Sequel</a> needs to use an SQL type that
+            should be specified by the user, it allows you to use a ruby string, and
+            that string is used verbatim as the SQL type.  You should not use user
+            input for type strings.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>])) <span class="ruby-comment"># SQL injection!</span></pre>
+            
+            <h4 id="label-SQL+Function+Names">SQL Function Names<span><a href="#label-SQL+Function+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>In most cases, <a href="../../classes/Sequel.html">Sequel</a> does not
+            quote SQL function names.  You should not use user input for function
+            names.</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>])) <span class="ruby-comment"># SQL injection!</span></pre>
+            
+            <h4 id="label-auto_literal_strings+extension">auto_literal_strings extension<span><a href="#label-auto_literal_strings+extension">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>If the auto_literal_strings extension is used for backwards compatibility,
+            then <a href="../../classes/Sequel.html">Sequel</a> will treat plain
+            strings as literal strings if they are used as the first argument to a
+            filtering method.  This can lead to SQL injection:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-node">&quot;name &gt; #{params[:id].to_s}&quot;</span>)&#x000A;<span class="ruby-comment"># SQL injection when using auto_literal_strings extension</span></pre>
+            
+            <p>If you are using the auto_literal_strings extension, you need to be very
+            careful, as the following methods will treat a plain string given as the
+            first arguments as a literal strings:</p>
             <ul><li>
             <p><a
             href="../../classes/Sequel/Dataset.html#method-i-where">Sequel::Dataset#where</a></p>
@@ -257,13 +287,7 @@
             href="../../classes/Sequel/Dataset.html#method-i-exclude">Sequel::Dataset#exclude</a></p>
             </li><li>
             <p><a
-            href="../../classes/Sequel/Dataset.html#method-i-exclude_where">Sequel::Dataset#exclude_where</a></p>
-            </li><li>
-            <p><a
             href="../../classes/Sequel/Dataset.html#method-i-exclude_having">Sequel::Dataset#exclude_having</a></p>
-            </li><li>
-            <p><a
-            href="../../classes/Sequel/Dataset.html#method-i-and">Sequel::Dataset#and</a></p>
             </li><li>
             <p><a
             href="../../classes/Sequel/Dataset.html#method-i-or">Sequel::Dataset#or</a></p>
@@ -278,62 +302,41 @@
             href="../../classes/Sequel/Dataset.html#method-i-5B-5D">Sequel::Dataset#[]</a></p>
             </li></ul>
             
+            <p>Even stuff that looks like it may be safe isn&#39;t:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">first</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">num_rows</span>])&#x000A;<span class="ruby-comment"># SQL injection when using auto_literal_strings extension</span></pre>
+            
             <p>The <a
             href="../../classes/Sequel/Model/ClassMethods.html#method-i-find">Model.find</a>
             and <a
             href="../../classes/Sequel/Model/ClassMethods.html#method-i-find_or_create">Model.find_or_create</a>
-            class methods also call down to the filter methods.</p>
+            class methods also will treat string arguments as literal strings if the
+            auto_literal_strings extension is used:</p>
             
-            <p>The no_auto_string_literals extension can be used to remove the default
-            support  for plain strings as literal strings in filter methods.</p>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>])&#x000A;<span class="ruby-comment"># SQL injection when using auto_literal_strings extension</span></pre>
             
-            <h4 id="label-SQL+Fragment+passed+to+Dataset-23update">SQL Fragment passed to Dataset#update<span><a href="#label-SQL+Fragment+passed+to+Dataset-23update">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <p>Similar to the filter methods, <a
+            <p>Similar to the filter methods, the auto_literal_strings extension also
+            makes <a
             href="../../classes/Sequel/Dataset.html#method-i-update">Sequel::Dataset#update</a>
-            also treats a string argument as raw SQL:</p>
+            treats a string argument as raw SQL:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;column = 1&quot;</span>)</pre>
             
             <p>So you should not do:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-node">&quot;column = #{params[:value].to_s}&quot;</span>) <span class="ruby-comment"># SQL Injection!</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">changes</span>])&#x000A;<span class="ruby-comment"># SQL injection when using auto_literal_strings extension</span></pre>
+            
+            <p>or:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-node">&quot;column = #{params[:value].to_s}&quot;</span>)&#x000A;<span class="ruby-comment"># SQL injection when using auto_literal_strings extension</span></pre>
             
             <p>Instead, you should do:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">value</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span></pre>
             
-            <p>The no_auto_string_literals extension can also be used to remove the
-            default support for plain strings as literal strings in update methods.</p>
-            
-            <h4 id="label-SQL+Fragment+passed+to+Dataset-23lock_style+and+Model-23lock-21">SQL Fragment passed to Dataset#lock_style and Model#lock!<span><a href="#label-SQL+Fragment+passed+to+Dataset-23lock_style+and+Model-23lock-21">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <p>The <a
-            href="../../classes/Sequel/Dataset.html#method-i-lock_style">Sequel::Dataset#lock_style</a>
-            and Sequel::Model#lock! methods also treat an input string as SQL code.
-            This method should not be called with user input.</p>
-            
-            <h4 id="label-SQL+Fragment+passed+to+Virtual+Row+-23-60+method">SQL Fragment passed to Virtual Row #` method<span><a href="#label-SQL+Fragment+passed+to+Virtual+Row+-23-60+method">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <p>Virtual row blocks currently support a #` method for using literal SQL:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%x`some SQL`</span>}</pre>
-            
-            <p>This method should not be called with user input.</p>
-            
-            <h4 id="label-SQL+Type+Names">SQL Type Names<span><a href="#label-SQL+Type+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <p>In general, most places where <a
-            href="../../classes/Sequel.html">Sequel</a> needs to use an SQL type that
-            should be specified by the user, it allows you to use a ruby string, and
-            that string is used verbatim as the SQL type.  You should not use user
-            input for type strings.</p>
-            
-            <h4 id="label-SQL+Function+Names">SQL Function Names<span><a href="#label-SQL+Function+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <p>In most cases, <a href="../../classes/Sequel.html">Sequel</a> does not
-            quote SQL function names.  You should not use user input for function
-            names.</p>
+            <p>Because using the auto_literal_strings extension makes SQL injection so
+            much eaiser, it is recommended to not use it, and instead use Sequel.lit
+            with placeholders.</p>
             
             <h3 id="label-SQL+Identifier+Injections">SQL Identifier Injections<span><a href="#label-SQL+Identifier+Injections">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -363,10 +366,10 @@
             <p>Note how the identifier is still quoted in these cases.  <a
             href="../../classes/Sequel.html">Sequel</a> quotes identifiers by default
             on most databases.  However, it does not quote identifiers by default on
-            DB2 and Informix. On those databases using an identifier derived from user
-            input can lead to SQL injection. Similarly, if you turn off identifier
-            quoting manually on other databases, you open yourself up to SQL injection
-            if you use identifiers derived from user input.</p>
+            DB2. On those databases using an identifier derived from user input can
+            lead to SQL injection. Similarly, if you turn off identifier quoting
+            manually on other databases, you open yourself up to SQL injection if you
+            use identifiers derived from user input.</p>
             
             <p>When <a href="../../classes/Sequel.html">Sequel</a> quotes identifiers,
             using an identifier derived from user input does not lead to SQL injection,
@@ -395,6 +398,10 @@
             However, if you are creating symbols from user input, you at least have a
             denial of service vulnerability in ruby &lt;2.2, and possibly a more
             serious vulnerability.</p>
+            
+            <p>Note that many Database schema modification methods (e.g. create_table,
+            add_column) also allow for SQL identifier injections, and possibly also SQL
+            code injections. These methods should never be called with user input.</p>
             
             <h2 id="label-Denial+of+Service">Denial of Service<span><a href="#label-Denial+of+Service">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -430,7 +437,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-keyword">alias</span>]))</pre>
             
-            <p>Then you have a denial of service vulnerability.  In general, such a
+            <p>Then you can have a denial of service vulnerability.  In general, such a
             vulnerability is unlikely, because you are probably indexing into the
             returned hash(es) by name, and if an alias was used and you didn&#39;t
             expect it, your application wouldn&#39;t work.</p>
@@ -499,29 +506,16 @@
             entries in the first argument (<code>params[:album]</code> in this
             example).</p>
             
-            <p>In addition to these two methods, you can also use  <a
-            href="../../classes/Sequel/Model/InstanceMethods.html#method-i-set_only">Model#set_only</a>
-            or <a
-            href="../../classes/Sequel/Model/InstanceMethods.html#method-i-update_only">Model#update_only</a>,
-            which are similar but iterate over the entries in the first argument,
-            checking the second argument to see if setting the entries is allowed.</p>
+            <p>If you want to override the columns that <a
+            href="../../classes/Sequel/Model/InstanceMethods.html#method-i-set">Model#set</a>
+            allows by default during mass assignment, you can use the
+            whitelist_security plugin, then call the set_allowed_columns class method.</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>], [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>])&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">update_only</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>], [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>])</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">whitelist_security</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>]) <span class="ruby-comment"># Only name and copies_sold set</span></pre>
             
-            <p>If you expect all entries in the second argument to be present in the first
-            argument, use <code>set_fields</code> or <code>update_fields</code>.  If
-            you are not sure if all arguments in the second argument will be present in
-            the first argument, but do not want to allow setting any column other than
-            the ones listed in the second argument, use <code>set_only</code> or
-            <code>update_only</code>.</p>
-            
-            <p>You can override the columns to allow by default during mass assignment via
-            the <a
-            href="../../classes/Sequel/Model/ClassMethods.html#method-i-set_allowed_columns">Model.set_allowed_columns</a>
-            class method.  This is a good practice, though being explicit on a per-call
-            basis is still recommended:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>]) <span class="ruby-comment"># Only name and copies_sold set</span></pre>
+            <p>Being explicit on a per-call basis using the set_fields and update_fields
+            methods is recommended instead of using the whitelist_security plugin and
+            setting a global whitelist.</p>
             
             <p>For more details on the mass assignment methods, see the <a
             href="mass_assignment_rdoc.html">Mass Assignment Guide</a>.</p>
@@ -536,7 +530,8 @@
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>])</pre>
             
             <p>is probably a bad idea.  Assuming you are using a web framework,
-            <code>params[:id]</code> could be a string, an array, a hash, or nil.</p>
+            <code>params[:id]</code> could be a string, an array, a hash, nil, or
+            potentially something else.</p>
             
             <p>Assuming that <code>id</code> is an integer field, you probably want to do:</p>
             
@@ -550,7 +545,7 @@
             <p>If you are trying to use an IN clause with a list of id values based on
             input provided on a web form:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">ids</span>].<span class="ruby-identifier">to_a</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">to_i</span>})</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">ids</span>].<span class="ruby-identifier">to_a</span>.<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span>:<span class="ruby-identifier">to_i</span>))</pre>
             
             <p>Basically, be as explicit as possible. While there aren&#39;t any known
             security issues in <a href="../../classes/Sequel.html">Sequel</a> when you

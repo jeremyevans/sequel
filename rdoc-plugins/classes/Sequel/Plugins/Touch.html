@@ -52,7 +52,7 @@
             
             <p>Usage:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Allow touching of all model instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Album instances, with a custom column</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, :<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">updated_on</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Artist instances, updating the albums and tags</span>&#x000A;<span class="ruby-comment"># associations when touching, touching the +updated_on+ column for</span>&#x000A;<span class="ruby-comment"># albums and the +updated_at+ column for tags</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>[{:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">updated_on</span>}, :<span class="ruby-identifier">tags</span>]</pre>
+            <pre class="ruby"><span class="ruby-comment"># Allow touching of all model instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Album instances, with a custom column</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, <span class="ruby-identifier">column</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">updated_on</span>&#x000A;&#x000A;<span class="ruby-comment"># Allow touching of Artist instances, updating the albums and tags</span>&#x000A;<span class="ruby-comment"># associations when touching, touching the +updated_on+ column for</span>&#x000A;<span class="ruby-comment"># albums and the +updated_at+ column for tags</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, <span class="ruby-identifier">associations</span><span class="ruby-operator">:</span> [{<span class="ruby-identifier">albums</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">updated_on</span>}, :<span class="ruby-identifier">tags</span>]</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -72,23 +72,6 @@
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TOUCH_COLUMN_DEFAULT</td>
-                    <td>=</td>
-                    <td class='context-item-value'>:updated_at</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The default column to update when touching</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
               <div class='method public-class' id='method-method-c-apply'>
@@ -104,7 +87,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -131,7 +114,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:updated_at</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:updated_at</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

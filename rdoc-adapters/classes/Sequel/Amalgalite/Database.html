@@ -39,12 +39,7 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p><a href="Database.html">Database</a> class for <a
-            href="../SQLite.html">SQLite</a> databases used with <a
-            href="../../Sequel.html">Sequel</a> and the amalgalite driver.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
@@ -67,20 +62,6 @@
             </div>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DatasetClass</td>
-                    <td>=</td>
-                    <td class='context-item-value'>self</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-connect'>
@@ -101,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>] = <span class="ruby-string">&#39;:memory:&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>])&#x000A;  <span class="ruby-identifier">db</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>])&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">busy_handler</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">BusyTimeout</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:timeout</span>, <span class="ruby-value">5000</span>)<span class="ruby-operator">/</span><span class="ruby-value">50</span>, <span class="ruby-value">50</span>))&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">type_map</span> = <span class="ruby-constant">SequelTypeMap</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db</span>){<span class="ruby-identifier">db</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">s</span>)}}&#x000A;  <span class="ruby-identifier">db</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>] = <span class="ruby-string">&#39;:memory:&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">blank_object?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>])&#x000A;  <span class="ruby-identifier">db</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>])&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">busy_handler</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Amalgalite</span><span class="ruby-operator">::</span><span class="ruby-constant">BusyTimeout</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:timeout</span>, <span class="ruby-value">5000</span>)<span class="ruby-operator">/</span><span class="ruby-value">50</span>, <span class="ruby-value">50</span>))&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">type_map</span> = <span class="ruby-constant">SequelTypeMap</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">db</span>){<span class="ruby-identifier">db</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">s</span>)}}&#x000A;  <span class="ruby-identifier">db</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-database_type'>
@@ -112,15 +93,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../Amalgalite.html">Amalgalite</a> is just the <a
-                  href="../SQLite.html">SQLite</a> database without a separate <a
-                  href="../SQLite.html">SQLite</a> installation.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:sqlite</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:sqlite</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute'>
@@ -131,14 +109,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Run the given <a href="../SQL.html">SQL</a> with the given arguments and
-                  yield each row.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">stmt</span> = <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>)})&#x000A;    <span class="ruby-keyword">ensure</span>&#x000A;      <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">close</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">stmt</span> = <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>)})&#x000A;    <span class="ruby-keyword">ensure</span>&#x000A;      <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">close</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_ddl'>
@@ -149,14 +125,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Run the given <a href="../SQL.html">SQL</a> with the given arguments.
-                  Returns nil.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_ddl-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_ddl-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_ddl-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_dui'>
@@ -167,14 +141,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Run the given <a href="../SQL.html">SQL</a> with the given arguments and
-                  return the number of changed rows.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 99</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">sql</span>)}; <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">row_changes</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">sql</span>)}; <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">row_changes</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_insert'>
@@ -185,14 +157,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Run the given <a href="../SQL.html">SQL</a> with the given arguments and
-                  return the last inserted row id.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">sql</span>)}; <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">last_insert_rowid</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_batch</span>(<span class="ruby-identifier">sql</span>)}; <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">last_insert_rowid</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-single_value'>
@@ -210,7 +180,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-single_value-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-single_value-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">single_value</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">first_value_from</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-single_value-source'><span class="ruby-comment"># File lib/sequel/adapters/amalgalite.rb, line 111</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">single_value</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">first_value_from</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

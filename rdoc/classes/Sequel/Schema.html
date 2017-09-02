@@ -52,44 +52,9 @@
             <ol>
               <li><a href="Schema/AlterTableGenerator.html">Sequel::Schema::AlterTableGenerator</a></li>
               <li><a href="Schema/CreateTableGenerator.html">Sequel::Schema::CreateTableGenerator</a></li>
-              <li><a href="Schema/CreateTableGenerator.html">Sequel::Schema::Generator</a></li>
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>Generator</td>
-                    <td>=</td>
-                    <td class='context-item-value'>CreateTableGenerator</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Schema/CreateTableGenerator.html">Schema::CreateTableGenerator</a>
-                      is an internal class that the user is not expected to instantiate directly.
-                      Instances are created by <a
-                      href="Database.html#method-i-create_table">Sequel::Database#create_table</a>.
-                      It is used to specify table creation parameters.  It takes a <a
-                      href="Database.html">Database</a> object and a block of
-                      column/index/constraint specifications, and gives the <a
-                      href="Database.html">Database</a> a table description, which the database
-                      uses to create a table.</p>
-                      
-                      <p><a href="Schema/CreateTableGenerator.html">Schema::CreateTableGenerator</a>
-                      has some methods but also includes method_missing, allowing users to
-                      specify column type as a method instead of using the column method, which
-                      makes for a nicer DSL.</p>
-                      
-                      <p>For more information on Sequel&#39;s support for schema modification, see
-                      the <a href="../../files/doc/schema_modification_rdoc.html">“Schema
-                      Modification” guide</a>.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -72,7 +72,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 230</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>&#x000A;  <span class="ruby-ivar">@actions</span> = []&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 228</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>&#x000A;  <span class="ruby-ivar">@actions</span> = []&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -89,7 +89,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-reverse-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-reverse-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 234</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>&#x000A;  <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-reverse-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 232</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>&#x000A;  <span class="ruby-comment"># Allow calling private methods as the reversing methods are private</span>&#x000A;  <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

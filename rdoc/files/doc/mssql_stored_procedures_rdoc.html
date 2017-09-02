@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-02 10:46:37 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -49,7 +49,7 @@
             
             <p>Execute it as follows:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {:<span class="ruby-identifier">args</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&#39;Input String&#39;</span>, :<span class="ruby-identifier">output</span>]})</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {<span class="ruby-identifier">args</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, :<span class="ruby-identifier">output</span>]})</pre>
             
             <p>Use the <code>:output</code> symbol to denote an output variable. The
             result will contain a hash of the output variables, as well as the result
@@ -60,7 +60,7 @@
             <p>Output variables will be strings by default. To specify their type, include
             the SQL type:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {:<span class="ruby-identifier">args</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [:<span class="ruby-identifier">output</span>, <span class="ruby-string">&#39;int&#39;</span>]]})</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {<span class="ruby-identifier">args</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [:<span class="ruby-identifier">output</span>, <span class="ruby-string">&#39;int&#39;</span>]]})</pre>
             
             <p>Result:</p>
             
@@ -70,7 +70,7 @@
             position in the parameter list. To name the output variable, include their
             name:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {:<span class="ruby-identifier">args</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [:<span class="ruby-identifier">output</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;Output&#39;</span>]]})</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {<span class="ruby-identifier">args</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [:<span class="ruby-identifier">output</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;Output&#39;</span>]]})</pre>
             
             <p>Result:</p>
             

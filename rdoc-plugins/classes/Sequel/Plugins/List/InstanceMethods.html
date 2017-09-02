@@ -42,6 +42,7 @@
             <ol>
               <li><a href="#method-i-after_destroy">after_destroy</a></li>
               <li><a href="#method-i-at_position">at_position</a></li>
+              <li><a href="#method-i-before_validation">before_validation</a></li>
               <li><a href="#method-i-last_position">last_position</a></li>
               <li><a href="#method-i-list_dataset">list_dataset</a></li>
               <li><a href="#method-i-move_down">move_down</a></li>
@@ -93,6 +94,24 @@
                     [show source]
                   </a>
                   <pre id='method-i-at_position-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">at_position</span>(<span class="ruby-identifier">p</span>)&#x000A;  <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">position_field</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">p</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-before_validation'>
+                <a name='method-i-before_validation'></a>
+                <div class='synopsis'>
+                  <span class='name'>before_validation</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the value of the position_field to the maximum value plus 1 unless the
+                  position field already has a value.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_validation-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 174</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_validation</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;    <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-last_position'>

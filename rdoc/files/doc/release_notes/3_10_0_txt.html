@@ -162,19 +162,16 @@
             <p>Dataset#first_source_table was added, giving you the unaliased version of
             the table for the first source.</p>
             </li><li>
-            <p>Add <a
-            href="../../../classes/Sequel/BasicObject.html#method-c-remove_methods-21">Sequel::BasicObject.remove_methods!</a>,
-            useful on ruby 1.8 if you require other libraries after <a
-            href="../../../classes/Sequel.html">Sequel</a> that add methods to Object.
-            For example, if YAML is required after sequel, then the following will
-            raise an error:</p>
+            <p>Add Sequel::BasicObject.remove_methods!, useful on ruby 1.8 if you require
+            other libraries after <a href="../../../classes/Sequel.html">Sequel</a>
+            that add methods to Object. For example, if YAML is required after sequel,
+            then the following will raise an error:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">y</span>}</pre>
             
-            <p>because YAML adds the y method to all objects.  Now, you can call <a
-            href="../../../classes/Sequel/BasicObject.html#method-c-remove_methods-21">Sequel::BasicObject.remove_methods!</a>,
-            which will remove those methods from <a
-            href="../../../classes/Sequel/BasicObject.html">Sequel::BasicObject</a>,
+            <p>because YAML adds the y method to all objects.  Now, you can call
+            Sequel::BasicObject.remove_methods!, which will remove those methods from
+            <a href="../../../classes/Sequel/BasicObject.html">Sequel::BasicObject</a>,
             allowing them to be used as intended in the above DSL.</p>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> associations now accept

@@ -81,7 +81,6 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#attribute-i-after_connect">after_connect</a></li>
-              <li><a href="#method-i-created_count">created_count</a></li>
               <li><a href="#attribute-i-db">db</a></li>
               <li><a href="#method-i-servers">servers</a></li>
             </ol>
@@ -100,42 +99,23 @@
               <div class='name-list'>
                 <table summary='Constants'>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONNECTION_POOL_MAP</td>
+                    <td class='context-item-name'>OPTS</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      {[true, false] => :single, 
-                      [true, true] => :sharded_single,
-                      [false, false] => :threaded,
-                      [false, true] => :sharded_threaded}
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>A map of [single threaded, sharded] values to symbols or <a
-                      href="ConnectionPool.html">ConnectionPool</a> subclasses.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONNECTION_POOL__MAP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>CONNECTION_POOL_MAP</td>
+                    <td class='context-item-value'>Sequel::OPTS</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DEFAULT_SERVER</td>
+                    <td class='context-item-name'>POOL_CLASS_MAP</td>
                     <td>=</td>
-                    <td class='context-item-value'>:default</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The default server to use</p>
+                    <td class='context-item-value'>
+                      {
+                      :threaded => :ThreadedConnectionPool,
+                      :single => :SingleConnectionPool,
+                      :sharded_threaded => :ShardedThreadedConnectionPool,
+                      :sharded_single => :ShardedSingleConnectionPool
+                      }.freeze
                     </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>OPTS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::OPTS</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -204,28 +184,10 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;  <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;  <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-created_count'>
-                <a name='method-i-created_count'></a>
-                <div class='synopsis'>
-                  <span class='name'>created_count</span>
-                  <span class='arguments'>(*args)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Alias for <code>size</code>, not aliased directly for ease of subclass
-                  implementation</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-created_count-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-created_count-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">created_count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Sequel::ConnectionPool#created_count&quot;</span>, <span class="ruby-node">&quot;Use #size instead&quot;</span>)&#x000A;  <span class="ruby-identifier">size</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-servers'>
                 <a name='method-i-servers'></a>
                 <div class='synopsis'>
@@ -241,7 +203,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-servers-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">servers</span>&#x000A;  [<span class="ruby-value">:default</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">servers</span>&#x000A;  [<span class="ruby-value">:default</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

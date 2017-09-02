@@ -58,20 +58,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ATTRIBUTE_JOINER</td>
-                    <td>=</td>
-                    <td class='context-item-value'>' and '.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-add'>
@@ -90,7 +76,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-add-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add</span>(<span class="ruby-identifier">att</span>, <span class="ruby-identifier">msg</span>)&#x000A;  <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>){<span class="ruby-keyword">self</span>[<span class="ruby-identifier">att</span>] = []} <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">msg</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-add-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add</span>(<span class="ruby-identifier">att</span>, <span class="ruby-identifier">msg</span>)&#x000A;  <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>){<span class="ruby-keyword">self</span>[<span class="ruby-identifier">att</span>] = []} <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">msg</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-count'>
@@ -109,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-count-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-count-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">values</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-count-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">values</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-empty-3F'>
@@ -126,7 +112,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-empty-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-empty-3F-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-empty-3F-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-full_messages'>
@@ -151,7 +137,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-full_messages-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-full_messages-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">full_messages</span>&#x000A;  <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span> &#x000A;    <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = <span class="ruby-operator">*</span><span class="ruby-identifier">kv</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(&#39; and &#39;)} #{e}&quot;</span>)}&#x000A;    <span class="ruby-identifier">m</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-full_messages-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">full_messages</span>&#x000A;  <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span> &#x000A;    <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = <span class="ruby-operator">*</span><span class="ruby-identifier">kv</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(&#39; and &#39;)} #{e}&quot;</span>)}&#x000A;    <span class="ruby-identifier">m</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-on'>
@@ -171,7 +157,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-on-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-on-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">on</span>(<span class="ruby-identifier">att</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">and</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-on-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">on</span>(<span class="ruby-identifier">att</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">and</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

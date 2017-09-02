@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-01-29 16:13:26 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,11 +43,11 @@
             
             <h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p>Model hooks, also known as model callbacks, are used to specify actions
-            that occur at a given point in a model instance&#39;s lifecycle, such as
-            before or after the model object is saved, created, updated, destroyed, or
-            validated.  There are also around hooks for all types, which wrap the
-            before hooks, the behavior, and the after hooks.</p>
+            <p>Model hooks are used to specify actions that occur at a given point in a
+            model instance&#39;s lifecycle, such as before or after the model object is
+            saved, created, updated, destroyed, or validated.  There are also around
+            hooks for all types, which wrap the before hooks, the behavior, and the
+            after hooks.</p>
             
             <h2 id="label-Basic+Usage">Basic Usage<span><a href="#label-Basic+Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -134,8 +134,9 @@
             <code>around_save</code>, <code>before_save</code>, and
             <code>after_save</code> are called in both cases.</p>
             
-            <p>Also note that the validation hooks are not called if the <code>:validate&#x000A;=&gt; false</code> option is passed to save.  However, the validation hooks
-            are called if you call <code>Model#valid?</code> manually:</p>
+            <p>Note that the validation hooks are still called if <code>validate:&#x000A;false</code> option is passed to save.  If you call
+            <code>Model#valid?</code> manually, then only the validation hooks are
+            called:</p>
             <ul><li>
             <p><code>around_validation</code></p>
             <ul><li>
@@ -164,67 +165,14 @@
             <code>Model#destroy</code>, they are not called if you use
             <code>Model#delete</code>.</p>
             
-            <h2 id="label-Special+Hook-Related+Instance+Variables">Special Hook-Related Instance Variables<span><a href="#label-Special+Hook-Related+Instance+Variables">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>For after_save hooks, a @was_new instance variable is present that
-            indicates whether the record was a new record that was just inserted, or an
-            existing record that was updated.  <a
-            href="../../classes/Sequel.html">Sequel</a> marks a record as existing as
-            soon as it inserts the record, so in an after_save or after_create hook,
-            the instance is no longer considered new.  You have to check @was_new to
-            see if the record was inserted.  This exists so that you don&#39;t have to
-            have separate after_create and after_update hooks that are mostly the same
-            and only differ slightly depending on whether the record was a new record.</p>
-            
-            <p>For after_update hooks, a @columns_updated instance variable is present
-            that is a hash of the values used to update the row (keys are column
-            symbols, values are column values).  This should be used by any code that
-            wants to check what columns and values were used during the update.  You
-            can&#39;t just check the current values of the instance, since <a
-            href="../../classes/Sequel.html">Sequel</a> offers ways to manually specify
-            which columns to use during the save.</p>
-            
             <h2 id="label-Transaction-related+Hooks">Transaction-related Hooks<span><a href="#label-Transaction-related+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p>There are four other model hooks that <code>Sequel::Model</code> supports,
-            all related to transactions.  These are <code>after_commit</code>,
-            <code>after_rollback</code>, <code>after_destroy_commit</code>, and
-            <code>after_destroy_rollback</code>.  <code>after_commit</code> is called
-            after the transaction in which you saved the object commits, only if it
-            commits.  <code>after_rollback</code> is called after the transaction in
-            which you saved the object rolls back, if it rolls back. 
-            <code>after_destroy_commit</code> is called after the transaction in which
-            you destroyed the object commits, if it commits. 
-            <code>after_destroy_rollback</code> is called after the transaction in
-            which you destroyed the object rolls back, if it rolls back.</p>
+            <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> no longer
+            offers transaction hooks for model instances.  However, you can use the
+            database transaction hooks inside model <code>before_save</code> and
+            <code>after_save</code> hooks:</p>
             
-            <p>If you aren&#39;t using transactions when saving or destroying model
-            objects, and there isn&#39;t a currently open transaction,
-            <code>after_commit</code> and <code>after_destroy_commit</code> will be
-            called after <code>after_save</code> and <code>after_destroy</code>,
-            respectively, and <code>after_rollback</code> and
-            <code>after_destroy_rollback</code> won&#39;t be called at all.</p>
-            
-            <p>The purpose of these hooks is dealing with external systems that are
-            interacting with the same database.  For example, let&#39;s say you have a
-            model that stores a picture, and you have a background job library that
-            makes thumbnails of all of the pictures.  So when a model object is
-            created, you want to add a background job that will create the thumbnail
-            for the picture.  If you used after_save for this and transactions are
-            being used, you are subject to a race condition where the background job
-            library will check the database table for the record before the transaction
-            that saved the record commits, and it won&#39;t be able to see the
-            record&#39;s data.  Using after_commit, you are guaranteed that the
-            background job library will not get notified of the record until after the
-            transaction commits and the data is viewable.</p>
-            
-            <p>Note that when using the after_commit or after_rollback hooks, you
-            don&#39;t know whether the saved object was newly created or updated.  If
-            you only want to run an action after commit of a newly created record, you
-            need to use the Database&#39;s after_commit inside the model&#39;s
-            after_create hook:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">after_create</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">update_external_cache</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">rollback_action</span>}&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">commit_action</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h2 id="label-Running+Hooks">Running Hooks<span><a href="#label-Running+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -239,14 +187,14 @@
             database without saving a model object.  One example is by using plain
             datasets, or one of the model&#39;s dataset methods:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">copies_sold</span>, <span class="ruby-value">1</span>))&#x000A;<span class="ruby-comment"># UPDATE albums SET copies_sold = copies_sold + 1 WHERE name = &#39;RF&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">copies_sold</span><span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">copies_sold</span>, <span class="ruby-value">1</span>))&#x000A;<span class="ruby-comment"># UPDATE albums SET copies_sold = copies_sold + 1 WHERE name = &#39;RF&#39;</span></pre>
             
             <p>In this case, the <code>update</code> method is called on the dataset
             returned by <code>Album.where</code>.  Even if there is only a single
             object with the name RF, this will not call any hooks.  If you want model
             hooks to be called, you need to make sure to operate on a model object:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># UPDATE albums SET copies_sold = 2 WHERE id = 1</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;RF&#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">copies_sold</span><span class="ruby-operator">:</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># UPDATE albums SET copies_sold = 2 WHERE id = 1</span></pre>
             
             <p>For the destroy hooks, you need to make sure you call <code>destroy</code>
             on the object:</p>
@@ -273,13 +221,13 @@
             <p>The <code>this</code> dataset works just like any other dataset, so you can
             call <code>update</code> on it to modify it:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">copies_sold</span><span class="ruby-operator">:</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
             
             <p>If you want to insert a row into the model&#39;s table without running the
             creation hooks, you can use <code>Model.insert</code> instead of
             <code>Model.create</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># does not run hooks</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># does not run hooks</span></pre>
             
             <h2 id="label-Canceling+Actions+in+Hooks">Canceling Actions in Hooks<span><a href="#label-Canceling+Actions+in+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -294,12 +242,6 @@
             behavior, that will run even if validations are skipped:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;    <span class="ruby-identifier">cancel_action</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>For backwards compatibility, <a href="../../classes/Sequel.html">Sequel</a>
-            also treats the <code>before_*</code> hook methods returning
-            <code>false</code> as an indication that the action should be canceled. 
-            This usage is discouraged in new code, but you should be aware of this
-            behavior so that you do not inadvertently return false.</p>
             
             <p>For around hooks, neglecting to call <code>super</code> halts hook
             processing in the same way as calling <code>cancel_action</code> in a
@@ -371,9 +313,6 @@
             <p>before hooks are run in reverse order of inclusion</p>
             </li><li>
             <p>after hooks are run in order of inclusion</p>
-            </li><li>
-            <p>returning false in any before hook will pass the false value down the hook
-            method chain, halting the hook processing.</p>
             </li></ul>
             
             <p>So if you define the same before hook in both a model and a plugin that the

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,18 +43,19 @@
             
             <h2 id="label-Purpose+of+this+Guide">Purpose of this Guide<span><a href="#label-Purpose+of+this+Guide">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> is a simple to use, very
-            flexible, and powerful database library that supports a wide variety of
-            different querying methods.  This guide aims to be a gentle introduction to
-            Sequel&#39;s querying support.</p>
+            <p><a href="../../classes/Sequel.html">Sequel</a> is a flexible and powerful
+            database library that supports a wide variety of different querying
+            methods.  This guide aims to be a introduction to Sequel&#39;s querying
+            support.</p>
             
-            <p>While you can easily use raw SQL with <a
+            <p>While you can use raw SQL with <a
             href="../../classes/Sequel.html">Sequel</a>, a large part of the advantage
             you get from using <a href="../../classes/Sequel.html">Sequel</a> is
-            Sequel&#39;s ability to abstract SQL from you and give you a much nicer
+            Sequel&#39;s ability to abstract SQL from you and give you a pure-ruby
             interface. <a href="../../classes/Sequel.html">Sequel</a> also ships with a
             <a href="core_extensions_rdoc.html">core_extensions extension</a>, which
-            better integrates Sequel&#39;s DSL into the ruby language.</p>
+            adds methods to core ruby types to work with <a
+            href="../../classes/Sequel.html">Sequel</a>.</p>
             
             <h2 id="label-Retrieving+Objects">Retrieving Objects<span><a href="#label-Retrieving+Objects">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -84,7 +85,7 @@
             <p>The <code>Sequel::Model.[]</code> is the easiest method to use to find a
             model instance by its primary key value:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Find artist with primary key (id) 1</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Find artist with primary key (id) 1</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id = 1)</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>If there is no record with the given primary key, nil will be returned. If
             you want to raise an exception if no record is found, you can use
@@ -102,7 +103,7 @@
             
             <p>Any options you pass to <code>first</code> will be used as a filter:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>If there is no matching row, <code>first</code> will return nil.  If you
             want to raise an exception instead, use <code>first!</code>.</p>
@@ -110,7 +111,7 @@
             <p><code>Sequel::Dataset#[]</code> is basically an alias for
             <code>first</code>, except it requires an argument:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>][:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&quot;YJM&quot;, :id=&gt;1}</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>][{<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;YJM&#39;</span>}]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&quot;YJM&quot;, :id=&gt;1}</span></pre>
             
             <p>Note that while Model.[] allows you to pass a primary key directly,
             Dataset#[] does not (unless it is a model dataset).</p>
@@ -141,6 +142,13 @@
             you want:</p>
             
             <pre class="ruby"><span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; &quot;YJM&quot;</span></pre>
+            
+            <h4 id="label-Retrieving+a+Multiple+Column+Values">Retrieving a Multiple Column Values<span><a href="#label-Retrieving+a+Multiple+Column+Values">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>If you want the value for multiple columns, you can pass an array to
+            <code>Sequel::Dataset#get</code>:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">artist_id</span>, <span class="ruby-identifier">artist_name</span>,  = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; [1, &quot;YJM&quot;]</span></pre>
             
             <h3 id="label-Retrieving+Multiple+Objects">Retrieving Multiple Objects<span><a href="#label-Retrieving+Multiple+Objects">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -200,44 +208,44 @@
             <h4 id="label-As+a+Hash">As a Hash<span><a href="#label-As+a+Hash">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to take an SQL
-            query and return it as a ruby hash, using the <code>to_hash</code> method:</p>
+            query and return it as a ruby hash, using the <code>as_hash</code> method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;&quot;YJM&quot;, 2=&gt;&quot;AS&quot;}</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">as_hash</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;&quot;YJM&quot;, 2=&gt;&quot;AS&quot;}</span></pre>
             
-            <p>As you can see, the <code>to_hash</code> method uses the first symbol as
+            <p>As you can see, the <code>as_hash</code> method uses the first symbol as
             the key and the second symbol as the value.  So if you swap the two
             arguments the hash will have its keys and values transposed:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;1, &quot;AS&quot;=&gt;2}</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">as_hash</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;1, &quot;AS&quot;=&gt;2}</span></pre>
             
             <p>Now what if you have multiple values for the same key?  By default,
-            <code>to_hash</code> will just have the last matching value.  If you care
+            <code>as_hash</code> will just have the last matching value.  If you care
             about all matching values, use <code>to_hash_groups</code>, which makes the
             values of the array an array of matching values, in the order they were
             received:</p>
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash_groups</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;[1, 10, ...], &quot;AS&quot;=&gt;[2, 20, ...]}</span></pre>
             
-            <p>If you only provide one argument to <code>to_hash</code>, it uses the
+            <p>If you only provide one argument to <code>as_hash</code>, it uses the
             entire hash or model object as the value:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;{:id=&gt;1, :name=&gt;&quot;YJM&quot;}, &quot;AS&quot;=&gt;{:id=&gt;2, :name=&gt;&quot;AS&quot;}}</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">as_hash</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;{:id=&gt;1, :name=&gt;&quot;YJM&quot;}, &quot;AS&quot;=&gt;{:id=&gt;2, :name=&gt;&quot;AS&quot;}}</span></pre>
             
             <p>and <code>to_hash_groups</code> works similarly:</p>
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">to_hash_groups</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;[{:id=&gt;1, :name=&gt;&quot;YJM&quot;}, {:id=&gt;10, :name=&gt;&quot;YJM&quot;}], ...}</span></pre>
             
-            <p>Model datasets have a <code>to_hash</code> method that can be called
+            <p>Model datasets have a <code>as_hash</code> method that can be called
             without any arguments, in which case it will use the primary key as the key
             and the model object as the value.  This can be used to easily create an
             identity map:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;#&lt;Artist @values={:id=&gt;1, :name=&gt;&quot;YGM&quot;}&gt;,</span>&#x000A;<span class="ruby-comment">#     2=&gt;#&lt;Artist @values={:id=&gt;2, :name=&gt;&quot;AS&quot;}&gt;}</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">as_hash</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;#&lt;Artist @values={:id=&gt;1, :name=&gt;&quot;YGM&quot;}&gt;,</span>&#x000A;<span class="ruby-comment">#     2=&gt;#&lt;Artist @values={:id=&gt;2, :name=&gt;&quot;AS&quot;}&gt;}</span></pre>
             
             <p>There is no equivalent handling to <code>to_hash_groups</code>, since there
             would only be one matching record, as the primary key must be unique.</p>
             
-            <p>Note that <code>to_hash</code> never modifies the columns selected. 
+            <p>Note that <code>as_hash</code> never modifies the columns selected. 
             However, just like <a href="../../classes/Sequel.html">Sequel</a> has a
             <code>select_map</code> method to modify the columns selected and return an
             array, <a href="../../classes/Sequel.html">Sequel</a> also has a
@@ -265,9 +273,9 @@
             <p>Methods that return modified datasets, discussed below</p>
             </li></ol>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> uses a method chaining,
-            functional style API to modify datasets.  Let&#39;s start with a simple
-            example.</p>
+            <p><a href="../../classes/Sequel.html">Sequel</a> datasets are frozen and use
+            a method chaining, functional style API that returns modified datasets. 
+            Let&#39;s start with a simple example.</p>
             
             <p>This is a basic dataset that includes all records in the table
             <code>artists</code>:</p>
@@ -277,24 +285,23 @@
             <p>Let&#39;s say we are only interested in the artists whose names start with
             “A”:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</span></pre>
             
             <p>Here we see that <code>where</code> returns a dataset that adds a
             <code>WHERE</code> clause to the query.  It&#39;s important to note that
             <code>where</code> does not modify the receiver:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds1</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-identifier">ds2</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds1</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-identifier">ds2</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</span></pre>
             
-            <p>In <a href="../../classes/Sequel.html">Sequel</a>, most dataset methods
-            that you will be using will not modify the dataset itself, so you can
-            freely use the dataset in multiple places without worrying that its usage
-            in one place will affect its usage in another place.  This is what is meant
-            by a functional style API.</p>
+            <p>In <a href="../../classes/Sequel.html">Sequel</a>, dataset methods do not
+            modify the dataset itself, so you can freely use the dataset in multiple
+            places without worrying that its usage in one place will affect its usage
+            in another place.  This is what is meant by a functional style API.</p>
             
             <p>Let&#39;s say we only want to select the id and name columns, and that we
             want to order by name:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds2</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39; ORDER BY name</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds2</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;) ORDER BY name</span></pre>
             
             <p>Note how you don&#39;t need to assign the returned value of order to a
             variable, and then call select on that.  Because order just returns a
@@ -318,48 +325,48 @@
             
             <p>The most common format for providing filters is via a hash.  In general, <a
             href="../../classes/Sequel.html">Sequel</a> treats conditions specified
-            with a hash as equality or inclusion.  What type of condition is used
-            depends on the values in the hash.</p>
+            with a hash as equality, inclusion, or identity.  What type of condition is
+            used depends on the values in the hash.</p>
             
             <p>Unless <a href="../../classes/Sequel.html">Sequel</a> has special support
             for the value&#39;s class, it uses a simple equality statement:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name = &#39;YJM&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id = 1)</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;)</span></pre>
             
             <p>For arrays, <a href="../../classes/Sequel.html">Sequel</a> uses the IN
-            operator.</p>
+            operator with a value list:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (1, 2)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id IN (1, 2))</span></pre>
             
             <p>For datasets, <a href="../../classes/Sequel.html">Sequel</a> uses the IN
             operator with a subselect:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">artist_id</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT artist_id FROM albums)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">artist_id</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT artist_id FROM albums))</span></pre>
             
             <p>For boolean values such as nil, true, and false, <a
             href="../../classes/Sequel.html">Sequel</a> uses the IS operator:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id IS NULL</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id IS NULL)</span></pre>
             
             <p>For ranges, <a href="../../classes/Sequel.html">Sequel</a> uses a pair of
             inequality statements:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id &gt;= 1 AND id &lt;= 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id &gt;= 1) AND (id &lt;= 5))</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span><span class="ruby-operator">...</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id &gt;= 1) AND (id &lt; 5))</span></pre>
             
             <p>Finally, for regexps, <a href="../../classes/Sequel.html">Sequel</a> uses
             an SQL regular expression.  Note that this is probably only supported on
             PostgreSQL and MySQL.</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name ~ &#39;JM$&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name ~ &#39;JM$&#39;)</span></pre>
             
             <p>If there are multiple arguments in the hash, the filters are ANDed
             together:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1 AND name ~ &#39;JM$&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id = 1) AND (name ~ &#39;JM$&#39;))</span></pre>
             
             <p>This works the same as if you used two separate <code>where</code> calls:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1 AND name ~ &#39;JM$&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id = 1) AND (name ~ &#39;JM$&#39;))</span></pre>
             
             <h3 id="label-Array+of+Two+Element+Arrays">Array of Two Element Arrays<span><a href="#label-Array+of+Two+Element+Arrays">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -367,13 +374,13 @@
             only advantage to using an array of two element arrays is that it allows
             you to duplicate keys, so you can do:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>([[:<span class="ruby-identifier">name</span>, <span class="ruby-regexp">/JM$/</span>], [:<span class="ruby-identifier">name</span>, <span class="ruby-regexp">/^YJ/</span>]])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name ~ &#39;JM$&#39; AND name ~ &#39;^YJ&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>([[:<span class="ruby-identifier">name</span>, <span class="ruby-regexp">/JM$/</span>], [:<span class="ruby-identifier">name</span>, <span class="ruby-regexp">/^YJ/</span>]])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((name ~ &#39;JM$&#39;)) AND ((name ~ &#39;^YJ&#39;))</span></pre>
             
             <h3 id="label-Virtual+Row+Blocks">Virtual Row Blocks<span><a href="#label-Virtual+Row+Blocks">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>If a block is passed to a filter, it is treated as a virtual row block:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id &gt; 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id &gt; 5)</span></pre>
             
             <p>You can learn more about virtual row blocks in the <a
             href="virtual_rows_rdoc.html">“Virtual Rows” guide</a>.</p>
@@ -381,12 +388,12 @@
             <p>You can provide both regular arguments and a block, in which case the
             results will be ANDed together:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">...</span><span class="ruby-string">&#39;M&#39;</span>){<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt;= &#39;A&#39; AND name &lt; &#39;M&#39; AND id &gt; 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">...</span><span class="ruby-string">&#39;M&#39;</span>){<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((name &gt;= &#39;A&#39;) AND (name &lt; &#39;M&#39;) AND (id &gt; 5))</span></pre>
             
             <p>Using virtual row blocks, what you can do with single entry hash or an
             array with a single two element array can also be done using the =~ method:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">=~</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">=~</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id = 5)</span></pre>
             
             <h3 id="label-Symbols">Symbols<span><a href="#label-Symbols">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -417,38 +424,40 @@
             operator for <code>AND</code>, the | operator for <code>OR</code>, and the
             ~ operator for inversion:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>] <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39; AND (b = 1 OR c != 3)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-constant">Sequel</span>[{<span class="ruby-identifier">b</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>}] <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(<span class="ruby-identifier">c</span><span class="ruby-operator">:</span> <span class="ruby-value">3</span>)))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;) AND ((b = 1) OR (c != 3)))</span></pre>
             
             <p>You can combine these expression operators with the virtual row support:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>((<span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE a &gt; 1 AND b(c) &gt;= 1 AND NOT d</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>((<span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((a &gt; 1) AND (b(c) &gt;= 1) AND NOT d)</span></pre>
             
             <p>Note the use of parentheses when using the &amp; and | operators, as they
             have lower precedence than other operators.  The following will not work:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>(<span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># Raises a TypeError, as it calls Integer#| with a Sequel::SQL::Identifier</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>(<span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># Raises a TypeError</span></pre>
             
             <h3 id="label-Strings+with+Placeholders">Strings with Placeholders<span><a href="#label-Strings+with+Placeholders">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>Assuming you want to get your hands dirty and write some SQL, <a
-            href="../../classes/Sequel.html">Sequel</a> allows you to use strings using
-            placeholders for the values:</p>
+            <p>Assuming you want to get your hands dirty and use SQL fragments in filters,
+            <a href="../../classes/Sequel.html">Sequel</a> allows you to do so if you
+            explicitly mark the strings as literal strings using
+            <code>Sequel.lit</code>. You can use placeholders in the string and pass
+            arguments for the placeholders:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name LIKE ?&quot;</span>, <span class="ruby-string">&#39;Y%&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name LIKE ?&quot;</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39;)</span></pre>
             
             <p>This is the most common type of placeholder, where each question mark is
             substituted with the next argument:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name LIKE ? AND id = ?&quot;</span>, <span class="ruby-string">&#39;Y%&#39;</span>, <span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; AND id = 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name LIKE ? AND id = ?&quot;</span>, <span class="ruby-string">&#39;Y%&#39;</span>, <span class="ruby-value">5</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; AND id = 5)</span></pre>
             
             <p>You can also use named placeholders with a hash, where the named
             placeholders use colons before the placeholder names:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name LIKE :name AND id = :id&quot;</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Y%&#39;</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; AND id = 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;name LIKE :name AND id = :id&quot;</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Y%&#39;</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; AND id = 5)</span></pre>
             
             <p>You don&#39;t have to provide any placeholders if you don&#39;t want to:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;id = 2&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 2</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;id = 2&quot;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 2</span></pre>
             
             <p>However, if you are using any untrusted input, you should definitely be
             using placeholders. In general, unless you are hardcoding values in the
@@ -456,7 +465,7 @@
             has been built using interpolation, unless you are sure of what you are
             doing.</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-node">&quot;id = #{params[:id]}&quot;</span>) <span class="ruby-comment"># Don&#39;t do this!</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>]) <span class="ruby-comment"># Do this instead</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_i</span>) <span class="ruby-comment"># Even better</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-node">&quot;id = #{params[:id]}&quot;</span>)) <span class="ruby-comment"># Don&#39;t do this!</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>])) <span class="ruby-comment"># Do this instead</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_i</span>)              <span class="ruby-comment"># Even better</span></pre>
             
             <h3 id="label-Inverting">Inverting<span><a href="#label-Inverting">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -466,46 +475,45 @@
             inverting conditions, so to write a not equals condition, you write an
             equals condition, and invert it:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>).<span class="ruby-identifier">invert</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>).<span class="ruby-identifier">invert</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id != 5)</span></pre>
             
             <p>Note that <code>invert</code> inverts the entire filter:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;A&#39;</span>}.<span class="ruby-identifier">invert</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5 OR name &lt;= &#39;A&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;A&#39;</span>}.<span class="ruby-identifier">invert</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id != 5) OR (name &lt;= &#39;A&#39;))</span></pre>
             
             <p>In general, <code>invert</code> is used rarely, since <code>exclude</code>
             allows you to invert only specific filters:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>).<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;A&#39;</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5 OR name &lt;= &#39;A&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id != 5)</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>).<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;A&#39;</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((id = 5) OR (name &lt;= &#39;A&#39;)</span></pre>
             
             <p>So to do a NOT IN with an array:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id NOT IN (1, 2)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id NOT IN (1, 2))</span></pre>
             
             <p>Or to use the NOT LIKE operator:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;)</span></pre>
             
             <p>You can use <a href="../../classes/Sequel.html">Sequel</a>.~ to negate
             expressions:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span></pre>
             
             <p>On <a href="../../classes/Sequel.html">Sequel</a> expression objects, you
             can use ~ to negate them:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;)</span></pre>
             
-            <p>On Ruby 1.9+, you can use !~ on <a
-            href="../../classes/Sequel.html">Sequel</a> expressions to create negated
-            expressions:</p>
+            <p>You can use !~ on <a href="../../classes/Sequel.html">Sequel</a>
+            expressions to create negated expressions:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{ <span class="ruby-identifier">id</span> <span class="ruby-operator">!~</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">!~</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id != 5)</span></pre>
             
             <h3 id="label-Removing">Removing<span><a href="#label-Removing">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>To remove all existing filters, use <code>unfiltered</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">unfiltered</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">unfiltered</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <h2 id="label-Ordering">Ordering<span><a href="#label-Ordering">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -535,13 +543,16 @@
             <h3 id="label-Reversing">Reversing<span><a href="#label-Reversing">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Just like you can invert an existing filter, you can reverse an existing
-            order, using <code>reverse</code>:</p>
+            order, using <code>reverse</code> without an order:</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">reverse</span>&#x000A;<span class="ruby-comment"># SELECT FROM artists ORDER BY id DESC</span></pre>
             
-            <p>As you might expect, <code>reverse</code> is not used all that much.  In
-            general, <code>Sequel.desc</code> is used more commonly to specify a
-            descending order for columns:</p>
+            <p>Alternatively, you can provide reverse with the order:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">reverse</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT FROM artists ORDER BY id DESC</span></pre>
+            
+            <p>To specify a single entry be reversed, <code>Sequel.desc</code> can be
+            used:</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">id</span>))&#x000A;<span class="ruby-comment"># SELECT FROM artists ORDER BY id DESC</span></pre>
             
@@ -625,7 +636,7 @@
             <p>Either of these would return the 11th through 15th records in the original
             dataset.</p>
             
-            <p>To remove a limit from a dataset, use <code>unlimited</code>:</p>
+            <p>To remove a limit and offset from a dataset, use <code>unlimited</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span>).<span class="ruby-identifier">unlimited</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
@@ -672,43 +683,39 @@
             possible use is if you only wanted to return artists who had at least 10
             albums:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">having</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-operator">*</span>){} <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums</span>&#x000A;<span class="ruby-comment"># GROUP BY artist_id HAVING count(*) &gt;= 10</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">having</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-operator">*</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums</span>&#x000A;<span class="ruby-comment"># GROUP BY artist_id HAVING (count(*) &gt;= 10)</span></pre>
             
             <p>Both the WHERE clause and the HAVING clause are removed by
             <code>unfiltered</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">having</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-operator">*</span>){} <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10</span>}.&#x000A; <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">unfiltered</span>&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">having</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-operator">*</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10</span>}.&#x000A; <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">unfiltered</span>&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</span></pre>
             
             <h2 id="label-Joins">Joins<span><a href="#label-Joins">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> makes it very easy to join a
-            dataset to another table or dataset. The underlying method used is
+            <p><a href="../../classes/Sequel.html">Sequel</a> has support for many
+            different SQL join types. The underlying method used is
             <code>join_table</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join_table</span>(:<span class="ruby-identifier">inner</span>, :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join_table</span>(:<span class="ruby-identifier">inner</span>, :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id)</span></pre>
             
             <p>In most cases, you won&#39;t call <code>join_table</code> directly, as <a
             href="../../classes/Sequel.html">Sequel</a> provides shortcuts for all
             common (and most uncommon) join types. For example <code>join</code> does
             an inner join:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id))))</span></pre>
             
             <p>And <code>left_join</code> does a LEFT JOIN:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">left_join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># LEFT JOIN artists ON artists.id = albums.artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">left_join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># LEFT JOIN artists ON (artists.id = albums.artist_id)</span></pre>
             
             <h3 id="label-Table-2FDataset+to+Join">Table/Dataset to Join<span><a href="#label-Table-2FDataset+to+Join">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>For all of these specialized join methods, the first argument is generally
             the name of the table to which you are joining.  However, you can also
-            provide a model class:</p>
+            provide a dataset, in which case a subselect is used:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Artist</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)</pre>
-            
-            <p>Or a dataset, in which case a subselect is used:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;A&#39;</span>}, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN (SELECT * FROM artists WHERE (name &lt; &#39;A&#39;)) AS t1</span>&#x000A;<span class="ruby-comment">#  ON (t1.id = albums.artist_id)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;A&#39;</span>}, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN (SELECT * FROM artists WHERE (name &lt; &#39;A&#39;)) AS t1</span>&#x000A;<span class="ruby-comment">#  ON (t1.id = albums.artist_id)</span></pre>
             
             <h3 id="label-Join+Conditions">Join Conditions<span><a href="#label-Join+Conditions">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -721,20 +728,19 @@
             <p>A hash used as the join conditions operates similarly to a filter, except
             that unqualified symbol keys are automatically qualified with the table
             from the first argument, and unqualified symbol values are automatically
-            qualified with the first table or the last table joined.  This implicit
-            qualification is one of the reasons that joins in <a
-            href="../../classes/Sequel.html">Sequel</a> are easy to specify:</p>
+            qualified with the last table joined (or the first table in the dataset if
+            there hasn&#39;t been a previous join):</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id)</span></pre>
             
-            <p>Note how the <code>:id</code> symbol is automatically qualified with
+            <p>Note how the <code>id</code> symbol is automatically qualified with
             <code>artists</code>, while the <code>artist_id</code> symbol is
             automatically qualified with <code>albums</code>.</p>
             
             <p>Because <a href="../../classes/Sequel.html">Sequel</a> uses the last joined
             table for implicit qualifications of values, you can do things like:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">members</span>, :<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># INNER JOIN members ON members.artist_id = artists.id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">members</span>, <span class="ruby-identifier">artist_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment"># INNER JOIN members ON (members.artist_id = artists.id)</span></pre>
             
             <p>Note that when joining to the <code>members</code> table,
             <code>artist_id</code> is qualified with <code>members</code> and
@@ -742,7 +748,7 @@
             
             <p>While a good default, implicit qualification is not always correct:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">tracks</span>, :<span class="ruby-identifier">album_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># INNER JOIN tracks ON tracks.album_id = artists.id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">tracks</span>, <span class="ruby-identifier">album_id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment"># INNER JOIN tracks ON (tracks.album_id = artists.id)</span></pre>
             
             <p>Note here how <code>id</code> is qualified with <code>artists</code>
             instead of <code>albums</code>. This is wrong as the foreign key
@@ -750,39 +756,35 @@
             <code>artists.id</code>.  To fix this, you need to explicitly qualify when
             joining:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">tracks</span>, :<span class="ruby-identifier">album_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">albums</span>][:<span class="ruby-identifier">id</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># INNER JOIN tracks ON tracks.album_id = albums.id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">tracks</span>, <span class="ruby-identifier">album_id</span><span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">albums</span>][:<span class="ruby-identifier">id</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON (artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment"># INNER JOIN tracks ON (tracks.album_id = albums.id)</span></pre>
             
             <p>Just like in filters, an array of two element arrays is treated the same as
             a hash, but allows for duplicate keys:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, [[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>], [:<span class="ruby-identifier">id</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>]])&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment">#  ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment">#   AND artists.id &gt;= 1 AND artists.id &lt;= 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, [[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>], [:<span class="ruby-identifier">id</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>]])&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment">#  ON ((artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment">#   AND (artists.id &gt;= 1) AND (artists.id &lt;= 5))</span></pre>
             
             <p>And just like in the hash case, unqualified symbol elements in the array
             are implicitly qualified.</p>
             
             <p>By default, <a href="../../classes/Sequel.html">Sequel</a> only qualifies
             unqualified symbols in the conditions.  However, You can provide an options
-            hash with a <code>:qualify=&gt;:deep</code> option to do a deep
-            qualification, which can qualify subexpressions.  For example, let&#39;s
-            say you are doing a JOIN using case insensitive string comparison:</p>
+            hash with a <code>qualify: :deep</code> option to do a deep qualification,
+            which can qualify subexpressions.  For example, let&#39;s say you are doing
+            a JOIN using case insensitive string comparison:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, {<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">lower</span>, :<span class="ruby-identifier">name</span>) =<span class="ruby-operator">&gt;</span>&#x000A;                      <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">lower</span>, :<span class="ruby-identifier">artist_name</span>)},&#x000A;           :<span class="ruby-identifier">qualify</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">deep</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment">#  ON (lower(artists.name) = lower(albums.artist_name))</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, {<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">lower</span>, :<span class="ruby-identifier">name</span>) =<span class="ruby-operator">&gt;</span>&#x000A;                      <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">lower</span>, :<span class="ruby-identifier">artist_name</span>)},&#x000A;           <span class="ruby-identifier">qualify</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">deep</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment">#  ON (lower(artists.name) = lower(albums.artist_name))</span></pre>
             
-            <p>Note how the arguments to lower were qualified correctly in both cases.
-            Starting in <a href="../../classes/Sequel.html">Sequel</a> 4, the
-            <code>:qualify=&gt;:deep</code> option is going to become the default.</p>
+            <p>Note how the arguments to lower were qualified correctly in both cases.</p>
             
             <h4 id="label-USING+Joins">USING Joins<span><a href="#label-USING+Joins">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>The most common type of join conditions is a JOIN ON, as displayed above. 
             However, the SQL standard allows for join conditions to be specified with
-            JOIN USING, which <a href="../../classes/Sequel.html">Sequel</a> makes easy
-            to use.</p>
+            JOIN USING, assuming the column name is the same in both tables.</p>
             
-            <p>JOIN USING is useful when the columns you are using have the same names in
-            both tables.  For example, if instead of having a primary column named
-            <code>id</code> in all of your tables, you use <code>artist_id</code> in
-            your <code>artists</code> table and <code>album_id</code> in your
+            <p>For example, if instead of having a primary column named <code>id</code> in
+            all of your tables, you use <code>artist_id</code> in your
+            <code>artists</code> table and <code>album_id</code> in your
             <code>albums</code> table, you could do:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, [:<span class="ruby-identifier">artist_id</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists USING (artist_id)</span></pre>
@@ -791,7 +793,7 @@
             
             <h4 id="label-NATURAL+Joins">NATURAL Joins<span><a href="#label-NATURAL+Joins">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>NATURAL Joins take it one step further than USING joins, by assuming that
+            <p>NATURAL joins take it one step further than USING joins, by assuming that
             all columns with the same names in both tables should be used for joining:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">natural_join</span>(:<span class="ruby-identifier">artists</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums NATURAL JOIN artists</span></pre>
@@ -811,7 +813,7 @@
             tables, but only want albums where the artist&#39;s name comes before the
             album&#39;s name.</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">j</span>, <span class="ruby-identifier">lj</span>, <span class="ruby-identifier">js</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">j</span>][:<span class="ruby-identifier">name</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">lj</span>][:<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment"># ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># AND artists.name &lt; albums.name</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">artist_id</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">j</span>, <span class="ruby-identifier">lj</span>, <span class="ruby-identifier">js</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">j</span>][:<span class="ruby-identifier">name</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">lj</span>][:<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment"># ON ((artists.id = albums.artist_id)</span>&#x000A;<span class="ruby-comment"># AND (artists.name &lt; albums.name))</span></pre>
             
             <p>Because greater than can&#39;t be expressed with a hash in <a
             href="../../classes/Sequel.html">Sequel</a>, you need to use a block and
@@ -838,7 +840,7 @@
             <p>Using multiple FROM tables and setting conditions in the WHERE clause is an
             old-school way of joining tables:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">artists</span>[:<span class="ruby-identifier">id</span>]=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">albums</span>[:<span class="ruby-identifier">artist_id</span>]}}&#x000A;<span class="ruby-comment"># SELECT * FROM albums, artists WHERE artists.id = albums.artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">artists</span>[:<span class="ruby-identifier">id</span>]=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">albums</span>[:<span class="ruby-identifier">artist_id</span>]}}&#x000A;<span class="ruby-comment"># SELECT * FROM albums, artists WHERE (artists.id = albums.artist_id)</span></pre>
             
             <h3 id="label-Using+the+current+dataset+in+a+subselect">Using the current dataset in a subselect<span><a href="#label-Using+the+current+dataset+in+a+subselect">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -847,7 +849,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">100</span>).<span class="ruby-identifier">from_self</span>.<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM albums ORDER BY artist_id LIMIT 100)</span>&#x000A;<span class="ruby-comment">#  AS t1 GROUP BY artist_id</span></pre>
             
-            <p>This is slightly different than without <code>from_self</code>:</p>
+            <p>This is different than without <code>from_self</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">100</span>).<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums GROUP BY artist_id ORDER BY name LIMIT 100</span></pre>
             
@@ -866,7 +868,7 @@
             modified by another query until the current transaction commits.  You just
             use the <code>for_update</code> dataset method when returning the rows:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">for_update</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;  <span class="ruby-comment"># SELECT * FROM albums WHERE id = 1 FOR UPDATE</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_tracks</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">for_update</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>)&#x000A;  <span class="ruby-comment"># SELECT * FROM albums WHERE (id = 1) FOR UPDATE</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">num_tracks</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This will ensure that no other connection modifies the row between when you
             select it and when the transaction ends.</p>
@@ -883,7 +885,8 @@
             <h2 id="label-Custom+SQL">Custom SQL<span><a href="#label-Custom+SQL">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to use custom
-            SQL by providing it to the <code>Database#[]</code> method as a string:</p>
+            SQL for the query by providing it to the <code>Database#[]</code> method as
+            a string:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists&quot;</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
@@ -894,13 +897,19 @@
             
             <p>With either of these methods, you can use placeholders:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists WHERE id = ?&quot;</span>, <span class="ruby-value">5</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT * FROM artists WHERE id = :id&quot;</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists WHERE id = ?&quot;</span>, <span class="ruby-value">5</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT * FROM artists WHERE id = :id&quot;</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5</span></pre>
             
             <p>Note that if you specify the dataset using custom SQL, you can still call
             the dataset modification methods, but in many cases they will appear to
             have no affect:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists&quot;</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
+            
+            <p>You can use the implicit_subquery extension to automatically wrap queries
+            that use custom SQL in subqueries if a method is called that would modify
+            the SQL:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">implicit_subquery</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists&quot;</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM (SELECT * FROM artists) AS t1 ORDER BY id&quot;</span></pre>
             
             <p>If you must drop down to using custom SQL, it&#39;s recommended that you
             only do so for specific parts of a query.  For example, if the reason you
@@ -922,7 +931,7 @@
             <p>If you just want to know whether the current dataset would return any rows,
             use <code>empty?</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE id = 0 LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE name LIKE &#39;R%&#39; ESCAPE &#39;\&#39; LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; false</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE (id = 0) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE (name LIKE &#39;R%&#39; ESCAPE &#39;\&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; false</span></pre>
             
             <h2 id="label-Aggregate+Calculations">Aggregate Calculations<span><a href="#label-Aggregate+Calculations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -935,10 +944,15 @@
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">count</span>&#x000A;<span class="ruby-comment"># SELECT count(*) AS count FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 2</span></pre>
             
+            <p>If you pass an expression to count, it will return the number of records
+            where that expression in not NULL:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT count(artist_id) AS count FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1</span></pre>
+            
             <p>The other methods take a column argument and call the aggregate function
             with the argument:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT sum(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 3</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">avg</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT avg(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1.5</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">min</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT min(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">max</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT max(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 2</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT sum(id) AS sum FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 3</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">avg</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT avg(id) AS avg FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1.5</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">min</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT min(id) AS min FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">max</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT max(id) AS max FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 2</span></pre>
           </div>
           <div id='context'>
           </div>

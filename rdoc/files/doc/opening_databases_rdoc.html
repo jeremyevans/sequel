@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-07-13 15:05:07 -0700</span>
+          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -74,12 +74,12 @@
             
             <p>You can also pass an additional option hash with the connection string:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog&#39;</span>, :<span class="ruby-identifier">user=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;user&#39;</span>, :<span class="ruby-identifier">password=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;password&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>)</pre>
             
             <p>You can also just use an options hash without a connection string.  If you
             do this, you must provide the adapter to use:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(:<span class="ruby-identifier">adapter=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;postgres&#39;</span>, :<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;localhost&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;blog&#39;</span>, :<span class="ruby-identifier">user=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;user&#39;</span>, :<span class="ruby-identifier">password=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;password&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">adapter</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;postgres&#39;</span>, <span class="ruby-identifier">host</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-identifier">database</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>)</pre>
             
             <p>All of the above statements are equivalent.</p>
             
@@ -92,12 +92,12 @@
             argument is a hash. So the following statements are equivalent to the
             previous statements.</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-string">&#39;blog&#39;</span>, :<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;localhost&#39;</span>, :<span class="ruby-identifier">user=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;user&#39;</span>, :<span class="ruby-identifier">password=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;password&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;localhost&#39;</span>, :<span class="ruby-identifier">user=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;user&#39;</span>, :<span class="ruby-identifier">password=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;password&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;blog&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-identifier">host</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-identifier">host</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>, <span class="ruby-identifier">database</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;blog&#39;</span>)</pre>
             
             <p>Note that using an adapter method forces the use of the specified adapter,
             not a database type, even though some adapters have the same name as the
             database type.  So if you want to connect to SQLite, for example, you can
-            do so using the sqlite, do, jdbc, and swift adapters. If you want to
+            do so using the sqlite, amalgalite, and jdbc adapters. If you want to
             connect to SQLite on JRuby using the jdbc adapter, you should not use
             <code>Sequel.sqlite</code> for example, as that uses the C-based sqlite3
             gem. Instead, the <code>Sequel.jdbc</code> would be appropriate (though as
@@ -134,19 +134,31 @@
             <p>The adapter to use</p>
             </td></tr><tr><td class='label'>:database </td><td>
             <p>The name of the database to which to connect</p>
+            </td></tr><tr><td class='label'>:cache_schema </td><td>
+            <p>Whether schema should be cached for this database (true by default)</p>
+            </td></tr><tr><td class='label'>:default_string_column_size </td><td>
+            <p>The default size for string columns (255 by default)</p>
             </td></tr><tr><td class='label'>:host </td><td>
             <p>The hostname of the database server to which to connect</p>
+            </td></tr><tr><td class='label'>:keep_reference </td><td>
+            <p>Whether to keep a reference to the database in Sequel::DATABASES (true by
+            default)</p>
             </td></tr><tr><td class='label'>:loggers </td><td>
             <p>An array of SQL loggers to log to</p>
+            </td></tr><tr><td class='label'>:log_connection_info </td><td>
+            <p>Whether to include connection information in log messages (false by
+            default)</p>
+            </td></tr><tr><td class='label'>:log_warn_duration </td><td>
+            <p>The amount of seconds after which the queries are logged at :warn level</p>
             </td></tr><tr><td class='label'>:password </td><td>
             <p>The password for the user account</p>
             </td></tr><tr><td class='label'>:servers </td><td>
             <p>A hash with symbol keys and hash or proc values, used with
             master/slave/partitioned database configurations</p>
-            </td></tr><tr><td class='label'>:single_threaded </td><td>
-            <p>Whether to use a single-threaded (non-thread safe) connection pool</p>
+            </td></tr><tr><td class='label'>:sql_log_level </td><td>
+            <p>The level at which to issue queries to the loggers (:info by default)</p>
             </td></tr><tr><td class='label'>:test </td><td>
-            <p>Whether to test that a valid database connection can be made (false by
+            <p>Whether to test that a valid database connection can be made (true by
             default)</p>
             </td></tr><tr><td class='label'>:user </td><td>
             <p>The user account name to use logging in</p>
@@ -158,16 +170,18 @@
             <p>A callable object called after each new connection is made, with the
             connection object (and server argument if the callable accepts 2
             arguments), useful for customizations that you want to apply to all
-            connections (default: nil).</p>
+            connections (nil by default).</p>
             </td></tr><tr><td class='label'>:max_connections </td><td>
-            <p>The maximum size of the connection pool (default: 4 connections on most
+            <p>The maximum size of the connection pool (4 connections by default on most
             databases)</p>
-            </td></tr><tr><td class='label'>:pool_sleep_time </td><td>
-            <p>The number of seconds to sleep before trying to acquire a connection again
-            (default: 0.001 seconds)</p>
             </td></tr><tr><td class='label'>:pool_timeout </td><td>
             <p>The number of seconds to wait if a connection cannot be acquired before
-            raising an error (default: 5 seconds)</p>
+            raising an error (5 seconds by default)</p>
+            </td></tr><tr><td class='label'>:preconnect </td><td>
+            <p>Whether to automatically make the maximum number of connections when
+            setting up the pool. Can be set to “concurrently” to connect in parallel.</p>
+            </td></tr><tr><td class='label'>:single_threaded </td><td>
+            <p>Whether to use a single-threaded (non-thread safe) connection pool</p>
             </td></tr></tbody></table>
             
             <h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
@@ -189,8 +203,7 @@
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>:command_timeout </td><td>
             <p>Sets the time in seconds to wait while attempting to execute a command
             before cancelling the attempt and generating an error. Specifically, it
-            sets the ADO CommandTimeout property. If this property is not set, the
-            default of 30 seconds is used.</p>
+            sets the ADO CommandTimeout property.</p>
             </td></tr><tr><td class='label'>:driver </td><td>
             <p>The driver to use in the ADO connection string.  If not provided, a default
             of “SQL Server” is used.</p>
@@ -211,7 +224,7 @@
             
             <p>Example connections:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># SQL Server</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado:///sequel_test?host=server%5cdb_instance&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado://user:password@server/database?host=server%5cdb_instance&amp;provider=SQLNCLI10&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2007</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(:<span class="ruby-identifier">conn_string=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\path\filename.accdb&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2000</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(:<span class="ruby-identifier">conn_string=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.mdb&#39;</span>)&#x000A;<span class="ruby-comment"># Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(:<span class="ruby-identifier">conn_string=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-comment"># SQL Server</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado:///sequel_test?host=server%5cdb_instance&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado://user:password@server/database?host=server%5cdb_instance&amp;provider=SQLNCLI10&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2007</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-identifier">conn_string</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\path\filename.accdb&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2000</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-identifier">conn_string</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.mdb&#39;</span>)&#x000A;<span class="ruby-comment"># Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-identifier">conn_string</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)</pre>
             
             <h3 id="label-amalgalite+">amalgalite <span><a href="#label-amalgalite+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -245,20 +258,12 @@
             
             <p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for
             individual database types is done using subadapters. There are currently
-            subadapters for PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby, Oracle,
-            MSSQL, JTDS, AS400, Progress, Firebird, Informix, and DB2. For PostgreSQL,
-            MySQL, SQLite, H2, HSQLDB, Derby, AS400 and JTDS, this can use the `jdbc-*`
-            gem, for the others you need to have the `.jar` in your CLASSPATH or load
-            the Java class manually before calling <a
+            subadapters for DB2, Derby, H2, HSQLDB, JTDS, MySQL, Oracle, PostgreSQL,
+            SQLAnywhere, SQLite, and SQL Server. For Derby, H2, HSQLDB, JTDS, MySQL,
+            Postgres, SQLite3 the adapters can use the `jdbc-*` gem, for the others you
+            need to have the `.jar` in your CLASSPATH or load the Java class manually
+            before calling <a
             href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>.</p>
-            
-            <p>You just use the JDBC connection string directly, which can be specified
-            via the string given to <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> or via
-            the :uri, :url, or :database options. <a
-            href="../../classes/Sequel.html">Sequel</a> does no preprocessing of the
-            string, it passes it directly to JDBC. So if you have problems getting a
-            connection string to work, look up the JDBC documentation.</p>
             
             <p>Note that when using a JDBC adapter, the best way to use <a
             href="../../classes/Sequel.html">Sequel</a> is via <a
@@ -269,6 +274,11 @@
             &#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding
             slashes for the database name (use no preceding slashes for a relative
             path, and one preceding slash for an absolute path).</p>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> does no preprocessing of
+            JDBC connection strings, it passes them directly to JDBC. So if you have
+            problems getting a connection string to work, look up the  documentation
+            for the JDBC driver.</p>
             
             <p>Example connection strings:</p>
             
@@ -293,9 +303,13 @@
             connection.</p>
             </td></tr><tr><td class='label'>:login_timeout </td><td>
             <p>Set the login timeout on the JDBC connection (in seconds).</p>
+            </td></tr><tr><td class='label'>:jdbc_properties </td><td>
+            <p>A hash for properties to set, skips the normal connection process of using
+            java.sql.drivermanager.getconnection and tries the backup process of using
+            driver.new.connect for the appropriate driver.</p>
             </td></tr></tbody></table>
             
-            <p>There are a few issues with specific jdbc drivers:</p>
+            <p>There are a few issues with specific jdbc driver gems:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>jdbc-h2 </td><td>
             <p>jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working
             correctly in some cases.</p>
@@ -308,8 +322,8 @@
             
             <p>Requires: mysqlplus (or mysql if mysqlplus is not available)</p>
             
-            <p>The MySQL adapter does not support the pure-ruby MySQL adapter that used to
-            ship with ActiveRecord, it requires the native adapter.</p>
+            <p>The MySQL adapter does not support the pure-ruby mysql.rb driver, it
+            requires the C-extension driver.</p>
             
             <p>The following additional options are supported:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
@@ -320,7 +334,8 @@
             </td></tr><tr><td class='label'>:compress </td><td>
             <p>Whether to compress data sent/received via the socket connection.</p>
             </td></tr><tr><td class='label'>:config_default_group </td><td>
-            <p>The default group to read from the in the MySQL config file.</p>
+            <p>The default group to read from the in the MySQL config file, defaults to
+            “client”)</p>
             </td></tr><tr><td class='label'>:config_local_infile </td><td>
             <p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with
             the given value.</p>
@@ -345,6 +360,10 @@
             </td></tr><tr><td class='label'>:connect_timeout </td><td>
             <p>Set the timeout in seconds before a connection attempt is abandoned.</p>
             </td></tr></tbody></table>
+            
+            <p>The :sslkey, :sslcert, :sslca, :sslcapath, and :sslca options (in that
+            order) are passed to Mysql#ssl_set method if either the :sslca or :sslkey
+            option is given.</p>
             
             <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -395,9 +414,9 @@
             <p>Requires: pg (or postgres-pr/postgres-compat if pg is not available)</p>
             
             <p>The <a href="../../classes/Sequel.html">Sequel</a> postgres adapter works
-            with the pg, postgres, and postgres-pr ruby libraries. The pg library is
-            the best supported, as it supports real bound variables and prepared
-            statements. If the pg library is being used, <a
+            with the pg and postgres-pr ruby libraries. The pg library is the best
+            supported, as it supports real bound variables and prepared statements. If
+            the pg library is being used, <a
             href="../../classes/Sequel.html">Sequel</a> will also attempt to load the
             sequel_pg library, which is a C extension that optimizes performance when
             <a href="../../classes/Sequel.html">Sequel</a> is used with pg.  All users
@@ -513,10 +532,6 @@
             or blob values via tinytds, you should use this option or modify your
             freetds.conf file.</p>
             </td></tr></tbody></table>
-            
-            <p>The <a href="../../classes/Sequel.html">Sequel</a> tinytds adapter requires
-            tiny_tds &gt;= 0.4.5, and if you are using FreeTDS 0.91, you must at least
-            be using 0.91rc2 (0.91rc1 does not work).</p>
           </div>
           <div id='context'>
           </div>

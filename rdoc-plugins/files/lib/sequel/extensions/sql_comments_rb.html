@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-11-23 09:48:29 -0800</span>
+          <span class='datetime'>2017-08-01 08:12:01 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -51,15 +51,15 @@
             <p>The reason for the prefixing and suffixing by newlines is to work correctly
             when used in subqueries:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ds</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (id IN (SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment"># )) -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">id</span><span class="ruby-operator">:</span> <span class="ruby-identifier">ds</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (id IN (SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment"># )) -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
             
             <p>In addition to working on SELECT queries, it also works when inserting,
             updating, and deleting.</p>
             
             <p>Due to the use of single line SQL comments and converting all whitespace to
             spaces, this should correctly handle even malicious input.  However, it
-            would be unwise to rely on that, you should probably attempt to ensure that
-            the argument given to Dataset#comment is not derived from user input.</p>
+            would be unwise to rely on that, you should ensure that the argument given
+            to Dataset#comment is not derived from user input.</p>
             
             <p>You can load this extension into specific datasets:</p>
             

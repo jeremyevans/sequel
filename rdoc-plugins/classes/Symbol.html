@@ -50,9 +50,6 @@
             <a href="../files/lib/sequel/extensions/pg_row_ops_rb.html">lib/sequel/extensions/pg_row_ops.rb</a>
           </li>
           <li class='other'>
-            <a href="../files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">lib/sequel/extensions/ruby18_symbol_extensions.rb</a>
-          </li>
-          <li class='other'>
             <a href="../files/lib/sequel/extensions/symbol_aref_rb.html">lib/sequel/extensions/symbol_aref.rb</a>
           </li>
           <li class='other'>
@@ -101,7 +98,6 @@
                 <li><a href="Sequel/Postgres/JSONOpMethods.html">Sequel::Postgres::JSONOpMethods</a></li>
                 <li><a href="Sequel/Postgres/RangeOpMethods.html">Sequel::Postgres::RangeOpMethods</a></li>
                 <li><a href="Sequel/Postgres/PGRowOp/ExpressionMethods.html">Sequel::Postgres::PGRowOp::ExpressionMethods</a></li>
-                <li>Sequel::SQL::InequalityMethods</li>
                 <li>Sequel::SQL::AliasMethods</li>
               </ol>
             </div>
@@ -113,18 +109,16 @@
                 <a name='method-i-5B-5D'></a>
                 <div class='synopsis'>
                   <span class='name'>[]</span>
-                  <span class='arguments'>(*args)</span>
+                  <span class='arguments'>(v)</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Create an SQL Function with the receiver as the function name and the given
-                  arguments.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/ruby18_symbol_extensions.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/symbol_aref.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">aref_before_sequel</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-identifier'>
@@ -135,16 +129,15 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Returns receiver wrapped in an <code>Sequel::SQL::Identifier</code>. 
-                  Usually used to prevent splitting the symbol.</p>
+                  <p>Returns receiver wrapped in an <code>Sequel::SQL::Identifier</code>.</p>
                   
-                  <pre class="ruby">:<span class="ruby-identifier">a__b</span> <span class="ruby-comment"># SQL: &quot;a&quot;.&quot;b&quot;</span>&#x000A;:<span class="ruby-identifier">a__b</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># SQL: &quot;a__b&quot;</span></pre>
+                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># SQL: &quot;a&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-identifier-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 216</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-identifier-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 208</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">identifier</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_function'>
@@ -156,10 +149,7 @@
                 <div class='description'>
                   
                   <p>Returns a <code>Sequel::SQL::Function</code> with this as the function
-                  name, and the given arguments. This is aliased as <code>Symbol#[]</code> if
-                  the RUBY_VERSION is less than 1.9.0. Ruby 1.9 defines
-                  <code>Symbol#[]</code>, and <a href="Sequel.html">Sequel</a> doesn&#39;t
-                  override methods defined by ruby itself.</p>
+                  name, and the given arguments.</p>
                   
                   <pre class="ruby">:<span class="ruby-identifier">now</span>.<span class="ruby-identifier">sql_function</span> <span class="ruby-comment"># SQL: now()</span>&#x000A;:<span class="ruby-identifier">sum</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># SQL: sum(a)</span>&#x000A;:<span class="ruby-identifier">concat</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SQL: concat(a, b)</span></pre>
                 </div>
@@ -167,7 +157,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_function-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_function-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 228</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_function-source'><span class="ruby-comment"># File lib/sequel/extensions/core_extensions.rb, line 218</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

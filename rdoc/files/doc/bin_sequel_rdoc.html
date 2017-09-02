@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2017-08-10 09:06:47 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -59,10 +59,7 @@
             load path.  However, if you want to run bin/sequel from the root of a
             repository checkout, you should probably do:</p>
             
-            <pre>ruby -I lib bin/sequel</pre>
-            
-            <p>The -I lib makes sure that you are using the repository checkout&#39;s
-            code.</p>
+            <pre class="ruby"><span class="ruby-identifier">ruby</span> <span class="ruby-identifier">bin</span><span class="ruby-operator">/</span><span class="ruby-identifier">sequel</span></pre>
             
             <h2 id="label-Choosing+the+Database+to+Connect+to">Choosing the Database to Connect to<span><a href="#label-Choosing+the+Database+to+Connect+to">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -165,6 +162,11 @@
             <p>The -d option dumps the migration in database-independent format, the -D
             option dumps it in database-specific format.</p>
             
+            <p>Note that the support for dumping schema is fairly limited.  It doesn&#39;t
+            handle database views, functions, triggers, schemas, partial indexes,
+            functional indexes, and many other things.  You should probably use the
+            database specific tools to handle those.</p>
+            
             <p>The -S option dumps the schema cache for all tables in the database, which
             can speed up the usage of <a href="../../classes/Sequel.html">Sequel</a>
             with models when using the schema_caching extension.  You should provide
@@ -183,6 +185,14 @@
             
             <p>This copies the table structure, table data, indexes, and foreign keys from
             the MySQL database to the PostgreSQL database.</p>
+            
+            <p>Note that the support for copying is fairly limited.  It doesn&#39;t handle
+            database views, functions, triggers, schemas, partial indexes, functional
+            indexes, and many other things. Also, the data type conversion may not be
+            exactly what you want.  It is best designed for quick conversions and
+            testing.  For serious production use, use the database&#39;s tools to copy
+            databases for the same database type, and for different database types, use
+            the <a href="../../classes/Sequel.html">Sequel</a> API.</p>
             
             <h2 id="label-Other+Options">Other Options<span><a href="#label-Other+Options">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
