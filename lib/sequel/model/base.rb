@@ -83,7 +83,7 @@ module Sequel
       # Sequel will not check the number of rows modified (default: true).
       attr_accessor :require_modification
   
-      # If true (the default), tequires that all models have valid tables,
+      # If true (the default), requires that all models have valid tables,
       # raising exceptions if creating a model without a valid table backing it.
       # Setting this to false will allow the creation of model classes where the
       # underlying table doesn't exist.
