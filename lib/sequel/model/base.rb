@@ -109,17 +109,6 @@ module Sequel
       # database to typecast the value correctly.
       attr_accessor :typecast_on_assignment
   
-      # :nocov:
-      def use_after_commit_rollback
-        Sequel::Deprecation.deprecate("Model.use_after_commit_rollback", "Model transaction hooks have been removed, switch to using database transaction hooks")
-        false
-      end
-      def use_after_commit_rollback=(v)
-        Sequel::Deprecation.deprecate("Model.use_after_commit_rollback=", "Model transaction hooks have been removed, switch to using database transaction hooks")
-        false
-      end
-      # :nocov:
-  
       # Whether to use a transaction by default when saving/deleting records (default: true).
       # If you are sending database queries in before_* or after_* hooks, you shouldn't change
       # the default setting without a good reason.
@@ -1030,17 +1019,6 @@ module Sequel
         attr_writer(meth)
       end
 
-      # :nocov:
-      def use_after_commit_rollback
-        Sequel::Deprecation.deprecate("Model#use_after_commit_rollback", "Model transaction hooks have been removed, switch to using database transaction hooks")
-        false
-      end
-      def use_after_commit_rollback=(v)
-        Sequel::Deprecation.deprecate("Model#use_after_commit_rollback=", "Model transaction hooks have been removed, switch to using database transaction hooks")
-        false
-      end
-      # :nocov:
-  
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns. The returned hash is a reference to the
       # receiver's values hash, and modifying it will also modify the receiver's
