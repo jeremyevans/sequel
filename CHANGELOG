@@ -1,5 +1,7 @@
 === master
 
+* Remove deprecated Model.allowed_columns method in the base model support (jeremyevans)
+
 * Remove deprecated Model.plugin_module_defined? private method (jeremyevans)
 
 * Remove deprecated support for Model#_before_validation private method (jeremyevans)
