@@ -1469,12 +1469,6 @@ module Sequel
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
-        # :nocov:
-        if method(:_before_validation).owner != InstanceMethods
-          Sequel::Deprecation.deprecate("Using Model#_before_validation", "You should switch to using Model#before_validation")
-          _before_validation
-        end
-        # :nocov:
         unless checked_save_failure(opts){_valid?(opts)}
           raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
           return
@@ -1622,12 +1616,6 @@ module Sequel
       #   artist.set(name: 'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
-        # :nocov:
-        if method(:_before_validation).owner != InstanceMethods
-          Sequel::Deprecation.deprecate("Using Model#_before_validation", "You should switch to using Model#before_validation")
-          _before_validation
-        end
-        # :nocov:
         begin
           _valid?(opts)
         rescue HookFailed
@@ -1637,10 +1625,6 @@ module Sequel
 
       private
       
-      # SEQUEL51: Remove
-      def _before_validation
-      end
-
       # Do the deletion of the object's dataset, and check that the row
       # was actually deleted.
       def _delete

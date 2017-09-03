@@ -1,3 +1,7 @@
+=== master
+
+* Remove deprecated support for Model#_before_validation private method (jeremyevans)
+
 === 5.0.0 (2017-09-01)
 
 * Make bin/sequel -M option always use base 10 (jeremyevans)
