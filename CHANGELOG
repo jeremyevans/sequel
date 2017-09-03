@@ -1,5 +1,7 @@
 === master
 
+* Remove deprecated Model.plugin_module_defined? private method (jeremyevans)
+
 * Remove deprecated support for Model#_before_validation private method (jeremyevans)
 
 === 5.0.0 (2017-09-01)

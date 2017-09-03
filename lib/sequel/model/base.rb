@@ -933,13 +933,6 @@ module Sequel
         Sequel::Plugins.const_get(module_name)
       end
 
-      # :nocov:
-      def plugin_module_defined?(plugin, submod)
-        Sequel::Deprecation.deprecate("Model.plugin_module_defined? (private method)", "Use const_defined?(submod, false)")
-        plugin.const_defined?(submod, false)
-      end
-      # :nocov:
-  
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
       #
