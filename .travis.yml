@@ -25,5 +25,6 @@ before_script:
   - psql -c 'create database sequel_test;' -U postgres
 addons:
   postgresql: "9.6"
+  mariadb: "10.0"
 services:
   - postgresql
