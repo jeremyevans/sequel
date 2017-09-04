@@ -24,6 +24,6 @@ before_script:
   - mysql -e 'create database sequel_test;'
   - psql -c 'create database sequel_test;' -U postgres
 addons:
-  postgresql: "9.4"
+  postgresql: "9.6"
 services:
   - postgresql
