@@ -72,6 +72,17 @@ describe "PostgreSQL", '#create_table' do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
   end
 
+  it "should create a table copying another table" do
+    begin
+      @db.create_table(:some_table) { text :name; index :name }
+      @db.create_table(:another_table, :like => :some_table)
+      @db[:another_table].columns.must_equal [:name]
+      @db.indexes(:another_table).keys.must_equal [:another_table_name_idx]
+    ensure
+      @db.drop_table?(:some_table, :another_table)
+    end
+  end
+
   it "should create a table inheriting from another table" do
     @db.create_table(:unlogged_dolls){text :name}
     @db.create_table(:tmp_dolls, :inherits=>:unlogged_dolls){}

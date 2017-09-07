@@ -892,6 +892,10 @@ module Sequel
           sql += " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
         end
 
+        if like = options[:like]
+          sql = sql.sub('()', "(LIKE #{quote_schema_table(like)} INCLUDING ALL)")
+        end
+
         if on_commit = options[:on_commit]
           raise(Error, "can't provide :on_commit without :temp to create_table") unless options[:temp]
           raise(Error, "unsupported on_commit option: #{on_commit.inspect}") unless ON_COMMIT.has_key?(on_commit)

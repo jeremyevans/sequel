@@ -169,6 +169,8 @@ module Sequel
     #             foreign server that was specified in CREATE SERVER.
     # :inherits :: Inherit from a different table.  An array can be
     #              specified to inherit from multiple tables.
+    # :like :: Copy all collum names, data types and constraints from a different
+    #          table into another table.
     # :unlogged :: Create the table as an unlogged table.
     # :options :: The OPTIONS clause to use for foreign tables.  Should be a hash
     #             where keys are option names and values are option values.  Note
