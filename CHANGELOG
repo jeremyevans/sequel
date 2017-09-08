@@ -1,5 +1,7 @@
 === master
 
+* Make Database#copy_into in the jdbc/postgresql adapter handle multi-byte strings (ckoenig) (#1416)
+
 * Remove deprecated Model use_after_commit_rollback class and instance methods (jeremyevans)
 
 * Remove deprecated Model.allowed_columns method in the base model support (jeremyevans)

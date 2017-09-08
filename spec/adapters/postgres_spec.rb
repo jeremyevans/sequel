@@ -1751,7 +1751,7 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
   describe "Postgres::Database#copy_into using UTF-8 encoding" do
     before(:all) do
       @db = DB
-      @db.create_table!(:test_copy){Text :t}
+      @db.create_table!(:test_copy){String :t}
       @ds = @db[:test_copy].order(:t)
     end
     before do
@@ -1762,14 +1762,14 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
     end
 
     it "should work with UTF-8 characters using the :data option" do
-      @db.copy_into(:test_copy, :data=>["ä\n", "ä\n"])
-      @ds.select_map([:t]).must_equal [["ä"], ["ä"]]
+      @db.copy_into(:test_copy, :data=>(["\u00E4\n"]*2))
+      @ds.select_map([:t]).map{|a| a.map{|s| s.force_encoding('UTF-8')}}.must_equal([["\u00E4"]] * 2)
     end
 
     it "should work with UTF-8 characters using a block" do
-      buf = ["ä\n", "ä\n"]
+      buf = (["\u00E4\n"]*2)
       @db.copy_into(:test_copy){buf.shift}
-      @ds.select_map([:t]).must_equal [["ä"], ["ä"]]
+      @ds.select_map([:t]).map{|a| a.map{|s| s.force_encoding('UTF-8')}}.must_equal([["\u00E4"]] * 2)
     end
   end
 
@@ -1853,7 +1853,6 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
       e.wrapped_exception.must_be_kind_of ArgumentError
       e.message.must_include "foo"
     end
-
   end
 end
 
