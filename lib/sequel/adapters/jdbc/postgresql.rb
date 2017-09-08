@@ -65,10 +65,14 @@ module Sequel
               copier = copy_manager.copy_in(copy_into_sql(table, opts))
               if block_given?
                 while buf = yield
-                  copier.writeToCopy(buf.to_java_bytes, 0, buf.length)
+                  java_bytes = buf.to_java_bytes
+                  copier.writeToCopy(java_bytes, 0, java_bytes.length)
                 end
               else
-                data.each { |d| copier.writeToCopy(d.to_java_bytes, 0, d.length) }
+                data.each do |d|
+                  java_bytes = d.to_java_bytes
+                  copier.writeToCopy(java_bytes, 0, java_bytes.length)
+                end
               end
             rescue Exception => e
               copier.cancelCopy if copier

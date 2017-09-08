@@ -1748,6 +1748,31 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
     end
   end
 
+  describe "Postgres::Database#copy_into using UTF-8 encoding" do
+    before(:all) do
+      @db = DB
+      @db.create_table!(:test_copy){Text :t}
+      @ds = @db[:test_copy].order(:t)
+    end
+    before do
+      @db[:test_copy].delete
+    end
+    after(:all) do
+      @db.drop_table?(:test_copy)
+    end
+
+    it "should work with UTF-8 characters using the :data option" do
+      @db.copy_into(:test_copy, :data=>["ä\n", "ä\n"])
+      @ds.select_map([:t]).must_equal [["ä"], ["ä"]]
+    end
+
+    it "should work with UTF-8 characters using a block" do
+      buf = ["ä\n", "ä\n"]
+      @db.copy_into(:test_copy){buf.shift}
+      @ds.select_map([:t]).must_equal [["ä"], ["ä"]]
+    end
+  end
+
   describe "Postgres::Database#copy_table" do
     before(:all) do
       @db = DB
