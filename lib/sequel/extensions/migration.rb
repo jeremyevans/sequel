@@ -516,6 +516,8 @@ module Sequel
     def initialize(db, directory, opts=OPTS)
       super
       @current = opts[:current] || current_migration_version
+      raise(Error, "No current version available") unless current
+
       latest_version = latest_migration_version
 
       @target = if opts[:target]
@@ -526,14 +528,13 @@ module Sequel
         latest_version
       end
 
+      raise(Error, "No target version available, probably because no migration files found or filenames don't follow the migration filename convention") unless target
+
       if @target > latest_version
         @target = latest_version
       elsif @target < 0
         @target = 0
       end
-
-      raise(Error, "No current version available") unless current
-      raise(Error, "No target version available, probably because no migration files found or filenames don't follow the migration filename convention") unless target
 
       @direction = current < target ? :up : :down
       @migrations = get_migrations
