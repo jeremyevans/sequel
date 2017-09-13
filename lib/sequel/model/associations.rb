@@ -2543,7 +2543,7 @@ module Sequel
 
           begin
             cbs.each do |cb|
-              res = case cb
+              case cb
               when Symbol
                 # Allow calling private methods in association callbacks
                 send(cb, object)
