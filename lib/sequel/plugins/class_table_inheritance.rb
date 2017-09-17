@@ -132,7 +132,7 @@ module Sequel
     #                 Cook:      :staff,
     #                 Manager:   :managers,
     #                 Executive: :executives,
-    #                 CEO:       ::executives }
+    #                 CEO:       :executives }
     #
     #   # Using integers to store the class type, with a :model_map hash
     #   # and an sti_key of :type
