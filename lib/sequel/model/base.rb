@@ -427,6 +427,7 @@ module Sequel
 
       # Freeze a model class, disallowing any further changes to it.
       def freeze
+        return self if frozen?
         dataset_module.freeze
         overridable_methods_module.freeze
 

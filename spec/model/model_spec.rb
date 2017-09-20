@@ -191,6 +191,11 @@ describe "Sequel::Model.freeze" do
     proc{model.dataset_module{}}.must_raise RuntimeError
   end
 
+  it "should work if the model is already frozen" do
+    model = Class.new(Sequel::Model(:items))
+    model.freeze.freeze
+  end
+
   it "should freeze a model class without a dataset without breaking" do
     model = Class.new(Sequel::Model)
     model.freeze

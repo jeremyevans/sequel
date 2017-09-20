@@ -1,5 +1,7 @@
 === master
 
+* Do not raise an error if calling Model.freeze on a frozen model (jeremyevans) (#1421)
+
 * Make Database#copy_into in the jdbc/postgresql adapter handle multi-byte strings (ckoenig) (#1416)
 
 * Remove deprecated Model use_after_commit_rollback class and instance methods (jeremyevans)
