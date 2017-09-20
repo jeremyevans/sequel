@@ -195,6 +195,16 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:drop_table, :a, {:foo=>:bar}]]
   end
   
+  it "should reverse add_foreign_key with :foreign_key_constraint_name option" do
+    Sequel.migration{change{alter_table(:t){add_foreign_key :b, :c, :foreign_key_constraint_name=>:f}}}.apply(@db, :down)
+    actions = @db.actions
+    actions.must_equal [[:alter_table, [[:drop_foreign_key, :b, {:foreign_key_constraint_name=>:f}]]]]
+    @db.sqls
+    db = Sequel.mock
+    db.alter_table(:t){send(*actions[0][1][0])}
+    db.sqls.must_equal ["ALTER TABLE t DROP CONSTRAINT f", "ALTER TABLE t DROP COLUMN b"]
+  end
+  
   it "should raise in the down direction if migration uses unsupported method" do
     m = Sequel.migration{change{run 'SQL'}}
     m.apply(@db, :up)

@@ -1204,6 +1204,20 @@ describe "DB#alter_table" do
     @db.sqls.must_equal ["ALTER TABLE cats DROP CONSTRAINT cats_node_id_fkey", "ALTER TABLE cats DROP COLUMN node_id"]
   end
 
+  it "should support drop_foreign_key with :foreign_key_constraint_name option" do
+    @db.alter_table(:cats) do
+      drop_foreign_key :node_id, :foreign_key_constraint_name=>:foo
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats DROP CONSTRAINT foo", "ALTER TABLE cats DROP COLUMN node_id"]
+  end
+
+  it "should support drop_foreign_key with :name option" do
+    @db.alter_table(:cats) do
+      drop_foreign_key :node_id, :name=>:foo
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats DROP CONSTRAINT foo", "ALTER TABLE cats DROP COLUMN node_id"]
+  end
+
   it "should support drop_foreign_key with composite foreign keys" do
     def @db.foreign_key_list(table_name)
       [{:name=>:cats_node_id_prop_id_fkey, :columns=>[:node_id, :prop_id]}] 

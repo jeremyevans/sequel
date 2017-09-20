@@ -520,6 +520,10 @@ module Sequel
       #   drop_foreign_key(:artist_id) # DROP CONSTRAINT table_artist_id_fkey, DROP COLUMN artist_id
       #   drop_foreign_key([:name]) # DROP CONSTRAINT table_name_fkey
       def drop_foreign_key(name, opts=OPTS)
+        if !name.is_a?(Array) && opts[:foreign_key_constraint_name]
+          opts = Hash[opts]
+          opts[:name] = opts[:foreign_key_constraint_name]
+        end
         drop_composite_foreign_key(Array(name), opts)
         drop_column(name) unless name.is_a?(Array)
       end
