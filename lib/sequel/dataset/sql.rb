@@ -80,8 +80,8 @@ module Sequel
         end
       when Integer
         sql << literal_integer(v)
-      when Hash
-        literal_hash_append(sql, v)
+      when method(:castable_to_hash?).to_proc
+        literal_hash_append(sql, v.to_hash)
       when SQL::Expression
         literal_expression_append(sql, v)
       when Float
@@ -1529,6 +1529,14 @@ module Sequel
 
     def update_update_sql(sql)
       sql << 'UPDATE'
+    end
+
+    def castable_to_hash?(value)
+      value.respond_to?(:to_hash) && value.method(:to_hash).arity == 0 && !internal_sql_literal?(value)
+    end
+
+    def internal_sql_literal?(object)
+      object.respond_to?(:sql_literal_append) || object.respond_to?(:sql_literal)
     end
   end
 end

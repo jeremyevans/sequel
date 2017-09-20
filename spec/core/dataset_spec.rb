@@ -400,6 +400,16 @@ describe "Dataset#where" do
     @dataset.where(:name => 'xyz', :price => 342).select_sql.must_equal 'SELECT * FROM test WHERE ((name = \'xyz\') AND (price = 342))'
   end
   
+  it "should work with objects that quack like a hash" do
+    object_castable_to_hash = Class.new do
+      def to_hash
+        {:name => 'xyz', :price => 342}
+      end
+    end.new
+  
+    @dataset.where(object_castable_to_hash).select_sql.must_equal 'SELECT * FROM test WHERE ((name = \'xyz\') AND (price = 342))'
+  end
+  
   it "should work with a placeholder literal string" do
     @dataset.where(Sequel.lit('price < ? AND id in ?', 100, [1, 2, 3])).select_sql.must_equal "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
