@@ -1,5 +1,7 @@
 === master
 
+* Do not issue unnecessary query for macaddr type oid when loading the pg_inet extension (jeltz) (#1423)
+
 * Make alter_table add_foreign_key with a column symbol reversible when using the :foreign_key_constraint_name option (jeremyevans) (#1422)
 
 * Do not raise an error if calling Model.freeze on a frozen model (jeremyevans) (#1421)
