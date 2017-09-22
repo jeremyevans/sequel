@@ -46,7 +46,7 @@ module Sequel
           if respond_to?(:register_array_type)
             register_array_type('inet', :oid=>1041, :scalar_oid=>869)
             register_array_type('cidr', :oid=>651, :scalar_oid=>650)
-            register_array_type('macaddr', :oid=>1040)
+            register_array_type('macaddr', :oid=>1040, :scalar_oid=>829)
           end
           @schema_type_classes[:ipaddr] = IPAddr
         end
