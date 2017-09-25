@@ -1551,11 +1551,11 @@ extensions.
   #   :id  <----- :meta -------> :id
   #   :name                      :name
   class Album < Sequel::Model
-    many_to_many :artists, left_key: Sequel.pg_jsonb(:meta)['album_id'].cast(String).cast(Integer)
+    many_to_many :artists, left_key: Sequel.pg_jsonb(:meta)['album_id'].cast(String).cast(Integer),
       right_key: Sequel.pg_jsonb(:meta)['artist_id'].cast(String).cast(Integer)
   end
   class Artist < Sequel::Model
-    many_to_many :albums, left_key: Sequel.pg_jsonb(:meta)['artist_id'].cast(String).cast(Integer)
+    many_to_many :albums, left_key: Sequel.pg_jsonb(:meta)['artist_id'].cast(String).cast(Integer),
       right_key: Sequel.pg_jsonb(:meta)['album_id'].cast(String).cast(Integer)
   end
 
