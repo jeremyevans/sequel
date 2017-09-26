@@ -494,6 +494,10 @@ module Sequel
     # Sequel checks that the datasets using this method have an order, but it cannot
     # ensure that the order is unambiguous.
     #
+    # Note that this method is not safe to use on many adapters if you are
+    # running additional queries inside the provided block.  If you are
+    # running queries inside the block, use a separate thread or shard inside +paged_each+.
+    #
     # Options:
     # :rows_per_fetch :: The number of rows to fetch per query.  Defaults to 1000.
     # :strategy :: The strategy to use for paging of results.  By default this is :offset,
