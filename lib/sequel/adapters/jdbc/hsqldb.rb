@@ -53,7 +53,7 @@ module Sequel
           when :add_column
             if op[:table]
               [super(table, op.merge(:table=>nil)),
-               alter_table_sql(table, op.merge(:op=>:add_constraint, :type=>:foreign_key, :name=>op[:foreign_key_name], :columns=>[op[:name]], :table=>op[:table]))]
+               alter_table_sql(table, op.merge(:op=>:add_constraint, :type=>:foreign_key, :name=>op[:foreign_key_constraint_name], :columns=>[op[:name]], :table=>op[:table]))]
             else
               super
             end

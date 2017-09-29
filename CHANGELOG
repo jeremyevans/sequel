@@ -1,5 +1,7 @@
 === master
 
+* Make jdbc/h2 and jdbc/hsqldb adapters respect :foreign_key_constraint_name option when adding new foreign key column (jeremyevans)
+
 * Do not issue unnecessary query for macaddr type oid when loading the pg_inet extension (jeltz) (#1423)
 
 * Make alter_table add_foreign_key with a column symbol reversible when using the :foreign_key_constraint_name option (jeremyevans) (#1422)

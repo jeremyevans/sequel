@@ -89,7 +89,8 @@ module Sequel
 
               if ref
                 op[:table] = ref
-                sqls << "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])}) #{column_references_sql(op)}"
+                constraint_name = op[:foreign_key_constraint_name]
+                sqls << "ALTER TABLE #{quote_schema_table(table)} ADD#{" CONSTRAINT #{quote_identifier(constraint_name)}" if constraint_name} FOREIGN KEY (#{quote_identifier(op[:name])}) #{column_references_sql(op)}"
               end
 
               sqls
