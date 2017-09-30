@@ -1,4 +1,4 @@
-=== master
+=== 5.1.0 (2017-10-01)
 
 * Make jdbc/h2 and jdbc/hsqldb adapters respect :foreign_key_constraint_name option when adding new foreign key column (jeremyevans)
 
