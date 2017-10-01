@@ -1,4 +1,4 @@
-Fri, 01 Sep 2017 18:14:09 -0700
+Sun, 01 Oct 2017 09:37:14 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -25,7 +25,7 @@ lib/sequel/extensions/identifier_mangling.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/implicit_subquery.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/inflector.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/looser_typecasting.rb	Thu, 19 Jan 2017 10:04:33 -0800
-lib/sequel/extensions/migration.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/migration.rb	Sun, 10 Sep 2017 11:56:28 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -36,7 +36,7 @@ lib/sequel/extensions/pg_array_ops.rb	Tue, 13 Sep 2016 13:21:30 -0700
 lib/sequel/extensions/pg_enum.rb	Thu, 19 Jan 2017 10:04:33 -0800
 lib/sequel/extensions/pg_hstore.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_hstore_ops.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/extensions/pg_inet.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/pg_inet.rb	Fri, 22 Sep 2017 12:58:46 -0700
 lib/sequel/extensions/pg_inet_ops.rb	Tue, 13 Sep 2016 13:21:30 -0700
 lib/sequel/extensions/pg_interval.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_json.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -81,7 +81,7 @@ lib/sequel/plugins/blacklist_security.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_readers.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_subsets.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/caching.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/class_table_inheritance.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/class_table_inheritance.rb	Sun, 17 Sep 2017 07:40:05 -0700
 lib/sequel/plugins/column_conflicts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/column_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/columns_updated.rb	Tue, 28 Mar 2017 16:44:29 -0700

@@ -29,12 +29,41 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-09-01 16:52:42 -0700</span>
+          <span class='datetime'>2017-10-01 09:19:35 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-5.1.0+-282017-10-01-29">5.1.0 (2017-10-01)<span><a href="#label-5.1.0+-282017-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make jdbc/h2 and jdbc/hsqldb adapters respect :foreign_key_constraint_name
+            option when adding new foreign key column (jeremyevans)</p>
+            </li><li>
+            <p>Do not issue unnecessary query for macaddr type oid when loading the
+            pg_inet extension (jeltz) (#1423)</p>
+            </li><li>
+            <p>Make alter_table add_foreign_key with a column symbol reversible when using
+            the :foreign_key_constraint_name option (jeremyevans) (#1422)</p>
+            </li><li>
+            <p>Do not raise an error if calling Model.freeze on a frozen model
+            (jeremyevans) (#1421)</p>
+            </li><li>
+            <p>Make Database#copy_into in the jdbc/postgresql adapter handle multi-byte
+            strings (ckoenig) (#1416)</p>
+            </li><li>
+            <p>Remove deprecated Model use_after_commit_rollback class and instance
+            methods (jeremyevans)</p>
+            </li><li>
+            <p>Remove deprecated Model.allowed_columns method in the base model support
+            (jeremyevans)</p>
+            </li><li>
+            <p>Remove deprecated Model.plugin_module_defined? private method (jeremyevans)</p>
+            </li><li>
+            <p>Remove deprecated support for Model#_before_validation private method
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-5.0.0+-282017-09-01-29">5.0.0 (2017-09-01)<span><a href="#label-5.0.0+-282017-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

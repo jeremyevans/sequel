@@ -1,4 +1,4 @@
-Fri, 01 Sep 2017 18:13:58 -0700
+Sun, 01 Oct 2017 09:36:13 -0700
 lib/sequel/adapters/ado.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/ado/access.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/ado/mssql.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -7,13 +7,13 @@ lib/sequel/adapters/ibmdb.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/db2.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/derby.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/adapters/jdbc/h2.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/adapters/jdbc/hsqldb.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/adapters/jdbc/h2.rb	Fri, 29 Sep 2017 08:29:39 -0700
+lib/sequel/adapters/jdbc/hsqldb.rb	Fri, 29 Sep 2017 08:29:39 -0700
 lib/sequel/adapters/jdbc/jtds.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/mssql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/mysql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/oracle.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/adapters/jdbc/postgresql.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/adapters/jdbc/postgresql.rb	Fri, 08 Sep 2017 08:11:22 -0700
 lib/sequel/adapters/jdbc/sqlanywhere.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/sqlite.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/jdbc/sqlserver.rb	Tue, 01 Aug 2017 08:12:00 -0700
