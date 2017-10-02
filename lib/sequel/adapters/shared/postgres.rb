@@ -524,7 +524,7 @@ module Sequel
 
       # The version of the PostgreSQL server, used for determining capability.
       def server_version(server=nil)
-        return @server_version if @server_version
+        return @server_version if defined?(@server_version)
         @server_version = synchronize(server) do |conn|
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
