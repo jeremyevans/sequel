@@ -1165,7 +1165,7 @@ Called before adding an object to the association:
   
   class Artist
     # Don't allow adding an album to an artist if it has no tracks
-    one_to_many :albums, before_add: lambda{|ar, al| artist.cancel_action if al.num_tracks == 0}
+    one_to_many :albums, before_add: lambda{|ar, al| ar.cancel_action if al.num_tracks == 0}
   end
 
 ==== :after_add [+one_to_many+, +many_to_many+]
@@ -1189,7 +1189,7 @@ Called before removing an object from the association using <tt>remove_<i>associ
 
   class Artist
     # Don't allow removing a self-titled album
-    one_to_many :albums, before_remove: lambda{|ar, al| artist.cancel_action if al.name == ar.name}
+    one_to_many :albums, before_remove: lambda{|ar, al| ar.cancel_action if al.name == ar.name}
   end
 
 This is not called when using <tt>remove_all_<i>association</i></tt>.
