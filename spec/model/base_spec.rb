@@ -381,6 +381,25 @@ describe "A model inheriting from a model" do
   end
 end
 
+describe "A model inheriting from a custom base that sets @dataset" do
+  before do
+    ::Feline = Class.new(Sequel::Model)
+    def Feline.inherited(subclass)
+      subclass.instance_variable_set(:@dataset, nil)
+      superclass.inherited(subclass)
+    end
+    class ::Leopard < Feline; end
+  end
+  after do
+    Object.send(:remove_const, :Leopard)
+    Object.send(:remove_const, :Feline)
+  end
+
+  it "should not infer the dataset of the subclass" do
+    proc{Leopard.dataset}.must_raise(Sequel::Error)
+  end
+end
+
 describe "Model.primary_key" do
   before do
     @c = Class.new(Sequel::Model)
