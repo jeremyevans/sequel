@@ -152,7 +152,7 @@ plain strings to literal strings.
 ==== SQL Fragment passed to Dataset#lock_style and Model#lock!
 
 The Sequel::Dataset#lock_style and Sequel::Model#lock! methods also treat
-an input string as SQL code. This method should not be called with user input.
+an input string as SQL code. These methods should not be called with user input.
 
   DB[:table].lock_style(params[:id]) # SQL injection!
   Album.first.lock!(params[:id]) # SQL injection!
@@ -184,8 +184,8 @@ injection:
   # SQL injection when using auto_literal_strings extension
 
 If you are using the auto_literal_strings extension, you need to be very careful,
-as the following methods will treat a plain string given as the first arguments
-as a literal strings:
+as the following methods will treat a plain string given as the first argument
+as a literal string:
 
 * Sequel::Dataset#where
 * Sequel::Dataset#having
@@ -204,7 +204,7 @@ Even stuff that looks like it may be safe isn't:
 
 The Model.find[rdoc-ref:Sequel::Model::ClassMethods#find] and
 Model.find_or_create[rdoc-ref:Sequel::Model::ClassMethods#find_or_create]
-class methods also will treat string arguments as literal strings if the
+class methods will also treat string arguments as literal strings if the
 auto_literal_strings extension is used:
 
   Album.find(params[:id])
