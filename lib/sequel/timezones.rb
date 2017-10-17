@@ -164,7 +164,6 @@ module Sequel
           ary << offset
         end
         convert_input_timestamp(ary, input_timezone)
-        convert_input_timestamp(ary, input_timezone)
       when Time
         if datetime_class == DateTime
           v.to_datetime
