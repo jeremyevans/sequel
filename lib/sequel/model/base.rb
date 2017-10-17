@@ -484,7 +484,7 @@ module Sequel
           subclass.instance_variable_set(iv, sup_class_value)
         end
 
-        unless ivs.include?("@dataset")
+        unless ivs.include?(:@dataset)
           if @dataset && self != Model
             subclass.set_dataset(@dataset.clone, :inherited=>true)
           elsif (n = subclass.name) && !n.to_s.empty?
