@@ -1,3 +1,7 @@
+=== master
+
+* Do not ignore existing @dataset instance variable when subclassing Sequel::Model (bjmllr) (#1435)
+
 === 5.1.0 (2017-10-01)
 
 * Make jdbc/h2 and jdbc/hsqldb adapters respect :foreign_key_constraint_name option when adding new foreign key column (jeremyevans)
