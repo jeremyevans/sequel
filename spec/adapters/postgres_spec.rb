@@ -727,12 +727,13 @@ describe "A PostgreSQL dataset with a timestamp field" do
       DateTime :time
     end
     @d = @db[:test3]
+    @db.extension :pg_extended_date_support
   end
   before do
     @d.delete
   end
   after do
-    @db.convert_infinite_timestamps = false if @db.adapter_scheme == :postgres
+    @db.convert_infinite_timestamps = false
   end
   after(:all) do
     @db.drop_table?(:test3)
@@ -756,74 +757,126 @@ describe "A PostgreSQL dataset with a timestamp field" do
     (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).must_equal t.strftime('%N').to_i/1000
   end
 
-  if DB.adapter_scheme == :postgres
-    it "should handle infinite timestamps if convert_infinite_timestamps is set" do
-      @d.insert(:time=>Sequel.cast('infinity', DateTime))
-      @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:time).must_be_nil
-      @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:time).must_equal 'infinity'
-      @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:time).must_equal 1.0/0.0
-      @db.convert_infinite_timestamps = 'nil'
-      @db[:test3].get(:time).must_be_nil
-      @db.convert_infinite_timestamps = 'string'
-      @db[:test3].get(:time).must_equal 'infinity'
-      @db.convert_infinite_timestamps = 'float'
-      @db[:test3].get(:time).must_equal 1.0/0.0
-      @db.convert_infinite_timestamps = 't'
-      @db[:test3].get(:time).must_equal 1.0/0.0
-      @db.convert_infinite_timestamps = 'f'
-      proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
-      @db.convert_infinite_timestamps = nil
-      proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
-      @db.convert_infinite_timestamps = false
-      proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
-
-      @d.update(:time=>Sequel.cast('-infinity', DateTime))
-      @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:time).must_be_nil
-      @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:time).must_equal '-infinity'
-      @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:time).must_equal(-1.0/0.0)
+  it "should handle BC times and dates" do
+    d = Date.new(-1234, 2, 3)
+    @db.get(Sequel.cast(d, Date)).must_equal d
+    begin
+      Sequel.default_timezone = :utc
+      t = Time.at(-100000000000).utc + 0.5
+      @db.get(Sequel.cast(t, Time)).must_equal t
+      @db.get(Sequel.cast(t, :timestamptz)).must_equal t
+      Sequel.datetime_class = DateTime
+      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+      @db.get(Sequel.cast(dt, DateTime)).must_equal dt
+      @db.get(Sequel.cast(dt, :timestamptz)).must_equal dt
+    ensure
+      Sequel.datetime_class = Time
+      Sequel.default_timezone = nil
     end
+  end
 
-    it "should handle conversions from infinite strings/floats in models" do
-      c = Class.new(Sequel::Model(:test3))
-      @db.convert_infinite_timestamps = :float
-      c.new(:time=>'infinity').time.must_equal 'infinity'
-      c.new(:time=>'-infinity').time.must_equal '-infinity'
-      c.new(:time=>1.0/0.0).time.must_equal 1.0/0.0
-      c.new(:time=>-1.0/0.0).time.must_equal(-1.0/0.0)
-    end
+  it "should handle infinite timestamps if convert_infinite_timestamps is set" do
+    @d.insert(:time=>Sequel.cast('infinity', DateTime))
+    @db.convert_infinite_timestamps = :nil
+    @db[:test3].get(:time).must_be_nil
+    @db.convert_infinite_timestamps = :string
+    @db[:test3].get(:time).must_equal 'infinity'
+    @db.convert_infinite_timestamps = :float
+    @db[:test3].get(:time).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = 'nil'
+    @db[:test3].get(:time).must_be_nil
+    @db.convert_infinite_timestamps = 'string'
+    @db[:test3].get(:time).must_equal 'infinity'
+    @db.convert_infinite_timestamps = 'float'
+    @db[:test3].get(:time).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = 't'
+    @db[:test3].get(:time).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = true
+    @db[:test3].get(:time).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = 'f'
+    proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
+    @db.convert_infinite_timestamps = nil
+    proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
+    @db.convert_infinite_timestamps = false
+    proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
 
-    it "should handle infinite dates if convert_infinite_timestamps is set" do
-      @d.insert(:date=>Sequel.cast('infinity', Date))
-      @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:date).must_be_nil
-      @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:date).must_equal 'infinity'
-      @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:date).must_equal 1.0/0.0
+    @d.update(:time=>Sequel.cast('-infinity', DateTime))
+    @db.convert_infinite_timestamps = :nil
+    @db[:test3].get(:time).must_be_nil
+    @db.convert_infinite_timestamps = :string
+    @db[:test3].get(:time).must_equal '-infinity'
+    @db.convert_infinite_timestamps = :float
+    @db[:test3].get(:time).must_equal(-1.0/0.0)
+  end
 
-      @d.update(:date=>Sequel.cast('-infinity', :timestamp))
-      @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:date).must_be_nil
-      @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:date).must_equal '-infinity'
-      @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:date).must_equal(-1.0/0.0)
-    end
+  it "should handle infinite dates if convert_infinite_timestamps is set" do
+    @d.insert(:time=>Sequel.cast('infinity', DateTime))
+    @db.convert_infinite_timestamps = :nil
+    @db[:test3].get(Sequel.cast(:time, Date)).must_be_nil
+    @db.convert_infinite_timestamps = :string
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal 'infinity'
+    @db.convert_infinite_timestamps = :float
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = 'nil'
+    @db[:test3].get(Sequel.cast(:time, Date)).must_be_nil
+    @db.convert_infinite_timestamps = 'string'
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal 'infinity'
+    @db.convert_infinite_timestamps = 'float'
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = 't'
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = true
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal 1.0/0.0
+    @db.convert_infinite_timestamps = 'f'
+    proc{@db[:test3].get(Sequel.cast(:time, Date))}.must_raise ArgumentError, Sequel::InvalidValue
+    @db.convert_infinite_timestamps = nil
+    proc{@db[:test3].get(Sequel.cast(:time, Date))}.must_raise ArgumentError, Sequel::InvalidValue
+    @db.convert_infinite_timestamps = false
+    proc{@db[:test3].get(Sequel.cast(:time, Date))}.must_raise ArgumentError, Sequel::InvalidValue
 
-    it "should handle conversions from infinite strings/floats in models" do
-      c = Class.new(Sequel::Model(:test3))
-      @db.convert_infinite_timestamps = :float
-      c.new(:date=>'infinity').date.must_equal 'infinity'
-      c.new(:date=>'-infinity').date.must_equal '-infinity'
-      c.new(:date=>1.0/0.0).date.must_equal 1.0/0.0
-      c.new(:date=>-1.0/0.0).date.must_equal(-1.0/0.0)
-    end
+    @d.update(:time=>Sequel.cast('-infinity', DateTime))
+    @db.convert_infinite_timestamps = :nil
+    @db[:test3].get(Sequel.cast(:time, Date)).must_be_nil
+    @db.convert_infinite_timestamps = :string
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal '-infinity'
+    @db.convert_infinite_timestamps = :float
+    @db[:test3].get(Sequel.cast(:time, Date)).must_equal(-1.0/0.0)
+  end
+
+  it "should handle conversions from infinite strings/floats in models" do
+    c = Class.new(Sequel::Model(:test3))
+    @db.convert_infinite_timestamps = :float
+    c.new(:time=>'infinity').time.must_equal 'infinity'
+    c.new(:time=>'-infinity').time.must_equal '-infinity'
+    c.new(:time=>1.0/0.0).time.must_equal 1.0/0.0
+    c.new(:time=>-1.0/0.0).time.must_equal(-1.0/0.0)
+  end
+
+  it "should handle infinite dates if convert_infinite_timestamps is set" do
+    @d.insert(:date=>Sequel.cast('infinity', Date))
+    @db.convert_infinite_timestamps = :nil
+    @db[:test3].get(:date).must_be_nil
+    @db.convert_infinite_timestamps = :string
+    @db[:test3].get(:date).must_equal 'infinity'
+    @db.convert_infinite_timestamps = :float
+    @db[:test3].get(:date).must_equal 1.0/0.0
+
+    @d.update(:date=>Sequel.cast('-infinity', :timestamp))
+    @db.convert_infinite_timestamps = :nil
+    @db[:test3].get(:date).must_be_nil
+    @db.convert_infinite_timestamps = :string
+    @db[:test3].get(:date).must_equal '-infinity'
+    @db.convert_infinite_timestamps = :float
+    @db[:test3].get(:date).must_equal(-1.0/0.0)
+  end
+
+  it "should handle conversions from infinite strings/floats in models" do
+    c = Class.new(Sequel::Model(:test3))
+    @db.convert_infinite_timestamps = :float
+    c.new(:date=>'infinity').date.must_equal 'infinity'
+    c.new(:date=>'-infinity').date.must_equal '-infinity'
+    c.new(:date=>1.0/0.0).date.must_equal 1.0/0.0
+    c.new(:date=>-1.0/0.0).date.must_equal(-1.0/0.0)
   end
 
   it "explain and analyze should not raise errors" do

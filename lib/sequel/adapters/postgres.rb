@@ -149,17 +149,8 @@ module Sequel
     class Database < Sequel::Database
       include Sequel::Postgres::DatabaseMethods
 
-      INFINITE_TIMESTAMP_STRINGS = ['infinity'.freeze, '-infinity'.freeze].freeze
-      INFINITE_DATETIME_VALUES = ([PLUS_INFINITY, MINUS_INFINITY] + INFINITE_TIMESTAMP_STRINGS).freeze
-      
       set_adapter_scheme :postgresql
       set_adapter_scheme :postgres
-
-      # Whether infinite timestamps/dates should be converted on retrieval.  By default, no
-      # conversion is done, so an error is raised if you attempt to retrieve an infinite
-      # timestamp/date.  You can set this to :nil to convert to nil, :string to leave
-      # as a string, or :float to convert to an infinite float.
-      attr_reader :convert_infinite_timestamps
 
       # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
       # handle fractional seconds in Time/DateTime or blobs with "\0". Only public for use by
@@ -232,36 +223,19 @@ module Sequel
         conn
       end
       
-      # Set whether to allow infinite timestamps/dates.  Make sure the
-      # conversion proc for date reflects that setting.
-      def convert_infinite_timestamps=(v)
-        @convert_infinite_timestamps = case v
-        when Symbol
-          v
-        when 'nil'
-          :nil
-        when 'string'
-          :string
-        when 'float'
-          :float
-        when String
-          typecast_value_boolean(v)
-        else
-          false
-        end
+      # Always false, support was moved to pg_extended_date_support extension.
+      # Needs to stay defined here so that sequel_pg works.
+      def convert_infinite_timestamps
+        false
+      end
 
-        pr = old_pr = @use_iso_date_format ? TYPE_TRANSLATOR.method(:date) : Sequel.method(:string_to_date)
-        if v
-          pr = lambda do |val|
-            case val
-            when *INFINITE_TIMESTAMP_STRINGS
-              infinite_timestamp_value(val)
-            else
-              old_pr.call(val)
-            end
-          end
+      # Enable pg_extended_date_support extension if symbol or string is given.
+      def convert_infinite_timestamps=(v)
+        case v
+        when Symbol, String, true
+          extension(:pg_extended_date_support)
+          self.convert_infinite_timestamps = v
         end
-        add_conversion_proc(1082, pr)
       end
 
       def disconnect_connection(conn)
@@ -462,21 +436,6 @@ module Sequel
         end
       end
 
-      # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
-      # value based on the convert_infinite_timestamps setting.
-      def to_application_timestamp(value)
-        if convert_infinite_timestamps
-          case value
-          when *INFINITE_TIMESTAMP_STRINGS
-            infinite_timestamp_value(value)
-          else
-            super
-          end
-        else
-          super
-        end
-      end
-        
       private
 
       # Execute the given SQL string or prepared statement on the connection object.
@@ -583,53 +542,9 @@ module Sequel
         end
       end
 
-      # Return an appropriate value for the given infinite timestamp string.
-      def infinite_timestamp_value(value)
-        case convert_infinite_timestamps
-        when :nil
-          nil
-        when :string
-          value
-        else
-          value == 'infinity' ? PLUS_INFINITY : MINUS_INFINITY
-        end
-      end
-      
       # Don't log, since logging is done by the underlying connection.
       def log_connection_execute(conn, sql)
         conn.execute(sql)
-      end
-
-      # If the value is an infinite value (either an infinite float or a string returned by
-      # by PostgreSQL for an infinite date), return it without converting it if
-      # convert_infinite_timestamps is set.
-      def typecast_value_date(value)
-        if convert_infinite_timestamps
-          case value
-          when *INFINITE_DATETIME_VALUES
-            value
-          else
-            super
-          end
-        else
-          super
-        end
-      end
-
-      # If the value is an infinite value (either an infinite float or a string returned by
-      # by PostgreSQL for an infinite timestamp), return it without converting it if
-      # convert_infinite_timestamps is set.
-      def typecast_value_datetime(value)
-        if convert_infinite_timestamps
-          case value
-          when *INFINITE_DATETIME_VALUES
-            value
-          else
-            super
-          end
-        else
-          super
-        end
       end
     end
     
