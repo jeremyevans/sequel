@@ -79,8 +79,17 @@ module Sequel
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
-        if value.is_a?(String) && value.end_with?(' BC')
-          super(value.sub(' BC', '').sub(' ', ' BC '))
+        if value.is_a?(String) && (m = value.match(/(?:(?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/)) && (m[1] || m[2])
+          if m[2]
+            value = value.sub(' BC', '').sub(' ', ' BC ')
+          end
+          if m[1]
+            dt = DateTime.parse(value)
+            dt = dt.to_time unless Sequel.datetime_class == DateTime
+            Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
+          else
+            super(value)
+          end
         elsif convert_infinite_timestamps
           case value
           when *INFINITE_TIMESTAMP_STRINGS
@@ -165,6 +174,8 @@ module Sequel
         end
 
         if RUBY_ENGINE == 'jruby'
+          # :nocov:
+
           # Work around JRuby bug #4822 in Time#to_datetime for times before date of calendar reform
           def literal_time(time)
             if time < TIME_YEAR_1
@@ -185,6 +196,7 @@ module Sequel
               super
             end
           end
+          # :nocov:
         else
           # Handle BC Time objects.
           def literal_time(time)
