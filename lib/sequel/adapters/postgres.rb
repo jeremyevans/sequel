@@ -286,6 +286,9 @@ module Sequel
         #           a version of PostgreSQL before 9.0, you will probably want to
         #           use a string if you are using any options at all, as the syntax
         #           Sequel uses for options is only compatible with PostgreSQL 9.0+.
+        #           This should should be the full COPY statement passed to PostgreSQL,
+        #           not just the SELECT query.  If a string is given, the :format and
+        #           :options options are ignored.
         # Dataset :: Uses a query instead of a table name when copying.
         # other :: Uses a table name (usually a symbol) when copying.
         # 
