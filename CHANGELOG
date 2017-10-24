@@ -1,5 +1,7 @@
 === master
 
+* Fix type conversion for smallint unsigned and integer unsigned types on jdbc/mysql (jeremyevans) (#1443)
+
 * Add pg_extended_date_support extension, for handling infinite and BC dates/timestamps (jeremyevans)
 
 * Do not ignore existing @dataset instance variable when subclassing Sequel::Model (bjmllr) (#1435)

@@ -142,6 +142,18 @@ describe "A MySQL dataset" do
     DB.drop_table?(:items)
   end
 
+  it "should handle large unsigned smallint/integer values" do
+    DB.alter_table(:items){set_column_type :value, 'smallint unsigned'}
+    @d.insert(:value=>(1 << 15) + 1)
+    @d.get(:value).must_equal((1 << 15) + 1)
+    DB.alter_table(:items){set_column_type :value, 'integer unsigned'}
+    @d.update(:value=>(1 << 31) + 1)
+    @d.get(:value).must_equal((1 << 31) + 1)
+    DB.alter_table(:items){set_column_type :value, 'bigint unsigned'}
+    @d.update(:value=>(1 << 63) + 1)
+    @d.get(:value).must_equal((1 << 63) + 1)
+  end
+
   it "should support ORDER clause in UPDATE statements" do
     @d.order(:name).update_sql(:value => 1).must_equal 'UPDATE `items` SET `value` = 1 ORDER BY `name`'
   end

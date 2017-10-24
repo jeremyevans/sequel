@@ -73,6 +73,16 @@ module Sequel
           mysql_connection_setting_sqls.each{|sql| statement(conn){|s| log_connection_yield(sql, conn){s.execute(sql)}}}
           super
         end
+
+        # Handle unsigned integer values
+        def setup_type_convertor_map
+          super
+          TypeConvertor::BASIC_MAP.dup
+          @type_convertor_map[Java::JavaSQL::Types::SMALLINT] = @type_convertor_map[Java::JavaSQL::Types::INTEGER]
+          @type_convertor_map[Java::JavaSQL::Types::INTEGER] = @type_convertor_map[Java::JavaSQL::Types::BIGINT]
+          @basic_type_convertor_map[Java::JavaSQL::Types::SMALLINT] = @basic_type_convertor_map[Java::JavaSQL::Types::INTEGER]
+          @basic_type_convertor_map[Java::JavaSQL::Types::INTEGER] = @basic_type_convertor_map[Java::JavaSQL::Types::BIGINT]
+        end
       end
     end
   end
