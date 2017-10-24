@@ -642,7 +642,7 @@ module Sequel
       end
 
       # Called before loading subadapter-specific code, necessary so that subadapter initialization code
-      # that runs queries works correctly.  This cannot be overriding in subadapters,
+      # that runs queries works correctly.  This cannot be overridden in subadapters.
       def setup_type_convertor_map_early
         @type_convertor_map = TypeConvertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>method(:timestamp_convert))
         @basic_type_convertor_map = TypeConvertor::BASIC_MAP.dup
