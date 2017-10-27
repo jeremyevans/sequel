@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>5.2.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>5.2.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/5.2.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2017-10-27 08:36:52 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>A pg_extended_date_support extension has been added.  This extension adds
+            support for infinite and BC dates/timestamps on PostgreSQL.</p>
+            
+            <p>The postgres adapter already had a convert_infinite_timestamps setting, but
+            it wasn&#39;t supported in the jdbc/postgresql adapter and it didn&#39;t
+            handle BC dates/timestamps.  Setting a non-default
+            convert_infinite_timestamps setting in the postgres adapter will now
+            automatically load the extension for backwards compatibility.</p>
+            
+            <p>The pg_extended_date_support extension by default just fixes the handling
+            of BC dates/timestamps.  To get it to handle infinite timestamps, you need
+            to choose the appropriate setting for your application:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_extended_date_support</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = :<span class="ruby-identifier">string</span> <span class="ruby-comment"># or :float or :nil</span></pre>
+            
+            <p>This extension also enables the handling of timezone offsets with seconds,
+            which is not natively supported by ruby&#39;s Time class in ruby &lt;2.5.</p>
+            </li></ul>
+            
+            <h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The jdbc/mysql adapter now handles smallint unsigned and integer unsigned
+            column types where the value for the column is outside of the range of a
+            Java short or integer.</p>
+            </li><li>
+            <p>Sequel::Model.inherited no longer modifies an existing @dataset instance
+            variable if one has already been set.  This fixes a regression that was
+            introduced in <a href="../../../classes/Sequel.html">Sequel</a> 5.0.0.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

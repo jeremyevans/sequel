@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-09-25 08:08:07 -0700</span>
+          <span class='datetime'>2017-10-02 08:20:49 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -933,7 +933,7 @@
             
             <p>Called before adding an object to the association:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Don&#39;t allow adding an album to an artist if it has no tracks</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">before_add</span><span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ar</span>, <span class="ruby-identifier">al</span><span class="ruby-operator">|</span> <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">cancel_action</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">al</span>.<span class="ruby-identifier">num_tracks</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Don&#39;t allow adding an album to an artist if it has no tracks</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">before_add</span><span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ar</span>, <span class="ruby-identifier">al</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ar</span>.<span class="ruby-identifier">cancel_action</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">al</span>.<span class="ruby-identifier">num_tracks</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-3Aafter_add+-5Bone_to_many-2C+many_to_many-5D">:after_add [<code>one_to_many</code>, <code>many_to_many</code>]<span><a href="#label-3Aafter_add+-5Bone_to_many-2C+many_to_many-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -946,7 +946,7 @@
             <p>Called before removing an object from the association using
             <code>remove_<em>association</em></code>:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Don&#39;t allow removing a self-titled album</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">before_remove</span><span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ar</span>, <span class="ruby-identifier">al</span><span class="ruby-operator">|</span> <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">cancel_action</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">al</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">ar</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Don&#39;t allow removing a self-titled album</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, <span class="ruby-identifier">before_remove</span><span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ar</span>, <span class="ruby-identifier">al</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ar</span>.<span class="ruby-identifier">cancel_action</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">al</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">ar</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This is not called when using <code>remove_all_<em>association</em></code>.</p>
             

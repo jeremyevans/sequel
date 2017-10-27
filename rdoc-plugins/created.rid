@@ -1,4 +1,4 @@
-Sun, 01 Oct 2017 09:37:14 -0700
+Fri, 27 Oct 2017 11:55:55 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -34,6 +34,7 @@ lib/sequel/extensions/pagination.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_array.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_array_ops.rb	Tue, 13 Sep 2016 13:21:30 -0700
 lib/sequel/extensions/pg_enum.rb	Thu, 19 Jan 2017 10:04:33 -0800
+lib/sequel/extensions/pg_extended_date_support.rb	Thu, 19 Oct 2017 15:26:18 -0700
 lib/sequel/extensions/pg_hstore.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_hstore_ops.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_inet.rb	Fri, 22 Sep 2017 12:58:46 -0700

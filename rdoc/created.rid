@@ -1,6 +1,6 @@
-Sun, 01 Oct 2017 09:34:11 -0700
+Fri, 27 Oct 2017 11:54:56 -0700
 README.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-CHANGELOG	Sun, 01 Oct 2017 09:19:35 -0700
+CHANGELOG	Fri, 27 Oct 2017 08:37:11 -0700
 MIT-LICENSE	Thu, 19 Jan 2017 10:04:33 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -12,8 +12,8 @@ lib/sequel/deprecated.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/exceptions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/timezones.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/version.rb	Sun, 01 Oct 2017 09:19:35 -0700
+lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
+lib/sequel/version.rb	Fri, 27 Oct 2017 08:36:59 -0700
 lib/sequel/connection_pool/sharded_single.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -38,7 +38,7 @@ lib/sequel/dataset/prepared_statements.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/query.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/sql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/model/associations.rb	Wed, 13 Sep 2017 08:03:38 -0700
-lib/sequel/model/base.rb	Wed, 20 Sep 2017 11:40:48 -0700
+lib/sequel/model/base.rb	Tue, 17 Oct 2017 09:47:15 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -46,7 +46,7 @@ lib/sequel/model/exceptions.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/plugins.rb	Tue, 01 Aug 2017 08:12:01 -0700
 doc/advanced_associations.rdoc	Mon, 25 Sep 2017 08:08:07 -0700
-doc/association_basics.rdoc	Mon, 25 Sep 2017 08:08:07 -0700
+doc/association_basics.rdoc	Mon, 02 Oct 2017 08:20:49 -0700
 doc/bin_sequel.rdoc	Thu, 10 Aug 2017 09:06:47 -0700
 doc/cheat_sheet.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/code_order.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -67,7 +67,7 @@ doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/reflection.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/schema_modification.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/security.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
+doc/security.rdoc	Tue, 17 Oct 2017 07:32:06 -0700
 doc/sharding.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/sql.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/testing.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -194,4 +194,5 @@ doc/release_notes/4.8.0.txt	Fri, 28 Feb 2014 09:33:59 -0800
 doc/release_notes/4.9.0.txt	Tue, 01 Apr 2014 10:01:57 -0700
 doc/release_notes/5.0.0.txt	Fri, 01 Sep 2017 17:57:51 -0700
 doc/release_notes/5.1.0.txt	Sun, 01 Oct 2017 09:19:35 -0700
+doc/release_notes/5.2.0.txt	Fri, 27 Oct 2017 08:36:52 -0700
 lib/sequel/extensions/migration.rb	Sun, 10 Sep 2017 11:56:28 -0700
