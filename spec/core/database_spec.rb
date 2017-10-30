@@ -102,6 +102,18 @@ describe "A new Database" do
   end
 end
 
+describe "Database :connect_sqls option" do
+  it "should issue the each sql query for each new connection" do
+    db = Sequel.mock(:connect_sqls=>['SELECT 1', 'SELECT 2'])
+    db.sqls.must_equal ['SELECT 1', 'SELECT 2']
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 3']
+    db.disconnect
+    db['SELECT 3'].get
+    db.sqls.must_equal ['SELECT 1', 'SELECT 2', 'SELECT 3']
+  end
+end
+
 describe "Database#freeze" do
   before do
     @db = Sequel.mock.freeze

@@ -76,6 +76,9 @@ class Sequel::ConnectionPool
   # connection made, and is usually used to set custom per-connection settings.
   attr_accessor :after_connect
 
+  # An array of sql strings to execute on each new connection.
+  attr_accessor :connect_sqls
+
   # The Sequel::Database object tied to this connection pool.
   attr_accessor :db
 
@@ -86,6 +89,7 @@ class Sequel::ConnectionPool
   # :after_connect :: A callable object called after each new connection is made, with the
   #                   connection object (and server argument if the callable accepts 2 arguments),
   #                   useful for customizations that you want to apply to all connections.
+  # :connect_sqls :: An array of sql strings to execute on each new connection, after :after_connect runs.
   # :preconnect :: Automatically create the maximum number of connections, so that they don't
   #                need to be created as needed.  This is useful when connecting takes a long time
   #                and you want to avoid possible latency during runtime.
@@ -94,6 +98,7 @@ class Sequel::ConnectionPool
   def initialize(db, opts=OPTS)
     @db = db
     @after_connect = opts[:after_connect]
+    @connect_sqls = opts[:connect_sqls]
     @error_classes = db.send(:database_error_classes).dup.freeze
   end
   
@@ -119,11 +124,18 @@ class Sequel::ConnectionPool
   def make_new(server)
     begin
       conn = @db.connect(server)
+
       if ac = @after_connect
         if ac.arity == 2
           ac.call(conn, server)
         else
           ac.call(conn)
+        end
+      end
+
+      if cs = @connect_sqls
+        cs.each do |sql|
+          db.send(:log_connection_execute, conn, sql)
         end
       end
     rescue Exception=>exception
