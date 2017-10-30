@@ -27,6 +27,8 @@ module Sequel
       TIME_YEAR_1 = Time.at(-62135596800).utc
       INFINITE_TIMESTAMP_STRINGS = ['infinity'.freeze, '-infinity'.freeze].freeze
       INFINITE_DATETIME_VALUES = ([PLUS_INFINITY, MINUS_INFINITY] + INFINITE_TIMESTAMP_STRINGS).freeze
+      PLUS_DATE_INFINITY = Date::Infinity.new
+      MINUS_DATE_INFINITY = -PLUS_DATE_INFINITY
 
       # Add dataset methods and update the conversion proces for dates and timestamps.
       def self.extended(db)
@@ -52,6 +54,8 @@ module Sequel
           :nil
         when 'string'
           :string
+        when 'date'
+          :date
         when 'float'
           :float
         when String, true
@@ -111,6 +115,8 @@ module Sequel
           nil
         when :string
           value
+        when :date
+          value == 'infinity' ? PLUS_DATE_INFINITY : MINUS_DATE_INFINITY
         else
           value == 'infinity' ? PLUS_INFINITY : MINUS_INFINITY
         end
@@ -168,6 +174,15 @@ module Sequel
             date = db.from_application_timestamp(date)
             minutes = (date.is_a?(DateTime) ? date.offset * 1440 : date.utc_offset/60).to_i
             date.strftime("'%Y-%m-%d %H:%M:%S.%N#{format_timestamp_offset(*minutes.divmod(60))} BC'")
+          else
+            super
+          end
+        end
+
+        # Handle Date::Infinity values
+        def literal_other_append(sql, v)
+          if v.is_a?(Date::Infinity)
+            sql << (v > 0 ? "'infinity'" : "'-infinity'")
           else
             super
           end

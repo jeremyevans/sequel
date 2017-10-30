@@ -49,6 +49,14 @@ describe "pg_extended_date_support extension" do
       t.(ni).must_equal ni
     end
 
+    [:date, 'date'].each do |v|
+      @db.convert_infinite_timestamps = v
+      d.(pi).must_equal Date::Infinity.new
+      t.(pi).must_equal Date::Infinity.new
+      d.(ni).must_equal -Date::Infinity.new
+      t.(ni).must_equal -Date::Infinity.new
+    end
+
     [:float, 'float', 't', true].each do |v|
       @db.convert_infinite_timestamps = v
       d.(pi).must_equal 1.0/0.0
@@ -90,6 +98,11 @@ describe "pg_extended_date_support extension" do
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20).to_time
     Sequel.datetime_class = DateTime
     @db.conversion_procs[1114].call("1200-02-15 14:13:20-00:00:00").must_equal DateTime.new(1200, 2, 15, 14, 13, 20)
+  end
+
+  it "should format Date::Infinity values" do
+    @db.literal(Date::Infinity.new).must_equal "'infinity'"
+    @db.literal(-Date::Infinity.new).must_equal "'-infinity'"
   end
 
   it "should format BC dates" do

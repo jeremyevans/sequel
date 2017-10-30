@@ -1,3 +1,7 @@
+=== master
+
+* Support Date::Infinity values in the pg_extended_date_support extension (jeremyevans)
+
 === 5.2.0 (2017-10-27)
 
 * Fix type conversion for smallint unsigned and integer unsigned types on jdbc/mysql (jeremyevans) (#1443)
