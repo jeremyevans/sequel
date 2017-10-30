@@ -1,5 +1,7 @@
 === master
 
+* Avoid warning if trying to rollback after a commit or rollback raises an exception in the postgres adapter (jeremyevans)
+
 * Support Date::Infinity values in the pg_extended_date_support extension (jeremyevans)
 
 === 5.2.0 (2017-10-27)

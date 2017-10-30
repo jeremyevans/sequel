@@ -549,6 +549,10 @@ module Sequel
       def log_connection_execute(conn, sql)
         conn.execute(sql)
       end
+
+      def rollback_transaction(conn, opts=OPTS)
+        super unless conn.transaction_status == 0
+      end
     end
     
     class Dataset < Sequel::Dataset
