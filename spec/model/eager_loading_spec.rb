@@ -675,9 +675,9 @@ describe Sequel::Model, "#eager" do
   it "should cache the negative lookup when eagerly loading a *_to_many associations" do
     a = EagerBand.eager(:albums).where{id > 100}.all
     a.must_equal [EagerBand.load(:id => 101), EagerBand.load(:id =>102)]
-    sqls = DB.sqls
-    ['SELECT * FROM albums WHERE (albums.band_id IN (101, 102))', 'SELECT * FROM albums WHERE (albums.band_id IN (102, 101))'].must_include(sqls.delete_at(1))
-    sqls.must_equal ['SELECT * FROM bands WHERE (id > 100)', "SELECT * FROM tracks WHERE (tracks.album_id IN (101))"]
+    DB.sqls.must_equal ['SELECT * FROM bands WHERE (id > 100)',
+      'SELECT * FROM albums WHERE (albums.band_id IN (101, 102))',
+      "SELECT * FROM tracks WHERE (tracks.album_id IN (101))"]
     a.map{|b| b.associations[:albums]}.must_equal [[EagerAlbum.load({:band_id=>101, :id=>101})], []]
     DB.sqls.must_equal []
   end
@@ -1100,9 +1100,9 @@ describe Sequel::Model, "#eager" do
     EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id=>3, :album_id=>1}])
     a = EagerBand.eager(:top_10_albums=>{proc{|ds| ds.select(:id, :name)}=>:tracks}).all
     a.must_equal [EagerBand.load(:id => 2)]
-    sqls = DB.sqls
-    sqls.pop.must_match(/SELECT \* FROM tracks WHERE \(tracks.album_id IN \((\d+, ){10}\d+\)\)/)
-    sqls.must_equal ['SELECT * FROM bands', 'SELECT id, name FROM albums WHERE (albums.band_id IN (2))']
+    DB.sqls.must_equal ['SELECT * FROM bands',
+      'SELECT id, name FROM albums WHERE (albums.band_id IN (2))',
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))']
     a = a.first
     a.top_10_albums.must_equal((1..10).map{|i| EagerAlbum.load(:band_id=>2, :id=>i)})
     a.top_10_albums.map{|x| x.tracks}.must_equal [[EagerTrack.load(:id => 3, :album_id=>1)]] + ([[]] * 9)

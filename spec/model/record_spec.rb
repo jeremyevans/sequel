@@ -146,10 +146,8 @@ describe "Model#save" do
     o = @c.new(:x => 11)
     def o.autoincrementing_primary_key() :y end
     o.save
-    sqls = DB.sqls
-    sqls.length.must_equal 2
-    sqls.first.must_equal "INSERT INTO items (x) VALUES (11)"
-    sqls.last.must_match %r{SELECT \* FROM items WHERE \(\([xy] = 1[13]\) AND \([xy] = 1[13]\)\) LIMIT 1}
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)",
+      'SELECT * FROM items WHERE ((x = 11) AND (y = 13)) LIMIT 1']
   end
 
   it "should update a record for an existing model instance" do
@@ -837,7 +835,7 @@ describe Sequel::Model, "#this" do
   it "should support composite primary keys" do
     @example.set_primary_key [:x, :y]
     instance = @example.load(:x => 4, :y => 5)
-    instance.this.sql.must_match(/SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/)
+    instance.this.sql.must_equal 'SELECT * FROM examples WHERE ((x = 4) AND (y = 5)) LIMIT 1'
   end
 end
 
@@ -1223,9 +1221,7 @@ describe Sequel::Model, "#update_fields" do
   it "should set only the given fields, and then save the changes to the record" do
     @o1.update_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
     @o1.values.must_equal(:x => 1, :y => 2, :id=>1)
-    sqls = DB.sqls
-    sqls.pop.must_match(/UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/)
-    sqls.must_equal []
+    DB.sqls.must_equal ['UPDATE items SET x = 1, y = 2 WHERE (id = 1)']
 
     @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])
     @o1.values.must_equal(:x => 1, :y => 5, :id=>1)

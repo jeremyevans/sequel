@@ -231,10 +231,8 @@ end
 
 describe Sequel::Model do
   it "should have class method aliased as model" do
-    Sequel::Model.instance_methods.collect{|x| x.to_s}.must_include("model")
-
     model_a = Class.new(Sequel::Model(:items))
-    model_a.new.model.wont_be_nil
+    model_a.new.model.must_be_same_as model_a
   end
 
   it "should be associated with a dataset" do
@@ -626,10 +624,9 @@ describe Sequel::Model, ".find_or_create" do
     @db.fetch = [[], {:x=>1, :id=>1}]
     @db.autoid = 1
     @c.find_or_create(:x => 1){|x| x[:y] = 2}.must_equal @c.load(:x=>1, :id=>1)
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM items WHERE (x = 1) LIMIT 1"
-    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].must_include(sqls[1])
-    sqls.last.must_equal "SELECT * FROM items WHERE id = 1"
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "SELECT * FROM items WHERE id = 1"]
   end
 end
 
@@ -687,17 +684,12 @@ describe Sequel::Model, "attribute accessors" do
   end
 
   it "should be created on set_dataset" do
-    %w'x z x= z='.each do |x|
-      @c.instance_methods.collect{|z| z.to_s}.wont_include(x)
-    end
+    a = [:x, :z, :x= ,:z=]
+    (a - @c.instance_methods).must_equal a
     @c.set_dataset(@dataset)
-    %w'x z x= z='.each do |x|
-      @c.instance_methods.collect{|z| z.to_s}.must_include(x)
-    end
+    (a - @c.instance_methods).must_equal []
     o = @c.new
-    %w'x z x= z='.each do |x|
-      o.methods.collect{|z| z.to_s}.must_include(x)
-    end
+    (a - o.methods).must_equal []
 
     o.x.must_be_nil
     o.x = 34
@@ -769,9 +761,7 @@ describe Sequel::Model, ".[]" do
   it "should work correctly for composite primary key specified as array" do
     @c.set_primary_key [:node_id, :kind]
     @c[3921, 201].must_be_kind_of(@c)
-    sqls = DB.sqls
-    sqls.length.must_equal 1
-    sqls.first.must_match(/^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/)
+    DB.sqls.must_equal ['SELECT * FROM items WHERE ((node_id = 3921) AND (kind = 201)) LIMIT 1']
   end
 end
 
