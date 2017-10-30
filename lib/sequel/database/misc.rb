@@ -151,6 +151,19 @@ module Sequel
         concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
         @pool.send(:preconnect, concurrent)
       end
+
+      case exts = @opts[:extensions]
+      when String
+        extension(*exts.split(',').map(&:to_sym))
+      when Array
+        extension(*exts)
+      when Symbol
+        extension(exts)
+      when nil
+        # nothing
+      else
+        raise Error, "unsupported Database :extensions option: #{@opts[:extensions].inspect}"
+      end
     end
 
     # Freeze internal data structures for the Database instance.

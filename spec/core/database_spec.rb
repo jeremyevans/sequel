@@ -2547,6 +2547,20 @@ describe "Database extensions" do
     Sequel.mock.a.must_equal 1
     Sequel.mock.b.must_equal 2
   end
+
+  it "should be loadable via the :extensions Database option" do
+    Sequel::Database.register_extension(:a, Module.new{def a; 1; end})
+    Sequel::Database.register_extension(:b, Module.new{def b; 2; end})
+    Sequel.mock(:extensions=>:a).a.must_equal 1
+    db = Sequel.mock(:extensions=>'a,b')
+    db.a.must_equal 1
+    db.b.must_equal 2
+    db = Sequel.mock(:extensions=>[:a, :b])
+    db.a.must_equal 1
+    db.b.must_equal 2
+    proc{Sequel.mock(:extensions=>nil).a}.must_raise NoMethodError
+    proc{Sequel.mock(:extensions=>Object.new)}.must_raise Sequel::Error
+  end
 end
 
 describe "Database specific exception classes" do

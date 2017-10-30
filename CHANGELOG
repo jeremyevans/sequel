@@ -1,5 +1,7 @@
 === master
 
+* Support :extensions Database option for loading extensions when initializing, useful in connection strings (jeremyevans)
+
 * Avoid warning if trying to rollback after a commit or rollback raises an exception in the postgres adapter (jeremyevans)
 
 * Support Date::Infinity values in the pg_extended_date_support extension (jeremyevans)
