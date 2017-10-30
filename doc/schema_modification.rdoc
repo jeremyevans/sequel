@@ -398,15 +398,26 @@ creates a new column:
   end
 
 If you want to add a new foreign key constraint to an existing column, you provide an
-array with a single element.  It's encouraged to provide a name when adding the constraint,
-via the :name option:
+array with a single element:
+
+  alter_table(:albums) do
+    add_foreign_key [:artist_id], :artists
+  end
+
+It's encouraged to provide a name when adding the constraint, via the :foreign_key_constraint_name
+option if adding the column and the constraint:
+
+  alter_table(:albums) do
+    add_foreign_key :artist_id, :artists, foreign_key_constraint_name: :albums_artist_id_fkey
+  end
+
+or via the :name option if just adding the constraint:
 
   alter_table(:albums) do
     add_foreign_key [:artist_id], :artists, name: :albums_artist_id_fkey
   end
 
-To set up a multiple column foreign key constraint, use an array with multiple column
-symbols:
+To set up a multiple column foreign key constraint, use an array with multiple column symbols:
 
   alter_table(:albums) do
     add_foreign_key [:artist_name, :artist_location], :artists, name: :albums_artist_name_location_fkey
