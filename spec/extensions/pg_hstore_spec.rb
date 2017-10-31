@@ -32,7 +32,7 @@ describe "pg_hstore extension" do
     @db.literal(Sequel.hstore("c"=>nil)).must_equal '\'"c"=>NULL\'::hstore'
     @db.literal(Sequel.hstore("c"=>'NULL')).must_equal '\'"c"=>"NULL"\'::hstore'
     @db.literal(Sequel.hstore('c'=>'\ "\'=>')).must_equal '\'"c"=>"\\\\ \\"\'\'=>"\'::hstore'
-    ['\'"a"=>"b","c"=>"d"\'::hstore', '\'"c"=>"d","a"=>"b"\'::hstore'].must_include(@db.literal(Sequel.hstore("a"=>"b","c"=>"d")))
+    @db.literal(Sequel.hstore("a"=>"b","c"=>"d")).must_equal '\'"a"=>"b","c"=>"d"\'::hstore'
   end
 
   it "should register conversion proc correctly" do
@@ -178,7 +178,7 @@ describe "pg_hstore extension" do
     @db.bound_variable_arg(Sequel.hstore('1'=>nil), nil).must_equal '"1"=>NULL'
     @db.bound_variable_arg(Sequel.hstore('1'=>"NULL"), nil).must_equal '"1"=>"NULL"'
     @db.bound_variable_arg(Sequel.hstore('1'=>"'\\ \"=>"), nil).must_equal '"1"=>"\'\\\\ \\"=>"'
-    ['"a"=>"b","c"=>"d"', '"c"=>"d","a"=>"b"'].must_include(@db.bound_variable_arg(Sequel.hstore("a"=>"b","c"=>"d"), nil))
+    @db.bound_variable_arg(Sequel.hstore("a"=>"b","c"=>"d"), nil).must_equal '"a"=>"b","c"=>"d"'
   end
 
   it "should parse hstore type from the schema correctly" do

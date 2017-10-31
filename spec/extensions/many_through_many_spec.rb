@@ -462,12 +462,12 @@ describe Sequel::Model, "many_through_many" do
 
   it "should not add associations methods directly to class" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
-    im = @c1.instance_methods.collect{|x| x.to_s}
-    im.must_include('tags')
-    im.must_include('tags_dataset')
-    im2 = @c1.instance_methods(false).collect{|x| x.to_s}
-    im2.wont_include('tags')
-    im2.wont_include('tags_dataset')
+    im = @c1.instance_methods
+    im.must_include(:tags)
+    im.must_include(:tags_dataset)
+    im2 = @c1.instance_methods(false)
+    im2.wont_include(:tags)
+    im2.wont_include(:tags_dataset)
   end
 
   it "should support after_load association callback" do
@@ -603,11 +603,9 @@ describe "many_through_many eager loading methods" do
   it "should eagerly load multiple associations in a single call" do
     a = @c1.eager(:tags, :albums).all
     a.must_equal [@c1.load(:id=>1)]
-    sqls = DB.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_equal 'SELECT * FROM artists'
-    sqls[1..-1].must_include('SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
-    sqls[1..-1].must_include('SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
+    DB.sqls.must_equal ['SELECT * FROM artists',
+      'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))',
+      'SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))']
     a = a.first
     a.tags.must_equal [Tag.load(:id=>2)]
     a.albums.must_equal [Album.load(:id=>3)]
@@ -617,11 +615,9 @@ describe "many_through_many eager loading methods" do
   it "should eagerly load multiple associations in separate" do
     a = @c1.eager(:tags).eager(:albums).all
     a.must_equal [@c1.load(:id=>1)]
-    sqls = DB.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_equal 'SELECT * FROM artists'
-    sqls[1..-1].must_include('SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
-    sqls[1..-1].must_include('SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
+    DB.sqls.must_equal ['SELECT * FROM artists',
+      'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))',
+      'SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))']
     a = a.first
     a.tags.must_equal [Tag.load(:id=>2)]
     a.albums.must_equal [Album.load(:id=>3)]
@@ -1585,12 +1581,12 @@ describe Sequel::Model, "one_through_many" do
 
   it "should not add associations methods directly to class" do
     @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
-    im = @c1.instance_methods.collect{|x| x.to_s}
-    im.must_include('tag')
-    im.must_include('tag_dataset')
-    im2 = @c1.instance_methods(false).collect{|x| x.to_s}
-    im2.wont_include('tag')
-    im2.wont_include('tag_dataset')
+    im = @c1.instance_methods
+    im.must_include(:tag)
+    im.must_include(:tag_dataset)
+    im2 = @c1.instance_methods(false)
+    im2.wont_include(:tag)
+    im2.wont_include(:tag_dataset)
   end
 
   it "should support after_load association callback" do
@@ -1681,11 +1677,9 @@ describe "one_through_many eager loading methods" do
   it "should eagerly load multiple associations in a single call" do
     a = @c1.eager(:tag, :album).all
     a.must_equal [@c1.load(:id=>1)]
-    sqls = DB.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_equal 'SELECT * FROM artists'
-    sqls[1..-1].must_include('SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
-    sqls[1..-1].must_include('SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
+    DB.sqls.must_equal ['SELECT * FROM artists',
+      'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))',
+      'SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))']
     a = a.first
     a.tag.must_equal Tag.load(:id=>2)
     a.album.must_equal Album.load(:id=>3)
@@ -1695,11 +1689,9 @@ describe "one_through_many eager loading methods" do
   it "should eagerly load multiple associations in separate" do
     a = @c1.eager(:tag).eager(:album).all
     a.must_equal [@c1.load(:id=>1)]
-    sqls = DB.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_equal 'SELECT * FROM artists'
-    sqls[1..-1].must_include('SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
-    sqls[1..-1].must_include('SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))')
+    DB.sqls.must_equal ['SELECT * FROM artists',
+      'SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))',
+      'SELECT albums.*, albums_artists.artist_id AS x_foreign_key_x FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id IN (1))']
     a = a.first
     a.tag.must_equal Tag.load(:id=>2)
     a.album.must_equal Album.load(:id=>3)

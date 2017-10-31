@@ -45,8 +45,7 @@ describe "Sequel::Plugins::Uuid" do
       def _save_refresh(*) end
     end
     o = c.create
-    c.db.sqls.first.must_match(/INSERT INTO t \(u\) VALUES \('[-0-9a-f]+'\)/)
-    o.u.must_match(/[-0-9a-f]+/)
+    c.db.sqls.must_equal ["INSERT INTO t (u) VALUES ('#{o.u}')"]
   end
 
   it "should not raise an error if the model doesn't have the uuid column" do
@@ -97,6 +96,6 @@ describe "Sequel::Plugins::Uuid" do
     c2.db.reset
     o = c2.create
     o.u.must_equal @uuid
-    c2.db.sqls.first.must_match(/INSERT INTO t \([u]\) VALUES \('#{@uuid}'\)/)
+    c2.db.sqls.must_equal ["INSERT INTO t (u) VALUES ('#{@uuid}')"]
   end
 end

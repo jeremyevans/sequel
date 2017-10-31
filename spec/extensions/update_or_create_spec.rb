@@ -20,32 +20,28 @@ describe "Sequel::Plugins::UpdateOrCreate" do
 
     @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
     @c.update_or_create({:a=>2}, :a=>3){|t| t.b = 4}.must_equal @c.load(:id=>1, :a=>3, :b=>4)
-    sqls = @db.sqls
-    sqls.shift.must_equal "SELECT * FROM test WHERE (a = 2) LIMIT 1"
-    sqls.shift.must_match(/UPDATE test SET [ab] = [34], [ab] = [34] WHERE \(id = 1\)/)
+    @db.sqls.must_equal ["SELECT * FROM test WHERE (a = 2) LIMIT 1",
+      'UPDATE test SET a = 3, b = 4 WHERE (id = 1)']
   end
 
   it ".update_or_create should create a record if an existing record does not exist" do
     @db.fetch = [[], [{:id=>1, :a=>1, :b=>4}]]
     @c.update_or_create(:a=>1){|t| t.b = 4}.must_equal @c.load(:id=>1, :a=>1, :b=>4)
-    sqls = @db.sqls
-    sqls.shift.must_equal "SELECT * FROM test WHERE (a = 1) LIMIT 1"
-    sqls.shift.must_match(/INSERT INTO test \([ab], [ab]\) VALUES \([14], [14]\)/)
-    sqls.shift.must_equal "SELECT * FROM test WHERE (id = 1) LIMIT 1"
+    @db.sqls.must_equal ["SELECT * FROM test WHERE (a = 1) LIMIT 1",
+      "INSERT INTO test (a, b) VALUES (1, 4)",
+      "SELECT * FROM test WHERE (id = 1) LIMIT 1"]
 
     @db.fetch = [[], [{:id=>1, :a=>1, :b=>4}]]
     @c.update_or_create({:a=>1}, :b=>4).must_equal @c.load(:id=>1, :a=>1, :b=>4)
-    sqls = @db.sqls
-    sqls.shift.must_equal "SELECT * FROM test WHERE (a = 1) LIMIT 1"
-    sqls.shift.must_match(/INSERT INTO test \([ab], [ab]\) VALUES \([14], [14]\)/)
-    sqls.shift.must_equal "SELECT * FROM test WHERE (id = 1) LIMIT 1"
+    @db.sqls.must_equal ["SELECT * FROM test WHERE (a = 1) LIMIT 1",
+      "INSERT INTO test (a, b) VALUES (1, 4)",
+      "SELECT * FROM test WHERE (id = 1) LIMIT 1"]
 
     @db.fetch = [[], [{:id=>1, :a=>3, :b=>4}]]
     @c.update_or_create({:a=>1}, :a=>3){|t| t.b = 4}.must_equal @c.load(:id=>1, :a=>3, :b=>4)
-    sqls = @db.sqls
-    sqls.shift.must_equal "SELECT * FROM test WHERE (a = 1) LIMIT 1"
-    sqls.shift.must_match(/INSERT INTO test \([ab], [ab]\) VALUES \([34], [34]\)/)
-    sqls.shift.must_equal "SELECT * FROM test WHERE (id = 1) LIMIT 1"
+    @db.sqls.must_equal ["SELECT * FROM test WHERE (a = 1) LIMIT 1",
+      "INSERT INTO test (a, b) VALUES (3, 4)",
+      "SELECT * FROM test WHERE (id = 1) LIMIT 1"]
   end
 
   it ".update_or_create should return an existing record even if no changes necessary" do

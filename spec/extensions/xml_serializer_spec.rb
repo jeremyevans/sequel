@@ -125,30 +125,25 @@ describe "Sequel::Plugins::XmlSerializer" do
   end
 
   it "should support an :encoding option when serializing" do
-    ["<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>",
-     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><name>YJM</name><id>2</id></artist>"].must_include(@artist.to_xml(:encoding=>'UTF-8').gsub(/\n */m, ''))
+     @artist.to_xml(:encoding=>'UTF-8').gsub(/\n */m, '').must_equal "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>"
   end
 
   it "should support a :builder_opts option when serializing" do
-    ["<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>",
-     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><name>YJM</name><id>2</id></artist>"].must_include(@artist.to_xml(:builder_opts=>{:encoding=>'UTF-8'}).gsub(/\n */m, ''))
+    @artist.to_xml(:builder_opts=>{:encoding=>'UTF-8'}).gsub(/\n */m, '').must_equal "<?xml version=\"1.0\" encoding=\"UTF-8\"?><artist><id>2</id><name>YJM</name></artist>"
   end
 
   it "should support an :types option when serializing" do
-    ["<?xml version=\"1.0\"?><artist><id type=\"integer\">2</id><name type=\"string\">YJM</name></artist>",
-     "<?xml version=\"1.0\"?><artist><name type=\"string\">YJM</name><id type=\"integer\">2</id></artist>"].must_include(@artist.to_xml(:types=>true).gsub(/\n */m, ''))
+    @artist.to_xml(:types=>true).gsub(/\n */m, '').must_equal "<?xml version=\"1.0\"?><artist><id type=\"integer\">2</id><name type=\"string\">YJM</name></artist>"
   end
 
   it "should support an :root_name option when serializing" do
-    ["<?xml version=\"1.0\"?><ar><id>2</id><name>YJM</name></ar>",
-     "<?xml version=\"1.0\"?><ar><name>YJM</name><id>2</id></ar>"].must_include(@artist.to_xml(:root_name=>'ar').gsub(/\n */m, ''))
+    @artist.to_xml(:root_name=>'ar').gsub(/\n */m, '').must_equal "<?xml version=\"1.0\"?><ar><id>2</id><name>YJM</name></ar>"
   end
 
   it "should support an :array_root_name option when serializing arrays" do
     artist = @artist
     Artist.dataset = Artist.dataset.with_extend{define_method(:all){[artist]}}
-    ["<?xml version=\"1.0\"?><ars><ar><id>2</id><name>YJM</name></ar></ars>",
-     "<?xml version=\"1.0\"?><ars><ar><name>YJM</name><id>2</id></ar></ars>"].must_include(Artist.to_xml(:array_root_name=>'ars', :root_name=>'ar').gsub(/\n */m, ''))
+    Artist.to_xml(:array_root_name=>'ars', :root_name=>'ar').gsub(/\n */m, '').must_equal "<?xml version=\"1.0\"?><ars><ar><id>2</id><name>YJM</name></ar></ars>"
   end
 
   it "should raise an exception for xml tags that aren't associations, columns, or setter methods" do

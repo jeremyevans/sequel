@@ -274,25 +274,19 @@ describe "class_table_inheritance plugin" do
 
   it "should insert the correct rows into all tables when inserting into parent class" do
     Employee.create(:name=>'E')
-    sqls = @db.sqls
-    sqls.length.must_equal 1
-    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Employee)', '(E|Employee)'\)/)
+    @db.sqls.must_equal ["INSERT INTO employees (name, kind) VALUES ('E', 'Employee')"]
   end
     
   it "should insert the correct rows into all tables when inserting into subclass without separate table" do
     Intern.create(:name=>'E')
-    sqls = @db.sqls
-    sqls.length.must_equal 1
-    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Intern)', '(E|Intern)'\)/)
+    @db.sqls.must_equal ["INSERT INTO employees (name, kind) VALUES ('E', 'Intern')"]
   end
     
   it "should insert the correct rows into all tables when inserting" do
     Ceo.create(:num_managers=>3, :num_staff=>2, :name=>'E')
-    sqls = @db.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Ceo)', '(E|Ceo)'\)/)
-    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/)
-    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/)
+    @db.sqls.must_equal ["INSERT INTO employees (name, kind) VALUES ('E', 'Ceo')",
+      "INSERT INTO managers (id, num_staff) VALUES (1, 2)",
+      "INSERT INTO executives (id, num_managers) VALUES (1, 3)"]
   end
     
   it "should insert the correct rows into all tables when inserting when insert_select is supported" do
@@ -306,22 +300,18 @@ describe "class_table_inheritance plugin" do
       end)
     end
     Ceo.create(:num_managers=>3, :num_staff=>2, :name=>'E')
-    sqls = @db.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Ceo)', '(E|Ceo)'\) RETURNING \*/)
-    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\) RETURNING \*/)
-    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\) RETURNING \*/)
+    @db.sqls.must_equal ["INSERT INTO employees (name, kind) VALUES ('E', 'Ceo') RETURNING *",
+      "INSERT INTO managers (id, num_staff) VALUES (1, 2) RETURNING *",
+      "INSERT INTO executives (id, num_managers) VALUES (1, 3) RETURNING *"]
   end
     
   it "should insert the correct rows into all tables with a given primary key" do
     e = Ceo.new(:num_managers=>3, :num_staff=>2, :name=>'E')
     e.id = 2
     e.save
-    sqls = @db.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_match(/INSERT INTO employees \((name|kind|id), (name|kind|id), (name|kind|id)\) VALUES \(('E'|'Ceo'|2), ('E'|'Ceo'|2), ('E'|'Ceo'|2)\)/)
-    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/)
-    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/)
+    @db.sqls.must_equal ["INSERT INTO employees (id, name, kind) VALUES (2, 'E', 'Ceo')",
+      "INSERT INTO managers (id, num_staff) VALUES (2, 2)",
+      "INSERT INTO executives (id, num_managers) VALUES (2, 3)"]
   end
 
   it "should update the correct rows in all tables when updating parent class" do
@@ -463,22 +453,18 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
 
   it "should insert the correct rows into all tables when inserting" do
     Executive.create(:num_managers=>3, :num_staff=>2, :name=>'E')
-    sqls = @db.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_match(/INSERT INTO employees \(name\) VALUES \('E'\)/)
-    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/)
-    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/)
-    end
+    @db.sqls.must_equal ["INSERT INTO employees (name) VALUES ('E')",
+      "INSERT INTO managers (id, num_staff) VALUES (1, 2)",
+      "INSERT INTO executives (id, num_managers) VALUES (1, 3)"]
+  end
     
   it "should insert the correct rows into all tables with a given primary key" do
     e = Executive.new(:num_managers=>3, :num_staff=>2, :name=>'E')
     e.id = 2
     e.save
-    sqls = @db.sqls
-    sqls.length.must_equal 3
-    sqls[0].must_match(/INSERT INTO employees \((name|id), (name|id)\) VALUES \(('E'|2), ('E'|2)\)/)
-    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/)
-    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/)
+    @db.sqls.must_equal ["INSERT INTO employees (id, name) VALUES (2, 'E')",
+      "INSERT INTO managers (id, num_staff) VALUES (2, 2)",
+      "INSERT INTO executives (id, num_managers) VALUES (2, 3)"]
   end
 
   it "should update the correct rows in all tables when updating" do

@@ -76,9 +76,7 @@ describe "Sequel::Plugins::Timestamps" do
   it "should use the same value for the creation and update timestamps when creating if the :update_on_create option is given" do
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create
-    sqls = @c.db.sqls
-    sqls.shift.must_match(/INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/)
-    sqls.must_equal []
+    @c.db.sqls.must_equal ["INSERT INTO t (created_at, updated_at) VALUES ('2009-08-01', '2009-08-01')"]
     o.created_at.must_be :===, o.updated_at
   end
 
@@ -201,7 +199,7 @@ describe "Sequel::Plugins::Timestamps" do
     o = c2.create
     o.c.must_equal '2009-08-01'
     o.u.must_be :===, o.c 
-    c2.db.sqls.first.must_match(/INSERT INTO t \([cu], [cu]\) VALUES \('2009-08-01', '2009-08-01'\)/)
+    c2.db.sqls.must_equal ["INSERT INTO t (c, u) VALUES ('2009-08-01', '2009-08-01')"]
     c2.db.reset
     o = c2.load(:id=>1).save
     o.u.must_equal '2009-08-01'

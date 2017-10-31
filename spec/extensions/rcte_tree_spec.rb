@@ -121,9 +121,8 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
        {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>2}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>1}]])
     os = @ds.eager(:ancestors).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT id AS x_root_x, nodes\.\* FROM nodes WHERE \(id IN \([12], [12]\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.parent_id = nodes\.id\)\) SELECT \* FROM t AS nodes/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT id AS x_root_x, nodes.* FROM nodes WHERE (id IN (1, 2)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id)) SELECT * FROM t AS nodes']
     os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D'), @c.load(:id=>9, :parent_id=>nil, :name=>'E')]
     os.map{|o| o.ancestors}.must_equal [[@c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil)],
       [@c.load(:id=>2, :name=>'AA', :parent_id=>1), @c.load(:id=>1, :name=>'00', :parent_id=>8), @c.load(:id=>8, :name=>'?', :parent_id=>nil)],
@@ -143,9 +142,8 @@ describe Sequel::Model, "rcte_tree" do
        {:i=>1, :name=>'00', :pi=>8, :kal=>1}, {:i=>1, :name=>'00', :pi=>8, :kal=>2},
        {:i=>8, :name=>'?', :pi=>nil, :kal=>2}, {:i=>8, :name=>'?', :pi=>nil, :kal=>1}]])
     os = @ds.eager(:as).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH cte AS \(SELECT i AS kal, nodes\.\* FROM nodes WHERE \(i IN \([12], [12]\)\) UNION ALL SELECT cte\.kal, nodes\.\* FROM nodes INNER JOIN cte ON \(cte\.pi = nodes\.i\)\) SELECT \* FROM cte/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH cte AS (SELECT i AS kal, nodes.* FROM nodes WHERE (i IN (1, 2)) UNION ALL SELECT cte.kal, nodes.* FROM nodes INNER JOIN cte ON (cte.pi = nodes.i)) SELECT * FROM cte AS nodes']
     os.must_equal [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D'), @c.load(:i=>9, :pi=>nil, :name=>'E')]
     os.map{|o| o.as}.must_equal [[@c.load(:i=>1, :name=>'00', :pi=>8), @c.load(:i=>8, :name=>'?', :pi=>nil)],
       [@c.load(:i=>2, :name=>'AA', :pi=>1), @c.load(:i=>1, :name=>'00', :pi=>8), @c.load(:i=>8, :name=>'?', :pi=>nil)],
@@ -164,9 +162,8 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>1}, {:id=>1, :name=>'00', :parent_id=>8, :x_root_x=>2},
        {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>2}, {:id=>8, :name=>'?', :parent_id=>nil, :x_root_x=>1}]])
     @ds.eager(:ancestors).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT id AS x_root_x, nodes\.\* FROM nodes WHERE \(\(id IN \([12], [12]\)\) AND \(i = 1\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.parent_id = nodes\.id\) WHERE \(i = 1\)\) SELECT \* FROM t AS nodes WHERE \(i = 1\)/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT id AS x_root_x, nodes.* FROM nodes WHERE ((id IN (1, 2)) AND (i = 1)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.parent_id = nodes.id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)']
   end
 
   it "should eagerly load descendants" do
@@ -176,9 +173,8 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7}]])
     os = @ds.eager(:descendants).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\* FROM nodes WHERE \(parent_id IN \([267], [267], [267]\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\)\) SELECT \* FROM t AS nodes/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x, nodes.* FROM nodes WHERE (parent_id IN (2, 6, 7)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id)) SELECT * FROM t AS nodes']
     os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
     os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E'), @c.load(:id=>3, :name=>'00', :parent_id=>6)],
       [@c.load(:id=>3, :name=>'00', :parent_id=>6)],
@@ -198,9 +194,8 @@ describe Sequel::Model, "rcte_tree" do
        {:i=>3, :name=>'00', :pi=>6, :kal=>6}, {:i=>3, :name=>'00', :pi=>6, :kal=>2},
        {:i=>4, :name=>'?', :pi=>7, :kal=>7}, {:i=>5, :name=>'?', :pi=>4, :kal=>7}]])
     os = @ds.eager(:ds).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH cte AS \(SELECT pi AS kal, nodes\.\* FROM nodes WHERE \(pi IN \([267], [267], [267]\)\) UNION ALL SELECT cte\.kal, nodes\.\* FROM nodes INNER JOIN cte ON \(cte\.i = nodes\.pi\)\) SELECT \* FROM cte/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH cte AS (SELECT pi AS kal, nodes.* FROM nodes WHERE (pi IN (2, 6, 7)) UNION ALL SELECT cte.kal, nodes.* FROM nodes INNER JOIN cte ON (cte.i = nodes.pi)) SELECT * FROM cte AS nodes']
     os.must_equal [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D')]
     os.map{|o| o.ds}.must_equal [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E'), @c.load(:i=>3, :name=>'00', :pi=>6)],
       [@c.load(:i=>3, :name=>'00', :pi=>6)],
@@ -218,9 +213,8 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6, :x_level_x=>0}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2, :x_level_x=>1},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7, :x_level_x=>0}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7, :x_level_x=>1}]])
     os = @ds.eager(:descendants=>2).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\*, CAST\(0 AS integer\) AS x_level_x FROM nodes WHERE \(parent_id IN \([267], [267], [267]\)\) UNION ALL SELECT t\.x_root_x, nodes\.\*, \(t\.x_level_x \+ 1\) AS x_level_x FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\) WHERE \(t\.x_level_x < 1\)\) SELECT \* FROM t AS nodes/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x, nodes.*, CAST(0 AS integer) AS x_level_x FROM nodes WHERE (parent_id IN (2, 6, 7)) UNION ALL SELECT t.x_root_x, nodes.*, (t.x_level_x + 1) AS x_level_x FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (t.x_level_x < 1)) SELECT * FROM t AS nodes']
     os.must_equal [@c.load(:id=>2, :parent_id=>1, :name=>'AA'), @c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>7, :parent_id=>1, :name=>'D')]
     os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E'), @c.load(:id=>3, :name=>'00', :parent_id=>6)],
       [@c.load(:id=>3, :name=>'00', :parent_id=>6)],
@@ -238,9 +232,8 @@ describe Sequel::Model, "rcte_tree" do
        {:i=>3, :name=>'00', :pi=>6, :kal=>6, :lal=>0}, {:i=>3, :name=>'00', :pi=>6, :kal=>2, :lal=>1},
        {:i=>4, :name=>'?', :pi=>7, :kal=>7, :lal=>0}, {:i=>5, :name=>'?', :pi=>4, :kal=>7, :lal=>1}]])
     os = @ds.eager(:ds=>2).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH cte AS \(SELECT pi AS kal, nodes\.\*, CAST\(0 AS integer\) AS lal FROM nodes WHERE \(pi IN \([267], [267], [267]\)\) UNION ALL SELECT cte\.kal, nodes\.\*, \(cte\.lal \+ 1\) AS lal FROM nodes INNER JOIN cte ON \(cte\.i = nodes\.pi\) WHERE \(cte\.lal < 1\)\) SELECT \* FROM cte/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH cte AS (SELECT pi AS kal, nodes.*, CAST(0 AS integer) AS lal FROM nodes WHERE (pi IN (2, 6, 7)) UNION ALL SELECT cte.kal, nodes.*, (cte.lal + 1) AS lal FROM nodes INNER JOIN cte ON (cte.i = nodes.pi) WHERE (cte.lal < 1)) SELECT * FROM cte AS nodes']
     os.must_equal [@c.load(:i=>2, :pi=>1, :name=>'AA'), @c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>7, :pi=>1, :name=>'D')]
     os.map{|o| o.ds}.must_equal [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E'), @c.load(:i=>3, :name=>'00', :pi=>6)],
       [@c.load(:i=>3, :name=>'00', :pi=>6)],
@@ -258,9 +251,8 @@ describe Sequel::Model, "rcte_tree" do
        {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>6}, {:id=>3, :name=>'00', :parent_id=>6, :x_root_x=>2},
        {:id=>4, :name=>'?', :parent_id=>7, :x_root_x=>7}, {:id=>5, :name=>'?', :parent_id=>4, :x_root_x=>7}]])
     @ds.eager(:descendants).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT parent_id AS x_root_x, nodes\.\* FROM nodes WHERE \(\(parent_id IN \([267], [267], [267]\)\) AND \(i = 1\)\) UNION ALL SELECT t\.x_root_x, nodes\.\* FROM nodes INNER JOIN t ON \(t\.id = nodes\.parent_id\) WHERE \(i = 1\)\) SELECT \* FROM t AS nodes WHERE \(i = 1\)/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x, nodes.* FROM nodes WHERE ((parent_id IN (2, 6, 7)) AND (i = 1)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)']
   end
 end
 
@@ -335,9 +327,8 @@ describe Sequel::Model, "rcte_tree with composite keys" do
        {:id=>1, :id2=>2, :name=>'00', :parent_id=>8, :parent_id2=>9, :x_root_x_0=>1, :x_root_x_1=>2}, {:id=>1, :id2=>2, :name=>'00', :parent_id=>8, :parent_id2=>9, :x_root_x_0=>2, :x_root_x_1=>3},
        {:id=>8, :id2=>9, :name=>'?', :parent_id=>nil, :parent_id2=>nil, :x_root_x_0=>2, :x_root_x_1=>3}, {:id=>8, :id2=>9, :name=>'?', :parent_id=>nil, :parent_id2=>nil, :x_root_x_0=>1, :x_root_x_1=>2}]])
     os = @ds.eager(:ancestors).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT id AS x_root_x_0, id2 AS x_root_x_1, nodes\.\* FROM nodes WHERE \(\(id, id2\) IN \(\([12], [23]\), \([12], [23]\)\)\) UNION ALL SELECT t\.x_root_x_0, t\.x_root_x_1, nodes\.\* FROM nodes INNER JOIN t ON \(\(t\.parent_id = nodes\.id\) AND \(t\.parent_id2 = nodes\.id2\)\)\) SELECT \* FROM t AS nodes/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT id AS x_root_x_0, id2 AS x_root_x_1, nodes.* FROM nodes WHERE ((id, id2) IN ((1, 2), (2, 3))) UNION ALL SELECT t.x_root_x_0, t.x_root_x_1, nodes.* FROM nodes INNER JOIN t ON ((t.parent_id = nodes.id) AND (t.parent_id2 = nodes.id2))) SELECT * FROM t AS nodes']
     os.must_equal [@c.load(:id=>2, :id2=>3, :parent_id=>1, :parent_id2=>2, :name=>'AA'), @c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D'), @c.load(:id=>9, :id2=>10, :parent_id=>nil, :parent_id2=>nil, :name=>'E')]
     os.map{|o| o.ancestors}.must_equal [[@c.load(:id=>1, :id2=>2, :name=>'00', :parent_id=>8, :parent_id2=>9), @c.load(:id=>8, :id2=>9, :name=>'?', :parent_id=>nil, :parent_id2=>nil)],
       [@c.load(:id=>2, :id2=>3, :name=>'AA', :parent_id=>1, :parent_id2=>2), @c.load(:id=>1, :id2=>2, :name=>'00', :parent_id=>8, :parent_id2=>9), @c.load(:id=>8, :id2=>9, :name=>'?', :parent_id=>nil, :parent_id2=>nil)],
@@ -357,9 +348,8 @@ describe Sequel::Model, "rcte_tree with composite keys" do
        {:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7, :x_root_x_0=>6, :x_root_x_1=>7}, {:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7, :x_root_x_0=>2, :x_root_x_1=>3},
        {:id=>4, :id2=>5, :name=>'?', :parent_id=>7, :parent_id2=>8, :x_root_x_0=>7, :x_root_x_1=>8}, {:id=>5, :id2=>6, :name=>'?', :parent_id=>4, :parent_id2=>5, :x_root_x_0=>7, :x_root_x_1=>8}]])
     os = @ds.eager(:descendants).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT parent_id AS x_root_x_0, parent_id2 AS x_root_x_1, nodes\.\* FROM nodes WHERE \(\(parent_id, parent_id2\) IN \(\([267], [378]\), \([267], [378]\), \([267], [378]\)\)\) UNION ALL SELECT t\.x_root_x_0, t\.x_root_x_1, nodes\.\* FROM nodes INNER JOIN t ON \(\(t\.id = nodes\.parent_id\) AND \(t\.id2 = nodes\.parent_id2\)\)\) SELECT \* FROM t AS nodes/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x_0, parent_id2 AS x_root_x_1, nodes.* FROM nodes WHERE ((parent_id, parent_id2) IN ((2, 3), (6, 7), (7, 8))) UNION ALL SELECT t.x_root_x_0, t.x_root_x_1, nodes.* FROM nodes INNER JOIN t ON ((t.id = nodes.parent_id) AND (t.id2 = nodes.parent_id2))) SELECT * FROM t AS nodes']
     os.must_equal [@c.load(:id=>2, :id2=>3, :parent_id=>1, :parent_id2=>2, :name=>'AA'), @c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D')]
     os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>9, :id2=>10, :parent_id=>2, :parent_id2=>3, :name=>'E'), @c.load(:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7)],
       [@c.load(:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7)],
@@ -377,9 +367,8 @@ describe Sequel::Model, "rcte_tree with composite keys" do
        {:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7, :x_root_x_0=>6, :x_root_x_1=>7, :x_level_x=>0}, {:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7, :x_root_x_0=>2, :x_root_x_1=>3, :x_level_x=>1},
        {:id=>4, :id2=>5, :name=>'?', :parent_id=>7, :parent_id2=>8, :x_root_x_0=>7, :x_root_x_1=>8, :x_level_x=>0}, {:id=>5, :id2=>6, :name=>'?', :parent_id=>4, :parent_id2=>5, :x_root_x_0=>7, :x_root_x_1=>8, :x_level_x=>1}]])
     os = @ds.eager(:descendants=>2).all
-    sqls = @db.sqls
-    sqls.first.must_equal "SELECT * FROM nodes"
-    sqls.last.must_match(/WITH t AS \(SELECT parent_id AS x_root_x_0, parent_id2 AS x_root_x_1, nodes\.\*, CAST\(0 AS integer\) AS x_level_x FROM nodes WHERE \(\(parent_id, parent_id2\) IN \(\([267], [378]\), \([267], [378]\), \([267], [378]\)\)\) UNION ALL SELECT t\.x_root_x_0, t\.x_root_x_1, nodes\.\*, \(t\.x_level_x \+ 1\) AS x_level_x FROM nodes INNER JOIN t ON \(\(t\.id = nodes\.parent_id\) AND \(t\.id2 = nodes\.parent_id2\)\) WHERE \(t\.x_level_x < 1\)\) SELECT \* FROM t AS nodes/)
+    @db.sqls.must_equal ["SELECT * FROM nodes",
+      'WITH t AS (SELECT parent_id AS x_root_x_0, parent_id2 AS x_root_x_1, nodes.*, CAST(0 AS integer) AS x_level_x FROM nodes WHERE ((parent_id, parent_id2) IN ((2, 3), (6, 7), (7, 8))) UNION ALL SELECT t.x_root_x_0, t.x_root_x_1, nodes.*, (t.x_level_x + 1) AS x_level_x FROM nodes INNER JOIN t ON ((t.id = nodes.parent_id) AND (t.id2 = nodes.parent_id2)) WHERE (t.x_level_x < 1)) SELECT * FROM t AS nodes']
     os.must_equal [@c.load(:id=>2, :id2=>3, :parent_id=>1, :parent_id2=>2, :name=>'AA'), @c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D')]
     os.map{|o| o.descendants}.must_equal [[@c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>9, :id2=>10, :parent_id=>2, :parent_id2=>3, :name=>'E'), @c.load(:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7)],
       [@c.load(:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7)],

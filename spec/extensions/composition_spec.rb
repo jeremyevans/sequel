@@ -53,11 +53,8 @@ describe "Composition plugin" do
 
   it "should set column values even when not validating" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @c.load({}).set(:date=>Date.new(4, 8, 12)).save(:validate=>false)
-    sql = DB.sqls.last
-    sql.must_include("year = 4")
-    sql.must_include("month = 8")
-    sql.must_include("day = 12")
+    @c.load(id: 1).set(:date=>Date.new(4, 8, 12)).save(:validate=>false)
+    DB.sqls.must_equal ['UPDATE items SET year = 4, month = 8, day = 12 WHERE (id = 1)']
   end
 
   it ".compositions should return the reflection hash of compositions" do
@@ -81,10 +78,7 @@ describe "Composition plugin" do
     @c.composition :date, :composer=>proc{Date.new(year+1, month+2, day+3)}, :decomposer=>proc{[:year, :month, :day].each{|s| self.send("#{s}=", date.send(s) * 2)}}
     @o.date.must_equal Date.new(2, 4, 6)
     @o.save
-    sql = DB.sqls.last
-    sql.must_include("year = 4")
-    sql.must_include("month = 8")
-    sql.must_include("day = 12")
+    DB.sqls.must_equal ['UPDATE items SET year = 4, month = 8, day = 12 WHERE (id = 1)']
   end
 
   it "should allow call super in composition getter and setter method definition in class" do
@@ -187,9 +181,7 @@ describe "Composition plugin" do
     @o.date.month.must_equal 6
     @o.date = c.new(3, 4)
     @o.save
-    sql = DB.sqls.last
-    sql.must_include("year = 6")
-    sql.must_include("month = 12")
+    DB.sqls.must_equal ['UPDATE items SET year = 6, month = 12, day = 3 WHERE (id = 1)']
   end
 
   it ":mapping option should work with an array of two pairs of symbols" do
@@ -209,9 +201,7 @@ describe "Composition plugin" do
     @o.date.m.must_equal 6
     @o.date = c.new(3, 4)
     @o.save
-    sql = DB.sqls.last
-    sql.must_include("year = 6")
-    sql.must_include("month = 12")
+    DB.sqls.must_equal ['UPDATE items SET year = 6, month = 12, day = 3 WHERE (id = 1)']
   end
 
   it ":mapping option :composer should return nil if all values are nil" do
@@ -223,10 +213,7 @@ describe "Composition plugin" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @o.date = nil
     @o.save
-    sql = DB.sqls.last
-    sql.must_include("year = NULL")
-    sql.must_include("month = NULL")
-    sql.must_include("day = NULL")
+    DB.sqls.must_equal ['UPDATE items SET year = NULL, month = NULL, day = NULL WHERE (id = 1)']
   end
 
   it "should work with frozen instances" do
@@ -249,10 +236,7 @@ describe "Composition plugin" do
     o = c.load(:id=>1, :year=>1, :month=>2, :day=>3)
     o.date.must_equal Date.new(1, 2, 3)
     o.save
-    sql = DB.sqls.last
-    sql.must_include("year = 1")
-    sql.must_include("month = 2")
-    sql.must_include("day = 3")
+    DB.sqls.must_equal ['UPDATE items SET year = 1, month = 2, day = 3 WHERE (id = 1)']
   end
 
   it "should freeze composition metadata when freezing model class" do

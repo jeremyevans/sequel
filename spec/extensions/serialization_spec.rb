@@ -15,15 +15,15 @@ describe "Serialization plugin" do
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)
-    DB.sqls.last.must_match(/INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 2|2, '--- 1\n(\.\.\.\n)?')\)/)
+    DB.sqls.must_equal ["INSERT INTO items (def, abc) VALUES (2, '--- 1\n...\n')"]
 
     @c.plugin :serialization, :marshal, :def
     @c.create(:abc => 1, :def=> 1)
-    DB.sqls.last.must_match(/INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n(\.\.\.\n)?', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n(\.\.\.\n)?')\)/)
+    DB.sqls.must_equal ["INSERT INTO items (abc, def) VALUES ('--- 1\n...\n', 'BAhpBg==\n')"]
     
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [123])
-    DB.sqls.last.must_match(/INSERT INTO items \((ghi)\) VALUES \('\[123\]'\)/)
+    DB.sqls.must_equal ["INSERT INTO items (ghi) VALUES ('[123]')"]
   end
 
   it "should handle validations of underlying column" do

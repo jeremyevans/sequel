@@ -105,13 +105,11 @@ describe "Sequel::Plugins::AssociationPks" do
 
   it "should set associated pks correctly for a many_to_many association" do
     @Album.load(:id=>2).tag_pks = [1, 3]
-    sqls = @db.sqls
-    sqls[0].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
-    sqls[1].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[2].must_equal 'BEGIN'
-    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/)
-    sqls[4].must_equal 'COMMIT'
-    sqls.length.must_equal 5
+    @db.sqls.must_equal ["DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))",
+      'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
+      'BEGIN',
+      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)',
+      'COMMIT']
   end
 
   it "should return correct right-side associated cpks for one_to_many associations" do
@@ -161,10 +159,8 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should set associated pks correctly for left-side cpks for a one_to_many association" do
     @Vocalist.one_to_many :instruments, :class=>@Instrument, :key=>[:first, :last], :delay_pks=>false
     @Vocalist.load(:first=>'F1', :last=>'L1').instrument_pks = [1, 2]
-    sqls = @db.sqls
-    sqls[0].must_match(/UPDATE instruments SET (first = 'F1', last = 'L1'|last = 'L1', first = 'F1') WHERE \(id IN \(1, 2\)\)/)
-    sqls[1].must_match(/UPDATE instruments SET (first = NULL, last = NULL|last = NULL, first = NULL) WHERE \(\(instruments.first = 'F1'\) AND \(instruments.last = 'L1'\) AND \(id NOT IN \(1, 2\)\)\)/)
-    sqls.length.must_equal 2
+    @db.sqls.must_equal ["UPDATE instruments SET first = 'F1', last = 'L1' WHERE (id IN (1, 2))",
+      "UPDATE instruments SET first = NULL, last = NULL WHERE ((instruments.first = 'F1') AND (instruments.last = 'L1') AND (id NOT IN (1, 2)))"]
   end
 
   it "should set associated pks correctly for left-side cpks for a many_to_many association" do
@@ -209,10 +205,8 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should set associated right-side cpks correctly for left-side cpks for a one_to_many association" do
     @Vocalist.one_to_many :hits, :class=>@Hit, :key=>[:first, :last], :order=>:week, :delay_pks=>false
     @Vocalist.load(:first=>'F1', :last=>'L1').hit_pks = [[1997, 1], [1997, 2]]
-    sqls = @db.sqls
-    sqls[0].must_match(/UPDATE hits SET (first = 'F1', last = 'L1'|last = 'L1', first = 'F1') WHERE \(\(year, week\) IN \(\(1997, 1\), \(1997, 2\)\)\)/)
-    sqls[1].must_match(/UPDATE hits SET (first = NULL, last = NULL|last = NULL, first = NULL) WHERE \(\(hits.first = 'F1'\) AND \(hits.last = 'L1'\) AND \(\(year, week\) NOT IN \(\(1997, 1\), \(1997, 2\)\)\)\)/)
-    sqls.length.must_equal 2
+    @db.sqls.must_equal ["UPDATE hits SET first = 'F1', last = 'L1' WHERE ((year, week) IN ((1997, 1), (1997, 2)))",
+      "UPDATE hits SET first = NULL, last = NULL WHERE ((hits.first = 'F1') AND (hits.last = 'L1') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"]
   end
 
   it "should set associated right-side cpks correctly for left-side cpks for a many_to_many association" do
@@ -238,13 +232,11 @@ describe "Sequel::Plugins::AssociationPks" do
     album = @Album.load(:id=>2)
     album.use_transactions = true
     album.tag_pks = [1, 3]
-    sqls = @db.sqls
-    sqls[0].must_equal "BEGIN"
-    sqls[1].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
-    sqls[2].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/)
-    sqls[4].must_equal "COMMIT"
-    sqls.length.must_equal 5
+    @db.sqls.must_equal ["BEGIN",
+      "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))",
+      'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
+      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)',
+      "COMMIT"]
   end
 
   it "should automatically convert keys to numbers if the primary key is an integer for one_to_many associations" do
@@ -264,22 +256,23 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
     @Tag.db_schema[:id][:type] = :integer
     @Album.load(:id=>2).tag_pks = %w'1 3'
-    sqls = @db.sqls
-    sqls[0].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
-    sqls[1].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/)
-    sqls.length.must_equal 5
+    @db.sqls.must_equal ["DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))",
+      'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
+      'BEGIN',
+      'INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)',
+      'COMMIT']
   end
 
   it "should not automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
     @Tag.db_schema[:id][:type] = :string
     @Album.load(:id=>2).tag_pks = %w'1 3'
-    sqls = @db.sqls
-    sqls[0].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))"
-    sqls[1].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/)
-    sqls[4].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/)
-    sqls.length.must_equal 6
+    sqls = @db.sqls.must_equal [
+      "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))",
+      'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
+      'BEGIN',
+      "INSERT INTO albums_tags (album_id, tag_id) VALUES (2, '1')",
+      "INSERT INTO albums_tags (album_id, tag_id) VALUES (2, '3')",
+      'COMMIT']
   end
 
   it "should automatically convert keys to numbers for appropriate integer primary key for composite key associations" do

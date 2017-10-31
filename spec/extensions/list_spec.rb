@@ -92,15 +92,14 @@ describe "List plugin" do
     @sc.create(:scope_id=>1).values.must_equal(:id=>1, :scope_id=>1, :position=>1)
     @sc.create(:scope_id=>1).values.must_equal(:id=>2, :scope_id=>1, :position=>2)
     @sc.create(:scope_id=>2).values.must_equal(:id=>3, :scope_id=>2, :position=>1)
-    sqls = @db.sqls
-    sqls.slice!(7).must_match(/INSERT INTO items \((scope_id|position), (scope_id|position)\) VALUES \([12], [12]\)/)
-    sqls.slice!(4).must_match(/INSERT INTO items \((scope_id|position), (scope_id|position)\) VALUES \([12], [12]\)/)
-    sqls.slice!(1).must_match(/INSERT INTO items \((scope_id|position), (scope_id|position)\) VALUES \(1, 1\)/)
-    sqls.must_equal ["SELECT max(position) AS max FROM items WHERE (scope_id = 1) LIMIT 1",
+    @db.sqls.must_equal ["SELECT max(position) AS max FROM items WHERE (scope_id = 1) LIMIT 1",
+      'INSERT INTO items (scope_id, position) VALUES (1, 1)',
       "SELECT * FROM items WHERE (id = 1) ORDER BY scope_id, position LIMIT 1",
       "SELECT max(position) AS max FROM items WHERE (scope_id = 1) LIMIT 1",
+      'INSERT INTO items (scope_id, position) VALUES (1, 2)',
       "SELECT * FROM items WHERE (id = 2) ORDER BY scope_id, position LIMIT 1",
       "SELECT max(position) AS max FROM items WHERE (scope_id = 2) LIMIT 1",
+      'INSERT INTO items (scope_id, position) VALUES (2, 1)',
       "SELECT * FROM items WHERE (id = 3) ORDER BY scope_id, position LIMIT 1"]
   end
 

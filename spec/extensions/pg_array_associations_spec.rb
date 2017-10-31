@@ -248,9 +248,8 @@ describe Sequel::Model, "pg_array_associations" do
   it "should eagerly load correctly" do
     a = @c1.eager(:tags).all
     a.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))']
     a.first.tags.must_equal [@o2]
     @db.sqls.must_equal []
 
@@ -268,9 +267,8 @@ describe Sequel::Model, "pg_array_associations" do
 
     a = @c1.eager(:tags).all
     a.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT \* FROM tags WHERE \(\(tags\.id \* 3\) IN \([369], [369], [369]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE ((tags.id * 3) IN (3, 6, 9))']
     a.first.tags.must_equal [@o2]
     @db.sqls.must_equal []
 
@@ -284,9 +282,9 @@ describe Sequel::Model, "pg_array_associations" do
   it "should allow cascading of eager loading for associations of associated models" do
     a = @c1.eager(:tags=>:artists).all
     a.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.slice!(1).must_match(/SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ['SELECT * FROM artists', "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2]::integer[])"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))',
+      "SELECT * FROM artists WHERE (artists.tag_ids && ARRAY[2]::integer[])"]
     a.first.tags.must_equal [@o2]
     a.first.tags.first.artists.must_equal [@o1]
     @db.sqls.must_equal []
@@ -302,9 +300,8 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls.must_equal []
 
     @o2.artists2.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2]::integer[])"]
+    @db.sqls.must_equal ["SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[2]::integer[])",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))']
     @o2.artists2.first.tags.must_equal [@o2]
     @db.sqls.must_equal []
   end
@@ -318,7 +315,7 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls
 
     @o1.tags2.must_equal [@o2]
-    @db.sqls.first.must_match(/SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
+    @db.sqls.must_equal ['SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (tags.id IN (1, 2, 3))']
     @o1.tags2.first.artists.must_equal [@o1]
     @db.sqls.must_equal []
 
@@ -332,9 +329,8 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls
 
     a = @c1.eager(:tags2).all
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (tags.id IN (1, 2, 3))']
     a.must_equal [@o1]
     a.first.tags2.must_equal [@o2]
     a.first.tags2.first.artists.must_equal [@o1]
@@ -359,27 +355,24 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>2
     a = @c1.eager(:tags).all
     a.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))']
     a.first.tags.must_equal [@c2.load(:id=>1), @c2.load(:id=>2)]
     @db.sqls.must_equal []
 
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>[1, 1]
     a = @c1.eager(:tags).all
     a.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))']
     a.first.tags.must_equal [@c2.load(:id=>2)]
     @db.sqls.must_equal []
 
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>[nil, 1]
     a = @c1.eager(:tags).all
     a.must_equal [@o1]
-    sqls = @db.sqls
-    sqls.pop.must_match(/SELECT \* FROM tags WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
-    sqls.must_equal ["SELECT * FROM artists"]
+    @db.sqls.must_equal ["SELECT * FROM artists",
+      'SELECT * FROM tags WHERE (tags.id IN (1, 2, 3))']
     a.first.tags.must_equal [@c2.load(:id=>2), @c2.load(:id=>3)]
     @db.sqls.length.must_equal 0
 

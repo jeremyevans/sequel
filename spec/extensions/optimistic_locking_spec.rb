@@ -105,7 +105,7 @@ describe "optimistic_locking plugin" do
       @c.db.sqls
       p2.update(:name=>'Bob')
     end
-    @c.db.sqls.first.must_match(/UPDATE people SET (name = 'Bob', lock_version = 4|lock_version = 4, name = 'Bob') WHERE \(\(id = 1\) AND \(lock_version = 3\)\)/)
+    @c.db.sqls.must_equal ["UPDATE people SET name = 'Bob', lock_version = 4 WHERE ((id = 1) AND (lock_version = 3))"]
   end
 
   it "should increment the lock column when #modified! even if no columns are changed" do
