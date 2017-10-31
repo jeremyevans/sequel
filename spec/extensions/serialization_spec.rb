@@ -15,11 +15,11 @@ describe "Serialization plugin" do
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)
-    DB.sqls.must_equal ["INSERT INTO items (def, abc) VALUES (2, '--- 1\n...\n')"]
+    DB.sqls.map{|s| s.sub("1\n...", '1')}.must_equal ["INSERT INTO items (def, abc) VALUES (2, '--- 1\n')"]
 
     @c.plugin :serialization, :marshal, :def
     @c.create(:abc => 1, :def=> 1)
-    DB.sqls.must_equal ["INSERT INTO items (abc, def) VALUES ('--- 1\n...\n', 'BAhpBg==\n')"]
+    DB.sqls.map{|s| s.sub("1\n...", '1')}.must_equal ["INSERT INTO items (abc, def) VALUES ('--- 1\n', 'BAhpBg==\n')"]
     
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [123])
