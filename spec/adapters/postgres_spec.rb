@@ -225,14 +225,6 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
   end
-
-  it "Dataset#insert_conflict should respect expressions in the target argument" do
-    @ds.insert_conflict(:target=>:a).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"a\") DO NOTHING"
-    @ds.insert_conflict(:target=>:c, :conflict_where=>{:c_is_unique=>true}).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"c\") WHERE (\"c_is_unique\" IS TRUE) DO NOTHING"
-    @ds.insert_conflict(:target=>[:b, :c]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", \"c\") DO NOTHING"
-    @ds.insert_conflict(:target=>[:b, Sequel.function(:round, :c)]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
-    @ds.insert_conflict(:target=>[:b, Sequel.virtual_row{|o| o.round(:c)}]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
-  end
 end if DB.server_version >= 90500
 
 describe "A PostgreSQL database" do
@@ -355,13 +347,6 @@ describe "A PostgreSQL database" do
     Sequel.connect(DB.opts.merge(:notice_receiver=>proc{|r| a = r.result_error_message})){|db| db.do("BEGIN\nRAISE WARNING 'foo';\nEND;")}
     a.must_equal "WARNING:  foo\n"
   end if uses_pg && DB.server_version >= 90000
-
-  # These only test the SQL created, because a true test using file_fdw or postgres_fdw
-  # requires superuser permissions, and you should not be running the tests as a superuser.
-  it "should support creating and dropping foreign tables" do
-    DB.send(:create_table_sql, :t, DB.create_table_generator{Integer :a}, :foreign=>:f, :options=>{:o=>1}).must_equal 'CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')'
-    DB.send(:drop_table_sql, :t, :foreign=>true).must_equal 'DROP FOREIGN TABLE "t"'
-  end
 end
 
 describe "A PostgreSQL database with domain types" do
@@ -1531,47 +1516,34 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
 
   it "#create_function and #drop_function should create and drop functions" do
     proc{@d['SELECT tf()'].all}.must_raise(Sequel::DatabaseError)
-    args = ['tf', 'SELECT 1', {:returns=>:integer}]
-    @d.send(:create_function_sql, *args).must_match(/\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/)
-    @d.create_function(*args)
+    @d.create_function('tf', 'SELECT 1', :returns=>:integer)
     @d['SELECT tf()'].all.must_equal [{:tf=>1}]
-    @d.send(:drop_function_sql, 'tf').must_equal 'DROP FUNCTION tf()'
     @d.drop_function('tf')
     proc{@d['SELECT tf()'].all}.must_raise(Sequel::DatabaseError)
   end
 
   it "#create_function and #drop_function should support options" do
     args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'}}]
-    @d.send(:create_function_sql,*args).must_match(/\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/)
     @d.create_function(*args)
     # Make sure replace works
     @d.create_function(*args)
     @d['SELECT tf(1, 2)'].all.must_equal [{:tf=>3}]
     args = ['tf', {:if_exists=>true, :cascade=>true, :args=>[[:integer, :a], :integer]}]
-    @d.send(:drop_function_sql,*args).must_equal 'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE'
     @d.drop_function(*args)
     # Make sure if exists works
     @d.drop_function(*args)
   end
 
   it "#create_language and #drop_language should create and drop languages" do
-    @d.send(:create_language_sql, :plpgsql).must_equal 'CREATE LANGUAGE plpgsql'
     @d.create_language(:plpgsql, :replace=>true) if @d.server_version < 90000
     proc{@d.create_language(:plpgsql)}.must_raise(Sequel::DatabaseError)
-    @d.send(:drop_language_sql, :plpgsql).must_equal 'DROP LANGUAGE plpgsql'
     @d.drop_language(:plpgsql) if @d.server_version < 90000
     proc{@d.drop_language(:plpgsql)}.must_raise(Sequel::DatabaseError) if @d.server_version < 90000
-    @d.send(:create_language_sql, :plpgsql, :replace=>true, :trusted=>true, :handler=>:a, :validator=>:b).must_equal(@d.server_version >= 90000 ? 'CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b' : 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b')
-    @d.send(:drop_language_sql, :plpgsql, :if_exists=>true, :cascade=>true).must_equal 'DROP LANGUAGE IF EXISTS plpgsql CASCADE'
     # Make sure if exists works
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
   end
 
   it "#create_schema and #drop_schema should create and drop schemas" do
-    @d.send(:create_schema_sql, :sequel).must_equal 'CREATE SCHEMA "sequel"'
-    @d.send(:create_schema_sql, :sequel, :if_not_exists=>true, :owner=>:foo).must_equal 'CREATE SCHEMA IF NOT EXISTS "sequel" AUTHORIZATION "foo"'
-    @d.send(:drop_schema_sql, :sequel).must_equal 'DROP SCHEMA "sequel"'
-    @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).must_equal 'DROP SCHEMA IF EXISTS "sequel" CASCADE'
     @d.create_schema(:sequel)
     @d.create_schema(:sequel, :if_not_exists=>true) if @d.server_version >= 90300
     @d.create_table(Sequel[:sequel][:test]){Integer :a}
@@ -1581,7 +1553,6 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
   it "#create_trigger and #drop_trigger should create and drop triggers" do
     @d.create_language(:plpgsql) if @d.server_version < 90000
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).must_equal 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW EXECUTE PROCEDURE tf()'
     @d.create_table(:test){String :name; Integer :value}
     @d.create_trigger(:test, :identity, :tf, :each_row=>true)
     @d[:test].insert(:name=>'a', :value=>1)
@@ -1590,15 +1561,11 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>1}]
     @d[:test].filter(:name=>'a').update(:value=>3)
     @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>3}]
-    @d.send(:drop_trigger_sql, :test, :identity).must_equal 'DROP TRIGGER identity ON "test"'
     @d.drop_trigger(:test, :identity)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).must_equal 'CREATE TRIGGER identity AFTER INSERT ON "test" EXECUTE PROCEDURE tf(1, \'a\')'
-    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).must_equal 'DROP TRIGGER IF EXISTS identity ON "test" CASCADE'
     # Make sure if exists works
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
 
     if @d.supports_trigger_conditions?
-      @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {Sequel[:new][:name] => 'b'}).must_equal %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
       @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {Sequel[:new][:name] => 'b'})
       @d[:test].filter(:name=>'a').update(:value=>nil)
       @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>nil}]

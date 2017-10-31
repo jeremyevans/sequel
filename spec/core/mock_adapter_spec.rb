@@ -577,6 +577,71 @@ describe "PostgreSQL support" do
     inf = -1.0/0.0
     @db[:test5].insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('-Infinity')}
   end
+
+  it "Dataset#insert_conflict should respect expressions in the target argument" do
+    @ds = @db[:ic_test]
+    @ds.insert_conflict(:target=>:a).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"a\") DO NOTHING"
+    @ds.insert_conflict(:target=>:c, :conflict_where=>{:c_is_unique=>true}).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"c\") WHERE (\"c_is_unique\" IS TRUE) DO NOTHING"
+    @ds.insert_conflict(:target=>[:b, :c]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", \"c\") DO NOTHING"
+    @ds.insert_conflict(:target=>[:b, Sequel.function(:round, :c)]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
+    @ds.insert_conflict(:target=>[:b, Sequel.virtual_row{|o| o.round(:c)}]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
+  end
+
+  it "should support creating and dropping foreign tables" do
+    @db.create_table(:t, :foreign=>:f, :options=>{:o=>1}){Integer :a}
+    @db.drop_table(:t, :foreign=>true)
+    @db.sqls.must_equal ['CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')',
+      'DROP FOREIGN TABLE "t"']
+  end
+
+  it "#create_function and #drop_function should create and drop functions" do
+    @db.create_function('tf', 'SELECT 1', :returns=>:integer)
+    @db.drop_function('tf')
+    @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ["CREATE FUNCTION tf() RETURNS integer LANGUAGE SQL AS 'SELECT 1'",
+      'DROP FUNCTION tf()']
+  end
+
+  it "#create_function and #drop_function should support options" do
+    @db.create_function('tf', 'SELECT $1 + $2', :args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'})
+    @db.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>[[:integer, :a], :integer])
+    @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ["CREATE OR REPLACE FUNCTION tf(a integer, integer) RETURNS integer LANGUAGE SQL IMMUTABLE STRICT SECURITY DEFINER COST 2 SET search_path = public AS 'SELECT $1 + $2'",
+      'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE']
+  end
+
+  it "#create_language and #drop_language should create and drop languages" do
+    @db.create_language(:plpgsql)
+    @db.create_language(:plpgsql, :replace=>true, :trusted=>true, :handler=>:a, :validator=>:b)
+    @db.drop_language(:plpgsql)
+    @db.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)
+    @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ['CREATE LANGUAGE plpgsql',
+      'CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b',
+      'DROP LANGUAGE plpgsql',
+      'DROP LANGUAGE IF EXISTS plpgsql CASCADE']
+  end
+
+  it "#create_schema and #drop_schema should create and drop schemas" do
+    @db.create_schema(:sequel)
+    @db.create_schema(:sequel, :if_not_exists=>true, :owner=>:foo)
+    @db.drop_schema(:sequel)
+    @db.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
+    @db.sqls.must_equal ['CREATE SCHEMA "sequel"',
+      'CREATE SCHEMA IF NOT EXISTS "sequel" AUTHORIZATION "foo"',
+      'DROP SCHEMA "sequel"',
+      'DROP SCHEMA IF EXISTS "sequel" CASCADE']
+  end
+
+  it "#create_trigger and #drop_trigger should create and drop triggers" do
+    @db.create_trigger(:test, :identity, :tf, :each_row=>true)
+    @db.create_trigger(:test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a'])
+    @db.create_trigger(:test, :identity, :tf, :each_row=>true, :when=> {Sequel[:new][:name] => 'b'})
+    @db.drop_trigger(:test, :identity)
+    @db.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
+    @db.sqls.map{|s| s.gsub(/\s+/, ' ').strip}.must_equal ['CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW EXECUTE PROCEDURE tf()',
+      'CREATE TRIGGER identity AFTER INSERT ON "test" EXECUTE PROCEDURE tf(1, \'a\')',
+      %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()},
+      'DROP TRIGGER identity ON "test"',
+      'DROP TRIGGER IF EXISTS identity ON "test" CASCADE']
+  end
 end
 
 describe "MySQL support" do
