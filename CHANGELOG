@@ -1,5 +1,7 @@
 === master
 
+* Make Database#reset_primary_key_sequence work on PostgreSQL 10+ (jeremyevans)
+
 * Support :connect_sqls Database option for easily issuing sql commands on all new connections (jeremyevans)
 
 * Support :extensions Database option for loading extensions when initializing, useful in connection strings (jeremyevans)

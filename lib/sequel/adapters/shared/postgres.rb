@@ -506,10 +506,20 @@ module Sequel
         return unless seq = primary_key_sequence(table)
         pk = SQL::Identifier.new(primary_key(table))
         db = self
-        seq_ds = db.from(LiteralString.new(seq))
         s, t = schema_and_table(table)
         table = Sequel.qualify(s, t) if s
-        get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
+
+        if server_version >= 100000
+          seq_ds = metadata_dataset.from(:pg_sequence).where(:seqrelid=>regclass_oid(LiteralString.new(seq)))
+          increment_by = :seqincrement
+          min_value = :seqmin
+        else
+          seq_ds = metadata_dataset.from(LiteralString.new(seq))
+          increment_by = :increment_by
+          min_value = :min_value
+        end
+
+        get{setval(seq, db[table].select(coalesce(max(pk)+seq_ds.select(increment_by), seq_ds.select(min_value))), false)}
       end
 
       def rollback_prepared_transaction(transaction_id, opts=OPTS)
