@@ -203,7 +203,6 @@ module Sequel
       # This should be used for types without fixed OIDs, which includes all types that
       # are not included in a default PostgreSQL installation.
       def add_named_conversion_proc(name, &block)
-        name = name.to_s if name.is_a?(Symbol)
         unless oid = from(:pg_type).where(:typtype=>['b', 'e'], :typname=>name.to_s).get(:oid)
           raise Error, "No matching type in pg_type for #{name.inspect}"
         end
