@@ -129,7 +129,7 @@ describe "Database schema parser" do
     DB.schema(:items).first.last[:ruby_default].must_equal Sequel::CURRENT_TIMESTAMP
   end
 
-  cspecify "should parse current date defaults from the schema properly", :mysql, :oracle do
+  cspecify "should parse current date defaults from the schema properly", [proc{|db| !db.mariadb? || db.server_version <= 100200}, :mysql], :oracle do
     DB.create_table!(:items){Date :a, :default=>Sequel::CURRENT_DATE}
     DB.schema(:items).first.last[:ruby_default].must_equal Sequel::CURRENT_DATE
   end
@@ -765,14 +765,14 @@ describe "Database schema modifiers" do
       primary_key :id
       String :name2
       String :number2
-      constraint :bar, Sequel.~(:id=>nil)
+      constraint :bar, Sequel.~(:number2=>nil, :name2=>nil)
     end
     @ds.insert(:name2=>'A12')
     @db.alter_table(:items) do
       add_column :number, Integer
+      drop_constraint :bar
       drop_column :number2
       rename_column :name2, :name
-      drop_constraint :bar
       set_column_not_null :name
       set_column_default :name, 'A13'
       add_constraint :foo, Sequel.like(:name, 'A%')

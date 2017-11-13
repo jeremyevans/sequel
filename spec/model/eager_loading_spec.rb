@@ -222,6 +222,31 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should eagerly load a single one_to_one association using the :window_function strategy on MySQL" do
+    odb = DB
+    db = Class.new do
+      def database_type; :mysql; end
+      define_method(:method_missing) do |*args, &block|
+        odb.send(*args, &block)
+      end
+    end.new
+
+    begin
+      EagerTrack.dataset = EagerTrack.dataset.with_extend do
+        def supports_window_functions?; true end
+        define_method(:db){db}
+      end
+      EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :eager_limit_strategy=>:window_function
+      a = EagerAlbum.eager(:track).all
+      a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+      DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x = 1) ORDER BY x_sequel_row_number_x']
+      a.first.track.must_equal EagerTrack.load(:id => 3, :album_id=>1)
+      DB.sqls.must_equal []
+    ensure
+      db = DB
+    end
+  end
+  
   it "should automatically use an eager limit stategy if the association has an offset" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1]
     EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 4, :album_id=>1}])

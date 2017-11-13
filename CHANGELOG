@@ -1,5 +1,7 @@
 === master
 
+* Support common table expressions, window functions, dropping CHECK constraints, and recognizing CURRENT_DATE defaults on MariaDB 10.2+ (jeremyevans)
+
 * Make Database#reset_primary_key_sequence work on PostgreSQL 10+ (jeremyevans)
 
 * Support :connect_sqls Database option for easily issuing sql commands on all new connections (jeremyevans)

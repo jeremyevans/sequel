@@ -2043,7 +2043,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
   end
 
   ConstraintValidationsSpecs = shared_description do
-    cspecify "should set up constraints that work even outside the model", :mysql do 
+    cspecify "should set up constraints that work even outside the model", [proc{|db| !db.mariadb? || db.server_version <= 100200}, :mysql] do 
       @ds.insert(@valid_row)
 
       # Test for unique constraint

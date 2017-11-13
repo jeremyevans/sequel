@@ -56,6 +56,8 @@ module Sequel
             UniqueConstraintViolation
           when 1451, 1452
             ForeignKeyConstraintViolation
+          when 4025
+            CheckConstraintViolation
           else
             super
           end

@@ -145,6 +145,7 @@ module Sequel
           rn = ds.row_number_column 
           limit, offset = limit_and_offset
           ds = ds.unordered.select_append{|o| o.row_number.function.over(:partition=>predicate_key, :order=>ds.opts[:order]).as(rn)}.from_self
+          ds = ds.order(rn) if ds.db.database_type == :mysql
           ds = if !returns_array?
             ds.where(rn => offset ? offset+1 : 1)
           elsif offset

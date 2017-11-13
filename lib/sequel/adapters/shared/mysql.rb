@@ -74,6 +74,7 @@ module Sequel
 
       def freeze
         server_version
+        mariadb?
         supports_timestamp_usecs?
         super
       end
@@ -116,10 +117,16 @@ module Sequel
         run("XA ROLLBACK #{literal(transaction_id)}", opts)
       end
 
+      # Whether the database is MariaDB and not MySQL
+      def mariadb?
+        return @is_mariadb if defined?(@is_mariadb)
+        @is_mariadb = !(fetch('SELECT version()').single_value! !~ /mariadb/i)
+      end
+
       # Get version of MySQL server, used for determined capabilities.
       def server_version
         @server_version ||= begin
-          m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
+          m = /(\d+)\.(\d+)\.(\d+)/.match(fetch('SELECT version()').single_value!)
           (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
         end
       end
@@ -237,6 +244,10 @@ module Sequel
           "DROP FOREIGN KEY #{quote_identifier(name)}"
         when :unique
           "DROP INDEX #{quote_identifier(op[:name])}"
+        when :check, nil 
+          if supports_check_constraints?
+            "DROP CONSTRAINT #{quote_identifier(op[:name])}"
+          end
         end
       end
 
@@ -263,6 +274,11 @@ module Sequel
           default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
         end
         super(default, type)
+      end
+
+      def column_schema_to_ruby_default(default, type)
+        return Sequel::CURRENT_DATE if mariadb? && server_version >= 100200 && default == 'curdate()'
+        super
       end
 
       # Don't allow combining adding foreign key operations with other
@@ -390,6 +406,7 @@ module Sequel
         /foreign key constraint fails/ => ForeignKeyConstraintViolation,
         /cannot be null/ => NotNullConstraintViolation,
         /Deadlock found when trying to get lock; try restarting transaction/ => SerializationFailure,
+        /CONSTRAINT .+ failed for/ => CheckConstraintViolation,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
@@ -470,6 +487,11 @@ module Sequel
         server_version >= 50600 && (op[:op] == :drop_index || (op[:op] == :drop_constraint && op[:type] == :unique))
       end
 
+      # Whether the database supports CHECK constraints
+      def supports_check_constraints?
+        mariadb? && server_version >= 100200
+      end
+
       # MySQL can combine multiple alter table ops into a single query.
       def supports_combining_alter_table_ops?
         true
@@ -545,7 +567,7 @@ module Sequel
 
       Dataset.def_sql_method(self, :delete, %w'delete from where order limit')
       Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
-      Dataset.def_sql_method(self, :select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
+      Dataset.def_sql_method(self, :select, %w'with select distinct calc_found_rows columns from join where group having compounds order limit lock')
       Dataset.def_sql_method(self, :update, %w'update ignore table set where order limit')
 
       include Sequel::Dataset::Replace
@@ -713,6 +735,10 @@ module Sequel
         sql << '`' << c.to_s.gsub('`', '``') << '`'
       end
 
+      def supports_cte?(type=:select)
+        type == :select && db.mariadb? && db.server_version >= 100200
+      end
+
       # MySQL does not support derived column lists
       def supports_derived_column_lists?
         false
@@ -760,7 +786,11 @@ module Sequel
       def supports_timestamp_usecs?
         db.supports_timestamp_usecs?
       end
-      
+
+      def supports_window_functions?
+        db.mariadb? && db.server_version >= 100200
+      end
+
       # Sets up the update methods to use UPDATE IGNORE.
       # Useful if you have a unique key and want to just skip
       # updating rows that violate the unique key restriction.
@@ -927,6 +957,11 @@ module Sequel
       # MySQL specific SQL_CALC_FOUND_ROWS option
       def select_calc_found_rows_sql(sql)
         sql << ' SQL_CALC_FOUND_ROWS' if opts[:calc_found_rows]
+      end
+
+      # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
+      def select_with_sql_base
+        opts[:with].any?{|w| w[:recursive]} ? "WITH RECURSIVE " : super
       end
 
       # MySQL uses WITH ROLLUP syntax.
