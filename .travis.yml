@@ -16,6 +16,7 @@ matrix:
     - rvm: jruby-head
     - rvm: ruby-head
     - rvm: jruby-19mode
+    - rvm: jruby-9.0.5.0
 before_install:
   - gem install bundler
 script: bundle exec rake spec_travis
