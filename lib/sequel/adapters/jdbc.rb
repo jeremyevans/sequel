@@ -404,6 +404,10 @@ module Sequel
             cps = cps[1]
           else
             log_connection_yield("CLOSE #{name}", conn){cps[1].close} if cps
+            if name
+              opts = Hash[opts]
+              opts[:name] = name
+            end
             cps = log_connection_yield("PREPARE#{" #{name}:" if name} #{sql}", conn){prepare_jdbc_statement(conn, sql, opts)}
             if size = fetch_size
               cps.setFetchSize(size)

@@ -151,6 +151,21 @@ module Sequel
           nil
         end
 
+        # Work around issue when using Sequel's bound variable support where the
+        # same SQL is used in different bound variable calls, but the schema has
+        # changed between the calls.  This is necessary as jdbc-postgres versions
+        # after 9.4.1200 violate the JDBC API.  These versions cache separate
+        # PreparedStatement instances, which are eventually prepared server side after the
+        # prepareThreshold is met.  The JDBC API violation is that PreparedStatement#close
+        # does not release the server side prepared statement.
+        def prepare_jdbc_statement(conn, sql, opts)
+          ps = super
+          unless opts[:name]
+            ps.prepare_threshold = 0
+          end
+          ps
+        end
+
         # If the given argument is a recognized PostgreSQL-specific type, create
         # a PGObject instance with unknown type and the bound argument string value,
         # and set that as the prepared statement argument.

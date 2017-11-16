@@ -1,5 +1,7 @@
 === master
 
+* Explicitly disallow use of server-side prepared statements when using Dataset#call in the jdbc/postgresql adapter (jeremyevans) (#1448)
+
 * Support common table expressions, window functions, dropping CHECK constraints, and recognizing CURRENT_DATE defaults on MariaDB 10.2+ (jeremyevans)
 
 * Make Database#reset_primary_key_sequence work on PostgreSQL 10+ (jeremyevans)
