@@ -641,6 +641,11 @@ module Sequel
         db.sqlite_version >= 30803
       end
 
+      # SQLite supports CTEs in subqueries if it supports CTEs.
+      def supports_cte_in_subqueries?
+        supports_cte?
+      end
+
       # SQLite does not support table aliases with column aliases
       def supports_derived_column_lists?
         false
@@ -763,6 +768,11 @@ module Sequel
       def select_values_sql(sql)
         sql << "VALUES "
         expression_list_append(sql, opts[:values])
+      end
+
+      # SQLite does not support CTEs directly inside UNION/INTERSECT/EXCEPT.
+      def supports_cte_in_compounds?
+        false
       end
 
       # SQLite supports quoted function names.

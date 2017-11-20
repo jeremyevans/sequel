@@ -1,5 +1,7 @@
 === master
 
+* Support WITH clauses in subqueries on SQLite, but not in UNION/INTERSECT/EXCEPT (jeremyevans)
+
 * Hoist WITH clauses to INSERT statement level if INSERT subquery uses a CTE on MSSQL (jeremyevans)
 
 * Respect indislive and ignore indcheckxmin index attributes when using Database#indexes on PostgreSQL (jeremyevans)

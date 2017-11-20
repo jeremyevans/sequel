@@ -192,6 +192,11 @@ module Sequel
       true
     end
 
+    # Whether common table expressions are supported in UNION/INTERSECT/EXCEPT clauses.
+    def supports_cte_in_compounds?
+      supports_cte_in_subqueries?
+    end
+
     # Whether the database supports quoting function names.
     def supports_quoted_function_names?
       false

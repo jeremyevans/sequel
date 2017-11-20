@@ -1122,7 +1122,7 @@ module Sequel
 
     # Add the dataset to the list of compounds
     def compound_clone(type, dataset, opts)
-      if hoist_cte?(dataset)
+      if dataset.is_a?(Dataset) && dataset.opts[:with] && !supports_cte_in_compounds?
         s, ds = hoist_cte(dataset)
         return s.compound_clone(type, ds, opts)
       end
