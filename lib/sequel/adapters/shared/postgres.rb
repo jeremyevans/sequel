@@ -431,7 +431,8 @@ module Sequel
           order(*order).
           select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
-        ds = ds.where(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
+        ds = ds.where(:indisready=>true) if server_version >= 80300
+        ds = ds.where(:indislive=>true) if server_version >= 90300
 
         indexes = {}
         ds.each do |r|

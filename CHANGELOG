@@ -1,5 +1,7 @@
 === master
 
+* Respect indislive and ignore indcheckxmin index attributes when using Database#indexes on PostgreSQL (jeremyevans)
+
 * Explicitly disallow use of server-side prepared statements when using Dataset#call in the jdbc/postgresql adapter (jeremyevans) (#1448)
 
 * Support common table expressions, window functions, dropping CHECK constraints, and recognizing CURRENT_DATE defaults on MariaDB 10.2+ (jeremyevans)
