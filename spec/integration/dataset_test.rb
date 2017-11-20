@@ -771,6 +771,13 @@ if DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
       @ds2.filter(:id=>@db[:t].select{max(id)}).delete
       @ds.select_order_map(:id).must_equal [1, 1]
     end
+
+    it "should support a subselect in an subquery used for INSERT" do
+      @db.transaction(:rollback=>:always) do
+        @ds.insert([:id], @db[:foo].with(:foo, @ds.select{(id + 10).as(:id)}))
+        @ds.select_order_map(:id).must_equal [1,2,11,12]
+      end
+    end
   end
 end
 

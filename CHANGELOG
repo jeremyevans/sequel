@@ -1,5 +1,7 @@
 === master
 
+* Hoist WITH clauses to INSERT statement level if INSERT subquery uses a CTE on MSSQL (jeremyevans)
+
 * Respect indislive and ignore indcheckxmin index attributes when using Database#indexes on PostgreSQL (jeremyevans)
 
 * Explicitly disallow use of server-side prepared statements when using Dataset#call in the jdbc/postgresql adapter (jeremyevans) (#1448)

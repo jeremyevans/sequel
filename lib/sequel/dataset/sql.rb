@@ -49,6 +49,9 @@ module Sequel
 
       if values.is_a?(Array) && values.empty? && !insert_supports_empty_values? 
         columns, values = insert_empty_columns_values
+      elsif values.is_a?(Dataset) && hoist_cte?(values) && supports_cte?(:insert)
+        ds, values = hoist_cte(values)
+        return ds.clone(:columns=>columns, :values=>values).send(:_insert_sql)
       end
       clone(:columns=>columns, :values=>values).send(:_insert_sql)
     end

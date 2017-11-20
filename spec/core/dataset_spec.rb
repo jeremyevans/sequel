@@ -3568,6 +3568,16 @@ describe "Dataset#insert_sql" do
   it "should use unaliased table name" do
     @ds.from(Sequel.as(:items, :i)).insert_sql(1).must_equal "INSERT INTO items VALUES (1)"
   end
+
+  it "should hoist WITH clauses from query if the dataset doesn't support CTEs in subselects" do
+    @ds = @ds.with_extend do
+      Sequel::Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
+      def supports_cte?(type=:select); true end
+      def supports_cte_in_subselect?; false end
+    end
+    @ds.insert_sql(@ds.from(:foo).with(:foo, @ds.select(:bar))).must_equal 'WITH foo AS (SELECT bar FROM items) INSERT INTO items SELECT * FROM foo'
+    @ds.insert_sql([:a], @ds.from(:foo).with(:foo, @ds.select(:bar))).must_equal 'WITH foo AS (SELECT bar FROM items) INSERT INTO items (a) SELECT * FROM foo'
+  end
 end
 
 describe "Dataset#inspect" do
