@@ -316,6 +316,12 @@ describe Sequel::Model, ".dataset_module" do
     @c.order(:bar).foo.sql.must_equal 'SELECT * FROM items ORDER BY baz, bar'
   end
 
+  it "should have dataset_module support a reverse method" do
+    @c.dataset_module{reverse(:foo){:baz}}
+    @c.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz DESC'
+    @c.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar ORDER BY baz DESC'
+  end
+
   it "should have dataset_module support a select method" do
     @c.dataset_module{select :foo, :baz}
     @c.foo.sql.must_equal 'SELECT baz FROM items'

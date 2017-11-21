@@ -1,5 +1,7 @@
 === master
 
+* Add DatasetModule#reverse for simpler use of descending orders (jeremyevans)
+
 * Support WITH clauses in subqueries on SQLite, but not in UNION/INTERSECT/EXCEPT (jeremyevans)
 
 * Hoist WITH clauses to INSERT statement level if INSERT subquery uses a CTE on MSSQL (jeremyevans)

@@ -522,6 +522,12 @@ describe "Database#extend_datasets custom methods" do
     ds.order(:bar).foo.sql.must_equal 'SELECT * FROM items ORDER BY baz, bar'
   end
 
+  it "should have dataset_module support a reverse method" do
+    @db.extend_datasets{reverse(:foo){:baz}}
+    ds.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz DESC'
+    ds.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar ORDER BY baz DESC'
+  end
+
   it "should have dataset_module support a select method" do
     @db.extend_datasets{select :foo, :baz}
     ds.foo.sql.must_equal 'SELECT baz FROM items'
