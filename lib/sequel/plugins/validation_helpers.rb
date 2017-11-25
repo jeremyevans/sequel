@@ -48,9 +48,9 @@ module Sequel
     #     def default_validation_helpers_options(type)
     #       case type
     #       when :exact_length
-    #         {message: lambda{|exact| I18n.t("errors.exact_length", exact: exact)}
+    #         {message: lambda{|exact| I18n.t("errors.exact_length", exact: exact)}}
     #       when :integer
-    #         {message: lambda{I18n.t("errors.integer")}
+    #         {message: lambda{I18n.t("errors.integer")}}
     #       else
     #         super
     #       end
