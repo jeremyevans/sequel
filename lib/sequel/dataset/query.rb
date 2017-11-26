@@ -1199,6 +1199,12 @@ module Sequel
         cond = filter_expr(cond, &block)
         cond = SQL::BooleanExpression.invert(cond) if invert
         cond = SQL::BooleanExpression.new(combine, @opts[clause], cond) if @opts[clause]
+
+        if cond.nil?
+          Sequel::Deprecation.deprecate('Filtering method called on dataset with no existing filter with virtual row block and no argument and virtual row block returned nil.  Currently, this results in the filter being ignored instead of using a NULL filter.  In Sequel 5.4+, this behavior will change to using a NULL filter, similar to the behavior in all other cases.')
+          #cond = Sequel::NULL
+        end
+
         clone(clause => cond)
       end
     end
@@ -1213,11 +1219,9 @@ module Sequel
       expr = nil if expr == EMPTY_ARRAY
 
       if block
-        if expr
-          return SQL::BooleanExpression.new(:AND, filter_expr(expr), filter_expr(Sequel.virtual_row(&block)))
-        else
-          return filter_expr(Sequel.virtual_row(&block))
-        end
+        cond = filter_expr(Sequel.virtual_row(&block))
+        cond = SQL::BooleanExpression.new(:AND, filter_expr(expr), cond) if expr
+        return cond
       end
 
       case expr

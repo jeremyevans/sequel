@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Dataset#where calls with no existing filter, no argument, and where the virtual row block returns nil (jeremyevans) (#1454)
+
 * Add DatasetModule#reverse for simpler use of descending orders (jeremyevans)
 
 * Support WITH clauses in subqueries on SQLite, but not in UNION/INTERSECT/EXCEPT (jeremyevans)
