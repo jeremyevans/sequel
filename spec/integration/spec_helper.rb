@@ -42,6 +42,10 @@ if ENV['SEQUEL_ERROR_SQL']
   DB.extension :error_sql
 end
 
+if ENV['SEQUEL_SYNCHRONIZE_SQL']
+  DB.extension :synchronize_sql
+end
+
 if ENV['SEQUEL_CONNECTION_VALIDATOR']
   ENV['SEQUEL_NO_CHECK_SQLS'] = '1'
   DB.extension(:connection_validator)

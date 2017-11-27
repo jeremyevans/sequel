@@ -1,48 +1,45 @@
 # frozen-string-literal: true
 #
-# The synchronize_sql extension exists to work around some connection- pool
-# performance considerations in a number of adapters where escaping a string
-# as part of placeholder substitution requires an actual database connection.
-# These adapters include amalgalite, mysql2, postgres, tinytds, and JDBC
-# postgres. In these adapters, `literal_string_append` includes a call to
-# `db.synchronize` to obtain a real connection object do use for escaping the
-# passed-in string.
+# The synchronize_sql extension checks out a connection from the pool while
+# generating an SQL string.  In cases where a connection is necessary
+# in order to properly escape input, and multiple inputs in the query need
+# escaping, this can result in fewer connection checkouts and better
+# overall performance. In other cases this results in a performance decrease
+# because a connection is checked out and either not used or kept checked out
+# longer than necessary.
 #
-# This has the effect of checking out a connection from the pool for _every_
-# placeholder that needs substitution in a query. For queries with lots of
-# placeholders (e.g. IN queries with long lists), this can cause the query to
-# spend longer waiting for a connection than the actual pool timeout (since
-# every individual acquisition will take less than the timeout, but the sum of
-# all of them can be greater)
+# The adapters where this extension may improve performance include amalgalite,
+# mysql2, postgres, jdbc/postgresql, and tinytds. In these adapters, escaping
+# strings requires a connection object for as proper escaping requires calling
+# an escaping method on the connection object.
 #
-# This dataset wraps all the _sql methods with a connection acquisition, so
-# there will be no need to checkout/return connections continuously during the
-# placeholder substitution.
+# This extension is most helpful when dealing with queries with lots of
+# strings that need escaping (e.g. IN queries with long lists).  By default,
+# a connection will be checked out and back in for each string to be escaped,
+# which under high contention can cause the query to spend longer generating
+# the SQL string than the actual pool timeout (since every individual checkout
+# will take less than the timeout, but the sum of all of them can be greater).
 #
-# While this extension might solve some problems for heavily-loaded connection
-# pools with queries containing lots of placeholders, it also creates some new
-# ones. Now _every_ query is going to call `synchronize` twice, even queries
-# that have no actual placeholders, and the total time spent holding a
-# connection is going to be higher, since it's not released during the parts
-# of query preparation that are not placeholder substitution.
+# This extension is unnecessary and will decrease performance if the single
+# threaded connection pool is used.
 
-
+#
 module Sequel
-    class Dataset
-        module SynchronizeSQL
-            %w(
-                insert_sql
-                select_sql
-                update_sql
-                delete_sql
-            ).each do |method_name|
-                define_method(method_name) do |*args|
-                    db.synchronize(@opts[:server]) do
-                        super *args
-                    end
-                end
-            end
+  class Dataset
+    module SynchronizeSQL
+      %w'insert select update delete'.each do |type|
+        define_method(:"#{type}_sql") do |*args|
+          if @opts[:sql].is_a?(String)
+            return super(*args)
+          end
+
+          db.synchronize(@opts[:server]) do
+            super(*args)
+          end
         end
-        register_extension(:synchronize_sql, SynchronizeSQL)
+      end
     end
+
+    register_extension(:synchronize_sql, SynchronizeSQL)
+  end
 end
