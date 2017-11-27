@@ -410,10 +410,9 @@ module Sequel
         else
           range = 0...32
           order = [Sequel[:indc][:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(Sequel[:ind][:indkey], [x]), x]}, 32, Sequel[:att][:attnum])]
-          attnums = range.map{|x| SQL::Subscript.new(Sequel[:ind][:indkey], [x])} unless server_version >= 80100 
         end
 
-        attnums ||= SQL::Function.new(:ANY, Sequel[:ind][:indkey])
+        attnums = SQL::Function.new(:ANY, Sequel[:ind][:indkey])
 
         ds = metadata_dataset.
           from{pg_class.as(:tab)}.

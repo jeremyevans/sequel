@@ -1,5 +1,7 @@
 === master
 
+* Drop support for PostgreSQL <8.1 in Database#indexes (jeremyevans)
+
 * Add synchronize_sql extension, for checking out a connection around SQL generation (KJTsanaktsidis, jeremyevans) (#1451)
 
 * Deprecate Dataset#where calls with no existing filter, no argument, and where the virtual row block returns nil (jeremyevans) (#1454)
