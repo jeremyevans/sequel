@@ -124,20 +124,19 @@ error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
 error_proc["Error: Cannot specify #{exclusive_options.map{|v| "-#{v}"}.join(' and ')} together"] if exclusive_options.length > 1
 
 connect_proc = lambda do |database|
-  db = if database.nil? || database.empty?
-    Sequel.connect('mock:///')
+  db_opts = {:test=>test, :loggers=>loggers}
+  if database.nil? || database.empty?
+    Sequel.connect('mock:///', db_opts)
   elsif File.exist?(database)
     require 'yaml'
     env ||= "development"
     db_config = YAML.load_file(database)
     db_config = db_config[env] || db_config[env.to_sym] || db_config
     db_config.keys.each{|k| db_config[k.to_sym] = db_config.delete(k)}
-    Sequel.connect(db_config, :test=>test)
+    Sequel.connect(db_config, db_opts)
   else
-    Sequel.connect(database, :test=>test)
+    Sequel.connect(database, db_opts)
   end
-  db.loggers = loggers
-  db
 end
 
 begin
