@@ -1498,22 +1498,15 @@ module Sequel
           model.default_set_fields_options
         end
 
-        case opts[:missing]
-        when :skip
+        case missing = opts[:missing]
+        when :skip, :raise
+          do_raise = true if missing == :raise
           fields.each do |f|
             if hash.has_key?(f) 
               set_column_value("#{f}=", hash[f])
             elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
               set_column_value("#{sf}=", hash[sf])
-            end
-          end
-        when :raise
-          fields.each do |f|
-            if hash.has_key?(f)
-              set_column_value("#{f}=", hash[f])
-            elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
-              set_column_value("#{sf}=", hash[sf])
-            else
+            elsif do_raise
               raise(Sequel::Error, "missing field in hash: #{f.inspect} not in #{hash.inspect}")
             end
           end
