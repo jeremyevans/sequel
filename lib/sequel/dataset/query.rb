@@ -774,6 +774,16 @@ module Sequel
     #   DB[:items].returning # RETURNING *
     #   DB[:items].returning(nil) # RETURNING NULL
     #   DB[:items].returning(:id, :name) # RETURNING id, name
+    #
+    #   DB[:items].returning.insert(:a=>1) do |hash|
+    #     # hash for each row inserted, with values for all columns
+    #   end
+    #   DB[:items].returning.update(:a=>1) do |hash|
+    #     # hash for each row updated, with values for all columns
+    #   end
+    #   DB[:items].returning.delete(:a=>1) do |hash|
+    #     # hash for each row deleted, with values for all columns
+    #   end
     def returning(*values)
       raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
       clone(:returning=>values.freeze)
