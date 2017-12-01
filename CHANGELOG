@@ -1,5 +1,7 @@
 === master
 
+* Add datetime_parse_to_time extension, for parsing timestamp strings without offsets using DateTime.parse.to_time (jeremyevans) (#1455)
+
 * Add WHERE NULL filter for Dataset#where calls with no existing filter, no argument, and where the virtual row block returns nil (jeremyevans)
 
 === 5.3.0 (2017-12-01)
