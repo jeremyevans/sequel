@@ -378,14 +378,9 @@ describe "Dataset#where" do
     @dataset.where(nil).sql.must_equal "SELECT * FROM test WHERE NULL"
   end
   
-  deprecated "should handle nil block result has no existing filter" do
-    @dataset.where{nil}.sql.must_equal "SELECT * FROM test"
-  end
-
-  # SEQUEL54
   it "should handle nil block result has no existing filter" do
     @dataset.where{nil}.sql.must_equal "SELECT * FROM test WHERE NULL"
-  end if false
+  end
   
   it "should just clone if given an empty array or hash argument" do
     @dataset.where({}).sql.must_equal @dataset.sql

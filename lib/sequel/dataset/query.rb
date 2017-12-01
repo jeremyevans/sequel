@@ -1211,8 +1211,7 @@ module Sequel
         cond = SQL::BooleanExpression.new(combine, @opts[clause], cond) if @opts[clause]
 
         if cond.nil?
-          Sequel::Deprecation.deprecate('Filtering method called on dataset with no existing filter with virtual row block and no argument and virtual row block returned nil.  Currently, this results in the filter being ignored instead of using a NULL filter.  In Sequel 5.4+, this behavior will change to using a NULL filter, similar to the behavior in all other cases.')
-          #cond = Sequel::NULL
+          cond = Sequel::NULL
         end
 
         clone(clause => cond)

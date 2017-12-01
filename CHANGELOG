@@ -1,3 +1,7 @@
+=== master
+
+* Add WHERE NULL filter for Dataset#where calls with no existing filter, no argument, and where the virtual row block returns nil (jeremyevans)
+
 === 5.3.0 (2017-12-01)
 
 * Add logger to Database instance before making first connection in bin/sequel (jeremyevans)
