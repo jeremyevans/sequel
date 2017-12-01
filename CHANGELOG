@@ -1,4 +1,4 @@
-=== master
+=== 5.3.0 (2017-12-01)
 
 * Add logger to Database instance before making first connection in bin/sequel (jeremyevans)
 
