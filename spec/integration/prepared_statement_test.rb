@@ -319,7 +319,7 @@ describe "Bound Argument Types" do
       TrueClass :b
     end
     @ds = @db[:items]
-    @vs = {:d=>Date.civil(2010, 10, 11), :dt=>DateTime.civil(2010, 10, 12, 13, 14, 15), :f=>1.0, :s=>'str', :t=>Time.at(20101010), :file=>Sequel::SQL::Blob.new('blob'), :b=>true}
+    @vs = {:d=>Date.civil(2010, 10, 11), :dt=>DateTime.civil(2010, 10, 12, 13, 14, 15), :f=>1.0, :s=>'str', :t=>Time.at(Time.now.to_i), :file=>Sequel::SQL::Blob.new('blob'), :b=>true}
   end
   before do
     @ds.delete
