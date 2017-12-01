@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
+          <span class='datetime'>2017-10-30 13:46:56 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -362,8 +362,17 @@
             <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>If you want to add a new foreign key constraint to an existing column, you
-            provide an array with a single element.  It&#39;s encouraged to provide a
-            name when adding the constraint, via the :name option:</p>
+            provide an array with a single element:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>It&#39;s encouraged to provide a name when adding the constraint, via the
+            :foreign_key_constraint_name option if adding the column and the
+            constraint:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">foreign_key_constraint_name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_id_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>or via the :name option if just adding the constraint:</p>
             
             <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> [:<span class="ruby-identifier">artist_id</span>], :<span class="ruby-identifier">artists</span>, <span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">albums_artist_id_fkey</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             

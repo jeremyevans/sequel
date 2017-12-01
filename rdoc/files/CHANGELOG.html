@@ -29,12 +29,60 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-10-27 08:37:11 -0700</span>
+          <span class='datetime'>2017-12-01 07:52:45 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-5.3.0+-282017-12-01-29">5.3.0 (2017-12-01)<span><a href="#label-5.3.0+-282017-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add logger to Database instance before making first connection in
+            bin/sequel (jeremyevans)</p>
+            </li><li>
+            <p>Drop support for PostgreSQL &lt;8.1 in Database#indexes (jeremyevans)</p>
+            </li><li>
+            <p>Add synchronize_sql extension, for checking out a connection around SQL
+            generation (KJTsanaktsidis, jeremyevans) (#1451)</p>
+            </li><li>
+            <p>Deprecate Dataset#where calls with no existing filter, no argument, and
+            where the virtual row block returns nil (jeremyevans) (#1454)</p>
+            </li><li>
+            <p>Add DatasetModule#reverse for simpler use of descending orders
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support WITH clauses in subqueries on SQLite, but not in
+            UNION/INTERSECT/EXCEPT (jeremyevans)</p>
+            </li><li>
+            <p>Hoist WITH clauses to INSERT statement level if INSERT subquery uses a CTE
+            on MSSQL (jeremyevans)</p>
+            </li><li>
+            <p>Respect indislive and ignore indcheckxmin index attributes when using
+            Database#indexes on PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Explicitly disallow use of server-side prepared statements when using
+            Dataset#call in the jdbc/postgresql adapter (jeremyevans) (#1448)</p>
+            </li><li>
+            <p>Support common table expressions, window functions, dropping CHECK
+            constraints, and recognizing CURRENT_DATE defaults on MariaDB 10.2+
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#reset_primary_key_sequence work on PostgreSQL 10+
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support :connect_sqls Database option for easily issuing sql commands on
+            all new connections (jeremyevans)</p>
+            </li><li>
+            <p>Support :extensions Database option for loading extensions when
+            initializing, useful in connection strings (jeremyevans)</p>
+            </li><li>
+            <p>Avoid warning if trying to rollback after a commit or rollback raises an
+            exception in the postgres adapter (jeremyevans)</p>
+            </li><li>
+            <p>Support Date::Infinity values in the pg_extended_date_support extension
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-5.2.0+-282017-10-27-29">5.2.0 (2017-10-27)<span><a href="#label-5.2.0+-282017-10-27-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

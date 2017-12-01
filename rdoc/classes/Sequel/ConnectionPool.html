@@ -81,6 +81,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#attribute-i-after_connect">after_connect</a></li>
+              <li><a href="#attribute-i-connect_sqls">connect_sqls</a></li>
               <li><a href="#attribute-i-db">db</a></li>
               <li><a href="#method-i-servers">servers</a></li>
             </ol>
@@ -141,6 +142,16 @@
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>
+                      <a name='attribute-i-connect_sqls'>connect_sqls</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>An array of sql strings to execute on each new connection.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
                       <a name='attribute-i-db'>db</a>
                     </td>
                     <td class='context-item-value'>[RW]</td>
@@ -172,6 +183,9 @@
                   connection object (and server argument if the callable accepts 2
                   arguments), useful for customizations that you want to apply to all
                   connections.</p>
+                  </td></tr><tr><td class='label'>:connect_sqls </td><td>
+                  <p>An array of sql strings to execute on each new connection, after
+                  :after_connect runs.</p>
                   </td></tr><tr><td class='label'>:preconnect </td><td>
                   <p>Automatically create the maximum number of connections, so that they
                   don&#39;t need to be created as needed.  This is useful when connecting
@@ -184,7 +198,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;  <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 97</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;  <span class="ruby-ivar">@connect_sqls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_sqls</span>]&#x000A;  <span class="ruby-ivar">@error_classes</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:database_error_classes</span>).<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -203,7 +217,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-servers-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">servers</span>&#x000A;  [<span class="ruby-value">:default</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">servers</span>&#x000A;  [<span class="ruby-value">:default</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

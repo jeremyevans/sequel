@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v5.2.0</h2>
+    <h2>Sequel::Model Plugins for v5.3.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -162,6 +162,7 @@
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
 <li><a href='http://github.com/gucki/sequel_paperclip'>sequel_paperclip</a>: Provides attachment functionality for models, including post processing (thumbnail generation, etc).</li>
+<li><a href='https://github.com/yuryroot/sequel-pg_advisory_lock'>sequel-pg_advisory_lock</a>: Allows you to use PostgreSQL advisory locks for application-level mutexes.</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Lets you add procs that automatically rescue and fix model errors.</li>
 <li><a href='https://github.com/mlen/sequel_secure_password'>sequel_secure_password</a>: Adds bcrypt authentication and password hashing to models.</li>
@@ -231,6 +232,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Dataset#comment method, for setting an SQL comment in the queries created by the dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_agg_rb.html">string_agg</a>: Adds generic database support for aggregate string concatentation.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/synchronize_sql_rb.html">synchronize_sql</a>: Checks out a connection while generating SQL strings, improving performance in some cases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot</a>: Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</li>
 </ul>
 
