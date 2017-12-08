@@ -41,7 +41,9 @@ module Sequel
     module Nullifiable
       # Return a cloned nullified dataset.
       def nullify
-        with_extend(NullDataset)
+        cached_dataset(:_nullify_ds) do
+          with_extend(NullDataset)
+        end
       end
     end
 

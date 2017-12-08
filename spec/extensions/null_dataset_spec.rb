@@ -21,6 +21,11 @@ describe "null_dataset extension" do
     @i.must_equal 0
   end
 
+  it "nullify should be a cached dataset" do
+    ds = @db[:table]
+    ds.nullify.object_id.must_equal(ds.nullify.object_id)
+  end
+
   it "should make insert be a noop" do
     @ds.insert(1).must_be_nil
   end
