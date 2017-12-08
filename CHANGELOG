@@ -1,5 +1,7 @@
 === master
 
+* Cache Dataset#nullify dataset in the null_dataset extension (chanks) (#1456)
+
 * Add datetime_parse_to_time extension, for parsing timestamp strings without offsets using DateTime.parse.to_time (jeremyevans) (#1455)
 
 * Add WHERE NULL filter for Dataset#where calls with no existing filter, no argument, and where the virtual row block returns nil (jeremyevans)
