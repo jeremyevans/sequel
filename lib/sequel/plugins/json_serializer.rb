@@ -406,7 +406,7 @@ module Sequel
             end
           end
 
-          res = if row_proc 
+          res = if row_proc || @opts[:eager_graph] 
             array = if opts[:array]
               opts = opts.dup
               opts.delete(:array)
@@ -414,7 +414,7 @@ module Sequel
               all
             end
             array.map{|obj| Literal.new(Sequel.object_to_json(obj, opts, &opts[:instance_block]))}
-           else
+          else
             all
           end
 
