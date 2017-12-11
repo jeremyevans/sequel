@@ -172,6 +172,13 @@ describe "Sequel::Plugins::XmlSerializer" do
     x.first.albums.must_equal [a]
   end
 
+  it "should work correctly for eager graphed datasets" do
+    ds = Album.dataset.eager_graph(:artist).with_fetch(:id=>1, :name=>'RF', :artist_id=>2, :artist_id_0=>2, :artist_name=>'YJM')
+    albums = Album.array_from_xml(ds.to_xml(:only=>:name, :include=>{:artist=>{:only=>:name}}), :associations=>:artist)
+    albums.must_equal [Album.load(:name=>@album.name)]
+    albums.first.artist.must_equal Artist.load(:name=>@artist.name)
+  end
+
   it "should raise an error if the dataset does not have a row_proc" do
     proc{Album.dataset.naked.to_xml}.must_raise(Sequel::Error)
   end

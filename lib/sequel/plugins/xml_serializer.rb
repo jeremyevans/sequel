@@ -389,7 +389,7 @@ module Sequel
         # as well as the :array_root_name option for specifying the name of
         # the root node that contains the nodes for all of the instances.
         def to_xml(opts=OPTS)
-          raise(Sequel::Error, "Dataset#to_xml") unless row_proc
+          raise(Sequel::Error, "Dataset#to_xml") unless row_proc || @opts[:eager_graph]
           x = model.xml_builder(opts)
           name_proc = model.xml_serialize_name_proc(opts)
           array = if opts[:array]
