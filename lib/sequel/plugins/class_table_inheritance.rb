@@ -196,6 +196,8 @@ module Sequel
       # :key_chooser :: proc returning key for the provided model instance
       # :table_map :: Hash with class name symbols keys mapping to table name symbol values.
       #               Overrides implicit table names.
+      # :ignore_subclass_columns :: Array with column names as symbols that are ignored
+      #                             on all sub-classes.
       def self.configure(model, opts = OPTS)
         SingleTableInheritance.configure model, opts[:key], opts
 
@@ -206,6 +208,7 @@ module Sequel
           @cti_table_columns = columns
           @cti_table_map = opts[:table_map] || {}
           @cti_alias = opts[:alias] || @dataset.first_source
+          @cti_ignore_subclass_columns = opts[:ignore_subclass_columns] || []
         end
       end
 
@@ -232,17 +235,22 @@ module Sequel
         # the implicit naming is incorrect.
         attr_reader :cti_table_map
 
+        # An array of columns that may be duplicated in sub-classes. The
+        # primary key column is always allowed to be duplicated
+        attr_reader :cti_ignore_subclass_columns
+
         # Freeze CTI information when freezing model class.
         def freeze
           @cti_models.freeze
           @cti_tables.freeze
           @cti_table_columns.freeze
           @cti_table_map.freeze
+          @cti_ignore_subclass_columns.freeze
 
           super
         end
 
-        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil, :@cti_alias=>nil)
+        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil, :@cti_alias=>nil, :@cti_ignore_subclass_columns=>nil)
 
         def inherited(subclass)
           ds = sti_dataset
@@ -273,10 +281,10 @@ module Sequel
             if cti_tables.length == 1
               ds = ds.select(*self.columns.map{|cc| Sequel.qualify(cti_table_name, Sequel.identifier(cc))})
             end
-            cols = columns - [pk]
+            cols = (columns - [pk]) - cti_ignore_subclass_columns
             dup_cols = cols & ds.columns
             unless dup_cols.empty?
-              raise Error, "class_table_inheritance with duplicate column names (other than the primary key column) is not supported, make sure tables have unique column names"
+              raise Error, "class_table_inheritance with duplicate column names (other than the primary key column) is not supported, make sure tables have unique column names (duplicate columns: #{dup_cols}). If this is desired, specify these columns in the :ignore_subclass_columns option when initializing the plugin"
             end
             sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)

@@ -6,7 +6,7 @@ describe "class_table_inheritance plugin" do
     def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
       {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
-       :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}]],
+       :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}] ],
        :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
        :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
        }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
@@ -486,7 +486,7 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
 end
 
 describe "class_table_inheritance plugin with duplicate columns" do
-  it "should raise error" do
+  it "should raise error if no columns are explicitly ignored" do
     @db = Sequel.mock(:autoid=>proc{|sql| 1})
     def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
@@ -510,6 +510,56 @@ describe "class_table_inheritance plugin with duplicate columns" do
     end 
     proc{class ::Manager < Employee; end}.must_raise Sequel::Error
   end
+
+  describe "with certain sub-class columns ignored" do
+    before do
+      @db = Sequel.mock(:autoid=>proc{|sql| 1})
+      def @db.supports_schema_parsing?() true end
+      def @db.schema(table, opts={})
+        {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}], [:updated_at, {:type=>:datetime}]],
+         :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}], [:updated_at, {:type=>:datetime}], [:another_duplicate_column, {:type=>:integer}]],
+         :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}], [:updated_at, {:type=>:datetime}], [:another_duplicate_column, {:type=>:integer}]],
+         }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
+      end
+      @db.extend_datasets do
+        def columns
+          {[:employees]=>[:id, :name, :kind, :updated_at],
+           [:managers]=>[:id, :num_staff, :updated_at, :another_duplicate_column],
+           [:executives]=>[:id, :num_managers, :updated_at, :another_duplicate_column],
+           [:employees, :managers]=>[:id, :name, :kind, :updated_at, :num_staff],
+          }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
+        end
+      end
+      class ::Employee < Sequel::Model(@db)
+        def _save_refresh; @values[:id] = 1 end
+        def self.columns
+          dataset.columns || dataset.opts[:from].first.expression.columns
+        end
+        plugin :class_table_inheritance, :ignore_subclass_columns=>[:updated_at]
+      end 
+      class ::Manager < Employee
+        Manager.cti_ignore_subclass_columns.push(:another_duplicate_column)
+      end
+      class ::Executive < Manager; end
+    end
+
+    it "should not use the ignored column in a sub-class subquery" do
+      Employee.dataset.sql.must_equal 'SELECT * FROM employees'
+      Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, employees.updated_at, managers.num_staff, managers.another_duplicate_column FROM employees INNER JOIN managers ON (managers.id = employees.id)) AS employees'
+      Executive.dataset.sql.must_equal 'SELECT * FROM (SELECT employees.id, employees.name, employees.kind, employees.updated_at, managers.num_staff, managers.another_duplicate_column, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)) AS employees'
+    end
+
+    it "should include schema for columns for tables for ancestor classes" do
+      Employee.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :updated_at=>{:type=>:datetime})
+      Manager.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :updated_at=>{:type=>:datetime}, :num_staff=>{:type=>:integer}, :another_duplicate_column=>{:type=>:integer})
+      Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :updated_at=>{:type=>:datetime}, :num_staff=>{:type=>:integer}, :another_duplicate_column=>{:type=>:integer}, :num_managers=>{:type=>:integer})
+    end
+
+    after do
+      Object.send(:remove_const, :Executive)
+    end
+  end
+
   after do
     Object.send(:remove_const, :Manager)
     Object.send(:remove_const, :Employee)
