@@ -510,7 +510,7 @@ ThreadedConnectionPoolSpecs = shared_description do
     @pool.hold{|cc| cc.must_equal c}
     @pool.hold do |cc|
       cc.must_equal c
-      Thread.new{@pool.hold{|cc2| cc2.must_equal c2}}
+      Thread.new{@pool.hold{|cc2| _(cc2).must_equal c2}}.join
     end
   end
 
@@ -523,7 +523,7 @@ ThreadedConnectionPoolSpecs = shared_description do
     @pool.hold{|cc| cc.must_equal c}
     @pool.hold do |cc|
       cc.must_equal c2
-      Thread.new{@pool.hold{|cc2| cc2.must_equal c}}
+      Thread.new{@pool.hold{|cc2| _(cc2).must_equal c}}.join
     end
   end
 
