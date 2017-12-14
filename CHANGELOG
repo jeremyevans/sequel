@@ -1,5 +1,7 @@
 === master
 
+* Add class_table_inheritance plugin :ignore_subclass_columns option (brianphillips) (#1459)
+
 * Make Dataset#to_xml in xml_serializer work with eager_graphed datasets (jeremyevans)
 
 * Make Dataset#to_json in json_serializer work with eager_graphed datasets (jeremyevans)
