@@ -511,7 +511,7 @@ describe "A PostgreSQL dataset" do
 
   it "should support :using when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
-    @db[:atest].insert(1262304000)
+    @db[:atest].insert(1262404000)
     @db.alter_table(:atest){set_column_type :t, Time, :using=>Sequel.cast('epoch', Time) + Sequel.cast('1 second', :interval) * :t}
     @db[:atest].get(Sequel.extract(:year, :t)).must_equal 2010
   end
