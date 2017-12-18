@@ -247,7 +247,7 @@ module Sequel
       @single_threaded
     end
     
-    if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby'
+    if RUBY_ENGINE == 'ruby' && RUBY_VERSION < '2.5'
       # Acquires a database connection, yielding it to the passed block. This is
       # useful if you want to make sure the same connection is used for all
       # database queries in the block.  It is also useful if you want to gain
