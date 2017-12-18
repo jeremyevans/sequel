@@ -175,7 +175,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/current_datetime_timestamp_rb.html">current_datetime_timestamp</a>: Creates current Time/DateTime objects that are literalized as CURRENT_TIMESTAMP.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/dataset_source_alias_rb.html">dataset_source_alias</a>: Automatically aliases datasets to their source instead of using t1, t2, etc..</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/duplicate_columns_handler.html">duplicate_columns_handler</a>: Allows you to raise or warn if the dataset returns multiple columns with the same name when returning the results.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/duplicate_columns_handler_rb.html">duplicate_columns_handler</a>: Allows you to raise or warn if the dataset returns multiple columns with the same name when returning the results.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_consider_nulls_rb.html">empty_array_consider_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty array use a NULL expression for NULL column values.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/implicit_subquery_rb.html">implicit_subquery</a>: Makes dataset methods that return datasets with modified SQL use a subquery implicitly if the current dataset uses raw SQL.</li>
@@ -186,7 +186,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/round_timestamps_rb.html">round_timestamps</a>: Automatically round timestamp values to database supported precision before literalizing them.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove</a>: Adds Dataset#select_remove to remove selected columns from a dataset.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/sequel_4_dataset_methods.html">sequel_4_dataset_methods</a>: Adds #and, #exclude_where, #interval, and #range dataset methods.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/sequel_4_dataset_methods_rb.html">sequel_4_dataset_methods</a>: Adds #and, #exclude_where, #interval, and #range dataset methods.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Dataset#comment method, for setting an SQL comment in the queries created by the dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_agg_rb.html">string_agg</a>: Adds generic database support for aggregate string concatentation.</li>
@@ -213,7 +213,6 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a>: Adds DSL support for calling PostgreSQL json operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{&lt;,&lt;=,&gt;,&gt;=,[]} that are only usable on ruby 1.8.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/s_rb.html">s</a>: Adds Sequel::S module with #S private method for easily calling Sequel.expr, including use as a refinement.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>: Adds instance methods to String for converting the string into a Date/Time/DateTime.</li>
