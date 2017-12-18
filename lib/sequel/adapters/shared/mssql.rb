@@ -473,12 +473,6 @@ module Sequel
         :datetime
       end
 
-      # MSSQL has both datetime and timestamp classes, most people are going
-      # to want datetime
-      def type_literal_generic_time(column)
-        column[:only_time] ? :time : :datetime
-      end
-      
       # MSSQL doesn't have a true boolean class, so it uses bit
       def type_literal_generic_trueclass(column)
         :bit

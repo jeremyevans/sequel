@@ -1010,7 +1010,16 @@ module Sequel
     # Sequel uses the timestamp type by default for Time values.
     # If the :only_time option is used, the time type is used.
     def type_literal_generic_time(column)
-      column[:only_time] ? :time : :timestamp
+      if column[:only_time]
+        type_literal_generic_only_time(column)
+      else
+        type_literal_generic_datetime(column)
+      end
+    end
+
+    # Use time by default for Time values if :only_time option is used.
+    def type_literal_generic_only_time(column)
+      :time
     end
 
     # Sequel uses the boolean type by default for TrueClass and FalseClass.

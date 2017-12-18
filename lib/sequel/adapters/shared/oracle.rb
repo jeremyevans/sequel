@@ -285,7 +285,7 @@ module Sequel
 
       # Oracle doesn't have a time type, so use timestamp for all
       # time columns.
-      def type_literal_generic_time(column)
+      def type_literal_generic_only_time(column)
         :timestamp
       end
 

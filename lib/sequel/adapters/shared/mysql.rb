@@ -537,15 +537,11 @@ module Sequel
 
       # MySQL has both datetime and timestamp classes, most people are going
       # to want datetime.
-      def type_literal_generic_time(column)
-        if column[:only_time]
-          if supports_timestamp_usecs?
-            :'time(6)'
-          else
-            :time
-          end
+      def type_literal_generic_only_time(column)
+        if supports_timestamp_usecs?
+          :'time(6)'
         else
-          type_literal_generic_datetime(column)
+          :time
         end
       end
 
