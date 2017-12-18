@@ -183,6 +183,15 @@ END
     Marshal.load(File.read(TMP_FILE)).must_equal("`a`"=>[[:a, {:type=>:integer, :db_type=>"integer", :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false}]])
   end
 
+  it "-X should dump the index cache" do
+    bin(:args=>"-X #{TMP_FILE}").must_equal ''
+    Marshal.load(File.read(TMP_FILE)).must_equal({})
+    DB.create_table(:a){Integer :id}
+    DB.create_table(:b){Integer :b, index: {name: "idx_test", unique: true}}
+    bin(:args=>"-X #{TMP_FILE}").must_equal ''
+    Marshal.load(File.read(TMP_FILE)).must_equal("`a`"=>{}, "`b`"=>{:idx_test=>{:unique=>true, :columns=>[:b]}})
+  end
+
   it "-t should output full backtraces on error" do
     bin(:args=>'-c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").must_be :<,  3
     bin(:args=>'-t -c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").must_be :>,  3
