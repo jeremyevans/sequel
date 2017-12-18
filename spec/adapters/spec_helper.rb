@@ -32,6 +32,8 @@ end
 IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 
+DB.extension(:pg_timestamptz) if ENV['SEQUEL_PG_TIMESTAMPTZ']
+
 if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
   DB.extension :duplicate_columns_handler
   DB.opts[:on_duplicate_columns] = dch.to_sym unless dch.empty?
