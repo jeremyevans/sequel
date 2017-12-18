@@ -1,5 +1,7 @@
 === master
 
+* Support Sequel.date_{add,sub} :cast option for setting cast type in date_arithmetic extension (jeremyevans)
+
 * Optimize Database#synchronize implementation on ruby 2.5+ (jeremyevans)
 
 * Add class_table_inheritance plugin :ignore_subclass_columns option (brianphillips) (#1459)
