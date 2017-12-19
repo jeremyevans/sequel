@@ -105,6 +105,10 @@ describe "pg_extended_date_support extension" do
     @db.literal(-Date::Infinity.new).must_equal "'-infinity'"
   end
 
+  it "should raise errors for literalizing random Objects" do
+    proc{@db.literal(Object.new)}.must_raise Sequel::Error
+  end
+
   it "should format BC dates" do
     @db.literal(Date.new(-1091, 10, 20)).must_equal "'1092-10-20 BC'"
     @db.literal(Date.new(1092, 10, 20)).must_equal "'1092-10-20'"
