@@ -82,6 +82,7 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
+        table = table.value if table.is_a?(Sequel::SQL::Identifier)
         metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
           if opts[:only_autocreated]
             # If specifically asked for only autocreated indexes, then return those an only those

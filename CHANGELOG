@@ -1,5 +1,7 @@
 === master
 
+* Allow Database#indexes on SQLite to handle SQL::Identifier values (jeremyevans)
+
 * Add pg_timestamptz extension for using timestamptz (timestamp with time zone) as the default timestamp type (jeremyevans)
 
 * Support Sequel.date_{add,sub} :cast option for setting cast type in date_arithmetic extension (jeremyevans)
