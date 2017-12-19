@@ -7,6 +7,7 @@ code = nil
 copy_databases = nil
 dump_migration = nil
 dump_schema = nil
+dump_indexes = nil
 env = nil
 migrate_dir = nil
 migrate_ver = nil
@@ -106,6 +107,11 @@ options = OptionParser.new do |opts|
   opts.on_tail("-v", "--version", "Show version") do
     show_version = true
   end
+
+  opts.on("-X", "--dump-indexes filename", "dump the index cache for all tables to the file") do |v|
+    dump_indexes = v
+    exclusive_options << :X
+  end
 end
 opts = options
 opts.parse!
@@ -168,6 +174,13 @@ begin
     DB.extension :schema_caching
     DB.tables.each{|t| DB.schema(Sequel::SQL::Identifier.new(t))}
     DB.dump_schema_cache(dump_schema)
+    exit
+  end
+  if dump_indexes
+    extra_proc.call
+    DB.extension :index_caching
+    DB.tables.each{|t| DB.indexes(t)}
+    DB.dump_index_cache(dump_indexes)
     exit
   end
   if copy_databases
