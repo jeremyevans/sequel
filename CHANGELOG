@@ -1,5 +1,7 @@
 === master
 
+* Add index_caching extension for caching calls to Database#indexes (kenaniah, jeremyevans) (#1461)
+
 * Allow Database#indexes on SQLite to handle SQL::Identifier values (jeremyevans)
 
 * Add pg_timestamptz extension for using timestamptz (timestamp with time zone) as the default timestamp type (jeremyevans)

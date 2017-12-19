@@ -156,6 +156,7 @@ SEQUEL_COLUMNS_INTROSPECTION :: Use the columns_introspection extension when run
 SEQUEL_CONNECTION_VALIDATOR :: Use the connection validator extension when running the specs
 SEQUEL_DUPLICATE_COLUMNS_HANDLER :: Use the duplicate columns handler extension with value given when running the specs
 SEQUEL_ERROR_SQL :: Use the error_sql extension when running the specs
+SEQUEL_INDEX_CACHING :: Use the index_caching extension when running the specs
 SEQUEL_FREEZE_DATABASE :: Freeze the database before running the integration specs
 SEQUEL_IDENTIFIER_MANGLING :: Use the identifier_mangling extension when running the specs
 SEQUEL_MODEL_PREPARED_STATEMENTS :: Use the prepared_statements plugin when running the specs

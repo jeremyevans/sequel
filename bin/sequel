@@ -179,7 +179,7 @@ begin
   if dump_indexes
     extra_proc.call
     DB.extension :index_caching
-    DB.tables.each{|t| DB.indexes(t)}
+    DB.tables.each{|t| DB.indexes(Sequel::SQL::Identifier.new(t))}
     DB.dump_index_cache(dump_indexes)
     exit
   end

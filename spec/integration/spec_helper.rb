@@ -38,6 +38,10 @@ if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type
   end
 end
 
+if ENV['SEQUEL_INDEX_CACHING']
+  DB.extension :index_caching
+end
+
 if ENV['SEQUEL_ERROR_SQL']
   DB.extension :error_sql
 end

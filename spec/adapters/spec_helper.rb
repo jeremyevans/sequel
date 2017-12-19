@@ -33,6 +33,7 @@ IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTI
 DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 
 DB.extension(:pg_timestamptz) if ENV['SEQUEL_PG_TIMESTAMPTZ']
+DB.extension :index_caching if ENV['SEQUEL_INDEX_CACHING']
 
 if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
   DB.extension :duplicate_columns_handler
