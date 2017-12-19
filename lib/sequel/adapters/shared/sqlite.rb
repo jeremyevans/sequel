@@ -189,6 +189,7 @@ module Sequel
             ops.each{|op| alter_table_sql_list(table, [op]).flatten.each{|sql| execute_ddl(sql)}}
           end
         end
+        remove_cached_schema(table)
       ensure
         run "PRAGMA foreign_keys = 1" if fks
       end
