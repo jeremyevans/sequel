@@ -58,6 +58,7 @@ module Sequel
       def indexes(table, opts = OPTS)
         m = output_identifier_meth
         im = input_identifier_meth
+        table = table.value if table.is_a?(Sequel::SQL::Identifier)
         indexes = {}
         metadata_dataset.
          from(Sequel[:dbo][:sysobjects].as(:z)).

@@ -165,6 +165,7 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
+        table = table.value if table.is_a?(Sequel::SQL::Identifier)
         i = Sequel[:i]
         ds = metadata_dataset.from(Sequel.lit('[sys].[tables]').as(:t)).
          join(Sequel.lit('[sys].[indexes]').as(:i), :object_id=>:object_id).

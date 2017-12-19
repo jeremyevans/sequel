@@ -69,6 +69,7 @@ module Sequel
       # Use SYSCAT.INDEXES to get the indexes for the table
       def indexes(table, opts = OPTS)
         m = output_identifier_meth
+        table = table.value if table.is_a?(Sequel::SQL::Identifier)
         indexes = {}
         metadata_dataset.
          from(Sequel[:syscat][:indexes]).

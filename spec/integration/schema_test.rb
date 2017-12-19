@@ -189,23 +189,25 @@ describe "Database index parsing" do
   end
 
   it "should parse indexes into a hash" do
-    # Delete :deferrable entry, since not all adapters implement it
-    f = lambda{h = DB.indexes(:items); h.values.each{|h2| h2.delete(:deferrable)}; h}
+    [:items, Sequel.identifier(:items)].each do |table|
+      # Delete :deferrable entry, since not all adapters implement it
+      f = lambda{h = DB.indexes(table); h.values.each{|h2| h2.delete(:deferrable)}; h}
 
-    DB.create_table!(:items){Integer :n; Integer :a}
-    f.call.must_equal({})
-    DB.add_index(:items, :n)
-    f.call.must_equal(:items_n_index=>{:columns=>[:n], :unique=>false})
-    DB.drop_index(:items, :n)
-    f.call.must_equal({})
-    DB.add_index(:items, :n, :unique=>true, :name=>:blah_blah_index)
-    f.call.must_equal(:blah_blah_index=>{:columns=>[:n], :unique=>true})
-    DB.add_index(:items, [:n, :a])
-    f.call.must_equal(:blah_blah_index=>{:columns=>[:n], :unique=>true}, :items_n_a_index=>{:columns=>[:n, :a], :unique=>false})
-    DB.drop_index(:items, :n, :name=>:blah_blah_index)
-    f.call.must_equal(:items_n_a_index=>{:columns=>[:n, :a], :unique=>false})
-    DB.drop_index(:items, [:n, :a])
-    f.call.must_equal({})
+      DB.create_table!(table){Integer :n; Integer :a}
+      f.call.must_equal({})
+      DB.add_index(table, :n)
+      f.call.must_equal(:items_n_index=>{:columns=>[:n], :unique=>false})
+      DB.drop_index(table, :n)
+      f.call.must_equal({})
+      DB.add_index(table, :n, :unique=>true, :name=>:blah_blah_index)
+      f.call.must_equal(:blah_blah_index=>{:columns=>[:n], :unique=>true})
+      DB.add_index(table, [:n, :a])
+      f.call.must_equal(:blah_blah_index=>{:columns=>[:n], :unique=>true}, :items_n_a_index=>{:columns=>[:n, :a], :unique=>false})
+      DB.drop_index(table, :n, :name=>:blah_blah_index)
+      f.call.must_equal(:items_n_a_index=>{:columns=>[:n, :a], :unique=>false})
+      DB.drop_index(table, [:n, :a])
+      f.call.must_equal({})
+    end
   end
   
   it "should not include a primary key index" do
