@@ -1,5 +1,9 @@
 === master
 
+* Don't attempt to insert a second time if insert_select runs a query that doesn't return results, which can happen when triggers are used (jeremyevans)
+
+* Make Dataset#insert_select on PostgreSQL and MSSQL return false instead of nil if the INSERT query is sent to the database but returns no rows (jeremyevans)
+
 * Add index_caching extension for caching calls to Database#indexes (kenaniah, jeremyevans) (#1461)
 
 * Allow Database#indexes on SQLite, MSSQL, SQLAnywhere, and DB2 to handle SQL::Identifier values (jeremyevans)

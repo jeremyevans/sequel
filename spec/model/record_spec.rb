@@ -100,6 +100,34 @@ describe "Model#save" do
     DB.sqls.must_equal ["INSERT INTO items (y) VALUES (2) RETURNING *"]
   end
 
+  it "should issue regular insert query if insert_select returns nil" do
+    @c.dataset = @c.dataset.with_fetch(:id=>4, :x=>2).with_autoid(4).with_extend do
+      def supports_insert_select?; true end
+      def insert_select(hash)
+      end
+    end
+    o = @c.new(:x => 1)
+    o.save
+    
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 4"]
+    o.values.must_equal(:id=>4, :x=>2)
+  end
+
+  it "should assume insert statement already ran if insert_select returns false" do
+    @c.dataset = @c.dataset.with_fetch(:y=>2).with_extend do
+      def supports_insert_select?; true end
+      def insert_select(hash)
+        with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING *")
+        false
+      end
+    end
+    o = @c.new(:x => 1)
+    o.save
+    
+    o.values.must_equal(:x=>1)
+    DB.sqls.must_equal ["INSERT INTO items (y) VALUES (2) RETURNING *"]
+  end
+
   it "should not use dataset's insert_select method if specific columns are selected" do
     @c.dataset = @c.dataset.select(:y).with_extend{def insert_select(*) raise; end}
     @c.new(:x => 1).save

@@ -1635,8 +1635,8 @@ module Sequel
       # the record should be refreshed from the database.
       def _insert
         ds = _insert_dataset
-        if _use_insert_select?(ds) && (h = _insert_select_raw(ds))
-          _save_set_values(h)
+        if _use_insert_select?(ds) && !(h = _insert_select_raw(ds)).nil?
+          _save_set_values(h) if h
           nil
         else
           iid = _insert_raw(ds)

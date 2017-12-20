@@ -575,10 +575,12 @@ module Sequel
         where(Sequel.lit("CONTAINS (?, ?)", cols, terms))
       end
 
-      # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
+      # Insert a record, returning the record inserted, using OUTPUT.  Always returns nil without
+      # running an INSERT statement if disable_insert_output is used.  If the query runs
+      # but returns no values, returns false.
       def insert_select(*values)
         return unless supports_insert_select?
-        with_sql_first(insert_select_sql(*values))
+        with_sql_first(insert_select_sql(*values)) || false
       end
 
       # Add OUTPUT clause unless there is already an existing output clause, then return

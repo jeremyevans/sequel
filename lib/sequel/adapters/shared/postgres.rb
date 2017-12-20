@@ -1393,11 +1393,13 @@ module Sequel
         insert_conflict
       end
 
-      # Insert a record returning the record inserted.  Always returns nil without
-      # inserting a query if disable_insert_returning is used.
+      # Insert a record, returning the record inserted, using RETURNING.  Always returns nil without
+      # running an INSERT statement if disable_insert_returning is used.  If the query runs
+      # but returns no values, returns false.
       def insert_select(*values)
         return unless supports_insert_select?
-        server?(:default).with_sql_first(insert_select_sql(*values))
+        # Handle case where query does not return a row
+        server?(:default).with_sql_first(insert_select_sql(*values)) || false
       end
 
       # The SQL to use for an insert_select, adds a RETURNING clause to the insert
