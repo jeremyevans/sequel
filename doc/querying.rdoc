@@ -92,14 +92,9 @@ will do a reverse order by the primary key field:
 
 Note:
 
-1. +last+ is equivalent to running a +reverse.first+ query, in other words it
-reverses the order of the dataset and then calls +first+.  This is why +last+
-raises a Sequel::Error when there is no order on a plain dataset - because it
-will provide the same record as +first+, and most users will find that confusing.
-2. +last+ is not necessarily going to give you the last record
-in the dataset unless you give the dataset an unambiguous order.
-3. +last+ will ignore +limit+ if chained together in a query because it sets a
-limit of 1 if no arguments are given.
+1. +last+ is equivalent to running a +reverse.first+ query, in other words it reverses the order of the dataset and then calls +first+.  This is why +last+ raises a Sequel::Error when there is no order on a plain dataset - because it will provide the same record as +first+, and most users will find that confusing.
+2. +last+ is not necessarily going to give you the last record in the dataset unless you give the dataset an unambiguous order.
+3. +last+ will ignore +limit+ if chained together in a query because it sets a limit of 1 if no arguments are given.
 
 ==== Retrieving a Single Column Value
 
