@@ -49,6 +49,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.each{|r| p r}
   dataset.all # => [{...}, {...}, ...]
   dataset.first # => {...}
+  dataset.last # => {...}
 
 == Update/Delete rows
 

@@ -49,7 +49,7 @@ to raise an exception if no record is found, you can use <tt>Sequel::Model.with_
 
 ==== Using +first+
 
-If you just want the first record in the dataset,
+If you want the first record in the dataset,
 <tt>Sequel::Dataset#first</tt> is probably the most obvious method to use:
 
   artist = Artist.first
@@ -82,22 +82,24 @@ Dataset#[] does not (unless it is a model dataset).
 ==== Using +last+
 
 If you want the last record in the dataset,
-<tt>Sequel::Dataset#last</tt> is an obvious method to use.  Note
-that last requires that the dataset be ordered, unless the
-dataset is a model dataset.  For a model dataset, +last+ will do a
-reverse order by the primary key field:
+<tt>Sequel::Dataset#last</tt> is an obvious method to use.  +last+ requires the
+dataset be ordered, unless the dataset is a model dataset in which case +last+
+will do a reverse order by the primary key field:
 
   artist = Artist.last
   # SELECT * FROM artists ORDER BY id DESC LIMIT 1
   # => #<Artist @values={:name=>"YJM", :id=>1}>
 
-Note that what +last+ does is reverse the order of the dataset and then
-call +first+.  This is why +last+ raises a Sequel::Error if there is no
-order on a plain dataset, because otherwise it would provide the same record
-as +first+, and most users would find that confusing.
+Note:
 
-Note that +last+ is not necessarily going to give you the last record
+1. +last+ is equivalent to running a +reverse.first+ query, in other words it
+reverses the order of the dataset and then calls +first+.  This is why +last+
+raises a Sequel::Error when there is no order on a plain dataset - because it
+will provide the same record as +first+, and most users will find that confusing.
+2. +last+ is not necessarily going to give you the last record
 in the dataset unless you give the dataset an unambiguous order.
+3. +last+ will ignore +limit+ if chained together in a query because it sets a
+limit of 1 if no arguments are given.
 
 ==== Retrieving a Single Column Value
 
