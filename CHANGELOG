@@ -1,5 +1,7 @@
 === master
 
+* Enable fractional seconds in timestamps on DB2 (jeremyevans) (#1463)
+
 * Don't attempt to insert a second time if insert_select runs a query that doesn't return results, which can happen when triggers are used (jeremyevans)
 
 * Make Dataset#insert_select on PostgreSQL and MSSQL return false instead of nil if the INSERT query is sent to the database but returns no rows (jeremyevans)

@@ -346,11 +346,6 @@ module Sequel
         false
       end
 
-      # DB2 does not support fractional seconds in timestamps.
-      def supports_timestamp_usecs?
-        false
-      end
-
       # DB2 supports window functions
       def supports_window_functions?
         true
@@ -383,6 +378,11 @@ module Sequel
       # Use 0 for false on DB2
       def literal_false
         '0'
+      end
+
+      # DB2 doesn't support fractional seconds in times, only fractional seconds in timestamps.
+      def literal_sqltime(v)
+        v.strftime("'%H:%M:%S'")
       end
 
       # Use 1 for true on DB2
