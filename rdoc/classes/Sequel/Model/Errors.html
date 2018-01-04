@@ -1,173 +1,183 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Model::Errors</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Model::Errors
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/model/errors_rb.html">lib/sequel/model/errors.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>Hash</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p><a href="Errors.html">Errors</a> represents validation errors, a simple
-            hash subclass with a few convenience methods.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-add">add</a></li>
-              <li><a href="#method-i-count">count</a></li>
-              <li><a href="#method-i-empty-3F">empty?</a></li>
-              <li><a href="#method-i-full_messages">full_messages</a></li>
-              <li><a href="#method-i-on">on</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-add'>
-                <a name='method-i-add'></a>
-                <div class='synopsis'>
-                  <span class='name'>add</span>
-                  <span class='arguments'>(att, msg)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Adds an error for the given attribute.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;is not valid&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;invalid&#39;</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-add-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add</span>(<span class="ruby-identifier">att</span>, <span class="ruby-identifier">msg</span>)&#x000A;  <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>){<span class="ruby-keyword">self</span>[<span class="ruby-identifier">att</span>] = []} <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">msg</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-count'>
-                <a name='method-i-count'></a>
-                <div class='synopsis'>
-                  <span class='name'>count</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the total number of error messages.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">count</span> <span class="ruby-comment"># =&gt; 3</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-count-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-count-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">values</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-empty-3F'>
-                <a name='method-i-empty-3F'></a>
-                <div class='synopsis'>
-                  <span class='name'>empty?</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return true if there are no error messages, false otherwise.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-empty-3F-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-empty-3F-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-full_messages'>
-                <a name='method-i-full_messages'></a>
-                <div class='synopsis'>
-                  <span class='name'>full_messages</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Returns an array of fully-formatted error messages.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&#39;name is not valid&#39;,</span>&#x000A;<span class="ruby-comment">#     &#39;hometown is not at least 2 letters&#39;]</span></pre>
-                  
-                  <p>If the message is a <a
-                  href="../LiteralString.html">Sequel::LiteralString</a>, it will be used
-                  literally, without the column name:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;Album name is not valid&quot;</span>))&#x000A;<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&#39;Album name is not valid&#39;]</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-full_messages-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-full_messages-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">full_messages</span>&#x000A;  <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span> &#x000A;    <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = <span class="ruby-operator">*</span><span class="ruby-identifier">kv</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(&#39; and &#39;)} #{e}&quot;</span>)}&#x000A;    <span class="ruby-identifier">m</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-on'>
-                <a name='method-i-on'></a>
-                <div class='synopsis'>
-                  <span class='name'>on</span>
-                  <span class='arguments'>(att)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Returns the array of errors for the given attribute, or nil if there are no
-                  errors for the attribute.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># =&gt; [&#39;name is not valid&#39;]</span>&#x000A;<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># =&gt; nil</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-on-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-on-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">on</span>(<span class="ruby-identifier">att</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">and</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Model::Errors</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Model::Errors
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/model/errors_rb.html">lib/sequel/model/errors.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Hash</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="Errors.html">Errors</a> represents validation errors, a simple
+hash subclass with a few convenience methods.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-add">add</a></li>
+<li><a href="#method-i-count">count</a></li>
+<li><a href="#method-i-empty-3F">empty?</a></li>
+<li><a href="#method-i-full_messages">full_messages</a></li>
+<li><a href="#method-i-on">on</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-add'>
+<a name='method-i-add'></a>
+<div class='synopsis'>
+<span class='name'>add</span>
+<span class='arguments'>(att, msg)</span>
+
+</div>
+<div class='description'>
+
+<p>Adds an error for the given attribute.</p>
+
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;is not valid&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;invalid&#39;</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-add-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add</span>(<span class="ruby-identifier">att</span>, <span class="ruby-identifier">msg</span>)&#x000A;  <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>){<span class="ruby-keyword">self</span>[<span class="ruby-identifier">att</span>] = []} <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">msg</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-count'>
+<a name='method-i-count'></a>
+<div class='synopsis'>
+<span class='name'>count</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return the total number of error messages.</p>
+
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">count</span> <span class="ruby-comment"># =&gt; 3</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-count-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-count-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">count</span>&#x000A;  <span class="ruby-identifier">values</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-empty-3F'>
+<a name='method-i-empty-3F'></a>
+<div class='synopsis'>
+<span class='name'>empty?</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return true if there are no error messages, false otherwise.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-empty-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-empty-3F-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">empty?</span>&#x000A;  <span class="ruby-identifier">count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-full_messages'>
+<a name='method-i-full_messages'></a>
+<div class='synopsis'>
+<span class='name'>full_messages</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Returns an array of fully-formatted error messages.</p>
+
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&#39;name is not valid&#39;,</span>&#x000A;<span class="ruby-comment">#     &#39;hometown is not at least 2 letters&#39;]</span></pre>
+
+<p>If the message is a <a
+href="../LiteralString.html">Sequel::LiteralString</a>, it will be used
+literally, without the column name:</p>
+
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;Album name is not valid&quot;</span>))&#x000A;<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&#39;Album name is not valid&#39;]</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-full_messages-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-full_messages-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_messages</span>&#x000A;  <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span> &#x000A;    <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = <span class="ruby-operator">*</span><span class="ruby-identifier">kv</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(&#39; and &#39;)} #{e}&quot;</span>)}&#x000A;    <span class="ruby-identifier">m</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-on'>
+<a name='method-i-on'></a>
+<div class='synopsis'>
+<span class='name'>on</span>
+<span class='arguments'>(att)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns the array of errors for the given attribute, or nil if there are no
+errors for the attribute.</p>
+
+<pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># =&gt; [&#39;name is not valid&#39;]</span>&#x000A;<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:id</span>) <span class="ruby-comment"># =&gt; nil</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-on-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-on-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">on</span>(<span class="ruby-identifier">att</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">att</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">and</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

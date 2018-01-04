@@ -1,222 +1,234 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::MigrationDSL</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::MigrationDSL
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/extensions/migration_rb.html">lib/sequel/extensions/migration.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>BasicObject</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>Internal class used by the <a
-            href="../Sequel.html#method-c-migration">Sequel.migration</a> DSL, part of
-            the <code>migration</code> extension.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-create">create</a></li>
-              <li><a href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-change">change</a></li>
-              <li><a href="#method-i-down">down</a></li>
-              <li><a href="#attribute-i-migration">migration</a></li>
-              <li><a href="#method-i-no_transaction">no_transaction</a></li>
-              <li><a href="#method-i-transaction">transaction</a></li>
-              <li><a href="#method-i-up">up</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-migration'>migration</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The underlying <a href="SimpleMigration.html">SimpleMigration</a> instance</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-create'>
-                <a name='method-c-create'></a>
-                <div class='synopsis'>
-                  <span class='name'>create</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-create-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-create-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">migration</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Create a new migration class, and instance_exec the block.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@migration</span> = <span class="ruby-constant">SimpleMigration</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-constant">Migration</span>.<span class="ruby-identifier">descendants</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">migration</span>&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-change'>
-                <a name='method-i-change'></a>
-                <div class='synopsis'>
-                  <span class='name'>change</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Creates a reversible migration.  This is the same as creating the same
-                  block with <code>up</code>, but it also calls the block and attempts to
-                  create a <code>down</code> block that will reverse the changes made by the
-                  block.</p>
-                  
-                  <p>There are no guarantees that this will work perfectly in all cases, but it
-                  works for some simple cases.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-change-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-change-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">change</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-constant">MigrationReverser</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-down'>
-                <a name='method-i-down'></a>
-                <div class='synopsis'>
-                  <span class='name'>down</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Defines the migration&#39;s down action.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-down-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-down-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">down</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-no_transaction'>
-                <a name='method-i-no_transaction'></a>
-                <div class='synopsis'>
-                  <span class='name'>no_transaction</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Disable the use of transactions for the related migration</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-no_transaction-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-no_transaction-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">no_transaction</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-transaction'>
-                <a name='method-i-transaction'></a>
-                <div class='synopsis'>
-                  <span class='name'>transaction</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Enable the use of transactions for the related migration</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-transaction-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-transaction-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">transaction</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-up'>
-                <a name='method-i-up'></a>
-                <div class='synopsis'>
-                  <span class='name'>up</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Defines the migration&#39;s up action.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-up-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-up-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">up</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::MigrationDSL</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::MigrationDSL
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/extensions/migration_rb.html">lib/sequel/extensions/migration.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>BasicObject</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Internal class used by the <a
+href="../Sequel.html#method-c-migration">Sequel.migration</a> DSL, part of
+the <code>migration</code> extension.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-create">create</a></li>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-change">change</a></li>
+<li><a href="#method-i-down">down</a></li>
+<li><a href="#attribute-i-migration">migration</a></li>
+<li><a href="#method-i-no_transaction">no_transaction</a></li>
+<li><a href="#method-i-transaction">transaction</a></li>
+<li><a href="#method-i-up">up</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-migration'>migration</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The underlying <a href="SimpleMigration.html">SimpleMigration</a> instance</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-create'>
+<a name='method-c-create'></a>
+<div class='synopsis'>
+<span class='name'>create</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-create-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-create-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">migration</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Create a new migration class, and instance_exec the block.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@migration</span> = <span class="ruby-constant">SimpleMigration</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-constant">Migration</span>.<span class="ruby-identifier">descendants</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">migration</span>&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-change'>
+<a name='method-i-change'></a>
+<div class='synopsis'>
+<span class='name'>change</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Creates a reversible migration.  This is the same as creating the same
+block with <code>up</code>, but it also calls the block and attempts to
+create a <code>down</code> block that will reverse the changes made by the
+block.</p>
+
+<p>There are no guarantees that this will work perfectly in all cases, but it
+works for some simple cases.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-change-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-change-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">change</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-constant">MigrationReverser</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-down'>
+<a name='method-i-down'></a>
+<div class='synopsis'>
+<span class='name'>down</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Defines the migration&#39;s down action.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-down-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-down-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">down</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-no_transaction'>
+<a name='method-i-no_transaction'></a>
+<div class='synopsis'>
+<span class='name'>no_transaction</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Disable the use of transactions for the related migration</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-no_transaction-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-no_transaction-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">no_transaction</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-transaction'>
+<a name='method-i-transaction'></a>
+<div class='synopsis'>
+<span class='name'>transaction</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Enable the use of transactions for the related migration</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-transaction-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-transaction-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transaction</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-up'>
+<a name='method-i-up'></a>
+<div class='synopsis'>
+<span class='name'>up</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Defines the migration&#39;s up action.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-up-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-up-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">up</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

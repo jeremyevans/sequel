@@ -1,92 +1,94 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.20.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.20.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.20.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The swift adapter now supports an SQLite subadapter.  Use the :db_type
-            =&gt; &#39;sqlite&#39; option when connecting.  You can use an in memory
-            database with the following connection string:</p>
-            
-            <pre>swift:///?database=:memory:&amp;db_type=sqlite</pre>
-            </li><li>
-            <p>Arbitrary JDBC properties can now be set in the JDBC adapter using the
-            :jdbc_properties option when connecting.  The value of this option should
-            be a hash where keys and values are JDBC property keys and values.</p>
-            </li><li>
-            <p>Basic Microsoft Access support was added to the ado adapter. The creation
-            of autoincrementing primary key integers now works, and identifiers are now
-            quoted with [].</p>
-            </li><li>
-            <p>The Database#indexes method now supports a :partial option when connecting
-            to MySQL, which makes it include partial indexes (which are usually
-            excluded).</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The class_table_inheritance plugin now handles subclass associations
-            better.  Previously, the implicit eager loading code had issues when you
-            called an association method that only existed in the subclass.</p>
-            </li><li>
-            <p>The error message used when a validates_max_length validation is applied to
-            a nil column value has been improved.  You can override the message
-            yourself using the :nil_message option.</p>
-            </li><li>
-            <p>The read_timeout and connect_timeout options now work correctly in the
-            mysql adapter.</p>
-            </li><li>
-            <p>Another MySQL disconnect error message is now recognized.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The swift adapter was upgraded to support swift 0.8.1.  Older versions of
-            swift are no longer supported.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.20.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.20.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.20.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The swift adapter now supports an SQLite subadapter.  Use the :db_type
+=&gt; &#39;sqlite&#39; option when connecting.  You can use an in memory
+database with the following connection string:</p>
+
+<pre>swift:///?database=:memory:&amp;db_type=sqlite</pre>
+</li><li>
+<p>Arbitrary JDBC properties can now be set in the JDBC adapter using the
+:jdbc_properties option when connecting.  The value of this option should
+be a hash where keys and values are JDBC property keys and values.</p>
+</li><li>
+<p>Basic Microsoft Access support was added to the ado adapter. The creation
+of autoincrementing primary key integers now works, and identifiers are now
+quoted with [].</p>
+</li><li>
+<p>The Database#indexes method now supports a :partial option when connecting
+to MySQL, which makes it include partial indexes (which are usually
+excluded).</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The class_table_inheritance plugin now handles subclass associations
+better.  Previously, the implicit eager loading code had issues when you
+called an association method that only existed in the subclass.</p>
+</li><li>
+<p>The error message used when a validates_max_length validation is applied to
+a nil column value has been improved.  You can override the message
+yourself using the :nil_message option.</p>
+</li><li>
+<p>The read_timeout and connect_timeout options now work correctly in the
+mysql adapter.</p>
+</li><li>
+<p>Another MySQL disconnect error message is now recognized.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The swift adapter was upgraded to support swift 0.8.1.  Older versions of
+swift are no longer supported.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

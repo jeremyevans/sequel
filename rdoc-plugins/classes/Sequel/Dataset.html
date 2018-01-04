@@ -1,100 +1,101 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Dataset</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Dataset
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/extensions/auto_literal_strings_rb.html">lib/sequel/extensions/auto_literal_strings.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/dataset_source_alias_rb.html">lib/sequel/extensions/dataset_source_alias.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/implicit_subquery_rb.html">lib/sequel/extensions/implicit_subquery.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/null_dataset_rb.html">lib/sequel/extensions/null_dataset.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/pagination_rb.html">lib/sequel/extensions/pagination.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/query_rb.html">lib/sequel/extensions/query.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/round_timestamps_rb.html">lib/sequel/extensions/round_timestamps.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/split_array_nil_rb.html">lib/sequel/extensions/split_array_nil.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/extensions/synchronize_sql_rb.html">lib/sequel/extensions/synchronize_sql.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/plugins/finder_rb.html">lib/sequel/plugins/finder.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="../Object.html">Object</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="Dataset/AutoLiteralStrings.html">Sequel::Dataset::AutoLiteralStrings</a></li>
-              <li><a href="Dataset/DatasetSourceAlias.html">Sequel::Dataset::DatasetSourceAlias</a></li>
-              <li><a href="Dataset/ImplicitSubquery.html">Sequel::Dataset::ImplicitSubquery</a></li>
-              <li><a href="Dataset/NullDataset.html">Sequel::Dataset::NullDataset</a></li>
-              <li><a href="Dataset/Nullifiable.html">Sequel::Dataset::Nullifiable</a></li>
-              <li><a href="Dataset/Pagination.html">Sequel::Dataset::Pagination</a></li>
-              <li><a href="Dataset/RoundTimestamps.html">Sequel::Dataset::RoundTimestamps</a></li>
-              <li><a href="Dataset/SplitArrayNil.html">Sequel::Dataset::SplitArrayNil</a></li>
-              <li><a href="Dataset/SynchronizeSQL.html">Sequel::Dataset::SynchronizeSQL</a></li>
-              <li><a href="Dataset/Query.html">Sequel::Dataset::Query</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Dataset</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Dataset
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/extensions/auto_literal_strings_rb.html">lib/sequel/extensions/auto_literal_strings.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/dataset_source_alias_rb.html">lib/sequel/extensions/dataset_source_alias.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/implicit_subquery_rb.html">lib/sequel/extensions/implicit_subquery.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/null_dataset_rb.html">lib/sequel/extensions/null_dataset.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/pagination_rb.html">lib/sequel/extensions/pagination.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/query_rb.html">lib/sequel/extensions/query.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/round_timestamps_rb.html">lib/sequel/extensions/round_timestamps.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/split_array_nil_rb.html">lib/sequel/extensions/split_array_nil.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/extensions/synchronize_sql_rb.html">lib/sequel/extensions/synchronize_sql.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/plugins/finder_rb.html">lib/sequel/plugins/finder.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../Object.html">Object</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Dataset/AutoLiteralStrings.html">Sequel::Dataset::AutoLiteralStrings</a></li>
+<li><a href="Dataset/DatasetSourceAlias.html">Sequel::Dataset::DatasetSourceAlias</a></li>
+<li><a href="Dataset/ImplicitSubquery.html">Sequel::Dataset::ImplicitSubquery</a></li>
+<li><a href="Dataset/NullDataset.html">Sequel::Dataset::NullDataset</a></li>
+<li><a href="Dataset/Nullifiable.html">Sequel::Dataset::Nullifiable</a></li>
+<li><a href="Dataset/Pagination.html">Sequel::Dataset::Pagination</a></li>
+<li><a href="Dataset/RoundTimestamps.html">Sequel::Dataset::RoundTimestamps</a></li>
+<li><a href="Dataset/SplitArrayNil.html">Sequel::Dataset::SplitArrayNil</a></li>
+<li><a href="Dataset/SynchronizeSQL.html">Sequel::Dataset::SynchronizeSQL</a></li>
+<li><a href="Dataset/Query.html">Sequel::Dataset::Query</a></li>
+</ol>
+</div>
+<div id='section'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

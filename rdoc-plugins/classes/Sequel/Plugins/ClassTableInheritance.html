@@ -1,215 +1,219 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::ClassTableInheritance</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::ClassTableInheritance
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">lib/sequel/plugins/class_table_inheritance.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Overview">Overview<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p>The class_table_inheritance plugin uses the single_table_inheritance
-            plugin, so it supports all of the single_table_inheritance features, but it
-            additionally supports subclasses that have additional columns, which are
-            stored in a separate table with a key referencing the primary table.</p>
-            
-            <h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Detail">Detail<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Detail">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p>For example, with this hierarchy:</p>
-            
-            <pre>    Employee&#x000A;   /        \&#x000A;Staff     Manager&#x000A;  |          |&#x000A;Cook      Executive&#x000A;             |&#x000A;            CEO</pre>
-            
-            <p>the following database schema may be used (table - columns):</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>employees </td><td>
-            <p>id, name, kind</p>
-            </td></tr><tr><td class='label'>staff </td><td>
-            <p>id, manager_id</p>
-            </td></tr><tr><td class='label'>managers </td><td>
-            <p>id, num_staff</p>
-            </td></tr><tr><td class='label'>executives </td><td>
-            <p>id, num_managers</p>
-            </td></tr></tbody></table>
-            
-            <p>The class_table_inheritance plugin assumes that the root table (e.g.
-            employees) has a primary key column (usually autoincrementing), and all
-            other tables have a foreign key of the same name that points to the same
-            column in their superclass&#39;s table, which is also the primary key for
-            that table.  In this example, the employees table has an id column is a
-            primary key and the id column in every other table is a foreign key
-            referencing employees.id, which is also the primary key of that table.</p>
-            
-            <p>Additionally, note that other than the primary key column, no subclass
-            table has a column with the same name as any superclass table. This plugin
-            does not support cases where the column names in a subclass table overlap
-            with any column names in a superclass table.</p>
-            
-            <p>In this example the staff table also stores Cook model objects and the
-            executives table also stores CEO model objects.</p>
-            
-            <p>When using the class_table_inheritance plugin, subclasses that have
-            additional columns use joined datasets in subselects:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT employees.id, employees.name, employees.kind,</span>&#x000A;<span class="ruby-comment">#          managers.num_staff</span>&#x000A;<span class="ruby-comment">#   FROM employees</span>&#x000A;<span class="ruby-comment">#   JOIN managers ON (managers.id = employees.id)</span>&#x000A;<span class="ruby-comment"># ) AS employees</span>&#x000A;&#x000A;<span class="ruby-constant">CEO</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT employees.id, employees.name, employees.kind,</span>&#x000A;<span class="ruby-comment">#          managers.num_staff, executives.num_managers</span>&#x000A;<span class="ruby-comment">#   FROM employees</span>&#x000A;<span class="ruby-comment">#   JOIN managers ON (managers.id = employees.id)</span>&#x000A;<span class="ruby-comment">#   JOIN executives ON (executives.id = managers.id)</span>&#x000A;<span class="ruby-comment">#   WHERE (employees.kind IN (&#39;CEO&#39;))</span>&#x000A;<span class="ruby-comment"># ) AS employees</span></pre>
-            
-            <p>This allows CEO.all to return instances with all attributes loaded.  The
-            plugin overrides the deleting, inserting, and updating in the model to work
-            with multiple tables, by handling each table individually.</p>
-            
-            <h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">Subclass loading<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p>When model objects are retrieved for a superclass the result can contain
-            subclass instances that only have column entries for the columns in the
-            superclass table.  Calling the column method on the subclass instance for a
-            column not in the superclass table will cause a query to the database to
-            get the value for that column.  If the subclass instance was retreived
-            using Dataset#all, the query to the database will attempt to load the
-            column values for all subclass instances that were retrieved.  For example:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Staff&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">manager_id</span> <span class="ruby-comment"># Loads the manager_id attribute from the database</span></pre>
-            
-            <p>If you want to get all columns in a subclass instance after loading via the
-            superclass, call Model#refresh.</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">refresh</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;, :num_staff=&gt;4, :num_managers=&gt;2}</span></pre>
-            
-            <p>You can also load directly from a subclass:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Executive&#39;, :num_staff=&gt;4, :num_managers=&gt;2}</span></pre>
-            
-            <p>Note that when loading from a subclass, because the subclass dataset uses a
-            subquery that by default uses the same alias at the primary table, any
-            qualified identifiers should reference the subquery alias (and qualified
-            identifiers should not be needed unless joining to another table):</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">employees</span>[:<span class="ruby-identifier">id</span>]=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}}.<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">executives</span>[:<span class="ruby-identifier">id</span>]=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}}.<span class="ruby-identifier">first</span> <span class="ruby-comment"># doesn&#39;t work</span></pre>
-            
-            <h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Usage">Usage<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <pre class="ruby"><span class="ruby-comment"># Use the default of storing the class name in the sti_key</span>&#x000A;<span class="ruby-comment"># column (:kind in this case)</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Employee</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>, <span class="ruby-identifier">key</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">kind</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Have subclasses inherit from the appropriate class</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Staff</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Employee</span>; <span class="ruby-keyword">end</span>    <span class="ruby-comment"># uses staff table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Cook</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Staff</span>; <span class="ruby-keyword">end</span>        <span class="ruby-comment"># cooks table doesn&#39;t exist so uses staff table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Manager</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Employee</span>; <span class="ruby-keyword">end</span>  <span class="ruby-comment"># uses managers table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Executive</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Manager</span>; <span class="ruby-keyword">end</span> <span class="ruby-comment"># uses executives table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">CEO</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Executive</span>; <span class="ruby-keyword">end</span>     <span class="ruby-comment"># ceos table doesn&#39;t exist so uses executives table</span>&#x000A;&#x000A;<span class="ruby-comment"># Some examples of using these options:</span>&#x000A;&#x000A;<span class="ruby-comment"># Specifying the tables with a :table_map hash</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>,&#x000A;  <span class="ruby-identifier">table_map</span><span class="ruby-operator">:</span> {<span class="ruby-constant">Employee</span><span class="ruby-operator">:</span>  :<span class="ruby-identifier">employees</span>,&#x000A;              <span class="ruby-constant">Staff</span><span class="ruby-operator">:</span>     :<span class="ruby-identifier">staff</span>,&#x000A;              <span class="ruby-constant">Cook</span><span class="ruby-operator">:</span>      :<span class="ruby-identifier">staff</span>,&#x000A;              <span class="ruby-constant">Manager</span><span class="ruby-operator">:</span>   :<span class="ruby-identifier">managers</span>,&#x000A;              <span class="ruby-constant">Executive</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">executives</span>,&#x000A;              <span class="ruby-constant">CEO</span><span class="ruby-operator">:</span>       :<span class="ruby-identifier">executives</span> }&#x000A;&#x000A;<span class="ruby-comment"># Using integers to store the class type, with a :model_map hash</span>&#x000A;<span class="ruby-comment"># and an sti_key of :type</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>, <span class="ruby-identifier">key</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">type</span>,&#x000A;  <span class="ruby-identifier">model_map</span><span class="ruby-operator">:</span> {<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Staff</span>, <span class="ruby-value">2</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Cook</span>, <span class="ruby-value">3</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Manager</span>, <span class="ruby-value">4</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Executive</span>, <span class="ruby-value">5</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">CEO</span>}&#x000A;&#x000A;<span class="ruby-comment"># Using non-class name strings</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>, <span class="ruby-identifier">key</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">type</span>,&#x000A;  <span class="ruby-identifier">model_map</span><span class="ruby-operator">:</span> {<span class="ruby-string">&#39;staff&#39;</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Staff</span>, <span class="ruby-string">&#39;cook staff&#39;</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Cook</span>, <span class="ruby-string">&#39;supervisor&#39;</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Manager</span>}&#x000A;&#x000A;<span class="ruby-comment"># By default the plugin sets the respective column value</span>&#x000A;<span class="ruby-comment"># when a new instance is created.</span>&#x000A;<span class="ruby-constant">Cook</span>.<span class="ruby-identifier">create</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;cook staff&#39;</span>&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">create</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;supervisor&#39;</span>&#x000A;&#x000A;<span class="ruby-comment"># You can customize this behavior with the :key_chooser option.</span>&#x000A;<span class="ruby-comment"># This is most useful when using a non-bijective mapping.</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">class_table_inheritance</span>, <span class="ruby-identifier">key</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">type</span>,&#x000A;  <span class="ruby-identifier">model_map</span><span class="ruby-operator">:</span> {<span class="ruby-string">&#39;cook staff&#39;</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Cook</span>, <span class="ruby-string">&#39;supervisor&#39;</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Manager</span>},&#x000A;  <span class="ruby-identifier">key_chooser</span><span class="ruby-operator">:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">instance</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key_map</span>[<span class="ruby-identifier">instance</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">to_s</span>].<span class="ruby-identifier">first</span> <span class="ruby-operator">||</span> <span class="ruby-string">&#39;stranger&#39;</span> }&#x000A;&#x000A;<span class="ruby-comment"># Using custom procs, with :model_map taking column values</span>&#x000A;<span class="ruby-comment"># and yielding either a class, string, symbol, or nil,</span>&#x000A;<span class="ruby-comment"># and :key_map taking a class object and returning the column</span>&#x000A;<span class="ruby-comment"># value to use</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">single_table_inheritance</span>, <span class="ruby-identifier">key</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">type</span>,&#x000A;  <span class="ruby-identifier">model_map</span><span class="ruby-operator">:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>},&#x000A;  <span class="ruby-identifier">key_map</span><span class="ruby-operator">:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">klass</span><span class="ruby-operator">|</span> <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">reverse</span>}&#x000A;&#x000A;<span class="ruby-comment"># You can use the same class for multiple values.</span>&#x000A;<span class="ruby-comment"># This is mainly useful when the sti_key column contains multiple values</span>&#x000A;<span class="ruby-comment"># which are different but do not require different code.</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">single_table_inheritance</span>, <span class="ruby-identifier">key</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">type</span>,&#x000A;  <span class="ruby-identifier">model_map</span><span class="ruby-operator">:</span> {<span class="ruby-string">&#39;staff&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;Staff&quot;</span>,&#x000A;              <span class="ruby-string">&#39;manager&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;Manager&quot;</span>,&#x000A;              <span class="ruby-string">&#39;overpayed staff&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;Staff&quot;</span>,&#x000A;              <span class="ruby-string">&#39;underpayed staff&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;Staff&quot;</span>}</pre>
-            
-            <p>One minor issue to note is that if you specify the <code>:key_map</code>
-            option as a hash, instead of having it inferred from the
-            <code>:model_map</code>, you should only use class name strings as keys,
-            you should not use symbols as keys.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-apply">apply</a></li>
-              <li><a href="#method-c-configure">configure</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="ClassTableInheritance/ClassMethods.html">Sequel::Plugins::ClassTableInheritance::ClassMethods</a></li>
-              <li><a href="ClassTableInheritance/InstanceMethods.html">Sequel::Plugins::ClassTableInheritance::InstanceMethods</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-apply'>
-                <a name='method-c-apply'></a>
-                <div class='synopsis'>
-                  <span class='name'>apply</span>
-                  <span class='arguments'>(model, opts = OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The class_table_inheritance plugin requires the single_table_inheritance
-                  plugin and the lazy_attributes plugin to handle lazily-loaded attributes
-                  for subclass instances returned by superclass methods.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 181</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-configure'>
-                <a name='method-c-configure'></a>
-                <div class='synopsis'>
-                  <span class='name'>configure</span>
-                  <span class='arguments'>(model, opts = OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Initialize the plugin using the following options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:alias </td><td>
-                  <p>Change the alias used for the subquery in model datasets. using this as the
-                  alias.</p>
-                  </td></tr><tr><td class='label'>:key </td><td>
-                  <p>Column symbol that holds the key that identifies the class to use.
-                  Necessary if you want to call model methods on a superclass that return
-                  subclass instances</p>
-                  </td></tr><tr><td class='label'>:model_map </td><td>
-                  <p><a href="../../Hash.html">Hash</a> or proc mapping the key column values to
-                  model class names.</p>
-                  </td></tr><tr><td class='label'>:key_map </td><td>
-                  <p><a href="../../Hash.html">Hash</a> or proc mapping model class names to key
-                  column values. Each value or return is an array of possible key column
-                  values.</p>
-                  </td></tr><tr><td class='label'>:key_chooser </td><td>
-                  <p>proc returning key for the provided model instance</p>
-                  </td></tr><tr><td class='label'>:table_map </td><td>
-                  <p><a href="../../Hash.html">Hash</a> with class name symbols keys mapping to
-                  table name symbol values. Overrides implicit table names.</p>
-                  </td></tr><tr><td class='label'>:ignore_subclass_columns </td><td>
-                  <p><a href="../../Array.html">Array</a> with column names as symbols that are
-                  ignored on all sub-classes.</p>
-                  </td></tr></tbody></table>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 200</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">SingleTableInheritance</span>.<span class="ruby-identifier">configure</span> <span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>], <span class="ruby-identifier">opts</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@cti_models</span> = [<span class="ruby-keyword">self</span>]&#x000A;    <span class="ruby-ivar">@cti_tables</span> = [<span class="ruby-identifier">table_name</span>]&#x000A;    <span class="ruby-ivar">@cti_instance_dataset</span> = <span class="ruby-ivar">@instance_dataset</span>&#x000A;    <span class="ruby-ivar">@cti_table_columns</span> = <span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-ivar">@cti_table_map</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table_map</span>] <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-ivar">@cti_alias</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:alias</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">first_source</span>&#x000A;    <span class="ruby-ivar">@cti_ignore_subclass_columns</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ignore_subclass_columns</span>] <span class="ruby-operator">||</span> []&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::ClassTableInheritance</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::ClassTableInheritance
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/class_table_inheritance_rb.html">lib/sequel/plugins/class_table_inheritance.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Overview">Overview<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>The class_table_inheritance plugin uses the single_table_inheritance
+plugin, so it supports all of the single_table_inheritance features, but it
+additionally supports subclasses that have additional columns, which are
+stored in a separate table with a key referencing the primary table.</p>
+
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Detail">Detail<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Detail">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>For example, with this hierarchy:</p>
+
+<pre>    Employee&#x000A;   /        \&#x000A;Staff     Manager&#x000A;  |          |&#x000A;Cook      Executive&#x000A;             |&#x000A;            CEO</pre>
+
+<p>the following database schema may be used (table - columns):</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>employees </td><td>
+<p>id, name, kind</p>
+</td></tr><tr><td class='label'>staff </td><td>
+<p>id, manager_id</p>
+</td></tr><tr><td class='label'>managers </td><td>
+<p>id, num_staff</p>
+</td></tr><tr><td class='label'>executives </td><td>
+<p>id, num_managers</p>
+</td></tr></tbody></table>
+
+<p>The class_table_inheritance plugin assumes that the root table (e.g.
+employees) has a primary key column (usually autoincrementing), and all
+other tables have a foreign key of the same name that points to the same
+column in their superclass&#39;s table, which is also the primary key for
+that table.  In this example, the employees table has an id column is a
+primary key and the id column in every other table is a foreign key
+referencing employees.id, which is also the primary key of that table.</p>
+
+<p>Additionally, note that other than the primary key column, no subclass
+table has a column with the same name as any superclass table. This plugin
+does not support cases where the column names in a subclass table overlap
+with any column names in a superclass table.</p>
+
+<p>In this example the staff table also stores Cook model objects and the
+executives table also stores CEO model objects.</p>
+
+<p>When using the class_table_inheritance plugin, subclasses that have
+additional columns use joined datasets in subselects:</p>
+
+<pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT employees.id, employees.name, employees.kind,</span>&#x000A;<span class="ruby-comment">#          managers.num_staff</span>&#x000A;<span class="ruby-comment">#   FROM employees</span>&#x000A;<span class="ruby-comment">#   JOIN managers ON (managers.id = employees.id)</span>&#x000A;<span class="ruby-comment"># ) AS employees</span>&#x000A;&#x000A;<span class="ruby-constant">CEO</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT employees.id, employees.name, employees.kind,</span>&#x000A;<span class="ruby-comment">#          managers.num_staff, executives.num_managers</span>&#x000A;<span class="ruby-comment">#   FROM employees</span>&#x000A;<span class="ruby-comment">#   JOIN managers ON (managers.id = employees.id)</span>&#x000A;<span class="ruby-comment">#   JOIN executives ON (executives.id = managers.id)</span>&#x000A;<span class="ruby-comment">#   WHERE (employees.kind IN (&#39;CEO&#39;))</span>&#x000A;<span class="ruby-comment"># ) AS employees</span></pre>
+
+<p>This allows CEO.all to return instances with all attributes loaded.  The
+plugin overrides the deleting, inserting, and updating in the model to work
+with multiple tables, by handling each table individually.</p>
+
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">Subclass loading<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Subclass+loading">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>When model objects are retrieved for a superclass the result can contain
+subclass instances that only have column entries for the columns in the
+superclass table.  Calling the column method on the subclass instance for a
+column not in the superclass table will cause a query to the database to
+get the value for that column.  If the subclass instance was retreived
+using Dataset#all, the query to the database will attempt to load the
+column values for all subclass instances that were retrieved.  For example:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Staff&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">manager_id</span> <span class="ruby-comment"># Loads the manager_id attribute from the database</span></pre>
+
+<p>If you want to get all columns in a subclass instance after loading via the
+superclass, call Model#refresh.</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">refresh</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;, :num_staff=&gt;4, :num_managers=&gt;2}</span></pre>
+
+<p>You can also load directly from a subclass:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Executive&#39;, :num_staff=&gt;4, :num_managers=&gt;2}</span></pre>
+
+<p>Note that when loading from a subclass, because the subclass dataset uses a
+subquery that by default uses the same alias at the primary table, any
+qualified identifiers should reference the subquery alias (and qualified
+identifiers should not be needed unless joining to another table):</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">employees</span>[<span class="ruby-value">:id</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}}.<span class="ruby-identifier">first</span> <span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Executive</span>.<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">executives</span>[<span class="ruby-value">:id</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}}.<span class="ruby-identifier">first</span> <span class="ruby-comment"># doesn&#39;t work</span></pre>
+
+<h1 id="module-Sequel::Plugins::ClassTableInheritance-label-Usage">Usage<span><a href="#module-Sequel::Plugins::ClassTableInheritance-label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<pre class="ruby"><span class="ruby-comment"># Use the default of storing the class name in the sti_key</span>&#x000A;<span class="ruby-comment"># column (:kind in this case)</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Employee</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:class_table_inheritance</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:kind</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Have subclasses inherit from the appropriate class</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Staff</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Employee</span>; <span class="ruby-keyword">end</span>    <span class="ruby-comment"># uses staff table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Cook</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Staff</span>; <span class="ruby-keyword">end</span>        <span class="ruby-comment"># cooks table doesn&#39;t exist so uses staff table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Manager</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Employee</span>; <span class="ruby-keyword">end</span>  <span class="ruby-comment"># uses managers table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Executive</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Manager</span>; <span class="ruby-keyword">end</span> <span class="ruby-comment"># uses executives table</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">CEO</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Executive</span>; <span class="ruby-keyword">end</span>     <span class="ruby-comment"># ceos table doesn&#39;t exist so uses executives table</span>&#x000A;&#x000A;<span class="ruby-comment"># Some examples of using these options:</span>&#x000A;&#x000A;<span class="ruby-comment"># Specifying the tables with a :table_map hash</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:class_table_inheritance</span>,&#x000A;  <span class="ruby-value">table_map:</span> {<span class="ruby-value">Employee:</span>  <span class="ruby-value">:employees</span>,&#x000A;              <span class="ruby-value">Staff:</span>     <span class="ruby-value">:staff</span>,&#x000A;              <span class="ruby-value">Cook:</span>      <span class="ruby-value">:staff</span>,&#x000A;              <span class="ruby-value">Manager:</span>   <span class="ruby-value">:managers</span>,&#x000A;              <span class="ruby-value">Executive:</span> <span class="ruby-value">:executives</span>,&#x000A;              <span class="ruby-value">CEO:</span>       <span class="ruby-value">:executives</span> }&#x000A;&#x000A;<span class="ruby-comment"># Using integers to store the class type, with a :model_map hash</span>&#x000A;<span class="ruby-comment"># and an sti_key of :type</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:class_table_inheritance</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:type</span>,&#x000A;  <span class="ruby-value">model_map:</span> {<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Staff</span>, <span class="ruby-value">2</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Cook</span>, <span class="ruby-value">3</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Manager</span>, <span class="ruby-value">4</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Executive</span>, <span class="ruby-value">5</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:CEO</span>}&#x000A;&#x000A;<span class="ruby-comment"># Using non-class name strings</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:class_table_inheritance</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:type</span>,&#x000A;  <span class="ruby-value">model_map:</span> {<span class="ruby-string">&#39;staff&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Staff</span>, <span class="ruby-string">&#39;cook staff&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Cook</span>, <span class="ruby-string">&#39;supervisor&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Manager</span>}&#x000A;&#x000A;<span class="ruby-comment"># By default the plugin sets the respective column value</span>&#x000A;<span class="ruby-comment"># when a new instance is created.</span>&#x000A;<span class="ruby-constant">Cook</span>.<span class="ruby-identifier">create</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;cook staff&#39;</span>&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">create</span>.<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;supervisor&#39;</span>&#x000A;&#x000A;<span class="ruby-comment"># You can customize this behavior with the :key_chooser option.</span>&#x000A;<span class="ruby-comment"># This is most useful when using a non-bijective mapping.</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:class_table_inheritance</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:type</span>,&#x000A;  <span class="ruby-value">model_map:</span> {<span class="ruby-string">&#39;cook staff&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Cook</span>, <span class="ruby-string">&#39;supervisor&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Manager</span>},&#x000A;  <span class="ruby-value">key_chooser:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">instance</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key_map</span>[<span class="ruby-identifier">instance</span>.<span class="ruby-identifier">model</span>.<span class="ruby-identifier">to_s</span>].<span class="ruby-identifier">first</span> <span class="ruby-operator">||</span> <span class="ruby-string">&#39;stranger&#39;</span> }&#x000A;&#x000A;<span class="ruby-comment"># Using custom procs, with :model_map taking column values</span>&#x000A;<span class="ruby-comment"># and yielding either a class, string, symbol, or nil,</span>&#x000A;<span class="ruby-comment"># and :key_map taking a class object and returning the column</span>&#x000A;<span class="ruby-comment"># value to use</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:type</span>,&#x000A;  <span class="ruby-value">model_map:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>},&#x000A;  <span class="ruby-value">key_map:</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">klass</span><span class="ruby-operator">|</span> <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">reverse</span>}&#x000A;&#x000A;<span class="ruby-comment"># You can use the same class for multiple values.</span>&#x000A;<span class="ruby-comment"># This is mainly useful when the sti_key column contains multiple values</span>&#x000A;<span class="ruby-comment"># which are different but do not require different code.</span>&#x000A;<span class="ruby-constant">Employee</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-value">key:</span> <span class="ruby-value">:type</span>,&#x000A;  <span class="ruby-value">model_map:</span> {<span class="ruby-string">&#39;staff&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;Staff&quot;</span>,&#x000A;              <span class="ruby-string">&#39;manager&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;Manager&quot;</span>,&#x000A;              <span class="ruby-string">&#39;overpayed staff&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;Staff&quot;</span>,&#x000A;              <span class="ruby-string">&#39;underpayed staff&#39;</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;Staff&quot;</span>}</pre>
+
+<p>One minor issue to note is that if you specify the <code>:key_map</code>
+option as a hash, instead of having it inferred from the
+<code>:model_map</code>, you should only use class name strings as keys,
+you should not use symbols as keys.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="ClassTableInheritance/ClassMethods.html">Sequel::Plugins::ClassTableInheritance::ClassMethods</a></li>
+<li><a href="ClassTableInheritance/InstanceMethods.html">Sequel::Plugins::ClassTableInheritance::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span>
+<span class='arguments'>(model, opts = OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>The class_table_inheritance plugin requires the single_table_inheritance
+plugin and the lazy_attributes plugin to handle lazily-loaded attributes
+for subclass instances returned by superclass methods.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 181</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span>
+<span class='arguments'>(model, opts = OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Initialize the plugin using the following options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:alias </td><td>
+<p>Change the alias used for the subquery in model datasets. using this as the
+alias.</p>
+</td></tr><tr><td class='label'>:key </td><td>
+<p>Column symbol that holds the key that identifies the class to use.
+Necessary if you want to call model methods on a superclass that return
+subclass instances</p>
+</td></tr><tr><td class='label'>:model_map </td><td>
+<p><a href="../../Hash.html">Hash</a> or proc mapping the key column values to
+model class names.</p>
+</td></tr><tr><td class='label'>:key_map </td><td>
+<p><a href="../../Hash.html">Hash</a> or proc mapping model class names to key
+column values. Each value or return is an array of possible key column
+values.</p>
+</td></tr><tr><td class='label'>:key_chooser </td><td>
+<p>proc returning key for the provided model instance</p>
+</td></tr><tr><td class='label'>:table_map </td><td>
+<p><a href="../../Hash.html">Hash</a> with class name symbols keys mapping to
+table name symbol values. Overrides implicit table names.</p>
+</td></tr><tr><td class='label'>:ignore_subclass_columns </td><td>
+<p><a href="../../Array.html">Array</a> with column names as symbols that are
+ignored on all sub-classes.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 200</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">SingleTableInheritance</span>.<span class="ruby-identifier">configure</span> <span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>], <span class="ruby-identifier">opts</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@cti_models</span> = [<span class="ruby-keyword">self</span>]&#x000A;    <span class="ruby-ivar">@cti_tables</span> = [<span class="ruby-identifier">table_name</span>]&#x000A;    <span class="ruby-ivar">@cti_instance_dataset</span> = <span class="ruby-ivar">@instance_dataset</span>&#x000A;    <span class="ruby-ivar">@cti_table_columns</span> = <span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-ivar">@cti_table_map</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table_map</span>] <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-ivar">@cti_alias</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:alias</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">first_source</span>&#x000A;    <span class="ruby-ivar">@cti_ignore_subclass_columns</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:ignore_subclass_columns</span>] <span class="ruby-operator">||</span> []&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

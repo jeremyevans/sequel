@@ -1,126 +1,131 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::NestedAttributes::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::NestedAttributes::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/nested_attributes_rb.html">lib/sequel/plugins/nested_attributes.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-freeze">freeze</a></li>
-              <li><a href="#method-i-nested_attributes">nested_attributes</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Freeze nested_attributes_module when freezing model class.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@nested_attributes_module</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@nested_attributes_module</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-nested_attributes'>
-                <a name='method-i-nested_attributes'></a>
-                <div class='synopsis'>
-                  <span class='name'>nested_attributes</span>
-                  <span class='arguments'>(*associations, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Allow nested attributes to be set for the given associations.  Options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:destroy </td><td>
-                  <p>Allow destruction of nested records.</p>
-                  </td></tr><tr><td class='label'>:fields </td><td>
-                  <p>If provided, should be an <a href="../../../Array.html">Array</a> or proc.
-                  If it is an array, restricts the fields allowed to be modified through the
-                  association_attributes= method to the specific fields given. If it is a
-                  proc, it will be called with the associated object and should return an
-                  array of the allowable fields.</p>
-                  </td></tr><tr><td class='label'>:limit </td><td>
-                  <p>For *_to_many associations, a limit on the number of records that will be
-                  processed, to prevent denial of service attacks.</p>
-                  </td></tr><tr><td class='label'>:reject_if </td><td>
-                  <p>A proc that is given each attribute hash before it is passed to its
-                  associated object. If the proc returns a truthy value, the attribute hash
-                  is ignored.</p>
-                  </td></tr><tr><td class='label'>:remove </td><td>
-                  <p>Allow disassociation of nested records (can remove the associated object
-                  from the parent object, but not destroy the associated object).</p>
-                  </td></tr><tr><td class='label'>:transform </td><td>
-                  <p>A proc to transform attribute hashes before they are passed to associated
-                  object. Takes two arguments, the parent object and the attribute hash. Uses
-                  the return value as the new attribute hash.</p>
-                  </td></tr><tr><td class='label'>:unmatched_pk </td><td>
-                  <p>Specify the action to be taken if a primary key is provided in a record,
-                  but it doesn&#39;t match an existing associated object. Set to :create to
-                  create a new object with that primary key, :ignore to ignore the record, or
-                  :raise to raise an error. The default is :raise.</p>
-                  </td></tr></tbody></table>
-                  
-                  <p>If a block is provided, it is used to set the :reject_if option.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-nested_attributes-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-nested_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nested_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">include</span>(<span class="ruby-ivar">@nested_attributes_module</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@nested_attributes_module</span>&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">reflections</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no association named #{a} for #{self}&quot;</span>)}&#x000A;  <span class="ruby-identifier">reflections</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>] = <span class="ruby-identifier">opts</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:unmatched_pk</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:raise</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:reject_if</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">def_nested_attribute_method</span>(<span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::NestedAttributes::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::NestedAttributes::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/nested_attributes_rb.html">lib/sequel/plugins/nested_attributes.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#method-i-nested_attributes">nested_attributes</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Freeze nested_attributes_module when freezing model class.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@nested_attributes_module</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@nested_attributes_module</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-nested_attributes'>
+<a name='method-i-nested_attributes'></a>
+<div class='synopsis'>
+<span class='name'>nested_attributes</span>
+<span class='arguments'>(*associations, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Allow nested attributes to be set for the given associations.  Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:destroy </td><td>
+<p>Allow destruction of nested records.</p>
+</td></tr><tr><td class='label'>:fields </td><td>
+<p>If provided, should be an <a href="../../../Array.html">Array</a> or proc.
+If it is an array, restricts the fields allowed to be modified through the
+association_attributes= method to the specific fields given. If it is a
+proc, it will be called with the associated object and should return an
+array of the allowable fields.</p>
+</td></tr><tr><td class='label'>:limit </td><td>
+<p>For *_to_many associations, a limit on the number of records that will be
+processed, to prevent denial of service attacks.</p>
+</td></tr><tr><td class='label'>:reject_if </td><td>
+<p>A proc that is given each attribute hash before it is passed to its
+associated object. If the proc returns a truthy value, the attribute hash
+is ignored.</p>
+</td></tr><tr><td class='label'>:remove </td><td>
+<p>Allow disassociation of nested records (can remove the associated object
+from the parent object, but not destroy the associated object).</p>
+</td></tr><tr><td class='label'>:transform </td><td>
+<p>A proc to transform attribute hashes before they are passed to associated
+object. Takes two arguments, the parent object and the attribute hash. Uses
+the return value as the new attribute hash.</p>
+</td></tr><tr><td class='label'>:unmatched_pk </td><td>
+<p>Specify the action to be taken if a primary key is provided in a record,
+but it doesn&#39;t match an existing associated object. Set to :create to
+create a new object with that primary key, :ignore to ignore the record, or
+:raise to raise an error. The default is :raise.</p>
+</td></tr></tbody></table>
+
+<p>If a block is provided, it is used to set the :reject_if option.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-nested_attributes-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-nested_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nested_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">include</span>(<span class="ruby-ivar">@nested_attributes_module</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@nested_attributes_module</span>&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">reflections</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no association named #{a} for #{self}&quot;</span>)}&#x000A;  <span class="ruby-identifier">reflections</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>] = <span class="ruby-identifier">opts</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:unmatched_pk</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:raise</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:reject_if</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">def_nested_attribute_method</span>(<span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

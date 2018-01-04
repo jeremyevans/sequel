@@ -1,234 +1,235 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Postgres
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>Top level module for holding all PostgreSQL-related modules and classes for
-            <a href="../Sequel.html">Sequel</a>.  All adapters that connect to
-            PostgreSQL support the following options:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:client_min_messages </td><td>
-            <p>Change the minimum level of messages that PostgreSQL will send to the the
-            client.  The PostgreSQL default is NOTICE, the <a
-            href="../Sequel.html">Sequel</a> default is WARNING.  Set to nil to not
-            change the server default. Overridable on a per instance basis via the
-            :client_min_messages option.</p>
-            </td></tr><tr><td class='label'>:force_standard_strings </td><td>
-            <p>Set to false to not force the use of standard strings.  Overridable on a
-            per instance basis via the :force_standard_strings option.</p>
-            </td></tr><tr><td class='label'>:search_path </td><td>
-            <p>Set the schema search_path for this Database&#39;s connections. Allows to
-            to set which schemas do not need explicit qualification, and in which order
-            to check the schemas when an unqualified object is referenced.</p>
-            </td></tr></tbody></table>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
-              <li><a href="#method-c-sequel_pg_version_supported-3F">sequel_pg_version_supported?</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="Postgres/DatabaseMethods.html">Sequel::Postgres::DatabaseMethods</a></li>
-              <li><a href="Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
-              <li><a href="Postgres/MockAdapterDatabaseMethods.html">Sequel::Postgres::MockAdapterDatabaseMethods</a></li>
-              <li><a href="Postgres/Adapter.html">Sequel::Postgres::Adapter</a></li>
-              <li><a href="Postgres/AlterTableGenerator.html">Sequel::Postgres::AlterTableGenerator</a></li>
-              <li><a href="Postgres/CreateTableGenerator.html">Sequel::Postgres::CreateTableGenerator</a></li>
-              <li><a href="Postgres/Database.html">Sequel::Postgres::Database</a></li>
-              <li><a href="Postgres/Dataset.html">Sequel::Postgres::Dataset</a></li>
-              <li><a href="Postgres/ExclusionConstraintViolation.html">Sequel::Postgres::ExclusionConstraintViolation</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONVERSION_PROCS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>MINUS_INFINITY</td>
-                    <td>=</td>
-                    <td class='context-item-value'>-1.0/0.0</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>NAN</td>
-                    <td>=</td>
-                    <td class='context-item-value'>0.0/0.0</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PGError</td>
-                    <td>=</td>
-                    <td class='context-item-value'>PG::Error if defined?(PG::Error)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PGconn</td>
-                    <td>=</td>
-                    <td class='context-item-value'>PG::Connection if defined?(PG::Connection)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PGresult</td>
-                    <td>=</td>
-                    <td class='context-item-value'>PG::Result if defined?(PG::Result)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PLUS_INFINITY</td>
-                    <td>=</td>
-                    <td class='context-item-value'>1.0/0.0</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>TYPE_TRANSLATOR</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      tt = Class.new do
-                      def boolean(s) s == 't' end
-                      def integer(s) s.to_i end
-                      def float(s) 
-                      case s
-                      when 'NaN'
-                      NAN
-                      when 'Infinity'
-                      PLUS_INFINITY
-                      when '-Infinity'
-                      MINUS_INFINITY
-                      else
-                      s.to_f 
-                      end
-                      end
-                      def date(s) ::Date.new(*s.split('-').map(&:to_i)) end
-                      def bytea(str)
-                      str = if str =~ /\A\\x/
-                      # PostgreSQL 9.0+ bytea hex format
-                      str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
-                      else
-                      # Historical PostgreSQL bytea escape format
-                      str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
-                      if s.size == 2 then s[1,1] else s[1,3].oct.chr end
-                      }
-                      end
-                      ::Sequel::SQL::Blob.new(str)
-                      end
-                      end.new.freeze
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>USES_PG</td>
-                    <td>=</td>
-                    <td class='context-item-value'>true</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-mock_adapter_setup'>
-                <a name='method-c-mock_adapter_setup'></a>
-                <div class='synopsis'>
-                  <span class='name'>mock_adapter_setup</span>
-                  <span class='arguments'>(db)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-mock_adapter_setup-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-sequel_pg_version_supported-3F'>
-                <a name='method-c-sequel_pg_version_supported-3F'></a>
-                <div class='synopsis'>
-                  <span class='name'>sequel_pg_version_supported?</span>
-                  <span class='arguments'>(version)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Whether the given sequel_pg version integer is supported.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-sequel_pg_version_supported-3F-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Postgres
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Top level module for holding all PostgreSQL-related modules and classes for
+<a href="../Sequel.html">Sequel</a>.  All adapters that connect to
+PostgreSQL support the following options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:client_min_messages </td><td>
+<p>Change the minimum level of messages that PostgreSQL will send to the the
+client.  The PostgreSQL default is NOTICE, the <a
+href="../Sequel.html">Sequel</a> default is WARNING.  Set to nil to not
+change the server default. Overridable on a per instance basis via the
+:client_min_messages option.</p>
+</td></tr><tr><td class='label'>:force_standard_strings </td><td>
+<p>Set to false to not force the use of standard strings.  Overridable on a
+per instance basis via the :force_standard_strings option.</p>
+</td></tr><tr><td class='label'>:search_path </td><td>
+<p>Set the schema search_path for this Database&#39;s connections. Allows to
+to set which schemas do not need explicit qualification, and in which order
+to check the schemas when an unqualified object is referenced.</p>
+</td></tr></tbody></table>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
+<li><a href="#method-c-sequel_pg_version_supported-3F">sequel_pg_version_supported?</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Postgres/DatabaseMethods.html">Sequel::Postgres::DatabaseMethods</a></li>
+<li><a href="Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
+<li><a href="Postgres/MockAdapterDatabaseMethods.html">Sequel::Postgres::MockAdapterDatabaseMethods</a></li>
+<li><a href="Postgres/Adapter.html">Sequel::Postgres::Adapter</a></li>
+<li><a href="Postgres/AlterTableGenerator.html">Sequel::Postgres::AlterTableGenerator</a></li>
+<li><a href="Postgres/CreateTableGenerator.html">Sequel::Postgres::CreateTableGenerator</a></li>
+<li><a href="Postgres/Database.html">Sequel::Postgres::Database</a></li>
+<li><a href="Postgres/Dataset.html">Sequel::Postgres::Dataset</a></li>
+<li><a href="Postgres/ExclusionConstraintViolation.html">Sequel::Postgres::ExclusionConstraintViolation</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONVERSION_PROCS</td>
+<td>=</td>
+<td class='context-item-value'>{}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MINUS_INFINITY</td>
+<td>=</td>
+<td class='context-item-value'>-1.0/0.0</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>NAN</td>
+<td>=</td>
+<td class='context-item-value'>0.0/0.0</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>PGError</td>
+<td>=</td>
+<td class='context-item-value'>PG::Error if defined?(PG::Error)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>PGconn</td>
+<td>=</td>
+<td class='context-item-value'>PG::Connection if defined?(PG::Connection)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>PGresult</td>
+<td>=</td>
+<td class='context-item-value'>PG::Result if defined?(PG::Result)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>PLUS_INFINITY</td>
+<td>=</td>
+<td class='context-item-value'>1.0/0.0</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>TYPE_TRANSLATOR</td>
+<td>=</td>
+<td class='context-item-value'>tt = Class.new do
+def boolean(s) s == 't' end
+def integer(s) s.to_i end
+def float(s) 
+case s
+when 'NaN'
+NAN
+when 'Infinity'
+PLUS_INFINITY
+when '-Infinity'
+MINUS_INFINITY
+else
+s.to_f 
+end
+end
+def date(s) ::Date.new(*s.split('-').map(&:to_i)) end
+def bytea(str)
+str = if str =~ /\A\\x/
+# PostgreSQL 9.0+ bytea hex format
+str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
+else
+# Historical PostgreSQL bytea escape format
+str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
+if s.size == 2 then s[1,1] else s[1,3].oct.chr end
+}
+end
+::Sequel::SQL::Blob.new(str)
+end
+end.new.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>USES_PG</td>
+<td>=</td>
+<td class='context-item-value'>true</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-mock_adapter_setup'>
+<a name='method-c-mock_adapter_setup'></a>
+<div class='synopsis'>
+<span class='name'>mock_adapter_setup</span>
+<span class='arguments'>(db)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-sequel_pg_version_supported-3F'>
+<a name='method-c-sequel_pg_version_supported-3F'></a>
+<div class='synopsis'>
+<span class='name'>sequel_pg_version_supported?</span>
+<span class='arguments'>(version)</span>
+
+</div>
+<div class='description'>
+
+<p>Whether the given sequel_pg version integer is supported.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-sequel_pg_version_supported-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-sequel_pg_version_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">sequel_pg_version_supported?</span>(<span class="ruby-identifier">version</span>)&#x000A;  <span class="ruby-identifier">version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10617</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

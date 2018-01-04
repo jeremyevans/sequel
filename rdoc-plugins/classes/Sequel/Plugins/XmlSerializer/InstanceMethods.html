@@ -1,188 +1,195 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::XmlSerializer::InstanceMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::XmlSerializer::InstanceMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/xml_serializer_rb.html">lib/sequel/plugins/xml_serializer.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-from_xml">from_xml</a></li>
-              <li><a href="#method-i-from_xml_node">from_xml_node</a></li>
-              <li><a href="#method-i-to_xml">to_xml</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-from_xml'>
-                <a name='method-i-from_xml'></a>
-                <div class='synopsis'>
-                  <span class='name'>from_xml</span>
-                  <span class='arguments'>(xml, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Update the contents of this instance based on the given XML. Accepts the
-                  following options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name_proc </td><td>
-                  <p>Proc or <a href="../../../Hash.html">Hash</a> that accepts a string and
-                  returns a string, used to convert tag names to column or association names.</p>
-                  </td></tr><tr><td class='label'>:underscore </td><td>
-                  <p>Sets the :name_proc option to one that calls <code>underscore</code> on the
-                  input string.  Requires that you load the inflector extension or another
-                  library that adds <a
-                  href="../../../String.html#method-i-underscore">String#underscore</a>.</p>
-                  </td></tr></tbody></table>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-from_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 210</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span>(<span class="ruby-identifier">xml</span>).<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-from_xml_node'>
-                <a name='method-i-from_xml_node'></a>
-                <div class='synopsis'>
-                  <span class='name'>from_xml_node</span>
-                  <span class='arguments'>(parent, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Update the contents of this instance based on the given  XML node, which
-                  should be a Nokogiri::XML::Node instance. By default, just calls set with a
-                  hash created from the content of the node.</p>
-                  
-                  <p>Options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
-                  <p>Indicates that the associations cache should be updated by creating a new
-                  associated object using data from the hash.  Should be a <a
-                  href="../../../Symbol.html">Symbol</a> for a single association, an array
-                  of symbols for multiple associations, or a hash with symbol keys and
-                  dependent association option hash values.</p>
-                  </td></tr><tr><td class='label'>:fields </td><td>
-                  <p>Changes the behavior to call set_fields using the provided fields, instead
-                  of calling set.</p>
-                  </td></tr></tbody></table>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml_node-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-from_xml_node-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 224</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">parent</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Malformed XML used&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)}&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;XML consisting of just text nodes used&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">assocs</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;    <span class="ruby-identifier">assocs</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">assocs</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>&#x000A;      {<span class="ruby-identifier">assocs</span>=<span class="ruby-operator">&gt;</span><span class="ruby-constant">OPTS</span>}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;      <span class="ruby-identifier">assocs_tmp</span> = {}&#x000A;      <span class="ruby-identifier">assocs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">assocs_tmp</span>[<span class="ruby-identifier">v</span>] = <span class="ruby-constant">OPTS</span>}&#x000A;      <span class="ruby-identifier">assocs_tmp</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;      <span class="ruby-identifier">assocs</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;:associations should be Symbol, Array, or Hash if present&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">assocs_hash</span> = {}&#x000A;    <span class="ruby-identifier">assocs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">assocs_hash</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">v</span>}&#x000A;    <span class="ruby-identifier">assocs_present</span> = []&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">hash</span> = {}&#x000A;  <span class="ruby-identifier">populate_associations</span> = {}&#x000A;  <span class="ruby-identifier">name_proc</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">xml_deserialize_name_proc</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)&#x000A;    <span class="ruby-identifier">k</span> = <span class="ruby-identifier">name_proc</span>[<span class="ruby-identifier">node</span>.<span class="ruby-identifier">name</span>]&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">assocs_hash</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">assocs_hash</span>[<span class="ruby-identifier">k</span>]&#x000A;      <span class="ruby-identifier">assocs_present</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">node</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">node</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-string">&#39;nil&#39;</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">assocs_present</span>&#x000A;    <span class="ruby-identifier">assocs_present</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">node</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">assoc_opts</span> = <span class="ruby-identifier">assocs</span>[<span class="ruby-identifier">assoc</span>]&#x000A;&#x000A;      <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">assoc</span>)&#x000A;        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Association #{assoc} is not defined for #{model}&quot;</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;&#x000A;      <span class="ruby-identifier">populate_associations</span>[<span class="ruby-identifier">assoc</span>] = <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span>&#x000A;        <span class="ruby-identifier">node</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">assoc_opts</span>)}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">node</span>, <span class="ruby-identifier">assoc_opts</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">fields</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:fields</span>]&#x000A;    <span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">populate_associations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">values</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">associations</span>[<span class="ruby-identifier">assoc</span>] = <span class="ruby-identifier">values</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-to_xml'>
-                <a name='method-i-to_xml'></a>
-                <div class='synopsis'>
-                  <span class='name'>to_xml</span>
-                  <span class='arguments'>(opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return a string in XML format.  If a block is given, yields the XML builder
-                  object so you can add additional XML tags. Accepts the following options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:builder </td><td>
-                  <p>The builder instance used to build the XML, which should be an instance of
-                  Nokogiri::XML::Node.  This is necessary if you are serializing entire
-                  object graphs, like associated objects.</p>
-                  </td></tr><tr><td class='label'>:builder_opts </td><td>
-                  <p>Options to pass to the Nokogiri::XML::Builder initializer, if the :builder
-                  option is not provided.</p>
-                  </td></tr><tr><td class='label'>:camelize</td><td>
-                  <p>Sets the :name_proc option to one that calls <code>camelize</code> on the
-                  input string.  Requires that you load the inflector extension or another
-                  library that adds <a
-                  href="../../../String.html#method-i-camelize">String#camelize</a>.</p>
-                  </td></tr><tr><td class='label'>:dasherize </td><td>
-                  <p>Sets the :name_proc option to one that calls <code>dasherize</code> on the
-                  input string.  Requires that you load the inflector extension or another
-                  library that adds <a
-                  href="../../../String.html#method-i-dasherize">String#dasherize</a>.</p>
-                  </td></tr><tr><td class='label'>:encoding </td><td>
-                  <p>The encoding to use for the XML output, passed to the
-                  Nokogiri::XML::Builder initializer.</p>
-                  </td></tr><tr><td class='label'>:except </td><td>
-                  <p><a href="../../../Symbol.html">Symbol</a> or <a
-                  href="../../../Array.html">Array</a> of Symbols of columns not to include
-                  in the XML output.</p>
-                  </td></tr><tr><td class='label'>:include </td><td>
-                  <p><a href="../../../Symbol.html">Symbol</a>, <a
-                  href="../../../Array.html">Array</a> of Symbols, or a <a
-                  href="../../../Hash.html">Hash</a> with <a
-                  href="../../../Symbol.html">Symbol</a> keys and <a
-                  href="../../../Hash.html">Hash</a> values specifying associations or other
-                  non-column attributes to include in the XML output.  Using a nested hash,
-                  you can pass options to associations to affect the XML used for associated
-                  objects.</p>
-                  </td></tr><tr><td class='label'>:name_proc </td><td>
-                  <p>Proc or <a href="../../../Hash.html">Hash</a> that accepts a string and
-                  returns a string, used to format tag names.</p>
-                  </td></tr><tr><td class='label'>:only </td><td>
-                  <p><a href="../../../Symbol.html">Symbol</a> or <a
-                  href="../../../Array.html">Array</a> of Symbols of columns to only include
-                  in the JSON output, ignoring all other columns.</p>
-                  </td></tr><tr><td class='label'>:root_name </td><td>
-                  <p>The base name to use for the XML tag that contains the data for this
-                  instance.  This will be the name of the root node if you are only
-                  serializing a single object, but not if you are serializing an array of
-                  objects using Model.to_xml or Dataset#to_xml.</p>
-                  </td></tr><tr><td class='label'>:types </td><td>
-                  <p>Set to true to include type information for all of the columns, pulled from
-                  the db_schema.</p>
-                  </td></tr></tbody></table>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_xml-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-to_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 331</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_xml</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">values</span>&#x000A;  <span class="ruby-identifier">types</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:types</span>]&#x000A;  <span class="ruby-identifier">inc</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:include</span>]&#x000A;&#x000A;  <span class="ruby-identifier">cols</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">only</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:only</span>]&#x000A;    <span class="ruby-constant">Array</span>(<span class="ruby-identifier">only</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:except</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">name_proc</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">xml_serialize_name_proc</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">x</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">xml_builder</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">x</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">name_proc</span>[<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:root_name</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:underscore</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">name</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;/&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)).<span class="ruby-identifier">to_s</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x1</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">attrs</span> = {}&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">types</span>&#x000A;        <span class="ruby-identifier">attrs</span>[<span class="ruby-value">:type</span>] = <span class="ruby-identifier">db_schema</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">c</span>, <span class="ruby-constant">OPTS</span>)[<span class="ruby-value">:type</span>]&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">v</span> = <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">c</span>]&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>&#x000A;        <span class="ruby-identifier">attrs</span>[<span class="ruby-value">:nil</span>] = <span class="ruby-string">&#39;&#39;</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">x1</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">name_proc</span>[<span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>], <span class="ruby-identifier">v</span>, <span class="ruby-identifier">attrs</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">inc</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;      <span class="ruby-identifier">inc</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">to_xml_include</span>(<span class="ruby-identifier">x1</span>, <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">Array</span>(<span class="ruby-identifier">inc</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">to_xml_include</span>(<span class="ruby-identifier">x1</span>, <span class="ruby-identifier">i</span>)}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">yield</span> <span class="ruby-identifier">x1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">x</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::XmlSerializer::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::XmlSerializer::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/xml_serializer_rb.html">lib/sequel/plugins/xml_serializer.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-from_xml">from_xml</a></li>
+<li><a href="#method-i-from_xml_node">from_xml_node</a></li>
+<li><a href="#method-i-to_xml">to_xml</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-from_xml'>
+<a name='method-i-from_xml'></a>
+<div class='synopsis'>
+<span class='name'>from_xml</span>
+<span class='arguments'>(xml, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Update the contents of this instance based on the given XML. Accepts the
+following options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:name_proc </td><td>
+<p>Proc or <a href="../../../Hash.html">Hash</a> that accepts a string and
+returns a string, used to convert tag names to column or association names.</p>
+</td></tr><tr><td class='label'>:underscore </td><td>
+<p>Sets the :name_proc option to one that calls <code>underscore</code> on the
+input string.  Requires that you load the inflector extension or another
+library that adds <a
+href="../../../String.html#method-i-underscore">String#underscore</a>.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-from_xml-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-from_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 210</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from_xml</span>(<span class="ruby-identifier">xml</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">from_xml_node</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span>(<span class="ruby-identifier">xml</span>).<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-from_xml_node'>
+<a name='method-i-from_xml_node'></a>
+<div class='synopsis'>
+<span class='name'>from_xml_node</span>
+<span class='arguments'>(parent, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Update the contents of this instance based on the given  XML node, which
+should be a Nokogiri::XML::Node instance. By default, just calls set with a
+hash created from the content of the node.</p>
+
+<p>Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
+<p>Indicates that the associations cache should be updated by creating a new
+associated object using data from the hash.  Should be a <a
+href="../../../Symbol.html">Symbol</a> for a single association, an array
+of symbols for multiple associations, or a hash with symbol keys and
+dependent association option hash values.</p>
+</td></tr><tr><td class='label'>:fields </td><td>
+<p>Changes the behavior to call set_fields using the provided fields, instead
+of calling set.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-from_xml_node-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-from_xml_node-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 224</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from_xml_node</span>(<span class="ruby-identifier">parent</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">parent</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Malformed XML used&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)}&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;XML consisting of just text nodes used&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">assocs</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;    <span class="ruby-identifier">assocs</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">assocs</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>&#x000A;      {<span class="ruby-identifier">assocs</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">OPTS</span>}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;      <span class="ruby-identifier">assocs_tmp</span> = {}&#x000A;      <span class="ruby-identifier">assocs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">assocs_tmp</span>[<span class="ruby-identifier">v</span>] = <span class="ruby-constant">OPTS</span>}&#x000A;      <span class="ruby-identifier">assocs_tmp</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;      <span class="ruby-identifier">assocs</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;:associations should be Symbol, Array, or Hash if present&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">assocs_hash</span> = {}&#x000A;    <span class="ruby-identifier">assocs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">assocs_hash</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">v</span>}&#x000A;    <span class="ruby-identifier">assocs_present</span> = []&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">hash</span> = {}&#x000A;  <span class="ruby-identifier">populate_associations</span> = {}&#x000A;  <span class="ruby-identifier">name_proc</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">xml_deserialize_name_proc</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">node</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)&#x000A;    <span class="ruby-identifier">k</span> = <span class="ruby-identifier">name_proc</span>[<span class="ruby-identifier">node</span>.<span class="ruby-identifier">name</span>]&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">assocs_hash</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">assocs_hash</span>[<span class="ruby-identifier">k</span>]&#x000A;      <span class="ruby-identifier">assocs_present</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">node</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">node</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-string">&#39;nil&#39;</span>) <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">assocs_present</span>&#x000A;    <span class="ruby-identifier">assocs_present</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">node</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">assoc_opts</span> = <span class="ruby-identifier">assocs</span>[<span class="ruby-identifier">assoc</span>]&#x000A;&#x000A;      <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">assoc</span>)&#x000A;        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Association #{assoc} is not defined for #{model}&quot;</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;&#x000A;      <span class="ruby-identifier">populate_associations</span>[<span class="ruby-identifier">assoc</span>] = <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span>&#x000A;        <span class="ruby-identifier">node</span>.<span class="ruby-identifier">children</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Nokogiri</span><span class="ruby-operator">::</span><span class="ruby-constant">XML</span><span class="ruby-operator">::</span><span class="ruby-constant">Text</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">assoc_opts</span>)}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">from_xml_node</span>(<span class="ruby-identifier">node</span>, <span class="ruby-identifier">assoc_opts</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">fields</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:fields</span>]&#x000A;    <span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">populate_associations</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">values</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">associations</span>[<span class="ruby-identifier">assoc</span>] = <span class="ruby-identifier">values</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-to_xml'>
+<a name='method-i-to_xml'></a>
+<div class='synopsis'>
+<span class='name'>to_xml</span>
+<span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return a string in XML format.  If a block is given, yields the XML builder
+object so you can add additional XML tags. Accepts the following options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:builder </td><td>
+<p>The builder instance used to build the XML, which should be an instance of
+Nokogiri::XML::Node.  This is necessary if you are serializing entire
+object graphs, like associated objects.</p>
+</td></tr><tr><td class='label'>:builder_opts </td><td>
+<p>Options to pass to the Nokogiri::XML::Builder initializer, if the :builder
+option is not provided.</p>
+</td></tr><tr><td class='label'>:camelize</td><td>
+<p>Sets the :name_proc option to one that calls <code>camelize</code> on the
+input string.  Requires that you load the inflector extension or another
+library that adds <a
+href="../../../String.html#method-i-camelize">String#camelize</a>.</p>
+</td></tr><tr><td class='label'>:dasherize </td><td>
+<p>Sets the :name_proc option to one that calls <code>dasherize</code> on the
+input string.  Requires that you load the inflector extension or another
+library that adds <a
+href="../../../String.html#method-i-dasherize">String#dasherize</a>.</p>
+</td></tr><tr><td class='label'>:encoding </td><td>
+<p>The encoding to use for the XML output, passed to the
+Nokogiri::XML::Builder initializer.</p>
+</td></tr><tr><td class='label'>:except </td><td>
+<p><a href="../../../Symbol.html">Symbol</a> or <a
+href="../../../Array.html">Array</a> of Symbols of columns not to include
+in the XML output.</p>
+</td></tr><tr><td class='label'>:include </td><td>
+<p><a href="../../../Symbol.html">Symbol</a>, <a
+href="../../../Array.html">Array</a> of Symbols, or a <a
+href="../../../Hash.html">Hash</a> with <a
+href="../../../Symbol.html">Symbol</a> keys and <a
+href="../../../Hash.html">Hash</a> values specifying associations or other
+non-column attributes to include in the XML output.  Using a nested hash,
+you can pass options to associations to affect the XML used for associated
+objects.</p>
+</td></tr><tr><td class='label'>:name_proc </td><td>
+<p>Proc or <a href="../../../Hash.html">Hash</a> that accepts a string and
+returns a string, used to format tag names.</p>
+</td></tr><tr><td class='label'>:only </td><td>
+<p><a href="../../../Symbol.html">Symbol</a> or <a
+href="../../../Array.html">Array</a> of Symbols of columns to only include
+in the JSON output, ignoring all other columns.</p>
+</td></tr><tr><td class='label'>:root_name </td><td>
+<p>The base name to use for the XML tag that contains the data for this
+instance.  This will be the name of the root node if you are only
+serializing a single object, but not if you are serializing an array of
+objects using Model.to_xml or Dataset#to_xml.</p>
+</td></tr><tr><td class='label'>:types </td><td>
+<p>Set to true to include type information for all of the columns, pulled from
+the db_schema.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_xml-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-to_xml-source'><span class="ruby-comment"># File lib/sequel/plugins/xml_serializer.rb, line 331</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_xml</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">values</span>&#x000A;  <span class="ruby-identifier">types</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:types</span>]&#x000A;  <span class="ruby-identifier">inc</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:include</span>]&#x000A;&#x000A;  <span class="ruby-identifier">cols</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">only</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:only</span>]&#x000A;    <span class="ruby-constant">Array</span>(<span class="ruby-identifier">only</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:except</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">name_proc</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">xml_serialize_name_proc</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">x</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">xml_builder</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">x</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">name_proc</span>[<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:root_name</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:underscore</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">name</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&#39;/&#39;</span>, <span class="ruby-string">&#39;__&#39;</span>)).<span class="ruby-identifier">to_s</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x1</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">attrs</span> = {}&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">types</span>&#x000A;        <span class="ruby-identifier">attrs</span>[<span class="ruby-value">:type</span>] = <span class="ruby-identifier">db_schema</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">c</span>, <span class="ruby-constant">OPTS</span>)[<span class="ruby-value">:type</span>]&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">v</span> = <span class="ruby-identifier">vals</span>[<span class="ruby-identifier">c</span>]&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>&#x000A;        <span class="ruby-identifier">attrs</span>[<span class="ruby-value">:nil</span>] = <span class="ruby-string">&#39;&#39;</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">x1</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">name_proc</span>[<span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>], <span class="ruby-identifier">v</span>, <span class="ruby-identifier">attrs</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">inc</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;      <span class="ruby-identifier">inc</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">to_xml_include</span>(<span class="ruby-identifier">x1</span>, <span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">Array</span>(<span class="ruby-identifier">inc</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">to_xml_include</span>(<span class="ruby-identifier">x1</span>, <span class="ruby-identifier">i</span>)}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">yield</span> <span class="ruby-identifier">x1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">x</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,139 +1,148 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Sequel4DatasetMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Sequel4DatasetMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/extensions/sequel_4_dataset_methods_rb.html">lib/sequel/extensions/sequel_4_dataset_methods.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-and">and</a></li>
-              <li><a href="#method-i-exclude_where">exclude_where</a></li>
-              <li><a href="#method-i-interval">interval</a></li>
-              <li><a href="#method-i-range">range</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-and'>
-                <a name='method-i-and'></a>
-                <div class='synopsis'>
-                  <span class='name'>and</span>
-                  <span class='arguments'>(*cond, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Alias for where.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-and-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-and-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">and</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-exclude_where'>
-                <a name='method-i-exclude_where'></a>
-                <div class='synopsis'>
-                  <span class='name'>exclude_where</span>
-                  <span class='arguments'>(*cond, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Alias for exclude.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-exclude_where-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-exclude_where-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">exclude_where</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">exclude</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-interval'>
-                <a name='method-i-interval'></a>
-                <div class='synopsis'>
-                  <span class='name'>interval</span>
-                  <span class='arguments'>(column=Sequel.virtual_row(&Proc.new))</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Returns the interval between minimum and maximum values for the given 
-                  column/expression. Uses a virtual row block if no argument is given.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">interval</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># SELECT (max(id) - min(id)) FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 6</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">interval</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">column</span>)} <span class="ruby-comment"># SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 7</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-interval-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-interval-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">interval</span>(<span class="ruby-identifier">column</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_placeholder_literalizer</span>(<span class="ruby-value">:_interval_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>&#x000A;      <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">select</span>((<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:max</span>, <span class="ruby-identifier">arg</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:min</span>, <span class="ruby-identifier">arg</span>)).<span class="ruby-identifier">as</span>(<span class="ruby-value">:interval</span>))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">get</span>{(<span class="ruby-identifier">max</span>(<span class="ruby-identifier">column</span>) <span class="ruby-operator">-</span> <span class="ruby-identifier">min</span>(<span class="ruby-identifier">column</span>)).<span class="ruby-identifier">as</span>(<span class="ruby-value">:interval</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-range'>
-                <a name='method-i-range'></a>
-                <div class='synopsis'>
-                  <span class='name'>range</span>
-                  <span class='arguments'>(column=Sequel.virtual_row(&Proc.new))</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Returns a <code>Range</code> instance made from the minimum and maximum
-                  values for the given column/expression.  Uses a virtual row block if no
-                  argument is given.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">range</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># SELECT max(id) AS v1, min(id) AS v2 FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1..10</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">interval</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">column</span>)} <span class="ruby-comment"># SELECT max(function(column)) AS v1, min(function(column)) AS v2 FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 0..7</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-range-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-range-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">range</span>(<span class="ruby-identifier">column</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>))&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_placeholder_literalizer</span>(<span class="ruby-value">:_range_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>&#x000A;        <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">select</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:min</span>, <span class="ruby-identifier">arg</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:v1</span>), <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:max</span>, <span class="ruby-identifier">arg</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:v2</span>))&#x000A;      <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">min</span>(<span class="ruby-identifier">column</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">v1</span>), <span class="ruby-identifier">max</span>(<span class="ruby-identifier">column</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">v2</span>)]}.<span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>&#x000A;    (<span class="ruby-identifier">r</span>[<span class="ruby-value">:v1</span>]<span class="ruby-operator">..</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:v2</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Sequel4DatasetMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Sequel4DatasetMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/extensions/sequel_4_dataset_methods_rb.html">lib/sequel/extensions/sequel_4_dataset_methods.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-and">and</a></li>
+<li><a href="#method-i-exclude_where">exclude_where</a></li>
+<li><a href="#method-i-interval">interval</a></li>
+<li><a href="#method-i-range">range</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-and'>
+<a name='method-i-and'></a>
+<div class='synopsis'>
+<span class='name'>and</span>
+<span class='arguments'>(*cond, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Alias for where.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-and-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-and-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">and</span>(<span class="ruby-operator">*</span><span class="ruby-identifier ruby-title">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-exclude_where'>
+<a name='method-i-exclude_where'></a>
+<div class='synopsis'>
+<span class='name'>exclude_where</span>
+<span class='arguments'>(*cond, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Alias for exclude.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exclude_where-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-exclude_where-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude_where</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">exclude</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cond</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-interval'>
+<a name='method-i-interval'></a>
+<div class='synopsis'>
+<span class='name'>interval</span>
+<span class='arguments'>(column=Sequel.virtual_row(&Proc.new))</span>
+
+</div>
+<div class='description'>
+
+<p>Returns the interval between minimum and maximum values for the given 
+column/expression. Uses a virtual row block if no argument is given.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">interval</span>(<span class="ruby-value">:id</span>) <span class="ruby-comment"># SELECT (max(id) - min(id)) FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 6</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">interval</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">column</span>)} <span class="ruby-comment"># SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 7</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-interval-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-interval-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">interval</span>(<span class="ruby-identifier">column</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_placeholder_literalizer</span>(<span class="ruby-value">:_interval_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>&#x000A;      <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">select</span>((<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:max</span>, <span class="ruby-identifier">arg</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:min</span>, <span class="ruby-identifier">arg</span>)).<span class="ruby-identifier">as</span>(<span class="ruby-value">:interval</span>))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">get</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">get</span>{(<span class="ruby-identifier">max</span>(<span class="ruby-identifier">column</span>) <span class="ruby-operator">-</span> <span class="ruby-identifier">min</span>(<span class="ruby-identifier">column</span>)).<span class="ruby-identifier">as</span>(<span class="ruby-value">:interval</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-range'>
+<a name='method-i-range'></a>
+<div class='synopsis'>
+<span class='name'>range</span>
+<span class='arguments'>(column=Sequel.virtual_row(&Proc.new))</span>
+
+</div>
+<div class='description'>
+
+<p>Returns a <code>Range</code> instance made from the minimum and maximum
+values for the given column/expression.  Uses a virtual row block if no
+argument is given.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">range</span>(<span class="ruby-value">:id</span>) <span class="ruby-comment"># SELECT max(id) AS v1, min(id) AS v2 FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1..10</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">interval</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">column</span>)} <span class="ruby-comment"># SELECT max(function(column)) AS v1, min(function(column)) AS v2 FROM table LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 0..7</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-range-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-range-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_4_dataset_methods.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">range</span>(<span class="ruby-identifier">column</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>))&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">loader</span> = <span class="ruby-identifier">cached_placeholder_literalizer</span>(<span class="ruby-value">:_range_loader</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">arg</span> = <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>&#x000A;        <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">select</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:min</span>, <span class="ruby-identifier">arg</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:v1</span>), <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:max</span>, <span class="ruby-identifier">arg</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:v2</span>))&#x000A;      <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">aggregate_dataset</span>.<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">min</span>(<span class="ruby-identifier">column</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">v1</span>), <span class="ruby-identifier">max</span>(<span class="ruby-identifier">column</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">v2</span>)]}.<span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>&#x000A;    (<span class="ruby-identifier">r</span>[<span class="ruby-value">:v1</span>]<span class="ruby-operator">..</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:v2</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

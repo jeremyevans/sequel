@@ -1,82 +1,84 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>5.1.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>5.1.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/5.1.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-10-01 09:19:35 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Database#copy_into in the jdbc/postgresql adapter now works correctly when
-            using multibyte characters in strings.</p>
-            </li><li>
-            <p>The alter_table add_foreign_key method is now reversible when the
-            :foreign_key_constraint_name option is used.</p>
-            </li><li>
-            <p>The jdbc/h2 and jdbc/hsqldb adapters now respect the
-            :foreign_key_constraint_name option.</p>
-            </li><li>
-            <p>Calling Model.freeze on an already frozen model no longer raises an error.</p>
-            </li><li>
-            <p>An unnecessary database query is now avoided when loading the pg_inet
-            extension when the pg_array extension is already loaded.</p>
-            </li><li>
-            <p>A better exception message is now used when migrating with an empty
-            migration directory.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Model.allowed_columns has been removed. Use the whitelist_security plugin
-            if you want to call it.</p>
-            </li><li>
-            <p>Model use_after_commit_rollback class and instance accessors have been
-            removed.</p>
-            </li><li>
-            <p>Support for the Model#_before_validation method has been removed.</p>
-            </li><li>
-            <p>The private Model.plugin_module_defined? method has been removed.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>5.1.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.1.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.1.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-10-01 09:19:35 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#copy_into in the jdbc/postgresql adapter now works correctly when
+using multibyte characters in strings.</p>
+</li><li>
+<p>The alter_table add_foreign_key method is now reversible when the
+:foreign_key_constraint_name option is used.</p>
+</li><li>
+<p>The jdbc/h2 and jdbc/hsqldb adapters now respect the
+:foreign_key_constraint_name option.</p>
+</li><li>
+<p>Calling Model.freeze on an already frozen model no longer raises an error.</p>
+</li><li>
+<p>An unnecessary database query is now avoided when loading the pg_inet
+extension when the pg_array extension is already loaded.</p>
+</li><li>
+<p>A better exception message is now used when migrating with an empty
+migration directory.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Model.allowed_columns has been removed. Use the whitelist_security plugin
+if you want to call it.</p>
+</li><li>
+<p>Model use_after_commit_rollback class and instance accessors have been
+removed.</p>
+</li><li>
+<p>Support for the Model#_before_validation method has been removed.</p>
+</li><li>
+<p>The private Model.plugin_module_defined? method has been removed.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

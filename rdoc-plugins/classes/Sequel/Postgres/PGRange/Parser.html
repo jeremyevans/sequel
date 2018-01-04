@@ -1,143 +1,145 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres::PGRange::Parser</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::PGRange::Parser
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/extensions/pg_range_rb.html">lib/sequel/extensions/pg_range.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="../../../Object.html">Object</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>Creates callable objects that convert strings into <a
-            href="../PGRange.html">PGRange</a> instances.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-call">call</a></li>
-              <li><a href="#attribute-i-converter">converter</a></li>
-              <li><a href="#attribute-i-db_type">db_type</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-converter'>converter</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>A callable object to convert the beginning and ending of the range into the
-                      appropriate ruby type.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-db_type'>db_type</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The database range type for this parser (e.g. &#39;int4range&#39;),
-                      automatically setting the <a
-                      href="Parser.html#attribute-i-db_type">#db_type</a> for the returned <a
-                      href="../PGRange.html">PGRange</a> instances.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(db_type, converter=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the <a href="Parser.html#attribute-i-db_type">#db_type</a> and
-                  converter on initialization.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-call'>
-                <a name='method-i-call'></a>
-                <div class='synopsis'>
-                  <span class='name'>call</span>
-                  <span class='arguments'>(string)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Parse the range type input string into a <a
-                  href="../PGRange.html">PGRange</a> value.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">string</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;empty&#39;</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">empty</span>(<span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;invalid or unhandled range format: #{string.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">matches</span> = <span class="ruby-regexp">/\A(\[|\()(&quot;((?:\&quot;|[^&quot;])*)&quot;|[^&quot;]*),(&quot;((?:\&quot;|[^&quot;])*)&quot;|[^&quot;]*)(\]|\))\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">string</span>)&#x000A;&#x000A;  <span class="ruby-identifier">exclude_begin</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;(&#39;</span>&#x000A;  <span class="ruby-identifier">exclude_end</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">6</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;)&#39;</span>&#x000A;&#x000A;  <span class="ruby-comment"># If the input is quoted, it needs to be unescaped.  Also, quoted input isn&#39;t</span>&#x000A;  <span class="ruby-comment"># checked for emptiness, since the empty quoted string is considered an </span>&#x000A;  <span class="ruby-comment"># element that happens to be the empty string, while an unquoted empty string</span>&#x000A;  <span class="ruby-comment"># is considered unbounded.</span>&#x000A;  <span class="ruby-comment">#</span>&#x000A;  <span class="ruby-comment"># While PostgreSQL allows pure escaping for input (without quoting), it appears</span>&#x000A;  <span class="ruby-comment"># to always use the quoted output form when characters need to be escaped, so</span>&#x000A;  <span class="ruby-comment"># there isn&#39;t a need to unescape unquoted output.</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">beg</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">3</span>]&#x000A;    <span class="ruby-identifier">beg</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">/\(.)/</span>, <span class="ruby-string">&#39;\1&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">beg</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">2</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">matches</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">en</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">5</span>]&#x000A;    <span class="ruby-identifier">en</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">/\(.)/</span>, <span class="ruby-string">&#39;\1&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">en</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">4</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">matches</span>[<span class="ruby-value">4</span>].<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span> = <span class="ruby-identifier">converter</span>&#x000A;    <span class="ruby-identifier">beg</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">beg</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">beg</span>&#x000A;    <span class="ruby-identifier">en</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">en</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">en</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">beg</span>, <span class="ruby-identifier">en</span>, <span class="ruby-value">:exclude_begin=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">exclude_begin</span>, <span class="ruby-value">:exclude_end=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">exclude_end</span>, <span class="ruby-value">:db_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres::PGRange::Parser</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PGRange::Parser
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/extensions/pg_range_rb.html">lib/sequel/extensions/pg_range.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../../../Object.html">Object</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Creates callable objects that convert strings into <a
+href="../PGRange.html">PGRange</a> instances.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-call">call</a></li>
+<li><a href="#attribute-i-converter">converter</a></li>
+<li><a href="#attribute-i-db_type">db_type</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-converter'>converter</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A callable object to convert the beginning and ending of the range into the
+appropriate ruby type.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-db_type'>db_type</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The database range type for this parser (e.g. &#39;int4range&#39;),
+automatically setting the <a
+href="Parser.html#attribute-i-db_type">#db_type</a> for the returned <a
+href="../PGRange.html">PGRange</a> instances.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(db_type, converter=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the <a href="Parser.html#attribute-i-db_type">#db_type</a> and
+converter on initialization.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-call'>
+<a name='method-i-call'></a>
+<div class='synopsis'>
+<span class='name'>call</span>
+<span class='arguments'>(string)</span>
+
+</div>
+<div class='description'>
+
+<p>Parse the range type input string into a <a
+href="../PGRange.html">PGRange</a> value.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">string</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;empty&#39;</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">empty</span>(<span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;invalid or unhandled range format: #{string.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">matches</span> = <span class="ruby-regexp">/\A(\[|\()(&quot;((?:\\&quot;|[^&quot;])*)&quot;|[^&quot;]*),(&quot;((?:\\&quot;|[^&quot;])*)&quot;|[^&quot;]*)(\]|\))\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">string</span>)&#x000A;&#x000A;  <span class="ruby-identifier">exclude_begin</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">1</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;(&#39;</span>&#x000A;  <span class="ruby-identifier">exclude_end</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">6</span>] <span class="ruby-operator">==</span> <span class="ruby-string">&#39;)&#39;</span>&#x000A;&#x000A;  <span class="ruby-comment"># If the input is quoted, it needs to be unescaped.  Also, quoted input isn&#39;t</span>&#x000A;  <span class="ruby-comment"># checked for emptiness, since the empty quoted string is considered an</span>&#x000A;  <span class="ruby-comment"># element that happens to be the empty string, while an unquoted empty string</span>&#x000A;  <span class="ruby-comment"># is considered unbounded.</span>&#x000A;  <span class="ruby-comment">#</span>&#x000A;  <span class="ruby-comment"># While PostgreSQL allows pure escaping for input (without quoting), it appears</span>&#x000A;  <span class="ruby-comment"># to always use the quoted output form when characters need to be escaped, so</span>&#x000A;  <span class="ruby-comment"># there isn&#39;t a need to unescape unquoted output.</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">beg</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">3</span>]&#x000A;    <span class="ruby-identifier">beg</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">/\\(.)/</span>, <span class="ruby-string">&#39;\1&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">beg</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">2</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">matches</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">en</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">5</span>]&#x000A;    <span class="ruby-identifier">en</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">/\\(.)/</span>, <span class="ruby-string">&#39;\1&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">en</span> = <span class="ruby-identifier">matches</span>[<span class="ruby-value">4</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">matches</span>[<span class="ruby-value">4</span>].<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span> = <span class="ruby-identifier">converter</span>&#x000A;    <span class="ruby-identifier">beg</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">beg</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">beg</span>&#x000A;    <span class="ruby-identifier">en</span> = <span class="ruby-identifier">c</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">en</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">en</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">beg</span>, <span class="ruby-identifier">en</span>, <span class="ruby-value">:exclude_begin</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">exclude_begin</span>, <span class="ruby-value">:exclude_end</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">exclude_end</span>, <span class="ruby-value">:db_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">db_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

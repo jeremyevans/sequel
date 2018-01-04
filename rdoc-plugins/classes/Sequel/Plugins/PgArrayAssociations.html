@@ -1,144 +1,146 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::PgArrayAssociations</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::PgArrayAssociations
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/pg_array_associations_rb.html">lib/sequel/plugins/pg_array_associations.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>This plugin allows you to create associations where the foreign keys are
-            stored in a PostgreSQL array column in one of the tables.  The model with
-            the table containing the array column has a pg_array_to_many association to
-            the associated model, and the model with the table containing the primary
-            key referenced by elements in the array column has a many_to_pg_array
-            association to the associated model.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#   tags                albums</span>&#x000A;<span class="ruby-comment">#   :id (int4) &lt;--\    :id</span>&#x000A;<span class="ruby-comment">#   :name          \-- :tag_ids (int4[])</span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">pg_array_associations</span>&#x000A;  <span class="ruby-identifier">pg_array_to_many</span> :<span class="ruby-identifier">tags</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Tag</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">pg_array_associations</span>&#x000A;  <span class="ruby-identifier">many_to_pg_array</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>These association types work similarly to Sequel&#39;s other association
-            types, so you can use them as you would any other association. Unlike other
-            associations, they do not support composite keys.</p>
-            
-            <p>One thing that is different is that the modification methods for
-            pg_array_to_many associations do not affect the database, since they
-            operate purely on the receiver.  For example:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_tag</span>(<span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>])</pre>
-            
-            <p>does not save the album.  This allows you to call add_tag repeatedly and
-            the save after to combine all changes into a single query.  Note that the
-            many_to_pg_array association modification methods do save, so:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">tag</span> = <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-identifier">tag</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>])</pre>
-            
-            <p>will save the changes to the album.</p>
-            
-            <p>They support some additional options specific to this plugin:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:array_type </td><td>
-            <p>This overrides the type of the array.  By default, the type is determined
-            by looking at the db_schema for the model, and if that fails, it defaults
-            to :integer.</p>
-            </td></tr><tr><td class='label'>:raise_on_save_failure </td><td>
-            <p>Do not raise exceptions for hook or validation failures when saving
-            associated objects in the add/remove methods (return nil instead).</p>
-            </td></tr><tr><td class='label'>:save_after_modify </td><td>
-            <p>For pg_array_to_many associations, this makes the the modification methods
-            save the current object, so they operate more similarly to the one_to_many
-            and many_to_many association modification methods.</p>
-            </td></tr><tr><td class='label'>:uniq </td><td>
-            <p>Similar to many_to_many associations, this can be used to make sure the
-            returned associated object array has uniq values.</p>
-            </td></tr></tbody></table>
-            
-            <p>Note that until PostgreSQL gains the ability to enforce foreign key
-            constraints in array columns, this plugin is not recommended for production
-            use unless you plan on emulating referential integrity constraints via
-            triggers.</p>
-            
-            <p>This plugin should work on all supported PostgreSQL versions, except the
-            remove_all modification method for many_to_pg_array associations, which
-            requires the array_remove method added in PostgreSQL 9.3.</p>
-            
-            <p>This plugin requires that the underlying database have the pg_array
-            extension loaded.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-apply">apply</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="PgArrayAssociations/ClassMethods.html">Sequel::Plugins::PgArrayAssociations::ClassMethods</a></li>
-              <li><a href="PgArrayAssociations/DatasetMethods.html">Sequel::Plugins::PgArrayAssociations::DatasetMethods</a></li>
-              <li><a href="PgArrayAssociations/ManyToPgArrayAssociationReflection.html">Sequel::Plugins::PgArrayAssociations::ManyToPgArrayAssociationReflection</a></li>
-              <li><a href="PgArrayAssociations/PgArrayToManyAssociationReflection.html">Sequel::Plugins::PgArrayAssociations::PgArrayToManyAssociationReflection</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-apply'>
-                <a name='method-c-apply'></a>
-                <div class='synopsis'>
-                  <span class='name'>apply</span>
-                  <span class='arguments'>(model)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Add the pg_array extension to the database</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 300</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_array</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::PgArrayAssociations</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PgArrayAssociations
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/pg_array_associations_rb.html">lib/sequel/plugins/pg_array_associations.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>This plugin allows you to create associations where the foreign keys are
+stored in a PostgreSQL array column in one of the tables.  The model with
+the table containing the array column has a pg_array_to_many association to
+the associated model, and the model with the table containing the primary
+key referenced by elements in the array column has a many_to_pg_array
+association to the associated model.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#   tags                albums</span>&#x000A;<span class="ruby-comment">#   :id (int4) &lt;--\    :id</span>&#x000A;<span class="ruby-comment">#   :name          \-- :tag_ids (int4[])</span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>&#x000A;  <span class="ruby-identifier">pg_array_to_many</span> <span class="ruby-value">:tags</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Tag</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:pg_array_associations</span>&#x000A;  <span class="ruby-identifier">many_to_pg_array</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>These association types work similarly to Sequel&#39;s other association
+types, so you can use them as you would any other association. Unlike other
+associations, they do not support composite keys.</p>
+
+<p>One thing that is different is that the modification methods for
+pg_array_to_many associations do not affect the database, since they
+operate purely on the receiver.  For example:</p>
+
+<pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_tag</span>(<span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>])</pre>
+
+<p>does not save the album.  This allows you to call add_tag repeatedly and
+the save after to combine all changes into a single query.  Note that the
+many_to_pg_array association modification methods do save, so:</p>
+
+<pre class="ruby"><span class="ruby-identifier">tag</span> = <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-identifier">tag</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>])</pre>
+
+<p>will save the changes to the album.</p>
+
+<p>They support some additional options specific to this plugin:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:array_type </td><td>
+<p>This overrides the type of the array.  By default, the type is determined
+by looking at the db_schema for the model, and if that fails, it defaults
+to :integer.</p>
+</td></tr><tr><td class='label'>:raise_on_save_failure </td><td>
+<p>Do not raise exceptions for hook or validation failures when saving
+associated objects in the add/remove methods (return nil instead).</p>
+</td></tr><tr><td class='label'>:save_after_modify </td><td>
+<p>For pg_array_to_many associations, this makes the the modification methods
+save the current object, so they operate more similarly to the one_to_many
+and many_to_many association modification methods.</p>
+</td></tr><tr><td class='label'>:uniq </td><td>
+<p>Similar to many_to_many associations, this can be used to make sure the
+returned associated object array has uniq values.</p>
+</td></tr></tbody></table>
+
+<p>Note that until PostgreSQL gains the ability to enforce foreign key
+constraints in array columns, this plugin is not recommended for production
+use unless you plan on emulating referential integrity constraints via
+triggers.</p>
+
+<p>This plugin should work on all supported PostgreSQL versions, except the
+remove_all modification method for many_to_pg_array associations, which
+requires the array_remove method added in PostgreSQL 9.3.</p>
+
+<p>This plugin requires that the underlying database have the pg_array
+extension loaded.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="PgArrayAssociations/ClassMethods.html">Sequel::Plugins::PgArrayAssociations::ClassMethods</a></li>
+<li><a href="PgArrayAssociations/DatasetMethods.html">Sequel::Plugins::PgArrayAssociations::DatasetMethods</a></li>
+<li><a href="PgArrayAssociations/ManyToPgArrayAssociationReflection.html">Sequel::Plugins::PgArrayAssociations::ManyToPgArrayAssociationReflection</a></li>
+<li><a href="PgArrayAssociations/PgArrayToManyAssociationReflection.html">Sequel::Plugins::PgArrayAssociations::PgArrayToManyAssociationReflection</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span>
+<span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+<p>Add the pg_array extension to the database</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 300</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_array</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

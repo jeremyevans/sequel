@@ -1,122 +1,123 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::Finder</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::Finder
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/finder_rb.html">lib/sequel/plugins/finder.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The finder plugin adds Model.finder for defining optimized finder methods.
-            There are two ways to use this.  The recommended way is to pass a symbol
-            that represents a model class method that returns a dataset:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">by_name</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> :<span class="ruby-identifier">by_name</span></pre>
-            
-            <p>This creates an optimized first_by_name method, which you can call
-            normally:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-string">&quot;Joe&quot;</span>)</pre>
-            
-            <p>The alternative way to use this to pass your own block:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}</pre>
-            
-            <p>Additionally, there is a Model.prepared_finder method.  This works
-            similarly to Model.finder, but uses a prepared statement.  This limits the
-            types of arguments that will be accepted, but can perform better in the
-            database.</p>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Make all model subclasses support Model.finder</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">finder</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support Model.finder</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">finder</span></pre>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-apply">apply</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="Finder/ClassMethods.html">Sequel::Plugins::Finder::ClassMethods</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>FINDER_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[:first, :all, :each, :get].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-apply'>
-                <a name='method-c-apply'></a>
-                <div class='synopsis'>
-                  <span class='name'>apply</span>
-                  <span class='arguments'>(mod)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/finder.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;    <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::Finder</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::Finder
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/finder_rb.html">lib/sequel/plugins/finder.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The finder plugin adds Model.finder for defining optimized finder methods.
+There are two ways to use this.  The recommended way is to pass a symbol
+that represents a model class method that returns a dataset:</p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier ruby-title">by_name</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> <span class="ruby-value">:by_name</span></pre>
+
+<p>This creates an optimized first_by_name method, which you can call
+normally:</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-string">&quot;Joe&quot;</span>)</pre>
+
+<p>The alternative way to use this to pass your own block:</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}</pre>
+
+<p>Additionally, there is a Model.prepared_finder method.  This works
+similarly to Model.finder, but uses a prepared statement.  This limits the
+types of arguments that will be accepted, but can perform better in the
+database.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support Model.finder</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:finder</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support Model.finder</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:finder</span></pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Finder/ClassMethods.html">Sequel::Plugins::Finder::ClassMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>FINDER_TYPES</td>
+<td>=</td>
+<td class='context-item-value'>[:first, :all, :each, :get].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span>
+<span class='arguments'>(mod)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/finder.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;    <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

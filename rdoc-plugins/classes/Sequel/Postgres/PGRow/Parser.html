@@ -1,217 +1,217 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres::PGRow::Parser</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::PGRow::Parser
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/extensions/pg_row_rb.html">lib/sequel/extensions/pg_row.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="../../../Object.html">Object</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The <a href="Parser.html">Parser</a> is responsible for taking the input
-            string from PostgreSQL, and returning an appropriate ruby object that the
-            type represents, such as an <a href="ArrayRow.html">ArrayRow</a> or <a
-            href="HashRow.html">HashRow</a>.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-call">call</a></li>
-              <li><a href="#attribute-i-column_converters">column_converters</a></li>
-              <li><a href="#attribute-i-column_oids">column_oids</a></li>
-              <li><a href="#attribute-i-columns">columns</a></li>
-              <li><a href="#attribute-i-converter">converter</a></li>
-              <li><a href="#attribute-i-oid">oid</a></li>
-              <li><a href="#method-i-typecast">typecast</a></li>
-              <li><a href="#attribute-i-typecaster">typecaster</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-column_converters'>column_converters</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Converters for each member in the composite type.  If not present, no
-                      conversion will be done, so values will remain strings.  If present, should
-                      be an array of callable objects.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-column_oids'>column_oids</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The OIDs for each member in the composite type.  Not currently used, but
-                      made available for user code.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-columns'>columns</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The columns for the parser, if any.  If the parser has no columns, it will
-                      treat the input as an array.  If it has columns, it will treat the input as
-                      a hash. If present, should be an array of strings.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-converter'>converter</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>A converter for the object as a whole.  Used to wrap the returned
-                      array/hash in another object, such as an <a
-                      href="ArrayRow.html">ArrayRow</a> or <a href="HashRow.html">HashRow</a>. 
-                      If present, should be callable.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-oid'>oid</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The oid for the composite type itself.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-typecaster'>typecaster</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>A callable object used for typecasting the object. This is similar to the
-                      converter, but it is called by the typecasting code, which has different
-                      assumptions than the converter.  For instance, the converter should be
-                      called with all of the member values already typecast, but the typecaster
-                      may not be.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(h=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Sets each of the parser&#39;s attributes, using options with the same name
-                  (e.g. :columns sets the columns attribute).</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 284</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">h</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:columns</span>]&#x000A;  <span class="ruby-ivar">@column_converters</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_converters</span>]&#x000A;  <span class="ruby-ivar">@column_oids</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_oids</span>]&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:converter</span>]&#x000A;  <span class="ruby-ivar">@typecaster</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:typecaster</span>]&#x000A;  <span class="ruby-ivar">@oid</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:oid</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-call'>
-                <a name='method-i-call'></a>
-                <div class='synopsis'>
-                  <span class='name'>call</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Convert the PostgreSQL composite type input format into an appropriate ruby
-                  object.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 295</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">convert</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">convert_columns</span>(<span class="ruby-constant">Splitter</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">parse</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-typecast'>
-                <a name='method-i-typecast'></a>
-                <div class='synopsis'>
-                  <span class='name'>typecast</span>
-                  <span class='arguments'>(obj)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Typecast the given object to the appropriate type using the typecaster. 
-                  Note that this does not conversion for the members of the composite type,
-                  since those conversion expect strings and strings may not be provided.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-typecast-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-typecast-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 303</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span> &#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">obj</span>))&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@columns</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser without columns cannot typecast from a hash&#39;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser can only typecast arrays and hashes&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres::PGRow::Parser</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PGRow::Parser
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/extensions/pg_row_rb.html">lib/sequel/extensions/pg_row.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../../../Object.html">Object</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The <a href="Parser.html">Parser</a> is responsible for taking the input
+string from PostgreSQL, and returning an appropriate ruby object that the
+type represents, such as an <a href="ArrayRow.html">ArrayRow</a> or <a
+href="HashRow.html">HashRow</a>.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-call">call</a></li>
+<li><a href="#attribute-i-column_converters">column_converters</a></li>
+<li><a href="#attribute-i-column_oids">column_oids</a></li>
+<li><a href="#attribute-i-columns">columns</a></li>
+<li><a href="#attribute-i-converter">converter</a></li>
+<li><a href="#attribute-i-oid">oid</a></li>
+<li><a href="#method-i-typecast">typecast</a></li>
+<li><a href="#attribute-i-typecaster">typecaster</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-column_converters'>column_converters</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>Converters for each member in the composite type.  If not present, no
+conversion will be done, so values will remain strings.  If present, should
+be an array of callable objects.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-column_oids'>column_oids</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The OIDs for each member in the composite type.  Not currently used, but
+made available for user code.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-columns'>columns</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The columns for the parser, if any.  If the parser has no columns, it will
+treat the input as an array.  If it has columns, it will treat the input as
+a hash. If present, should be an array of strings.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-converter'>converter</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A converter for the object as a whole.  Used to wrap the returned
+array/hash in another object, such as an <a
+href="ArrayRow.html">ArrayRow</a> or <a href="HashRow.html">HashRow</a>. 
+If present, should be callable.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-oid'>oid</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The oid for the composite type itself.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-typecaster'>typecaster</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A callable object used for typecasting the object. This is similar to the
+converter, but it is called by the typecasting code, which has different
+assumptions than the converter.  For instance, the converter should be
+called with all of the member values already typecast, but the typecaster
+may not be.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(h=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Sets each of the parser&#39;s attributes, using options with the same name
+(e.g. :columns sets the columns attribute).</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 284</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">h</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:columns</span>]&#x000A;  <span class="ruby-ivar">@column_converters</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_converters</span>]&#x000A;  <span class="ruby-ivar">@column_oids</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:column_oids</span>]&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:converter</span>]&#x000A;  <span class="ruby-ivar">@typecaster</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:typecaster</span>]&#x000A;  <span class="ruby-ivar">@oid</span> = <span class="ruby-identifier">h</span>[<span class="ruby-value">:oid</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-call'>
+<a name='method-i-call'></a>
+<div class='synopsis'>
+<span class='name'>call</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+<p>Convert the PostgreSQL composite type input format into an appropriate ruby
+object.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 295</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">convert</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">convert_columns</span>(<span class="ruby-constant">Splitter</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">parse</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-typecast'>
+<a name='method-i-typecast'></a>
+<div class='synopsis'>
+<span class='name'>typecast</span>
+<span class='arguments'>(obj)</span>
+
+</div>
+<div class='description'>
+
+<p>Typecast the given object to the appropriate type using the typecaster. 
+Note that this does not conversion for the members of the composite type,
+since those conversion expect strings and strings may not be provided.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-typecast-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-typecast-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 303</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span> &#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">convert_format</span>(<span class="ruby-identifier">obj</span>))&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@columns</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser without columns cannot typecast from a hash&#39;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">_typecast</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;PGRow::Parser can only typecast arrays and hashes&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

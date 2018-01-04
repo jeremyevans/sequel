@@ -1,104 +1,109 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::ColumnsIntrospection</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::ColumnsIntrospection
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/extensions/columns_introspection_rb.html">lib/sequel/extensions/columns_introspection.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-columns">columns</a></li>
-            </ol>
-            <h3>Protected Instance</h3>
-            <ol>
-              <li><a href="#method-i-probable_columns">probable_columns</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-columns'>
-                <a name='method-i-columns'></a>
-                <div class='synopsis'>
-                  <span class='name'>columns</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Attempt to guess the columns that will be returned if there are columns
-                  selected, in order to skip a database query to retrieve the columns.  This
-                  should work with Symbols, SQL::Identifiers, SQL::QualifiedIdentifiers, and
-                  SQL::AliasedExpressions.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/columns_introspection.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">_columns</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">cols</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">pcs</span> = <span class="ruby-identifier">probable_columns</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">pcs</span>.<span class="ruby-identifier">all?</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">pcs</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Protected Instance methods</h2>
-              <div class='method protected-instance' id='method-method-i-probable_columns'>
-                <a name='method-i-probable_columns'></a>
-                <div class='synopsis'>
-                  <span class='name'>probable_columns</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return an array of probable column names for the dataset, or nil if it is
-                  not possible to determine that through introspection.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-probable_columns-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-probable_columns-source'><span class="ruby-comment"># File lib/sequel/extensions/columns_introspection.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">probable_columns</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">cols</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">probable_column_name</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:join</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:with</span>] <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">from</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:from</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">from</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">from</span> = <span class="ruby-identifier">from</span>.<span class="ruby-identifier">first</span>)&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">from</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>)&#x000A;      <span class="ruby-identifier">from</span> = <span class="ruby-identifier">from</span>.<span class="ruby-identifier">expression</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    &#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">from</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Dataset</span>&#x000A;      <span class="ruby-identifier">from</span>.<span class="ruby-identifier">probable_columns</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>&#x000A;      <span class="ruby-identifier">schemas</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@schemas</span>)&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">schemas</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">table</span> = <span class="ruby-identifier">literal</span>(<span class="ruby-identifier">from</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">sch</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">schemas</span>[<span class="ruby-identifier">table</span>]})&#x000A;        <span class="ruby-identifier">sch</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>,<span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>}&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::ColumnsIntrospection</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::ColumnsIntrospection
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/extensions/columns_introspection_rb.html">lib/sequel/extensions/columns_introspection.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-columns">columns</a></li>
+</ol>
+<h3>Protected Instance</h3>
+<ol>
+<li><a href="#method-i-probable_columns">probable_columns</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-columns'>
+<a name='method-i-columns'></a>
+<div class='synopsis'>
+<span class='name'>columns</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Attempt to guess the columns that will be returned if there are columns
+selected, in order to skip a database query to retrieve the columns.  This
+should work with Symbols, SQL::Identifiers, SQL::QualifiedIdentifiers, and
+SQL::AliasedExpressions.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-columns-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/columns_introspection.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">_columns</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">cols</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">pcs</span> = <span class="ruby-identifier">probable_columns</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">pcs</span>.<span class="ruby-identifier">all?</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">pcs</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Protected Instance methods</h2>
+<div class='method protected-instance' id='method-method-i-probable_columns'>
+<a name='method-i-probable_columns'></a>
+<div class='synopsis'>
+<span class='name'>probable_columns</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return an array of probable column names for the dataset, or nil if it is
+not possible to determine that through introspection.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-probable_columns-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-probable_columns-source'><span class="ruby-comment"># File lib/sequel/extensions/columns_introspection.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">probable_columns</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">cols</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">probable_column_name</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:join</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:with</span>] <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">from</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:from</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">from</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">from</span> = <span class="ruby-identifier">from</span>.<span class="ruby-identifier">first</span>)&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">from</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>)&#x000A;      <span class="ruby-identifier">from</span> = <span class="ruby-identifier">from</span>.<span class="ruby-identifier">expression</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    &#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">from</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Dataset</span>&#x000A;      <span class="ruby-identifier">from</span>.<span class="ruby-identifier">probable_columns</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>&#x000A;      <span class="ruby-identifier">schemas</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_get</span>(<span class="ruby-value">:@schemas</span>)&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">schemas</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">table</span> = <span class="ruby-identifier">literal</span>(<span class="ruby-identifier">from</span>)) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">sch</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">schemas</span>[<span class="ruby-identifier">table</span>]})&#x000A;        <span class="ruby-identifier">sch</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>,<span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>}&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

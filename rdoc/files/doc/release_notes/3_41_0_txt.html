@@ -1,190 +1,192 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.41.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.41.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.41.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2012-11-01 08:50:01 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A connection_validator extension has been added, which automatically
-            determines if connections checked out from the pool are still valid.  If
-            they are not valid, the connection is disconnected and another connection
-            is used automatically, transparent to user code.</p>
-            
-            <p>Checking if connections are valid requires a query, so this extension
-            causes a performance hit.  For that reason, connections are only checked by
-            default if they have been inactive for more than a configured amount of
-            time (1 hour by default).  You can choose to validate connections on every
-            checkout via:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_validation_timeout</span> = <span class="ruby-value">-1</span></pre>
-            
-            <p>However, this can cause a substantial performance hit unless you are
-            purposely using coarse connection checkouts via manual calls to
-            Database#synchronize (for example, in a Rack middleware).  Using coarse
-            checkouts can greatly reduce the amount of concurrency that <a
-            href="../../../classes/Sequel.html">Sequel</a> supports (for example,
-            limiting the number of concurrent requests to the number of database
-            connections), so this method is not without its tradeoffs.</p>
-            </li><li>
-            <p>Sequel.delay has been added for a generic form of delayed evaluation.  This
-            method takes a block and delays evaluating it until query literalization. 
-            By default, <a href="../../../classes/Sequel.html">Sequel</a> evaluates
-            most arguments immediately:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">foo</span> = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">bar</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">baz=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">foo</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 1)</span>&#x000A;<span class="ruby-identifier">foo</span> = <span class="ruby-value">2</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 1)</span></pre>
-            
-            <p>Using Sequel.delay, you can delay the evaluation:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">foo</span> = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">bar</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">baz=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-identifier">foo</span>})&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 1)</span>&#x000A;<span class="ruby-identifier">foo</span> = <span class="ruby-value">2</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 2)</span></pre>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the
-            :unlogged option when creating tables on PostgreSQL, to create an UNLOGGED
-            table.</p>
-            </li><li>
-            <p>On SQLite, Database#transaction now supports a :mode option for setting up
-            IMMEDIATE/EXCLUSIVE SQLite transactions.  <a
-            href="../../../classes/Sequel.html">Sequel</a> also supports a
-            Database#transaction_mode accessor for setting the default transaction mode
-            on SQLite.</p>
-            </li><li>
-            <p>Most pg_* extension objects (e.g. PGArray) now support the as method for
-            creating an SQL::AliasedExpression object.</p>
-            </li><li>
-            <p>The single_table_inheritance plugin now supports non-bijective mappings. 
-            In lay terms, this means that a one-to-one mapping of column values to
-            classes is no longer required.  You can now have multiple column values
-            that map to a single class in the :model_map option, and specify a
-            :key_chooser option to choose which column value to use for the given model
-            class.</p>
-            </li><li>
-            <p>The touch plugin now handles the touching of many_to_many associations, and
-            other associations that use joined datasets.</p>
-            </li><li>
-            <p>ConnectionPool#pool_type has been added. It returns a symbol representing
-            the type of connection pool in use (similar to Database#database_type).</p>
-            </li><li>
-            <p>Database#valid_connection? has been added for checking if a given
-            connection is still valid.</p>
-            </li><li>
-            <p>Database#disconnect_connection is now part of the public API, and can be
-            used to disconnect a given connection.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Uniqueness validation now correctly handles nil values. Previously, it
-            checked the underlying table for other rows where the column IS NULL, but
-            that is incorrect behavior.  Sequel&#39;s new (correct) behavior is to skip
-            the uniqueness check if the column is nil.</p>
-            </li><li>
-            <p>Foreign key parsing is now supported on Microsoft SQL Server.</p>
-            </li><li>
-            <p>Dataset#reverse and reverse_order now accept virtual row blocks.</p>
-            </li><li>
-            <p>Changing the name of the primary key column, and possibly other schema
-            changes on the primary key column, are now supported on MySQL.</p>
-            </li><li>
-            <p>Primary key columns are now specifically marked as NOT NULL on SQLite, as
-            non-integer primary keys on SQLite are not considered NOT NULL by default.</p>
-            </li><li>
-            <p>Failure to create a native prepared statement is now handled better in the
-            postgres, mysql, and mysql2 adapters.</p>
-            </li><li>
-            <p>Firebird now emulates selecting data without an underlying table (e.g.
-            DB.get(1)).</p>
-            </li><li>
-            <p>Finding the name of the constraint that sets column defaults on Microsoft
-            SQL Server now works correctly on JRuby 1.7.</p>
-            </li><li>
-            <p>An additional type of disconnect error is now recognized in the
-            jdbc/sqlserver adapter.</p>
-            </li><li>
-            <p>Many adapters have been fixed so that they don&#39;t raise an exception if
-            trying to disconnect an already disconnected connection.</p>
-            </li><li>
-            <p>Many adapters have been fixed so that Database#log_connection_execute logs
-            and executes the given SQL on the connection.</p>
-            </li><li>
-            <p>Many adapters have been fixed so that Database#database_error_classes
-            returns an array of database exception classes for that adapter.</p>
-            </li><li>
-            <p>Database#log_exception now handles a nil exception message.</p>
-            </li><li>
-            <p>Dataset#limit(nil, nil) now resets offset in addition to limit, but you
-            should still use Dataset#unlimited instead.</p>
-            </li><li>
-            <p>A bin/sequel usage quide has been added to the documentation.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now treats clob columns
-            as strings instead of blobs (except on DB2 when use_clob_as_blob = true). 
-            This can make it so the values are returned as strings instead of SQL::Blob
-            values. Since SQL::Blob is a String subclass, this generally will not
-            affect user code unless you are passing the values as input to a separate
-            blob column.</p>
-            </li><li>
-            <p>The Database &lt;-&gt; ConnectionPool interface was completely changed. <a
-            href="../../../classes/Sequel.html">Sequel</a> no longer supports custom
-            connection procs or disconnection procs in the connection pools.  The
-            :disconnection_proc Database option is no longer respected, and blocks
-            passed to Database.new are now ignored.</p>
-            
-            <p>This change should not be user-visible, but if you had any code that was
-            monkeying with the connection pool internals, you may need to modify it.</p>
-            </li><li>
-            <p>Code that was using the uniqueness check to also check for presence should
-            add a separate check for presence.  Such code was broken, as it only worked
-            if there was already a NULL column value in the table. If you were relying
-            on this broken behavior, you should clean up the NULL data in the column
-            and then mark the database column as NOT NULL.</p>
-            </li><li>
-            <p>If you have code that specifically abuses the fact that non-integer primary
-            keys on SQLite allow NULL values by default, it will no longer work.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.41.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.41.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.41.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2012-11-01 08:50:01 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A connection_validator extension has been added, which automatically
+determines if connections checked out from the pool are still valid.  If
+they are not valid, the connection is disconnected and another connection
+is used automatically, transparent to user code.</p>
+
+<p>Checking if connections are valid requires a query, so this extension
+causes a performance hit.  For that reason, connections are only checked by
+default if they have been inactive for more than a configured amount of
+time (1 hour by default).  You can choose to validate connections on every
+checkout via:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_validation_timeout</span> = <span class="ruby-value">-1</span></pre>
+
+<p>However, this can cause a substantial performance hit unless you are
+purposely using coarse connection checkouts via manual calls to
+Database#synchronize (for example, in a Rack middleware).  Using coarse
+checkouts can greatly reduce the amount of concurrency that <a
+href="../../../classes/Sequel.html">Sequel</a> supports (for example,
+limiting the number of concurrent requests to the number of database
+connections), so this method is not without its tradeoffs.</p>
+</li><li>
+<p>Sequel.delay has been added for a generic form of delayed evaluation.  This
+method takes a block and delays evaluating it until query literalization. 
+By default, <a href="../../../classes/Sequel.html">Sequel</a> evaluates
+most arguments immediately:</p>
+
+<pre class="ruby"><span class="ruby-identifier">foo</span> = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bar</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:baz</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">foo</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 1)</span>&#x000A;<span class="ruby-identifier">foo</span> = <span class="ruby-value">2</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 1)</span></pre>
+
+<p>Using Sequel.delay, you can delay the evaluation:</p>
+
+<pre class="ruby"><span class="ruby-identifier">foo</span> = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:bar</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:baz</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-identifier">foo</span>})&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 1)</span>&#x000A;<span class="ruby-identifier">foo</span> = <span class="ruby-value">2</span>&#x000A;<span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-comment"># SELECT * FROM bar WHERE (baz = 2)</span></pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the
+:unlogged option when creating tables on PostgreSQL, to create an UNLOGGED
+table.</p>
+</li><li>
+<p>On SQLite, Database#transaction now supports a :mode option for setting up
+IMMEDIATE/EXCLUSIVE SQLite transactions.  <a
+href="../../../classes/Sequel.html">Sequel</a> also supports a
+Database#transaction_mode accessor for setting the default transaction mode
+on SQLite.</p>
+</li><li>
+<p>Most pg_* extension objects (e.g. PGArray) now support the as method for
+creating an SQL::AliasedExpression object.</p>
+</li><li>
+<p>The single_table_inheritance plugin now supports non-bijective mappings. 
+In lay terms, this means that a one-to-one mapping of column values to
+classes is no longer required.  You can now have multiple column values
+that map to a single class in the :model_map option, and specify a
+:key_chooser option to choose which column value to use for the given model
+class.</p>
+</li><li>
+<p>The touch plugin now handles the touching of many_to_many associations, and
+other associations that use joined datasets.</p>
+</li><li>
+<p>ConnectionPool#pool_type has been added. It returns a symbol representing
+the type of connection pool in use (similar to Database#database_type).</p>
+</li><li>
+<p>Database#valid_connection? has been added for checking if a given
+connection is still valid.</p>
+</li><li>
+<p>Database#disconnect_connection is now part of the public API, and can be
+used to disconnect a given connection.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Uniqueness validation now correctly handles nil values. Previously, it
+checked the underlying table for other rows where the column IS NULL, but
+that is incorrect behavior.  Sequel&#39;s new (correct) behavior is to skip
+the uniqueness check if the column is nil.</p>
+</li><li>
+<p>Foreign key parsing is now supported on Microsoft SQL Server.</p>
+</li><li>
+<p>Dataset#reverse and reverse_order now accept virtual row blocks.</p>
+</li><li>
+<p>Changing the name of the primary key column, and possibly other schema
+changes on the primary key column, are now supported on MySQL.</p>
+</li><li>
+<p>Primary key columns are now specifically marked as NOT NULL on SQLite, as
+non-integer primary keys on SQLite are not considered NOT NULL by default.</p>
+</li><li>
+<p>Failure to create a native prepared statement is now handled better in the
+postgres, mysql, and mysql2 adapters.</p>
+</li><li>
+<p>Firebird now emulates selecting data without an underlying table (e.g.
+DB.get(1)).</p>
+</li><li>
+<p>Finding the name of the constraint that sets column defaults on Microsoft
+SQL Server now works correctly on JRuby 1.7.</p>
+</li><li>
+<p>An additional type of disconnect error is now recognized in the
+jdbc/sqlserver adapter.</p>
+</li><li>
+<p>Many adapters have been fixed so that they don&#39;t raise an exception if
+trying to disconnect an already disconnected connection.</p>
+</li><li>
+<p>Many adapters have been fixed so that Database#log_connection_execute logs
+and executes the given SQL on the connection.</p>
+</li><li>
+<p>Many adapters have been fixed so that Database#database_error_classes
+returns an array of database exception classes for that adapter.</p>
+</li><li>
+<p>Database#log_exception now handles a nil exception message.</p>
+</li><li>
+<p>Dataset#limit(nil, nil) now resets offset in addition to limit, but you
+should still use Dataset#unlimited instead.</p>
+</li><li>
+<p>A bin/sequel usage quide has been added to the documentation.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now treats clob columns
+as strings instead of blobs (except on DB2 when use_clob_as_blob = true). 
+This can make it so the values are returned as strings instead of SQL::Blob
+values. Since SQL::Blob is a String subclass, this generally will not
+affect user code unless you are passing the values as input to a separate
+blob column.</p>
+</li><li>
+<p>The Database &lt;-&gt; ConnectionPool interface was completely changed. <a
+href="../../../classes/Sequel.html">Sequel</a> no longer supports custom
+connection procs or disconnection procs in the connection pools.  The
+:disconnection_proc Database option is no longer respected, and blocks
+passed to Database.new are now ignored.</p>
+
+<p>This change should not be user-visible, but if you had any code that was
+monkeying with the connection pool internals, you may need to modify it.</p>
+</li><li>
+<p>Code that was using the uniqueness check to also check for presence should
+add a separate check for presence.  Such code was broken, as it only worked
+if there was already a NULL column value in the table. If you were relying
+on this broken behavior, you should clean up the NULL data in the column
+and then mark the database column as NOT NULL.</p>
+</li><li>
+<p>If you have code that specifically abuses the fact that non-integer primary
+keys on SQLite allow NULL values by default, it will no longer work.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

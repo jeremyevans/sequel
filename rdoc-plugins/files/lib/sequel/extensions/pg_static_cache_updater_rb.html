@@ -1,94 +1,96 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>pg_static_cache_updater.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>pg_static_cache_updater.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/pg_static_cache_updater.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The pg_static_cache_updater extension is designed to automatically update
-            the caches in the models using the static_cache plugin when changes to the
-            underlying tables are detected.</p>
-            
-            <p>Before using the extension in production, you have to add triggers to the
-            tables for the classes where you want the caches updated automatically. 
-            You would generally do this during a migration:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_function</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(:<span class="ruby-identifier">table_1</span>)&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(:<span class="ruby-identifier">table_2</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table_2</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table_1</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_function</span>(<span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>After the triggers have been added, in your application process, after
-            setting up your models, you need to listen for changes to the underlying
-            tables:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Model1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">table_1</span>)&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">static_cache</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Model2</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">table_2</span>)&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">static_cache</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_static_cache_updater</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen_for_static_cache_updates</span>([<span class="ruby-constant">Model1</span>, <span class="ruby-constant">Model2</span>])</pre>
-            
-            <p>When an INSERT/UPDATE/DELETE happens on the underlying table, the trigger
-            will send a notification with the table&#39;s OID. The application(s)
-            listening on that channel will receive the notification, check the oid to
-            see if it matches one for the model tables it is interested in, and tell
-            that model to reload the cache if there is a match.</p>
-            
-            <p>Note that listen_for_static_cache_updates spawns a new thread which will
-            reserve its own database connection.  This thread runs until the
-            application process is shutdown.</p>
-            
-            <p>Also note that PostgreSQL does not send notifications to channels until
-            after the transaction including the changes is committed.  Also, because a
-            separate thread is used to listen for notifications, there may be a slight
-            delay between when the transaction is committed and when the cache is
-            reloaded.</p>
-            
-            <p>Requirements:</p>
-            <ul><li>
-            <p>PostgreSQL 9.0+</p>
-            </li><li>
-            <p>Listening Database object must be using the postgres adapter with the pg
-            driver (the model classes do not have to use the same Database).</p>
-            </li><li>
-            <p>Must be using a thread-safe connection pool (the default).</p>
-            </li></ul>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/Postgres/StaticCacheUpdater.html">Sequel::Postgres::StaticCacheUpdater</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>pg_static_cache_updater.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>pg_static_cache_updater.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/pg_static_cache_updater.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-02-11 15:50:14 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_static_cache_updater extension is designed to automatically update
+the caches in the models using the static_cache plugin when changes to the
+underlying tables are detected.</p>
+
+<p>Before using the extension in production, you have to add triggers to the
+tables for the classes where you want the caches updated automatically. 
+You would generally do this during a migration:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_function</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-value">:table_1</span>)&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(<span class="ruby-value">:table_2</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">drop_trigger</span>(<span class="ruby-value">:table_2</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_trigger</span>(<span class="ruby-value">:table_1</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_function</span>(<span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>After the triggers have been added, in your application process, after
+setting up your models, you need to listen for changes to the underlying
+tables:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Model1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:table_1</span>)&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Model2</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:table_2</span>)&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:static_cache</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_static_cache_updater</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen_for_static_cache_updates</span>([<span class="ruby-constant">Model1</span>, <span class="ruby-constant">Model2</span>])</pre>
+
+<p>When an INSERT/UPDATE/DELETE happens on the underlying table, the trigger
+will send a notification with the table&#39;s OID. The application(s)
+listening on that channel will receive the notification, check the oid to
+see if it matches one for the model tables it is interested in, and tell
+that model to reload the cache if there is a match.</p>
+
+<p>Note that listen_for_static_cache_updates spawns a new thread which will
+reserve its own database connection.  This thread runs until the
+application process is shutdown.</p>
+
+<p>Also note that PostgreSQL does not send notifications to channels until
+after the transaction including the changes is committed.  Also, because a
+separate thread is used to listen for notifications, there may be a slight
+delay between when the transaction is committed and when the cache is
+reloaded.</p>
+
+<p>Requirements:</p>
+<ul><li>
+<p>PostgreSQL 9.0+</p>
+</li><li>
+<p>Listening Database object must be using the postgres adapter with the pg
+driver (the model classes do not have to use the same Database).</p>
+</li><li>
+<p>Must be using a thread-safe connection pool (the default).</p>
+</li></ul>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/Postgres/StaticCacheUpdater.html">Sequel::Postgres::StaticCacheUpdater</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

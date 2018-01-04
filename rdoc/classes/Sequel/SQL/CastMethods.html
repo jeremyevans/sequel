@@ -1,134 +1,140 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::SQL::CastMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::SQL::CastMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>Holds methods that are used to cast objects to different <a
-            href="../SQL.html">SQL</a> types.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-cast">cast</a></li>
-              <li><a href="#method-i-cast_numeric">cast_numeric</a></li>
-              <li><a href="#method-i-cast_string">cast_string</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-cast'>
-                <a name='method-i-cast'></a>
-                <div class='synopsis'>
-                  <span class='name'>cast</span>
-                  <span class='arguments'>(sql_type)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="Cast.html">Cast</a> the reciever to the given <a
-                  href="../SQL.html">SQL</a> type.  You can specify a ruby class as a type,
-                  and it is handled similarly to using a database independent type in the
-                  schema methods.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">integer</span>) <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">String</span>) <span class="ruby-comment"># CAST(func() AS varchar(255))</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-cast-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 669</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast</span>(<span class="ruby-identifier">sql_type</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-cast_numeric'>
-                <a name='method-i-cast_numeric'></a>
-                <div class='synopsis'>
-                  <span class='name'>cast_numeric</span>
-                  <span class='arguments'>(sql_type = nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="Cast.html">Cast</a> the reciever to the given <a
-                  href="../SQL.html">SQL</a> type (or the database&#39;s default Integer type
-                  if none given), and return the result as a <code>NumericExpression</code>,
-                  so you can use the bitwise operators on the result.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_numeric</span> <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(func() AS double precision)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_numeric-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-cast_numeric-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 679</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-cast_string'>
-                <a name='method-i-cast_string'></a>
-                <div class='synopsis'>
-                  <span class='name'>cast_string</span>
-                  <span class='arguments'>(sql_type = nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="Cast.html">Cast</a> the reciever to the given <a
-                  href="../SQL.html">SQL</a> type (or the database&#39;s default String type
-                  if none given), and return the result as a <code>StringExpression</code>,
-                  so you can use + directly on the result for <a href="../SQL.html">SQL</a>
-                  string concatenation.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_string</span> <span class="ruby-comment"># CAST(func() AS varchar(255))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">text</span>) <span class="ruby-comment"># CAST(func() AS text)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_string-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-cast_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 689</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::SQL::CastMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::SQL::CastMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Holds methods that are used to cast objects to different <a
+href="../SQL.html">SQL</a> types.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-cast">cast</a></li>
+<li><a href="#method-i-cast_numeric">cast_numeric</a></li>
+<li><a href="#method-i-cast_string">cast_string</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-cast'>
+<a name='method-i-cast'></a>
+<div class='synopsis'>
+<span class='name'>cast</span>
+<span class='arguments'>(sql_type)</span>
+
+</div>
+<div class='description'>
+
+<p><a href="Cast.html">Cast</a> the reciever to the given <a
+href="../SQL.html">SQL</a> type.  You can specify a ruby class as a type,
+and it is handled similarly to using a database independent type in the
+schema methods.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:integer</span>) <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">String</span>) <span class="ruby-comment"># CAST(func() AS varchar(255))</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-cast-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 669</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-cast_numeric'>
+<a name='method-i-cast_numeric'></a>
+<div class='synopsis'>
+<span class='name'>cast_numeric</span>
+<span class='arguments'>(sql_type = nil)</span>
+
+</div>
+<div class='description'>
+
+<p><a href="Cast.html">Cast</a> the reciever to the given <a
+href="../SQL.html">SQL</a> type (or the database&#39;s default Integer type
+if none given), and return the result as a <code>NumericExpression</code>,
+so you can use the bitwise operators on the result.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_numeric</span> <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(func() AS double precision)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_numeric-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-cast_numeric-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 679</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-cast_string'>
+<a name='method-i-cast_string'></a>
+<div class='synopsis'>
+<span class='name'>cast_string</span>
+<span class='arguments'>(sql_type = nil)</span>
+
+</div>
+<div class='description'>
+
+<p><a href="Cast.html">Cast</a> the reciever to the given <a
+href="../SQL.html">SQL</a> type (or the database&#39;s default String type
+if none given), and return the result as a <code>StringExpression</code>,
+so you can use + directly on the result for <a href="../SQL.html">SQL</a>
+string concatenation.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_string</span> <span class="ruby-comment"># CAST(func() AS varchar(255))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_string</span>(<span class="ruby-value">:text</span>) <span class="ruby-comment"># CAST(func() AS text)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_string-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-cast_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 689</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

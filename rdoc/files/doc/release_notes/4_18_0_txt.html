@@ -1,89 +1,91 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.18.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.18.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.18.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2015-01-02 11:08:19 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>An :auto_increment key has been added to the schema information for primary
-            key columns on JDBC, PostgreSQL, MySQL, MSSQL, DB2, and SQLite.  This fixes
-            issues in the schema_dumper extension where non-auto-incrementing integer
-            primary keys are no longer dumped as auto-incrementing.</p>
-            
-            <p>For adapters that don&#39;t have specific support for detecting auto
-            incrementing primary keys, <a
-            href="../../../classes/Sequel.html">Sequel</a> now assumes a primary key is
-            auto incrementing only if it is not a composite primary key and the type
-            contains int (e.g. int, integer, bigint).</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#empty? now ignores any order on the dataset.  Previously, calling
-            empty? on a dataset ordered by an alias in the SELECT list could raise an
-            exception.</p>
-            </li><li>
-            <p>Schema qualified tables are now handled correctly in many_through_many
-            associations.</p>
-            </li><li>
-            <p>Using a hash as the value for the :eager association option now works
-            correctly.</p>
-            </li><li>
-            <p>All PG::ConnectionBad exceptions are now treated as disconnect errors in
-            the postgres adapter.  This should be more robust than the previous method
-            of trying to recognize disconnect errors by trying to parse the exception
-            message.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now skips a hash
-            allocation when issuing queries through datasets if sharding is not used.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses the JDBC
-            schema parsing in the jdbc/sqlserver adapter.  Instead, it uses the MSSQL
-            schema parsing, which should be more accurate than the generic JDBC schema
-            parsing.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.18.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.18.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.18.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2015-01-02 11:08:19 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An :auto_increment key has been added to the schema information for primary
+key columns on JDBC, PostgreSQL, MySQL, MSSQL, DB2, and SQLite.  This fixes
+issues in the schema_dumper extension where non-auto-incrementing integer
+primary keys are no longer dumped as auto-incrementing.</p>
+
+<p>For adapters that don&#39;t have specific support for detecting auto
+incrementing primary keys, <a
+href="../../../classes/Sequel.html">Sequel</a> now assumes a primary key is
+auto incrementing only if it is not a composite primary key and the type
+contains int (e.g. int, integer, bigint).</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#empty? now ignores any order on the dataset.  Previously, calling
+empty? on a dataset ordered by an alias in the SELECT list could raise an
+exception.</p>
+</li><li>
+<p>Schema qualified tables are now handled correctly in many_through_many
+associations.</p>
+</li><li>
+<p>Using a hash as the value for the :eager association option now works
+correctly.</p>
+</li><li>
+<p>All PG::ConnectionBad exceptions are now treated as disconnect errors in
+the postgres adapter.  This should be more robust than the previous method
+of trying to recognize disconnect errors by trying to parse the exception
+message.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now skips a hash
+allocation when issuing queries through datasets if sharding is not used.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses the JDBC
+schema parsing in the jdbc/sqlserver adapter.  Instead, it uses the MSSQL
+schema parsing, which should be more accurate than the generic JDBC schema
+parsing.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,111 +1,113 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.14.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.14.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.14.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2014-09-01 08:59:17 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Delayed evaluation blocks can now accept the dataset literalizing the
-            delayed evaluation as an argument.  This makes it so the delayed evaluation
-            result can depend on the dataset doing the literalization:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first_source</span>, :<span class="ruby-identifier">col</span>)=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span>          <span class="ruby-comment"># SELECT * FROM a WHERE (a.col = 1)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM b WHERE (b.col = 1)</span></pre>
-            </li><li>
-            <p>Database#create_trigger on PostgreSQL now supports a :when option to create
-            a filter for the trigger, so that it is only triggered when the filter
-            condition is true.</p>
-            </li><li>
-            <p>You can now override the cache key prefix in the caching plugin by
-            overriding the cache_key_prefix class method.  This can be useful when
-            using a table inheritance plugin.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>You can now pass arbitrary types to Dataset#where and related methods. 
-            Previously, if a type was not explicitly handled, an exception would be
-            raised.  Now you can pass any object that can be literalized.  The only
-            exception is that you can&#39;t pass Numeric objects, since where and
-            similar methods should only deal with boolean expressions.</p>
-            </li><li>
-            <p>association_join and related methods now work correctly if the dataset
-            already has an explicit selection.</p>
-            </li><li>
-            <p>A regression has been fixed in the class_table_inheritance plugin when
-            using a hierarchy of more than 2 levels, when using the superclass to load
-            a subclass instance more than 2 levels below, and later attempting to load
-            a column contained in one of the middle tables.</p>
-            </li><li>
-            <p>When using _delete or _remove keys in the nested_attributes plugin to
-            remove existing associated objects, the associated objects are now deleted
-            from the cached association array at time of call. This is for consistency
-            when adding new associated objects, where the new associated objects are
-            added to the cached association array at time of call.</p>
-            </li><li>
-            <p>The nested_attributes plugin now handles composite primary keys correctly
-            when working around validation issues for one_to_one and one_to_many
-            associations.</p>
-            </li><li>
-            <p>If exception A is raised during a transaction, and exception B is raised
-            while attempting to rollback the transaction, the transaction code will now
-            raise exception A instead of exception B.</p>
-            </li><li>
-            <p>An additional serialization failure is now detected on PostgreSQL.</p>
-            </li><li>
-            <p>An additional disconnect error is now recognized in the jdbc/jtds adapter.</p>
-            </li><li>
-            <p>The code examples in the RDoc are now syntax highlighted, and many minor
-            fixes to the code examples in the RDoc were made. Additionally, many other
-            improvements were made to the RDoc.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#delayed_evaluation_sql_append now accepts the delayed evaluation as
-            an argument, instead of the callable contained by the delayed evaluation.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.14.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.14.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.14.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2014-09-01 08:59:17 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Delayed evaluation blocks can now accept the dataset literalizing the
+delayed evaluation as an argument.  This makes it so the delayed evaluation
+result can depend on the dataset doing the literalization:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first_source</span>, <span class="ruby-value">:col</span>)<span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span>          <span class="ruby-comment"># SELECT * FROM a WHERE (a.col = 1)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM b WHERE (b.col = 1)</span></pre>
+</li><li>
+<p>Database#create_trigger on PostgreSQL now supports a :when option to create
+a filter for the trigger, so that it is only triggered when the filter
+condition is true.</p>
+</li><li>
+<p>You can now override the cache key prefix in the caching plugin by
+overriding the cache_key_prefix class method.  This can be useful when
+using a table inheritance plugin.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>You can now pass arbitrary types to Dataset#where and related methods. 
+Previously, if a type was not explicitly handled, an exception would be
+raised.  Now you can pass any object that can be literalized.  The only
+exception is that you can&#39;t pass Numeric objects, since where and
+similar methods should only deal with boolean expressions.</p>
+</li><li>
+<p>association_join and related methods now work correctly if the dataset
+already has an explicit selection.</p>
+</li><li>
+<p>A regression has been fixed in the class_table_inheritance plugin when
+using a hierarchy of more than 2 levels, when using the superclass to load
+a subclass instance more than 2 levels below, and later attempting to load
+a column contained in one of the middle tables.</p>
+</li><li>
+<p>When using _delete or _remove keys in the nested_attributes plugin to
+remove existing associated objects, the associated objects are now deleted
+from the cached association array at time of call. This is for consistency
+when adding new associated objects, where the new associated objects are
+added to the cached association array at time of call.</p>
+</li><li>
+<p>The nested_attributes plugin now handles composite primary keys correctly
+when working around validation issues for one_to_one and one_to_many
+associations.</p>
+</li><li>
+<p>If exception A is raised during a transaction, and exception B is raised
+while attempting to rollback the transaction, the transaction code will now
+raise exception A instead of exception B.</p>
+</li><li>
+<p>An additional serialization failure is now detected on PostgreSQL.</p>
+</li><li>
+<p>An additional disconnect error is now recognized in the jdbc/jtds adapter.</p>
+</li><li>
+<p>The code examples in the RDoc are now syntax highlighted, and many minor
+fixes to the code examples in the RDoc were made. Additionally, many other
+improvements were made to the RDoc.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#delayed_evaluation_sql_append now accepts the delayed evaluation as
+an argument, instead of the callable contained by the delayed evaluation.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

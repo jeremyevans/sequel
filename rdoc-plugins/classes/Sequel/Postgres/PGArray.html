@@ -1,172 +1,177 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres::PGArray</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::PGArray
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/extensions/pg_array_rb.html">lib/sequel/extensions/pg_array.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../../files/lib/sequel/extensions/pg_range_rb.html">lib/sequel/extensions/pg_range.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>DelegateClass(Array)</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>Represents a PostgreSQL array column value.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#attribute-i-array_type">array_type</a></li>
-              <li><a href="#method-i-op">op</a></li>
-              <li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li>Sequel::SQL::AliasMethods</li>
-              </ol>
-            </div>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="PGArray/DatabaseMethods.html">Sequel::Postgres::PGArray::DatabaseMethods</a></li>
-              <li><a href="PGArray/Creator.html">Sequel::Postgres::PGArray::Creator</a></li>
-              <li><a href="PGArray/Parser.html">Sequel::Postgres::PGArray::Parser</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-array_type'>array_type</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The type of this array.  May be nil if no type was given. If a type is
-                      provided, the array is automatically casted to this type when literalizing.
-                      This type is the underlying type, not the array type itself, so for an
-                      int4[] database type, it should be :int4 or &#39;int4&#39;</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(array, type=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the array to delegate to, and a database type.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 418</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)&#x000A;  <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-op'>
-                <a name='method-i-op'></a>
-                <div class='synopsis'>
-                  <span class='name'>op</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Wrap the <a href="PGArray.html">PGArray</a> instance in an <a
-                  href="ArrayOp.html">ArrayOp</a>, allowing you to easily use the PostgreSQL
-                  array functions and operators with literal arrays.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 285</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-sql_literal_append'>
-                <a name='method-i-sql_literal_append'></a>
-                <div class='synopsis'>
-                  <span class='name'>sql_literal_append</span>
-                  <span class='arguments'>(ds, sql)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Append the array <a href="../SQL.html">SQL</a> to the given sql string.  If
-                  the receiver has a type, add a cast to the database array type.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 426</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>&#x000A;    <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres::PGArray</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::PGArray
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/pg_array_rb.html">lib/sequel/extensions/pg_array.rb</a>
+</li>
+<li class='other'>
+<a href="../../../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
+</li>
+<li class='other'>
+<a href="../../../files/lib/sequel/extensions/pg_range_rb.html">lib/sequel/extensions/pg_range.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>DelegateClass(Array)</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Represents a PostgreSQL array column value.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#attribute-i-array_type">array_type</a></li>
+<li><a href="#method-i-op">op</a></li>
+<li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
+</ol>
+</div>
+<div id='context'>
+<div id='includes'>
+<h2>Included modules</h2>
+<ol>
+<li>Sequel::SQL::AliasMethods</li>
+</ol>
+</div>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="PGArray/DatabaseMethods.html">Sequel::Postgres::PGArray::DatabaseMethods</a></li>
+<li><a href="PGArray/Creator.html">Sequel::Postgres::PGArray::Creator</a></li>
+<li><a href="PGArray/Parser.html">Sequel::Postgres::PGArray::Parser</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-array_type'>array_type</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>The type of this array.  May be nil if no type was given. If a type is
+provided, the array is automatically casted to this type when literalizing.
+This type is the underlying type, not the array type itself, so for an
+int4[] database type, it should be :int4 or &#39;int4&#39;</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(array, type=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the array to delegate to, and a database type.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 418</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)&#x000A;  <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-op'>
+<a name='method-i-op'></a>
+<div class='synopsis'>
+<span class='name'>op</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Wrap the <a href="PGArray.html">PGArray</a> instance in an <a
+href="ArrayOp.html">ArrayOp</a>, allowing you to easily use the PostgreSQL
+array functions and operators with literal arrays.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-op-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 285</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;  <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-sql_literal_append'>
+<a name='method-i-sql_literal_append'></a>
+<div class='synopsis'>
+<span class='name'>sql_literal_append</span>
+<span class='arguments'>(ds, sql)</span>
+
+</div>
+<div class='description'>
+
+<p>Append the array <a href="../SQL.html">SQL</a> to the given sql string.  If
+the receiver has a type, add a cast to the database array type.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 426</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>&#x000A;    <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

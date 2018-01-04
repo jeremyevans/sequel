@@ -1,131 +1,133 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.21.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.21.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.21.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A tinytds adapter was added, enabling <a
-            href="../../../classes/Sequel.html">Sequel</a> users on a C-based ruby
-            running on *nix easy access to Microsoft SQL Server. Previously, the best
-            way to connect to Microsoft SQL Server from a C-based ruby on *nix was to
-            use the ODBC adapter with unixodbc and freetds.  However, setting that up
-            is nontrivial, while setting up tinytds is very easy.</p>
-            
-            <p>Note that the tinytds adapter currently requires the git master branch of
-            tiny_tds, but tiny_tds 0.4.0 should include the related changes.</p>
-            </li><li>
-            <p>An association_autoreloading plugin has been added to <a
-            href="../../../classes/Sequel.html">Sequel</a>, which removes stale
-            many_to_one associations from the cache when the associated foreign key
-            setter is used to change the value of the foreign key.</p>
-            </li><li>
-            <p>bin/sequel now operates more like a standard *nix utility. If given a file
-            on the command line after the connection string, it will assume that file
-            has ruby code and load it. If stdin is not a tty, it will read from stdin
-            and execute it as ruby code.</p>
-            
-            <p>For recent Linux users, this means you can have a shebang line such as:</p>
-            
-            <pre class="ruby"><span class="ruby-comment">#!/usr/bin/sequel postgres://user:pass@host/db</span></pre>
-            
-            <p>to create a self contained script.</p>
-            </li><li>
-            <p>bin/sequel now supports -r and -I options similar to ruby&#39;s -r and -I
-            options.</p>
-            </li><li>
-            <p>MySQL datasets now have a calc_found_rows method that uses
-            SQL_CALC_FOUND_ROWS, which provides a fast way to limit the number of
-            results returned by a dataset while having an easy way to determine how
-            many rows would have been returned if no limit was applied.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The Sequel::Model.plugin method can now be overridden just like any other
-            method.  Previously, it was the only method that was defined directly on
-            the class.  This allows the creation of plugins that can modify the plugin
-            system itself.</p>
-            </li><li>
-            <p>Symbol splitting (:table__column___alias) now works correctly for
-            identifiers that include characters that aren&#39;t in [w ]. Among other
-            things, this means that identifiers with accented characters or even kanji
-            characters can be used with symbol splitting.</p>
-            </li><li>
-            <p>If cover? is defined, it is now used in preference to include? for the
-            validates_includes/validates_inclusion_of validations. ruby 1.9 defines
-            include? differently for some ranges and can be very slow, while cover? is
-            similar to the 1.8 behavior of just checking the beginning and end of the
-            range.</p>
-            </li><li>
-            <p>The bin/sequel -L option now takes effect even if the -m, -C, -d, or -D
-            options are used.</p>
-            </li><li>
-            <p>The schema_dumper extension now recognizes the “bigint unsigned” type.</p>
-            </li><li>
-            <p>On Microsoft SQL Server, if joining to a subselect that uses a common table
-            expression, that common table expression is promoted to the main dataset. 
-            This allows most queries to work correctly, but is vulnerable to issues if
-            both the current dataset and the joined dataset use common table
-            expressions with the same name.  Unfortunately, unlike PostgreSQL,
-            Microsoft SQL Server does not allow common table expressions to occur in
-            subselects.</p>
-            </li><li>
-            <p>The NULL/NOT NULL, DEFAULT, and UNIQUE column options now use the proper
-            order on H2 and Oracle, so they can now be used in conjunction with each
-            other.</p>
-            </li><li>
-            <p>Row locks are now enabled on Oracle.</p>
-            </li><li>
-            <p>The join_table method on MySQL no longer ignores the block it was given.</p>
-            </li><li>
-            <p>The informix adapter now supports ruby-informix version &gt;= 0.7.3, while
-            still being backwards compatible with older versions.</p>
-            </li><li>
-            <p>The specs now run under both RSpec 2 and RSpec 1.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.21.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.21.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.21.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A tinytds adapter was added, enabling <a
+href="../../../classes/Sequel.html">Sequel</a> users on a C-based ruby
+running on *nix easy access to Microsoft SQL Server. Previously, the best
+way to connect to Microsoft SQL Server from a C-based ruby on *nix was to
+use the ODBC adapter with unixodbc and freetds.  However, setting that up
+is nontrivial, while setting up tinytds is very easy.</p>
+
+<p>Note that the tinytds adapter currently requires the git master branch of
+tiny_tds, but tiny_tds 0.4.0 should include the related changes.</p>
+</li><li>
+<p>An association_autoreloading plugin has been added to <a
+href="../../../classes/Sequel.html">Sequel</a>, which removes stale
+many_to_one associations from the cache when the associated foreign key
+setter is used to change the value of the foreign key.</p>
+</li><li>
+<p>bin/sequel now operates more like a standard *nix utility. If given a file
+on the command line after the connection string, it will assume that file
+has ruby code and load it. If stdin is not a tty, it will read from stdin
+and execute it as ruby code.</p>
+
+<p>For recent Linux users, this means you can have a shebang line such as:</p>
+
+<pre class="ruby"><span class="ruby-comment">#!/usr/bin/sequel postgres://user:pass@host/db</span></pre>
+
+<p>to create a self contained script.</p>
+</li><li>
+<p>bin/sequel now supports -r and -I options similar to ruby&#39;s -r and -I
+options.</p>
+</li><li>
+<p>MySQL datasets now have a calc_found_rows method that uses
+SQL_CALC_FOUND_ROWS, which provides a fast way to limit the number of
+results returned by a dataset while having an easy way to determine how
+many rows would have been returned if no limit was applied.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The Sequel::Model.plugin method can now be overridden just like any other
+method.  Previously, it was the only method that was defined directly on
+the class.  This allows the creation of plugins that can modify the plugin
+system itself.</p>
+</li><li>
+<p>Symbol splitting (:table__column___alias) now works correctly for
+identifiers that include characters that aren&#39;t in [w ]. Among other
+things, this means that identifiers with accented characters or even kanji
+characters can be used with symbol splitting.</p>
+</li><li>
+<p>If cover? is defined, it is now used in preference to include? for the
+validates_includes/validates_inclusion_of validations. ruby 1.9 defines
+include? differently for some ranges and can be very slow, while cover? is
+similar to the 1.8 behavior of just checking the beginning and end of the
+range.</p>
+</li><li>
+<p>The bin/sequel -L option now takes effect even if the -m, -C, -d, or -D
+options are used.</p>
+</li><li>
+<p>The schema_dumper extension now recognizes the “bigint unsigned” type.</p>
+</li><li>
+<p>On Microsoft SQL Server, if joining to a subselect that uses a common table
+expression, that common table expression is promoted to the main dataset. 
+This allows most queries to work correctly, but is vulnerable to issues if
+both the current dataset and the joined dataset use common table
+expressions with the same name.  Unfortunately, unlike PostgreSQL,
+Microsoft SQL Server does not allow common table expressions to occur in
+subselects.</p>
+</li><li>
+<p>The NULL/NOT NULL, DEFAULT, and UNIQUE column options now use the proper
+order on H2 and Oracle, so they can now be used in conjunction with each
+other.</p>
+</li><li>
+<p>Row locks are now enabled on Oracle.</p>
+</li><li>
+<p>The join_table method on MySQL no longer ignores the block it was given.</p>
+</li><li>
+<p>The informix adapter now supports ruby-informix version &gt;= 0.7.3, while
+still being backwards compatible with older versions.</p>
+</li><li>
+<p>The specs now run under both RSpec 2 and RSpec 1.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

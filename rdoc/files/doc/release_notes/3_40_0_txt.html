@@ -1,126 +1,128 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.40.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.40.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.40.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2012-09-26 14:22:27 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now has vastly improved
-            support for Microsoft Access.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the CUBRID
-            database, with a cubrid adapter that uses the cubrid gem, and a jdbc/cubrid
-            adapter for accessing CUBRID via JDBC on JRuby.</p>
-            </li><li>
-            <p>The association_pks plugin now supports composite keys.</p>
-            </li><li>
-            <p>Database#transaction now accepts a :disconnect=&gt;:retry option, in which
-            case it will automatically retry the block if it detects a disconnection. 
-            This is potentially dangerous, and should only be used if the entire block
-            is idempotent.  There is also no checking against an infinite retry loop.</p>
-            </li><li>
-            <p>SQL::CaseExpression#with_merged_expression has been added, for converting a
-            CaseExpression with an associated expression to one without an associated
-            expression, by merging the expression into each condition.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now quotes
-            arguments/columns in common table expressions.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles nil values
-            correctly in the pg_row extension.</p>
-            </li><li>
-            <p>Sequel::Postgres::HStore instances can now be marshalled.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses clob for String
-            :text=&gt;true types on databases that don&#39;t support a text type.</p>
-            </li><li>
-            <p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now quotes
-            channel identifier names when using LISTEN/NOTIFY.</p>
-            </li><li>
-            <p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now
-            correctly handles the case where named type conversion procs have been
-            added before the Database object is instantiated.</p>
-            </li><li>
-            <p>On DB2, <a href="../../../classes/Sequel.html">Sequel</a> now explicitly
-            sets NOT NULL for unique constraint columns instead of foreign key columns.
-            DB2 does not allow columns in unique constraints to be NULL, but does allow
-            foreign key columns to be NULL.</p>
-            </li><li>
-            <p>In the oracle adapter, clob values are now returned as ruby strings upon
-            retrieval.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now detects more types of
-            disconnections in the postgres, mysql, and mysql2 adapters.</p>
-            </li><li>
-            <p>If a database provides a default column value that isn&#39;t a ruby string,
-            it is used directly as the ruby default, instead of causing the schema
-            parsing to fail.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Code using Sequel&#39;s oracle adapter that expected clob values to be
-            returned as OCI8::CLOB instances needs to be modified to work with ruby
-            strings.</p>
-            </li><li>
-            <p>Because <a href="../../../classes/Sequel.html">Sequel</a> now quotes column
-            names in common table expressions, those names are now case sensitive,
-            which could break certain poorly coded queries.  Similar issues exist with
-            the quoting of channel identifier names in LISTEN/NOTIFY on PostgreSQL.</p>
-            </li><li>
-            <p>The private Database#requires_return_generated_keys? method has been
-            removed from the jdbc adapter.  Custom jdbc subadapters relying on this
-            method should override the private Database#execute_statement_insert method
-            instead to ensure that RETURN_GENERATED_KEYS is used for insert statements.</p>
-            </li><li>
-            <p>The private Dataset#argument_list and argument_list_append methods have
-            been removed.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.40.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.40.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.40.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2012-09-26 14:22:27 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now has vastly improved
+support for Microsoft Access.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the CUBRID
+database, with a cubrid adapter that uses the cubrid gem, and a jdbc/cubrid
+adapter for accessing CUBRID via JDBC on JRuby.</p>
+</li><li>
+<p>The association_pks plugin now supports composite keys.</p>
+</li><li>
+<p>Database#transaction now accepts a :disconnect=&gt;:retry option, in which
+case it will automatically retry the block if it detects a disconnection. 
+This is potentially dangerous, and should only be used if the entire block
+is idempotent.  There is also no checking against an infinite retry loop.</p>
+</li><li>
+<p>SQL::CaseExpression#with_merged_expression has been added, for converting a
+CaseExpression with an associated expression to one without an associated
+expression, by merging the expression into each condition.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now quotes
+arguments/columns in common table expressions.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles nil values
+correctly in the pg_row extension.</p>
+</li><li>
+<p>Sequel::Postgres::HStore instances can now be marshalled.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now uses clob for String
+:text=&gt;true types on databases that don&#39;t support a text type.</p>
+</li><li>
+<p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now quotes
+channel identifier names when using LISTEN/NOTIFY.</p>
+</li><li>
+<p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now
+correctly handles the case where named type conversion procs have been
+added before the Database object is instantiated.</p>
+</li><li>
+<p>On DB2, <a href="../../../classes/Sequel.html">Sequel</a> now explicitly
+sets NOT NULL for unique constraint columns instead of foreign key columns.
+DB2 does not allow columns in unique constraints to be NULL, but does allow
+foreign key columns to be NULL.</p>
+</li><li>
+<p>In the oracle adapter, clob values are now returned as ruby strings upon
+retrieval.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now detects more types of
+disconnections in the postgres, mysql, and mysql2 adapters.</p>
+</li><li>
+<p>If a database provides a default column value that isn&#39;t a ruby string,
+it is used directly as the ruby default, instead of causing the schema
+parsing to fail.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Code using Sequel&#39;s oracle adapter that expected clob values to be
+returned as OCI8::CLOB instances needs to be modified to work with ruby
+strings.</p>
+</li><li>
+<p>Because <a href="../../../classes/Sequel.html">Sequel</a> now quotes column
+names in common table expressions, those names are now case sensitive,
+which could break certain poorly coded queries.  Similar issues exist with
+the quoting of channel identifier names in LISTEN/NOTIFY on PostgreSQL.</p>
+</li><li>
+<p>The private Database#requires_return_generated_keys? method has been
+removed from the jdbc adapter.  Custom jdbc subadapters relying on this
+method should override the private Database#execute_statement_insert method
+instead to ensure that RETURN_GENERATED_KEYS is used for insert statements.</p>
+</li><li>
+<p>The private Dataset#argument_list and argument_list_append methods have
+been removed.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

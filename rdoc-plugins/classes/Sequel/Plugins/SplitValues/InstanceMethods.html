@@ -1,98 +1,103 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::SplitValues::InstanceMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::SplitValues::InstanceMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/split_values_rb.html">lib/sequel/plugins/split_values.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-5B-5D">[]</a></li>
-              <li><a href="#method-i-split_noncolumn_values">split_noncolumn_values</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-5B-5D'>
-                <a name='method-i-5B-5D'></a>
-                <div class='synopsis'>
-                  <span class='name'>[]</span>
-                  <span class='arguments'>(k)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If there isn&#39;t an entry in the values hash, but there is a
-                  noncolumn_values hash, look in that hash for the value.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/plugins/split_values.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">k</span>)&#x000A;  <span class="ruby-keyword">if</span>  (<span class="ruby-identifier">res</span> = <span class="ruby-keyword">super</span>).<span class="ruby-identifier">nil?</span>&#x000A;    <span class="ruby-ivar">@noncolumn_values</span>[<span class="ruby-identifier">k</span>] <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@values</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@noncolumn_values</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">res</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-split_noncolumn_values'>
-                <a name='method-i-split_noncolumn_values'></a>
-                <div class='synopsis'>
-                  <span class='name'>split_noncolumn_values</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Check all entries in the values hash.  If any of the keys are not columns,
-                  move the entry into the noncolumn_values hash.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-split_noncolumn_values-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-split_noncolumn_values-source'><span class="ruby-comment"># File lib/sequel/plugins/split_values.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">split_noncolumn_values</span>&#x000A;  <span class="ruby-identifier">cols</span> = (<span class="ruby-ivar">@values</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span>&#x000A;&#x000A;  <span class="ruby-identifier">nc</span> = <span class="ruby-ivar">@noncolumn_values</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>&#x000A;  <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">nc</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::SplitValues::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::SplitValues::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/split_values_rb.html">lib/sequel/plugins/split_values.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-5B-5D">[]</a></li>
+<li><a href="#method-i-split_noncolumn_values">split_noncolumn_values</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-5B-5D'>
+<a name='method-i-5B-5D'></a>
+<div class='synopsis'>
+<span class='name'>[]</span>
+<span class='arguments'>(k)</span>
+
+</div>
+<div class='description'>
+
+<p>If there isn&#39;t an entry in the values hash, but there is a
+noncolumn_values hash, look in that hash for the value.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/plugins/split_values.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">k</span>)&#x000A;  <span class="ruby-keyword">if</span>  (<span class="ruby-identifier">res</span> = <span class="ruby-keyword">super</span>).<span class="ruby-identifier">nil?</span>&#x000A;    <span class="ruby-ivar">@noncolumn_values</span>[<span class="ruby-identifier">k</span>] <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@values</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@noncolumn_values</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">res</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-split_noncolumn_values'>
+<a name='method-i-split_noncolumn_values'></a>
+<div class='synopsis'>
+<span class='name'>split_noncolumn_values</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Check all entries in the values hash.  If any of the keys are not columns,
+move the entry into the noncolumn_values hash.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-split_noncolumn_values-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-split_noncolumn_values-source'><span class="ruby-comment"># File lib/sequel/plugins/split_values.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_noncolumn_values</span>&#x000A;  <span class="ruby-identifier">cols</span> = (<span class="ruby-ivar">@values</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">self</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">empty?</span>&#x000A;&#x000A;  <span class="ruby-identifier">nc</span> = <span class="ruby-ivar">@noncolumn_values</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-identifier">vals</span> = <span class="ruby-ivar">@values</span>&#x000A;  <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">nc</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

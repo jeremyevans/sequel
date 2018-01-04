@@ -1,64 +1,66 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>server_logging.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>server_logging.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/server_logging.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-05-12 12:28:13 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The server_logging extension makes the logger include the server/shard the
-            query was issued on.  This makes it easier to use the logs when using
-            sharding.</p>
-            
-            <p>Example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[:<span class="ruby-identifier">server</span>]&#x000A;<span class="ruby-comment"># {:read_only=&gt;{}, :b=&gt;{}}</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_logging</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># (0.000005s) (conn: 1014942550, server: read_only) SELECT * FROM a</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># (0.000004s) (conn: 997304100, server: b) SELECT * FROM a</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-comment"># (0.000004s) (conn: 1014374750, server: default) INSERT INTO a DEFAULT VALUES</span></pre>
-            
-            <p>In order for the server/shard to be correct for all connections, you need
-            to use this before connections to the database are made, or you need to
-            call <code>Database#disconnect</code> after loading this extension.</p>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/ServerLogging.html">Sequel::ServerLogging</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>server_logging.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>server_logging.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/server_logging.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-05-12 12:28:13 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The server_logging extension makes the logger include the server/shard the
+query was issued on.  This makes it easier to use the logs when using
+sharding.</p>
+
+<p>Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]&#x000A;<span class="ruby-comment"># {:read_only=&gt;{}, :b=&gt;{}}</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_logging</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># (0.000005s) (conn: 1014942550, server: read_only) SELECT * FROM a</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># (0.000004s) (conn: 997304100, server: b) SELECT * FROM a</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-comment"># (0.000004s) (conn: 1014374750, server: default) INSERT INTO a DEFAULT VALUES</span></pre>
+
+<p>In order for the server/shard to be correct for all connections, you need
+to use this before connections to the database are made, or you need to
+call <code>Database#disconnect</code> after loading this extension.</p>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/ServerLogging.html">Sequel::ServerLogging</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

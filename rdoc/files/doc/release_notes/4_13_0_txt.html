@@ -1,205 +1,207 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.13.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.13.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.13.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2014-08-01 10:46:54 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A modification_detection plugin has been added, for automatic detection of
-            in-place column value modifications.  This makes it so you don&#39;t have
-            to call Model#modified! manually when changing a value in place.</p>
-            </li><li>
-            <p>A column_select plugin has been added, for automatically selecting
-            explicitly qualified columns in model datasets. Example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">column_select</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT albums.id, albums.name, albums.artist_id</span>&#x000A;<span class="ruby-comment"># FROM albums</span></pre>
-            </li><li>
-            <p>An insert_returning_select plugin has been added, for automatically setting
-            up RETURNING clauses for models that select explicit columns.  This is
-            useful when using the column_select or lazy_attributes plugins.</p>
-            </li><li>
-            <p>A pg_enum extension has been added, for easier dealing with PostgreSQL enum
-            types.  The possible values for the type are then returned in the schema
-            hashes under the :enum_values key.  It also adds create_enum, drop_enum,
-            and add_enum_value Database methods for migration support.</p>
-            </li><li>
-            <p>A round_timestamps extension has been added, for automatically rounding
-            timestamps to database supported precision when literalizing.</p>
-            </li><li>
-            <p>A dataset_source_alias extension has been added, for automatically aliasing
-            datasets to their first source, instead of using t1, t2. Example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">dataset_source_alias</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS b</span></pre>
-            </li><li>
-            <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html">Sequel</a>
-            now emulates RETURNING support using the OUTPUT clause, as long as only
-            simple column references are used.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A regression has been fixed in the timestamps and table inheritance
-            plugins, where column values would not be saved when skipping validations. 
-            This was first broken in 4.11.0.</p>
-            </li><li>
-            <p>A regression has been fixed on JRuby and Rubinius when using
-            Sequel::Model(dataset) if the dataset needs to literalize a symbol (and
-            most do).  This was first broken in 4.10.0.</p>
-            </li><li>
-            <p>Primary keys are now automatically setup for models even if the models
-            select specific columns.</p>
-            </li><li>
-            <p>The lazy_attributes plugin now uses qualified columns in its selection,
-            instead of unqualified columns.</p>
-            </li><li>
-            <p>When looking up model instances by primary key, <a
-            href="../../../classes/Sequel.html">Sequel</a> now uses a qualified primary
-            key if the model uses a joined dataset.</p>
-            </li><li>
-            <p>For associations that require joins, <a
-            href="../../../classes/Sequel.html">Sequel</a> will now use the associated
-            model&#39;s selection directly (instead of associated_table.*) if the
-            associated model&#39;s selection consists solely of qualified columns.</p>
-            
-            <p>Among other things, this means that a many_to_many association to  a model
-            that uses lazy attributes will not eagerly load the lazy attributes by
-            default.</p>
-            </li><li>
-            <p>Model#save now uses insert_select if there is an existing RETURNING clause
-            used by the underlying dataset, even if the model selects specific columns.</p>
-            </li><li>
-            <p>In Dataset#insert, aliased tables are now automatically unaliased. This
-            allows you to use a dataset with an aliased table and have full
-            SELECT/INSERT/UPDATE/DELETE support, assuming the database supports aliased
-            tables in UPDATE and DELETE.</p>
-            </li><li>
-            <p>Dataset#graph now qualifies columns correctly if the current dataset is a
-            joined dataset and it moves the current dataset to a subselect.</p>
-            </li><li>
-            <p>Dataset#joined_dataset? is now a public method, and can be used to
-            determine whether the dataset uses a join, either explicitly via JOIN or
-            implicitly via multiple FROM tables.</p>
-            </li><li>
-            <p>The Dataset#unqualified_column_for helper method has been added, returning
-            the unqualified version of a possibly qualified column.</p>
-            </li><li>
-            <p>The composition and serialization plugins now support validations on the
-            underlying columns.  Previously, they didn&#39;t update the underlying
-            columns until after validations were performed.  This works better when
-            using the auto_validations plugin.</p>
-            </li><li>
-            <p>The class_table_inheritance plugin now uses JOIN ON instead of JOIN USING,
-            which makes it work on all databases that <a
-            href="../../../classes/Sequel.html">Sequel</a> supports.  Additionally, the
-            plugin now explicitly selects qualified columns from all of the tables.</p>
-            </li><li>
-            <p>The list plugin now adds an after_destroy hook that will renumber rows
-            after the current row, similar to how moving existing values in the list
-            works.</p>
-            </li><li>
-            <p>The pg_json extension is now faster when json column value is a plain
-            string, number, true, false, or nil, if the underlying json library handles
-            such values natively.</p>
-            </li><li>
-            <p>External jdbc, odbc, and do subadapters can now be loaded automatically
-            without requiring them first, assuming proper support in the external
-            subadapter.</p>
-            </li><li>
-            <p>When using create_table on MySQL, correctly handle the :key option to when
-            calling foreign_key with a column reference.</p>
-            </li><li>
-            <p>On Oracle, use all_tab_cols instead of user_tab_cols for getting default
-            values when parsing the schema.  This makes it work if the user does not
-            own the table.</p>
-            </li><li>
-            <p>On Oracle, use all_tables and all_views for Database#tables and
-            Database#views.  This works better for users with limited rights.</p>
-            </li><li>
-            <p>Additional disconnect errors are now recognized in the postgres and
-            jdbc/mysql adapters.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> now uses
-            copy constructors (e.g. initialize_copy) instead of overriding dup and
-            clone.</p>
-            </li><li>
-            <p>The rake default task now runs plugin specs in addition to core and model
-            specs.</p>
-            </li></ul>
-            
-            <h1 id="label-bin-2Fsequel+Improvements">bin/sequel Improvements<span><a href="#label-bin-2Fsequel+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Add the sequel lib directory to the front of the load path instead of the
-            end, fixing cases where you end up requiring an old version of the sequel
-            gem (e.g. by using sequel_pg).</p>
-            </li><li>
-            <p>Add the sequel lib directory as an absolute path, fixing cases where you
-            later change the current directory.</p>
-            </li><li>
-            <p>Require sequel later in the code, so that bin/sequel -h doesn&#39;t need to
-            require sequel, and full backtrace is not printed if requiring sequel
-            raises an error (unless -t is used).</p>
-            </li><li>
-            <p>If an exception is raised, put a newline between the exception message and
-            backtrace.</p>
-            </li><li>
-            <p>Don&#39;t allow usage of -C with any of -cdDmS.</p>
-            </li><li>
-            <p>If sequel -v is given along with a database or code string to execute,
-            print the <a href="../../../classes/Sequel.html">Sequel</a> version but
-            also continue, similar to how ruby -v works.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The switch from JOIN ON to JOIN USING in the class_table_inheritance can
-            break certain usage, such as querying using unqualified primary key.  Users
-            should switch to using a qualified primary key instead.</p>
-            </li><li>
-            <p>Calling Dataset#returning when the underlying database does not support it
-            now raises an Error.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.13.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.13.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.13.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2014-08-01 10:46:54 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A modification_detection plugin has been added, for automatic detection of
+in-place column value modifications.  This makes it so you don&#39;t have
+to call Model#modified! manually when changing a value in place.</p>
+</li><li>
+<p>A column_select plugin has been added, for automatically selecting
+explicitly qualified columns in model datasets. Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_select</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT albums.id, albums.name, albums.artist_id</span>&#x000A;<span class="ruby-comment"># FROM albums</span></pre>
+</li><li>
+<p>An insert_returning_select plugin has been added, for automatically setting
+up RETURNING clauses for models that select explicit columns.  This is
+useful when using the column_select or lazy_attributes plugins.</p>
+</li><li>
+<p>A pg_enum extension has been added, for easier dealing with PostgreSQL enum
+types.  The possible values for the type are then returned in the schema
+hashes under the :enum_values key.  It also adds create_enum, drop_enum,
+and add_enum_value Database methods for migration support.</p>
+</li><li>
+<p>A round_timestamps extension has been added, for automatically rounding
+timestamps to database supported precision when literalizing.</p>
+</li><li>
+<p>A dataset_source_alias extension has been added, for automatically aliasing
+datasets to their first source, instead of using t1, t2. Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:dataset_source_alias</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS b</span></pre>
+</li><li>
+<p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html">Sequel</a>
+now emulates RETURNING support using the OUTPUT clause, as long as only
+simple column references are used.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A regression has been fixed in the timestamps and table inheritance
+plugins, where column values would not be saved when skipping validations. 
+This was first broken in 4.11.0.</p>
+</li><li>
+<p>A regression has been fixed on JRuby and Rubinius when using
+Sequel::Model(dataset) if the dataset needs to literalize a symbol (and
+most do).  This was first broken in 4.10.0.</p>
+</li><li>
+<p>Primary keys are now automatically setup for models even if the models
+select specific columns.</p>
+</li><li>
+<p>The lazy_attributes plugin now uses qualified columns in its selection,
+instead of unqualified columns.</p>
+</li><li>
+<p>When looking up model instances by primary key, <a
+href="../../../classes/Sequel.html">Sequel</a> now uses a qualified primary
+key if the model uses a joined dataset.</p>
+</li><li>
+<p>For associations that require joins, <a
+href="../../../classes/Sequel.html">Sequel</a> will now use the associated
+model&#39;s selection directly (instead of associated_table.*) if the
+associated model&#39;s selection consists solely of qualified columns.</p>
+
+<p>Among other things, this means that a many_to_many association to  a model
+that uses lazy attributes will not eagerly load the lazy attributes by
+default.</p>
+</li><li>
+<p>Model#save now uses insert_select if there is an existing RETURNING clause
+used by the underlying dataset, even if the model selects specific columns.</p>
+</li><li>
+<p>In Dataset#insert, aliased tables are now automatically unaliased. This
+allows you to use a dataset with an aliased table and have full
+SELECT/INSERT/UPDATE/DELETE support, assuming the database supports aliased
+tables in UPDATE and DELETE.</p>
+</li><li>
+<p>Dataset#graph now qualifies columns correctly if the current dataset is a
+joined dataset and it moves the current dataset to a subselect.</p>
+</li><li>
+<p>Dataset#joined_dataset? is now a public method, and can be used to
+determine whether the dataset uses a join, either explicitly via JOIN or
+implicitly via multiple FROM tables.</p>
+</li><li>
+<p>The Dataset#unqualified_column_for helper method has been added, returning
+the unqualified version of a possibly qualified column.</p>
+</li><li>
+<p>The composition and serialization plugins now support validations on the
+underlying columns.  Previously, they didn&#39;t update the underlying
+columns until after validations were performed.  This works better when
+using the auto_validations plugin.</p>
+</li><li>
+<p>The class_table_inheritance plugin now uses JOIN ON instead of JOIN USING,
+which makes it work on all databases that <a
+href="../../../classes/Sequel.html">Sequel</a> supports.  Additionally, the
+plugin now explicitly selects qualified columns from all of the tables.</p>
+</li><li>
+<p>The list plugin now adds an after_destroy hook that will renumber rows
+after the current row, similar to how moving existing values in the list
+works.</p>
+</li><li>
+<p>The pg_json extension is now faster when json column value is a plain
+string, number, true, false, or nil, if the underlying json library handles
+such values natively.</p>
+</li><li>
+<p>External jdbc, odbc, and do subadapters can now be loaded automatically
+without requiring them first, assuming proper support in the external
+subadapter.</p>
+</li><li>
+<p>When using create_table on MySQL, correctly handle the :key option to when
+calling foreign_key with a column reference.</p>
+</li><li>
+<p>On Oracle, use all_tab_cols instead of user_tab_cols for getting default
+values when parsing the schema.  This makes it work if the user does not
+own the table.</p>
+</li><li>
+<p>On Oracle, use all_tables and all_views for Database#tables and
+Database#views.  This works better for users with limited rights.</p>
+</li><li>
+<p>Additional disconnect errors are now recognized in the postgres and
+jdbc/mysql adapters.</p>
+</li><li>
+<p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> now uses
+copy constructors (e.g. initialize_copy) instead of overriding dup and
+clone.</p>
+</li><li>
+<p>The rake default task now runs plugin specs in addition to core and model
+specs.</p>
+</li></ul>
+
+<h1 id="label-bin-2Fsequel+Improvements">bin/sequel Improvements<span><a href="#label-bin-2Fsequel+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Add the sequel lib directory to the front of the load path instead of the
+end, fixing cases where you end up requiring an old version of the sequel
+gem (e.g. by using sequel_pg).</p>
+</li><li>
+<p>Add the sequel lib directory as an absolute path, fixing cases where you
+later change the current directory.</p>
+</li><li>
+<p>Require sequel later in the code, so that bin/sequel -h doesn&#39;t need to
+require sequel, and full backtrace is not printed if requiring sequel
+raises an error (unless -t is used).</p>
+</li><li>
+<p>If an exception is raised, put a newline between the exception message and
+backtrace.</p>
+</li><li>
+<p>Don&#39;t allow usage of -C with any of -cdDmS.</p>
+</li><li>
+<p>If sequel -v is given along with a database or code string to execute,
+print the <a href="../../../classes/Sequel.html">Sequel</a> version but
+also continue, similar to how ruby -v works.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The switch from JOIN ON to JOIN USING in the class_table_inheritance can
+break certain usage, such as querying using unqualified primary key.  Users
+should switch to using a qualified primary key instead.</p>
+</li><li>
+<p>Calling Dataset#returning when the underlying database does not support it
+now raises an Error.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

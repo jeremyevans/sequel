@@ -1,199 +1,206 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::JDBC::TypeConvertor</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::JDBC::TypeConvertor
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/adapters/jdbc_rb.html">lib/sequel/adapters/jdbc.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../../files/lib/sequel/adapters/jdbc/mysql_rb.html">lib/sequel/adapters/jdbc/mysql.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>Object</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-RubyBigDecimal">RubyBigDecimal</a></li>
-              <li><a href="#method-i-RubyBlob">RubyBlob</a></li>
-              <li><a href="#method-i-RubyClob">RubyClob</a></li>
-              <li><a href="#method-i-RubyDate">RubyDate</a></li>
-              <li><a href="#method-i-RubyTime">RubyTime</a></li>
-              <li><a href="#method-i-RubyTimestamp">RubyTimestamp</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="TypeConvertor/Java.html">Sequel::JDBC::TypeConvertor::Java</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BASIC_MAP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>MAP.dup</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>MAP</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Hash.new(o.method(:Object))</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-RubyBigDecimal'>
-                <a name='method-i-RubyBigDecimal'></a>
-                <div class='synopsis'>
-                  <span class='name'>RubyBigDecimal</span>
-                  <span class='arguments'>(r, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyBigDecimal-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-RubyBigDecimal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyBigDecimal</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBigDecimal</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-RubyBlob'>
-                <a name='method-i-RubyBlob'></a>
-                <div class='synopsis'>
-                  <span class='name'>RubyBlob</span>
-                  <span class='arguments'>(r, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyBlob-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-RubyBlob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyBlob</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBytes</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">v</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-RubyClob'>
-                <a name='method-i-RubyClob'></a>
-                <div class='synopsis'>
-                  <span class='name'>RubyClob</span>
-                  <span class='arguments'>(r, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyClob-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-RubyClob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyClob</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getClob</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-RubyDate'>
-                <a name='method-i-RubyDate'></a>
-                <div class='synopsis'>
-                  <span class='name'>RubyDate</span>
-                  <span class='arguments'>(r, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyDate-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-RubyDate-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyDate</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getDate</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-RubyTime'>
-                <a name='method-i-RubyTime'></a>
-                <div class='synopsis'>
-                  <span class='name'>RubyTime</span>
-                  <span class='arguments'>(r, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyTime-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-RubyTime-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyTime</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getTime</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v.to_string}.#{sprintf(&#39;%03i&#39;, v.getTime.divmod(1000).last)}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-RubyTimestamp'>
-                <a name='method-i-RubyTimestamp'></a>
-                <div class='synopsis'>
-                  <span class='name'>RubyTimestamp</span>
-                  <span class='arguments'>(r, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyTimestamp-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-RubyTimestamp-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyTimestamp</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getTimestamp</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_to_application_timestamp</span>([<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getHours</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMinutes</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSeconds</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getNanos</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::JDBC::TypeConvertor</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::JDBC::TypeConvertor
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/jdbc_rb.html">lib/sequel/adapters/jdbc.rb</a>
+</li>
+<li class='other'>
+<a href="../../../files/lib/sequel/adapters/jdbc/mysql_rb.html">lib/sequel/adapters/jdbc/mysql.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Object</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-RubyBigDecimal">RubyBigDecimal</a></li>
+<li><a href="#method-i-RubyBlob">RubyBlob</a></li>
+<li><a href="#method-i-RubyClob">RubyClob</a></li>
+<li><a href="#method-i-RubyDate">RubyDate</a></li>
+<li><a href="#method-i-RubyTime">RubyTime</a></li>
+<li><a href="#method-i-RubyTimestamp">RubyTimestamp</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="TypeConvertor/Java.html">Sequel::JDBC::TypeConvertor::Java</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>BASIC_MAP</td>
+<td>=</td>
+<td class='context-item-value'>MAP.dup</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MAP</td>
+<td>=</td>
+<td class='context-item-value'>Hash.new(o.method(:Object))</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-RubyBigDecimal'>
+<a name='method-i-RubyBigDecimal'></a>
+<div class='synopsis'>
+<span class='name'>RubyBigDecimal</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-RubyBigDecimal-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-RubyBigDecimal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyBigDecimal</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBigDecimal</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-RubyBlob'>
+<a name='method-i-RubyBlob'></a>
+<div class='synopsis'>
+<span class='name'>RubyBlob</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-RubyBlob-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-RubyBlob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyBlob</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBytes</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">v</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-RubyClob'>
+<a name='method-i-RubyClob'></a>
+<div class='synopsis'>
+<span class='name'>RubyClob</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-RubyClob-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-RubyClob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyClob</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getClob</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-RubyDate'>
+<a name='method-i-RubyDate'></a>
+<div class='synopsis'>
+<span class='name'>RubyDate</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-RubyDate-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-RubyDate-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyDate</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getDate</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-RubyTime'>
+<a name='method-i-RubyTime'></a>
+<div class='synopsis'>
+<span class='name'>RubyTime</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-RubyTime-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-RubyTime-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyTime</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getTime</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v.to_string}.#{sprintf(&#39;%03i&#39;, v.getTime.divmod(1000).last)}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-RubyTimestamp'>
+<a name='method-i-RubyTimestamp'></a>
+<div class='synopsis'>
+<span class='name'>RubyTimestamp</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-RubyTimestamp-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-RubyTimestamp-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyTimestamp</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getTimestamp</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_to_application_timestamp</span>([<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getHours</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMinutes</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSeconds</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getNanos</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,138 +1,147 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::Touch::InstanceMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::Touch::InstanceMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/touch_rb.html">lib/sequel/plugins/touch.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-after_create">after_create</a></li>
-              <li><a href="#method-i-after_destroy">after_destroy</a></li>
-              <li><a href="#method-i-after_update">after_update</a></li>
-              <li><a href="#method-i-touch">touch</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-after_create'>
-                <a name='method-i-after_create'></a>
-                <div class='synopsis'>
-                  <span class='name'>after_create</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="../Touch.html">Touch</a> all of the model&#39;s
-                  touched_associations when creating the object.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_create-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-after_create-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-after_destroy'>
-                <a name='method-i-after_destroy'></a>
-                <div class='synopsis'>
-                  <span class='name'>after_destroy</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="../Touch.html">Touch</a> all of the model&#39;s
-                  touched_associations when destroying the object.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_destroy-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 91</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-after_update'>
-                <a name='method-i-after_update'></a>
-                <div class='synopsis'>
-                  <span class='name'>after_update</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="../Touch.html">Touch</a> all of the model&#39;s
-                  touched_associations when updating the object.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_update-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 97</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-touch'>
-                <a name='method-i-touch'></a>
-                <div class='synopsis'>
-                  <span class='name'>touch</span>
-                  <span class='arguments'>(column=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="../Touch.html">Touch</a> the model object.  If a column is not
-                  given, use the model&#39;s touch_column as the column.  If the column to
-                  use is not one of the model&#39;s columns, just save the changes to the
-                  object instead of attempting to a value that doesn&#39;t exist.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-touch-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-touch-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 106</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">touch</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_instance_value</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_instance_value</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::Touch::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::Touch::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/touch_rb.html">lib/sequel/plugins/touch.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-after_create">after_create</a></li>
+<li><a href="#method-i-after_destroy">after_destroy</a></li>
+<li><a href="#method-i-after_update">after_update</a></li>
+<li><a href="#method-i-touch">touch</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-after_create'>
+<a name='method-i-after_create'></a>
+<div class='synopsis'>
+<span class='name'>after_create</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../Touch.html">Touch</a> all of the model&#39;s
+touched_associations when creating the object.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_create-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-after_create-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-after_destroy'>
+<a name='method-i-after_destroy'></a>
+<div class='synopsis'>
+<span class='name'>after_destroy</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../Touch.html">Touch</a> all of the model&#39;s
+touched_associations when destroying the object.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_destroy-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 91</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-after_update'>
+<a name='method-i-after_update'></a>
+<div class='synopsis'>
+<span class='name'>after_update</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../Touch.html">Touch</a> all of the model&#39;s
+touched_associations when updating the object.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_update-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 97</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-touch'>
+<a name='method-i-touch'></a>
+<div class='synopsis'>
+<span class='name'>touch</span>
+<span class='arguments'>(column=nil)</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../Touch.html">Touch</a> the model object.  If a column is not
+given, use the model&#39;s touch_column as the column.  If the column to
+use is not one of the model&#39;s columns, just save the changes to the
+object instead of attempting to a value that doesn&#39;t exist.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-touch-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-touch-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 106</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">touch</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">touch_instance_value</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">touch_instance_value</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

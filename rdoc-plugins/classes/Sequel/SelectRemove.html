@@ -1,98 +1,101 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::SelectRemove</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::SelectRemove
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/extensions/select_remove_rb.html">lib/sequel/extensions/select_remove.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-select_remove">select_remove</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-select_remove'>
-                <a name='method-i-select_remove'></a>
-                <div class='synopsis'>
-                  <span class='name'>select_remove</span>
-                  <span class='arguments'>(*cols)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Remove columns from the list of selected columns.  If any of the currently
-                  selected columns use expressions/aliases, this will remove selected columns
-                  with the given aliases.  It will also remove entries from the selection
-                  that match exactly:</p>
-                  
-                  <pre class="ruby"><span class="ruby-comment"># Assume columns a, b, and c in items table</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>] <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_remove</span>(:<span class="ruby-identifier">c</span>) <span class="ruby-comment"># SELECT a, b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">b</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">c</span>), <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">c</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)).<span class="ruby-identifier">select_remove</span>(:<span class="ruby-identifier">c</span>) <span class="ruby-comment"># SELECT a, c AS b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">b</span>][:<span class="ruby-identifier">c</span>], <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">c</span>][:<span class="ruby-identifier">b</span>]).<span class="ruby-identifier">select_remove</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">c</span>][:<span class="ruby-identifier">b</span>]) <span class="ruby-comment"># SELECT a, b AS c FROM items</span></pre>
-                  
-                  <p>Note that there are a few cases where this method may not work correctly:</p>
-                  <ul><li>
-                  <p>This dataset joins multiple tables and does not have an existing explicit
-                  selection. In this case, the code will currently use unqualified column
-                  names for all columns the dataset returns, except for the columns given.</p>
-                  </li><li>
-                  <p>This dataset has an existing explicit selection containing an item that
-                  returns multiple database columns (e.g. <a href=":table">Sequel</a>.*,
-                  Sequel.lit(&#39;column1, column2&#39;)).  In this case, the behavior is
-                  undefined and this method should not be used.</p>
-                  </li></ul>
-                  
-                  <p>There may be other cases where this method does not work correctly, use it
-                  with caution.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-select_remove-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-select_remove-source'><span class="ruby-comment"># File lib/sequel/extensions/select_remove.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">select_remove</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sel</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sel</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">sel</span>).<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>} <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::SelectRemove</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::SelectRemove
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/extensions/select_remove_rb.html">lib/sequel/extensions/select_remove.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-select_remove">select_remove</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-select_remove'>
+<a name='method-i-select_remove'></a>
+<div class='synopsis'>
+<span class='name'>select_remove</span>
+<span class='arguments'>(*cols)</span>
+
+</div>
+<div class='description'>
+
+<p>Remove columns from the list of selected columns.  If any of the currently
+selected columns use expressions/aliases, this will remove selected columns
+with the given aliases.  It will also remove entries from the selection
+that match exactly:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Assume columns a, b, and c in items table</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>] <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>) <span class="ruby-comment"># SELECT a, b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:c</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:c</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:b</span>)).<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>) <span class="ruby-comment"># SELECT a, c AS b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>][<span class="ruby-value">:c</span>], <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:c</span>][<span class="ruby-value">:b</span>]).<span class="ruby-identifier">select_remove</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:c</span>][<span class="ruby-value">:b</span>]) <span class="ruby-comment"># SELECT a, b AS c FROM items</span></pre>
+
+<p>Note that there are a few cases where this method may not work correctly:</p>
+<ul><li>
+<p>This dataset joins multiple tables and does not have an existing explicit
+selection. In this case, the code will currently use unqualified column
+names for all columns the dataset returns, except for the columns given.</p>
+</li><li>
+<p>This dataset has an existing explicit selection containing an item that
+returns multiple database columns (e.g. <a href=":table">Sequel</a>.*,
+Sequel.lit(&#39;column1, column2&#39;)).  In this case, the behavior is
+undefined and this method should not be used.</p>
+</li></ul>
+
+<p>There may be other cases where this method does not work correctly, use it
+with caution.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-select_remove-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-select_remove-source'><span class="ruby-comment"># File lib/sequel/extensions/select_remove.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_remove</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sel</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sel</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">sel</span>).<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>} <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

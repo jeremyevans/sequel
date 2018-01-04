@@ -1,169 +1,176 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::ColumnConflicts::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::ColumnConflicts::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/column_conflicts_rb.html">lib/sequel/plugins/column_conflicts.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-check_column_conflicts">check_column_conflicts</a></li>
-              <li><a href="#method-i-freeze">freeze</a></li>
-              <li><a href="#method-i-get_column_conflict-21">get_column_conflict!</a></li>
-              <li><a href="#attribute-i-get_column_conflicts">get_column_conflicts</a></li>
-              <li><a href="#method-i-set_column_conflict-21">set_column_conflict!</a></li>
-              <li><a href="#attribute-i-set_column_conflicts">set_column_conflicts</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-get_column_conflicts'>get_column_conflicts</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="../../../Hash.html">Hash</a> for columns where the getter method
-                      already exists. keys are column symbols/strings that conflict with method
-                      names and should be looked up directly instead of calling a method, values
-                      are the column symbol to lookup in the values hash.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-set_column_conflicts'>set_column_conflicts</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="../../../Hash.html">Hash</a> for columns where the setter method
-                      already exists. keys are column symbols/strings suffixed with = that
-                      conflict with method names and should be set directly in the values hash,
-                      values are the column symbol to set in the values hash.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-check_column_conflicts'>
-                <a name='method-i-check_column_conflicts'></a>
-                <div class='synopsis'>
-                  <span class='name'>check_column_conflicts</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Compare the column names for the model with the methods defined on <a
-                  href="../../Model.html">Sequel::Model</a>, and automatically setup the
-                  column conflicts.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-check_column_conflicts-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-check_column_conflicts-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_column_conflicts</span>&#x000A;  <span class="ruby-identifier">mod</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">get_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-node">&quot;#{c}=&quot;</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Freeze column conflict information when freezing model class.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@get_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@set_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-get_column_conflict-21'>
-                <a name='method-i-get_column_conflict-21'></a>
-                <div class='synopsis'>
-                  <span class='name'>get_column_conflict!</span>
-                  <span class='arguments'>(column)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the given column as one with a getter method conflict.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-get_column_conflict-21-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-get_column_conflict-21-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-set_column_conflict-21'>
-                <a name='method-i-set_column_conflict-21'></a>
-                <div class='synopsis'>
-                  <span class='name'>set_column_conflict!</span>
-                  <span class='arguments'>(column)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the given column as one with a setter method conflict.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_conflict-21-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-set_column_conflict-21-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-value">:&quot;#{column}=&quot;</span>] = <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-node">&quot;#{column}=&quot;</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::ColumnConflicts::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::ColumnConflicts::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/column_conflicts_rb.html">lib/sequel/plugins/column_conflicts.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-check_column_conflicts">check_column_conflicts</a></li>
+<li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#method-i-get_column_conflict-21">get_column_conflict!</a></li>
+<li><a href="#attribute-i-get_column_conflicts">get_column_conflicts</a></li>
+<li><a href="#method-i-set_column_conflict-21">set_column_conflict!</a></li>
+<li><a href="#attribute-i-set_column_conflicts">set_column_conflicts</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-get_column_conflicts'>get_column_conflicts</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p><a href="../../../Hash.html">Hash</a> for columns where the getter method
+already exists. keys are column symbols/strings that conflict with method
+names and should be looked up directly instead of calling a method, values
+are the column symbol to lookup in the values hash.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-set_column_conflicts'>set_column_conflicts</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p><a href="../../../Hash.html">Hash</a> for columns where the setter method
+already exists. keys are column symbols/strings suffixed with = that
+conflict with method names and should be set directly in the values hash,
+values are the column symbol to set in the values hash.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-check_column_conflicts'>
+<a name='method-i-check_column_conflicts'></a>
+<div class='synopsis'>
+<span class='name'>check_column_conflicts</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Compare the column names for the model with the methods defined on <a
+href="../../Model.html">Sequel::Model</a>, and automatically setup the
+column conflicts.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-check_column_conflicts-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-check_column_conflicts-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_column_conflicts</span>&#x000A;  <span class="ruby-identifier">mod</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">get_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-node">&quot;#{c}=&quot;</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Freeze column conflict information when freezing model class.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@get_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@set_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-get_column_conflict-21'>
+<a name='method-i-get_column_conflict-21'></a>
+<div class='synopsis'>
+<span class='name'>get_column_conflict!</span>
+<span class='arguments'>(column)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the given column as one with a getter method conflict.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_column_conflict-21-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-get_column_conflict-21-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-set_column_conflict-21'>
+<a name='method-i-set_column_conflict-21'></a>
+<div class='synopsis'>
+<span class='name'>set_column_conflict!</span>
+<span class='arguments'>(column)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the given column as one with a setter method conflict.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_column_conflict-21-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set_column_conflict-21-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-value">:&quot;#{column}=&quot;</span>] = <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-node">&quot;#{column}=&quot;</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

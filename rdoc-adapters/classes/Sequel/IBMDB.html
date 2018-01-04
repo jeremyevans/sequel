@@ -1,129 +1,129 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::IBMDB</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::IBMDB
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/adapters/ibmdb_rb.html">lib/sequel/adapters/ibmdb.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-boolean">boolean</a></li>
-              <li><a href="#method-i-int">int</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="IBMDB/Connection.html">Sequel::IBMDB::Connection</a></li>
-              <li><a href="IBMDB/Database.html">Sequel::IBMDB::Database</a></li>
-              <li><a href="IBMDB/Dataset.html">Sequel::IBMDB::Dataset</a></li>
-              <li><a href="IBMDB/Statement.html">Sequel::IBMDB::Statement</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DB2_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      {
-                      :boolean => tt.method(:boolean),
-                      :int => tt.method(:int),
-                      :blob => ::Sequel::SQL::Blob.method(:new),
-                      :time => ::Sequel.method(:string_to_time),
-                      :date => ::Sequel.method(:string_to_date)
-                      }.freeze
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hash holding type translation methods, used by <a
-                      href="IBMDB/Dataset.html#method-i-fetch_rows">Sequel::IBMDB::Dataset#fetch_rows</a>.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-boolean'>
-                <a name='method-i-boolean'></a>
-                <div class='synopsis'>
-                  <span class='name'>boolean</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-boolean-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-int'>
-                <a name='method-i-int'></a>
-                <div class='synopsis'>
-                  <span class='name'>int</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-int-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-int-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">int</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::IBMDB</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::IBMDB
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/adapters/ibmdb_rb.html">lib/sequel/adapters/ibmdb.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-boolean">boolean</a></li>
+<li><a href="#method-i-int">int</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="IBMDB/Connection.html">Sequel::IBMDB::Connection</a></li>
+<li><a href="IBMDB/Database.html">Sequel::IBMDB::Database</a></li>
+<li><a href="IBMDB/Dataset.html">Sequel::IBMDB::Dataset</a></li>
+<li><a href="IBMDB/Statement.html">Sequel::IBMDB::Statement</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>DB2_TYPES</td>
+<td>=</td>
+<td class='context-item-value'>{
+:boolean => tt.method(:boolean),
+:int => tt.method(:int),
+:blob => ::Sequel::SQL::Blob.method(:new),
+:time => ::Sequel.method(:string_to_time),
+:date => ::Sequel.method(:string_to_date)
+}.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Hash holding type translation methods, used by <a
+href="IBMDB/Dataset.html#method-i-fetch_rows">Sequel::IBMDB::Dataset#fetch_rows</a>.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-boolean'>
+<a name='method-i-boolean'></a>
+<div class='synopsis'>
+<span class='name'>boolean</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-boolean-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-int'>
+<a name='method-i-int'></a>
+<div class='synopsis'>
+<span class='name'>int</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-int-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-int-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">int</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

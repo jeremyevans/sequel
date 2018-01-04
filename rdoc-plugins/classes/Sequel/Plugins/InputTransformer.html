@@ -1,119 +1,122 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::InputTransformer</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::InputTransformer
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/input_transformer_rb.html">lib/sequel/plugins/input_transformer.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p><a href="InputTransformer.html">InputTransformer</a> is a plugin that
-            allows generic transformations of input values in model column setters. 
-            Example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">input_transformer</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_input_transformer</span>(:<span class="ruby-identifier">reverser</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;oof&#39;</span></pre>
-            
-            <p>You can specifically set some columns to skip some input input
-            transformers:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">skip_input_transformer</span>(:<span class="ruby-identifier">reverser</span>, :<span class="ruby-identifier">foo</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">foo</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">foo</span> <span class="ruby-comment"># =&gt; &#39;bar&#39;</span></pre>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances support input transformers (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">input_transformer</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support input transformers </span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">input_transformer</span></pre>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-apply">apply</a></li>
-              <li><a href="#method-c-configure">configure</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="InputTransformer/ClassMethods.html">Sequel::Plugins::InputTransformer::ClassMethods</a></li>
-              <li><a href="InputTransformer/InstanceMethods.html">Sequel::Plugins::InputTransformer::InstanceMethods</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-apply'>
-                <a name='method-c-apply'></a>
-                <div class='synopsis'>
-                  <span class='name'>apply</span>
-                  <span class='arguments'>(model, *)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@input_transformers</span> = {}&#x000A;    <span class="ruby-ivar">@skip_input_transformer_columns</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-configure'>
-                <a name='method-c-configure'></a>
-                <div class='synopsis'>
-                  <span class='name'>configure</span>
-                  <span class='arguments'>(model, transformer_name=nil, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If an input transformer is given in the plugin call, add it as a
-                  transformer</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">transformer_name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">add_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">transformer_name</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::InputTransformer</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::InputTransformer
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/input_transformer_rb.html">lib/sequel/plugins/input_transformer.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="InputTransformer.html">InputTransformer</a> is a plugin that
+allows generic transformations of input values in model column setters. 
+Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:input_transformer</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_input_transformer</span>(<span class="ruby-value">:reverser</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;oof&#39;</span></pre>
+
+<p>You can specifically set some columns to skip some input input
+transformers:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-value">:reverser</span>, <span class="ruby-value">:foo</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">foo:</span> <span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">foo</span> <span class="ruby-comment"># =&gt; &#39;bar&#39;</span></pre>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances support input transformers (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:input_transformer</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support input transformers</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:input_transformer</span></pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+<li><a href="#method-c-configure">configure</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="InputTransformer/ClassMethods.html">Sequel::Plugins::InputTransformer::ClassMethods</a></li>
+<li><a href="InputTransformer/InstanceMethods.html">Sequel::Plugins::InputTransformer::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span>
+<span class='arguments'>(model, *)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@input_transformers</span> = {}&#x000A;    <span class="ruby-ivar">@skip_input_transformer_columns</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-configure'>
+<a name='method-c-configure'></a>
+<div class='synopsis'>
+<span class='name'>configure</span>
+<span class='arguments'>(model, transformer_name=nil, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>If an input transformer is given in the plugin call, add it as a
+transformer</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">transformer_name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">add_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">transformer_name</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

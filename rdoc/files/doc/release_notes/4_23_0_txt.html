@@ -1,106 +1,108 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.23.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.23.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.23.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2015-06-01 07:48:19 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>An update_refresh plugin has been added, for refreshing a model instance
-            when updating.  The default behavior is to only refresh when inserting. 
-            However, if you have triggers on the model&#39;s table, it&#39;s a good
-            idea to refresh when updating to pick up the possibly changed values.  On
-            databases that support UPDATE RETURNING, such as PostgreSQL, the update and
-            refresh are done in a single query.</p>
-            </li><li>
-            <p>A delay_add_association plugin has been added, for delaying add_* method
-            calls for associations until after the receiver has been saved, if the
-            receiver is a new object. Example:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>))&#x000A;<span class="ruby-comment"># No database queries yet</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># Saves artist, then album</span></pre>
-            </li><li>
-            <p>A validate_associated plugin has been added, for validating associated
-            objects when validating the current object.  This was extracted from the
-            nested_attributes plugin, and is also used by the delay_add_association
-            plugin.  For example, if you have an albums association and you want to
-            validate all associated objects before saving the current object, you can
-            cal validate_associated_object for each object:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">reflection</span> = <span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">albums</span>)&#x000A;  <span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">validate_associated_object</span>(<span class="ruby-identifier">reflection</span>, <span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Database#transaction now returns the block return value if
-            :rollback=&gt;:always is used.  Previously, it would return nil in that
-            case.</p>
-            </li><li>
-            <p>Postgres::JSONBOp#[] and get_text now return JSONBOp instances instead of
-            JSONOp instances.</p>
-            </li><li>
-            <p>Model#move_to, move_up, and move_down in the list plugin now automatically
-            handle out-of-range targets by defaulting to the first or last position in
-            the list.  Previously, using an out of range target would raise an
-            exception.</p>
-            </li><li>
-            <p>Database#add_named_conversion_proc on PostgreSQL now works for enum types.</p>
-            </li><li>
-            <p>dataset.call_sproc(:insert, …) now works correctly on JDBC.</p>
-            </li><li>
-            <p>postgresql:// connection strings are now supported, since that is the
-            protocol name supported by libpq.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> has switched from rspec
-            to minitest/spec for testing, and now uses random test order when testing.
-            During the conversion process, many test order dependency bugs were fixed.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The deprecated fdbsql, jdbc/fdbsql, and openbase adapters have been
-            removed.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.23.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.23.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.23.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2015-06-01 07:48:19 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An update_refresh plugin has been added, for refreshing a model instance
+when updating.  The default behavior is to only refresh when inserting. 
+However, if you have triggers on the model&#39;s table, it&#39;s a good
+idea to refresh when updating to pick up the possibly changed values.  On
+databases that support UPDATE RETURNING, such as PostgreSQL, the update and
+refresh are done in a single query.</p>
+</li><li>
+<p>A delay_add_association plugin has been added, for delaying add_* method
+calls for associations until after the receiver has been saved, if the
+receiver is a new object. Example:</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>))&#x000A;<span class="ruby-comment"># No database queries yet</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># Saves artist, then album</span></pre>
+</li><li>
+<p>A validate_associated plugin has been added, for validating associated
+objects when validating the current object.  This was extracted from the
+nested_attributes plugin, and is also used by the delay_add_association
+plugin.  For example, if you have an albums association and you want to
+validate all associated objects before saving the current object, you can
+cal validate_associated_object for each object:</p>
+
+<pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">reflection</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-value">:albums</span>)&#x000A;  <span class="ruby-identifier">associations</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">obj</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">validate_associated_object</span>(<span class="ruby-identifier">reflection</span>, <span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#transaction now returns the block return value if
+:rollback=&gt;:always is used.  Previously, it would return nil in that
+case.</p>
+</li><li>
+<p>Postgres::JSONBOp#[] and get_text now return JSONBOp instances instead of
+JSONOp instances.</p>
+</li><li>
+<p>Model#move_to, move_up, and move_down in the list plugin now automatically
+handle out-of-range targets by defaulting to the first or last position in
+the list.  Previously, using an out of range target would raise an
+exception.</p>
+</li><li>
+<p>Database#add_named_conversion_proc on PostgreSQL now works for enum types.</p>
+</li><li>
+<p>dataset.call_sproc(:insert, …) now works correctly on JDBC.</p>
+</li><li>
+<p>postgresql:// connection strings are now supported, since that is the
+protocol name supported by libpq.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> has switched from rspec
+to minitest/spec for testing, and now uses random test order when testing.
+During the conversion process, many test order dependency bugs were fixed.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The deprecated fdbsql, jdbc/fdbsql, and openbase adapters have been
+removed.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

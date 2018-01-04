@@ -1,73 +1,75 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>synchronize_sql.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>synchronize_sql.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/synchronize_sql.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-11-27 08:19:40 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The synchronize_sql extension checks out a connection from the pool while
-            generating an SQL string.  In cases where a connection is necessary in
-            order to properly escape input, and multiple inputs in the query need
-            escaping, this can result in fewer connection checkouts and better overall
-            performance. In other cases this results in a performance decrease because
-            a connection is checked out and either not used or kept checked out longer
-            than necessary.</p>
-            
-            <p>The adapters where this extension may improve performance include
-            amalgalite, mysql2, postgres, jdbc/postgresql, and tinytds. In these
-            adapters, escaping strings requires a connection object for as proper
-            escaping requires calling an escaping method on the connection object.</p>
-            
-            <p>This extension is most helpful when dealing with queries with lots of
-            strings that need escaping (e.g. IN queries with long lists).  By default,
-            a connection will be checked out and back in for each string to be escaped,
-            which under high contention can cause the query to spend longer generating
-            the SQL string than the actual pool timeout (since every individual
-            checkout will take less than the timeout, but the sum of all of them can be
-            greater).</p>
-            
-            <p>This extension is unnecessary and will decrease performance if the single
-            threaded connection pool is used.</p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>synchronize_sql.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>synchronize_sql.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/synchronize_sql.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-11-27 08:19:40 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The synchronize_sql extension checks out a connection from the pool while
+generating an SQL string.  In cases where a connection is necessary in
+order to properly escape input, and multiple inputs in the query need
+escaping, this can result in fewer connection checkouts and better overall
+performance. In other cases this results in a performance decrease because
+a connection is checked out and either not used or kept checked out longer
+than necessary.</p>
+
+<p>The adapters where this extension may improve performance include
+amalgalite, mysql2, postgres, jdbc/postgresql, and tinytds. In these
+adapters, escaping strings requires a connection object for as proper
+escaping requires calling an escaping method on the connection object.</p>
+
+<p>This extension is most helpful when dealing with queries with lots of
+strings that need escaping (e.g. IN queries with long lists).  By default,
+a connection will be checked out and back in for each string to be escaped,
+which under high contention can cause the query to spend longer generating
+the SQL string than the actual pool timeout (since every individual
+checkout will take less than the timeout, but the sum of all of them can be
+greater).</p>
+
+<p>This extension is unnecessary and will decrease performance if the single
+threaded connection pool is used.</p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

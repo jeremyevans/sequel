@@ -1,187 +1,189 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.35.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.35.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.35.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2012-05-01 08:44:28 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A dirty plugin has been added, which saves the initial value of the column
-            when the column is changed, similar to ActiveModel::Dirty:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;Bar&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">initial_value</span>(:<span class="ruby-identifier">name</span>)   <span class="ruby-comment"># &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_change</span>(:<span class="ruby-identifier">name</span>)   <span class="ruby-comment"># [&#39;Foo&#39;, &#39;Bar&#39;]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># {:name =&gt; [&#39;Foo&#39;, &#39;Bar&#39;]}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">reset_column</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># =&gt; {}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">previous_changes</span>       <span class="ruby-comment"># =&gt; {:name=&gt;[&#39;Foo&#39;, &#39;Bar&#39;]}</span></pre>
-            </li><li>
-            <p>Database#create_table now respects an :as option to create a database based
-            on the results of a query.  The :as option value should either be an SQL
-            string or a dataset.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">new_foos</span>, :<span class="ruby-identifier">as=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foos</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">new=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>))</pre>
-            </li><li>
-            <p>The json_serializer and xml_serializer plugins can now serialize arbitrary
-            arrays of model objects by passing an :array option to the to_json class
-            method.  This works around an issue in ruby&#39;s JSON library where
-            Array#to_json does not pass arguments given to it to the members of the
-            array.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">array=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]], :<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums</span>)</pre>
-            </li><li>
-            <p>You can now use the % (modulus) operator in the same way you can use the
-            bitwise operators in Sequel:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">%</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (column % 1)</span></pre>
-            </li><li>
-            <p>On PostgreSQL, you can now provide :only, :cascade, and :restart options to
-            Dataset#truncate to use ONLY, CASCADE, and RESTART IDENTITY.  Additionally,
-            you can now truncate multiple tables at the same time:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">table1</span>, :<span class="ruby-identifier">table2</span>).<span class="ruby-identifier">truncate</span>(:<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)</pre>
-            </li><li>
-            <p>The :index option when creating columns in the schema generator can now
-            take a hash of index options:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">foo</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">bar</span>, :<span class="ruby-identifier">index=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}}</pre>
-            </li><li>
-            <p>A Database#cache_schema accessor has been added, it can be set to false to
-            have the Database never cache schema results.  This can be useful in Rails
-            development mode, so that you don&#39;t need to restart a running server to
-            have models pick up the new schema.</p>
-            </li><li>
-            <p>Database#log_exception has been added for easier instrumentation. It is
-            called with the exception and SQL query string for all queries that raise
-            an exception.</p>
-            </li><li>
-            <p>The <a
-            href="../../../classes/Sequel.html#method-c-migration">Sequel.migration</a>
-            DSL now has a transaction method that forces transaction use for the given
-            migration.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Many theoretical thread-safety issues have been fixed for ruby
-            implementations that don&#39;t use a global interpreter lock. Previously,
-            <a href="../../../classes/Sequel.html">Sequel</a> relied on MRI&#39;s
-            global interpreter lock for part of its thread safety, now it does manually
-            locking in more places to avoid thread-safety issues on JRuby (and other
-            ruby implementations without a global interpreter lock).</p>
-            
-            <p>No <a href="../../../classes/Sequel.html">Sequel</a> user ever reported a
-            production error related to the previous thread-safety issues, and most of
-            the issues fixed were so difficult to hit that even tests specifically
-            designed to raise errors were unable to do so.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel.html#attribute-c-single_threaded">Sequel.single_threaded</a>
-            = true now disables the mutex synchronization that enforces thread safety
-            for additional performance in single threaded mode.</p>
-            </li><li>
-            <p>Sequel&#39;s migrators now only attempt to use transactions by default if
-            the underlying database supports transactional DDL. SQLite does support
-            transactional DDL, but <a href="../../../classes/Sequel.html">Sequel</a>
-            will not use transactions for SQLite migrations as it causes issues when
-            emulating alter_table operations for tables with foreign keys.</p>
-            </li><li>
-            <p>Errors that occur when rolling back database transactions are now handled
-            correctly.  Previously, the underlying exception was raised, it wasn&#39;t
-            correctly wrapped in a Sequel::DatabaseError, and if it was due to a
-            database disconnection, the connection wasn&#39;t removed from the pool.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer sets ruby
-            instance variables on java objects, fixing warnings on JRuby 1.7 and
-            attempting to be forward compatible with JRuby 2.0.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses date and
-            timestamp formats that are multilanguage and not DATEFORMAT dependent on
-            Microsoft SQL Server.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now correctly escapes
-            blackslash-carriage return-line feed on Microsoft SQL Server.</p>
-            </li><li>
-            <p>Parsing the column default values in the oracle adapter no longer requires
-            database superuser privileges.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now correctly handles
-            parsing schema for tables in other databases on MySQL.  Previously, it
-            would always look in the current database.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer doubles
-            backslashes in strings by default.  It now only does so on MySQL, since
-            that is the only database that appears to use backslashes for escaping. 
-            This fixes issues with backslashes being doubled on some of the less
-            commonly used adapters.</p>
-            </li><li>
-            <p>The pg_auto_parameterize extension now works correctly when using cursors.</p>
-            </li><li>
-            <p>Dataset#truncate now raises an Error if you attempt to do so on a dataset
-            that uses HAVING.  Previously, it only checked for WHERE.</p>
-            </li><li>
-            <p>The schema dumper now recognized the identity type.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Association reflections now store cached information in a separate subhash
-            due to the thread-safety changes.  Any code accessing an association
-            reflection should always call the related method to get the cached data
-            instead of checking for a specific location in the hash.</p>
-            </li><li>
-            <p>Association reflection internals for many_through_many associations changed
-            significantly, any code that accesses the edge information in the
-            reflection will need to be changed to use the new methods instead of
-            accessing the old values directly.</p>
-            </li><li>
-            <p>The features deprecated in 3.34.0 have now been removed:</p>
-            <ul><li>
-            <p>Ruby &lt;1.8.7 support</p>
-            </li><li>
-            <p>PostgreSQL &lt;8.2 support</p>
-            </li><li>
-            <p>Dataset#disable_insert_returning on PostgreSQL</p>
-            </li><li>
-            <p>Array#all_two_pairs? and sql_expr_if_all_two_pairs</p>
-            </li></ul>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.35.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.35.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.35.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2012-05-01 08:44:28 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A dirty plugin has been added, which saves the initial value of the column
+when the column is changed, similar to ActiveModel::Dirty:</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;Bar&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">initial_value</span>(<span class="ruby-value">:name</span>)   <span class="ruby-comment"># &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_change</span>(<span class="ruby-value">:name</span>)   <span class="ruby-comment"># [&#39;Foo&#39;, &#39;Bar&#39;]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># {:name =&gt; [&#39;Foo&#39;, &#39;Bar&#39;]}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">reset_column</span>(<span class="ruby-value">:name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(<span class="ruby-value">:name</span>) <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># =&gt; {}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">previous_changes</span>       <span class="ruby-comment"># =&gt; {:name=&gt;[&#39;Foo&#39;, &#39;Bar&#39;]}</span></pre>
+</li><li>
+<p>Database#create_table now respects an :as option to create a database based
+on the results of a query.  The :as option value should either be an SQL
+string or a dataset.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:new_foos</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:foos</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:new</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>))</pre>
+</li><li>
+<p>The json_serializer and xml_serializer plugins can now serialize arbitrary
+arrays of model objects by passing an :array option to the to_json class
+method.  This works around an issue in ruby&#39;s JSON library where
+Array#to_json does not pass arguments given to it to the members of the
+array.</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-value">:array</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]], <span class="ruby-value">:include</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:albums</span>)</pre>
+</li><li>
+<p>You can now use the % (modulus) operator in the same way you can use the
+bitwise operators in Sequel:</p>
+
+<pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">%</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (column % 1)</span></pre>
+</li><li>
+<p>On PostgreSQL, you can now provide :only, :cascade, and :restart options to
+Dataset#truncate to use ONLY, CASCADE, and RESTART IDENTITY.  Additionally,
+you can now truncate multiple tables at the same time:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>).<span class="ruby-identifier">truncate</span>(<span class="ruby-value">:cascade</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)</pre>
+</li><li>
+<p>The :index option when creating columns in the schema generator can now
+take a hash of index options:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:foo</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:bar</span>, <span class="ruby-value">:index</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}}</pre>
+</li><li>
+<p>A Database#cache_schema accessor has been added, it can be set to false to
+have the Database never cache schema results.  This can be useful in Rails
+development mode, so that you don&#39;t need to restart a running server to
+have models pick up the new schema.</p>
+</li><li>
+<p>Database#log_exception has been added for easier instrumentation. It is
+called with the exception and SQL query string for all queries that raise
+an exception.</p>
+</li><li>
+<p>The <a
+href="../../../classes/Sequel.html#method-c-migration">Sequel.migration</a>
+DSL now has a transaction method that forces transaction use for the given
+migration.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Many theoretical thread-safety issues have been fixed for ruby
+implementations that don&#39;t use a global interpreter lock. Previously,
+<a href="../../../classes/Sequel.html">Sequel</a> relied on MRI&#39;s
+global interpreter lock for part of its thread safety, now it does manually
+locking in more places to avoid thread-safety issues on JRuby (and other
+ruby implementations without a global interpreter lock).</p>
+
+<p>No <a href="../../../classes/Sequel.html">Sequel</a> user ever reported a
+production error related to the previous thread-safety issues, and most of
+the issues fixed were so difficult to hit that even tests specifically
+designed to raise errors were unable to do so.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel.html#attribute-c-single_threaded">Sequel.single_threaded</a>
+= true now disables the mutex synchronization that enforces thread safety
+for additional performance in single threaded mode.</p>
+</li><li>
+<p>Sequel&#39;s migrators now only attempt to use transactions by default if
+the underlying database supports transactional DDL. SQLite does support
+transactional DDL, but <a href="../../../classes/Sequel.html">Sequel</a>
+will not use transactions for SQLite migrations as it causes issues when
+emulating alter_table operations for tables with foreign keys.</p>
+</li><li>
+<p>Errors that occur when rolling back database transactions are now handled
+correctly.  Previously, the underlying exception was raised, it wasn&#39;t
+correctly wrapped in a Sequel::DatabaseError, and if it was due to a
+database disconnection, the connection wasn&#39;t removed from the pool.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer sets ruby
+instance variables on java objects, fixing warnings on JRuby 1.7 and
+attempting to be forward compatible with JRuby 2.0.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now uses date and
+timestamp formats that are multilanguage and not DATEFORMAT dependent on
+Microsoft SQL Server.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now correctly escapes
+blackslash-carriage return-line feed on Microsoft SQL Server.</p>
+</li><li>
+<p>Parsing the column default values in the oracle adapter no longer requires
+database superuser privileges.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now correctly handles
+parsing schema for tables in other databases on MySQL.  Previously, it
+would always look in the current database.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer doubles
+backslashes in strings by default.  It now only does so on MySQL, since
+that is the only database that appears to use backslashes for escaping. 
+This fixes issues with backslashes being doubled on some of the less
+commonly used adapters.</p>
+</li><li>
+<p>The pg_auto_parameterize extension now works correctly when using cursors.</p>
+</li><li>
+<p>Dataset#truncate now raises an Error if you attempt to do so on a dataset
+that uses HAVING.  Previously, it only checked for WHERE.</p>
+</li><li>
+<p>The schema dumper now recognized the identity type.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Association reflections now store cached information in a separate subhash
+due to the thread-safety changes.  Any code accessing an association
+reflection should always call the related method to get the cached data
+instead of checking for a specific location in the hash.</p>
+</li><li>
+<p>Association reflection internals for many_through_many associations changed
+significantly, any code that accesses the edge information in the
+reflection will need to be changed to use the new methods instead of
+accessing the old values directly.</p>
+</li><li>
+<p>The features deprecated in 3.34.0 have now been removed:</p>
+<ul><li>
+<p>Ruby &lt;1.8.7 support</p>
+</li><li>
+<p>PostgreSQL &lt;8.2 support</p>
+</li><li>
+<p>Dataset#disable_insert_returning on PostgreSQL</p>
+</li><li>
+<p>Array#all_two_pairs? and sql_expr_if_all_two_pairs</p>
+</li></ul>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

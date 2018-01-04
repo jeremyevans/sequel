@@ -1,72 +1,72 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::AccessedColumns</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::AccessedColumns
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/accessed_columns_rb.html">lib/sequel/plugins/accessed_columns.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The accessed_columns plugin records which columns have been accessed for a
-            model instance.  This is useful if you are looking to remove other columns
-            from being SELECTed by the dataset that retrieved the instance, which can
-            significantly improve performance:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name, :artist_id]</span></pre>
-            
-            <p>Note that this plugin should probably not be used in production, as it
-            causes a performance hit.</p>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances record accessed columns (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">accessed_columns</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album instances record accessed columns</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">accessed_columns</span></pre>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="AccessedColumns/InstanceMethods.html">Sequel::Plugins::AccessedColumns::InstanceMethods</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::AccessedColumns</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::AccessedColumns
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/accessed_columns_rb.html">lib/sequel/plugins/accessed_columns.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The accessed_columns plugin records which columns have been accessed for a
+model instance.  This is useful if you are looking to remove other columns
+from being SELECTed by the dataset that retrieved the instance, which can
+significantly improve performance:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name, :artist_id]</span></pre>
+
+<p>Note that this plugin should probably not be used in production, as it
+causes a performance hit.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclass instances record accessed columns (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:accessed_columns</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album instances record accessed columns</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:accessed_columns</span></pre>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="AccessedColumns/InstanceMethods.html">Sequel::Plugins::AccessedColumns::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

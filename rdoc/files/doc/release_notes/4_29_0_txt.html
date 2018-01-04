@@ -1,88 +1,90 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.29.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.29.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.29.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2015-12-01 07:48:59 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A uuid plugin has now been added.  This plugin will automatically create a
-            uuid for newly created model objects.</p>
-            
-            <pre>Model.plugin :uuid&#x000A;Model.create.uuid =&gt; # some UUID</pre>
-            </li><li>
-            <p>Model#json_serializer_opts has been added to the json_serializer plugin,
-            allowing you to override the JSON serialization options on a per instance
-            basis without passing the options directly to Model#to_json.  This is
-            useful if you are including the model instance inside another datastructure
-            that will be serialized to JSON.</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_serializer_opts</span>(:<span class="ruby-identifier">root</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>)&#x000A;[<span class="ruby-identifier">obj</span>].<span class="ruby-identifier">to_json</span>&#x000A;<span class="ruby-comment"># =&gt; &#39;[{&quot;obj&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;Foo&quot;}}]&#39;</span></pre>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The Database#transaction :retry_on option now works when using savepoints.</p>
-            </li><li>
-            <p>Calling Database#table_exists? inside a transaction will now use a
-            savepoint if the database supports it, so that if the table doesn&#39;t
-            exist, it will not affect the state of the transaction.</p>
-            </li><li>
-            <p>Blobs can now be used as bound variables in the oracle adapter.</p>
-            </li><li>
-            <p>The sqlanywhere adapter now works with database sharding.</p>
-            </li><li>
-            <p>The Dataset#full_text_search :rank option has been fixed to order by rank
-            descending instead of ascending.</p>
-            </li><li>
-            <p>External adapters that do not support INSERT with DEFAULT VALUES can now
-            override Dataset#insert_empty_columns_values to set the columns and values
-            to use for an empty INSERT.</p>
-            </li><li>
-            <p>External adapters can now implement Dataset#date_add_sql_append to
-            integrate with the date_arithmetic extension.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.29.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.29.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.29.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2015-12-01 07:48:59 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A uuid plugin has now been added.  This plugin will automatically create a
+uuid for newly created model objects.</p>
+
+<pre>Model.plugin :uuid&#x000A;Model.create.uuid =&gt; # some UUID</pre>
+</li><li>
+<p>Model#json_serializer_opts has been added to the json_serializer plugin,
+allowing you to override the JSON serialization options on a per instance
+basis without passing the options directly to Model#to_json.  This is
+useful if you are including the model instance inside another datastructure
+that will be serialized to JSON.</p>
+
+<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">json_serializer_opts</span>(<span class="ruby-value">:root</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>)&#x000A;[<span class="ruby-identifier">obj</span>].<span class="ruby-identifier">to_json</span>&#x000A;<span class="ruby-comment"># =&gt; &#39;[{&quot;obj&quot;:{&quot;id&quot;:1,&quot;name&quot;:&quot;Foo&quot;}}]&#39;</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The Database#transaction :retry_on option now works when using savepoints.</p>
+</li><li>
+<p>Calling Database#table_exists? inside a transaction will now use a
+savepoint if the database supports it, so that if the table doesn&#39;t
+exist, it will not affect the state of the transaction.</p>
+</li><li>
+<p>Blobs can now be used as bound variables in the oracle adapter.</p>
+</li><li>
+<p>The sqlanywhere adapter now works with database sharding.</p>
+</li><li>
+<p>The Dataset#full_text_search :rank option has been fixed to order by rank
+descending instead of ascending.</p>
+</li><li>
+<p>External adapters that do not support INSERT with DEFAULT VALUES can now
+override Dataset#insert_empty_columns_values to set the columns and values
+to use for an empty INSERT.</p>
+</li><li>
+<p>External adapters can now implement Dataset#date_add_sql_append to
+integrate with the date_arithmetic extension.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

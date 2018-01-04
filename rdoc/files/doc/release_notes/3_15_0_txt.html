@@ -1,127 +1,129 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.15.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.15.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.15.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A mysql2 adapter was added to <a
-            href="../../../classes/Sequel.html">Sequel</a>.  It offers a large (2-6x)
-            performance increase over the standard mysql adapter. In order to use it,
-            you need to install mysql2, and change your connection strings to use
-            mysql2:// instead of mysql://.</p>
-            </li><li>
-            <p>Support for sequel_pg was added to the native postgres adapter, when pg is
-            being used as the backend.  sequel_pg also offers a large (2-6x)
-            performance increase over the default row fetching code that the <a
-            href="../../../classes/Sequel.html">Sequel</a> postgres adapter uses.  In
-            order to use it, you just need to install sequel_pg, and the postgres
-            adapter will pick it up automatically.</p>
-            </li><li>
-            <p>Mass assignment has been made about 10x faster by caching the allowed
-            setter methods in the model.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The following construct is now safe to use in environments that reload code
-            without unloading existing constants:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">MyModel</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>Previously, this would raise a superclass mismatch TypeError.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles the case
-            where both an implicit and an explicit table alias are given to join_table,
-            preferring the explicit alias. This can happen if you are using models with
-            aliased table names and eager graphing them.  Previously, this would result
-            in invalid SQL, with both aliases being used.</p>
-            </li><li>
-            <p>You can use use an aliased table for the :join_table option of a
-            many_to_many association.</p>
-            </li><li>
-            <p>The active_model plugin now supports the final release of ActiveModel
-            3.0.0.</p>
-            </li><li>
-            <p>Typecasting now works correctly for attributes loaded lazily when using the
-            lazy_attributes plugin.</p>
-            </li><li>
-            <p>The class_table_inheritance plugin now works with non-integer primary keys
-            on SQLite.</p>
-            </li><li>
-            <p>Temporary tables are now ignored when parsing the schema on PostgreSQL.</p>
-            </li><li>
-            <p>On MySQL, an :auto_increment key with a true value is added to the
-            Database#schema output hash if the related column is auto incrementing.</p>
-            </li><li>
-            <p>The mysql adapter now handles Mysql::Error exceptions raised when
-            disconnecting.</p>
-            </li><li>
-            <p>On SQLite, emulated alter_table commands that require dropping the table
-            now preserve the foreign key information, if SQLite foreign key support is
-            enabled (it is by default).</p>
-            </li><li>
-            <p>DSN-less connections now work correctly in more cases in the ODBC adapter.</p>
-            </li><li>
-            <p>A workaround has been added for a bug in the Microsoft SQL Server JDBC
-            Driver 3.0, involving it incorrectly returning a smallint instead of a char
-            type for the IS_AUTOINCREMENT metadata value.</p>
-            </li><li>
-            <p>An bug in the error handling when connecting to PostgreSQL using the do
-            (DataObjects) adapter has been fixed.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The caching of allowed mass assignment methods can result in the incorrect
-            exception class being raised if you manually undefine instance setter
-            methods in the model class.  If you do this, you need to clear the setter
-            methods cache manually:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">clear_setter_methods_cache</span></pre>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.15.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.15.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.15.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A mysql2 adapter was added to <a
+href="../../../classes/Sequel.html">Sequel</a>.  It offers a large (2-6x)
+performance increase over the standard mysql adapter. In order to use it,
+you need to install mysql2, and change your connection strings to use
+mysql2:// instead of mysql://.</p>
+</li><li>
+<p>Support for sequel_pg was added to the native postgres adapter, when pg is
+being used as the backend.  sequel_pg also offers a large (2-6x)
+performance increase over the default row fetching code that the <a
+href="../../../classes/Sequel.html">Sequel</a> postgres adapter uses.  In
+order to use it, you just need to install sequel_pg, and the postgres
+adapter will pick it up automatically.</p>
+</li><li>
+<p>Mass assignment has been made about 10x faster by caching the allowed
+setter methods in the model.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The following construct is now safe to use in environments that reload code
+without unloading existing constants:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">MyModel</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>Previously, this would raise a superclass mismatch TypeError.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles the case
+where both an implicit and an explicit table alias are given to join_table,
+preferring the explicit alias. This can happen if you are using models with
+aliased table names and eager graphing them.  Previously, this would result
+in invalid SQL, with both aliases being used.</p>
+</li><li>
+<p>You can use use an aliased table for the :join_table option of a
+many_to_many association.</p>
+</li><li>
+<p>The active_model plugin now supports the final release of ActiveModel
+3.0.0.</p>
+</li><li>
+<p>Typecasting now works correctly for attributes loaded lazily when using the
+lazy_attributes plugin.</p>
+</li><li>
+<p>The class_table_inheritance plugin now works with non-integer primary keys
+on SQLite.</p>
+</li><li>
+<p>Temporary tables are now ignored when parsing the schema on PostgreSQL.</p>
+</li><li>
+<p>On MySQL, an :auto_increment key with a true value is added to the
+Database#schema output hash if the related column is auto incrementing.</p>
+</li><li>
+<p>The mysql adapter now handles Mysql::Error exceptions raised when
+disconnecting.</p>
+</li><li>
+<p>On SQLite, emulated alter_table commands that require dropping the table
+now preserve the foreign key information, if SQLite foreign key support is
+enabled (it is by default).</p>
+</li><li>
+<p>DSN-less connections now work correctly in more cases in the ODBC adapter.</p>
+</li><li>
+<p>A workaround has been added for a bug in the Microsoft SQL Server JDBC
+Driver 3.0, involving it incorrectly returning a smallint instead of a char
+type for the IS_AUTOINCREMENT metadata value.</p>
+</li><li>
+<p>An bug in the error handling when connecting to PostgreSQL using the do
+(DataObjects) adapter has been fixed.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The caching of allowed mass assignment methods can result in the incorrect
+exception class being raised if you manually undefine instance setter
+methods in the model class.  If you do this, you need to clear the setter
+methods cache manually:</p>
+
+<pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">clear_setter_methods_cache</span></pre>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,129 +1,129 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::PreparedStatements</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::PreparedStatements
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/prepared_statements_rb.html">lib/sequel/plugins/prepared_statements.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The prepared_statements plugin modifies the model to use prepared
-            statements for instance level inserts and updates.</p>
-            
-            <p>Note that this plugin is unsafe in some circumstances, as it can allow up
-            to 2^N prepared statements to be created for each type of insert and update
-            query, where N is the number of columns in the table. It is recommended
-            that you use the <code>prepared_statements_safe</code> plugin in addition
-            to this plugin to reduce the number of prepared statements that can be
-            created, unless you tightly control how your model instances are saved.</p>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Make all model subclasses use prepared statements  (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use prepared statements</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements</span></pre>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-apply">apply</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="PreparedStatements/ClassMethods.html">Sequel::Plugins::PreparedStatements::ClassMethods</a></li>
-              <li><a href="PreparedStatements/InstanceMethods.html">Sequel::Plugins::PreparedStatements::InstanceMethods</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>MUTEX</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Mutex.new</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Synchronize access to the integer sequence so that no two calls get the
-                      same integer.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>NEXT</td>
-                    <td>=</td>
-                    <td class='context-item-value'>lambda{MUTEX.synchronize{i += 1}}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>This plugin names prepared statements uniquely using an integer sequence,
-                      this lambda returns the next integer to use.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-apply'>
-                <a name='method-c-apply'></a>
-                <div class='synopsis'>
-                  <span class='name'>apply</span>
-                  <span class='arguments'>(model)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Setup the datastructure used to hold the prepared statements in the model.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {<span class="ruby-value">:insert=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:insert_select=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:update=</span><span class="ruby-operator">&gt;</span>{}}.<span class="ruby-identifier">freeze</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::PreparedStatements</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::PreparedStatements
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/prepared_statements_rb.html">lib/sequel/plugins/prepared_statements.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The prepared_statements plugin modifies the model to use prepared
+statements for instance level inserts and updates.</p>
+
+<p>Note that this plugin is unsafe in some circumstances, as it can allow up
+to 2^N prepared statements to be created for each type of insert and update
+query, where N is the number of columns in the table. It is recommended
+that you use the <code>prepared_statements_safe</code> plugin in addition
+to this plugin to reduce the number of prepared statements that can be
+created, unless you tightly control how your model instances are saved.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses use prepared statements  (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use prepared statements</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span></pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-apply">apply</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="PreparedStatements/ClassMethods.html">Sequel::Plugins::PreparedStatements::ClassMethods</a></li>
+<li><a href="PreparedStatements/InstanceMethods.html">Sequel::Plugins::PreparedStatements::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MUTEX</td>
+<td>=</td>
+<td class='context-item-value'>Mutex.new</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Synchronize access to the integer sequence so that no two calls get the
+same integer.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>NEXT</td>
+<td>=</td>
+<td class='context-item-value'>lambda{MUTEX.synchronize{i += 1}}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>This plugin names prepared statements uniquely using an integer sequence,
+this lambda returns the next integer to use.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-apply'>
+<a name='method-c-apply'></a>
+<div class='synopsis'>
+<span class='name'>apply</span>
+<span class='arguments'>(model)</span>
+
+</div>
+<div class='description'>
+
+<p>Setup the datastructure used to hold the prepared statements in the model.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, {<span class="ruby-value">:insert</span><span class="ruby-operator">=&gt;</span>{}, <span class="ruby-value">:insert_select</span><span class="ruby-operator">=&gt;</span>{}, <span class="ruby-value">:update</span><span class="ruby-operator">=&gt;</span>{}}.<span class="ruby-identifier">freeze</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

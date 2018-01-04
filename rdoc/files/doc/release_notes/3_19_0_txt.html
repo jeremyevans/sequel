@@ -1,113 +1,115 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.19.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.19.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.19.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The add_* association methods now accept a primary key, and associates the
-            receiver to the associated model object with that primary key:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">42</span>)&#x000A;<span class="ruby-comment"># equivalent to: artist.add_album(Album[42])</span></pre>
-            </li><li>
-            <p>The validation_class_methods plugin now has the ability to reflect on
-            validations:</p>
-            
-            <pre>Album.plugin :validation_class_methods&#x000A;Album.validates_acceptance_of(:a)&#x000A;Album.validation_reflections&#x000A;# =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,&#x000A;            :message=&gt;&quot;is not accepted&quot;, :accept=&gt;&quot;1&quot;}]]}</pre>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>In the postgres, mysql, and sqlite adapters, typecasting now uses methods
-            instead of procs.  Since methods aren&#39;t closures (while procs are),
-            this makes typecasting faster (up to 15%).</p>
-            </li><li>
-            <p>When typecasting model column values, the classes of the new and existing
-            values are checked in addition to the values themselves. Previously, if the
-            new and existing values were equal (i.e. 1.0 and 1), it wouldn&#39;t update
-            the value.  Now, if the classes are different, it always updates the value.</p>
-            </li><li>
-            <p>Date and DateTime objects are now handled correctly when using prepared
-            statements/bound variables in the jdbc adapter.</p>
-            </li><li>
-            <p>Date, DateTime, Time, true, false, and SQL::Blob objects are now handled
-            correctly when using prepared statements/bound variables in the sqlite
-            adapter.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses varbinary(max)
-            instead of image for the generic File (blob) type on Microsoft SQL Server. 
-            This makes it possible to use an SQL::Blob object as a prepared statement
-            argument.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles blobs better
-            in the Amalgalite adapter.</p>
-            </li><li>
-            <p>When disconnecting a connection using the sqlite adapter, all open prepared
-            statements are now closed first.  Previously, attempting to disconnect a
-            connection with open prepared statements resulted in an error.</p>
-            </li><li>
-            <p>The license file has been renamed from COPYING to MIT-LICENSE, to make it
-            easier to determine at a glance which license is used.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Because <a href="../../../classes/Sequel.html">Sequel</a> switched the
-            generic File type from image to varbinary(max) on Microsoft SQL Server, any
-            migrations/schema modification methods that used the File type will now
-            result in a different column type than before.</p>
-            </li><li>
-            <p>The MYSQL_TYPE_PROCS, PG_TYPE_PROCS, and SQLITE_TYPE_PROCS constants have
-            been removed from the mysql, postgres, and sqlite adapters, respectively. 
-            The UNIX_EPOCH_TIME_FORMAT and FALSE_VALUES constants have also been
-            removed from the sqlite adapter.</p>
-            </li><li>
-            <p>Typecasting in the sqlite adapters now uses to_i and to_f instead of
-            Integer() and Float() with rescues.  If you put non-numeric data in numeric
-            columns on SQLite, this could cause problems.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.19.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.19.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.19.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The add_* association methods now accept a primary key, and associates the
+receiver to the associated model object with that primary key:</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">42</span>)&#x000A;<span class="ruby-comment"># equivalent to: artist.add_album(Album[42])</span></pre>
+</li><li>
+<p>The validation_class_methods plugin now has the ability to reflect on
+validations:</p>
+
+<pre>Album.plugin :validation_class_methods&#x000A;Album.validates_acceptance_of(:a)&#x000A;Album.validation_reflections&#x000A;# =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,&#x000A;            :message=&gt;&quot;is not accepted&quot;, :accept=&gt;&quot;1&quot;}]]}</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>In the postgres, mysql, and sqlite adapters, typecasting now uses methods
+instead of procs.  Since methods aren&#39;t closures (while procs are),
+this makes typecasting faster (up to 15%).</p>
+</li><li>
+<p>When typecasting model column values, the classes of the new and existing
+values are checked in addition to the values themselves. Previously, if the
+new and existing values were equal (i.e. 1.0 and 1), it wouldn&#39;t update
+the value.  Now, if the classes are different, it always updates the value.</p>
+</li><li>
+<p>Date and DateTime objects are now handled correctly when using prepared
+statements/bound variables in the jdbc adapter.</p>
+</li><li>
+<p>Date, DateTime, Time, true, false, and SQL::Blob objects are now handled
+correctly when using prepared statements/bound variables in the sqlite
+adapter.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now uses varbinary(max)
+instead of image for the generic File (blob) type on Microsoft SQL Server. 
+This makes it possible to use an SQL::Blob object as a prepared statement
+argument.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles blobs better
+in the Amalgalite adapter.</p>
+</li><li>
+<p>When disconnecting a connection using the sqlite adapter, all open prepared
+statements are now closed first.  Previously, attempting to disconnect a
+connection with open prepared statements resulted in an error.</p>
+</li><li>
+<p>The license file has been renamed from COPYING to MIT-LICENSE, to make it
+easier to determine at a glance which license is used.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Because <a href="../../../classes/Sequel.html">Sequel</a> switched the
+generic File type from image to varbinary(max) on Microsoft SQL Server, any
+migrations/schema modification methods that used the File type will now
+result in a different column type than before.</p>
+</li><li>
+<p>The MYSQL_TYPE_PROCS, PG_TYPE_PROCS, and SQLITE_TYPE_PROCS constants have
+been removed from the mysql, postgres, and sqlite adapters, respectively. 
+The UNIX_EPOCH_TIME_FORMAT and FALSE_VALUES constants have also been
+removed from the sqlite adapter.</p>
+</li><li>
+<p>Typecasting in the sqlite adapters now uses to_i and to_f instead of
+Integer() and Float() with rescues.  If you put non-numeric data in numeric
+columns on SQLite, this could cause problems.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

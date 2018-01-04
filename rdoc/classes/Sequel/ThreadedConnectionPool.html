@@ -1,268 +1,276 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::ThreadedConnectionPool</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::ThreadedConnectionPool
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/connection_pool/threaded_rb.html">lib/sequel/connection_pool/threaded.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="ConnectionPool.html">ConnectionPool</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>A connection pool allowing multi-threaded access to a pool of connections.
-            This is the default connection pool used by <a
-            href="../Sequel.html">Sequel</a>.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-all_connections">all_connections</a></li>
-              <li><a href="#attribute-i-allocated">allocated</a></li>
-              <li><a href="#attribute-i-available_connections">available_connections</a></li>
-              <li><a href="#method-i-disconnect">disconnect</a></li>
-              <li><a href="#method-i-hold">hold</a></li>
-              <li><a href="#attribute-i-max_size">max_size</a></li>
-              <li><a href="#method-i-pool_type">pool_type</a></li>
-              <li><a href="#method-i-size">size</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>USE_WAITER</td>
-                    <td>=</td>
-                    <td class='context-item-value'>true</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-allocated'>allocated</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>A hash with thread keys and connection values for currently allocated
-                      connections.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-available_connections'>available_connections</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>An array of connections that are available for use by the pool.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-max_size'>max_size</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The maximum number of connections this pool will create (per shard/server
-                      if sharding).</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(db, opts = OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The following additional options are respected:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:max_connections </td><td>
-                  <p>The maximum number of connections the connection pool will open (default 4)</p>
-                  </td></tr><tr><td class='label'>:pool_timeout </td><td>
-                  <p>The amount of seconds to wait to acquire a connection before raising a
-                  PoolTimeoutError (default 5)</p>
-                  </td></tr></tbody></table>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@max_size</span> = <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;:max_connections must be positive&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@max_size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-ivar">@mutex</span> = <span class="ruby-constant">Mutex</span>.<span class="ruby-identifier">new</span>  &#x000A;  <span class="ruby-ivar">@connection_handling</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connection_handling</span>]&#x000A;  <span class="ruby-ivar">@available_connections</span> = []&#x000A;  <span class="ruby-ivar">@allocated</span> = {}&#x000A;  <span class="ruby-ivar">@timeout</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5</span>)&#x000A;  <span class="ruby-ivar">@waiter</span> = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-all_connections'>
-                <a name='method-i-all_connections'></a>
-                <div class='synopsis'>
-                  <span class='name'>all_connections</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Yield all of the available connections, and the one currently allocated to
-                  this thread.  This will not yield connections currently allocated to other
-                  threads, as it is not safe to operate on them.  This holds the mutex while
-                  it is yielding all of the available connections, which means that until the
-                  method&#39;s block returns, the pool is locked.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-all_connections-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-all_connections-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">all_connections</span>&#x000A;  <span class="ruby-identifier">hold</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-disconnect'>
-                <a name='method-i-disconnect'></a>
-                <div class='synopsis'>
-                  <span class='name'>disconnect</span>
-                  <span class='arguments'>(opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Removes all connections currently available, optionally yielding each
-                  connection to the given block. This method has the effect of  disconnecting
-                  from the database, assuming that no connections are currently being used. 
-                  If you want to be able to disconnect connections that are currently in use,
-                  use the ShardedThreadedConnectionPool, which can do that. This connection
-                  pool does not, for performance reasons. To use the sharded pool, pass the
-                  <code>servers: {}</code> option when connecting to the database.</p>
-                  
-                  <p>Once a connection is requested using <a
-                  href="ThreadedConnectionPool.html#method-i-hold">hold</a>, the connection
-                  pool creates new connections to the database.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">conns</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">conns</span> = <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">clear</span>&#x000A;    <span class="ruby-ivar">@waiter</span>.<span class="ruby-identifier">signal</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">conns</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">conn</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-hold'>
-                <a name='method-i-hold'></a>
-                <div class='synopsis'>
-                  <span class='name'>hold</span>
-                  <span class='arguments'>(server=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Chooses the first available connection, or if none are available, creates a
-                  new connection.  Passes the connection to the supplied block:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">pool</span>.<span class="ruby-identifier">hold</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&#39;DROP TABLE posts&#39;</span>)}</pre>
-                  
-                  <p>Pool#hold is re-entrant, meaning it can be called recursively in the same
-                  thread without blocking.</p>
-                  
-                  <p>If no connection is immediately available and the pool is already using the
-                  maximum number of connections, Pool#hold will block until a connection is
-                  available or the timeout expires.  If the timeout expires before a
-                  connection can be acquired, a Sequel::PoolTimeout is raised.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-hold-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-hold-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">acquire</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;      <span class="ruby-identifier">oconn</span> = <span class="ruby-identifier">conn</span>&#x000A;      <span class="ruby-identifier">conn</span> = <span class="ruby-keyword">nil</span>&#x000A;      <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">oconn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">oconn</span>&#x000A;      <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span> &#x000A;        <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">t</span>)&#x000A;        <span class="ruby-ivar">@waiter</span>.<span class="ruby-identifier">signal</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">sync</span>{<span class="ruby-identifier">release</span>(<span class="ruby-identifier">t</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pool_type'>
-                <a name='method-i-pool_type'></a>
-                <div class='synopsis'>
-                  <span class='name'>pool_type</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pool_type-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pool_type-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pool_type</span>&#x000A;  <span class="ruby-value">:threaded</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-size'>
-                <a name='method-i-size'></a>
-                <div class='synopsis'>
-                  <span class='name'>size</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The total number of connections opened, either available or allocated. The
-                  calling code should not have the mutex before calling this.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-size-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-size-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 113</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">size</span>&#x000A;  <span class="ruby-ivar">@mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">_size</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::ThreadedConnectionPool</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::ThreadedConnectionPool
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/connection_pool/threaded_rb.html">lib/sequel/connection_pool/threaded.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="ConnectionPool.html">ConnectionPool</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>A connection pool allowing multi-threaded access to a pool of connections.
+This is the default connection pool used by <a
+href="../Sequel.html">Sequel</a>.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-all_connections">all_connections</a></li>
+<li><a href="#attribute-i-allocated">allocated</a></li>
+<li><a href="#attribute-i-available_connections">available_connections</a></li>
+<li><a href="#method-i-disconnect">disconnect</a></li>
+<li><a href="#method-i-hold">hold</a></li>
+<li><a href="#attribute-i-max_size">max_size</a></li>
+<li><a href="#method-i-pool_type">pool_type</a></li>
+<li><a href="#method-i-size">size</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>USE_WAITER</td>
+<td>=</td>
+<td class='context-item-value'>true</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-allocated'>allocated</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A hash with thread keys and connection values for currently allocated
+connections.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-available_connections'>available_connections</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>An array of connections that are available for use by the pool.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-max_size'>max_size</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The maximum number of connections this pool will create (per shard/server
+if sharding).</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(db, opts = OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>The following additional options are respected:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:max_connections </td><td>
+<p>The maximum number of connections the connection pool will open (default 4)</p>
+</td></tr><tr><td class='label'>:pool_timeout </td><td>
+<p>The amount of seconds to wait to acquire a connection before raising a
+PoolTimeoutError (default 5)</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@max_size</span> = <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:max_connections</span>] <span class="ruby-operator">||</span> <span class="ruby-value">4</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;:max_connections must be positive&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@max_size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-ivar">@mutex</span> = <span class="ruby-constant">Mutex</span>.<span class="ruby-identifier">new</span>  &#x000A;  <span class="ruby-ivar">@connection_handling</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connection_handling</span>]&#x000A;  <span class="ruby-ivar">@available_connections</span> = []&#x000A;  <span class="ruby-ivar">@allocated</span> = {}&#x000A;  <span class="ruby-ivar">@timeout</span> = <span class="ruby-constant">Float</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:pool_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">5</span>)&#x000A;  <span class="ruby-ivar">@waiter</span> = <span class="ruby-constant">ConditionVariable</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-all_connections'>
+<a name='method-i-all_connections'></a>
+<div class='synopsis'>
+<span class='name'>all_connections</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Yield all of the available connections, and the one currently allocated to
+this thread.  This will not yield connections currently allocated to other
+threads, as it is not safe to operate on them.  This holds the mutex while
+it is yielding all of the available connections, which means that until the
+method&#39;s block returns, the pool is locked.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-all_connections-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-all_connections-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>&#x000A;  <span class="ruby-identifier">hold</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-disconnect'>
+<a name='method-i-disconnect'></a>
+<div class='synopsis'>
+<span class='name'>disconnect</span>
+<span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Removes all connections currently available, optionally yielding each
+connection to the given block. This method has the effect of  disconnecting
+from the database, assuming that no connections are currently being used. 
+If you want to be able to disconnect connections that are currently in use,
+use the ShardedThreadedConnectionPool, which can do that. This connection
+pool does not, for performance reasons. To use the sharded pool, pass the
+<code>servers: {}</code> option when connecting to the database.</p>
+
+<p>Once a connection is requested using <a
+href="ThreadedConnectionPool.html#method-i-hold">hold</a>, the connection
+pool creates new connections to the database.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-disconnect-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">conns</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">conns</span> = <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-ivar">@available_connections</span>.<span class="ruby-identifier">clear</span>&#x000A;    <span class="ruby-ivar">@waiter</span>.<span class="ruby-identifier">signal</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">conns</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">conn</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-hold'>
+<a name='method-i-hold'></a>
+<div class='synopsis'>
+<span class='name'>hold</span>
+<span class='arguments'>(server=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Chooses the first available connection, or if none are available, creates a
+new connection.  Passes the connection to the supplied block:</p>
+
+<pre class="ruby"><span class="ruby-identifier">pool</span>.<span class="ruby-identifier">hold</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-string">&#39;DROP TABLE posts&#39;</span>)}</pre>
+
+<p>Pool#hold is re-entrant, meaning it can be called recursively in the same
+thread without blocking.</p>
+
+<p>If no connection is immediately available and the pool is already using the
+maximum number of connections, Pool#hold will block until a connection is
+available or the timeout expires.  If the timeout expires before a
+connection can be acquired, a Sequel::PoolTimeout is raised.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hold-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-hold-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">owned_connection</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">conn</span> = <span class="ruby-identifier">acquire</span>(<span class="ruby-identifier">t</span>)&#x000A;    <span class="ruby-keyword">yield</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;      <span class="ruby-identifier">oconn</span> = <span class="ruby-identifier">conn</span>&#x000A;      <span class="ruby-identifier">conn</span> = <span class="ruby-keyword">nil</span>&#x000A;      <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">oconn</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">oconn</span>&#x000A;      <span class="ruby-identifier">sync</span> <span class="ruby-keyword">do</span> &#x000A;        <span class="ruby-ivar">@allocated</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">t</span>)&#x000A;        <span class="ruby-ivar">@waiter</span>.<span class="ruby-identifier">signal</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">sync</span>{<span class="ruby-identifier">release</span>(<span class="ruby-identifier">t</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-pool_type'>
+<a name='method-i-pool_type'></a>
+<div class='synopsis'>
+<span class='name'>pool_type</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pool_type-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-pool_type-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>&#x000A;  <span class="ruby-value">:threaded</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-size'>
+<a name='method-i-size'></a>
+<div class='synopsis'>
+<span class='name'>size</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The total number of connections opened, either available or allocated. The
+calling code should not have the mutex before calling this.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-size-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-size-source'><span class="ruby-comment"># File lib/sequel/connection_pool/threaded.rb, line 113</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>&#x000A;  <span class="ruby-ivar">@mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">_size</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

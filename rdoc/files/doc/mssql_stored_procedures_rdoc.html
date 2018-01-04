@@ -1,89 +1,91 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>mssql_stored_procedures.rdoc</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>mssql_stored_procedures.rdoc</h1>
-        <div class='paths'>
-          doc/mssql_stored_procedures.rdoc
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Stored+Procedures+in+MSSQL">Stored Procedures in MSSQL<span><a href="#label-Stored+Procedures+in+MSSQL">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p>This guide documents the workaround implemented to allow executing stored
-            procedures in MSSQL, as well as getting the value of output variables.</p>
-            
-            <h2 id="label-Simple+Execution">Simple Execution<span><a href="#label-Simple+Execution">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The following stored procedure is used as an example:</p>
-            
-            <pre>CREATE PROCEDURE dbo.SequelTest(&#x000A;  @Input varchar(25),&#x000A;  @Output int OUTPUT&#x000A;)&#x000A;AS&#x000A;  SET @Output = LEN(@Input)&#x000A;  RETURN 0</pre>
-            
-            <p>Execute it as follows:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {<span class="ruby-identifier">args</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, :<span class="ruby-identifier">output</span>]})</pre>
-            
-            <p>Use the <code>:output</code> symbol to denote an output variable. The
-            result will contain a hash of the output variables, as well as the result
-            code and number of affected rows:</p>
-            
-            <pre class="ruby">{:<span class="ruby-identifier">result</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>, :<span class="ruby-identifier">numrows</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">var1</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}</pre>
-            
-            <p>Output variables will be strings by default. To specify their type, include
-            the SQL type:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {<span class="ruby-identifier">args</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [:<span class="ruby-identifier">output</span>, <span class="ruby-string">&#39;int&#39;</span>]]})</pre>
-            
-            <p>Result:</p>
-            
-            <pre class="ruby">{:<span class="ruby-identifier">result</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>, :<span class="ruby-identifier">numrows</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">var1</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}</pre>
-            
-            <p>Output variables will be named +var#{n}+ where n is their zero indexed
-            position in the parameter list. To name the output variable, include their
-            name:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-constant">SequelTest</span>, {<span class="ruby-identifier">args</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [:<span class="ruby-identifier">output</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;Output&#39;</span>]]})</pre>
-            
-            <p>Result:</p>
-            
-            <pre class="ruby">{:<span class="ruby-identifier">result</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>, :<span class="ruby-identifier">numrows</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">output</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}</pre>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>mssql_stored_procedures.rdoc</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>mssql_stored_procedures.rdoc
+</h1>
+<div class='paths'>
+doc/mssql_stored_procedures.rdoc
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Stored+Procedures+in+MSSQL">Stored Procedures in MSSQL<span><a href="#label-Stored+Procedures+in+MSSQL">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>This guide documents the workaround implemented to allow executing stored
+procedures in MSSQL, as well as getting the value of output variables.</p>
+
+<h2 id="label-Simple+Execution">Simple Execution<span><a href="#label-Simple+Execution">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The following stored procedure is used as an example:</p>
+
+<pre>CREATE PROCEDURE dbo.SequelTest(&#x000A;  @Input varchar(25),&#x000A;  @Output int OUTPUT&#x000A;)&#x000A;AS&#x000A;  SET @Output = LEN(@Input)&#x000A;  RETURN 0</pre>
+
+<p>Execute it as follows:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, <span class="ruby-value">:output</span>]})</pre>
+
+<p>Use the <code>:output</code> symbol to denote an output variable. The
+result will contain a hash of the output variables, as well as the result
+code and number of affected rows:</p>
+
+<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:var1</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}</pre>
+
+<p>Output variables will be strings by default. To specify their type, include
+the SQL type:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [<span class="ruby-value">:output</span>, <span class="ruby-string">&#39;int&#39;</span>]]})</pre>
+
+<p>Result:</p>
+
+<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:var1</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>}</pre>
+
+<p>Output variables will be named +var#{n}+ where n is their zero indexed
+position in the parameter list. To name the output variable, include their
+name:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(<span class="ruby-value">:SequelTest</span>, {<span class="ruby-value">args:</span> [<span class="ruby-string">&#39;Input String&#39;</span>, [<span class="ruby-value">:output</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-string">&#39;Output&#39;</span>]]})</pre>
+
+<p>Result:</p>
+
+<pre class="ruby">{<span class="ruby-value">:result</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">0</span>, <span class="ruby-value">:numrows</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">:output</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;1&quot;</span>}</pre>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

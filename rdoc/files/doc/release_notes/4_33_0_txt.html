@@ -1,146 +1,148 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.33.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.33.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.33.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-04-01 07:24:12 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A Sequel::Model.require_valid_table accessor has been added. This setting
-            is false for backwards compatibility, but if set to true, will raise an
-            error you try to create a model class where an invalid table name is used
-            or the schema or columns cannot be determined.  This makes it easier to
-            catch bugs, as things will fail fast, but it means that you must change
-            code like:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> :<span class="ruby-identifier">my_foos</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>to:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">my_foos</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>as otherwise Foo will attempt to use the foos table by default when
-            creating the class, which will raise an error as it is not the correct
-            table name.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel/Database.html#method-i-transaction">Sequel::Database#transaction</a>
-            now supports a :savepoint=&gt;:only option, which will create a savepoint
-            if already inside a transaction, but will yield without creating a
-            transaction if not inside a transaction.  The use case for this is when you
-            are running code that may raise an exception, and you don&#39;t want to
-            invalidate the current transaction state.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The graph_each extension now splits results into subhashes when using <a
-            href="../../../classes/Sequel/Dataset.html#method-i-first">Sequel::Dataset#first</a>,
-            as it did before <a href="../../../classes/Sequel.html">Sequel</a> 4.27.0.</p>
-            </li><li>
-            <p>On PostgreSQL, Dataset#insert_conflict now accepts an array of columns as
-            the value for the :target option.</p>
-            </li><li>
-            <p>You can now pass a <a
-            href="../../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a>
-            or a Sequel::SQL::QualifiedIdentifer as the table argument when creating a
-            foreign key.  Previously, only symbols were supported, and using other
-            values required specifying the :table option.  So this will now work to
-            reference a table that includes a double underscore:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">foo_id</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">fo__oo</span>)</pre>
-            </li><li>
-            <p>Creating model classes inside a transaction on PostgreSQL where the
-            implicit table name isn&#39;t correct no longer causes the transaction to
-            fail.</p>
-            
-            <p>Similar issues were also fixed in the boolean_readers, boolean_subsets, and
-            class_table_inheritance plugins.</p>
-            </li><li>
-            <p>On PostgreSQL, You can now use the :qualify=&gt;true option in the schema
-            dumper, to dump using schema-qualified table names.</p>
-            </li><li>
-            <p>On Microsoft SQL Server, the set_column_allow_null and set_column_not_null
-            alter table methods now work on varchar(max), text, and similar columns.</p>
-            </li><li>
-            <p>On Oracle, Sequel::Database#sequence_for_table now returns nil if given a
-            table that doesn&#39;t exist or that the user does not have access to.</p>
-            </li><li>
-            <p>Passing arbitrary objects to a model association method now indicates that
-            the association should be reloaded, which was used to work but was broken
-            in <a href="../../../classes/Sequel.html">Sequel</a> 4.32.0.</p>
-            </li><li>
-            <p>It is now possible to raise <a
-            href="../../../classes/Sequel/ValidationFailed.html">Sequel::ValidationFailed</a>
-            and <a
-            href="../../../classes/Sequel/HookFailed.html">Sequel::HookFailed</a>
-            without an argument.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> no longer
-            swallows many errors when subclassing or setting datasets.  While this
-            should hopefully not affect backwards compatibility, it may break things
-            where the methods were raising exceptions.  If this does break backwards
-            compatibility, it is most likely because it is no longer hiding another bug
-            that should be fixed.  Specific changes include:</p>
-            <ul><li>
-            <p>Model.inherited no longer rescues exceptions raised by set_dataset</p>
-            </li><li>
-            <p>When subclassing a model that has a dataset, the columns and schema are
-            just copied from the superclass</p>
-            </li><li>
-            <p>Only <a href="../../../classes/Sequel/Error.html">Sequel::Error</a> is
-            rescued in calls to columns and schema, before it would rescue
-            StandardError.</p>
-            </li></ul>
-            </li><li>
-            <p>The Sequel.firebird and Sequel.informix adapter methods have been removed,
-            they are no longer needed as the firebird and informix adapters were
-            removed a few versions back.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.33.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.33.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.33.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-04-01 07:24:12 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A Sequel::Model.require_valid_table accessor has been added. This setting
+is false for backwards compatibility, but if set to true, will raise an
+error you try to create a model class where an invalid table name is used
+or the schema or columns cannot be determined.  This makes it easier to
+catch bugs, as things will fail fast, but it means that you must change
+code like:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> <span class="ruby-value">:my_foos</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>to:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:my_foos</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>as otherwise Foo will attempt to use the foos table by default when
+creating the class, which will raise an error as it is not the correct
+table name.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel/Database.html#method-i-transaction">Sequel::Database#transaction</a>
+now supports a :savepoint=&gt;:only option, which will create a savepoint
+if already inside a transaction, but will yield without creating a
+transaction if not inside a transaction.  The use case for this is when you
+are running code that may raise an exception, and you don&#39;t want to
+invalidate the current transaction state.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The graph_each extension now splits results into subhashes when using <a
+href="../../../classes/Sequel/Dataset.html#method-i-first">Sequel::Dataset#first</a>,
+as it did before <a href="../../../classes/Sequel.html">Sequel</a> 4.27.0.</p>
+</li><li>
+<p>On PostgreSQL, Dataset#insert_conflict now accepts an array of columns as
+the value for the :target option.</p>
+</li><li>
+<p>You can now pass a <a
+href="../../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a>
+or a Sequel::SQL::QualifiedIdentifer as the table argument when creating a
+foreign key.  Previously, only symbols were supported, and using other
+values required specifying the :table option.  So this will now work to
+reference a table that includes a double underscore:</p>
+
+<pre class="ruby"><span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:foo_id</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-value">:fo__oo</span>)</pre>
+</li><li>
+<p>Creating model classes inside a transaction on PostgreSQL where the
+implicit table name isn&#39;t correct no longer causes the transaction to
+fail.</p>
+
+<p>Similar issues were also fixed in the boolean_readers, boolean_subsets, and
+class_table_inheritance plugins.</p>
+</li><li>
+<p>On PostgreSQL, You can now use the :qualify=&gt;true option in the schema
+dumper, to dump using schema-qualified table names.</p>
+</li><li>
+<p>On Microsoft SQL Server, the set_column_allow_null and set_column_not_null
+alter table methods now work on varchar(max), text, and similar columns.</p>
+</li><li>
+<p>On Oracle, Sequel::Database#sequence_for_table now returns nil if given a
+table that doesn&#39;t exist or that the user does not have access to.</p>
+</li><li>
+<p>Passing arbitrary objects to a model association method now indicates that
+the association should be reloaded, which was used to work but was broken
+in <a href="../../../classes/Sequel.html">Sequel</a> 4.32.0.</p>
+</li><li>
+<p>It is now possible to raise <a
+href="../../../classes/Sequel/ValidationFailed.html">Sequel::ValidationFailed</a>
+and <a
+href="../../../classes/Sequel/HookFailed.html">Sequel::HookFailed</a>
+without an argument.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> no longer
+swallows many errors when subclassing or setting datasets.  While this
+should hopefully not affect backwards compatibility, it may break things
+where the methods were raising exceptions.  If this does break backwards
+compatibility, it is most likely because it is no longer hiding another bug
+that should be fixed.  Specific changes include:</p>
+<ul><li>
+<p>Model.inherited no longer rescues exceptions raised by set_dataset</p>
+</li><li>
+<p>When subclassing a model that has a dataset, the columns and schema are
+just copied from the superclass</p>
+</li><li>
+<p>Only <a href="../../../classes/Sequel/Error.html">Sequel::Error</a> is
+rescued in calls to columns and schema, before it would rescue
+StandardError.</p>
+</li></ul>
+</li><li>
+<p>The Sequel.firebird and Sequel.informix adapter methods have been removed,
+they are no longer needed as the firebird and informix adapters were
+removed a few versions back.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

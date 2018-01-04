@@ -1,87 +1,89 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>schema_caching.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>schema_caching.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/schema_caching.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The schema_caching extension adds a few methods to Sequel::Database that
-            make it easy to dump the parsed schema information to a file, and load it
-            from that file.  Loading the schema information from a dumped file is
-            faster than parsing it from the database, so this can save bootup time for
-            applications with large numbers of models.</p>
-            
-            <p>Basic usage in application code:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">schema_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span></pre>
-            
-            <p>Then, whenever the database schema is modified, write a new cached file. 
-            You can do that with <code>bin/sequel</code>&#39;s -S option:</p>
-            
-            <pre>bin/sequel -S /path/to/schema.dump postgres://...</pre>
-            
-            <p>Alternatively, if you don&#39;t want to dump the schema information for all
-            tables, and you don&#39;t worry about race conditions, you can choose to
-            use the following in your application code:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">schema_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_schema_cache?</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_cache?</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)</pre>
-            
-            <p>With this method, you just have to delete the schema dump file if the
-            schema is modified, and the application will recreate it for you using just
-            the tables that your models use.</p>
-            
-            <p>Note that it is up to the application to ensure that the dumped cached
-            schema reflects the current state of the database.  <a
-            href="../../../../classes/Sequel.html">Sequel</a> does no checking to
-            ensure this, as checking would take time and the purpose of this code is to
-            take a shortcut.</p>
-            
-            <p>The cached schema is dumped in Marshal format, since it is the fastest and
-            it handles all ruby objects used in the schema hash.  Because of this, you
-            should not attempt to load the schema from a untrusted file.</p>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/SchemaCaching.html">Sequel::SchemaCaching</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>schema_caching.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>schema_caching.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/schema_caching.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-02-11 15:50:14 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The schema_caching extension adds a few methods to Sequel::Database that
+make it easy to dump the parsed schema information to a file, and load it
+from that file.  Loading the schema information from a dumped file is
+faster than parsing it from the database, so this can save bootup time for
+applications with large numbers of models.</p>
+
+<p>Basic usage in application code:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:schema_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span></pre>
+
+<p>Then, whenever the database schema is modified, write a new cached file. 
+You can do that with <code>bin/sequel</code>&#39;s -S option:</p>
+
+<pre>bin/sequel -S /path/to/schema.dump postgres://...</pre>
+
+<p>Alternatively, if you don&#39;t want to dump the schema information for all
+tables, and you don&#39;t worry about race conditions, you can choose to
+use the following in your application code:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:schema_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_schema_cache?</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_cache?</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)</pre>
+
+<p>With this method, you just have to delete the schema dump file if the
+schema is modified, and the application will recreate it for you using just
+the tables that your models use.</p>
+
+<p>Note that it is up to the application to ensure that the dumped cached
+schema reflects the current state of the database.  <a
+href="../../../../classes/Sequel.html">Sequel</a> does no checking to
+ensure this, as checking would take time and the purpose of this code is to
+take a shortcut.</p>
+
+<p>The cached schema is dumped in Marshal format, since it is the fastest and
+it handles all ruby objects used in the schema hash.  Because of this, you
+should not attempt to load the schema from a untrusted file.</p>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/SchemaCaching.html">Sequel::SchemaCaching</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

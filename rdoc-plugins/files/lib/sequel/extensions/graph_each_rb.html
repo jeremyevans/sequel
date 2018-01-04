@@ -1,67 +1,69 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>graph_each.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>graph_each.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/graph_each.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The graph_each extension adds Dataset#graph_each and makes Dataset#each
-            call graph_each if the dataset has been graphed. Dataset#graph_each splits
-            result hashes into subhashes per table:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">graph</span>(:<span class="ruby-identifier">b</span>, <span class="ruby-identifier">id</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">b_id</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;{:id=&gt;1, :b_id=&gt;2}, :b=&gt;{:id=&gt;2}}</span></pre>
-            
-            <p>You can load this extension into specific datasets:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">graph_each</span>)</pre>
-            
-            <p>Or you can load it into all of a database&#39;s datasets, which is probably
-            the desired behavior if you are using this extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">graph_each</span>)</pre>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/GraphEach.html">Sequel::GraphEach</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>graph_each.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>graph_each.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/graph_each.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The graph_each extension adds Dataset#graph_each and makes Dataset#each
+call graph_each if the dataset has been graphed. Dataset#graph_each splits
+result hashes into subhashes per table:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:b_id</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;{:id=&gt;1, :b_id=&gt;2}, :b=&gt;{:id=&gt;2}}</span></pre>
+
+<p>You can load this extension into specific datasets:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:graph_each</span>)</pre>
+
+<p>Or you can load it into all of a database&#39;s datasets, which is probably
+the desired behavior if you are using this extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:graph_each</span>)</pre>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/GraphEach.html">Sequel::GraphEach</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

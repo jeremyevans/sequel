@@ -1,105 +1,107 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.15.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.15.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.15.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2014-10-01 08:46:53 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>fdbsql and jdbc/fdbsql adapters have been added, for connecting to
-            FoundationDB SQL Layer.</p>
-            </li><li>
-            <p>A split_values plugin has been added, for moving non-column entries from
-            the values hash into a separate hash.  This allows you to select additional
-            columns (e.g. computed columns) when retrieving model instances, and be
-            able to save those instances without removing the additional columns.</p>
-            </li><li>
-            <p>A Sequel::Model.cache_associations accessor has been added, which can be
-            set to false to not cache any association metadata.  This can fix issues in
-            a development environment that uses code reloading.</p>
-            </li><li>
-            <p>The active_model plugin now supports activemodel 4.2.0beta1.</p>
-            </li><li>
-            <p>More PostgreSQL array types are handled automatically by the pg_array
-            extension, such as xml[] and uuid[].</p>
-            </li><li>
-            <p>Creating foreign tables is now supported on PostgreSQL via the :foreign and
-            :options create_table options.</p>
-            </li><li>
-            <p>The :nolog Database option is now supported in the informix adapter, where
-            it disables the use of transactions.</p>
-            </li><li>
-            <p>PlaceholderLiteralizer#with_dataset has been added, allowing you to create
-            another PlaceholderLiteralizer with a modified dataset, useful if you want
-            to change the row_proc or any non-SQL dataset options.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The tactical_eager_loading plugin once again works correctly with limited
-            associations.</p>
-            </li><li>
-            <p>A bug in older versions of MySQL is now worked around when schema dumping a
-            table with multiple timestamp columns.</p>
-            </li><li>
-            <p>On PostgreSQL, create_view(:view_name, dataset, :materialized=&gt;true) is
-            now reversible.</p>
-            </li><li>
-            <p>Postgres::{JSON,JSONB}Op#to_record and to_recordset no longer take an
-            optional argument.  This was supported in PostgreSQL 9.4beta1, but removed
-            before PostgreSQL 9.4beta2.</p>
-            </li><li>
-            <p>Dataset#insert now returns the last inserted id in the informix adapter.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer raises an
-            exception in AssociationReflection#reciprocal if the associated class has
-            an association that does not have a valid associated class.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now raises an exception
-            if a primary key is necessary to use an association, but the model does not
-            have a primary key.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.15.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.15.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.15.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2014-10-01 08:46:53 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>fdbsql and jdbc/fdbsql adapters have been added, for connecting to
+FoundationDB SQL Layer.</p>
+</li><li>
+<p>A split_values plugin has been added, for moving non-column entries from
+the values hash into a separate hash.  This allows you to select additional
+columns (e.g. computed columns) when retrieving model instances, and be
+able to save those instances without removing the additional columns.</p>
+</li><li>
+<p>A Sequel::Model.cache_associations accessor has been added, which can be
+set to false to not cache any association metadata.  This can fix issues in
+a development environment that uses code reloading.</p>
+</li><li>
+<p>The active_model plugin now supports activemodel 4.2.0beta1.</p>
+</li><li>
+<p>More PostgreSQL array types are handled automatically by the pg_array
+extension, such as xml[] and uuid[].</p>
+</li><li>
+<p>Creating foreign tables is now supported on PostgreSQL via the :foreign and
+:options create_table options.</p>
+</li><li>
+<p>The :nolog Database option is now supported in the informix adapter, where
+it disables the use of transactions.</p>
+</li><li>
+<p>PlaceholderLiteralizer#with_dataset has been added, allowing you to create
+another PlaceholderLiteralizer with a modified dataset, useful if you want
+to change the row_proc or any non-SQL dataset options.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The tactical_eager_loading plugin once again works correctly with limited
+associations.</p>
+</li><li>
+<p>A bug in older versions of MySQL is now worked around when schema dumping a
+table with multiple timestamp columns.</p>
+</li><li>
+<p>On PostgreSQL, create_view(:view_name, dataset, :materialized=&gt;true) is
+now reversible.</p>
+</li><li>
+<p>Postgres::{JSON,JSONB}Op#to_record and to_recordset no longer take an
+optional argument.  This was supported in PostgreSQL 9.4beta1, but removed
+before PostgreSQL 9.4beta2.</p>
+</li><li>
+<p>Dataset#insert now returns the last inserted id in the informix adapter.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer raises an
+exception in AssociationReflection#reciprocal if the associated class has
+an association that does not have a valid associated class.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now raises an exception
+if a primary key is necessary to use an association, but the model does not
+have a primary key.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

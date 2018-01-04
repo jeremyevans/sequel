@@ -1,145 +1,150 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::Subclasses::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::Subclasses::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/subclasses_rb.html">lib/sequel/plugins/subclasses.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-descendents">descendents</a></li>
-              <li><a href="#method-i-freeze_descendents">freeze_descendents</a></li>
-              <li><a href="#method-i-inherited">inherited</a></li>
-              <li><a href="#attribute-i-on_subclass">on_subclass</a></li>
-              <li><a href="#attribute-i-subclasses">subclasses</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-on_subclass'>on_subclass</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Callable object that should be called with every descendent class created.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-subclasses'>subclasses</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>All subclasses for the current model.  Does not include the model itself.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-descendents'>
-                <a name='method-i-descendents'></a>
-                <div class='synopsis'>
-                  <span class='name'>descendents</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>All descendent classes of this model.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-descendents-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-freeze_descendents'>
-                <a name='method-i-freeze_descendents'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze_descendents</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Freeze all descendent classes.  This also finalizes the associations for
-                  those classes before freezing.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze_descendents-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze_descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze_descendents</span>&#x000A;  <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-inherited'>
-                <a name='method-i-inherited'></a>
-                <div class='synopsis'>
-                  <span class='name'>inherited</span>
-                  <span class='arguments'>(subclass)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Add the subclass to this model&#39;s current subclasses, and initialize a
-                  new subclasses instance variable in the subclass.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-inherited-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;  <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::Subclasses::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::Subclasses::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/subclasses_rb.html">lib/sequel/plugins/subclasses.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-descendents">descendents</a></li>
+<li><a href="#method-i-freeze_descendents">freeze_descendents</a></li>
+<li><a href="#method-i-inherited">inherited</a></li>
+<li><a href="#attribute-i-on_subclass">on_subclass</a></li>
+<li><a href="#attribute-i-subclasses">subclasses</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-on_subclass'>on_subclass</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>Callable object that should be called with every descendent class created.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-subclasses'>subclasses</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>All subclasses for the current model.  Does not include the model itself.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-descendents'>
+<a name='method-i-descendents'></a>
+<div class='synopsis'>
+<span class='name'>descendents</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>All descendent classes of this model.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-descendents-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-freeze_descendents'>
+<a name='method-i-freeze_descendents'></a>
+<div class='synopsis'>
+<span class='name'>freeze_descendents</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Freeze all descendent classes.  This also finalizes the associations for
+those classes before freezing.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze_descendents-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze_descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze_descendents</span>&#x000A;  <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-inherited'>
+<a name='method-i-inherited'></a>
+<div class='synopsis'>
+<span class='name'>inherited</span>
+<span class='arguments'>(subclass)</span>
+
+</div>
+<div class='description'>
+
+<p>Add the subclass to this model&#39;s current subclasses, and initialize a
+new subclasses instance variable in the subclass.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inherited-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;  <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

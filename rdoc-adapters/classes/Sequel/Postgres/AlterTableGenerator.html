@@ -1,102 +1,107 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres::AlterTableGenerator</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::AlterTableGenerator
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>Sequel::Schema::AlterTableGenerator</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-add_exclusion_constraint">add_exclusion_constraint</a></li>
-              <li><a href="#method-i-validate_constraint">validate_constraint</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-add_exclusion_constraint'>
-                <a name='method-i-add_exclusion_constraint'></a>
-                <div class='synopsis'>
-                  <span class='name'>add_exclusion_constraint</span>
-                  <span class='arguments'>(elements, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Adds an exclusion constraint to an existing table, see <a
-                  href="CreateTableGenerator.html#method-i-exclude">Sequel::Postgres::CreateTableGenerator#exclude</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_exclusion_constraint-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-add_exclusion_constraint-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 117</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_exclusion_constraint</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-validate_constraint'>
-                <a name='method-i-validate_constraint'></a>
-                <div class='synopsis'>
-                  <span class='name'>validate_constraint</span>
-                  <span class='arguments'>(name)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Validate the constraint with the given name, which should have been added
-                  previously with NOT VALID.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-validate_constraint-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-validate_constraint-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">validate_constraint</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres::AlterTableGenerator</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::AlterTableGenerator
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Sequel::Schema::AlterTableGenerator</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-add_exclusion_constraint">add_exclusion_constraint</a></li>
+<li><a href="#method-i-validate_constraint">validate_constraint</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-add_exclusion_constraint'>
+<a name='method-i-add_exclusion_constraint'></a>
+<div class='synopsis'>
+<span class='name'>add_exclusion_constraint</span>
+<span class='arguments'>(elements, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Adds an exclusion constraint to an existing table, see <a
+href="CreateTableGenerator.html#method-i-exclude">Sequel::Postgres::CreateTableGenerator#exclude</a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_exclusion_constraint-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-add_exclusion_constraint-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 117</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_exclusion_constraint</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-validate_constraint'>
+<a name='method-i-validate_constraint'></a>
+<div class='synopsis'>
+<span class='name'>validate_constraint</span>
+<span class='arguments'>(name)</span>
+
+</div>
+<div class='description'>
+
+<p>Validate the constraint with the given name, which should have been added
+previously with NOT VALID.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validate_constraint-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-validate_constraint-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,152 +1,153 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Deprecation</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Deprecation
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/deprecated_rb.html">lib/sequel/deprecated.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>This module makes it easy to print deprecation warnings with optional
-            backtraces to a given stream. There are a two accessors you can use to
-            change how/where the deprecation methods are printed and whether/how
-            backtraces should be included:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-identifier">$stderr</span> <span class="ruby-comment"># print deprecation messages to standard error (default)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated_calls.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>) <span class="ruby-comment"># use a file instead</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># do not output deprecation messages</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">prefix</span> = <span class="ruby-string">&quot;SEQUEL DEPRECATION WARNING: &quot;</span> <span class="ruby-comment"># prefix deprecation messages with a given string (default)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">prefix</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># do not prefix deprecation messages</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># don&#39;t include backtraces</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># include full backtraces</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">10</span> <span class="ruby-comment"># include 10 backtrace lines (default)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">1</span> <span class="ruby-comment"># include 1 backtrace line</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line_no</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">3</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/my_app/</span>} <span class="ruby-comment"># select backtrace lines to output</span></pre>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#attribute-c-backtrace_filter">backtrace_filter</a></li>
-              <li><a href="#method-c-deprecate">deprecate</a></li>
-              <li><a href="#method-c-deprecate_constant">deprecate_constant</a></li>
-              <li><a href="#attribute-c-output">output</a></li>
-              <li><a href="#attribute-c-prefix">prefix</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-backtrace_filter'>backtrace_filter</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>How to filter backtraces.  <code>false</code> does not include backtraces,
-                      <code>true</code> includes full backtraces, an Integer includes that number
-                      of backtrace lines, and a proc is called with the backtrace line and line
-                      number to select the backtrace lines to include.  The default is 10
-                      backtrace lines.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-output'>output</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Where deprecation messages should be output, must respond to puts.  $stderr
-                      by default.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-prefix'>prefix</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Where deprecation messages should be prefixed with (“SEQUEL DEPRECATION
-                      WARNING: ” by default).</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-deprecate'>
-                <a name='method-c-deprecate'></a>
-                <div class='synopsis'>
-                  <span class='name'>deprecate</span>
-                  <span class='arguments'>(method, instead=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Print the message and possibly backtrace to the output.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-deprecate-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-deprecate-source'><span class="ruby-comment"># File lib/sequel/deprecated.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-identifier">method</span>, <span class="ruby-identifier">instead</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">output</span>&#x000A;  <span class="ruby-identifier">message</span> = <span class="ruby-identifier">instead</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{method} is deprecated and will be removed in Sequel 5.1.  #{instead}.&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">method</span>&#x000A;  <span class="ruby-identifier">message</span> = <span class="ruby-node">&quot;#{prefix}#{message}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">prefix</span>&#x000A;  <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">message</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">b</span> = <span class="ruby-identifier">backtrace_filter</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">b</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">c</span>)&#x000A;      <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Proc</span>&#x000A;    <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">each_with_index</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">line</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-deprecate_constant'>
-                <a name='method-c-deprecate_constant'></a>
-                <div class='synopsis'>
-                  <span class='name'>deprecate_constant</span>
-                  <span class='arguments'>(mod, constant)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If using ruby 2.3+, use Module#deprecate_constant to deprecate the
-                  constant, otherwise do nothing as the ruby implementation does not support
-                  constant deprecation.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-deprecate_constant-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-deprecate_constant-source'><span class="ruby-comment"># File lib/sequel/deprecated.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">deprecate_constant</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">constant</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;2.3&#39;</span>&#x000A;    <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">deprecate_constant</span>(<span class="ruby-identifier">constant</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Deprecation</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Deprecation
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/deprecated_rb.html">lib/sequel/deprecated.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>This module makes it easy to print deprecation warnings with optional
+backtraces to a given stream. There are a two accessors you can use to
+change how/where the deprecation methods are printed and whether/how
+backtraces should be included:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-identifier">$stderr</span> <span class="ruby-comment"># print deprecation messages to standard error (default)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated_calls.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>) <span class="ruby-comment"># use a file instead</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># do not output deprecation messages</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">prefix</span> = <span class="ruby-string">&quot;SEQUEL DEPRECATION WARNING: &quot;</span> <span class="ruby-comment"># prefix deprecation messages with a given string (default)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">prefix</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># do not prefix deprecation messages</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># don&#39;t include backtraces</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># include full backtraces</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">10</span> <span class="ruby-comment"># include 10 backtrace lines (default)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">1</span> <span class="ruby-comment"># include 1 backtrace line</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line_no</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">3</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/my_app/</span>} <span class="ruby-comment"># select backtrace lines to output</span></pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#attribute-c-backtrace_filter">backtrace_filter</a></li>
+<li><a href="#method-c-deprecate">deprecate</a></li>
+<li><a href="#method-c-deprecate_constant">deprecate_constant</a></li>
+<li><a href="#attribute-c-output">output</a></li>
+<li><a href="#attribute-c-prefix">prefix</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-c-backtrace_filter'>backtrace_filter</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>How to filter backtraces.  <code>false</code> does not include backtraces,
+<code>true</code> includes full backtraces, an Integer includes that number
+of backtrace lines, and a proc is called with the backtrace line and line
+number to select the backtrace lines to include.  The default is 10
+backtrace lines.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-c-output'>output</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>Where deprecation messages should be output, must respond to puts.  $stderr
+by default.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-c-prefix'>prefix</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>Where deprecation messages should be prefixed with (“SEQUEL DEPRECATION
+WARNING: ” by default).</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-deprecate'>
+<a name='method-c-deprecate'></a>
+<div class='synopsis'>
+<span class='name'>deprecate</span>
+<span class='arguments'>(method, instead=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Print the message and possibly backtrace to the output.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-deprecate-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-deprecate-source'><span class="ruby-comment"># File lib/sequel/deprecated.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">deprecate</span>(<span class="ruby-identifier">method</span>, <span class="ruby-identifier">instead</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">output</span>&#x000A;  <span class="ruby-identifier">message</span> = <span class="ruby-identifier">instead</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{method} is deprecated and will be removed in Sequel 5.1.  #{instead}.&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">method</span>&#x000A;  <span class="ruby-identifier">message</span> = <span class="ruby-node">&quot;#{prefix}#{message}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">prefix</span>&#x000A;  <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">message</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">b</span> = <span class="ruby-identifier">backtrace_filter</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">b</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">c</span>)&#x000A;      <span class="ruby-keyword">break</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">0</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Proc</span>&#x000A;    <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">each_with_index</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-identifier">line</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-deprecate_constant'>
+<a name='method-c-deprecate_constant'></a>
+<div class='synopsis'>
+<span class='name'>deprecate_constant</span>
+<span class='arguments'>(mod, constant)</span>
+
+</div>
+<div class='description'>
+
+<p>If using ruby 2.3+, use Module#deprecate_constant to deprecate the
+constant, otherwise do nothing as the ruby implementation does not support
+constant deprecation.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-deprecate_constant-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-deprecate_constant-source'><span class="ruby-comment"># File lib/sequel/deprecated.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">deprecate_constant</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">constant</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;2.3&#39;</span>&#x000A;    <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">deprecate_constant</span>(<span class="ruby-identifier">constant</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

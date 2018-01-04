@@ -1,153 +1,155 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>pg_row.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>pg_row.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/pg_row.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The pg_row extension adds support for <a
-            href="../../../../classes/Sequel.html">Sequel</a> to handle
-            PostgreSQL&#39;s row-valued/composite types.</p>
-            
-            <p>This extension integrates with Sequel&#39;s native postgres and
-            jdbc/postgresql adapters, so that when composite fields are retrieved, they
-            are parsed and returned as instances of
-            Sequel::Postgres::PGRow::(HashRow|ArrayRow), or optionally a custom type. 
-            HashRow and ArrayRow are DelegateClasses of of <a
-            href="../../../../classes/Hash.html">Hash</a> and <a
-            href="../../../../classes/Array.html">Array</a>, so they mostly act like a
-            hash or array, but not completely (is_a?(Hash) and is_a?(Array) are false).
-            If you want the actual hash for a HashRow, call HashRow#to_hash, and if you
-            want the actual array for an ArrayRow, call ArrayRow#to_a.  This is done so
-            that <a href="../../../../classes/Sequel.html">Sequel</a> does not treat a
-            values like an <a href="../../../../classes/Array.html">Array</a> or <a
-            href="../../../../classes/Hash.html">Hash</a> by default, which would cause
-            issues.</p>
-            
-            <p>In addition to the parsers, this extension comes with literalizers for
-            HashRow and ArrayRow using the standard <a
-            href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
-            so they work with on all adapters.</p>
-            
-            <p>To use this extension, first load it into the Database instance:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_row</span></pre>
-            
-            <p>If you plan to use arrays of composite types, make sure you load the
-            pg_array extension first:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span>, :<span class="ruby-identifier">pg_row</span></pre>
-            
-            <p>You can create an anonymous row type by calling the Sequel.pg_row with an
-            array:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row</span>(<span class="ruby-identifier">array</span>)</pre>
-            
-            <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions
-            extension</a>, or you have loaded the core_refinements extension and have
-            activated refinements for the file, you can also use <a
-            href="../../../../classes/Array.html#method-i-pg_row">Array#pg_row</a>:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_row</span></pre>
-            
-            <p>However, in most cases you are going to want something beyond anonymous row
-            types.  This extension allows you to register row types on a per database
-            basis, using Database#register_row_type:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_row_type</span>(:<span class="ruby-identifier">foo</span>)</pre>
-            
-            <p>When you register the row type, <a
-            href="../../../../classes/Sequel.html">Sequel</a> will query the PostgreSQL
-            system tables to find the related metadata, and will setup a custom HashRow
-            subclass for that type.  This includes looking up conversion procs for each
-            column in the type, so that when the composite type is returned from the
-            database, the members of the type have the correct type.  Additionally, if
-            the composite type also has an array form, <a
-            href="../../../../classes/Sequel.html">Sequel</a> registers an array type
-            for the composite type, so that array columns of the composite type are
-            converted correctly.</p>
-            
-            <p>You can then create values of that type by using Database#row_type:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(:<span class="ruby-identifier">address</span>, [<span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-string">&#39;12345&#39;</span>])</pre>
-            
-            <p>Let&#39;s say table address has columns street, city, and zip.  This would
-            return something similar to:</p>
-            
-            <pre class="ruby">{:<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;123 Sesame St.&#39;</span>, :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Some City&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;12345&#39;</span>}</pre>
-            
-            <p>You can also use a hash:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(:<span class="ruby-identifier">address</span>, <span class="ruby-identifier">street</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-identifier">city</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-identifier">zip</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;12345&#39;</span>)</pre>
-            
-            <p>So if you have a person table that has an address column, here&#39;s how
-            you could insert into the column:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">address</span><span class="ruby-operator">:</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(:<span class="ruby-identifier">address</span>, <span class="ruby-identifier">street</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-identifier">city</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-identifier">zip</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;12345&#39;</span>))</pre>
-            
-            <p>Note that registering row types without providing an explicit :converter
-            option creates anonymous classes.  This results in ruby being unable to
-            Marshal such objects.  You can work around this by assigning the anonymous
-            class to a constant. To get a list of such anonymous classes, you can use
-            the following code:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>) <span class="ruby-operator">&amp;&amp;</span>    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>) }.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}</pre>
-            
-            <p>See the schema modification guide for details on using row type columns in
-            CREATE/ALTER TABLE statements.</p>
-            
-            <p>This extension requires both the strscan and delegate libraries.</p>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/Postgres/PGRow.html">Sequel::Postgres::PGRow</a></p>
-          </div>
-          <div id='context'>
-            <div id='requires'>
-              <h2>Required files</h2>
-              <ol>
-                <li>delegate</li>
-                <li>strscan</li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>pg_row.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>pg_row.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/pg_row.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_row extension adds support for <a
+href="../../../../classes/Sequel.html">Sequel</a> to handle
+PostgreSQL&#39;s row-valued/composite types.</p>
+
+<p>This extension integrates with Sequel&#39;s native postgres and
+jdbc/postgresql adapters, so that when composite fields are retrieved, they
+are parsed and returned as instances of
+Sequel::Postgres::PGRow::(HashRow|ArrayRow), or optionally a custom type. 
+HashRow and ArrayRow are DelegateClasses of of <a
+href="../../../../classes/Hash.html">Hash</a> and <a
+href="../../../../classes/Array.html">Array</a>, so they mostly act like a
+hash or array, but not completely (is_a?(Hash) and is_a?(Array) are false).
+If you want the actual hash for a HashRow, call HashRow#to_hash, and if you
+want the actual array for an ArrayRow, call ArrayRow#to_a.  This is done so
+that <a href="../../../../classes/Sequel.html">Sequel</a> does not treat a
+values like an <a href="../../../../classes/Array.html">Array</a> or <a
+href="../../../../classes/Hash.html">Hash</a> by default, which would cause
+issues.</p>
+
+<p>In addition to the parsers, this extension comes with literalizers for
+HashRow and ArrayRow using the standard <a
+href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
+so they work with on all adapters.</p>
+
+<p>To use this extension, first load it into the Database instance:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_row</span></pre>
+
+<p>If you plan to use arrays of composite types, make sure you load the
+pg_array extension first:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_row</span></pre>
+
+<p>You can create an anonymous row type by calling the Sequel.pg_row with an
+array:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row</span>(<span class="ruby-identifier">array</span>)</pre>
+
+<p>If you have loaded the <a
+href="../../../doc/core_extensions_rdoc.html">core_extensions
+extension</a>, or you have loaded the core_refinements extension and have
+activated refinements for the file, you can also use <a
+href="../../../../classes/Array.html#method-i-pg_row">Array#pg_row</a>:</p>
+
+<pre class="ruby"><span class="ruby-identifier">array</span>.<span class="ruby-identifier">pg_row</span></pre>
+
+<p>However, in most cases you are going to want something beyond anonymous row
+types.  This extension allows you to register row types on a per database
+basis, using Database#register_row_type:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_row_type</span>(<span class="ruby-value">:foo</span>)</pre>
+
+<p>When you register the row type, <a
+href="../../../../classes/Sequel.html">Sequel</a> will query the PostgreSQL
+system tables to find the related metadata, and will setup a custom HashRow
+subclass for that type.  This includes looking up conversion procs for each
+column in the type, so that when the composite type is returned from the
+database, the members of the type have the correct type.  Additionally, if
+the composite type also has an array form, <a
+href="../../../../classes/Sequel.html">Sequel</a> registers an array type
+for the composite type, so that array columns of the composite type are
+converted correctly.</p>
+
+<p>You can then create values of that type by using Database#row_type:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(<span class="ruby-value">:address</span>, [<span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-string">&#39;12345&#39;</span>])</pre>
+
+<p>Let&#39;s say table address has columns street, city, and zip.  This would
+return something similar to:</p>
+
+<pre class="ruby">{<span class="ruby-value">:street</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-value">:city</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-value">:zip</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;12345&#39;</span>}</pre>
+
+<p>You can also use a hash:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(<span class="ruby-value">:address</span>, <span class="ruby-value">street:</span> <span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-value">city:</span> <span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-value">zip:</span> <span class="ruby-string">&#39;12345&#39;</span>)</pre>
+
+<p>So if you have a person table that has an address column, here&#39;s how
+you could insert into the column:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">address:</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">row_type</span>(<span class="ruby-value">:address</span>, <span class="ruby-value">street:</span> <span class="ruby-string">&#39;123 Sesame St.&#39;</span>, <span class="ruby-value">city:</span> <span class="ruby-string">&#39;Some City&#39;</span>, <span class="ruby-value">zip:</span> <span class="ruby-string">&#39;12345&#39;</span>))</pre>
+
+<p>Note that registering row types without providing an explicit :converter
+option creates anonymous classes.  This results in ruby being unable to
+Marshal such objects.  You can work around this by assigning the anonymous
+class to a constant. To get a list of such anonymous classes, you can use
+the following code:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>) <span class="ruby-operator">&amp;&amp;</span> \&#x000A;  <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>) }.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}</pre>
+
+<p>See the schema modification guide for details on using row type columns in
+CREATE/ALTER TABLE statements.</p>
+
+<p>This extension requires both the strscan and delegate libraries.</p>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/Postgres/PGRow.html">Sequel::Postgres::PGRow</a></p>
+</div>
+<div id='context'>
+<div id='requires'>
+<h2>Required files</h2>
+<ol>
+<li>delegate</li>
+<li>strscan</li>
+</ol>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

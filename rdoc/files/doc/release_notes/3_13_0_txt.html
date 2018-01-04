@@ -1,252 +1,254 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.13.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.13.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.13.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A json_serializer plugin was added that allows you to serialize model
-            instances or datasets to JSON using to_json.  It requires the json library.
-            The API was modeled on ActiveRecord&#39;s JSON serialization support.  You
-            can use :only and :except options to specify the columns included, :include
-            to specify associations to include, as well pass options to nested
-            associations using a hash.  In addition to serializing to JSON, it also
-            adds support for parsing JSON to model objects via JSON.parse or from_json.</p>
-            </li><li>
-            <p>An xml_serializer plugin was added that allows you to serialize model
-            instances or datasets to XML.  It requries the nokogiri library.  It has a
-            similar API to the json_serializer plugin, using to_xml instead of to_json,
-            and the from_xml class method instead of JSON.parse.</p>
-            </li><li>
-            <p>A tree plugin was added that allows you to treat <a
-            href="../../../classes/Sequel/Model.html">Sequel::Model</a> objects as
-            being part of a tree.  It provides similar features to rcte_tree, but works
-            on databases that don&#39;t support recursive common table expressions.  In
-            addition to the standard parent and children associations, it provides
-            instance methods to get the ancestors, descendants, and siblings of the
-            given tree node, and class methods to get the roots of the tree.</p>
-            </li><li>
-            <p>A list plugin was added that allows you to treat <a
-            href="../../../classes/Sequel/Model.html">Sequel::Model</a> objects as
-            being part of a list.  This adds instance methods to get the next and prev
-            items in the list, or to move the item to a specific place in the list. 
-            You can specify that all rows in the table belong to the same list, or
-            specify arbitrary scopes so that the same table can contain many separate
-            lists.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> is now compatible with
-            Ruby 1.9.2pre3.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports prepared
-            transactions/two-phase commit on PostgreSQL, MySQL, and H2.  You can
-            specify that you want to use prepared transactions using the :prepare
-            option which should be some transaction id string:</p>
-            
-            <pre>DB.transaction(:prepare=&gt;&#39;some string&#39;) do ... end</pre>
-            
-            <p>Assuming that no exceptions are raised in the transaction block, <a
-            href="../../../classes/Sequel.html">Sequel</a> will prepare the
-            transaction.  You can then commit the transaction later:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-string">&#39;some string&#39;</span>)</pre>
-            
-            <p>If you need to rollback the prepared transaction, you can do so as well:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;some string&#39;</span>)</pre>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports customizable
-            transaction isolation levels on PostgreSQL, MySQL, and Microsoft SQL
-            Server.  You can specify the transaction isolation level to use for any
-            transaction using the :isolation option with an :uncommitted, :committed,
-            :repeatable, or :serializable value:</p>
-            
-            <pre>DB.transaction(:isolation=&gt;:serializable) do ... end</pre>
-            
-            <p>You can also set the default isolation level for transactions via the
-            transaction_isolation_level Database attribute:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction_isolation_level</span> = :<span class="ruby-identifier">committed</span></pre>
-            
-            <p>If you are connecting to Microsoft SQL Server, it is recommended that you
-            set a default transaction isolation level if you plan on using this
-            feature.</p>
-            </li><li>
-            <p>You can specify a NULLS FIRST/LAST ordering by using the
-            :nulls=&gt;:first/:last option to asc and desc:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">release_date</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first</span>),&#x000A;             :<span class="ruby-identifier">name</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">last</span>))&#x000A;<span class="ruby-comment"># ORDER BY release_date DESC NULLS FIRST,</span>&#x000A;<span class="ruby-comment">#          name ASC NULLS LAST</span></pre>
-            
-            <p>This syntax is supported by PostgreSQL 8.3+, Firebird 1.5+, Oracle, and
-            probably some other databases as well, and makes it possible for the user
-            to specify whether NULL values should sort before or after other values.</p>
-            </li><li>
-            <p>Sequel::Model.find_or_create now accepts a block that is a yielded a new
-            model object to be created if an existing model object is not found.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Node</span>.<span class="ruby-identifier">find_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">parent_id</span> = <span class="ruby-value">4</span>}</pre>
-            </li><li>
-            <p>The :frame option for windows and window functions can now be a string that
-            is used literally in the SQL.  This is necessary if you want to specify a
-            custom frame, such as one that uses a specific number of rows preceding or
-            following.</p>
-            </li><li>
-            <p>Savepoints are now supported on H2.</p>
-            </li><li>
-            <p>A :methods_module association option was added, allowing you to specify the
-            module into which association instance methods are placed.  By default, it
-            uses the module containing the column accessor methods.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The :encoding option for the native MySQL adapter should now work correctly
-            in all cases.  This fix was included in 3.12.1.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles arrays of two
-            element arrays automatically when using them as the value of a filter hash:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>]=<span class="ruby-operator">&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])</pre>
-            
-            <p>Previously, you had to call .sql_array on the array in order to tell <a
-            href="../../../classes/Sequel.html">Sequel</a> that it was a value list and
-            not a conditions specifier.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer attempts to use
-            class polymorphism in the class_table_inheritance plugin if you don&#39;t
-            specify a cti_key.</p>
-            </li><li>
-            <p>When using the native SQLite adapter, prepared statements are now cached
-            per connection for increased performance.  Previously, <a
-            href="../../../classes/Sequel.html">Sequel</a> prepared a new statement for
-            every query.</p>
-            </li><li>
-            <p>tinyint(1) columns are now handled as booleans when connecting to MySQL via
-            JDBC.</p>
-            </li><li>
-            <p>On PostgreSQL, if no :schema option is provided for Database#tables,
-            table_exists?, or schema, and no default_schema is used,  assume all
-            schemas except the default non-public ones. Previously, it assumed the
-            public schema for tables and table_exists?, but did not assume any schema
-            for schema.</p>
-            
-            <p>This fixes issues if you use table names that overlap with table names in
-            the information_schema, such as domains.  It&#39;s still recommended that
-            you specify a default_schema if you are using a schema other than public.</p>
-            </li><li>
-            <p>Unsigned integers are now handled correctly in the schema dumper.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel/SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a>
-            is now a GenericExpression subclass, allowing you to treat it like most
-            other <a href="../../../classes/Sequel.html">Sequel</a> expression objects:</p>
-            
-            <pre class="ruby"><span class="ruby-string">&#39;(a || ?)&#39;</span>.<span class="ruby-identifier">lit</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;Test%&#39;</span>)&#x000A;<span class="ruby-comment"># ((a || b) LIKE &#39;Test%&#39;)</span></pre>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the bitwise
-            shift operators (&lt;&lt; and &gt;&gt;) on Microsoft SQL Server by
-            emulating them.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports most bitwise
-            operators (&amp;, |, ^, &lt;&lt;, &gt;&gt;) on H2 by emulating them.  The
-            bitwise complement operator is not yet supported.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now logs the SQL queries
-            that are sent when connecting to MySQL.</p>
-            </li><li>
-            <p>If a plugin cannot be loaded, <a
-            href="../../../classes/Sequel.html">Sequel</a> now gives a more detailed
-            error message.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Array#sql_array and the Sequel::SQL::SQLArray class are now considered
-            deprecated.  Use the Array#sql_value_list and the <a
-            href="../../../classes/Sequel/SQL/ValueList.html">Sequel::SQL::ValueList</a>
-            class instead.  SQLArray is now just an alias for ValueList, but it now is
-            an Array subclass instead of a <a
-            href="../../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>
-            subclass.</p>
-            </li><li>
-            <p>Using the ruby bitwise xor operator (^) on PostgreSQL now uses
-            PostgreSQL&#39;s bitwise xor operator (#) instead of PostgreSQL&#39;s
-            exponentiation operator (^).  If you want exponentiation, use the power
-            function.</p>
-            </li><li>
-            <p>Using the ruby bitwise complement operator (~) on MySQL now returns a
-            signed integer instead of an unsigned integer, for better compatibility
-            with other databases.</p>
-            </li><li>
-            <p>Using nil as a case expression value (the 2nd argument to Hash#case and
-            Array#case) will now use NULL as the case expression value, instead of
-            omitting the case expression value:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># 3.12.0</span>&#x000A;{<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># CASE WHEN 1 THEN 2 ELSE 0 END</span>&#x000A;&#x000A;<span class="ruby-comment"># 3.13.0</span>&#x000A;{<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># CASE NULL WHEN 1 THEN 2 ELSE 0 END</span></pre>
-            
-            <p>In general, you would never use nil explicitly, but the new behavior makes
-            more sense if you have a variable that might be nil:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">parent_id</span> = <span class="ruby-constant">Node</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">parent_id</span>&#x000A;{<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-identifier">parent_id</span>)</pre>
-            
-            <p>If parent_id IS NULL/nil, then previously <a
-            href="../../../classes/Sequel.html">Sequel</a> would have generated
-            unexpected SQL.  If you don&#39;t want a case expression value to be used,
-            do not pass a second argument to case.</p>
-            </li><li>
-            <p>Some internal transaction methods now take an optional options hash, so if
-            you have a custom adapter, you will need to make changes.</p>
-            </li><li>
-            <p>Some internal association methods now take an optional options hash.</p>
-            </li><li>
-            <p>Some Rakefile task names were modified in the name of consistency:</p>
-            
-            <pre>spec_coverage -&gt; spec_cov&#x000A;integration -&gt; spec_integration&#x000A;integration_cov -&gt; spec_integration_cov</pre>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.13.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.13.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.13.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A json_serializer plugin was added that allows you to serialize model
+instances or datasets to JSON using to_json.  It requires the json library.
+The API was modeled on ActiveRecord&#39;s JSON serialization support.  You
+can use :only and :except options to specify the columns included, :include
+to specify associations to include, as well pass options to nested
+associations using a hash.  In addition to serializing to JSON, it also
+adds support for parsing JSON to model objects via JSON.parse or from_json.</p>
+</li><li>
+<p>An xml_serializer plugin was added that allows you to serialize model
+instances or datasets to XML.  It requries the nokogiri library.  It has a
+similar API to the json_serializer plugin, using to_xml instead of to_json,
+and the from_xml class method instead of JSON.parse.</p>
+</li><li>
+<p>A tree plugin was added that allows you to treat <a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a> objects as
+being part of a tree.  It provides similar features to rcte_tree, but works
+on databases that don&#39;t support recursive common table expressions.  In
+addition to the standard parent and children associations, it provides
+instance methods to get the ancestors, descendants, and siblings of the
+given tree node, and class methods to get the roots of the tree.</p>
+</li><li>
+<p>A list plugin was added that allows you to treat <a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a> objects as
+being part of a list.  This adds instance methods to get the next and prev
+items in the list, or to move the item to a specific place in the list. 
+You can specify that all rows in the table belong to the same list, or
+specify arbitrary scopes so that the same table can contain many separate
+lists.</p>
+</li></ul>
+
+<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> is now compatible with
+Ruby 1.9.2pre3.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports prepared
+transactions/two-phase commit on PostgreSQL, MySQL, and H2.  You can
+specify that you want to use prepared transactions using the :prepare
+option which should be some transaction id string:</p>
+
+<pre>DB.transaction(:prepare=&gt;&#39;some string&#39;) do ... end</pre>
+
+<p>Assuming that no exceptions are raised in the transaction block, <a
+href="../../../classes/Sequel.html">Sequel</a> will prepare the
+transaction.  You can then commit the transaction later:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-string">&#39;some string&#39;</span>)</pre>
+
+<p>If you need to rollback the prepared transaction, you can do so as well:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;some string&#39;</span>)</pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports customizable
+transaction isolation levels on PostgreSQL, MySQL, and Microsoft SQL
+Server.  You can specify the transaction isolation level to use for any
+transaction using the :isolation option with an :uncommitted, :committed,
+:repeatable, or :serializable value:</p>
+
+<pre>DB.transaction(:isolation=&gt;:serializable) do ... end</pre>
+
+<p>You can also set the default isolation level for transactions via the
+transaction_isolation_level Database attribute:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction_isolation_level</span> = <span class="ruby-value">:committed</span></pre>
+
+<p>If you are connecting to Microsoft SQL Server, it is recommended that you
+set a default transaction isolation level if you plan on using this
+feature.</p>
+</li><li>
+<p>You can specify a NULLS FIRST/LAST ordering by using the
+:nulls=&gt;:first/:last option to asc and desc:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:release_date</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:first</span>),&#x000A;             <span class="ruby-value">:name</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>))&#x000A;<span class="ruby-comment"># ORDER BY release_date DESC NULLS FIRST,</span>&#x000A;<span class="ruby-comment">#          name ASC NULLS LAST</span></pre>
+
+<p>This syntax is supported by PostgreSQL 8.3+, Firebird 1.5+, Oracle, and
+probably some other databases as well, and makes it possible for the user
+to specify whether NULL values should sort before or after other values.</p>
+</li><li>
+<p>Sequel::Model.find_or_create now accepts a block that is a yielded a new
+model object to be created if an existing model object is not found.</p>
+
+<pre class="ruby"><span class="ruby-constant">Node</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">parent_id</span> = <span class="ruby-value">4</span>}</pre>
+</li><li>
+<p>The :frame option for windows and window functions can now be a string that
+is used literally in the SQL.  This is necessary if you want to specify a
+custom frame, such as one that uses a specific number of rows preceding or
+following.</p>
+</li><li>
+<p>Savepoints are now supported on H2.</p>
+</li><li>
+<p>A :methods_module association option was added, allowing you to specify the
+module into which association instance methods are placed.  By default, it
+uses the module containing the column accessor methods.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The :encoding option for the native MySQL adapter should now work correctly
+in all cases.  This fix was included in 3.12.1.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles arrays of two
+element arrays automatically when using them as the value of a filter hash:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>]<span class="ruby-operator">=&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])</pre>
+
+<p>Previously, you had to call .sql_array on the array in order to tell <a
+href="../../../classes/Sequel.html">Sequel</a> that it was a value list and
+not a conditions specifier.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer attempts to use
+class polymorphism in the class_table_inheritance plugin if you don&#39;t
+specify a cti_key.</p>
+</li><li>
+<p>When using the native SQLite adapter, prepared statements are now cached
+per connection for increased performance.  Previously, <a
+href="../../../classes/Sequel.html">Sequel</a> prepared a new statement for
+every query.</p>
+</li><li>
+<p>tinyint(1) columns are now handled as booleans when connecting to MySQL via
+JDBC.</p>
+</li><li>
+<p>On PostgreSQL, if no :schema option is provided for Database#tables,
+table_exists?, or schema, and no default_schema is used,  assume all
+schemas except the default non-public ones. Previously, it assumed the
+public schema for tables and table_exists?, but did not assume any schema
+for schema.</p>
+
+<p>This fixes issues if you use table names that overlap with table names in
+the information_schema, such as domains.  It&#39;s still recommended that
+you specify a default_schema if you are using a schema other than public.</p>
+</li><li>
+<p>Unsigned integers are now handled correctly in the schema dumper.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel/SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a>
+is now a GenericExpression subclass, allowing you to treat it like most
+other <a href="../../../classes/Sequel.html">Sequel</a> expression objects:</p>
+
+<pre class="ruby"><span class="ruby-string">&#39;(a || ?)&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-value">:b</span>).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;Test%&#39;</span>)&#x000A;<span class="ruby-comment"># ((a || b) LIKE &#39;Test%&#39;)</span></pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the bitwise
+shift operators (&lt;&lt; and &gt;&gt;) on Microsoft SQL Server by
+emulating them.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports most bitwise
+operators (&amp;, |, ^, &lt;&lt;, &gt;&gt;) on H2 by emulating them.  The
+bitwise complement operator is not yet supported.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now logs the SQL queries
+that are sent when connecting to MySQL.</p>
+</li><li>
+<p>If a plugin cannot be loaded, <a
+href="../../../classes/Sequel.html">Sequel</a> now gives a more detailed
+error message.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Array#sql_array and the Sequel::SQL::SQLArray class are now considered
+deprecated.  Use the Array#sql_value_list and the <a
+href="../../../classes/Sequel/SQL/ValueList.html">Sequel::SQL::ValueList</a>
+class instead.  SQLArray is now just an alias for ValueList, but it now is
+an Array subclass instead of a <a
+href="../../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>
+subclass.</p>
+</li><li>
+<p>Using the ruby bitwise xor operator (^) on PostgreSQL now uses
+PostgreSQL&#39;s bitwise xor operator (#) instead of PostgreSQL&#39;s
+exponentiation operator (^).  If you want exponentiation, use the power
+function.</p>
+</li><li>
+<p>Using the ruby bitwise complement operator (~) on MySQL now returns a
+signed integer instead of an unsigned integer, for better compatibility
+with other databases.</p>
+</li><li>
+<p>Using nil as a case expression value (the 2nd argument to Hash#case and
+Array#case) will now use NULL as the case expression value, instead of
+omitting the case expression value:</p>
+
+<pre class="ruby"><span class="ruby-comment"># 3.12.0</span>&#x000A;{<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># CASE WHEN 1 THEN 2 ELSE 0 END</span>&#x000A;&#x000A;<span class="ruby-comment"># 3.13.0</span>&#x000A;{<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># CASE NULL WHEN 1 THEN 2 ELSE 0 END</span></pre>
+
+<p>In general, you would never use nil explicitly, but the new behavior makes
+more sense if you have a variable that might be nil:</p>
+
+<pre class="ruby"><span class="ruby-identifier">parent_id</span> = <span class="ruby-constant">Node</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">parent_id</span>&#x000A;{<span class="ruby-value">1</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-identifier">parent_id</span>)</pre>
+
+<p>If parent_id IS NULL/nil, then previously <a
+href="../../../classes/Sequel.html">Sequel</a> would have generated
+unexpected SQL.  If you don&#39;t want a case expression value to be used,
+do not pass a second argument to case.</p>
+</li><li>
+<p>Some internal transaction methods now take an optional options hash, so if
+you have a custom adapter, you will need to make changes.</p>
+</li><li>
+<p>Some internal association methods now take an optional options hash.</p>
+</li><li>
+<p>Some Rakefile task names were modified in the name of consistency:</p>
+
+<pre>spec_coverage -&gt; spec_cov&#x000A;integration -&gt; spec_integration&#x000A;integration_cov -&gt; spec_integration_cov</pre>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

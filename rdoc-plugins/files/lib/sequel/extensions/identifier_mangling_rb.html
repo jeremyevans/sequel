@@ -1,72 +1,74 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>identifier_mangling.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>identifier_mangling.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/identifier_mangling.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The identifier_mangling extension adds support for to change the default
-            identifier mangling for datasets, as well as all datasets for a given
-            database.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Use uppercase identifiers in database, and lowercase in ruby.</span>&#x000A;<span class="ruby-comment"># Default behavior of Sequel, as the SQL standard behavior</span>&#x000A;<span class="ruby-comment"># folds unquoted identifiers to uppercase.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_input_method</span> = :<span class="ruby-identifier">upcase</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_output_method</span> = :<span class="ruby-identifier">downcase</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t modify identifiers.</span>&#x000A;<span class="ruby-comment"># Default behavior of Sequel on PostgreSQL, MySQL, SQLite,</span>&#x000A;<span class="ruby-comment"># as they fold unquoted identifiers to lowercase.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_input_method</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_output_method</span> = <span class="ruby-keyword">nil</span></pre>
-            
-            <p>You can also choose to turn on or off identifier quoting:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Quote identifiers.  Sequel&#39;s default behavior.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifiers</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t quote identifiers.  Sequel&#39;s default behavior on DB2.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifiers</span> = <span class="ruby-keyword">false</span></pre>
-            
-            <p>To modify the identifiers on a per-dataset basis:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">with_input_indentifier</span>(:<span class="ruby-identifier">upcase</span>).&#x000A;            <span class="ruby-identifier">with_output_identifier</span>(:<span class="ruby-identifier">downcase</span>).&#x000A;            <span class="ruby-identifier">with_quote_identifiers</span>(<span class="ruby-keyword">true</span>)</pre>
-            
-            <p>To load the extension into the database:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">identifier_mangling</span></pre>
-            
-            <p>Related modules: <a
-            href="../../../../classes/Sequel/IdentifierMangling/DatabaseMethods.html">Sequel::IdentifierMangling::DatabaseMethods</a>,
-            <a
-            href="../../../../classes/Sequel/IdentifierMangling/DatasetMethods.html">Sequel::IdentifierMangling::DatasetMethods</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>identifier_mangling.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>identifier_mangling.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/identifier_mangling.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The identifier_mangling extension adds support for to change the default
+identifier mangling for datasets, as well as all datasets for a given
+database.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Use uppercase identifiers in database, and lowercase in ruby.</span>&#x000A;<span class="ruby-comment"># Default behavior of Sequel, as the SQL standard behavior</span>&#x000A;<span class="ruby-comment"># folds unquoted identifiers to uppercase.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_input_method</span> = <span class="ruby-value">:upcase</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_output_method</span> = <span class="ruby-value">:downcase</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t modify identifiers.</span>&#x000A;<span class="ruby-comment"># Default behavior of Sequel on PostgreSQL, MySQL, SQLite,</span>&#x000A;<span class="ruby-comment"># as they fold unquoted identifiers to lowercase.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_input_method</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_output_method</span> = <span class="ruby-keyword">nil</span></pre>
+
+<p>You can also choose to turn on or off identifier quoting:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Quote identifiers.  Sequel&#39;s default behavior.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifiers</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t quote identifiers.  Sequel&#39;s default behavior on DB2.</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifiers</span> = <span class="ruby-keyword">false</span></pre>
+
+<p>To modify the identifiers on a per-dataset basis:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">with_input_indentifier</span>(<span class="ruby-value">:upcase</span>).&#x000A;            <span class="ruby-identifier">with_output_identifier</span>(<span class="ruby-value">:downcase</span>).&#x000A;            <span class="ruby-identifier">with_quote_identifiers</span>(<span class="ruby-keyword">true</span>)</pre>
+
+<p>To load the extension into the database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:identifier_mangling</span></pre>
+
+<p>Related modules: <a
+href="../../../../classes/Sequel/IdentifierMangling/DatabaseMethods.html">Sequel::IdentifierMangling::DatabaseMethods</a>,
+<a
+href="../../../../classes/Sequel/IdentifierMangling/DatasetMethods.html">Sequel::IdentifierMangling::DatasetMethods</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

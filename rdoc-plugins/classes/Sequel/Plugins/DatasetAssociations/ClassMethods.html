@@ -1,79 +1,82 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::DatasetAssociations::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::DatasetAssociations::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/dataset_associations_rb.html">lib/sequel/plugins/dataset_associations.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-associate">associate</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-associate'>
-                <a name='method-i-associate'></a>
-                <div class='synopsis'>
-                  <span class='name'>associate</span>
-                  <span class='arguments'>(type, name, *)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set up a dataset method for each association to return an associated
-                  dataset</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-associate-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/plugins/dataset_associations.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pluralize</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_sym</span>&#x000A;  <span class="ruby-identifier">dataset_module</span>{<span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-identifier">associated</span>(<span class="ruby-identifier">name</span>)}}&#x000A;  <span class="ruby-identifier">ret</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::DatasetAssociations::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::DatasetAssociations::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/dataset_associations_rb.html">lib/sequel/plugins/dataset_associations.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-associate">associate</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-associate'>
+<a name='method-i-associate'></a>
+<div class='synopsis'>
+<span class='name'>associate</span>
+<span class='arguments'>(type, name, *)</span>
+
+</div>
+<div class='description'>
+
+<p>Set up a dataset method for each association to return an associated
+dataset</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-associate-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/plugins/dataset_associations.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pluralize</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_sym</span>&#x000A;  <span class="ruby-identifier">dataset_module</span>{<span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-identifier">associated</span>(<span class="ruby-identifier">name</span>)}}&#x000A;  <span class="ruby-identifier">ret</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

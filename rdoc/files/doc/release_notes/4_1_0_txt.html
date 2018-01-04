@@ -1,126 +1,128 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.1.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.1.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.1.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2014-01-07 21:09:24 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Database#run and << now accept SQL::PlaceholderLiteralString objects,
-            allowing you to more easily run arbitrary DDL queries with placeholders:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;CREATE TABLE ? (? integer)&quot;</span>, :<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)</pre>
-            </li><li>
-            <p>You can now provide options for check constraints by calling the
-            constraint/add_constraint methods with a hash as the first argument. On
-            PostgreSQL, you can now use the :not_valid option for check constraints, so
-            they are enforced for inserts and updates, but not for existing rows.</p>
-            
-            <pre>DB.create_table(:table) do&#x000A;  ...&#x000A;  constraint({:name=&gt;:constraint_name, :not_valid=&gt;true}) do&#x000A;    column_name &gt; 10&#x000A;  end&#x000A;end</pre>
-            </li><li>
-            <p>Dataset#stream has been added to the mysql2 adapter, and will have the
-            dataset stream results if used with mysql2 0.3.12+.  This allows you to
-            process large datasets without keeping the entire dataset in memory.</p>
-            
-            <pre>DB[:large_table].stream.each{|r| ...}</pre>
-            </li><li>
-            <p>Database#error_info has been added to the postgres adapter.  It is
-            supported on PostgreSQL 9.3+ if pg-0.16.0+ is used as the underlying
-            driver, and it gives you a hash of metadata related to the exception:</p>
-            
-            <pre>DB[:table_name].insert(1) rescue DB.error_info($!)&#x000A;# =&gt; {:schema=&gt;&quot;public&quot;, :table=&gt;&quot;table_name&quot;, :column=&gt;nil,&#x000A;      :constraint=&gt;&quot;constraint_name&quot;, :type=&gt;nil}</pre>
-            </li><li>
-            <p>The :deferrable option is now supported when adding exclusion constraints
-            on PostgreSQL, to allow setting up deferred exclusion constraints.</p>
-            </li><li>
-            <p>The :inherits option is now supported in Database#create_table on
-            PostgreSQL, for table inheritance:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">t1</span>, :<span class="ruby-identifier">inherits=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">t0</span>){}&#x000A;<span class="ruby-comment"># CREATE TABLE t1 () INHERITS (t0)</span></pre>
-            </li><li>
-            <p>Dataset#replace and multi_replace are now supported on SQLite, just as they
-            have been previously on MySQL.</p>
-            </li><li>
-            <p>In the jdbc adapter, Java::JavaUtil::HashMap objects are now converted to
-            ruby Hash objects.  This is to make it easier to handle the PostgreSQL
-            hstore type when using the jdbc/postgres adapter.</p>
-            </li><li>
-            <p>The odbc adapter now supports a :drvconnect option that accepts an ODBC
-            connection string that is passed to ruby-odbc verbatim.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
-            plugin no longer breaks the instance_filters and update_primary_key
-            plugins.</p>
-            </li><li>
-            <p>Dropping indexes for tables in a specific schema is now supported on
-            PostgreSQL.  <a href="../../../classes/Sequel.html">Sequel</a> now
-            explicitly specifies the same schema as the table when dropping such
-            indexes.</p>
-            </li><li>
-            <p>Calling Model#add_association methods with a primary key value now raises a
-            <a
-            href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
-            if there is no object in the associated table with that primary key. 
-            Previously, this situation was not handled and resulted in a NoMethodError
-            being raised later.</p>
-            </li><li>
-            <p>When an invalid virtual row block function call is detected, an error is
-            now properly raised.  Previously, the error was not raised until the SQL
-            was produced for the query.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The :driver option to the odbc adapter is deprecated and will be removed in
-            a future version.  It is thought to be broken, and users wanting to use
-            DSN-less connections should use the new :drvconnect option.</p>
-            </li><li>
-            <p>The Postgres::ArrayOp#text_op private method has been removed.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.1.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.1.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.1.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2014-01-07 21:09:24 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#run and << now accept SQL::PlaceholderLiteralString objects,
+allowing you to more easily run arbitrary DDL queries with placeholders:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;CREATE TABLE ? (? integer)&quot;</span>, <span class="ruby-value">:table</span>, <span class="ruby-value">:column</span>)</pre>
+</li><li>
+<p>You can now provide options for check constraints by calling the
+constraint/add_constraint methods with a hash as the first argument. On
+PostgreSQL, you can now use the :not_valid option for check constraints, so
+they are enforced for inserts and updates, but not for existing rows.</p>
+
+<pre>DB.create_table(:table) do&#x000A;  ...&#x000A;  constraint({:name=&gt;:constraint_name, :not_valid=&gt;true}) do&#x000A;    column_name &gt; 10&#x000A;  end&#x000A;end</pre>
+</li><li>
+<p>Dataset#stream has been added to the mysql2 adapter, and will have the
+dataset stream results if used with mysql2 0.3.12+.  This allows you to
+process large datasets without keeping the entire dataset in memory.</p>
+
+<pre>DB[:large_table].stream.each{|r| ...}</pre>
+</li><li>
+<p>Database#error_info has been added to the postgres adapter.  It is
+supported on PostgreSQL 9.3+ if pg-0.16.0+ is used as the underlying
+driver, and it gives you a hash of metadata related to the exception:</p>
+
+<pre>DB[:table_name].insert(1) rescue DB.error_info($!)&#x000A;# =&gt; {:schema=&gt;&quot;public&quot;, :table=&gt;&quot;table_name&quot;, :column=&gt;nil,&#x000A;      :constraint=&gt;&quot;constraint_name&quot;, :type=&gt;nil}</pre>
+</li><li>
+<p>The :deferrable option is now supported when adding exclusion constraints
+on PostgreSQL, to allow setting up deferred exclusion constraints.</p>
+</li><li>
+<p>The :inherits option is now supported in Database#create_table on
+PostgreSQL, for table inheritance:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:t1</span>, <span class="ruby-value">:inherits</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:t0</span>){}&#x000A;<span class="ruby-comment"># CREATE TABLE t1 () INHERITS (t0)</span></pre>
+</li><li>
+<p>Dataset#replace and multi_replace are now supported on SQLite, just as they
+have been previously on MySQL.</p>
+</li><li>
+<p>In the jdbc adapter, Java::JavaUtil::HashMap objects are now converted to
+ruby Hash objects.  This is to make it easier to handle the PostgreSQL
+hstore type when using the jdbc/postgres adapter.</p>
+</li><li>
+<p>The odbc adapter now supports a :drvconnect option that accepts an ODBC
+connection string that is passed to ruby-odbc verbatim.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
+plugin no longer breaks the instance_filters and update_primary_key
+plugins.</p>
+</li><li>
+<p>Dropping indexes for tables in a specific schema is now supported on
+PostgreSQL.  <a href="../../../classes/Sequel.html">Sequel</a> now
+explicitly specifies the same schema as the table when dropping such
+indexes.</p>
+</li><li>
+<p>Calling Model#add_association methods with a primary key value now raises a
+<a
+href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
+if there is no object in the associated table with that primary key. 
+Previously, this situation was not handled and resulted in a NoMethodError
+being raised later.</p>
+</li><li>
+<p>When an invalid virtual row block function call is detected, an error is
+now properly raised.  Previously, the error was not raised until the SQL
+was produced for the query.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The :driver option to the odbc adapter is deprecated and will be removed in
+a future version.  It is thought to be broken, and users wanting to use
+DSN-less connections should use the new :drvconnect option.</p>
+</li><li>
+<p>The Postgres::ArrayOp#text_op private method has been removed.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

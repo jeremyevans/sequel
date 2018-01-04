@@ -1,136 +1,138 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.43.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.43.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.43.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-02-01 08:23:06 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Database#freeze has now been implemented.  It is now recommended to use it
-            in production and during testing, after loading extensions and making other
-            changes to Database state.  Once frozen, the Database settings cannot be
-            modified, but the Database can execute queries and return results.  By
-            freezing the Database, you gain greater thread-safety assurance and will be
-            alerted via an exception if runtime code attempts to modify Database state.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Model#refresh now uses the same optimization that Model.with_pk uses,
-            resulting in faster refreshing for most models.</p>
-            </li><li>
-            <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
-            plugin no longer automatically uses prepared statements in cases where it
-            is likely to be slower. Now, prepared statements are only used by default
-            for INSERT and UPDATE statements (and DELETE on Oracle and DB2).  This
-            change was made after benchmarking showed that using prepared statements
-            for primary key lookups, refreshes, and deletes is significantly slower
-            than non-prepared statements across almost all adapters.</p>
-            </li><li>
-            <p>Database#extension no longer attempts to load the same extension more than
-            once.</p>
-            </li><li>
-            <p>The timestamp migrator now handles key length limitations when using MySQL
-            with InnoDB engine and utf8mb4 charset default.</p>
-            </li><li>
-            <p>The jdbc/sqlite adapter will now use SQLite result codes for more accurate
-            exception types, if the jdbc-sqlite driver supports them.</p>
-            </li><li>
-            <p>dataset_module is now inherited correctly if using the
-            single_table_inheritance plugin.  This was broken in 4.42.0, and fixed in
-            4.42.1.</p>
-            </li><li>
-            <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
-            plugin now respects a server specified for the model instance, instead of
-            always using the default server.</p>
-            </li><li>
-            <p>The prepared_statements_associations plugin now respects a server specified
-            for the model instance if using the sharding plugin, instead of always
-            using the default server.</p>
-            </li><li>
-            <p>The prepared_statements_associations plugin now works correctly when using
-            some instance-specific associations, such as many_to_one associations using
-            a nil :key option.</p>
-            </li><li>
-            <p>The prepared_statements_with_pk plugin now respects a server specified for
-            the dataset, instead of always using the default server.</p>
-            </li><li>
-            <p>Model#freeze now freezes the associations hash after validating the model
-            instance, instead of before, fixing cases where validation calls
-            association methods.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer continually
-            tries to determine the server version on HSQLDB, if the first attempt
-            fails.</p>
-            </li><li>
-            <p>The mock adapter now uses a thread-safe incrementor for autoid.</p>
-            </li><li>
-            <p>Mysql2 native prepared statement support now better handles sharding where
-            connection options differ per shard.</p>
-            </li><li>
-            <p>On Oracle, Database#sequence_for_table is now thread-safe.</p>
-            </li><li>
-            <p>On PostgreSQL, Database#type_supported? is now thread-safe.</p>
-            </li><li>
-            <p>On MySQL, Database#supports_timestamp_usecs? now correctly memoizes false
-            values.</p>
-            </li><li>
-            <p>The jdbc/postgresql adapter now works correctly if the pg_hstore extension
-            is loaded first.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Maintainers of external adapters and Database extensions should update
-            their code to support Database#freeze.</p>
-            </li><li>
-            <p>Code that relies on Database extensions being loaded multiple times if
-            called multiple times needs to be updated, because now the extension only
-            gets loaded the first time Database#extension is called.</p>
-            </li><li>
-            <p>@enum_labels in the pg_enum extension is now frozen by default.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.43.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.43.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.43.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-02-01 08:23:06 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#freeze has now been implemented.  It is now recommended to use it
+in production and during testing, after loading extensions and making other
+changes to Database state.  Once frozen, the Database settings cannot be
+modified, but the Database can execute queries and return results.  By
+freezing the Database, you gain greater thread-safety assurance and will be
+alerted via an exception if runtime code attempts to modify Database state.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Model#refresh now uses the same optimization that Model.with_pk uses,
+resulting in faster refreshing for most models.</p>
+</li><li>
+<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
+plugin no longer automatically uses prepared statements in cases where it
+is likely to be slower. Now, prepared statements are only used by default
+for INSERT and UPDATE statements (and DELETE on Oracle and DB2).  This
+change was made after benchmarking showed that using prepared statements
+for primary key lookups, refreshes, and deletes is significantly slower
+than non-prepared statements across almost all adapters.</p>
+</li><li>
+<p>Database#extension no longer attempts to load the same extension more than
+once.</p>
+</li><li>
+<p>The timestamp migrator now handles key length limitations when using MySQL
+with InnoDB engine and utf8mb4 charset default.</p>
+</li><li>
+<p>The jdbc/sqlite adapter will now use SQLite result codes for more accurate
+exception types, if the jdbc-sqlite driver supports them.</p>
+</li><li>
+<p>dataset_module is now inherited correctly if using the
+single_table_inheritance plugin.  This was broken in 4.42.0, and fixed in
+4.42.1.</p>
+</li><li>
+<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
+plugin now respects a server specified for the model instance, instead of
+always using the default server.</p>
+</li><li>
+<p>The prepared_statements_associations plugin now respects a server specified
+for the model instance if using the sharding plugin, instead of always
+using the default server.</p>
+</li><li>
+<p>The prepared_statements_associations plugin now works correctly when using
+some instance-specific associations, such as many_to_one associations using
+a nil :key option.</p>
+</li><li>
+<p>The prepared_statements_with_pk plugin now respects a server specified for
+the dataset, instead of always using the default server.</p>
+</li><li>
+<p>Model#freeze now freezes the associations hash after validating the model
+instance, instead of before, fixing cases where validation calls
+association methods.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer continually
+tries to determine the server version on HSQLDB, if the first attempt
+fails.</p>
+</li><li>
+<p>The mock adapter now uses a thread-safe incrementor for autoid.</p>
+</li><li>
+<p>Mysql2 native prepared statement support now better handles sharding where
+connection options differ per shard.</p>
+</li><li>
+<p>On Oracle, Database#sequence_for_table is now thread-safe.</p>
+</li><li>
+<p>On PostgreSQL, Database#type_supported? is now thread-safe.</p>
+</li><li>
+<p>On MySQL, Database#supports_timestamp_usecs? now correctly memoizes false
+values.</p>
+</li><li>
+<p>The jdbc/postgresql adapter now works correctly if the pg_hstore extension
+is loaded first.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Maintainers of external adapters and Database extensions should update
+their code to support Database#freeze.</p>
+</li><li>
+<p>Code that relies on Database extensions being loaded multiple times if
+called multiple times needs to be updated, because now the extension only
+gets loaded the first time Database#extension is called.</p>
+</li><li>
+<p>@enum_labels in the pg_enum extension is now frozen by default.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

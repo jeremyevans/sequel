@@ -1,130 +1,134 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::BlacklistSecurity::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::BlacklistSecurity::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/blacklist_security_rb.html">lib/sequel/plugins/blacklist_security.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-freeze">freeze</a></li>
-              <li><a href="#attribute-i-restricted_columns">restricted_columns</a></li>
-              <li><a href="#method-i-set_restricted_columns">set_restricted_columns</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-restricted_columns'>restricted_columns</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Which columns are specifically restricted in a call to set/update/new/etc.
-                      (default: not set).  Some columns are restricted regardless of this
-                      setting, such as the primary key column and columns in
-                      Model::RESTRICTED_SETTER_METHODS.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Freeze restricted columns when freezing model class.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@restricted_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-set_restricted_columns'>
-                <a name='method-i-set_restricted_columns'></a>
-                <div class='synopsis'>
-                  <span class='name'>set_restricted_columns</span>
-                  <span class='arguments'>(*cols)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the columns to restrict when using mass assignment (e.g.
-                  <code>set</code>).  Using this means that attempts to call setter methods
-                  for the columns listed here will cause an exception or be silently skipped
-                  (based on the <code>strict_param_setting</code> setting). If you have any
-                  virtual setter methods (methods that end in =) that you want not to be used
-                  during mass assignment, they need to be listed here as well (without the
-                  =).</p>
-                  
-                  <p>It&#39;s generally a bad idea to rely on a blacklist approach for security.
-                  Using a whitelist approach such as the whitelist_security plugin or the
-                  set_fields methods is usually a better choice.  So use of this method is
-                  generally a bad idea.</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_restricted_columns</span>(:<span class="ruby-identifier">records_sold</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-identifier">hometown</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-identifier">records_sold</span><span class="ruby-operator">:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_restricted_columns-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-set_restricted_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_restricted_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">clear_setter_methods_cache</span>&#x000A;  <span class="ruby-ivar">@restricted_columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::BlacklistSecurity::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::BlacklistSecurity::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/blacklist_security_rb.html">lib/sequel/plugins/blacklist_security.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#attribute-i-restricted_columns">restricted_columns</a></li>
+<li><a href="#method-i-set_restricted_columns">set_restricted_columns</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-restricted_columns'>restricted_columns</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>Which columns are specifically restricted in a call to set/update/new/etc.
+(default: not set).  Some columns are restricted regardless of this
+setting, such as the primary key column and columns in
+Model::RESTRICTED_SETTER_METHODS.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Freeze restricted columns when freezing model class.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@restricted_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-set_restricted_columns'>
+<a name='method-i-set_restricted_columns'></a>
+<div class='synopsis'>
+<span class='name'>set_restricted_columns</span>
+<span class='arguments'>(*cols)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the columns to restrict when using mass assignment (e.g.
+<code>set</code>).  Using this means that attempts to call setter methods
+for the columns listed here will cause an exception or be silently skipped
+(based on the <code>strict_param_setting</code> setting). If you have any
+virtual setter methods (methods that end in =) that you want not to be used
+during mass assignment, they need to be listed here as well (without the
+=).</p>
+
+<p>It&#39;s generally a bad idea to rely on a blacklist approach for security.
+Using a whitelist approach such as the whitelist_security plugin or the
+set_fields methods is usually a better choice.  So use of this method is
+generally a bad idea.</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_restricted_columns</span>(<span class="ruby-value">:records_sold</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">records_sold:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_restricted_columns-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set_restricted_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_restricted_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">clear_setter_methods_cache</span>&#x000A;  <span class="ruby-ivar">@restricted_columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,122 +1,124 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.42.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.42.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.42.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2012-12-03 09:08:55 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#avg, interval, min, max, range, and sum now accept virtual row
-            blocks, allowing you to more easily get aggregate values of expressions
-            based on the table:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">sum</span>{<span class="ruby-identifier">some_function</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)} <span class="ruby-comment"># =&gt; 134</span>&#x000A;<span class="ruby-comment"># SELECT sum(some_function(column1, column2)) FROM table</span></pre>
-            </li><li>
-            <p>Database#do has been added on PostgreSQL for using the DO anonymous code
-            block execution statement.</p>
-            </li><li>
-            <p>Model.dataset_module now uses a Module subclass, which allows you to call
-            subset inside a dataset_module block, making it easier to consolidate
-            dataset method code:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">gold</span>){<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>Database#copy_table and copy_into are now supported on jdbc/postgres.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports deferred
-            constraints on constraint types other than foreign keys.  The only
-            databases that appear to implement this are Oracle and PostgreSQL.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports INITIALLY
-            IMMEDIATE deferred constraints via the :deferrable=&gt;:immediate
-            constraint/column option.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports setting the
-            default size of string columns, via the default_string_column_size option
-            or accessor.  In some cases, Sequel&#39;s default string column size of 255
-            is too large (e.g. MySQL with utf8mb4 character set), and this allows you
-            to change it.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#count and other methods now use a subselect in the case where the
-            dataset has an offset but no limit.</p>
-            </li><li>
-            <p>If an error occurs while attempting to commit a transaction, <a
-            href="../../../classes/Sequel.html">Sequel</a> now attempts to rollback the
-            transaction.  Some databases do this automatically, but not all.  Among
-            other things, this fixes issues with deferred foreign key constraint
-            violations on SQLite.</p>
-            </li><li>
-            <p>When extending a model&#39;s dataset, the model&#39;s instance_dataset is
-            reset, insuring that it will also be extended with the module.</p>
-            </li><li>
-            <p>When passing an invalid argument to Dataset#filter, the exception message
-            now includes the argument.</p>
-            </li><li>
-            <p>The force_encoding plugin now works with frozen string values.</p>
-            </li><li>
-            <p>Public methods added to a model dataset_module now have model class methods
-            created for them even if the method was added outside of a dataset_module
-            block.</p>
-            </li><li>
-            <p>On PostgreSQL, Database#indexes now includes a :deferrable entry for each
-            index hash, which will be true for unique indexes where the underlying
-            constraint is deferrable.</p>
-            </li><li>
-            <p>On Microsoft SQL Server 2000, Dataset#update no longer includes a limit
-            (TOP), allowing it to work correctly.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Model.dataset_methods has been removed.  This was used to store blocks for
-            methods created via def_dataset_method and subset. The internals have been
-            changed so that a dataset_module is always used in these cases, therefore
-            there was no longer a reason for this method.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.42.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.42.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.42.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2012-12-03 09:08:55 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#avg, interval, min, max, range, and sum now accept virtual row
+blocks, allowing you to more easily get aggregate values of expressions
+based on the table:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">sum</span>{<span class="ruby-identifier">some_function</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)} <span class="ruby-comment"># =&gt; 134</span>&#x000A;<span class="ruby-comment"># SELECT sum(some_function(column1, column2)) FROM table</span></pre>
+</li><li>
+<p>Database#do has been added on PostgreSQL for using the DO anonymous code
+block execution statement.</p>
+</li><li>
+<p>Model.dataset_module now uses a Module subclass, which allows you to call
+subset inside a dataset_module block, making it easier to consolidate
+dataset method code:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">subset</span>(<span class="ruby-value">:gold</span>){<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>Database#copy_table and copy_into are now supported on jdbc/postgres.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports deferred
+constraints on constraint types other than foreign keys.  The only
+databases that appear to implement this are Oracle and PostgreSQL.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports INITIALLY
+IMMEDIATE deferred constraints via the :deferrable=&gt;:immediate
+constraint/column option.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports setting the
+default size of string columns, via the default_string_column_size option
+or accessor.  In some cases, Sequel&#39;s default string column size of 255
+is too large (e.g. MySQL with utf8mb4 character set), and this allows you
+to change it.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#count and other methods now use a subselect in the case where the
+dataset has an offset but no limit.</p>
+</li><li>
+<p>If an error occurs while attempting to commit a transaction, <a
+href="../../../classes/Sequel.html">Sequel</a> now attempts to rollback the
+transaction.  Some databases do this automatically, but not all.  Among
+other things, this fixes issues with deferred foreign key constraint
+violations on SQLite.</p>
+</li><li>
+<p>When extending a model&#39;s dataset, the model&#39;s instance_dataset is
+reset, insuring that it will also be extended with the module.</p>
+</li><li>
+<p>When passing an invalid argument to Dataset#filter, the exception message
+now includes the argument.</p>
+</li><li>
+<p>The force_encoding plugin now works with frozen string values.</p>
+</li><li>
+<p>Public methods added to a model dataset_module now have model class methods
+created for them even if the method was added outside of a dataset_module
+block.</p>
+</li><li>
+<p>On PostgreSQL, Database#indexes now includes a :deferrable entry for each
+index hash, which will be true for unique indexes where the underlying
+constraint is deferrable.</p>
+</li><li>
+<p>On Microsoft SQL Server 2000, Dataset#update no longer includes a limit
+(TOP), allowing it to work correctly.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Model.dataset_methods has been removed.  This was used to store blocks for
+methods created via def_dataset_method and subset. The internals have been
+changed so that a dataset_module is always used in these cases, therefore
+there was no longer a reason for this method.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

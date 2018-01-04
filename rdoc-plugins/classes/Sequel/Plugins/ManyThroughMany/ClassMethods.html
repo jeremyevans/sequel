@@ -1,134 +1,139 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::ManyThroughMany::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::ManyThroughMany::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/many_through_many_rb.html">lib/sequel/plugins/many_through_many.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-many_through_many">many_through_many</a></li>
-              <li><a href="#method-i-one_through_many">one_through_many</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-many_through_many'>
-                <a name='method-i-many_through_many'></a>
-                <div class='synopsis'>
-                  <span class='name'>many_through_many</span>
-                  <span class='arguments'>(name, through, opts=OPTS, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Create a <a
-                  href="ClassMethods.html#method-i-many_through_many">#many_through_many</a>
-                  association.  Arguments:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>name </td><td>
-                  <p>Same as associate, the name of the association.</p>
-                  </td></tr><tr><td class='label'>through </td><td>
-                  <p>The tables and keys to join between the current table and the associated
-                  table. Must be an array, with elements that are either 3 element arrays, or
-                  hashes with keys :table, :left, and :right. The required entries in the
-                  array/hash are:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:table (first array element) </td><td>
-                  <p>The name of the table to join.</p>
-                  </td></tr><tr><td class='label'>:left (middle array element) </td><td>
-                  <p>The key joining the table to the previous table. Can use an array of
-                  symbols for a composite key association.</p>
-                  </td></tr><tr><td class='label'>:right (last array element) </td><td>
-                  <p>The key joining the table to the next table. Can use an array of symbols
-                  for a composite key association.</p>
-                  </td></tr></tbody></table>
-                  
-                  <p>If a hash is provided, the following keys are respected when using
-                  eager_graph:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:block </td><td>
-                  <p>A proc to use as the block argument to join.</p>
-                  </td></tr><tr><td class='label'>:conditions </td><td>
-                  <p>Extra conditions to add to the JOIN ON clause.  Must be a hash or array of
-                  two pairs.</p>
-                  </td></tr><tr><td class='label'>:join_type </td><td>
-                  <p>The join type to use for the join, defaults to :left_outer.</p>
-                  </td></tr><tr><td class='label'>:only_conditions </td><td>
-                  <p>Conditions to use for the join instead of the ones specified by the keys.</p>
-                  </td></tr></tbody></table>
-                  </td></tr><tr><td class='label'>opts </td><td>
-                  <p>The options for the associaion.  Takes the same options as many_to_many.</p>
-                  </td></tr></tbody></table>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-many_through_many-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-many_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 215</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-one_through_many'>
-                <a name='method-i-one_through_many'></a>
-                <div class='synopsis'>
-                  <span class='name'>one_through_many</span>
-                  <span class='arguments'>(name, through, opts=OPTS, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Creates a <a
-                  href="ClassMethods.html#method-i-one_through_many">#one_through_many</a>
-                  association.  See <a
-                  href="ClassMethods.html#method-i-many_through_many">#many_through_many</a>
-                  for arguments.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-one_through_many-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-one_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 220</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::ManyThroughMany::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::ManyThroughMany::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/many_through_many_rb.html">lib/sequel/plugins/many_through_many.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-many_through_many">many_through_many</a></li>
+<li><a href="#method-i-one_through_many">one_through_many</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-many_through_many'>
+<a name='method-i-many_through_many'></a>
+<div class='synopsis'>
+<span class='name'>many_through_many</span>
+<span class='arguments'>(name, through, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Create a <a
+href="ClassMethods.html#method-i-many_through_many">#many_through_many</a>
+association.  Arguments:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>name </td><td>
+<p>Same as associate, the name of the association.</p>
+</td></tr><tr><td class='label'>through </td><td>
+<p>The tables and keys to join between the current table and the associated
+table. Must be an array, with elements that are either 3 element arrays, or
+hashes with keys :table, :left, and :right. The required entries in the
+array/hash are:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:table (first array element) </td><td>
+<p>The name of the table to join.</p>
+</td></tr><tr><td class='label'>:left (middle array element) </td><td>
+<p>The key joining the table to the previous table. Can use an array of
+symbols for a composite key association.</p>
+</td></tr><tr><td class='label'>:right (last array element) </td><td>
+<p>The key joining the table to the next table. Can use an array of symbols
+for a composite key association.</p>
+</td></tr></tbody></table>
+
+<p>If a hash is provided, the following keys are respected when using
+eager_graph:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:block </td><td>
+<p>A proc to use as the block argument to join.</p>
+</td></tr><tr><td class='label'>:conditions </td><td>
+<p>Extra conditions to add to the JOIN ON clause.  Must be a hash or array of
+two pairs.</p>
+</td></tr><tr><td class='label'>:join_type </td><td>
+<p>The join type to use for the join, defaults to :left_outer.</p>
+</td></tr><tr><td class='label'>:only_conditions </td><td>
+<p>Conditions to use for the join instead of the ones specified by the keys.</p>
+</td></tr></tbody></table>
+</td></tr><tr><td class='label'>opts </td><td>
+<p>The options for the associaion.  Takes the same options as many_to_many.</p>
+</td></tr></tbody></table>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-many_through_many-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-many_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 215</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-one_through_many'>
+<a name='method-i-one_through_many'></a>
+<div class='synopsis'>
+<span class='name'>one_through_many</span>
+<span class='arguments'>(name, through, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Creates a <a
+href="ClassMethods.html#method-i-one_through_many">#one_through_many</a>
+association.  See <a
+href="ClassMethods.html#method-i-many_through_many">#many_through_many</a>
+for arguments.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-one_through_many-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-one_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 220</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">one_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

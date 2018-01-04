@@ -1,155 +1,151 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Model</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Model
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/model_rb.html">lib/sequel/model.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/model/associations_rb.html">lib/sequel/model/associations.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/model/base_rb.html">lib/sequel/model/base.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/model/dataset_module_rb.html">lib/sequel/model/dataset_module.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/model/errors_rb.html">lib/sequel/model/errors.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>Object</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p><code>Sequel::Model</code> is an object relational mapper built on top of
-            <a href="../Sequel.html">Sequel</a> core.  Each model class is backed by a
-            dataset instance, and many dataset methods can be called directly on the
-            class.  <a href="Model.html">Model</a> datasets return rows as model
-            instances, which are wrappers around the underlying hash that allow easily
-            updating or deleting the individual row.</p>
-            
-            <p><code>Sequel::Model</code> is built completely out of plugins.  <a
-            href="Plugins.html">Plugins</a> can override any class, instance, or
-            dataset method defined by a previous plugin and call super to get the
-            default behavior.  By default, <code>Sequel::Model</code> loads two
-            plugins, <code>Sequel::Model</code> (which is itself a plugin) for the base
-            support, and <code>Sequel::Model::Associations</code> for the associations
-            support.</p>
-            
-            <p>You can set the <code>SEQUEL_NO_ASSOCIATIONS</code> constant or environment
-            variable to make <a href="../Sequel.html">Sequel</a> not load the
-            associations plugin by default.</p>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="Model/Associations.html">Sequel::Model::Associations</a></li>
-              <li><a href="Model/ClassMethods.html">Sequel::Model::ClassMethods</a></li>
-              <li><a href="Model/DatasetMethods.html">Sequel::Model::DatasetMethods</a></li>
-              <li><a href="Model/InstanceMethods.html">Sequel::Model::InstanceMethods</a></li>
-              <li><a href="Model/DatasetModule.html">Sequel::Model::DatasetModule</a></li>
-              <li><a href="Model/Errors.html">Sequel::Model::Errors</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      [
-                      :after_create,
-                      :after_destroy,
-                      :after_save,
-                      :after_update,
-                      :after_validation,
-                      :before_create,
-                      :before_destroy,
-                      :before_save,
-                      :before_update,
-                      :before_validation
-                      ].freeze
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Empty instance methods to create that the user can override. Just like any
-                      other method defined by <a href="../Sequel.html">Sequel</a>, if you
-                      override one of these, you should call <code>super</code> to get the
-                      default behavior (while empty by default, they are often overridden by
-                      plugins).  See the <a href="../../files/doc/model_hooks_rdoc.html">“Model
-                      Hooks” guide</a> for more detail on hooks.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>OPTS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::OPTS</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>RESTRICTED_SETTER_METHODS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>instance_methods.map(&:to_s).select{|l| l.end_with?('=')}.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The setter methods (methods ending with =) that are never allowed to be
-                      called automatically via
-                      <code>set</code>/<code>update</code>/<code>new</code>/etc..</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Model</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Model
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/model_rb.html">lib/sequel/model.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/model/associations_rb.html">lib/sequel/model/associations.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/model/base_rb.html">lib/sequel/model/base.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/model/dataset_module_rb.html">lib/sequel/model/dataset_module.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/model/errors_rb.html">lib/sequel/model/errors.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Object</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><code>Sequel::Model</code> is an object relational mapper built on top of
+<a href="../Sequel.html">Sequel</a> core.  Each model class is backed by a
+dataset instance, and many dataset methods can be called directly on the
+class.  <a href="Model.html">Model</a> datasets return rows as model
+instances, which are wrappers around the underlying hash that allow easily
+updating or deleting the individual row.</p>
+
+<p><code>Sequel::Model</code> is built completely out of plugins.  <a
+href="Plugins.html">Plugins</a> can override any class, instance, or
+dataset method defined by a previous plugin and call super to get the
+default behavior.  By default, <code>Sequel::Model</code> loads two
+plugins, <code>Sequel::Model</code> (which is itself a plugin) for the base
+support, and <code>Sequel::Model::Associations</code> for the associations
+support.</p>
+
+<p>You can set the <code>SEQUEL_NO_ASSOCIATIONS</code> constant or environment
+variable to make <a href="../Sequel.html">Sequel</a> not load the
+associations plugin by default.</p>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Model/Associations.html">Sequel::Model::Associations</a></li>
+<li><a href="Model/ClassMethods.html">Sequel::Model::ClassMethods</a></li>
+<li><a href="Model/DatasetMethods.html">Sequel::Model::DatasetMethods</a></li>
+<li><a href="Model/InstanceMethods.html">Sequel::Model::InstanceMethods</a></li>
+<li><a href="Model/DatasetModule.html">Sequel::Model::DatasetModule</a></li>
+<li><a href="Model/Errors.html">Sequel::Model::Errors</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>HOOKS</td>
+<td>=</td>
+<td class='context-item-value'>[
+:after_create,
+:after_destroy,
+:after_save,
+:after_update,
+:after_validation,
+:before_create,
+:before_destroy,
+:before_save,
+:before_update,
+:before_validation
+].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Empty instance methods to create that the user can override. Just like any
+other method defined by <a href="../Sequel.html">Sequel</a>, if you
+override one of these, you should call <code>super</code> to get the
+default behavior (while empty by default, they are often overridden by
+plugins).  See the <a href="../../files/doc/model_hooks_rdoc.html">“Model
+Hooks” guide</a> for more detail on hooks.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>OPTS</td>
+<td>=</td>
+<td class='context-item-value'>Sequel::OPTS</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>RESTRICTED_SETTER_METHODS</td>
+<td>=</td>
+<td class='context-item-value'>instance_methods.map(&:to_s).select{|l| l.end_with?('=')}.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>The setter methods (methods ending with =) that are never allowed to be
+called automatically via
+<code>set</code>/<code>update</code>/<code>new</code>/etc..</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

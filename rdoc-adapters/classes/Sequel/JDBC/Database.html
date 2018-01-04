@@ -1,383 +1,401 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::JDBC::Database</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::JDBC::Database
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/adapters/jdbc_rb.html">lib/sequel/adapters/jdbc.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>Sequel::Database</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#attribute-i-basic_type_convertor_map">basic_type_convertor_map</a></li>
-              <li><a href="#method-i-call_sproc">call_sproc</a></li>
-              <li><a href="#method-i-connect">connect</a></li>
-              <li><a href="#attribute-i-convert_types">convert_types</a></li>
-              <li><a href="#method-i-disconnect_connection">disconnect_connection</a></li>
-              <li><a href="#attribute-i-driver">driver</a></li>
-              <li><a href="#method-i-execute">execute</a></li>
-              <li><a href="#method-i-execute_ddl">execute_ddl</a></li>
-              <li><a href="#method-i-execute_insert">execute_insert</a></li>
-              <li><a href="#attribute-i-fetch_size">fetch_size</a></li>
-              <li><a href="#method-i-foreign_key_list">foreign_key_list</a></li>
-              <li><a href="#method-i-freeze">freeze</a></li>
-              <li><a href="#method-i-indexes">indexes</a></li>
-              <li><a href="#method-i-jndi-3F">jndi?</a></li>
-              <li><a href="#method-i-tables">tables</a></li>
-              <li><a href="#attribute-i-type_convertor_map">type_convertor_map</a></li>
-              <li><a href="#method-i-uri">uri</a></li>
-              <li><a href="#method-i-views">views</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='aliases-list'>
-              <h2>Public Instance Aliases</h2>
-              <div class='name-list'>
-                <table summary='Public Instance Aliases'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>execute_dui</td>
-                    <td>-&gt;</td>
-                    <td class='context-item-value'><a href="#method-i-execute">execute</a></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-basic_type_convertor_map'>basic_type_convertor_map</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Map of <a href="../JDBC.html">JDBC</a> type ids to callable objects that
-                      return appropriate ruby or java values.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-convert_types'>convert_types</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Whether to convert some <a href="Java.html">Java</a> types to ruby types
-                      when retrieving rows. True by default, can be set to false to roughly
-                      double performance when fetching rows.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-driver'>driver</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The <a href="Java.html">Java</a> database driver we are using (should be a
-                      <a href="Java.html">Java</a> class)</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-fetch_size'>fetch_size</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The fetch size to use for <a href="../JDBC.html">JDBC</a> Statement objects
-                      created by this database. By default, this is nil so a fetch size is not
-                      set explicitly.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-type_convertor_map'>type_convertor_map</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Map of <a href="../JDBC.html">JDBC</a> type ids to callable objects that
-                      return appropriate ruby values.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-call_sproc'>
-                <a name='method-i-call_sproc'></a>
-                <div class='synopsis'>
-                  <span class='name'>call_sproc</span>
-                  <span class='arguments'>(name, opts = OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Execute the given stored procedure with the give name. If a block is given,
-                  the stored procedure should return rows.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call_sproc-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-call_sproc-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>] <span class="ruby-operator">||</span> []&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;{call #{name}(#{args.map{&#39;?&#39;}.join(&#39;,&#39;)})}&quot;</span>&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">cps</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepareCall</span>(<span class="ruby-identifier">sql</span>)&#x000A;&#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-value">0</span>&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_ps_arg</span>(<span class="ruby-identifier">cps</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>)}&#x000A;&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;        <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">cps</span>.<span class="ruby-identifier">executeQuery</span>}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">cps</span>.<span class="ruby-identifier">executeUpdate</span>}&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:insert</span>&#x000A;          <span class="ruby-identifier">last_insert_id</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">opts</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NativeException</span>, <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLException</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)&#x000A;    <span class="ruby-keyword">ensure</span>&#x000A;      <span class="ruby-identifier">cps</span>.<span class="ruby-identifier">close</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-connect'>
-                <a name='method-i-connect'></a>
-                <div class='synopsis'>
-                  <span class='name'>connect</span>
-                  <span class='arguments'>(server)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Connect to the database using JavaSQL::DriverManager.getConnection, and
-                  falling back to driver.new.connect if the driver is known.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 180</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">conn</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">jndi?</span>&#x000A;    <span class="ruby-identifier">get_connection_from_jndi</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">uri</span>(<span class="ruby-identifier">opts</span>)]&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">concat</span>([<span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>], <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">DriverManager</span>.<span class="ruby-identifier">setLoginTimeout</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:login_timeout</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:login_timeout</span>]&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">StandardError</span>, <span class="ruby-string">&quot;skipping regular connection&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:jdbc_properties</span>]&#x000A;      <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">DriverManager</span>.<span class="ruby-identifier">getConnection</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLException</span>, <span class="ruby-constant">NativeException</span>, <span class="ruby-constant">StandardError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">driver</span>&#x000A;      <span class="ruby-comment"># If the DriverManager can&#39;t get the connection - use the connect</span>&#x000A;      <span class="ruby-comment"># method of the driver. (This happens under Tomcat for instance)</span>&#x000A;      <span class="ruby-identifier">props</span> = <span class="ruby-identifier">java</span>.<span class="ruby-identifier">util</span>.<span class="ruby-constant">Properties</span>.<span class="ruby-identifier">new</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]&#x000A;        <span class="ruby-identifier">props</span>.<span class="ruby-identifier">setProperty</span>(<span class="ruby-string">&quot;user&quot;</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>])&#x000A;        <span class="ruby-identifier">props</span>.<span class="ruby-identifier">setProperty</span>(<span class="ruby-string">&quot;password&quot;</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>])&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">opts</span>[<span class="ruby-value">:jdbc_properties</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">props</span>.<span class="ruby-identifier">setProperty</span>(<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">v</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:jdbc_properties</span>]&#x000A;      <span class="ruby-keyword">begin</span>&#x000A;        <span class="ruby-identifier">c</span> = <span class="ruby-identifier">driver</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">props</span>)&#x000A;        <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span>, <span class="ruby-string">&#39;driver.new.connect returned nil: probably bad JDBC connection string&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">c</span>&#x000A;        <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-keyword">rescue</span> <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLException</span>, <span class="ruby-constant">NativeException</span>, <span class="ruby-constant">StandardError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e2</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">e2</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:message=</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">e2</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>&#x000A;          <span class="ruby-identifier">e2</span>.<span class="ruby-identifier">message</span> = <span class="ruby-node">&quot;#{e2.message}\n#{e.class.name}: #{e.message}&quot;</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e2</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">setup_connection</span>(<span class="ruby-identifier">conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-disconnect_connection'>
-                <a name='method-i-disconnect_connection'></a>
-                <div class='synopsis'>
-                  <span class='name'>disconnect_connection</span>
-                  <span class='arguments'>(c)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Close given adapter connections, and delete any related prepared
-                  statements.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect_connection-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-disconnect_connection-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 217</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">c</span>)&#x000A;  <span class="ruby-ivar">@connection_prepared_statements_mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@connection_prepared_statements</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">c</span>.<span class="ruby-identifier">close</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-execute'>
-                <a name='method-i-execute'></a>
-                <div class='synopsis'>
-                  <span class='name'>execute</span>
-                  <span class='arguments'>(sql, opts=OPTS, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 222</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sproc</span>]&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> [<span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Dataset</span>].<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">statement</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">size</span> = <span class="ruby-identifier">fetch_size</span>&#x000A;          <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">setFetchSize</span>(<span class="ruby-identifier">size</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">executeQuery</span>(<span class="ruby-identifier">sql</span>)}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>]&#x000A;        <span class="ruby-keyword">when</span> <span class="ruby-value">:ddl</span>&#x000A;          <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)}&#x000A;        <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>&#x000A;          <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">execute_statement_insert</span>(<span class="ruby-identifier">stmt</span>, <span class="ruby-identifier">sql</span>)}&#x000A;          <span class="ruby-identifier">last_insert_id</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:stmt=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">stmt</span>))&#x000A;        <span class="ruby-keyword">else</span>&#x000A;          <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">executeUpdate</span>(<span class="ruby-identifier">sql</span>)}&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-execute_ddl'>
-                <a name='method-i-execute_ddl'></a>
-                <div class='synopsis'>
-                  <span class='name'>execute_ddl</span>
-                  <span class='arguments'>(sql, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_ddl-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-execute_ddl-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 248</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>] = <span class="ruby-value">:ddl</span>&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-execute_insert'>
-                <a name='method-i-execute_insert'></a>
-                <div class='synopsis'>
-                  <span class='name'>execute_insert</span>
-                  <span class='arguments'>(sql, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 254</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>] = <span class="ruby-value">:insert</span>&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-foreign_key_list'>
-                <a name='method-i-foreign_key_list'></a>
-                <div class='synopsis'>
-                  <span class='name'>foreign_key_list</span>
-                  <span class='arguments'>(table, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Use the <a href="../JDBC.html">JDBC</a> metadata to get a list of foreign
-                  keys for the table.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_key_list-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-foreign_key_list-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 267</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">metadata_schema_and_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">foreign_keys</span> = {}&#x000A;  <span class="ruby-identifier">metadata</span>(<span class="ruby-value">:getImportedKeys</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">fk</span> = <span class="ruby-identifier">foreign_keys</span>[<span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]]&#x000A;      <span class="ruby-identifier">fk</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:fkcolumn_name</span>])]&#x000A;      <span class="ruby-identifier">fk</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:pkcolumn_name</span>])]&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]&#x000A;      <span class="ruby-identifier">foreign_keys</span>[<span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]] = {<span class="ruby-value">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]), <span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span>[[<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:fkcolumn_name</span>])]], <span class="ruby-value">:table=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:pktable_name</span>]), <span class="ruby-value">:key=</span><span class="ruby-operator">&gt;</span>[[<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:pkcolumn_name</span>])]]}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">foreign_keys</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fk</span><span class="ruby-operator">|</span>&#x000A;    [<span class="ruby-value">:columns</span>, <span class="ruby-value">:key</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">fk</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">fk</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 260</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@type_convertor_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@basic_type_convertor_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-indexes'>
-                <a name='method-i-indexes'></a>
-                <div class='synopsis'>
-                  <span class='name'>indexes</span>
-                  <span class='arguments'>(table, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Use the <a href="../JDBC.html">JDBC</a> metadata to get the index
-                  information for the table.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">metadata_schema_and_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata</span>(<span class="ruby-value">:getIndexInfo</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>, <span class="ruby-keyword">false</span>, <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">:column_name</span>]&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:primary_key_index_re</span>, <span class="ruby-keyword">true</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:index_name</span>] <span class="ruby-operator">=~</span> <span class="ruby-identifier">primary_key_index_re</span> &#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:index_name</span>])] <span class="ruby-operator">||=</span> {<span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span>[], <span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-keyword">false</span>, <span class="ruby-value">0</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:non_unique</span>])}&#x000A;    <span class="ruby-identifier">i</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-jndi-3F'>
-                <a name='method-i-jndi-3F'></a>
-                <div class='synopsis'>
-                  <span class='name'>jndi?</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Whether or not JNDI is being used for this connection.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-jndi-3F-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-jndi-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 301</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">jndi?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-operator">!</span>(<span class="ruby-identifier">uri</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">JNDI_URI_REGEXP</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-tables'>
-                <a name='method-i-tables'></a>
-                <div class='synopsis'>
-                  <span class='name'>tables</span>
-                  <span class='arguments'>(opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>All tables in this database</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-tables-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 306</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">get_tables</span>(<span class="ruby-string">&#39;TABLE&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-uri'>
-                <a name='method-i-uri'></a>
-                <div class='synopsis'>
-                  <span class='name'>uri</span>
-                  <span class='arguments'>(opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The uri for this connection.  You can specify the uri using the :uri, :url,
-                  or :database options.  You don&#39;t need to worry about this if you use
-                  Sequel.connect with the <a href="../JDBC.html">JDBC</a> connectrion
-                  strings.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-uri-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-uri-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 314</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">uri</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">ur</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:uri</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:url</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>]&#x000A;  <span class="ruby-identifier">ur</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\Ajdbc:/</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ur</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;jdbc:#{ur}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-views'>
-                <a name='method-i-views'></a>
-                <div class='synopsis'>
-                  <span class='name'>views</span>
-                  <span class='arguments'>(opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>All views in this database</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-views-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 321</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">get_tables</span>(<span class="ruby-string">&#39;VIEW&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::JDBC::Database</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::JDBC::Database
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/jdbc_rb.html">lib/sequel/adapters/jdbc.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Sequel::Database</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#attribute-i-basic_type_convertor_map">basic_type_convertor_map</a></li>
+<li><a href="#method-i-call_sproc">call_sproc</a></li>
+<li><a href="#method-i-connect">connect</a></li>
+<li><a href="#attribute-i-convert_types">convert_types</a></li>
+<li><a href="#method-i-disconnect_connection">disconnect_connection</a></li>
+<li><a href="#attribute-i-driver">driver</a></li>
+<li><a href="#method-i-execute">execute</a></li>
+<li><a href="#method-i-execute_ddl">execute_ddl</a></li>
+<li><a href="#method-i-execute_insert">execute_insert</a></li>
+<li><a href="#attribute-i-fetch_size">fetch_size</a></li>
+<li><a href="#method-i-foreign_key_list">foreign_key_list</a></li>
+<li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#method-i-indexes">indexes</a></li>
+<li><a href="#method-i-jndi-3F">jndi?</a></li>
+<li><a href="#method-i-tables">tables</a></li>
+<li><a href="#attribute-i-type_convertor_map">type_convertor_map</a></li>
+<li><a href="#method-i-uri">uri</a></li>
+<li><a href="#method-i-views">views</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='aliases-list'>
+<h2>Public Instance Aliases</h2>
+<div class='name-list'>
+<table summary='Public Instance Aliases'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>execute_dui</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-execute">execute</a></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-basic_type_convertor_map'>basic_type_convertor_map</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>Map of <a href="../JDBC.html">JDBC</a> type ids to callable objects that
+return appropriate ruby or java values.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-convert_types'>convert_types</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>Whether to convert some <a href="Java.html">Java</a> types to ruby types
+when retrieving rows. True by default, can be set to false to roughly
+double performance when fetching rows.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-driver'>driver</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The <a href="Java.html">Java</a> database driver we are using (should be a
+<a href="Java.html">Java</a> class)</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-fetch_size'>fetch_size</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>The fetch size to use for <a href="../JDBC.html">JDBC</a> Statement objects
+created by this database. By default, this is nil so a fetch size is not
+set explicitly.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-type_convertor_map'>type_convertor_map</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>Map of <a href="../JDBC.html">JDBC</a> type ids to callable objects that
+return appropriate ruby values.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-call_sproc'>
+<a name='method-i-call_sproc'></a>
+<div class='synopsis'>
+<span class='name'>call_sproc</span>
+<span class='arguments'>(name, opts = OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Execute the given stored procedure with the give name. If a block is given,
+the stored procedure should return rows.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call_sproc-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-call_sproc-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_sproc</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>] <span class="ruby-operator">||</span> []&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;{call #{name}(#{args.map{&#39;?&#39;}.join(&#39;,&#39;)})}&quot;</span>&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">cps</span> = <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepareCall</span>(<span class="ruby-identifier">sql</span>)&#x000A;&#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-value">0</span>&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">arg</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_ps_arg</span>(<span class="ruby-identifier">cps</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">i</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>)}&#x000A;&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;        <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">cps</span>.<span class="ruby-identifier">executeQuery</span>}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">cps</span>.<span class="ruby-identifier">executeUpdate</span>}&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:insert</span>&#x000A;          <span class="ruby-identifier">last_insert_id</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">opts</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NativeException</span>, <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLException</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)&#x000A;    <span class="ruby-keyword">ensure</span>&#x000A;      <span class="ruby-identifier">cps</span>.<span class="ruby-identifier">close</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-connect'>
+<a name='method-i-connect'></a>
+<div class='synopsis'>
+<span class='name'>connect</span>
+<span class='arguments'>(server)</span>
+
+</div>
+<div class='description'>
+
+<p>Connect to the database using JavaSQL::DriverManager.getConnection, and
+falling back to driver.new.connect if the driver is known.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-connect-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 180</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">conn</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">jndi?</span>&#x000A;    <span class="ruby-identifier">get_connection_from_jndi</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">args</span> = [<span class="ruby-identifier">uri</span>(<span class="ruby-identifier">opts</span>)]&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">concat</span>([<span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>], <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">DriverManager</span>.<span class="ruby-identifier">setLoginTimeout</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:login_timeout</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:login_timeout</span>]&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">StandardError</span>, <span class="ruby-string">&quot;skipping regular connection&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:jdbc_properties</span>]&#x000A;      <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">DriverManager</span>.<span class="ruby-identifier">getConnection</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLException</span>, <span class="ruby-constant">NativeException</span>, <span class="ruby-constant">StandardError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">driver</span>&#x000A;      <span class="ruby-comment"># If the DriverManager can&#39;t get the connection - use the connect</span>&#x000A;      <span class="ruby-comment"># method of the driver. (This happens under Tomcat for instance)</span>&#x000A;      <span class="ruby-identifier">props</span> = <span class="ruby-identifier">java</span>.<span class="ruby-identifier">util</span>.<span class="ruby-constant">Properties</span>.<span class="ruby-identifier">new</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>]&#x000A;        <span class="ruby-identifier">props</span>.<span class="ruby-identifier">setProperty</span>(<span class="ruby-string">&quot;user&quot;</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>])&#x000A;        <span class="ruby-identifier">props</span>.<span class="ruby-identifier">setProperty</span>(<span class="ruby-string">&quot;password&quot;</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>])&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">opts</span>[<span class="ruby-value">:jdbc_properties</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">props</span>.<span class="ruby-identifier">setProperty</span>(<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-identifier">v</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:jdbc_properties</span>]&#x000A;      <span class="ruby-keyword">begin</span>&#x000A;        <span class="ruby-identifier">c</span> = <span class="ruby-identifier">driver</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>], <span class="ruby-identifier">props</span>)&#x000A;        <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span>, <span class="ruby-string">&#39;driver.new.connect returned nil: probably bad JDBC connection string&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">c</span>&#x000A;        <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-keyword">rescue</span> <span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLException</span>, <span class="ruby-constant">NativeException</span>, <span class="ruby-constant">StandardError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e2</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">e2</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:message=</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">e2</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>&#x000A;          <span class="ruby-identifier">e2</span>.<span class="ruby-identifier">message</span> = <span class="ruby-node">&quot;#{e2.message}\n#{e.class.name}: #{e.message}&quot;</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-identifier">raise</span> <span class="ruby-identifier">e2</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">setup_connection</span>(<span class="ruby-identifier">conn</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-disconnect_connection'>
+<a name='method-i-disconnect_connection'></a>
+<div class='synopsis'>
+<span class='name'>disconnect_connection</span>
+<span class='arguments'>(c)</span>
+
+</div>
+<div class='description'>
+
+<p>Close given adapter connections, and delete any related prepared
+statements.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-disconnect_connection-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-disconnect_connection-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 217</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect_connection</span>(<span class="ruby-identifier">c</span>)&#x000A;  <span class="ruby-ivar">@connection_prepared_statements_mutex</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@connection_prepared_statements</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">c</span>.<span class="ruby-identifier">close</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-execute'>
+<a name='method-i-execute'></a>
+<div class='synopsis'>
+<span class='name'>execute</span>
+<span class='arguments'>(sql, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 222</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sproc</span>]&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> [<span class="ruby-constant">Symbol</span>, <span class="ruby-constant">Dataset</span>].<span class="ruby-identifier">any?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">statement</span>(<span class="ruby-identifier">conn</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">size</span> = <span class="ruby-identifier">fetch_size</span>&#x000A;          <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">setFetchSize</span>(<span class="ruby-identifier">size</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">executeQuery</span>(<span class="ruby-identifier">sql</span>)}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>]&#x000A;        <span class="ruby-keyword">when</span> <span class="ruby-value">:ddl</span>&#x000A;          <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)}&#x000A;        <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>&#x000A;          <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">execute_statement_insert</span>(<span class="ruby-identifier">stmt</span>, <span class="ruby-identifier">sql</span>)}&#x000A;          <span class="ruby-identifier">last_insert_id</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:stmt</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">stmt</span>))&#x000A;        <span class="ruby-keyword">else</span>&#x000A;          <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">executeUpdate</span>(<span class="ruby-identifier">sql</span>)}&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-execute_ddl'>
+<a name='method-i-execute_ddl'></a>
+<div class='synopsis'>
+<span class='name'>execute_ddl</span>
+<span class='arguments'>(sql, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_ddl-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-execute_ddl-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 248</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_ddl</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>] = <span class="ruby-value">:ddl</span>&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-execute_insert'>
+<a name='method-i-execute_insert'></a>
+<div class='synopsis'>
+<span class='name'>execute_insert</span>
+<span class='arguments'>(sql, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_insert-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 254</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>]&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:type</span>] = <span class="ruby-value">:insert</span>&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-foreign_key_list'>
+<a name='method-i-foreign_key_list'></a>
+<div class='synopsis'>
+<span class='name'>foreign_key_list</span>
+<span class='arguments'>(table, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Use the <a href="../JDBC.html">JDBC</a> metadata to get a list of foreign
+keys for the table.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-foreign_key_list-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-foreign_key_list-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 267</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">metadata_schema_and_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">foreign_keys</span> = {}&#x000A;  <span class="ruby-identifier">metadata</span>(<span class="ruby-value">:getImportedKeys</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">fk</span> = <span class="ruby-identifier">foreign_keys</span>[<span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]]&#x000A;      <span class="ruby-identifier">fk</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:fkcolumn_name</span>])]&#x000A;      <span class="ruby-identifier">fk</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:pkcolumn_name</span>])]&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]&#x000A;      <span class="ruby-identifier">foreign_keys</span>[<span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]] = {<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:fk_name</span>]), <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[[<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:fkcolumn_name</span>])]], <span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:pktable_name</span>]), <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[[<span class="ruby-identifier">r</span>[<span class="ruby-value">:key_seq</span>], <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:pkcolumn_name</span>])]]}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">foreign_keys</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">fk</span><span class="ruby-operator">|</span>&#x000A;    [<span class="ruby-value">:columns</span>, <span class="ruby-value">:key</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">fk</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">fk</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 260</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@type_convertor_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@basic_type_convertor_map</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-indexes'>
+<a name='method-i-indexes'></a>
+<div class='synopsis'>
+<span class='name'>indexes</span>
+<span class='arguments'>(table, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Use the <a href="../JDBC.html">JDBC</a> metadata to get the index
+information for the table.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-indexes-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">metadata_schema_and_table</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata</span>(<span class="ruby-value">:getIndexInfo</span>, <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>, <span class="ruby-keyword">false</span>, <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">:column_name</span>]&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:primary_key_index_re</span>, <span class="ruby-keyword">true</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:index_name</span>] <span class="ruby-operator">=~</span> <span class="ruby-identifier">primary_key_index_re</span> &#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:index_name</span>])] <span class="ruby-operator">||=</span> {<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-keyword">false</span>, <span class="ruby-value">0</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:non_unique</span>])}&#x000A;    <span class="ruby-identifier">i</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-jndi-3F'>
+<a name='method-i-jndi-3F'></a>
+<div class='synopsis'>
+<span class='name'>jndi?</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Whether or not JNDI is being used for this connection.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-jndi-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-jndi-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 301</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">jndi?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-operator">!</span>(<span class="ruby-identifier">uri</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">JNDI_URI_REGEXP</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-tables'>
+<a name='method-i-tables'></a>
+<div class='synopsis'>
+<span class='name'>tables</span>
+<span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>All tables in this database</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-tables-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 306</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">get_tables</span>(<span class="ruby-string">&#39;TABLE&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-uri'>
+<a name='method-i-uri'></a>
+<div class='synopsis'>
+<span class='name'>uri</span>
+<span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>The uri for this connection.  You can specify the uri using the :uri, :url,
+or :database options.  You don&#39;t need to worry about this if you use
+Sequel.connect with the <a href="../JDBC.html">JDBC</a> connectrion
+strings.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-uri-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-uri-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 314</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">uri</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">ur</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:uri</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:url</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>]&#x000A;  <span class="ruby-identifier">ur</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/^\Ajdbc:/</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ur</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;jdbc:#{ur}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-views'>
+<a name='method-i-views'></a>
+<div class='synopsis'>
+<span class='name'>views</span>
+<span class='arguments'>(opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>All views in this database</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-views-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 321</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">get_tables</span>(<span class="ruby-string">&#39;VIEW&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

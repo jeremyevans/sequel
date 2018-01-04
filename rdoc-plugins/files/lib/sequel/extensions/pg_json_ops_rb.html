@@ -1,112 +1,114 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>pg_json_ops.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>pg_json_ops.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/pg_json_ops.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-06-21 13:54:47 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The pg_json_ops extension adds support to Sequel&#39;s DSL to make it
-            easier to call PostgreSQL JSON functions and operators (added first in
-            PostgreSQL 9.3).  It also supports the JSONB functions and operators added
-            in PostgreSQL 9.4.</p>
-            
-            <p>To load the extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_json_ops</span></pre>
-            
-            <p>The most common usage is passing an expression to Sequel.pg_json_op or
-            Sequel.pg_jsonb_op:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_op</span>(:<span class="ruby-identifier">json_column</span>)&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(:<span class="ruby-identifier">jsonb_column</span>)</pre>
-            
-            <p>If you have also loaded the pg_json extension, you can use Sequel.pg_json
-            or Sequel.pg_jsonb as well:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>(:<span class="ruby-identifier">json_column</span>)&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(:<span class="ruby-identifier">jsonb_column</span>)</pre>
-            
-            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-            expression objects, you can call the pg_json or pg_jsonb method:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">json_column</span>].<span class="ruby-identifier">pg_json</span>&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">jsonb_column</span>].<span class="ruby-identifier">pg_jsonb</span></pre>
-            
-            <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions
-            extension</a>, or you have loaded the core_refinements extension and have
-            activated refinements for the file, you can also use <a
-            href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>
-            or <a
-            href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb">Sequel::Postgres::JSONOpMethods#pg_jsonb</a>:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">j</span> = :<span class="ruby-identifier">json_column</span>.<span class="ruby-identifier">pg_json</span>&#x000A;<span class="ruby-identifier">jb</span> = :<span class="ruby-identifier">jsonb_column</span>.<span class="ruby-identifier">pg_jsonb</span></pre>
-            
-            <p>This creates a <a
-            href="../../../../classes/Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a>
-            or <a
-            href="../../../../classes/Sequel/Postgres/JSONBOp.html">Sequel::Postgres::JSONBOp</a>
-            object that can be used for easier querying.  The following methods are
-            available for both JSONOp and JSONBOp instances:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">j</span>[<span class="ruby-value">1</span>]                     <span class="ruby-comment"># (json_column -&gt; 1)</span>&#x000A;<span class="ruby-identifier">j</span>[<span class="ruby-node">%w&#39;a b&#39;</span>]               <span class="ruby-comment"># (json_column #&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>)            <span class="ruby-comment"># (json_column -&gt;&gt; 1)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-node">%w&#39;a b&#39;</span>)      <span class="ruby-comment"># (json_column #&gt;&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>)      <span class="ruby-comment"># json_extract_path(json_column, &#39;a&#39;, &#39;b&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">extract_text</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path_text(json_column, &#39;a&#39;, &#39;b&#39;)</span>&#x000A;&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_length</span>           <span class="ruby-comment"># json_array_length(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_elements</span>         <span class="ruby-comment"># json_array_elements(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_elements_text</span>    <span class="ruby-comment"># json_array_elements_text(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">each</span>                   <span class="ruby-comment"># json_each(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">each_text</span>              <span class="ruby-comment"># json_each_text(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">keys</span>                   <span class="ruby-comment"># json_object_keys(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">typeof</span>                 <span class="ruby-comment"># json_typeof(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">strip_nulls</span>            <span class="ruby-comment"># json_strip_nulls(json_column)</span>&#x000A;&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">populate</span>(:<span class="ruby-identifier">a</span>)           <span class="ruby-comment"># json_populate_record(:a, json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">populate_set</span>(:<span class="ruby-identifier">a</span>)       <span class="ruby-comment"># json_populate_recordset(:a, json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">to_record</span>              <span class="ruby-comment"># json_to_record(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">to_recordset</span>           <span class="ruby-comment"># json_to_recordset(json_column)</span></pre>
-            
-            <p>There are additional methods are are only supported on JSONBOp instances:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">j</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>                     <span class="ruby-comment"># (jsonb_column - 1)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">concat</span>(:<span class="ruby-identifier">h</span>)              <span class="ruby-comment"># (jsonb_column || h)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contain_all</span>(:<span class="ruby-identifier">a</span>)         <span class="ruby-comment"># (jsonb_column ?&amp; a)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contain_any</span>(:<span class="ruby-identifier">a</span>)         <span class="ruby-comment"># (jsonb_column ?| a)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">h</span>)            <span class="ruby-comment"># (jsonb_column @&gt; h)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">h</span>)        <span class="ruby-comment"># (jsonb_column &lt;@ h)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">delete_path</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>)    <span class="ruby-comment"># (jsonb_column #- ARRAY[&#39;0&#39;,&#39;a&#39;])</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>)           <span class="ruby-comment"># (jsonb_column ? &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>, <span class="ruby-string">&#39;a&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># jsonb_insert(jsonb_column, ARRAY[0, &#39;a&#39;], &#39;{&quot;a&quot;:1}&#39;::jsonb, false)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">pretty</span>                  <span class="ruby-comment"># jsonb_pretty(jsonb_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">set</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>, :<span class="ruby-identifier">h</span>)        <span class="ruby-comment"># jsonb_set(jsonb_column, ARRAY[&#39;0&#39;,&#39;a&#39;], h, true)</span></pre>
-            
-            <p>If you are also using the pg_json extension, you should load it before
-            loading this extension.  Doing so will allow you to use the op method on
-            JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform
-            json/jsonb operations on json/jsonb literals.</p>
-            
-            <p>In order to get the automatic conversion from a ruby array to a PostgreSQL
-            array (as shown in the [] and get_text examples above), you need to load
-            the pg_array extension.</p>
-            
-            <p>Related modules: <a
-            href="../../../../classes/Sequel/Postgres/JSONBaseOp.html">Sequel::Postgres::JSONBaseOp</a>,
-            <a
-            href="../../../../classes/Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a>,
-            <a
-            href="../../../../classes/Sequel/Postgres/JSONBOp.html">Sequel::Postgres::JSONBOp</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>pg_json_ops.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>pg_json_ops.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/pg_json_ops.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-06-21 13:54:47 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The pg_json_ops extension adds support to Sequel&#39;s DSL to make it
+easier to call PostgreSQL JSON functions and operators (added first in
+PostgreSQL 9.3).  It also supports the JSONB functions and operators added
+in PostgreSQL 9.4.</p>
+
+<p>To load the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json_ops</span></pre>
+
+<p>The most common usage is passing an expression to Sequel.pg_json_op or
+Sequel.pg_jsonb_op:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_op</span>(<span class="ruby-value">:json_column</span>)&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-value">:jsonb_column</span>)</pre>
+
+<p>If you have also loaded the pg_json extension, you can use Sequel.pg_json
+or Sequel.pg_jsonb as well:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>(<span class="ruby-value">:json_column</span>)&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(<span class="ruby-value">:jsonb_column</span>)</pre>
+
+<p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+expression objects, you can call the pg_json or pg_jsonb method:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:json_column</span>].<span class="ruby-identifier">pg_json</span>&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:jsonb_column</span>].<span class="ruby-identifier">pg_jsonb</span></pre>
+
+<p>If you have loaded the <a
+href="../../../doc/core_extensions_rdoc.html">core_extensions
+extension</a>, or you have loaded the core_refinements extension and have
+activated refinements for the file, you can also use <a
+href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>
+or <a
+href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb">Sequel::Postgres::JSONOpMethods#pg_jsonb</a>:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span> = <span class="ruby-value">:json_column</span>.<span class="ruby-identifier">pg_json</span>&#x000A;<span class="ruby-identifier">jb</span> = <span class="ruby-value">:jsonb_column</span>.<span class="ruby-identifier">pg_jsonb</span></pre>
+
+<p>This creates a <a
+href="../../../../classes/Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a>
+or <a
+href="../../../../classes/Sequel/Postgres/JSONBOp.html">Sequel::Postgres::JSONBOp</a>
+object that can be used for easier querying.  The following methods are
+available for both JSONOp and JSONBOp instances:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span>[<span class="ruby-value">1</span>]                     <span class="ruby-comment"># (json_column -&gt; 1)</span>&#x000A;<span class="ruby-identifier">j</span>[<span class="ruby-node">%w&#39;a b&#39;</span>]               <span class="ruby-comment"># (json_column #&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>)            <span class="ruby-comment"># (json_column -&gt;&gt; 1)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-node">%w&#39;a b&#39;</span>)      <span class="ruby-comment"># (json_column #&gt;&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">extract</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>)      <span class="ruby-comment"># json_extract_path(json_column, &#39;a&#39;, &#39;b&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">extract_text</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># json_extract_path_text(json_column, &#39;a&#39;, &#39;b&#39;)</span>&#x000A;&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_length</span>           <span class="ruby-comment"># json_array_length(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_elements</span>         <span class="ruby-comment"># json_array_elements(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">array_elements_text</span>    <span class="ruby-comment"># json_array_elements_text(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">each</span>                   <span class="ruby-comment"># json_each(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">each_text</span>              <span class="ruby-comment"># json_each_text(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">keys</span>                   <span class="ruby-comment"># json_object_keys(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">typeof</span>                 <span class="ruby-comment"># json_typeof(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">strip_nulls</span>            <span class="ruby-comment"># json_strip_nulls(json_column)</span>&#x000A;&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">populate</span>(<span class="ruby-value">:a</span>)           <span class="ruby-comment"># json_populate_record(:a, json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">populate_set</span>(<span class="ruby-value">:a</span>)       <span class="ruby-comment"># json_populate_recordset(:a, json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">to_record</span>              <span class="ruby-comment"># json_to_record(json_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">to_recordset</span>           <span class="ruby-comment"># json_to_recordset(json_column)</span></pre>
+
+<p>There are additional methods are are only supported on JSONBOp instances:</p>
+
+<pre class="ruby"><span class="ruby-identifier">j</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>                     <span class="ruby-comment"># (jsonb_column - 1)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-value">:h</span>)              <span class="ruby-comment"># (jsonb_column || h)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contain_all</span>(<span class="ruby-value">:a</span>)         <span class="ruby-comment"># (jsonb_column ?&amp; a)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contain_any</span>(<span class="ruby-value">:a</span>)         <span class="ruby-comment"># (jsonb_column ?| a)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contains</span>(<span class="ruby-value">:h</span>)            <span class="ruby-comment"># (jsonb_column @&gt; h)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">contained_by</span>(<span class="ruby-value">:h</span>)        <span class="ruby-comment"># (jsonb_column &lt;@ h)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">delete_path</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>)    <span class="ruby-comment"># (jsonb_column #- ARRAY[&#39;0&#39;,&#39;a&#39;])</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>)           <span class="ruby-comment"># (jsonb_column ? &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>, <span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># jsonb_insert(jsonb_column, ARRAY[0, &#39;a&#39;], &#39;{&quot;a&quot;:1}&#39;::jsonb, false)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">pretty</span>                  <span class="ruby-comment"># jsonb_pretty(jsonb_column)</span>&#x000A;<span class="ruby-identifier">j</span>.<span class="ruby-identifier">set</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>, <span class="ruby-value">:h</span>)        <span class="ruby-comment"># jsonb_set(jsonb_column, ARRAY[&#39;0&#39;,&#39;a&#39;], h, true)</span></pre>
+
+<p>If you are also using the pg_json extension, you should load it before
+loading this extension.  Doing so will allow you to use the op method on
+JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform
+json/jsonb operations on json/jsonb literals.</p>
+
+<p>In order to get the automatic conversion from a ruby array to a PostgreSQL
+array (as shown in the [] and get_text examples above), you need to load
+the pg_array extension.</p>
+
+<p>Related modules: <a
+href="../../../../classes/Sequel/Postgres/JSONBaseOp.html">Sequel::Postgres::JSONBaseOp</a>,
+<a
+href="../../../../classes/Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a>,
+<a
+href="../../../../classes/Sequel/Postgres/JSONBOp.html">Sequel::Postgres::JSONBOp</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

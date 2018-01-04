@@ -1,84 +1,86 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>null_dataset.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>null_dataset.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/null_dataset.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-12-08 12:55:50 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The null_dataset extension adds the Dataset#nullify method, which returns a
-            cloned dataset that will never issue a query to the database.  It
-            implements the null object pattern for datasets.</p>
-            
-            <p>The most common usage is probably in a method that must return a dataset,
-            where the method knows the dataset shouldn&#39;t return anything.  With
-            standard <a href="../../../../classes/Sequel.html">Sequel</a>, you&#39;d
-            probably just add a WHERE condition that is always false, but that still
-            results in a query being sent to the database, and can be overridden using
-            unfiltered, the OR operator, or a UNION.</p>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">nullify</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">a</span><span class="ruby-operator">:</span> :<span class="ruby-identifier">b</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># =&gt; &quot;SELECT c FROM items WHERE (a = b)&quot;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># =&gt; [] # no query sent to the database</span></pre>
-            
-            <p>Note that there is one case where a null dataset will sent a query to the
-            database.  If you call columns on a nulled dataset and the dataset
-            doesn&#39;t have an already cached version of the columns, it will create a
-            new dataset with the same options to get the columns.</p>
-            
-            <p>This extension uses Object#extend at runtime, which can hurt performance.</p>
-            
-            <p>To add the nullify method to a single dataset:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">null_dataset</span>)</pre>
-            
-            <p>To add the nullify method to all datasets on a single database:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">null_dataset</span>)</pre>
-            
-            <p>Related modules: <a
-            href="../../../../classes/Sequel/Dataset/Nullifiable.html">Sequel::Dataset::Nullifiable</a>,
-            <a
-            href="../../../../classes/Sequel/Dataset/NullDataset.html">Sequel::Dataset::NullDataset</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>null_dataset.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>null_dataset.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/null_dataset.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-12-08 12:55:50 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The null_dataset extension adds the Dataset#nullify method, which returns a
+cloned dataset that will never issue a query to the database.  It
+implements the null object pattern for datasets.</p>
+
+<p>The most common usage is probably in a method that must return a dataset,
+where the method knows the dataset shouldn&#39;t return anything.  With
+standard <a href="../../../../classes/Sequel.html">Sequel</a>, you&#39;d
+probably just add a WHERE condition that is always false, but that still
+results in a query being sent to the database, and can be overridden using
+unfiltered, the OR operator, or a UNION.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">nullify</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">a:</span> <span class="ruby-value">:b</span>).<span class="ruby-identifier">select</span>(<span class="ruby-value">:c</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># =&gt; &quot;SELECT c FROM items WHERE (a = b)&quot;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># =&gt; [] # no query sent to the database</span></pre>
+
+<p>Note that there is one case where a null dataset will sent a query to the
+database.  If you call columns on a nulled dataset and the dataset
+doesn&#39;t have an already cached version of the columns, it will create a
+new dataset with the same options to get the columns.</p>
+
+<p>This extension uses Object#extend at runtime, which can hurt performance.</p>
+
+<p>To add the nullify method to a single dataset:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:null_dataset</span>)</pre>
+
+<p>To add the nullify method to all datasets on a single database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:null_dataset</span>)</pre>
+
+<p>Related modules: <a
+href="../../../../classes/Sequel/Dataset/Nullifiable.html">Sequel::Dataset::Nullifiable</a>,
+<a
+href="../../../../classes/Sequel/Dataset/NullDataset.html">Sequel::Dataset::NullDataset</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

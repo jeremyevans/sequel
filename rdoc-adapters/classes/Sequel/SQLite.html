@@ -1,243 +1,248 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::SQLite</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::SQLite
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/adapters/jdbc/sqlite_rb.html">lib/sequel/adapters/jdbc/sqlite.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/shared/sqlite_rb.html">lib/sequel/adapters/shared/sqlite.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/sqlite_rb.html">lib/sequel/adapters/sqlite.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-blob">blob</a></li>
-              <li><a href="#method-i-boolean">boolean</a></li>
-              <li><a href="#method-i-date">date</a></li>
-              <li><a href="#method-i-float">float</a></li>
-              <li><a href="#method-i-integer">integer</a></li>
-              <li><a href="#method-i-numeric">numeric</a></li>
-              <li><a href="#method-i-time">time</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="SQLite/DatabaseMethods.html">Sequel::SQLite::DatabaseMethods</a></li>
-              <li><a href="SQLite/DatasetMethods.html">Sequel::SQLite::DatasetMethods</a></li>
-              <li><a href="SQLite/Database.html">Sequel::SQLite::Database</a></li>
-              <li><a href="SQLite/Dataset.html">Sequel::SQLite::Dataset</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>FALSE_VALUES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>(%w'0 false f no n' + [0]).freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>SQLITE_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hash with string keys and callable values for converting <a
-                      href="SQLite.html">SQLite</a> types.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-mock_adapter_setup'>
-                <a name='method-c-mock_adapter_setup'></a>
-                <div class='synopsis'>
-                  <span class='name'>mock_adapter_setup</span>
-                  <span class='arguments'>(db)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-mock_adapter_setup-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-value">30903</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-blob'>
-                <a name='method-i-blob'></a>
-                <div class='synopsis'>
-                  <span class='name'>blob</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-blob-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-boolean'>
-                <a name='method-i-boolean'></a>
-                <div class='synopsis'>
-                  <span class='name'>boolean</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-boolean-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 14</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">downcase</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-constant">FALSE_VALUES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-date'>
-                <a name='method-i-date'></a>
-                <div class='synopsis'>
-                  <span class='name'>date</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-date-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_date</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-float'>
-                <a name='method-i-float'></a>
-                <div class='synopsis'>
-                  <span class='name'>float</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-float-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-float-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">float</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_f</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-integer'>
-                <a name='method-i-integer'></a>
-                <div class='synopsis'>
-                  <span class='name'>integer</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-integer-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-integer-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">integer</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-numeric'>
-                <a name='method-i-numeric'></a>
-                <div class='synopsis'>
-                  <span class='name'>numeric</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-numeric-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-numeric-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">numeric</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-time'>
-                <a name='method-i-time'></a>
-                <div class='synopsis'>
-                  <span class='name'>time</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-time-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">s</span><span class="ruby-operator">/</span><span class="ruby-value">3600</span>, (<span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">3600</span>)<span class="ruby-operator">/</span><span class="ruby-value">60</span>, <span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">60</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;    <span class="ruby-identifier">s</span>, <span class="ruby-identifier">f</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">divmod</span>(<span class="ruby-value">1</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">s</span><span class="ruby-operator">/</span><span class="ruby-value">3600</span>, (<span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">3600</span>)<span class="ruby-operator">/</span><span class="ruby-value">60</span>, <span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">60</span>, (<span class="ruby-identifier">f</span><span class="ruby-operator">*</span><span class="ruby-value">1000000</span>).<span class="ruby-identifier">round</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::SQLite</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::SQLite
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/adapters/shared/sqlite_rb.html">lib/sequel/adapters/shared/sqlite.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/adapters/sqlite_rb.html">lib/sequel/adapters/sqlite.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-blob">blob</a></li>
+<li><a href="#method-i-boolean">boolean</a></li>
+<li><a href="#method-i-date">date</a></li>
+<li><a href="#method-i-float">float</a></li>
+<li><a href="#method-i-integer">integer</a></li>
+<li><a href="#method-i-numeric">numeric</a></li>
+<li><a href="#method-i-time">time</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="SQLite/DatabaseMethods.html">Sequel::SQLite::DatabaseMethods</a></li>
+<li><a href="SQLite/DatasetMethods.html">Sequel::SQLite::DatasetMethods</a></li>
+<li><a href="SQLite/Database.html">Sequel::SQLite::Database</a></li>
+<li><a href="SQLite/Dataset.html">Sequel::SQLite::Dataset</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>FALSE_VALUES</td>
+<td>=</td>
+<td class='context-item-value'>(%w'0 false f no n' + [0]).freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>SQLITE_TYPES</td>
+<td>=</td>
+<td class='context-item-value'>{}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Hash with string keys and callable values for converting <a
+href="SQLite.html">SQLite</a> types.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-mock_adapter_setup'>
+<a name='method-c-mock_adapter_setup'></a>
+<div class='synopsis'>
+<span class='name'>mock_adapter_setup</span>
+<span class='arguments'>(db)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-value">30903</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-blob'>
+<a name='method-i-blob'></a>
+<div class='synopsis'>
+<span class='name'>blob</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-blob-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">blob</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-boolean'>
+<a name='method-i-boolean'></a>
+<div class='synopsis'>
+<span class='name'>boolean</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-boolean-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 14</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">boolean</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">downcase</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-constant">FALSE_VALUES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-date'>
+<a name='method-i-date'></a>
+<div class='synopsis'>
+<span class='name'>date</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-date-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_date</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-float'>
+<a name='method-i-float'></a>
+<div class='synopsis'>
+<span class='name'>float</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-float-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-float-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">float</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_f</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-integer'>
+<a name='method-i-integer'></a>
+<div class='synopsis'>
+<span class='name'>integer</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-integer-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-integer-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">integer</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-numeric'>
+<a name='method-i-numeric'></a>
+<div class='synopsis'>
+<span class='name'>numeric</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-numeric-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-numeric-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">numeric</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-time'>
+<a name='method-i-time'></a>
+<div class='synopsis'>
+<span class='name'>time</span>
+<span class='arguments'>(s)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-time-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">time</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">s</span><span class="ruby-operator">/</span><span class="ruby-value">3600</span>, (<span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">3600</span>)<span class="ruby-operator">/</span><span class="ruby-value">60</span>, <span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">60</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;    <span class="ruby-identifier">s</span>, <span class="ruby-identifier">f</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">divmod</span>(<span class="ruby-value">1</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">s</span><span class="ruby-operator">/</span><span class="ruby-value">3600</span>, (<span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">3600</span>)<span class="ruby-operator">/</span><span class="ruby-value">60</span>, <span class="ruby-identifier">s</span> <span class="ruby-operator">%</span> <span class="ruby-value">60</span>, (<span class="ruby-identifier">f</span><span class="ruby-operator">*</span><span class="ruby-value">1000000</span>).<span class="ruby-identifier">round</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

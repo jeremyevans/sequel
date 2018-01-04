@@ -1,546 +1,548 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>opening_databases.rdoc</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>opening_databases.rdoc</h1>
-        <div class='paths'>
-          doc/opening_databases.rdoc
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Connecting+to+a+database">Connecting to a database<span><a href="#label-Connecting+to+a+database">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p>All <a href="../../classes/Sequel.html">Sequel</a> activity begins with
-            connecting to a database, which creates a <a
-            href="../../classes/Sequel/Database.html">Sequel::Database</a> object. The
-            Database object is used to create datasets and execute queries. <a
-            href="../../classes/Sequel.html">Sequel</a> provides a powerful and
-            flexible mechanism for connecting to databases.  There are two main ways to
-            establish database connections:</p>
-            <ol><li>
-            <p>Using the <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method</p>
-            </li><li>
-            <p>Using the specialized adapter method (Sequel.sqlite, Sequel.postgres, etc.)</p>
-            </li></ol>
-            
-            <p>The connection options needed depend on the adapter being used, though most
-            adapters share the same basic connection options.</p>
-            
-            <p>If you are only connecting to a single database, it is recommended that you
-            store the database object in a constant named DB.  This is not required,
-            but it is the convention that most <a
-            href="../../classes/Sequel.html">Sequel</a> code uses.</p>
-            
-            <h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The connect method usually takes a well-formed URI, which is parsed into
-            connection options needed to open the database connection.  The
-            scheme/protocol part of the URI is used to determine the adapter to use:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@localhost/blog&#39;</span>) <span class="ruby-comment"># Uses the postgres adapter</span></pre>
-            
-            <p>You can use URI query parameters to specify options:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog?user=user&amp;password=password&#39;</span>)</pre>
-            
-            <p>You can also pass an additional option hash with the connection string:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>)</pre>
-            
-            <p>You can also just use an options hash without a connection string.  If you
-            do this, you must provide the adapter to use:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-identifier">adapter</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;postgres&#39;</span>, <span class="ruby-identifier">host</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-identifier">database</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>)</pre>
-            
-            <p>All of the above statements are equivalent.</p>
-            
-            <h2 id="label-Using+the+specialized+adapter+method">Using the specialized adapter method<span><a href="#label-Using+the+specialized+adapter+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The specialized adapter method is similar to <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> with
-            an options hash, except that it automatically populates the :adapter option
-            and assumes the first argument is the :database option, unless the first
-            argument is a hash. So the following statements are equivalent to the
-            previous statements.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-identifier">host</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-identifier">host</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-identifier">password</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;password&#39;</span>, <span class="ruby-identifier">database</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;blog&#39;</span>)</pre>
-            
-            <p>Note that using an adapter method forces the use of the specified adapter,
-            not a database type, even though some adapters have the same name as the
-            database type.  So if you want to connect to SQLite, for example, you can
-            do so using the sqlite, amalgalite, and jdbc adapters. If you want to
-            connect to SQLite on JRuby using the jdbc adapter, you should not use
-            <code>Sequel.sqlite</code> for example, as that uses the C-based sqlite3
-            gem. Instead, the <code>Sequel.jdbc</code> would be appropriate (though as
-            mentioned below, using <code>Sequel.connect</code> is recommended instead
-            of <code>Sequel.jdbc</code>).</p>
-            
-            <h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Both the <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method
-            and the specialized adapter methods take a block.  If you provide a block
-            to the method, <a href="../../classes/Sequel.html">Sequel</a> will create a
-            Database object and pass it as an argument to the block.  When the block
-            returns, <a href="../../classes/Sequel.html">Sequel</a> will disconnect the
-            database connection. For example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[:<span class="ruby-identifier">users</span>].<span class="ruby-identifier">count</span>}</pre>
-            
-            <p>Note that if you do not pass a block to <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>, <a
-            href="../../classes/Sequel.html">Sequel</a> will automatically retain a
-            reference to the object in the <code>Sequel::DATABASES</code> array.  So
-            calling <code>Sequel.connect</code> multiple times (say once per request),
-            can result in a memory leak.  For any application where database access is
-            needed for a long period of time, it&#39;s best to store the result of
-            Sequel.connection in a constant, as recommended above.</p>
-            
-            <h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>These options are shared by all adapters unless otherwise noted.</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adapter </td><td>
-            <p>The adapter to use</p>
-            </td></tr><tr><td class='label'>:database </td><td>
-            <p>The name of the database to which to connect</p>
-            </td></tr><tr><td class='label'>:cache_schema </td><td>
-            <p>Whether schema should be cached for this database (true by default)</p>
-            </td></tr><tr><td class='label'>:default_string_column_size </td><td>
-            <p>The default size for string columns (255 by default)</p>
-            </td></tr><tr><td class='label'>:host </td><td>
-            <p>The hostname of the database server to which to connect</p>
-            </td></tr><tr><td class='label'>:keep_reference </td><td>
-            <p>Whether to keep a reference to the database in Sequel::DATABASES (true by
-            default)</p>
-            </td></tr><tr><td class='label'>:loggers </td><td>
-            <p>An array of SQL loggers to log to</p>
-            </td></tr><tr><td class='label'>:log_connection_info </td><td>
-            <p>Whether to include connection information in log messages (false by
-            default)</p>
-            </td></tr><tr><td class='label'>:log_warn_duration </td><td>
-            <p>The amount of seconds after which the queries are logged at :warn level</p>
-            </td></tr><tr><td class='label'>:password </td><td>
-            <p>The password for the user account</p>
-            </td></tr><tr><td class='label'>:servers </td><td>
-            <p>A hash with symbol keys and hash or proc values, used with
-            master/slave/partitioned database configurations</p>
-            </td></tr><tr><td class='label'>:sql_log_level </td><td>
-            <p>The level at which to issue queries to the loggers (:info by default)</p>
-            </td></tr><tr><td class='label'>:test </td><td>
-            <p>Whether to test that a valid database connection can be made (true by
-            default)</p>
-            </td></tr><tr><td class='label'>:user </td><td>
-            <p>The user account name to use logging in</p>
-            </td></tr></tbody></table>
-            
-            <p>The following options can be specified and are passed to the database&#39;s
-            internal connection pool.</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:after_connect </td><td>
-            <p>A callable object called after each new connection is made, with the
-            connection object (and server argument if the callable accepts 2
-            arguments), useful for customizations that you want to apply to all
-            connections (nil by default).</p>
-            </td></tr><tr><td class='label'>:max_connections </td><td>
-            <p>The maximum size of the connection pool (4 connections by default on most
-            databases)</p>
-            </td></tr><tr><td class='label'>:pool_timeout </td><td>
-            <p>The number of seconds to wait if a connection cannot be acquired before
-            raising an error (5 seconds by default)</p>
-            </td></tr><tr><td class='label'>:preconnect </td><td>
-            <p>Whether to automatically make the maximum number of connections when
-            setting up the pool. Can be set to “concurrently” to connect in parallel.</p>
-            </td></tr><tr><td class='label'>:single_threaded </td><td>
-            <p>Whether to use a single-threaded (non-thread safe) connection pool</p>
-            </td></tr></tbody></table>
-            
-            <h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The following sections explain the options and behavior specific to each
-            adapter. If the library the adapter requires is different from the name of
-            the adapter scheme, it is listed specifically, otherwise you can assume
-            that is requires the library with the same name.</p>
-            
-            <h3 id="label-ado">ado<span><a href="#label-ado">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: win32ole</p>
-            
-            <p>The ADO adapter provides connectivity to ADO databases in Windows. It
-            relies on WIN32OLE library, so it isn&#39;t usable on other operating
-            systems (except possibly through WINE, but that&#39;s unlikely).</p>
-            
-            <p>The following options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:command_timeout </td><td>
-            <p>Sets the time in seconds to wait while attempting to execute a command
-            before cancelling the attempt and generating an error. Specifically, it
-            sets the ADO CommandTimeout property.</p>
-            </td></tr><tr><td class='label'>:driver </td><td>
-            <p>The driver to use in the ADO connection string.  If not provided, a default
-            of “SQL Server” is used.</p>
-            </td></tr><tr><td class='label'>:conn_string </td><td>
-            <p>The full ADO connection string.  If this is provided, the usual options are
-            ignored.</p>
-            </td></tr><tr><td class='label'>:provider </td><td>
-            <p>Sets the Provider of this ADO connection (for example, “SQLOLEDB”). If you
-            don&#39;t specify a provider, the default one used by WIN32OLE has major
-            problems, such as creating a new native database connection for every
-            query, which breaks things such as transactions and temporary tables.</p>
-            </td></tr></tbody></table>
-            
-            <p>Pay special attention to the :provider option, as without specifying a
-            provider, many things will be broken.  The SQLNCLI10 and SQLNCLI11
-            providers work well if you are connecting to Microsoft SQL Server, but it
-            is not the default as it depends on those providers being installed.</p>
-            
-            <p>Example connections:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># SQL Server</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado:///sequel_test?host=server%5cdb_instance&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado://user:password@server/database?host=server%5cdb_instance&amp;provider=SQLNCLI10&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2007</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-identifier">conn_string</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\path\filename.accdb&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2000</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-identifier">conn_string</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.mdb&#39;</span>)&#x000A;<span class="ruby-comment"># Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-identifier">conn_string</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)</pre>
-            
-            <h3 id="label-amalgalite+">amalgalite <span><a href="#label-amalgalite+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Amalgalite is an ruby extension that provides self contained access to
-            SQLite, so you don&#39;t need to install SQLite separately.  As amalgalite
-            is a file backed database, the :host, :user, and :password options are not
-            used.</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:database </td><td>
-            <p>The name of the database file</p>
-            </td></tr><tr><td class='label'>:timeout </td><td>
-            <p>The busy timeout period given in milliseconds</p>
-            </td></tr></tbody></table>
-            
-            <p>Without a database argument, assumes a memory database, so you can do:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">amalgalite</span></pre>
-            
-            <p>Handles paths in the connection string similar to the SQLite adapter, so
-            see the sqlite section below for details.</p>
-            
-            <h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>requires &#39;ibm_db&#39;</p>
-            
-            <p>This connects to DB2 using IBM_DB.  This is the recommended adapter if you
-            are using a C-based ruby to connect to DB2.</p>
-            
-            <h3 id="label-jdbc+">jdbc <span><a href="#label-jdbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: java</p>
-            
-            <p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for
-            individual database types is done using subadapters. There are currently
-            subadapters for DB2, Derby, H2, HSQLDB, JTDS, MySQL, Oracle, PostgreSQL,
-            SQLAnywhere, SQLite, and SQL Server. For Derby, H2, HSQLDB, JTDS, MySQL,
-            Postgres, SQLite3 the adapters can use the `jdbc-*` gem, for the others you
-            need to have the `.jar` in your CLASSPATH or load the Java class manually
-            before calling <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>.</p>
-            
-            <p>Note that when using a JDBC adapter, the best way to use <a
-            href="../../classes/Sequel.html">Sequel</a> is via <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>, NOT
-            Sequel.jdbc.  Use the JDBC connection string when connecting, which will be
-            in a different format than the native connection string.  The connection
-            string should start with &#39;jdbc:&#39;.  For PostgreSQL, use
-            &#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding
-            slashes for the database name (use no preceding slashes for a relative
-            path, and one preceding slash for an absolute path).</p>
-            
-            <p><a href="../../classes/Sequel.html">Sequel</a> does no preprocessing of
-            JDBC connection strings, it passes them directly to JDBC. So if you have
-            problems getting a connection string to work, look up the  documentation
-            for the JDBC driver.</p>
-            
-            <p>Example connection strings:</p>
-            
-            <pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
-            
-            <p>You can also use JNDI connection strings:</p>
-            
-            <pre>jdbc:jndi:java:comp/env/jndi_resource_name</pre>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:convert_types </td><td>
-            <p>If set to false, does not attempt to convert some Java types to ruby types.
-            Setting to false roughly doubles performance when selecting large numbers
-            of rows. Note that you can&#39;t provide this option inside the connection
-            string (as that is passed directly to JDBC), you have to pass it as a
-            separate option.</p>
-            </td></tr><tr><td class='label'>:driver </td><td>
-            <p>Specify the Java driver class to use to connect to the database.  This only
-            has an effect if the database type is not recognized from the connection
-            string, and only helps cases where
-            <code>java.sql.DriverManager.getConnection</code> does not return a
-            connection.</p>
-            </td></tr><tr><td class='label'>:login_timeout </td><td>
-            <p>Set the login timeout on the JDBC connection (in seconds).</p>
-            </td></tr><tr><td class='label'>:jdbc_properties </td><td>
-            <p>A hash for properties to set, skips the normal connection process of using
-            java.sql.drivermanager.getconnection and tries the backup process of using
-            driver.new.connect for the appropriate driver.</p>
-            </td></tr></tbody></table>
-            
-            <p>There are a few issues with specific jdbc driver gems:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>jdbc-h2 </td><td>
-            <p>jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working
-            correctly in some cases.</p>
-            </td></tr><tr><td class='label'>jdbc-postgres </td><td>
-            <p>jdbc-postgres 9.4.1204 has issues using PostgreSQL-specific types in bound
-            variables. Use jdbc-postgres 9.4.1200 or below.</p>
-            </td></tr></tbody></table>
-            
-            <h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: mysqlplus (or mysql if mysqlplus is not available)</p>
-            
-            <p>The MySQL adapter does not support the pure-ruby mysql.rb driver, it
-            requires the C-extension driver.</p>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
-            <p>If set to true, makes “WHERE primary_key IS NULL” select the last inserted
-            id.</p>
-            </td></tr><tr><td class='label'>:charset </td><td>
-            <p>Same as :encoding, :encoding takes precedence.</p>
-            </td></tr><tr><td class='label'>:compress </td><td>
-            <p>Whether to compress data sent/received via the socket connection.</p>
-            </td></tr><tr><td class='label'>:config_default_group </td><td>
-            <p>The default group to read from the in the MySQL config file, defaults to
-            “client”)</p>
-            </td></tr><tr><td class='label'>:config_local_infile </td><td>
-            <p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with
-            the given value.</p>
-            </td></tr><tr><td class='label'>:encoding </td><td>
-            <p>Specify the encoding/character set to use for the connection.</p>
-            </td></tr><tr><td class='label'>:fractional_seconds </td><td>
-            <p>On MySQL 5.6.5+, this option is recognized and will include fractional
-            seconds in time/timestamp values, as well as have the schema method create
-            columns that can contain fractional seconds by deafult.  This option is
-            also supported on other adapters that connect to MySQL.</p>
-            </td></tr><tr><td class='label'>:socket </td><td>
-            <p>Can be used to specify a Unix socket file to connect to instead of a TCP
-            host and port.</p>
-            </td></tr><tr><td class='label'>:sql_mode </td><td>
-            <p>Set the sql_mode(s) for a given connection.  Can be single symbol or
-            string, or an array of symbols or strings (e.g.
-            <code>:sql_mode=&gt;[:no_zero_date, :pipes_as_concat]</code>).</p>
-            </td></tr><tr><td class='label'>:timeout </td><td>
-            <p>Sets the wait_timeout for the connection, defaults to 1 month.</p>
-            </td></tr><tr><td class='label'>:read_timeout </td><td>
-            <p>Set the timeout in seconds for reading back results to a query.</p>
-            </td></tr><tr><td class='label'>:connect_timeout </td><td>
-            <p>Set the timeout in seconds before a connection attempt is abandoned.</p>
-            </td></tr></tbody></table>
-            
-            <p>The :sslkey, :sslcert, :sslca, :sslcapath, and :sslca options (in that
-            order) are passed to Mysql#ssl_set method if either the :sslca or :sslkey
-            option is given.</p>
-            
-            <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>This is a newer MySQL adapter that does typecasting in C, so it is often
-            faster than the mysql adapter.  The options given are passed to
-            Mysql2::Client.new, see the mysql2 documentation for details on what
-            options are supported.</p>
-            
-            <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>The ODBC adapter allows you to connect to any database with the appropriate
-            ODBC drivers installed.</p>
-            
-            <p>The :database option given ODBC database should be the DSN (Descriptive
-            Service Name) from the ODBC configuration.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">odbc</span>(<span class="ruby-string">&#39;mydb&#39;</span>, :<span class="ruby-identifier">user</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;user&quot;</span>, :<span class="ruby-identifier">password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;password&quot;</span>)</pre>
-            
-            <p>The :host and :port options are not respected. The following additional
-            options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
-            <p>Can be specified as &#39;mssql&#39;, &#39;progress&#39;, or &#39;db2&#39;
-            to use SQL syntax specific to those databases.</p>
-            </td></tr><tr><td class='label'>:drvconnect </td><td>
-            <p>Can be given an ODBC connection string, and will use
-            ODBC::Database#drvconnect to do the connection.  Typical usage would be:
-            <code>Sequel.odbc(:drvconnect=&gt;&#39;driver={...};...&#39;)</code></p>
-            </td></tr></tbody></table>
-            
-            <h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: oci8</p>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:autosequence </td><td>
-            <p>Set to true to use Sequel&#39;s conventions to guess the sequence to use
-            for datasets.  False by default.</p>
-            </td></tr><tr><td class='label'>:prefetch_rows </td><td>
-            <p>The number of rows to prefetch.  Defaults to 100, a larger number can be
-            specified and may improve performance when retrieving a large number of
-            rows.</p>
-            </td></tr><tr><td class='label'>:privilege </td><td>
-            <p>The Oracle privilege level.</p>
-            </td></tr></tbody></table>
-            
-            <h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: pg (or postgres-pr/postgres-compat if pg is not available)</p>
-            
-            <p>The <a href="../../classes/Sequel.html">Sequel</a> postgres adapter works
-            with the pg and postgres-pr ruby libraries. The pg library is the best
-            supported, as it supports real bound variables and prepared statements. If
-            the pg library is being used, <a
-            href="../../classes/Sequel.html">Sequel</a> will also attempt to load the
-            sequel_pg library, which is a C extension that optimizes performance when
-            <a href="../../classes/Sequel.html">Sequel</a> is used with pg.  All users
-            of <a href="../../classes/Sequel.html">Sequel</a> who use pg are encouraged
-            to install sequel_pg.  For users who want to use postgres-pr to avoid
-            issues with C extensions, it is recommended to use jeremyevans-postgres-pr,
-            which fixes many issues in the upstream postgres-pr gem, and is regularly
-            tested with <a href="../../classes/Sequel.html">Sequel</a>.</p>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:charset </td><td>
-            <p>Same as :encoding, :encoding takes precedence</p>
-            </td></tr><tr><td class='label'>:convert_infinite_timestamps </td><td>
-            <p>Whether infinite timestamps/dates should be converted on retrieval.  By
-            default, no conversion is done, so an error is raised if you attempt to
-            retrieve an infinite timestamp/date.  You can set this to :nil to convert
-            to nil, :string to leave as a string, or :float to convert to an infinite
-            float.</p>
-            </td></tr><tr><td class='label'>:connect_timeout </td><td>
-            <p>Set the number of seconds to wait for a connection (default 20, only
-            respected if using the pg library).</p>
-            </td></tr><tr><td class='label'>:driver_options </td><td>
-            <p>A hash of options to pass to the underlying driver (only respected if using
-            the pg library)</p>
-            </td></tr><tr><td class='label'>:encoding </td><td>
-            <p>Set the client_encoding to the given string</p>
-            </td></tr><tr><td class='label'>:notice_receiver </td><td>
-            <p>A proc that be called with the PGresult objects that have notice or warning
-            messages. The default notice receiver just prints the messages to stderr,
-            but this can be used to handle notice/warning messages differently.  Only
-            respected if using the pg library).</p>
-            </td></tr><tr><td class='label'>:sslmode </td><td>
-            <p>Set to &#39;disable&#39;, &#39;allow&#39;, &#39;prefer&#39;,
-            &#39;require&#39;, &#39;verify-ca&#39;, or &#39;verify-full&#39; to choose
-            how to treat SSL (only respected if using the pg library)</p>
-            </td></tr><tr><td class='label'>:sslrootcert </td><td>
-            <p>Specify the path to the root SSL certificate to use.</p>
-            </td></tr><tr><td class='label'>:search_path </td><td>
-            <p>Set to the schema search_path.  This can either be a single string
-            containing the schemas separated by commas (for use via a URL:
-            <code>postgres:///?search_path=schema1,schema2</code>), or it can be an
-            array of strings (for use via an option:
-            <code>Sequel.postgres(:search_path=&gt;[&#39;schema1&#39;,&#x000A;&#39;schema2&#39;])</code>).</p>
-            </td></tr><tr><td class='label'>:use_iso_date_format </td><td>
-            <p>This can be set to false to not force the ISO date format.  <a
-            href="../../classes/Sequel.html">Sequel</a> forces it by default to allow
-            for an optimization.</p>
-            </td></tr></tbody></table>
-            
-            <h3 id="label-sqlanywhere">sqlanywhere<span><a href="#label-sqlanywhere">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>The sqlanywhere driver works off connection strings, so a connection string
-            is built based on the url/options hash provided.  The following additional
-            options are respected:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:commlinks </td><td>
-            <p>specify the CommLinks connection string option</p>
-            </td></tr><tr><td class='label'>:conn_string </td><td>
-            <p>specify the connection string to use, ignoring all other options</p>
-            </td></tr><tr><td class='label'>:connection_name </td><td>
-            <p>specify the ConnectionName connection string option</p>
-            </td></tr><tr><td class='label'>:encoding </td><td>
-            <p>specify the CharSet connection string option</p>
-            </td></tr></tbody></table>
-            
-            <h3 id="label-sqlite">sqlite<span><a href="#label-sqlite">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: sqlite3</p>
-            
-            <p>As SQLite is a file-based database, the :host and :port options are
-            ignored, and the :database option should be a path to the file.</p>
-            
-            <p>Examples:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># In Memory databases:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:/&#39;</span>) &#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;:memory:&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Relative Path</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;./blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Absolute Path</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;/var/sqlite/blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///var/sqlite/blog.db&#39;</span>)</pre>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:readonly </td><td>
-            <p>open database in read-only mode</p>
-            </td></tr><tr><td class='label'>:timeout </td><td>
-            <p>the busy timeout to use in milliseconds (default: 5000).</p>
-            </td></tr></tbody></table>
-            
-            <p>Note that SQLite memory databases are restricted to a single connection by
-            default.  This is because SQLite does not allow multiple connections to a
-            single memory database.  For this reason, <a
-            href="../../classes/Sequel.html">Sequel</a> sets the maximum number of
-            connections in the connection pool to 1 by default when an SQLite memory
-            database is used.  Attempts to force the use of more than 1 connection can
-            result in weird behavior, since the connections will be to separate memory
-            databases.</p>
-            
-            <h3 id="label-tinytds">tinytds<span><a href="#label-tinytds">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: tiny_tds</p>
-            
-            <p>The connection options are passed directly to tiny_tds, except that the
-            tiny_tds :username option is set to the <a
-            href="../../classes/Sequel.html">Sequel</a> :user option.  If you want to
-            use an entry in the freetds.conf file, you should specify the :dataserver
-            option with that name as the value.  Some other options that you may want
-            to set are :login_timeout, :timeout, :tds_version, :azure, :appname, and
-            :encoding, see the tiny_tds <a href="../README_rdoc.html">README</a> for
-            details.</p>
-            
-            <p>Other <a href="../../classes/Sequel.html">Sequel</a> specific options:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server_version </td><td>
-            <p>Override the server version to use (9000000 = SQL Server 2005). This also
-            works on any other adapter that connects to Microsoft SQL Server.</p>
-            </td></tr><tr><td class='label'>:textsize </td><td>
-            <p>Override the default TEXTSIZE setting for this connection.  The FreeTDS
-            default is small (around 64000 bytes), but can be set up to around 2GB.
-            This should be specified as an integer.  If you plan on setting large text
-            or blob values via tinytds, you should use this option or modify your
-            freetds.conf file.</p>
-            </td></tr></tbody></table>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>opening_databases.rdoc</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>opening_databases.rdoc
+</h1>
+<div class='paths'>
+doc/opening_databases.rdoc
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Connecting+to+a+database">Connecting to a database<span><a href="#label-Connecting+to+a+database">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>All <a href="../../classes/Sequel.html">Sequel</a> activity begins with
+connecting to a database, which creates a <a
+href="../../classes/Sequel/Database.html">Sequel::Database</a> object. The
+Database object is used to create datasets and execute queries. <a
+href="../../classes/Sequel.html">Sequel</a> provides a powerful and
+flexible mechanism for connecting to databases.  There are two main ways to
+establish database connections:</p>
+<ol><li>
+<p>Using the <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method</p>
+</li><li>
+<p>Using the specialized adapter method (Sequel.sqlite, Sequel.postgres, etc.)</p>
+</li></ol>
+
+<p>The connection options needed depend on the adapter being used, though most
+adapters share the same basic connection options.</p>
+
+<p>If you are only connecting to a single database, it is recommended that you
+store the database object in a constant named DB.  This is not required,
+but it is the convention that most <a
+href="../../classes/Sequel.html">Sequel</a> code uses.</p>
+
+<h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The connect method usually takes a well-formed URI, which is parsed into
+connection options needed to open the database connection.  The
+scheme/protocol part of the URI is used to determine the adapter to use:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@localhost/blog&#39;</span>) <span class="ruby-comment"># Uses the postgres adapter</span></pre>
+
+<p>You can use URI query parameters to specify options:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog?user=user&amp;password=password&#39;</span>)</pre>
+
+<p>You can also pass an additional option hash with the connection string:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>)</pre>
+
+<p>You can also just use an options hash without a connection string.  If you
+do this, you must provide the adapter to use:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-value">adapter:</span> <span class="ruby-string">&#39;postgres&#39;</span>, <span class="ruby-value">host:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>)</pre>
+
+<p>All of the above statements are equivalent.</p>
+
+<h2 id="label-Using+the+specialized+adapter+method">Using the specialized adapter method<span><a href="#label-Using+the+specialized+adapter+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The specialized adapter method is similar to <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> with
+an options hash, except that it automatically populates the :adapter option
+and assumes the first argument is the :database option, unless the first
+argument is a hash. So the following statements are equivalent to the
+previous statements.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-value">host:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;blog&#39;</span>)</pre>
+
+<p>Note that using an adapter method forces the use of the specified adapter,
+not a database type, even though some adapters have the same name as the
+database type.  So if you want to connect to SQLite, for example, you can
+do so using the sqlite, amalgalite, and jdbc adapters. If you want to
+connect to SQLite on JRuby using the jdbc adapter, you should not use
+<code>Sequel.sqlite</code> for example, as that uses the C-based sqlite3
+gem. Instead, the <code>Sequel.jdbc</code> would be appropriate (though as
+mentioned below, using <code>Sequel.connect</code> is recommended instead
+of <code>Sequel.jdbc</code>).</p>
+
+<h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Both the <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method
+and the specialized adapter methods take a block.  If you provide a block
+to the method, <a href="../../classes/Sequel.html">Sequel</a> will create a
+Database object and pass it as an argument to the block.  When the block
+returns, <a href="../../classes/Sequel.html">Sequel</a> will disconnect the
+database connection. For example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}</pre>
+
+<p>Note that if you do not pass a block to <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>, <a
+href="../../classes/Sequel.html">Sequel</a> will automatically retain a
+reference to the object in the <code>Sequel::DATABASES</code> array.  So
+calling <code>Sequel.connect</code> multiple times (say once per request),
+can result in a memory leak.  For any application where database access is
+needed for a long period of time, it&#39;s best to store the result of
+Sequel.connection in a constant, as recommended above.</p>
+
+<h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>These options are shared by all adapters unless otherwise noted.</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:adapter </td><td>
+<p>The adapter to use</p>
+</td></tr><tr><td class='label'>:database </td><td>
+<p>The name of the database to which to connect</p>
+</td></tr><tr><td class='label'>:cache_schema </td><td>
+<p>Whether schema should be cached for this database (true by default)</p>
+</td></tr><tr><td class='label'>:default_string_column_size </td><td>
+<p>The default size for string columns (255 by default)</p>
+</td></tr><tr><td class='label'>:host </td><td>
+<p>The hostname of the database server to which to connect</p>
+</td></tr><tr><td class='label'>:keep_reference </td><td>
+<p>Whether to keep a reference to the database in Sequel::DATABASES (true by
+default)</p>
+</td></tr><tr><td class='label'>:loggers </td><td>
+<p>An array of SQL loggers to log to</p>
+</td></tr><tr><td class='label'>:log_connection_info </td><td>
+<p>Whether to include connection information in log messages (false by
+default)</p>
+</td></tr><tr><td class='label'>:log_warn_duration </td><td>
+<p>The amount of seconds after which the queries are logged at :warn level</p>
+</td></tr><tr><td class='label'>:password </td><td>
+<p>The password for the user account</p>
+</td></tr><tr><td class='label'>:servers </td><td>
+<p>A hash with symbol keys and hash or proc values, used with
+master/slave/partitioned database configurations</p>
+</td></tr><tr><td class='label'>:sql_log_level </td><td>
+<p>The level at which to issue queries to the loggers (:info by default)</p>
+</td></tr><tr><td class='label'>:test </td><td>
+<p>Whether to test that a valid database connection can be made (true by
+default)</p>
+</td></tr><tr><td class='label'>:user </td><td>
+<p>The user account name to use logging in</p>
+</td></tr></tbody></table>
+
+<p>The following options can be specified and are passed to the database&#39;s
+internal connection pool.</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:after_connect </td><td>
+<p>A callable object called after each new connection is made, with the
+connection object (and server argument if the callable accepts 2
+arguments), useful for customizations that you want to apply to all
+connections (nil by default).</p>
+</td></tr><tr><td class='label'>:max_connections </td><td>
+<p>The maximum size of the connection pool (4 connections by default on most
+databases)</p>
+</td></tr><tr><td class='label'>:pool_timeout </td><td>
+<p>The number of seconds to wait if a connection cannot be acquired before
+raising an error (5 seconds by default)</p>
+</td></tr><tr><td class='label'>:preconnect </td><td>
+<p>Whether to automatically make the maximum number of connections when
+setting up the pool. Can be set to “concurrently” to connect in parallel.</p>
+</td></tr><tr><td class='label'>:single_threaded </td><td>
+<p>Whether to use a single-threaded (non-thread safe) connection pool</p>
+</td></tr></tbody></table>
+
+<h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The following sections explain the options and behavior specific to each
+adapter. If the library the adapter requires is different from the name of
+the adapter scheme, it is listed specifically, otherwise you can assume
+that is requires the library with the same name.</p>
+
+<h3 id="label-ado">ado<span><a href="#label-ado">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: win32ole</p>
+
+<p>The ADO adapter provides connectivity to ADO databases in Windows. It
+relies on WIN32OLE library, so it isn&#39;t usable on other operating
+systems (except possibly through WINE, but that&#39;s unlikely).</p>
+
+<p>The following options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:command_timeout </td><td>
+<p>Sets the time in seconds to wait while attempting to execute a command
+before cancelling the attempt and generating an error. Specifically, it
+sets the ADO CommandTimeout property.</p>
+</td></tr><tr><td class='label'>:driver </td><td>
+<p>The driver to use in the ADO connection string.  If not provided, a default
+of “SQL Server” is used.</p>
+</td></tr><tr><td class='label'>:conn_string </td><td>
+<p>The full ADO connection string.  If this is provided, the usual options are
+ignored.</p>
+</td></tr><tr><td class='label'>:provider </td><td>
+<p>Sets the Provider of this ADO connection (for example, “SQLOLEDB”). If you
+don&#39;t specify a provider, the default one used by WIN32OLE has major
+problems, such as creating a new native database connection for every
+query, which breaks things such as transactions and temporary tables.</p>
+</td></tr></tbody></table>
+
+<p>Pay special attention to the :provider option, as without specifying a
+provider, many things will be broken.  The SQLNCLI10 and SQLNCLI11
+providers work well if you are connecting to Microsoft SQL Server, but it
+is not the default as it depends on those providers being installed.</p>
+
+<p>Example connections:</p>
+
+<pre class="ruby"><span class="ruby-comment"># SQL Server</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado:///sequel_test?host=server%5cdb_instance&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado://user:password@server/database?host=server%5cdb_instance&amp;provider=SQLNCLI10&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2007</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\\path\\filename.accdb&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2000</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.mdb&#39;</span>)&#x000A;<span class="ruby-comment"># Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(<span class="ruby-value">conn_string:</span> <span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)</pre>
+
+<h3 id="label-amalgalite+">amalgalite <span><a href="#label-amalgalite+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Amalgalite is an ruby extension that provides self contained access to
+SQLite, so you don&#39;t need to install SQLite separately.  As amalgalite
+is a file backed database, the :host, :user, and :password options are not
+used.</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:database </td><td>
+<p>The name of the database file</p>
+</td></tr><tr><td class='label'>:timeout </td><td>
+<p>The busy timeout period given in milliseconds</p>
+</td></tr></tbody></table>
+
+<p>Without a database argument, assumes a memory database, so you can do:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">amalgalite</span></pre>
+
+<p>Handles paths in the connection string similar to the SQLite adapter, so
+see the sqlite section below for details.</p>
+
+<h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>requires &#39;ibm_db&#39;</p>
+
+<p>This connects to DB2 using IBM_DB.  This is the recommended adapter if you
+are using a C-based ruby to connect to DB2.</p>
+
+<h3 id="label-jdbc+">jdbc <span><a href="#label-jdbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: java</p>
+
+<p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for
+individual database types is done using subadapters. There are currently
+subadapters for DB2, Derby, H2, HSQLDB, JTDS, MySQL, Oracle, PostgreSQL,
+SQLAnywhere, SQLite, and SQL Server. For Derby, H2, HSQLDB, JTDS, MySQL,
+Postgres, SQLite3 the adapters can use the `jdbc-*` gem, for the others you
+need to have the `.jar` in your CLASSPATH or load the Java class manually
+before calling <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>.</p>
+
+<p>Note that when using a JDBC adapter, the best way to use <a
+href="../../classes/Sequel.html">Sequel</a> is via <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>, NOT
+Sequel.jdbc.  Use the JDBC connection string when connecting, which will be
+in a different format than the native connection string.  The connection
+string should start with &#39;jdbc:&#39;.  For PostgreSQL, use
+&#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding
+slashes for the database name (use no preceding slashes for a relative
+path, and one preceding slash for an absolute path).</p>
+
+<p><a href="../../classes/Sequel.html">Sequel</a> does no preprocessing of
+JDBC connection strings, it passes them directly to JDBC. So if you have
+problems getting a connection string to work, look up the  documentation
+for the JDBC driver.</p>
+
+<p>Example connection strings:</p>
+
+<pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
+
+<p>You can also use JNDI connection strings:</p>
+
+<pre>jdbc:jndi:java:comp/env/jndi_resource_name</pre>
+
+<p>The following additional options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:convert_types </td><td>
+<p>If set to false, does not attempt to convert some Java types to ruby types.
+Setting to false roughly doubles performance when selecting large numbers
+of rows. Note that you can&#39;t provide this option inside the connection
+string (as that is passed directly to JDBC), you have to pass it as a
+separate option.</p>
+</td></tr><tr><td class='label'>:driver </td><td>
+<p>Specify the Java driver class to use to connect to the database.  This only
+has an effect if the database type is not recognized from the connection
+string, and only helps cases where
+<code>java.sql.DriverManager.getConnection</code> does not return a
+connection.</p>
+</td></tr><tr><td class='label'>:login_timeout </td><td>
+<p>Set the login timeout on the JDBC connection (in seconds).</p>
+</td></tr><tr><td class='label'>:jdbc_properties </td><td>
+<p>A hash for properties to set, skips the normal connection process of using
+java.sql.drivermanager.getconnection and tries the backup process of using
+driver.new.connect for the appropriate driver.</p>
+</td></tr></tbody></table>
+
+<p>There are a few issues with specific jdbc driver gems:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>jdbc-h2 </td><td>
+<p>jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working
+correctly in some cases.</p>
+</td></tr><tr><td class='label'>jdbc-postgres </td><td>
+<p>jdbc-postgres 9.4.1204 has issues using PostgreSQL-specific types in bound
+variables. Use jdbc-postgres 9.4.1200 or below.</p>
+</td></tr></tbody></table>
+
+<h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: mysqlplus (or mysql if mysqlplus is not available)</p>
+
+<p>The MySQL adapter does not support the pure-ruby mysql.rb driver, it
+requires the C-extension driver.</p>
+
+<p>The following additional options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
+<p>If set to true, makes “WHERE primary_key IS NULL” select the last inserted
+id.</p>
+</td></tr><tr><td class='label'>:charset </td><td>
+<p>Same as :encoding, :encoding takes precedence.</p>
+</td></tr><tr><td class='label'>:compress </td><td>
+<p>Whether to compress data sent/received via the socket connection.</p>
+</td></tr><tr><td class='label'>:config_default_group </td><td>
+<p>The default group to read from the in the MySQL config file, defaults to
+“client”)</p>
+</td></tr><tr><td class='label'>:config_local_infile </td><td>
+<p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with
+the given value.</p>
+</td></tr><tr><td class='label'>:encoding </td><td>
+<p>Specify the encoding/character set to use for the connection.</p>
+</td></tr><tr><td class='label'>:fractional_seconds </td><td>
+<p>On MySQL 5.6.5+, this option is recognized and will include fractional
+seconds in time/timestamp values, as well as have the schema method create
+columns that can contain fractional seconds by deafult.  This option is
+also supported on other adapters that connect to MySQL.</p>
+</td></tr><tr><td class='label'>:socket </td><td>
+<p>Can be used to specify a Unix socket file to connect to instead of a TCP
+host and port.</p>
+</td></tr><tr><td class='label'>:sql_mode </td><td>
+<p>Set the sql_mode(s) for a given connection.  Can be single symbol or
+string, or an array of symbols or strings (e.g.
+<code>:sql_mode=&gt;[:no_zero_date, :pipes_as_concat]</code>).</p>
+</td></tr><tr><td class='label'>:timeout </td><td>
+<p>Sets the wait_timeout for the connection, defaults to 1 month.</p>
+</td></tr><tr><td class='label'>:read_timeout </td><td>
+<p>Set the timeout in seconds for reading back results to a query.</p>
+</td></tr><tr><td class='label'>:connect_timeout </td><td>
+<p>Set the timeout in seconds before a connection attempt is abandoned.</p>
+</td></tr></tbody></table>
+
+<p>The :sslkey, :sslcert, :sslca, :sslcapath, and :sslca options (in that
+order) are passed to Mysql#ssl_set method if either the :sslca or :sslkey
+option is given.</p>
+
+<h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>This is a newer MySQL adapter that does typecasting in C, so it is often
+faster than the mysql adapter.  The options given are passed to
+Mysql2::Client.new, see the mysql2 documentation for details on what
+options are supported.</p>
+
+<h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The ODBC adapter allows you to connect to any database with the appropriate
+ODBC drivers installed.</p>
+
+<p>The :database option given ODBC database should be the DSN (Descriptive
+Service Name) from the ODBC configuration.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">odbc</span>(<span class="ruby-string">&#39;mydb&#39;</span>, <span class="ruby-value">:user</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;user&quot;</span>, <span class="ruby-value">:password</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;password&quot;</span>)</pre>
+
+<p>The :host and :port options are not respected. The following additional
+options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
+<p>Can be specified as &#39;mssql&#39;, &#39;progress&#39;, or &#39;db2&#39;
+to use SQL syntax specific to those databases.</p>
+</td></tr><tr><td class='label'>:drvconnect </td><td>
+<p>Can be given an ODBC connection string, and will use
+ODBC::Database#drvconnect to do the connection.  Typical usage would be:
+<code>Sequel.odbc(:drvconnect=&gt;&#39;driver={...};...&#39;)</code></p>
+</td></tr></tbody></table>
+
+<h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: oci8</p>
+
+<p>The following additional options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:autosequence </td><td>
+<p>Set to true to use Sequel&#39;s conventions to guess the sequence to use
+for datasets.  False by default.</p>
+</td></tr><tr><td class='label'>:prefetch_rows </td><td>
+<p>The number of rows to prefetch.  Defaults to 100, a larger number can be
+specified and may improve performance when retrieving a large number of
+rows.</p>
+</td></tr><tr><td class='label'>:privilege </td><td>
+<p>The Oracle privilege level.</p>
+</td></tr></tbody></table>
+
+<h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: pg (or postgres-pr/postgres-compat if pg is not available)</p>
+
+<p>The <a href="../../classes/Sequel.html">Sequel</a> postgres adapter works
+with the pg and postgres-pr ruby libraries. The pg library is the best
+supported, as it supports real bound variables and prepared statements. If
+the pg library is being used, <a
+href="../../classes/Sequel.html">Sequel</a> will also attempt to load the
+sequel_pg library, which is a C extension that optimizes performance when
+<a href="../../classes/Sequel.html">Sequel</a> is used with pg.  All users
+of <a href="../../classes/Sequel.html">Sequel</a> who use pg are encouraged
+to install sequel_pg.  For users who want to use postgres-pr to avoid
+issues with C extensions, it is recommended to use jeremyevans-postgres-pr,
+which fixes many issues in the upstream postgres-pr gem, and is regularly
+tested with <a href="../../classes/Sequel.html">Sequel</a>.</p>
+
+<p>The following additional options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:charset </td><td>
+<p>Same as :encoding, :encoding takes precedence</p>
+</td></tr><tr><td class='label'>:convert_infinite_timestamps </td><td>
+<p>Whether infinite timestamps/dates should be converted on retrieval.  By
+default, no conversion is done, so an error is raised if you attempt to
+retrieve an infinite timestamp/date.  You can set this to :nil to convert
+to nil, :string to leave as a string, or :float to convert to an infinite
+float.</p>
+</td></tr><tr><td class='label'>:connect_timeout </td><td>
+<p>Set the number of seconds to wait for a connection (default 20, only
+respected if using the pg library).</p>
+</td></tr><tr><td class='label'>:driver_options </td><td>
+<p>A hash of options to pass to the underlying driver (only respected if using
+the pg library)</p>
+</td></tr><tr><td class='label'>:encoding </td><td>
+<p>Set the client_encoding to the given string</p>
+</td></tr><tr><td class='label'>:notice_receiver </td><td>
+<p>A proc that be called with the PGresult objects that have notice or warning
+messages. The default notice receiver just prints the messages to stderr,
+but this can be used to handle notice/warning messages differently.  Only
+respected if using the pg library).</p>
+</td></tr><tr><td class='label'>:sslmode </td><td>
+<p>Set to &#39;disable&#39;, &#39;allow&#39;, &#39;prefer&#39;,
+&#39;require&#39;, &#39;verify-ca&#39;, or &#39;verify-full&#39; to choose
+how to treat SSL (only respected if using the pg library)</p>
+</td></tr><tr><td class='label'>:sslrootcert </td><td>
+<p>Specify the path to the root SSL certificate to use.</p>
+</td></tr><tr><td class='label'>:search_path </td><td>
+<p>Set to the schema search_path.  This can either be a single string
+containing the schemas separated by commas (for use via a URL:
+<code>postgres:///?search_path=schema1,schema2</code>), or it can be an
+array of strings (for use via an option:
+<code>Sequel.postgres(:search_path=&gt;[&#39;schema1&#39;,&#x000A;&#39;schema2&#39;])</code>).</p>
+</td></tr><tr><td class='label'>:use_iso_date_format </td><td>
+<p>This can be set to false to not force the ISO date format.  <a
+href="../../classes/Sequel.html">Sequel</a> forces it by default to allow
+for an optimization.</p>
+</td></tr></tbody></table>
+
+<h3 id="label-sqlanywhere">sqlanywhere<span><a href="#label-sqlanywhere">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The sqlanywhere driver works off connection strings, so a connection string
+is built based on the url/options hash provided.  The following additional
+options are respected:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:commlinks </td><td>
+<p>specify the CommLinks connection string option</p>
+</td></tr><tr><td class='label'>:conn_string </td><td>
+<p>specify the connection string to use, ignoring all other options</p>
+</td></tr><tr><td class='label'>:connection_name </td><td>
+<p>specify the ConnectionName connection string option</p>
+</td></tr><tr><td class='label'>:encoding </td><td>
+<p>specify the CharSet connection string option</p>
+</td></tr></tbody></table>
+
+<h3 id="label-sqlite">sqlite<span><a href="#label-sqlite">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: sqlite3</p>
+
+<p>As SQLite is a file-based database, the :host and :port options are
+ignored, and the :database option should be a path to the file.</p>
+
+<p>Examples:</p>
+
+<pre class="ruby"><span class="ruby-comment"># In Memory databases:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:/&#39;</span>) &#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;:memory:&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Relative Path</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;./blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Absolute Path</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;/var/sqlite/blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///var/sqlite/blog.db&#39;</span>)</pre>
+
+<p>The following additional options are supported:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:readonly </td><td>
+<p>open database in read-only mode</p>
+</td></tr><tr><td class='label'>:timeout </td><td>
+<p>the busy timeout to use in milliseconds (default: 5000).</p>
+</td></tr></tbody></table>
+
+<p>Note that SQLite memory databases are restricted to a single connection by
+default.  This is because SQLite does not allow multiple connections to a
+single memory database.  For this reason, <a
+href="../../classes/Sequel.html">Sequel</a> sets the maximum number of
+connections in the connection pool to 1 by default when an SQLite memory
+database is used.  Attempts to force the use of more than 1 connection can
+result in weird behavior, since the connections will be to separate memory
+databases.</p>
+
+<h3 id="label-tinytds">tinytds<span><a href="#label-tinytds">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>Requires: tiny_tds</p>
+
+<p>The connection options are passed directly to tiny_tds, except that the
+tiny_tds :username option is set to the <a
+href="../../classes/Sequel.html">Sequel</a> :user option.  If you want to
+use an entry in the freetds.conf file, you should specify the :dataserver
+option with that name as the value.  Some other options that you may want
+to set are :login_timeout, :timeout, :tds_version, :azure, :appname, and
+:encoding, see the tiny_tds <a href="../README_rdoc.html">README</a> for
+details.</p>
+
+<p>Other <a href="../../classes/Sequel.html">Sequel</a> specific options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:server_version </td><td>
+<p>Override the server version to use (9000000 = SQL Server 2005). This also
+works on any other adapter that connects to Microsoft SQL Server.</p>
+</td></tr><tr><td class='label'>:textsize </td><td>
+<p>Override the default TEXTSIZE setting for this connection.  The FreeTDS
+default is small (around 64000 bytes), but can be set up to around 2GB.
+This should be specified as an integer.  If you plan on setting large text
+or blob values via tinytds, you should use this option or modify your
+freetds.conf file.</p>
+</td></tr></tbody></table>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

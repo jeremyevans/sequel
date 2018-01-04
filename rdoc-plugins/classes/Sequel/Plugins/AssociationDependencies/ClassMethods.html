@@ -1,121 +1,125 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::AssociationDependencies::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::AssociationDependencies::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/association_dependencies_rb.html">lib/sequel/plugins/association_dependencies.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-add_association_dependencies">add_association_dependencies</a></li>
-              <li><a href="#attribute-i-association_dependencies">association_dependencies</a></li>
-              <li><a href="#method-i-freeze">freeze</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-association_dependencies'>association_dependencies</a>
-                    </td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>A hash specifying the association dependencies for each model.  The keys
-                      are symbols indicating the type of action and when it should be executed
-                      (e.g. :before_delete).  Values are an array of method symbols. For
-                      before_nullify, the symbols are remove_all_association methods.  For other
-                      types, the symbols are association_dataset methods, on which delete or
-                      destroy is called.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-add_association_dependencies'>
-                <a name='method-i-add_association_dependencies'></a>
-                <div class='synopsis'>
-                  <span class='name'>add_association_dependencies</span>
-                  <span class='arguments'>(hash)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Add association dependencies to this model.  The hash should have
-                  association name symbol keys and dependency action symbol values (e.g.
-                  albums: :destroy).</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_association_dependencies-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-add_association_dependencies-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_association_dependencies</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">association</span>, <span class="ruby-identifier">action</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Nonexistent association: #{association}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">association</span>)&#x000A;    <span class="ruby-identifier">type</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">:type</span>]&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid dependence action type: association: #{association}, dependence action: #{action}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">DEPENDENCE_ACTIONS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">action</span>)&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid association type: association: #{association}, type: #{type}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">time</span> = <span class="ruby-constant">ASSOCIATION_MAPPING</span>[<span class="ruby-identifier">type</span>]&#x000A;    <span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:&quot;#{time}_#{action}&quot;</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:nullify</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:one_to_many</span> , <span class="ruby-value">:many_to_many</span>&#x000A;        <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:remove_all_method</span>])}&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:one_to_one</span>&#x000A;        <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:setter_method</span>], <span class="ruby-keyword">nil</span>)}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Can&#39;t nullify many_to_one associated objects: association: #{association}&quot;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Can only nullify many_to_many associations: association: #{association}&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:many_to_many</span>&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:dataset_method</span>]&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Freeze association dependencies when freezing model class.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@association_dependencies</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::AssociationDependencies::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::AssociationDependencies::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/association_dependencies_rb.html">lib/sequel/plugins/association_dependencies.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-add_association_dependencies">add_association_dependencies</a></li>
+<li><a href="#attribute-i-association_dependencies">association_dependencies</a></li>
+<li><a href="#method-i-freeze">freeze</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-association_dependencies'>association_dependencies</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>A hash specifying the association dependencies for each model.  The keys
+are symbols indicating the type of action and when it should be executed
+(e.g. :before_delete).  Values are an array of method symbols. For
+before_nullify, the symbols are remove_all_association methods.  For other
+types, the symbols are association_dataset methods, on which delete or
+destroy is called.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-add_association_dependencies'>
+<a name='method-i-add_association_dependencies'></a>
+<div class='synopsis'>
+<span class='name'>add_association_dependencies</span>
+<span class='arguments'>(hash)</span>
+
+</div>
+<div class='description'>
+
+<p>Add association dependencies to this model.  The hash should have
+association name symbol keys and dependency action symbol values (e.g.
+albums: :destroy).</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_association_dependencies-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-add_association_dependencies-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_association_dependencies</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">association</span>, <span class="ruby-identifier">action</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Nonexistent association: #{association}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">association</span>)&#x000A;    <span class="ruby-identifier">type</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">:type</span>]&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid dependence action type: association: #{association}, dependence action: #{action}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">DEPENDENCE_ACTIONS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">action</span>)&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid association type: association: #{association}, type: #{type}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">time</span> = <span class="ruby-constant">ASSOCIATION_MAPPING</span>[<span class="ruby-identifier">type</span>]&#x000A;    <span class="ruby-identifier">association_dependencies</span>[<span class="ruby-value">:&quot;#{time}_#{action}&quot;</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">action</span> <span class="ruby-operator">==</span> <span class="ruby-value">:nullify</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:one_to_many</span> , <span class="ruby-value">:many_to_many</span>&#x000A;        <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:remove_all_method</span>])}&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:one_to_one</span>&#x000A;        <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:setter_method</span>], <span class="ruby-keyword">nil</span>)}&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Can&#39;t nullify many_to_one associated objects: association: #{association}&quot;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Can only nullify many_to_many associations: association: #{association}&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:many_to_many</span>&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:dataset_method</span>]&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Freeze association dependencies when freezing model class.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/association_dependencies.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@association_dependencies</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

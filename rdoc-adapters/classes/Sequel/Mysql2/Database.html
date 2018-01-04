@@ -1,192 +1,199 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Mysql2::Database</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Mysql2::Database
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/adapters/mysql2_rb.html">lib/sequel/adapters/mysql2.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong>Sequel::Database</strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-connect">connect</a></li>
-              <li><a href="#attribute-i-convert_tinyint_to_bool">convert_tinyint_to_bool</a></li>
-              <li><a href="#method-i-execute_dui">execute_dui</a></li>
-              <li><a href="#method-i-execute_insert">execute_insert</a></li>
-              <li><a href="#method-i-freeze">freeze</a></li>
-              <li><a href="#method-i-server_version">server_version</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a href="../MySQL/DatabaseMethods.html">Sequel::MySQL::DatabaseMethods</a></li>
-                <li><a href="../MySQL/MysqlMysql2/DatabaseMethods.html">Sequel::MySQL::MysqlMysql2::DatabaseMethods</a></li>
-                <li><a href="../MySQL/PreparedStatements/DatabaseMethods.html">Sequel::MySQL::PreparedStatements::DatabaseMethods</a></li>
-              </ol>
-            </div>
-          </div>
-          <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-convert_tinyint_to_bool'>convert_tinyint_to_bool</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Whether to convert tinyint columns to bool for this database</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-connect'>
-                <a name='method-i-connect'></a>
-                <div class='synopsis'>
-                  <span class='name'>connect</span>
-                  <span class='arguments'>(server)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Connect to the database.  In addition to the usual database options, the
-                  following options have effect:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
-                  <p>Set to true to use <a href="../MySQL.html">MySQL</a> default behavior of
-                  having a filter for an autoincrement column equals NULL to return the last
-                  inserted row.</p>
-                  </td></tr><tr><td class='label'>:charset </td><td>
-                  <p>Same as :encoding (:encoding takes precendence)</p>
-                  </td></tr><tr><td class='label'>:encoding </td><td>
-                  <p>Set all the related character sets for this connection (connection, client,
-                  database, server, and results).</p>
-                  </td></tr></tbody></table>
-                  
-                  <p>The options hash is also passed to mysql2, and can include mysql2 options
-                  such as :local_infile.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">&#39;localhost&#39;</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:username</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:user</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">|=</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span><span class="ruby-operator">::</span><span class="ruby-constant">FOUND_ROWS</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-value">:FOUND_ROWS</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]&#x000A;  <span class="ruby-identifier">conn</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:symbolize_keys=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:cache_rows=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;    &#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">NativePreparedStatements</span>&#x000A;    <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_default_query_options</span>, <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">dup</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">sqls</span> = <span class="ruby-identifier">mysql_connection_setting_sqls</span>&#x000A;&#x000A;  <span class="ruby-comment"># Set encoding a slightly different way after connecting,</span>&#x000A;  <span class="ruby-comment"># in case the READ_DEFAULT_GROUP overrode the provided encoding.</span>&#x000A;  <span class="ruby-comment"># Doesn&#39;t work across implicit reconnects, but Sequel doesn&#39;t turn on</span>&#x000A;  <span class="ruby-comment"># that feature.</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>]&#x000A;    <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-node">&quot;SET NAMES #{conn.escape(encoding.to_s)}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;&#x000A;  <span class="ruby-identifier">add_prepared_statements_cache</span>(<span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-identifier">conn</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-execute_dui'>
-                <a name='method-i-execute_dui'></a>
-                <div class='synopsis'>
-                  <span class='name'>execute_dui</span>
-                  <span class='arguments'>(sql, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">affected_rows</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-execute_insert'>
-                <a name='method-i-execute_insert'></a>
-                <div class='synopsis'>
-                  <span class='name'>execute_insert</span>
-                  <span class='arguments'>(sql, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">last_id</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-server_version'>
-                <a name='method-i-server_version'></a>
-                <div class='synopsis'>
-                  <span class='name'>server_version</span>
-                  <span class='arguments'>(server=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the version of the <a href="../MySQL.html">MySQL</a> server to which
-                  we are connecting.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-server_version-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_info</span>[<span class="ruby-value">:id</span>]} <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Mysql2::Database</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Mysql2::Database
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/mysql2_rb.html">lib/sequel/adapters/mysql2.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Sequel::Database</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-connect">connect</a></li>
+<li><a href="#attribute-i-convert_tinyint_to_bool">convert_tinyint_to_bool</a></li>
+<li><a href="#method-i-execute_dui">execute_dui</a></li>
+<li><a href="#method-i-execute_insert">execute_insert</a></li>
+<li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#method-i-server_version">server_version</a></li>
+</ol>
+</div>
+<div id='context'>
+<div id='includes'>
+<h2>Included modules</h2>
+<ol>
+<li><a href="../MySQL/DatabaseMethods.html">Sequel::MySQL::DatabaseMethods</a></li>
+<li><a href="../MySQL/MysqlMysql2/DatabaseMethods.html">Sequel::MySQL::MysqlMysql2::DatabaseMethods</a></li>
+<li><a href="../MySQL/PreparedStatements/DatabaseMethods.html">Sequel::MySQL::PreparedStatements::DatabaseMethods</a></li>
+</ol>
+</div>
+</div>
+<div id='section'>
+<div id='attribute-list'>
+<h2 class='section-bar'>Attributes</h2>
+<div class='name-list'>
+<table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-convert_tinyint_to_bool'>convert_tinyint_to_bool</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>Whether to convert tinyint columns to bool for this database</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-connect'>
+<a name='method-i-connect'></a>
+<div class='synopsis'>
+<span class='name'>connect</span>
+<span class='arguments'>(server)</span>
+
+</div>
+<div class='description'>
+
+<p>Connect to the database.  In addition to the usual database options, the
+following options have effect:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
+<p>Set to true to use <a href="../MySQL.html">MySQL</a> default behavior of
+having a filter for an autoincrement column equals NULL to return the last
+inserted row.</p>
+</td></tr><tr><td class='label'>:charset </td><td>
+<p>Same as :encoding (:encoding takes precendence)</p>
+</td></tr><tr><td class='label'>:encoding </td><td>
+<p>Set all the related character sets for this connection (connection, client,
+database, server, and results).</p>
+</td></tr></tbody></table>
+
+<p>The options hash is also passed to mysql2, and can include mysql2 options
+such as :local_infile.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-connect-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>] <span class="ruby-operator">||=</span> <span class="ruby-string">&#39;localhost&#39;</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:username</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:user</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:flags</span>] <span class="ruby-operator">|=</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span><span class="ruby-operator">::</span><span class="ruby-constant">FOUND_ROWS</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-value">:FOUND_ROWS</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:charset</span>]&#x000A;  <span class="ruby-identifier">conn</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Mysql2</span><span class="ruby-operator">::</span><span class="ruby-constant">Client</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:symbolize_keys</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:cache_rows</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;    &#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">NativePreparedStatements</span>&#x000A;    <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_default_query_options</span>, <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query_options</span>.<span class="ruby-identifier">dup</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">sqls</span> = <span class="ruby-identifier">mysql_connection_setting_sqls</span>&#x000A;&#x000A;  <span class="ruby-comment"># Set encoding a slightly different way after connecting,</span>&#x000A;  <span class="ruby-comment"># in case the READ_DEFAULT_GROUP overrode the provided encoding.</span>&#x000A;  <span class="ruby-comment"># Doesn&#39;t work across implicit reconnects, but Sequel doesn&#39;t turn on</span>&#x000A;  <span class="ruby-comment"># that feature.</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">encoding</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:encoding</span>]&#x000A;    <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-node">&quot;SET NAMES #{conn.escape(encoding.to_s)}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">sqls</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">sql</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;&#x000A;  <span class="ruby-identifier">add_prepared_statements_cache</span>(<span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-identifier">conn</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-execute_dui'>
+<a name='method-i-execute_dui'></a>
+<div class='synopsis'>
+<span class='name'>execute_dui</span>
+<span class='arguments'>(sql, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_dui-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">affected_rows</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-execute_insert'>
+<a name='method-i-execute_insert'></a>
+<div class='synopsis'>
+<span class='name'>execute_insert</span>
+<span class='arguments'>(sql, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute_insert-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">last_id</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-server_version'>
+<a name='method-i-server_version'></a>
+<div class='synopsis'>
+<span class='name'>server_version</span>
+<span class='arguments'>(server=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Return the version of the <a href="../MySQL.html">MySQL</a> server to which
+we are connecting.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-server_version-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_info</span>[<span class="ruby-value">:id</span>]} <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

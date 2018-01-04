@@ -1,337 +1,339 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.28.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.28.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.28.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-11-01 13:58:05 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Adapter+Support">New Adapter Support<span><a href="#label-New+Adapter+Support">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now has much better
-            support for the DB2 database.</p>
-            </li><li>
-            <p>An ibmdb adapter has been added, and is the recommended adapter to to use
-            if you want to connect to DB2 from MRI.</p>
-            </li><li>
-            <p>A jdbc db2 subadapter has been added, allowing good DB2 support on JRuby.</p>
-            </li><li>
-            <p>The db2 adapter has been cleaned up substantially, and now works well, but
-            it is still recommended that you switch to ibmdb if you are using the db2
-            adapter.</p>
-            </li><li>
-            <p>The firebird adapter has been split into shared and specific parts, and
-            quite a few fixes were made to it.</p>
-            </li><li>
-            <p>A jdbc firebird subadapter has been added, allowing connection to firebird
-            databases from JRuby.</p>
-            </li></ul>
-            
-            <h1 id="label-New+PostgreSQL+9.1+Features">New PostgreSQL 9.1 Features<span><a href="#label-New+PostgreSQL+9.1+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#returning has been added for using the RETURNING clause on
-            INSERT/UPDATE/DELETE queries.  RETURNING allows such queries to return
-            results in much the same way as a SELECT query works. When
-            Dataset#returning is used, Dataset insert, update, and delete now accept a
-            block that is passed to Dataset fetch_rows  which is yielded plain ruby
-            hashes for each row inserted, updated, or deleted.  If Dataset#returning is
-            used and a block is not given to those methods, those methods will return
-            an array of plain hashes for all rows inserted, updated, and deleted.</p>
-            </li><li>
-            <p>Dataset#with_sql now treats a symbol as a first argument as a method name
-            to call to get the SQL.  The expected use case for this is with
-            Dataset#returning and insert/update/delete:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].&#x000A; <span class="ruby-identifier">returning</span>(:<span class="ruby-identifier">id</span>).&#x000A; <span class="ruby-identifier">with_sql</span>(:<span class="ruby-identifier">update_sql</span>, :<span class="ruby-identifier">b</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>).&#x000A; <span class="ruby-identifier">map</span>(:<span class="ruby-identifier">id</span>)</pre>
-            
-            <p>Basically, it makes it more easily to statically set the
-            insert/update/delete SQL, and then be able to use the full dataset API for
-            returning results.  As mentioned above, using Dataset#returning with
-            insert, update, and delete yields plain hashes, so if you want to have the
-            row_proc applied (e.g. you are using models), you need to use this method
-            instead, since you can then call each or all to make sure the row_proc is
-            called on all returned rows.</p>
-            </li><li>
-            <p>Dataset#with (common table expressions) now affects INSERT/UPDATE/DELETE
-            queries.</p>
-            </li><li>
-            <p>Database#create_table? now uses CREATE TABLE IF NOT EXISTS on PostgreSQL
-            9.1.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The :limit option is now respected when eager loading via either eager or
-            eager_graph.  By default, <a href="../../../classes/Sequel.html">Sequel</a>
-            will just do an array slice of the resulting ruby array, which gets the
-            correct answer, but does not offer any performance improvements.  <a
-            href="../../../classes/Sequel.html">Sequel</a> also offers a new
-            :eager_limit_strategy option for using more advanced query types that only
-            load the related records from the database. The available values for the
-            :eager_limit_strategy option are:</p>
-            
-            <pre>:window_function - This uses the row_number window function&#x000A;  partitioned by the related key fields.  It can only be used&#x000A;  on databases that support window functions (PostgreSQL 8.4+,&#x000A;  Microsoft SQL Server 2005+, DB2).&#x000A;:correlated_subquery - This uses a correlated subquery that is&#x000A;  limited.  It works on most databases except MySQL and DB2.</pre>
-            
-            <p>You can provide a value of true as the option to have <a
-            href="../../../classes/Sequel.html">Sequel</a> pick a strategy to use. <a
-            href="../../../classes/Sequel.html">Sequel</a> will never use a correlated
-            subquery for true, since in some cases it can perform worse than loading
-            all related records and doing the array slice in ruby.</p>
-            
-            <p>If you want to enable an eager_limit_strategy globally, you can set
-            Sequel::Model.default_eager_limit_strategy to a value, and all associations
-            that use :limit will default to using that strategy.</p>
-            </li><li>
-            <p>one_to_one associations that do not represent true one-to-one database
-            relationships, but represent one-to-many relationships where you are only
-            returning the first object based on a given order are also now handled
-            correctly when eager loading. Previously, eager loading such associations
-            resulted in the last matching object being associated instead of the first
-            matching object being associated.</p>
-            
-            <p>You can also use an :eager_limit_strategy for one_to_one associations.  In
-            addition to the :window_function and :correlated_subquery values, there is
-            also a :distinct_on value that is available on PostgreSQL for using
-            DISTINCT ON, which is the fastest strategy if you are using PostgreSQL.</p>
-            </li><li>
-            <p>Dataset#map, to_hash, select_map, select_order_map, and select_hash now
-            accept arrays of symbols, and if given arrays of symbols, use arrays of
-            results.  For example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">map</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-comment"># =&gt; [[1, &#39;foo&#39;], [2, &#39;bar&#39;], ...]</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">to_hash</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">foo_id</span>], [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">bar_id</span>])&#x000A;<span class="ruby-comment"># =&gt; {[1, 3]=&gt;[&#39;foo&#39;, 5], [2, 4]=&gt;[&#39;bar&#39;, 6], ...}</span></pre>
-            </li><li>
-            <p>For SQL expression objects where <a
-            href="../../../classes/Sequel.html">Sequel</a> cannot deduce the type of
-            the object, it now will consider the type of the argument when a &amp;, |,
-            or + operator is used.  For example:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
-            
-            <p>Previously, this did “x AND 1”, now it does “x &amp; 1”.  Using a logical
-            operator on an integer doesn&#39;t make sense, but it&#39;s possible people
-            did so if the database uses 1/0 for true/false. Likewise:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
-            
-            <p>Previously, this did “x + &#39;foo&#39;” (addition), now it does “x ||
-            &#39;foo&#39;” (string concatenation).</p>
-            </li><li>
-            <p>The sql_string, sql_number, and sql_boolean methods are now available on
-            SQL::ComplexExpressions, so you can do:</p>
-            
-            <pre class="ruby">(:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; foos&#39;</span>&#x000A;<span class="ruby-comment"># (x + 1) || &#39; foos&#39;</span></pre>
-            
-            <p>Previously, there was not an easy way to generate such SQL expressions.</p>
-            </li><li>
-            <p>:after_load association hooks are now applied when using eager_graph. 
-            Previously, they were only applied when using eager, not when using
-            eager_graph.</p>
-            </li><li>
-            <p>Database#copy_table has been added to the postgres adapter if pg is used as
-            the underlying driver.  It allows you to get very fast exports of table
-            data in text or CSV format.  It also accepts datasets, allowing fast
-            exports of arbitrary queries in text or CSV format.</p>
-            </li><li>
-            <p>SQL extract support (:timestamp.extract(:year)) is now emulated on the
-            databases that don&#39;t natively support it, such as SQLite, Microsoft SQL
-            Server, and DB2.  At least the following values are supported for
-            extraction: :year, :month, :day, :hour, :minute, and :second.</p>
-            </li><li>
-            <p>The bitwise XOR operator is now emulated on SQLite.  Previously, attempting
-            to use it would cause the database to raise an error.</p>
-            </li><li>
-            <p>A Database#use_timestamp_timezones accessor has been added on SQLite.  This
-            allows you to turn off the use of timezones in timestamps by setting the
-            value to false.  This is necessary if you want you want to use the SQLite
-            datetime functions, or the new ability to emulate extract.</p>
-            
-            <p>Note that this setting does not affect the current database content.  To
-            convert old databases to the new format, you&#39;ll have to resave all rows
-            that have timestamps.</p>
-            
-            <p>At some point in the future, <a
-            href="../../../classes/Sequel.html">Sequel</a> may default to not using
-            timezones in timestamps by default on SQLite, so if you would like to rely
-            on the current behavior, you should set this accessor to true now.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now works around bugs in
-            MySQL when using a subselect with a LIMIT by using a nested subselect.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now works around issues
-            in Microsoft SQL Server and DB2 when using a subselect with IN/NOT IN that
-            uses the emulated offset support.</p>
-            </li><li>
-            <p>The jdbc adapter now returns java.sql.Clob objects as Sequel::SQL::Blobs.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now considers database
-            clob types as the :blob schema type.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel/SQLTime.html#method-c-create">Sequel::SQLTime.create</a>
-            has been added for more easily creating instances:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span>)</pre>
-            </li><li>
-            <p>Dataset#select_all now accepts SQL::AliasedExpression and SQL::JoinClause
-            arguments and returns the appropriate SQL::ColumnAll value that selects all
-            columns from the related table.</p>
-            </li><li>
-            <p>Model.set_dataset now accepts <a
-            href="../../../classes/Sequel/LiteralString.html">Sequel::LiteralString</a>
-            objects that represent table names.  This usage is not encouraged except in
-            rare cases such as using a set returning function in PostgreSQL.</p>
-            </li><li>
-            <p>Dataset#supports_cte? now takes an optional argument specifying the type of
-            query (:insert, :update, :delete, :select).  It defaults to :select.</p>
-            </li><li>
-            <p>Dataset#supports_returning? has been added.  It requires an argument
-            specifying the type of query (:insert, :update, or :delete).</p>
-            </li><li>
-            <p>Dataset#supports_cte_in_subqueries? has been added for checking for support
-            for this ability.  Apparently, only PostgreSQL currently supports this. 
-            For other adapters that support CTEs but not in subqueries, if a subquery
-            with a CTE is used in a JOIN, the CTE is moved from the subquery to the
-            main query.</p>
-            </li><li>
-            <p>Dataset#supports_select_all_and_column has been added for seeing if “SELECT
-            *, foo …” style queries are supported.  This is false on DB2, which
-            doesn&#39;t allow such queries.  When it is false, using select_append on a
-            dataset that doesn&#39;t specifically select columns will now change the
-            query to do “SELECT table.*, foo …” instead, working around the limitation
-            on DB2.</p>
-            </li><li>
-            <p>Dataset#supports_ordered_distinct_on? has been added.  Currently, this is
-            only true on PostgreSQL.  MySQL can emulate DISTINCT ON using GROUP BY, but
-            it doesn&#39;t respect ORDER BY, so it some cases it cannot be used
-            equivalently.</p>
-            </li><li>
-            <p>Dataset#supports_where_true? has been added for checking for support of
-            WHERE TRUE (or WHERE 1 if 1 is true).  Not all databases support using such
-            a construct, and on the databases that do not, you have to use WHERE (1 =
-            1) or something similar.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> 3.27.0 was negatively
-            affected by a serious bug in ActiveSupport&#39;s Time.=== that has still
-            not been fixed, which broke the literalization of Time objects.  In spite
-            of the bad precedent it sets, <a
-            href="../../../classes/Sequel.html">Sequel</a> now avoids using Time.=== on
-            a subclass of Time to work around this ActiveSupport bug.</p>
-            </li><li>
-            <p>Dataset#with_pk now uses a qualified primary key instead of an unqualified
-            primary key, which means it can now be used correctly after joining to a
-            separate table.</p>
-            </li><li>
-            <p>Association after_load hooks when lazy loading are now called after the
-            association has been loaded, which allows them to change which records are
-            cached.  This makes the lazy load case more similar to the eager load case.</p>
-            </li><li>
-            <p>The metaprogrammatically created methods that implement Sequel&#39;s DSL
-            support have been made significantly faster by using module_eval instead of
-            define_method.</p>
-            </li><li>
-            <p>The type translation in the postgres, mysql, and sqlite adapters has been
-            made faster by using Method objects that result in more direct processing.</p>
-            </li><li>
-            <p>Typecasting values for time columns from Time values to <a
-            href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> values now
-            correctly handles fractional seconds on ruby 1.9.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#insert_returning_sql has been changed to a private method in the
-            PostgreSQL and Firebird adapters, and it operates differently than it did
-            previously.  The private insert_returning_pk_sql and
-            insert_returning_select_sql methods have been removed.</p>
-            </li><li>
-            <p>Dataset#with_pk no longer does some defensive checking for misuse of
-            primary keys (e.g. providing a composite key when the model uses a single
-            key).  Previously, <a href="../../../classes/Sequel.html">Sequel</a> would
-            raise an Error immediately, now such behavior is undefined, with the most
-            likely behavior being the database raising an Error.</p>
-            </li><li>
-            <p>The :alias_association_type_map and :alias_association_name_map settings
-            have been removed from the :eager_graph dataset option, in favor of just
-            storing the related association reflection.</p>
-            </li><li>
-            <p>The internals of the db2 adapter have changed substantially, if you were
-            relying on some of the private methods defined in it, you will probably
-            have to modify your code.</p>
-            </li><li>
-            <p>The firebird adapter was substanially modified, specifically parts related
-            to insert returning autogenerated primary key values, so if you were
-            previously using the adapter you should probably take more care than usual
-            when testing your upgrade.</p>
-            </li><li>
-            <p>The Dataset::WITH_SUPPORTED constant has been removed.</p>
-            </li><li>
-            <p>The Dataset#supports_cte? method now accepts an optional argument. If you
-            overrode this method, your overridden method now must accept an optional
-            argument.</p>
-            </li><li>
-            <p>If you were previously doing:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
-            
-            <p>and wanting “x AND 1”, you have to switch to:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">sql_boolean</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
-            
-            <p>Likewise, if you were previously doing:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
-            
-            <p>and wanting “x + &#39;foo&#39;”, you need to switch to:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer does defensive
-            type checking in the SQL expression support, as it was often more strict
-            than the database and would not allow the creation of expressions that were
-            valid for the database.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.28.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.28.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.28.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-11-01 13:58:05 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Adapter+Support">New Adapter Support<span><a href="#label-New+Adapter+Support">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now has much better
+support for the DB2 database.</p>
+</li><li>
+<p>An ibmdb adapter has been added, and is the recommended adapter to to use
+if you want to connect to DB2 from MRI.</p>
+</li><li>
+<p>A jdbc db2 subadapter has been added, allowing good DB2 support on JRuby.</p>
+</li><li>
+<p>The db2 adapter has been cleaned up substantially, and now works well, but
+it is still recommended that you switch to ibmdb if you are using the db2
+adapter.</p>
+</li><li>
+<p>The firebird adapter has been split into shared and specific parts, and
+quite a few fixes were made to it.</p>
+</li><li>
+<p>A jdbc firebird subadapter has been added, allowing connection to firebird
+databases from JRuby.</p>
+</li></ul>
+
+<h1 id="label-New+PostgreSQL+9.1+Features">New PostgreSQL 9.1 Features<span><a href="#label-New+PostgreSQL+9.1+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#returning has been added for using the RETURNING clause on
+INSERT/UPDATE/DELETE queries.  RETURNING allows such queries to return
+results in much the same way as a SELECT query works. When
+Dataset#returning is used, Dataset insert, update, and delete now accept a
+block that is passed to Dataset fetch_rows  which is yielded plain ruby
+hashes for each row inserted, updated, or deleted.  If Dataset#returning is
+used and a block is not given to those methods, those methods will return
+an array of plain hashes for all rows inserted, updated, and deleted.</p>
+</li><li>
+<p>Dataset#with_sql now treats a symbol as a first argument as a method name
+to call to get the SQL.  The expected use case for this is with
+Dataset#returning and insert/update/delete:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].&#x000A; <span class="ruby-identifier">returning</span>(<span class="ruby-value">:id</span>).&#x000A; <span class="ruby-identifier">with_sql</span>(<span class="ruby-value">:update_sql</span>, <span class="ruby-value">:b</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:b</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>).&#x000A; <span class="ruby-identifier">map</span>(<span class="ruby-value">:id</span>)</pre>
+
+<p>Basically, it makes it more easily to statically set the
+insert/update/delete SQL, and then be able to use the full dataset API for
+returning results.  As mentioned above, using Dataset#returning with
+insert, update, and delete yields plain hashes, so if you want to have the
+row_proc applied (e.g. you are using models), you need to use this method
+instead, since you can then call each or all to make sure the row_proc is
+called on all returned rows.</p>
+</li><li>
+<p>Dataset#with (common table expressions) now affects INSERT/UPDATE/DELETE
+queries.</p>
+</li><li>
+<p>Database#create_table? now uses CREATE TABLE IF NOT EXISTS on PostgreSQL
+9.1.</p>
+</li></ul>
+
+<h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The :limit option is now respected when eager loading via either eager or
+eager_graph.  By default, <a href="../../../classes/Sequel.html">Sequel</a>
+will just do an array slice of the resulting ruby array, which gets the
+correct answer, but does not offer any performance improvements.  <a
+href="../../../classes/Sequel.html">Sequel</a> also offers a new
+:eager_limit_strategy option for using more advanced query types that only
+load the related records from the database. The available values for the
+:eager_limit_strategy option are:</p>
+
+<pre>:window_function - This uses the row_number window function&#x000A;  partitioned by the related key fields.  It can only be used&#x000A;  on databases that support window functions (PostgreSQL 8.4+,&#x000A;  Microsoft SQL Server 2005+, DB2).&#x000A;:correlated_subquery - This uses a correlated subquery that is&#x000A;  limited.  It works on most databases except MySQL and DB2.</pre>
+
+<p>You can provide a value of true as the option to have <a
+href="../../../classes/Sequel.html">Sequel</a> pick a strategy to use. <a
+href="../../../classes/Sequel.html">Sequel</a> will never use a correlated
+subquery for true, since in some cases it can perform worse than loading
+all related records and doing the array slice in ruby.</p>
+
+<p>If you want to enable an eager_limit_strategy globally, you can set
+Sequel::Model.default_eager_limit_strategy to a value, and all associations
+that use :limit will default to using that strategy.</p>
+</li><li>
+<p>one_to_one associations that do not represent true one-to-one database
+relationships, but represent one-to-many relationships where you are only
+returning the first object based on a given order are also now handled
+correctly when eager loading. Previously, eager loading such associations
+resulted in the last matching object being associated instead of the first
+matching object being associated.</p>
+
+<p>You can also use an :eager_limit_strategy for one_to_one associations.  In
+addition to the :window_function and :correlated_subquery values, there is
+also a :distinct_on value that is available on PostgreSQL for using
+DISTINCT ON, which is the fastest strategy if you are using PostgreSQL.</p>
+</li><li>
+<p>Dataset#map, to_hash, select_map, select_order_map, and select_hash now
+accept arrays of symbols, and if given arrays of symbols, use arrays of
+results.  For example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">map</span>([<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>])&#x000A;<span class="ruby-comment"># =&gt; [[1, &#39;foo&#39;], [2, &#39;bar&#39;], ...]</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">to_hash</span>([<span class="ruby-value">:id</span>, <span class="ruby-value">:foo_id</span>], [<span class="ruby-value">:name</span>, <span class="ruby-value">:bar_id</span>])&#x000A;<span class="ruby-comment"># =&gt; {[1, 3]=&gt;[&#39;foo&#39;, 5], [2, 4]=&gt;[&#39;bar&#39;, 6], ...}</span></pre>
+</li><li>
+<p>For SQL expression objects where <a
+href="../../../classes/Sequel.html">Sequel</a> cannot deduce the type of
+the object, it now will consider the type of the argument when a &amp;, |,
+or + operator is used.  For example:</p>
+
+<pre class="ruby"><span class="ruby-value">:x</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
+
+<p>Previously, this did “x AND 1”, now it does “x &amp; 1”.  Using a logical
+operator on an integer doesn&#39;t make sense, but it&#39;s possible people
+did so if the database uses 1/0 for true/false. Likewise:</p>
+
+<pre class="ruby"><span class="ruby-value">:x</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
+
+<p>Previously, this did “x + &#39;foo&#39;” (addition), now it does “x ||
+&#39;foo&#39;” (string concatenation).</p>
+</li><li>
+<p>The sql_string, sql_number, and sql_boolean methods are now available on
+SQL::ComplexExpressions, so you can do:</p>
+
+<pre class="ruby">(<span class="ruby-value">:x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; foos&#39;</span>&#x000A;<span class="ruby-comment"># (x + 1) || &#39; foos&#39;</span></pre>
+
+<p>Previously, there was not an easy way to generate such SQL expressions.</p>
+</li><li>
+<p>:after_load association hooks are now applied when using eager_graph. 
+Previously, they were only applied when using eager, not when using
+eager_graph.</p>
+</li><li>
+<p>Database#copy_table has been added to the postgres adapter if pg is used as
+the underlying driver.  It allows you to get very fast exports of table
+data in text or CSV format.  It also accepts datasets, allowing fast
+exports of arbitrary queries in text or CSV format.</p>
+</li><li>
+<p>SQL extract support (:timestamp.extract(:year)) is now emulated on the
+databases that don&#39;t natively support it, such as SQLite, Microsoft SQL
+Server, and DB2.  At least the following values are supported for
+extraction: :year, :month, :day, :hour, :minute, and :second.</p>
+</li><li>
+<p>The bitwise XOR operator is now emulated on SQLite.  Previously, attempting
+to use it would cause the database to raise an error.</p>
+</li><li>
+<p>A Database#use_timestamp_timezones accessor has been added on SQLite.  This
+allows you to turn off the use of timezones in timestamps by setting the
+value to false.  This is necessary if you want you want to use the SQLite
+datetime functions, or the new ability to emulate extract.</p>
+
+<p>Note that this setting does not affect the current database content.  To
+convert old databases to the new format, you&#39;ll have to resave all rows
+that have timestamps.</p>
+
+<p>At some point in the future, <a
+href="../../../classes/Sequel.html">Sequel</a> may default to not using
+timezones in timestamps by default on SQLite, so if you would like to rely
+on the current behavior, you should set this accessor to true now.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now works around bugs in
+MySQL when using a subselect with a LIMIT by using a nested subselect.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now works around issues
+in Microsoft SQL Server and DB2 when using a subselect with IN/NOT IN that
+uses the emulated offset support.</p>
+</li><li>
+<p>The jdbc adapter now returns java.sql.Clob objects as Sequel::SQL::Blobs.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now considers database
+clob types as the :blob schema type.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel/SQLTime.html#method-c-create">Sequel::SQLTime.create</a>
+has been added for more easily creating instances:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span>)</pre>
+</li><li>
+<p>Dataset#select_all now accepts SQL::AliasedExpression and SQL::JoinClause
+arguments and returns the appropriate SQL::ColumnAll value that selects all
+columns from the related table.</p>
+</li><li>
+<p>Model.set_dataset now accepts <a
+href="../../../classes/Sequel/LiteralString.html">Sequel::LiteralString</a>
+objects that represent table names.  This usage is not encouraged except in
+rare cases such as using a set returning function in PostgreSQL.</p>
+</li><li>
+<p>Dataset#supports_cte? now takes an optional argument specifying the type of
+query (:insert, :update, :delete, :select).  It defaults to :select.</p>
+</li><li>
+<p>Dataset#supports_returning? has been added.  It requires an argument
+specifying the type of query (:insert, :update, or :delete).</p>
+</li><li>
+<p>Dataset#supports_cte_in_subqueries? has been added for checking for support
+for this ability.  Apparently, only PostgreSQL currently supports this. 
+For other adapters that support CTEs but not in subqueries, if a subquery
+with a CTE is used in a JOIN, the CTE is moved from the subquery to the
+main query.</p>
+</li><li>
+<p>Dataset#supports_select_all_and_column has been added for seeing if “SELECT
+*, foo …” style queries are supported.  This is false on DB2, which
+doesn&#39;t allow such queries.  When it is false, using select_append on a
+dataset that doesn&#39;t specifically select columns will now change the
+query to do “SELECT table.*, foo …” instead, working around the limitation
+on DB2.</p>
+</li><li>
+<p>Dataset#supports_ordered_distinct_on? has been added.  Currently, this is
+only true on PostgreSQL.  MySQL can emulate DISTINCT ON using GROUP BY, but
+it doesn&#39;t respect ORDER BY, so it some cases it cannot be used
+equivalently.</p>
+</li><li>
+<p>Dataset#supports_where_true? has been added for checking for support of
+WHERE TRUE (or WHERE 1 if 1 is true).  Not all databases support using such
+a construct, and on the databases that do not, you have to use WHERE (1 =
+1) or something similar.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> 3.27.0 was negatively
+affected by a serious bug in ActiveSupport&#39;s Time.=== that has still
+not been fixed, which broke the literalization of Time objects.  In spite
+of the bad precedent it sets, <a
+href="../../../classes/Sequel.html">Sequel</a> now avoids using Time.=== on
+a subclass of Time to work around this ActiveSupport bug.</p>
+</li><li>
+<p>Dataset#with_pk now uses a qualified primary key instead of an unqualified
+primary key, which means it can now be used correctly after joining to a
+separate table.</p>
+</li><li>
+<p>Association after_load hooks when lazy loading are now called after the
+association has been loaded, which allows them to change which records are
+cached.  This makes the lazy load case more similar to the eager load case.</p>
+</li><li>
+<p>The metaprogrammatically created methods that implement Sequel&#39;s DSL
+support have been made significantly faster by using module_eval instead of
+define_method.</p>
+</li><li>
+<p>The type translation in the postgres, mysql, and sqlite adapters has been
+made faster by using Method objects that result in more direct processing.</p>
+</li><li>
+<p>Typecasting values for time columns from Time values to <a
+href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> values now
+correctly handles fractional seconds on ruby 1.9.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#insert_returning_sql has been changed to a private method in the
+PostgreSQL and Firebird adapters, and it operates differently than it did
+previously.  The private insert_returning_pk_sql and
+insert_returning_select_sql methods have been removed.</p>
+</li><li>
+<p>Dataset#with_pk no longer does some defensive checking for misuse of
+primary keys (e.g. providing a composite key when the model uses a single
+key).  Previously, <a href="../../../classes/Sequel.html">Sequel</a> would
+raise an Error immediately, now such behavior is undefined, with the most
+likely behavior being the database raising an Error.</p>
+</li><li>
+<p>The :alias_association_type_map and :alias_association_name_map settings
+have been removed from the :eager_graph dataset option, in favor of just
+storing the related association reflection.</p>
+</li><li>
+<p>The internals of the db2 adapter have changed substantially, if you were
+relying on some of the private methods defined in it, you will probably
+have to modify your code.</p>
+</li><li>
+<p>The firebird adapter was substanially modified, specifically parts related
+to insert returning autogenerated primary key values, so if you were
+previously using the adapter you should probably take more care than usual
+when testing your upgrade.</p>
+</li><li>
+<p>The Dataset::WITH_SUPPORTED constant has been removed.</p>
+</li><li>
+<p>The Dataset#supports_cte? method now accepts an optional argument. If you
+overrode this method, your overridden method now must accept an optional
+argument.</p>
+</li><li>
+<p>If you were previously doing:</p>
+
+<pre class="ruby"><span class="ruby-value">:x</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
+
+<p>and wanting “x AND 1”, you have to switch to:</p>
+
+<pre class="ruby"><span class="ruby-value">:x</span>.<span class="ruby-identifier">sql_boolean</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
+
+<p>Likewise, if you were previously doing:</p>
+
+<pre class="ruby"><span class="ruby-value">:x</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
+
+<p>and wanting “x + &#39;foo&#39;”, you need to switch to:</p>
+
+<pre class="ruby"><span class="ruby-value">:x</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer does defensive
+type checking in the SQL expression support, as it was often more strict
+than the database and would not allow the creation of expressions that were
+valid for the database.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

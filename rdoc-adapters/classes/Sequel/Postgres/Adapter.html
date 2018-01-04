@@ -1,242 +1,250 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres::Adapter</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::Adapter
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="../../PGconn.html">PGconn</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p><a href="../../PGconn.html">PGconn</a> subclass for connection specific
-            methods used with the pg or postgres-pr driver.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-async_exec">async_exec</a></li>
-              <li><a href="#method-i-block">block</a></li>
-              <li><a href="#method-i-check_disconnect_errors">check_disconnect_errors</a></li>
-              <li><a href="#method-i-escape_bytea">escape_bytea</a></li>
-              <li><a href="#method-i-escape_string">escape_string</a></li>
-              <li><a href="#method-i-execute">execute</a></li>
-              <li><a href="#method-i-status">status</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="Adapter/PGresult.html">Sequel::Postgres::Adapter::PGresult</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONNECTION_OK</td>
-                    <td>=</td>
-                    <td class='context-item-value'>-1</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Make postgres-pr look like pg</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DISCONNECT_ERROR_CLASSES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>[IOError, Errno::EPIPE, Errno::ECONNRESET]</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The underlying exception classes to reraise as disconnect errors instead of
-                      regular database errors.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DISCONNECT_ERROR_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/\A#{Regexp.union(disconnect_errors)}/</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Since exception class based disconnect checking may not work, also trying
-                      parsing the exception message to look for disconnect errors.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-async_exec'>
-                <a name='method-i-async_exec'></a>
-                <div class='synopsis'>
-                  <span class='name'>async_exec</span>
-                  <span class='arguments'>(sql)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-async_exec-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-async_exec-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">async_exec</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-constant">PGresult</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@conn</span>.<span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-block'>
-                <a name='method-i-block'></a>
-                <div class='synopsis'>
-                  <span class='name'>block</span>
-                  <span class='arguments'>(timeout=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-block-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-block-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">block</span>(<span class="ruby-identifier">timeout</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-check_disconnect_errors'>
-                <a name='method-i-check_disconnect_errors'></a>
-                <div class='synopsis'>
-                  <span class='name'>check_disconnect_errors</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Raise a Sequel::DatabaseDisconnectError if a one of the disconnect error
-                  classes is raised, or a PGError is raised and the connection status cannot
-                  be determined or it is not OK.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-check_disconnect_errors-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-check_disconnect_errors-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 106</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_disconnect_errors</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-operator">*</span><span class="ruby-constant">DISCONNECT_ERROR_CLASSES</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>))&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">s</span> = <span class="ruby-identifier">status</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span>&#x000A;      <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">status_ok</span> = (<span class="ruby-identifier">s</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Adapter</span><span class="ruby-operator">::</span><span class="ruby-constant">CONNECTION_OK</span>)&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">||=</span> <span class="ruby-operator">!</span><span class="ruby-identifier">status_ok</span>&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">DISCONNECT_ERROR_RE</span>&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>)) <span class="ruby-operator">:</span> <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_ok</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">disconnect</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-escape_bytea'>
-                <a name='method-i-escape_bytea'></a>
-                <div class='synopsis'>
-                  <span class='name'>escape_bytea</span>
-                  <span class='arguments'>(str)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Escape bytea values.  Uses historical format instead of hex format for
-                  maximum compatibility.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_bytea-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-escape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/[\000-\037\047\134\177-\377]/n</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\\#{sprintf(&#39;%o&#39;, b.each_byte{|x| break x}).rjust(3, &#39;0&#39;)}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-escape_string'>
-                <a name='method-i-escape_string'></a>
-                <div class='synopsis'>
-                  <span class='name'>escape_string</span>
-                  <span class='arguments'>(str)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Escape strings by doubling apostrophes.  This only works if standard
-                  conforming strings are used.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_string-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-escape_string-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_string</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&quot;&#39;&quot;</span>, <span class="ruby-string">&quot;&#39;&#39;&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-execute'>
-                <a name='method-i-execute'></a>
-                <div class='synopsis'>
-                  <span class='name'>execute</span>
-                  <span class='arguments'>(sql, args=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Execute the given <a href="../SQL.html">SQL</a> with this connection.  If a
-                  block is given, yield the results, otherwise, return the number of changed
-                  rows.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">v</span>, <span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">q</span> = <span class="ruby-identifier">check_disconnect_errors</span>{<span class="ruby-identifier">execute_query</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>)}&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">block_given?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">q</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">cmd_tuples</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">q</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">q</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:clear</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-status'>
-                <a name='method-i-status'></a>
-                <div class='synopsis'>
-                  <span class='name'>status</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-status-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-status-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>&#x000A;  <span class="ruby-constant">CONNECTION_OK</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres::Adapter</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::Adapter
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../../PGconn.html">PGconn</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="../../PGconn.html">PGconn</a> subclass for connection specific
+methods used with the pg or postgres-pr driver.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-async_exec">async_exec</a></li>
+<li><a href="#method-i-block">block</a></li>
+<li><a href="#method-i-check_disconnect_errors">check_disconnect_errors</a></li>
+<li><a href="#method-i-escape_bytea">escape_bytea</a></li>
+<li><a href="#method-i-escape_string">escape_string</a></li>
+<li><a href="#method-i-execute">execute</a></li>
+<li><a href="#method-i-status">status</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="Adapter/PGresult.html">Sequel::Postgres::Adapter::PGresult</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONNECTION_OK</td>
+<td>=</td>
+<td class='context-item-value'>-1</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Make postgres-pr look like pg</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>DISCONNECT_ERROR_CLASSES</td>
+<td>=</td>
+<td class='context-item-value'>[IOError, Errno::EPIPE, Errno::ECONNRESET]</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>The underlying exception classes to reraise as disconnect errors instead of
+regular database errors.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>DISCONNECT_ERROR_RE</td>
+<td>=</td>
+<td class='context-item-value'>/\A#{Regexp.union(disconnect_errors)}/</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>Since exception class based disconnect checking may not work, also trying
+parsing the exception message to look for disconnect errors.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-async_exec'>
+<a name='method-i-async_exec'></a>
+<div class='synopsis'>
+<span class='name'>async_exec</span>
+<span class='arguments'>(sql)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-async_exec-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-async_exec-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">async_exec</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-constant">PGresult</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@conn</span>.<span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-block'>
+<a name='method-i-block'></a>
+<div class='synopsis'>
+<span class='name'>block</span>
+<span class='arguments'>(timeout=nil)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-block-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-block-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">block</span>(<span class="ruby-identifier">timeout</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-check_disconnect_errors'>
+<a name='method-i-check_disconnect_errors'></a>
+<div class='synopsis'>
+<span class='name'>check_disconnect_errors</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Raise a Sequel::DatabaseDisconnectError if a one of the disconnect error
+classes is raised, or a PGError is raised and the connection status cannot
+be determined or it is not OK.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-check_disconnect_errors-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-check_disconnect_errors-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 106</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_disconnect_errors</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-operator">*</span><span class="ruby-constant">DISCONNECT_ERROR_CLASSES</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>))&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">s</span> = <span class="ruby-identifier">status</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span>&#x000A;      <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">status_ok</span> = (<span class="ruby-identifier">s</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Adapter</span><span class="ruby-operator">::</span><span class="ruby-constant">CONNECTION_OK</span>)&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">||=</span> <span class="ruby-operator">!</span><span class="ruby-identifier">status_ok</span>&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">DISCONNECT_ERROR_RE</span>&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>)) <span class="ruby-operator">:</span> <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_ok</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">disconnect</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-escape_bytea'>
+<a name='method-i-escape_bytea'></a>
+<div class='synopsis'>
+<span class='name'>escape_bytea</span>
+<span class='arguments'>(str)</span>
+
+</div>
+<div class='description'>
+
+<p>Escape bytea values.  Uses historical format instead of hex format for
+maximum compatibility.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-escape_bytea-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-escape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">escape_bytea</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/[\000-\037\047\134\177-\377]/n</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;\\#{sprintf(&#39;%o&#39;, b.each_byte{|x| break x}).rjust(3, &#39;0&#39;)}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-escape_string'>
+<a name='method-i-escape_string'></a>
+<div class='synopsis'>
+<span class='name'>escape_string</span>
+<span class='arguments'>(str)</span>
+
+</div>
+<div class='description'>
+
+<p>Escape strings by doubling apostrophes.  This only works if standard
+conforming strings are used.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-escape_string-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-escape_string-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">escape_string</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&quot;&#39;&quot;</span>, <span class="ruby-string">&quot;&#39;&#39;&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-execute'>
+<a name='method-i-execute'></a>
+<div class='synopsis'>
+<span class='name'>execute</span>
+<span class='arguments'>(sql, args=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Execute the given <a href="../SQL.html">SQL</a> with this connection.  If a
+block is given, yield the results, otherwise, return the number of changed
+rows.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">v</span>, <span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">q</span> = <span class="ruby-identifier">check_disconnect_errors</span>{<span class="ruby-identifier">execute_query</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>)}&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">block_given?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">q</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">cmd_tuples</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">q</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">q</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:clear</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-status'>
+<a name='method-i-status'></a>
+<div class='synopsis'>
+<span class='name'>status</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-status-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-status-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">status</span>&#x000A;  <span class="ruby-constant">CONNECTION_OK</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

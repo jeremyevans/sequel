@@ -1,81 +1,84 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::NestedAttributes::InstanceMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::NestedAttributes::InstanceMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/nested_attributes_rb.html">lib/sequel/plugins/nested_attributes.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-set_nested_attributes">set_nested_attributes</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-set_nested_attributes'>
-                <a name='method-i-set_nested_attributes'></a>
-                <div class='synopsis'>
-                  <span class='name'>set_nested_attributes</span>
-                  <span class='arguments'>(assoc, obj, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the nested attributes for the given association.  obj should be an
-                  enumerable of multiple objects for plural associations.  The opts hash can
-                  be used to override any of the default options set by the class-level
-                  nested_attributes call.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_nested_attributes-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-set_nested_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_nested_attributes</span>(<span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">obj</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no association named #{assoc} for #{model.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ref</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">assoc</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;nested attributes are not enabled for association #{assoc} for #{model.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">meta</span> = <span class="ruby-identifier">ref</span>[<span class="ruby-value">:nested_attributes</span>]&#x000A;  <span class="ruby-identifier">meta</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">meta</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">meta</span>[<span class="ruby-value">:reflection</span>] = <span class="ruby-identifier">ref</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">returns_array?</span>&#x000A;    <span class="ruby-identifier">nested_attributes_list_setter</span>(<span class="ruby-identifier">meta</span>, <span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">nested_attributes_setter</span>(<span class="ruby-identifier">meta</span>, <span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::NestedAttributes::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::NestedAttributes::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/nested_attributes_rb.html">lib/sequel/plugins/nested_attributes.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-set_nested_attributes">set_nested_attributes</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-set_nested_attributes'>
+<a name='method-i-set_nested_attributes'></a>
+<div class='synopsis'>
+<span class='name'>set_nested_attributes</span>
+<span class='arguments'>(assoc, obj, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the nested attributes for the given association.  obj should be an
+enumerable of multiple objects for plural associations.  The opts hash can
+be used to override any of the default options set by the class-level
+nested_attributes call.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_nested_attributes-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set_nested_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_nested_attributes</span>(<span class="ruby-identifier">assoc</span>, <span class="ruby-identifier">obj</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no association named #{assoc} for #{model.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ref</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">assoc</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;nested attributes are not enabled for association #{assoc} for #{model.inspect}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">meta</span> = <span class="ruby-identifier">ref</span>[<span class="ruby-value">:nested_attributes</span>]&#x000A;  <span class="ruby-identifier">meta</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">meta</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">meta</span>[<span class="ruby-value">:reflection</span>] = <span class="ruby-identifier">ref</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">returns_array?</span>&#x000A;    <span class="ruby-identifier">nested_attributes_list_setter</span>(<span class="ruby-identifier">meta</span>, <span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">nested_attributes_setter</span>(<span class="ruby-identifier">meta</span>, <span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

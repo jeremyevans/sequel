@@ -1,85 +1,87 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::ConnectionPool::ClassMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::ConnectionPool::ClassMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/connection_pool_rb.html">lib/sequel/connection_pool.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>Class methods used to return an appropriate pool subclass, separated into a
-            module for easier overridding by extensions.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-get_pool">get_pool</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-get_pool'>
-                <a name='method-i-get_pool'></a>
-                <div class='synopsis'>
-                  <span class='name'>get_pool</span>
-                  <span class='arguments'>(db, opts = OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return a pool subclass instance based on the given options.  If a
-                  <code>:pool_class</code> option is provided is provided, use that pool
-                  class, otherwise use a new instance of an appropriate pool subclass based
-                  on the <code>:single_threaded</code> and <code>:servers</code> options.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-get_pool-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-get_pool-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">get_pool</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">connection_pool_class</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::ConnectionPool::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::ConnectionPool::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/connection_pool_rb.html">lib/sequel/connection_pool.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Class methods used to return an appropriate pool subclass, separated into a
+module for easier overridding by extensions.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-get_pool">get_pool</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-get_pool'>
+<a name='method-i-get_pool'></a>
+<div class='synopsis'>
+<span class='name'>get_pool</span>
+<span class='arguments'>(db, opts = OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Return a pool subclass instance based on the given options.  If a
+<code>:pool_class</code> option is provided is provided, use that pool
+class, otherwise use a new instance of an appropriate pool subclass based
+on the <code>:single_threaded</code> and <code>:servers</code> options.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_pool-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-get_pool-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_pool</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">connection_pool_class</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

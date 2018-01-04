@@ -1,167 +1,169 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.35.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.35.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.35.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-07-14 14:38:07 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Forwards+Compatibility">Forwards Compatibility<span><a href="#label-Forwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Ruby 2.4 will unify the Fixnum and Bignum classes into the Integer class,
-            making both Fixnum and Bignum references to Integer. This will have the
-            affect of changing the behavior of <a
-            href="../../../classes/Sequel.html">Sequel</a> migrations that use a
-            reference to the Bignum class.</p>
-            
-            <p>For example, code like this will change behavior in ruby 2.4:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">column</span>, <span class="ruby-constant">Bignum</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-constant">Bignum</span>))</pre>
-            
-            <p>as this references the Bignum class. On ruby &lt;2.4, this will create a
-            64-bit integer column, on ruby 2.4+, it will create a 32-bit integer
-            column.</p>
-            
-            <p>Code like this will be fine and does not need changing:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Bignum</span> :<span class="ruby-identifier">column</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>as this calls the Bignum method.</p>
-            
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the :Bignum
-            symbol as a generic type, so you can now switch references to the Bignum
-            class to the :Bignum symbol whenever you want a generic 64-bit integer
-            type:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">column</span>, :<span class="ruby-constant">Bignum</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1&#39;</span>, :<span class="ruby-constant">Bignum</span>))</pre>
-            
-            <p>Note that you should only do this if you are using <a
-            href="../../../classes/Sequel.html">Sequel</a> 4.35.0+, as previous
-            versions of <a href="../../../classes/Sequel.html">Sequel</a> will treat
-            the :Bignum symbol as a database-specific type named Bignum.</p>
-            </li></ul>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A <a
-            href="../../../classes/Sequel/Database.html#attribute-i-log_connection_info">Sequel::Database#log_connection_info</a>
-            accessor has been added.  If set to true, this includes connection
-            information in Sequel&#39;s query log.  In threaded connection pools (the
-            default), this makes it simple to see which connection is executing which
-            queries.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_connection_info</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># Logged: (0.000004s) (conn: 9713390226040) SELECT 1 AS v LIMIT</span></pre>
-            </li><li>
-            <p>Sequel::Model#lock! now supports an optional lock style, instead of always
-            using FOR UPDATE (which is still the default):</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Example</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">lock!</span>(<span class="ruby-string">&#39;FOR NO KEY UPDATE&#39;</span>)&#x000A;<span class="ruby-comment">#=&gt; SELECT * FROM examples WHERE id = 1 FOR NO KEY UPDATE LIMIT 1</span></pre>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel/Dataset.html#method-i-skip_locked">Sequel::Dataset#skip_locked</a>
-            has been added, which skips locked rows when returning query results. This
-            is useful whenever you are implementing a queue or similar data structure. 
-            Currently, this is supported on PostgreSQL 9.5+, Oracle, and Microsoft SQL
-            Server.</p>
-            </li><li>
-            <p>An sql_comments extension has been added for setting SQL comments on
-            queries:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment</span>&#x000A;<span class="ruby-comment">#</span></pre>
-            
-            <p>All consecutive whitespace in the comment is replaced by a single space,
-            and the comment ends in a newline so that it works correctly in subqueries.</p>
-            
-            <p>This extension is mostly useful if you are doing analysis of your database
-            server query log and want to include higher level information about the
-            query in the comment.</p>
-            </li><li>
-            <p>A server_logging extension has been added, which includes server/shard
-            information in the query log, if connection info is being logged.</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_logging</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_connection_info</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># Logged: (0.000004s) (conn: 9712828677240, server: read_only)</span>&#x000A;<span class="ruby-comment">#         SELECT 1 AS v LIMIT 1 </span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># Logged: (0.000003s) (conn: 9712534040260, server: default)</span>&#x000A;<span class="ruby-comment">#         INSERT INTO a (b) VALUES (1)</span></pre>
-            </li><li>
-            <p>On PostgreSQL, Database#full_text_search now supports a :headline option
-            for adding an extract of the matched text to the SELECT list.</p>
-            </li><li>
-            <p>Sequel::Postgres::PGRange#cover? has been added to the pg_range extension,
-            which works with empty, unbounded, and exclusive beginning ranges. 
-            Previously, using cover? with these ranges would raise an exception.  Note
-            that cover? is now always defined, where previously it was only defined on
-            ruby 1.9+.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The jdbc adapters now work correctly on JRuby 9.1.  Previously, some parts
-            were broken on JRuby 9.1 due to frozen string literal issues.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel/Dataset.html#method-i-to_hash">Sequel::Dataset#to_hash</a>
-            and to_hash_groups now work correctly for model datasets doing eager
-            loading.</p>
-            </li><li>
-            <p>Using <a
-            href="../../../classes/Sequel/Database.html#method-i-transaction">Sequel::Database#transaction</a>
-            with the :rollback=&gt;:always option now automatically uses a savepoint if
-            supported when run inside another transaction.  If savepoints are not
-            supported, using :rollback=&gt;:always inside a transaction will now raise
-            an exception.</p>
-            </li><li>
-            <p>The delay_add_association plugin now handles hashes and primary keys passed
-            to the add_* association methods.</p>
-            </li><li>
-            <p>The json_serializer :include option now works correctly when using
-            *_to_many associations with the association_proxies plugin.</p>
-            </li><li>
-            <p>The schema_dumper extension now recognizes bool as a boolean type, for
-            consistency with the Database schema parser.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Custom adapters should switch from using log_yield to log_connection_yield
-            so that they work correctly when using log_connection_info.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.35.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.35.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.35.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-07-14 14:38:07 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Forwards+Compatibility">Forwards Compatibility<span><a href="#label-Forwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Ruby 2.4 will unify the Fixnum and Bignum classes into the Integer class,
+making both Fixnum and Bignum references to Integer. This will have the
+affect of changing the behavior of <a
+href="../../../classes/Sequel.html">Sequel</a> migrations that use a
+reference to the Bignum class.</p>
+
+<p>For example, code like this will change behavior in ruby 2.4:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> <span class="ruby-value">:column</span>, <span class="ruby-constant">Bignum</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-constant">Bignum</span>))</pre>
+
+<p>as this references the Bignum class. On ruby &lt;2.4, this will create a
+64-bit integer column, on ruby 2.4+, it will create a 32-bit integer
+column.</p>
+
+<p>Code like this will be fine and does not need changing:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Bignum</span> <span class="ruby-value">:column</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>as this calls the Bignum method.</p>
+
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the :Bignum
+symbol as a generic type, so you can now switch references to the Bignum
+class to the :Bignum symbol whenever you want a generic 64-bit integer
+type:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_column</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:Bignum</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-value">:Bignum</span>))</pre>
+
+<p>Note that you should only do this if you are using <a
+href="../../../classes/Sequel.html">Sequel</a> 4.35.0+, as previous
+versions of <a href="../../../classes/Sequel.html">Sequel</a> will treat
+the :Bignum symbol as a database-specific type named Bignum.</p>
+</li></ul>
+
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A <a
+href="../../../classes/Sequel/Database.html#attribute-i-log_connection_info">Sequel::Database#log_connection_info</a>
+accessor has been added.  If set to true, this includes connection
+information in Sequel&#39;s query log.  In threaded connection pools (the
+default), this makes it simple to see which connection is executing which
+queries.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_connection_info</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># Logged: (0.000004s) (conn: 9713390226040) SELECT 1 AS v LIMIT</span></pre>
+</li><li>
+<p>Sequel::Model#lock! now supports an optional lock style, instead of always
+using FOR UPDATE (which is still the default):</p>
+
+<pre class="ruby"><span class="ruby-constant">Example</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">lock!</span>(<span class="ruby-string">&#39;FOR NO KEY UPDATE&#39;</span>)&#x000A;<span class="ruby-comment">#=&gt; SELECT * FROM examples WHERE id = 1 FOR NO KEY UPDATE LIMIT 1</span></pre>
+</li><li>
+<p><a
+href="../../../classes/Sequel/Dataset.html#method-i-skip_locked">Sequel::Dataset#skip_locked</a>
+has been added, which skips locked rows when returning query results. This
+is useful whenever you are implementing a queue or similar data structure. 
+Currently, this is supported on PostgreSQL 9.5+, Oracle, and Microsoft SQL
+Server.</p>
+</li><li>
+<p>An sql_comments extension has been added for setting SQL comments on
+queries:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment</span>&#x000A;<span class="ruby-comment">#</span></pre>
+
+<p>All consecutive whitespace in the comment is replaced by a single space,
+and the comment ends in a newline so that it works correctly in subqueries.</p>
+
+<p>This extension is mostly useful if you are doing analysis of your database
+server query log and want to include higher level information about the
+query in the comment.</p>
+</li><li>
+<p>A server_logging extension has been added, which includes server/shard
+information in the query log, if connection info is being logged.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_logging</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_connection_info</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># Logged: (0.000004s) (conn: 9712828677240, server: read_only)</span>&#x000A;<span class="ruby-comment">#         SELECT 1 AS v LIMIT 1</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># Logged: (0.000003s) (conn: 9712534040260, server: default)</span>&#x000A;<span class="ruby-comment">#         INSERT INTO a (b) VALUES (1)</span></pre>
+</li><li>
+<p>On PostgreSQL, Database#full_text_search now supports a :headline option
+for adding an extract of the matched text to the SELECT list.</p>
+</li><li>
+<p>Sequel::Postgres::PGRange#cover? has been added to the pg_range extension,
+which works with empty, unbounded, and exclusive beginning ranges. 
+Previously, using cover? with these ranges would raise an exception.  Note
+that cover? is now always defined, where previously it was only defined on
+ruby 1.9+.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The jdbc adapters now work correctly on JRuby 9.1.  Previously, some parts
+were broken on JRuby 9.1 due to frozen string literal issues.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel/Dataset.html#method-i-to_hash">Sequel::Dataset#to_hash</a>
+and to_hash_groups now work correctly for model datasets doing eager
+loading.</p>
+</li><li>
+<p>Using <a
+href="../../../classes/Sequel/Database.html#method-i-transaction">Sequel::Database#transaction</a>
+with the :rollback=&gt;:always option now automatically uses a savepoint if
+supported when run inside another transaction.  If savepoints are not
+supported, using :rollback=&gt;:always inside a transaction will now raise
+an exception.</p>
+</li><li>
+<p>The delay_add_association plugin now handles hashes and primary keys passed
+to the add_* association methods.</p>
+</li><li>
+<p>The json_serializer :include option now works correctly when using
+*_to_many associations with the association_proxies plugin.</p>
+</li><li>
+<p>The schema_dumper extension now recognizes bool as a boolean type, for
+consistency with the Database schema parser.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Custom adapters should switch from using log_yield to log_connection_yield
+so that they work correctly when using log_connection_info.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

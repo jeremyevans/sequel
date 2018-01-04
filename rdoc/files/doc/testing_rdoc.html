@@ -1,264 +1,266 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>testing.rdoc</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>testing.rdoc</h1>
-        <div class='paths'>
-          doc/testing.rdoc
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-12-19 10:23:31 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Testing+with+Sequel">Testing with <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-Testing+with+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p>Whether or not you use <a href="../../classes/Sequel.html">Sequel</a> in
-            your application, you are usually going to want to have tests that ensure
-            that your code works.  When you are using <a
-            href="../../classes/Sequel.html">Sequel</a>, it&#39;s helpful to integrate
-            it into your testing framework, and it&#39;s generally best to run each
-            test in its own transaction if possible.  That keeps all tests isolated
-            from each other, and it&#39;s simple as it handles all of the cleanup for
-            you.  <a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t ship with
-            helpers for common libraries, as the exact code you need is often
-            application-specific, but this page offers some examples that you can
-            either use directly or build on.</p>
-            
-            <h2 id="label-Transactional+tests">Transactional tests<span><a href="#label-Transactional+tests">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>These run each test in its own transaction, the recommended way to test.</p>
-            
-            <h3 id="label-minitest-2Fspec">minitest/spec<span><a href="#label-minitest-2Fspec">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <h4 id="label-with+minitest-hooks">with minitest-hooks<span><a href="#label-with+minitest-hooks">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;minitest/hooks/default&#39;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">HooksSpec</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">around</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>, :<span class="ruby-identifier">auto_savepoint=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h4 id="label-without+minitest-hooks">without minitest-hooks<span><a href="#label-without+minitest-hooks">&para;</a> <a href="#top">&uarr;</a></span></h4>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">Spec</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>, :<span class="ruby-identifier">auto_savepoint=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h3 id="label-minitest-2Ftest">minitest/test<span><a href="#label-minitest-2Ftest">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <pre class="ruby"><span class="ruby-comment"># Use this class as the base class for your tests</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">SequelTestCase</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">Test</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>, :<span class="ruby-identifier">auto_savepoint=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h3 id="label-rspec+-3E-3D+2.8">rspec &gt;= 2.8<span><a href="#label-rspec+-3E-3D+2.8">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <pre class="ruby"><span class="ruby-constant">RSpec</span>.<span class="ruby-identifier">configure</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">c</span>.<span class="ruby-identifier">around</span>(:<span class="ruby-identifier">each</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">example</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>, :<span class="ruby-identifier">auto_savepoint=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-identifier">example</span>.<span class="ruby-identifier">run</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h2 id="label-Transactional+testing+with+multiple+databases">Transactional testing with multiple databases<span><a href="#label-Transactional+testing+with+multiple+databases">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>You can use the <a
-            href="../../classes/Sequel.html#method-c-transaction">Sequel.transaction</a>
-            method to run a transaction on multiple databases, rolling all of them
-            back.  Instead of:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>)</pre>
-            
-            <p>Use <a
-            href="../../classes/Sequel.html#method-c-transaction">Sequel.transaction</a>
-            with an array of databases:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">transaction</span>([<span class="ruby-constant">DB1</span>, <span class="ruby-constant">DB2</span>, <span class="ruby-constant">DB3</span>], :<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>)</pre>
-            
-            <h2 id="label-Transactional+testing+with+savepoints">Transactional testing with savepoints<span><a href="#label-Transactional+testing+with+savepoints">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Using minitest/spec and minitest-hooks, and assuming your database supports
-            it, you can use transactions around entire test suites, using savepoints
-            around each test.  This can sigificantly speed up any test suite where
-            there is a lot of shared setup in a before all hook.  By using savepoints
-            per test, each test is isolated from each other, rolling back changes after
-            it completes, and by using transactions per test suite, you only pay the
-            cost to load the data once for the test suite, and it is automatically
-            rolled back after the test suite completes.</p>
-            
-            <p>Example:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;minitest/hooks/default&#39;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">HooksSpec</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">around</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>, :<span class="ruby-identifier">savepoint=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">auto_savepoint=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">around_all</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">describe</span> <span class="ruby-string">&quot;some large test suite&quot;</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">before</span>(:<span class="ruby-identifier">all</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">import</span> <span class="ruby-comment"># Large number of rows</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h2 id="label-Nontransactional+tests">Nontransactional tests<span><a href="#label-Nontransactional+tests">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>In some cases, it is not possible to use transactions.  For example, if you
-            are testing a web application that is running in a separate process, you
-            don&#39;t have access to that process&#39;s database connections, so you
-            can&#39;t run your examples in transactions.  In that case, the best way to
-            handle things is to cleanup after each test by deleting or truncating the
-            database tables used in the test.</p>
-            
-            <p>The order in which you delete/truncate the tables is important if you are
-            using referential integrity in your database (which you should be doing). 
-            If you are using referential integrity, you need to make sure to delete in
-            tables referencing other tables before the tables that are being
-            referenced.  For example, if you have an <code>albums</code> table with an
-            <code>artist_id</code> field referencing the <code>artists</code> table,
-            you want to delete/truncate the <code>albums</code> table before the
-            <code>artists</code> table.  Note that if you have cyclic references in
-            your database, you will probably need to write your own custom cleaning
-            code.</p>
-            
-            <h3 id="label-minitest-2Fspec+or+rspec">minitest/spec or rspec<span><a href="#label-minitest-2Fspec+or+rspec">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <pre class="ruby"><span class="ruby-identifier">describe</span> <span class="ruby-string">&quot;some test suite&quot;</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">after</span> <span class="ruby-keyword">do</span>&#x000A;    [:<span class="ruby-identifier">table1</span>, :<span class="ruby-identifier">table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">truncate</span>}&#x000A;    <span class="ruby-comment"># or</span>&#x000A;    [:<span class="ruby-identifier">table1</span>, :<span class="ruby-identifier">table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">delete</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h3 id="label-minitest-2Ftest">minitest/test<span><a href="#label-minitest-2Ftest">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">SomeTestClass</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">Test</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">teardown</span>&#x000A;    [:<span class="ruby-identifier">table1</span>, :<span class="ruby-identifier">table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">truncate</span>}&#x000A;    <span class="ruby-comment"># or</span>&#x000A;    [:<span class="ruby-identifier">table1</span>, :<span class="ruby-identifier">table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">delete</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h1 id="label-Testing+Sequel+Itself">Testing <a href="../../classes/Sequel.html">Sequel</a> Itself<span><a href="#label-Testing+Sequel+Itself">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p><a href="../../classes/Sequel.html">Sequel</a> has multiple separate test
-            suites.  All test suites use minitest/spec, with the minitest-hooks and
-            minitest-shared_description extensions.</p>
-            
-            <h2 id="label-rake">rake<span><a href="#label-rake">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The default rake task runs Sequel&#39;s core, model, plugin, and extension
-            specs, the same as <code>rake spec</code> or <code>rake spec_core&#x000A;spec_model spec_plugin</code>.</p>
-            
-            <h2 id="label-rake+spec_core">rake spec_core<span><a href="#label-rake+spec_core">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The <code>spec_core</code> rake task runs Sequel&#39;s core specs.  These
-            specs use a mocked database connection, and test for specific SQL used and
-            for generally correct behavior.</p>
-            
-            <h2 id="label-rake+spec_model">rake spec_model<span><a href="#label-rake+spec_model">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The <code>spec_model</code> rake task runs Sequel&#39;s model specs.  These
-            specs also use a mocked database connection, and operate similar to the
-            core tests.</p>
-            
-            <h2 id="label-rake+spec_plugin">rake spec_plugin<span><a href="#label-rake+spec_plugin">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The <code>spec_plugin</code> rake task runs the specs for the plugins and
-            extensions that ship with <a href="../../classes/Sequel.html">Sequel</a>. 
-            These also use a mocked database connection, and operate very similarly to
-            the general <a href="../../classes/Sequel.html">Sequel</a> core and model
-            specs.</p>
-            
-            <h2 id="label-rake+spec_core_ext">rake spec_core_ext<span><a href="#label-rake+spec_core_ext">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The <code>spec_core_ext</code> rake task runs the specs for the <a
-            href="core_extensions_rdoc.html">core_extensions</a> extension.  These are
-            run separately from the other extension tests to make sure none of the
-            other extensions require the core_extensions.</p>
-            
-            <h2 id="label-rake+spec_bin">rake spec_bin<span><a href="#label-rake+spec_bin">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The <code>spec_bin</code> rake task runs the specs for bin/sequel.  These
-            use an SQLite3 database, and require either the sqlite3 (non-JRuby) or
-            jdbc-sqlite3 (JRuby) gem.</p>
-            
-            <h2 id="label-rake+spec_adapter+-28e.g.+rake+spec_postgres-29">rake spec_<em>adapter</em> (e.g. rake spec_postgres)<span><a href="#label-rake+spec_adapter+-28e.g.+rake+spec_postgres-29">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>The <code>spec_<em>adapter</em></code> specs run against a real database
-            connection with nothing mocked, and test for correct results.  They are
-            slower than the standard specs, but they will catch errors that are mocked
-            out by the default specs, as well as show issues that only occur on a
-            certain database, adapter, or a combination of the two.</p>
-            
-            <p>These specs are broken down into two parts.  For each database, there are
-            specific specs that only apply to that database, and these are called the
-            adapter specs.  There are also shared specs that apply to all (or almost
-            all) databases, these are called the integration specs. For database types
-            that don&#39;t have specific adapter tests, you can use <code>rake&#x000A;spec_integration</code> to just run the shared integration tests.</p>
-            
-            <h2 id="label-Environment+variables">Environment variables<span><a href="#label-Environment+variables">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p><a href="../../classes/Sequel.html">Sequel</a> uses environment variables
-            when testing to specify either the database to be tested or specify how
-            testing should be done.  You can also specify the databases to test by
-            copying <code>spec/spec_config.rb.example</code> to
-            <code>spec/spec_config.rb</code> and modifying it.  See that file for
-            details.  It may be necessary to use <code>spec_config.rb</code> as opposed
-            to an environment variable if your database connection cannot be specified
-            by a connection string.</p>
-            
-            <p><a href="../../classes/Sequel.html">Sequel</a> does not create test
-            databases automatically, except for file-based databases such as
-            SQLite/H2/HSQLDB/Derby.  It&#39;s up to the user to create the test
-            databases manually and give <a href="../../classes/Sequel.html">Sequel</a>
-            a valid connection string in an environment variable (or setup the
-            connection object in <code>spec_config.rb</code>).</p>
-            
-            <h3 id="label-Connection+Strings">Connection Strings<span><a href="#label-Connection+Strings">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>The SEQUEL_INTEGRATION_URL environment variable specifies the Database
-            connection URL to use for the adapter and integration specs.  Additionally,
-            when running the adapter specs, you can also use the
-            SEQUEL_<em>ADAPTER</em>_URL environment variable (e.g. SEQUEL_POSTGRES_URL
-            for spec_postgres).</p>
-            
-            <h3 id="label-Other">Other<span><a href="#label-Other">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>SEQUEL_COLUMNS_INTROSPECTION </td><td>
-            <p>Use the columns_introspection extension when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_CONNECTION_VALIDATOR </td><td>
-            <p>Use the connection validator extension when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_DUPLICATE_COLUMNS_HANDLER </td><td>
-            <p>Use the duplicate columns handler extension with value given when running
-            the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_ERROR_SQL </td><td>
-            <p>Use the error_sql extension when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_INDEX_CACHING </td><td>
-            <p>Use the index_caching extension when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_FREEZE_DATABASE </td><td>
-            <p>Freeze the database before running the integration specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_IDENTIFIER_MANGLING </td><td>
-            <p>Use the identifier_mangling extension when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_MODEL_PREPARED_STATEMENTS </td><td>
-            <p>Use the <a href="prepared_statements_rdoc.html">prepared_statements</a>
-            plugin when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_NO_CACHE_ASSOCIATIONS </td><td>
-            <p>Don&#39;t cache association metadata when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_NO_CHECK_SQLS </td><td>
-            <p>Don&#39;t check for specific SQL syntax when running the specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_CHECK_PENDING </td><td>
-            <p>Try running all specs (note, can cause lockups for some adapters), and
-            raise errors for skipped specs that don&#39;t fail</p>
-            </td></tr><tr><td class='label'>SEQUEL_NO_PENDING </td><td>
-            <p>Don&#39;t skip any specs, try running all specs (note, can cause lockups
-            for some adapters)</p>
-            </td></tr><tr><td class='label'>SEQUEL_PG_TIMESTAMPTZ </td><td>
-            <p>Use the pg_timestamptz extension when running the postgres specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_SPLIT_SYMBOLS </td><td>
-            <p>Turn on symbol splitting when running the adapter and integration specs</p>
-            </td></tr><tr><td class='label'>SEQUEL_SYNCHRONIZE_SQL </td><td>
-            <p>Use the synchronize_sql extension when running the specs</p>
-            </td></tr></tbody></table>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>testing.rdoc</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>testing.rdoc
+</h1>
+<div class='paths'>
+doc/testing.rdoc
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-12-19 10:23:31 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Testing+with+Sequel">Testing with <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-Testing+with+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p>Whether or not you use <a href="../../classes/Sequel.html">Sequel</a> in
+your application, you are usually going to want to have tests that ensure
+that your code works.  When you are using <a
+href="../../classes/Sequel.html">Sequel</a>, it&#39;s helpful to integrate
+it into your testing framework, and it&#39;s generally best to run each
+test in its own transaction if possible.  That keeps all tests isolated
+from each other, and it&#39;s simple as it handles all of the cleanup for
+you.  <a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t ship with
+helpers for common libraries, as the exact code you need is often
+application-specific, but this page offers some examples that you can
+either use directly or build on.</p>
+
+<h2 id="label-Transactional+tests">Transactional tests<span><a href="#label-Transactional+tests">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>These run each test in its own transaction, the recommended way to test.</p>
+
+<h3 id="label-minitest-2Fspec">minitest/spec<span><a href="#label-minitest-2Fspec">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<h4 id="label-with+minitest-hooks">with minitest-hooks<span><a href="#label-with+minitest-hooks">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;minitest/hooks/default&#39;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">HooksSpec</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">around</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>, <span class="ruby-value">:auto_savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h4 id="label-without+minitest-hooks">without minitest-hooks<span><a href="#label-without+minitest-hooks">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">Spec</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>, <span class="ruby-value">:auto_savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h3 id="label-minitest-2Ftest">minitest/test<span><a href="#label-minitest-2Ftest">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-comment"># Use this class as the base class for your tests</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">SequelTestCase</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">Test</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>, <span class="ruby-value">:auto_savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h3 id="label-rspec+-3E-3D+2.8">rspec &gt;= 2.8<span><a href="#label-rspec+-3E-3D+2.8">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-constant">RSpec</span>.<span class="ruby-identifier">configure</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">c</span>.<span class="ruby-identifier">around</span>(<span class="ruby-value">:each</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">example</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>, <span class="ruby-value">:auto_savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-identifier">example</span>.<span class="ruby-identifier">run</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h2 id="label-Transactional+testing+with+multiple+databases">Transactional testing with multiple databases<span><a href="#label-Transactional+testing+with+multiple+databases">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>You can use the <a
+href="../../classes/Sequel.html#method-c-transaction">Sequel.transaction</a>
+method to run a transaction on multiple databases, rolling all of them
+back.  Instead of:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>)</pre>
+
+<p>Use <a
+href="../../classes/Sequel.html#method-c-transaction">Sequel.transaction</a>
+with an array of databases:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">transaction</span>([<span class="ruby-constant">DB1</span>, <span class="ruby-constant">DB2</span>, <span class="ruby-constant">DB3</span>], <span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>)</pre>
+
+<h2 id="label-Transactional+testing+with+savepoints">Transactional testing with savepoints<span><a href="#label-Transactional+testing+with+savepoints">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Using minitest/spec and minitest-hooks, and assuming your database supports
+it, you can use transactions around entire test suites, using savepoints
+around each test.  This can sigificantly speed up any test suite where
+there is a lot of shared setup in a before all hook.  By using savepoints
+per test, each test is isolated from each other, rolling back changes after
+it completes, and by using transactions per test suite, you only pay the
+cost to load the data once for the test suite, and it is automatically
+rolled back after the test suite completes.</p>
+
+<p>Example:</p>
+
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;minitest/hooks/default&#39;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">HooksSpec</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">around</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>, <span class="ruby-value">:savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:auto_savepoint</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">around_all</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>){<span class="ruby-keyword">super</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">describe</span> <span class="ruby-string">&quot;some large test suite&quot;</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">before</span>(<span class="ruby-value">:all</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">import</span> <span class="ruby-comment"># Large number of rows</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h2 id="label-Nontransactional+tests">Nontransactional tests<span><a href="#label-Nontransactional+tests">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>In some cases, it is not possible to use transactions.  For example, if you
+are testing a web application that is running in a separate process, you
+don&#39;t have access to that process&#39;s database connections, so you
+can&#39;t run your examples in transactions.  In that case, the best way to
+handle things is to cleanup after each test by deleting or truncating the
+database tables used in the test.</p>
+
+<p>The order in which you delete/truncate the tables is important if you are
+using referential integrity in your database (which you should be doing). 
+If you are using referential integrity, you need to make sure to delete in
+tables referencing other tables before the tables that are being
+referenced.  For example, if you have an <code>albums</code> table with an
+<code>artist_id</code> field referencing the <code>artists</code> table,
+you want to delete/truncate the <code>albums</code> table before the
+<code>artists</code> table.  Note that if you have cyclic references in
+your database, you will probably need to write your own custom cleaning
+code.</p>
+
+<h3 id="label-minitest-2Fspec+or+rspec">minitest/spec or rspec<span><a href="#label-minitest-2Fspec+or+rspec">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-identifier">describe</span> <span class="ruby-string">&quot;some test suite&quot;</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">after</span> <span class="ruby-keyword">do</span>&#x000A;    [<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">truncate</span>}&#x000A;    <span class="ruby-comment"># or</span>&#x000A;    [<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">delete</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h3 id="label-minitest-2Ftest">minitest/test<span><a href="#label-minitest-2Ftest">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">SomeTestClass</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Minitest</span><span class="ruby-operator">::</span><span class="ruby-constant">Test</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">teardown</span>&#x000A;    [<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">truncate</span>}&#x000A;    <span class="ruby-comment"># or</span>&#x000A;    [<span class="ruby-value">:table1</span>, <span class="ruby-value">:table2</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">x</span>).<span class="ruby-identifier">delete</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<h1 id="label-Testing+Sequel+Itself">Testing <a href="../../classes/Sequel.html">Sequel</a> Itself<span><a href="#label-Testing+Sequel+Itself">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p><a href="../../classes/Sequel.html">Sequel</a> has multiple separate test
+suites.  All test suites use minitest/spec, with the minitest-hooks and
+minitest-shared_description extensions.</p>
+
+<h2 id="label-rake">rake<span><a href="#label-rake">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The default rake task runs Sequel&#39;s core, model, plugin, and extension
+specs, the same as <code>rake spec</code> or <code>rake spec_core&#x000A;spec_model spec_plugin</code>.</p>
+
+<h2 id="label-rake+spec_core">rake spec_core<span><a href="#label-rake+spec_core">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The <code>spec_core</code> rake task runs Sequel&#39;s core specs.  These
+specs use a mocked database connection, and test for specific SQL used and
+for generally correct behavior.</p>
+
+<h2 id="label-rake+spec_model">rake spec_model<span><a href="#label-rake+spec_model">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The <code>spec_model</code> rake task runs Sequel&#39;s model specs.  These
+specs also use a mocked database connection, and operate similar to the
+core tests.</p>
+
+<h2 id="label-rake+spec_plugin">rake spec_plugin<span><a href="#label-rake+spec_plugin">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The <code>spec_plugin</code> rake task runs the specs for the plugins and
+extensions that ship with <a href="../../classes/Sequel.html">Sequel</a>. 
+These also use a mocked database connection, and operate very similarly to
+the general <a href="../../classes/Sequel.html">Sequel</a> core and model
+specs.</p>
+
+<h2 id="label-rake+spec_core_ext">rake spec_core_ext<span><a href="#label-rake+spec_core_ext">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The <code>spec_core_ext</code> rake task runs the specs for the <a
+href="core_extensions_rdoc.html">core_extensions</a> extension.  These are
+run separately from the other extension tests to make sure none of the
+other extensions require the core_extensions.</p>
+
+<h2 id="label-rake+spec_bin">rake spec_bin<span><a href="#label-rake+spec_bin">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The <code>spec_bin</code> rake task runs the specs for bin/sequel.  These
+use an SQLite3 database, and require either the sqlite3 (non-JRuby) or
+jdbc-sqlite3 (JRuby) gem.</p>
+
+<h2 id="label-rake+spec_adapter+-28e.g.+rake+spec_postgres-29">rake spec_<em>adapter</em> (e.g. rake spec_postgres)<span><a href="#label-rake+spec_adapter+-28e.g.+rake+spec_postgres-29">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>The <code>spec_<em>adapter</em></code> specs run against a real database
+connection with nothing mocked, and test for correct results.  They are
+slower than the standard specs, but they will catch errors that are mocked
+out by the default specs, as well as show issues that only occur on a
+certain database, adapter, or a combination of the two.</p>
+
+<p>These specs are broken down into two parts.  For each database, there are
+specific specs that only apply to that database, and these are called the
+adapter specs.  There are also shared specs that apply to all (or almost
+all) databases, these are called the integration specs. For database types
+that don&#39;t have specific adapter tests, you can use <code>rake&#x000A;spec_integration</code> to just run the shared integration tests.</p>
+
+<h2 id="label-Environment+variables">Environment variables<span><a href="#label-Environment+variables">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p><a href="../../classes/Sequel.html">Sequel</a> uses environment variables
+when testing to specify either the database to be tested or specify how
+testing should be done.  You can also specify the databases to test by
+copying <code>spec/spec_config.rb.example</code> to
+<code>spec/spec_config.rb</code> and modifying it.  See that file for
+details.  It may be necessary to use <code>spec_config.rb</code> as opposed
+to an environment variable if your database connection cannot be specified
+by a connection string.</p>
+
+<p><a href="../../classes/Sequel.html">Sequel</a> does not create test
+databases automatically, except for file-based databases such as
+SQLite/H2/HSQLDB/Derby.  It&#39;s up to the user to create the test
+databases manually and give <a href="../../classes/Sequel.html">Sequel</a>
+a valid connection string in an environment variable (or setup the
+connection object in <code>spec_config.rb</code>).</p>
+
+<h3 id="label-Connection+Strings">Connection Strings<span><a href="#label-Connection+Strings">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The SEQUEL_INTEGRATION_URL environment variable specifies the Database
+connection URL to use for the adapter and integration specs.  Additionally,
+when running the adapter specs, you can also use the
+SEQUEL_<em>ADAPTER</em>_URL environment variable (e.g. SEQUEL_POSTGRES_URL
+for spec_postgres).</p>
+
+<h3 id="label-Other">Other<span><a href="#label-Other">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>SEQUEL_COLUMNS_INTROSPECTION </td><td>
+<p>Use the columns_introspection extension when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_CONNECTION_VALIDATOR </td><td>
+<p>Use the connection validator extension when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_DUPLICATE_COLUMNS_HANDLER </td><td>
+<p>Use the duplicate columns handler extension with value given when running
+the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_ERROR_SQL </td><td>
+<p>Use the error_sql extension when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_INDEX_CACHING </td><td>
+<p>Use the index_caching extension when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_FREEZE_DATABASE </td><td>
+<p>Freeze the database before running the integration specs</p>
+</td></tr><tr><td class='label'>SEQUEL_IDENTIFIER_MANGLING </td><td>
+<p>Use the identifier_mangling extension when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_MODEL_PREPARED_STATEMENTS </td><td>
+<p>Use the <a href="prepared_statements_rdoc.html">prepared_statements</a>
+plugin when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_NO_CACHE_ASSOCIATIONS </td><td>
+<p>Don&#39;t cache association metadata when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_NO_CHECK_SQLS </td><td>
+<p>Don&#39;t check for specific SQL syntax when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_CHECK_PENDING </td><td>
+<p>Try running all specs (note, can cause lockups for some adapters), and
+raise errors for skipped specs that don&#39;t fail</p>
+</td></tr><tr><td class='label'>SEQUEL_NO_PENDING </td><td>
+<p>Don&#39;t skip any specs, try running all specs (note, can cause lockups
+for some adapters)</p>
+</td></tr><tr><td class='label'>SEQUEL_PG_TIMESTAMPTZ </td><td>
+<p>Use the pg_timestamptz extension when running the postgres specs</p>
+</td></tr><tr><td class='label'>SEQUEL_SPLIT_SYMBOLS </td><td>
+<p>Turn on symbol splitting when running the adapter and integration specs</p>
+</td></tr><tr><td class='label'>SEQUEL_SYNCHRONIZE_SQL </td><td>
+<p>Use the synchronize_sql extension when running the specs</p>
+</td></tr></tbody></table>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

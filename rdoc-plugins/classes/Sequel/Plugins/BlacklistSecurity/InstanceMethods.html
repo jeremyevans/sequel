@@ -1,104 +1,109 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::BlacklistSecurity::InstanceMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::BlacklistSecurity::InstanceMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/blacklist_security_rb.html">lib/sequel/plugins/blacklist_security.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-set_except">set_except</a></li>
-              <li><a href="#method-i-update_except">update_except</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-set_except'>
-                <a name='method-i-set_except'></a>
-                <div class='synopsis'>
-                  <span class='name'>set_except</span>
-                  <span class='arguments'>(hash, *except)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set all values using the entries in the hash, except for the keys given in
-                  except.  You should probably use <code>set_fields</code> instead of this
-                  method, as blacklist approaches to security are a bad idea.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_except</span>({<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">hometown</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_except-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-set_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-update_except'>
-                <a name='method-i-update_except'></a>
-                <div class='synopsis'>
-                  <span class='name'>update_except</span>
-                  <span class='arguments'>(hash, *except)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Update all values using the entries in the hash, except for the keys given
-                  in except.  You should probably use <code>update_fields</code> instead of
-                  this method, as blacklist approaches to security are a bad idea.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_except</span>({<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">hometown</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-update_except-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-update_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::BlacklistSecurity::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::BlacklistSecurity::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/blacklist_security_rb.html">lib/sequel/plugins/blacklist_security.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-set_except">set_except</a></li>
+<li><a href="#method-i-update_except">update_except</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-set_except'>
+<a name='method-i-set_except'></a>
+<div class='synopsis'>
+<span class='name'>set_except</span>
+<span class='arguments'>(hash, *except)</span>
+
+</div>
+<div class='description'>
+
+<p>Set all values using the entries in the hash, except for the keys given in
+except.  You should probably use <code>set_fields</code> instead of this
+method, as blacklist approaches to security are a bad idea.</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">set_except</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:hometown</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;Jim&#39;</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_except-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-update_except'>
+<a name='method-i-update_except'></a>
+<div class='synopsis'>
+<span class='name'>update_except</span>
+<span class='arguments'>(hash, *except)</span>
+
+</div>
+<div class='description'>
+
+<p>Update all values using the entries in the hash, except for the keys given
+in except.  You should probably use <code>update_fields</code> instead of
+this method, as blacklist approaches to security are a bad idea.</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_except</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, <span class="ruby-value">:hometown</span>) <span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_except-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-update_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

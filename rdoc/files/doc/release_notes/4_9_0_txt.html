@@ -1,211 +1,213 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.9.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.9.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.9.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2014-04-01 10:01:57 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset::PlaceholderLiteralizer has been added as an optimization
-            framework.  This allows you to record changes to a given dataset using
-            placeholder arguments, and later quickly execute the query providing values
-            for the placeholders.  This is similar in idea to prepared statements,
-            except that the SQL for each query can change depending on the values for
-            the placeholders.</p>
-            
-            <p>Using this optimization framework, generating the SQL for query is about 3x
-            faster, and since SQL generation time is a significant portion of total
-            time for simple queries, simple queries can execute up to 50% faster.</p>
-            
-            <p>There are two APIs for this optimization framework.  There is a lower level
-            dataset API:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.&#x000A; <span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1 </span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], <span class="ruby-node">%w&quot;foo bar&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id IN (1, 2)) AND</span>&#x000A;<span class="ruby-comment">#   (name NOT IN (&#39;foo&#39;, &#39;bar&#39;))) LIMIT 1</span></pre>
-            
-            <p>There is also a higher level model API (Model.finder):</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-comment"># Given class method that returns a dataset</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">by_id_and_not_name</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">not_name</span>)&#x000A;    <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">not_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Create optimized method that returns first value</span>&#x000A;  <span class="ruby-identifier">finder</span> :<span class="ruby-identifier">by_id_and_not_name</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Call optimized method</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">first_by_id_and_not_name</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span></pre>
-            
-            <p>Model.finder defaults to creating a method that returns the first matching
-            row, but using the :type option you can create methods that call each, all,
-            or get.  There is also an option to choose the method name (:name), as well
-            as one to specify the number of arguments to use if the method doesn&#39;t
-            take a fixed number (:arity).</p>
-            
-            <p>Finally, Model.find, .first, and .first! now automatically use an optimized
-            finder if given a single argument. Model.[] uses an optimized finder if
-            given a single hash, and Model.[], .with_pk, and .with_pk! use an optimized
-            finder if the model has a composite primary key.  In all of these cases,
-            these methods are about 50% faster than before.</p>
-            </li><li>
-            <p>The pure-ruby PostgreSQL array parser that ships with <a
-            href="../../../classes/Sequel.html">Sequel</a> has been replaced with a
-            strscan-based parser.  This parser avoids O(n^2) performance for arrays
-            with multibyte strings, and in general is much faster.  Parsing an array
-            with a single string with 100,000 multibyte characters is about 1000x
-            faster, and now about half the speed of the C implementation in sequel_pg.</p>
-            </li><li>
-            <p>Dataset#paged_each now has a :strategy=&gt;:filter option that dramatically
-            improves performance, especially if the columns being ordered by are
-            indexed.</p>
-            
-            <p>Unfortunately, there are enough corner cases to this approach that it
-            cannot be used by default.  At the least, the dataset needs to be selecting
-            the columns it is ordering by, not aliasing the columns it is ordering by
-            in the SELECT clause, not have NULLs in any of the columns being ordered
-            by, and not itself use a limit or offset.</p>
-            
-            <p>If you are ordering by expressions that are not simple column values, you
-            can provide a :filter_value option proc that takes the last retrieved row
-            and array of order by expressions, and returns  an array of values in the
-            last retrieved row for those order by expressions.</p>
-            </li><li>
-            <p>In the postgres adapter, Dataset#paged_each now automatically uses a cursor
-            for improved performance.</p>
-            </li><li>
-            <p>In the mysql2 adapter, Dataset#paged_each now automatically uses streaming
-            for improved performance, if streaming is supported.</p>
-            </li><li>
-            <p>Dataset#with_sql_{each,all,first,single_value,insert,update} have been
-            added.  These methods take specific SQL and execute it on the database,
-            returning the appropriate value.  They are significantly faster than the
-            previous approach of
-            with_sql(SQL).{each,all,first,single_value,insert,update}, as they
-            don&#39;t require cloning the dataset.</p>
-            </li></ul>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Database#create_join_table! and create_join_table? have been added, for
-            consistency with create_table! and create_table?.</p>
-            </li><li>
-            <p>A :hold option has been added to Dataset#use_cursor in the postgres
-            adapter, which uses WITH HOLD in the query, allowing for usage of the
-            cursor outside the enclosing transaction.  When :hold is used, <a
-            href="../../../classes/Sequel.html">Sequel</a> does not automatically use a
-            transaction around the cursor call.</p>
-            </li><li>
-            <p>Dataset#where_current_of has been added to the postgres adapter, for
-            updating rows based on a cursor&#39;s current position.  This can be used
-            to update a large dataset where new values depend on some ruby method,
-            without keeping all rows in memory.</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ruby_method</span>(<span class="ruby-identifier">row</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>A current_datetime_timestamp extension has been added, for creating
-            Time/DateTime instances that are literalized as CURRENT_TIMESTAMP.  When
-            the dataset uses this extension, models that use the touch and timestamps
-            plugins will use CURRENT_TIMESTAMP for the timestamps.</p>
-            </li><li>
-            <p>The jdbc adapter now supports a :driver option, useful when <a
-            href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t have direct
-            support for the underlying driver, and where
-            java.sql.DriverManager.getConnection does not work correctly due to Java
-            class loading issues.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Multiple corner cases in Dataset#eager_graph have been fixed.</p>
-            </li><li>
-            <p>Calling Dataset#columns when using the eager_each plugin no longer triggers
-            eager loading.</p>
-            </li><li>
-            <p>Database#column_schema_to_ruby_default is now a public method in the
-            schema_dumper extension.</p>
-            </li><li>
-            <p>When validating associated objects for one_to_many and one_to_one
-            associations in the nested_attributes plugin, don&#39;t remove column
-            values if the association&#39;s foreign key is the associated model&#39;s
-            primary key.</p>
-            </li><li>
-            <p>On PostgreSQL, Dataset#disable_insert_returning has been added back.  This
-            disables the automatic use of RETURNING for INSERTs for the dataset.  This
-            is necessary in cases where INSERT RETURNING doesn&#39;t work, such as
-            PostgreSQL &lt;8.2 (or PostgreSQL variants that forked before 8.2), or when
-            using partitioning with trigger functions, or conditional rules.</p>
-            
-            <p>Note that if you use disable_insert_returning, insert will not return the
-            autoincremented primary key.  You need to call currval or lastval manually
-            using the same connection to get the value, or use nextval to get the value
-            to use before inserting.</p>
-            </li><li>
-            <p>The pg_array extension now uses the correct database type when typecasting
-            values for smallint, oid, real, character, and varchar arrays.  Previously,
-            <a href="../../../classes/Sequel.html">Sequel</a> did not use the correct
-            database type in some cases (e.g. text[] for a varchar[]), which resulted
-            in errors if the value was used in a filter expression.</p>
-            </li><li>
-            <p>Additional unique constraint violations are now recognized on SQLite.</p>
-            </li><li>
-            <p>Check constraint violations are now recognized on SQLite &gt;=3.8.2.</p>
-            </li><li>
-            <p>Adapters that emulate bitwise operators now do so using an append only
-            design, similar to how all other queries are built in <a
-            href="../../../classes/Sequel.html">Sequel</a>.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>In some cases <a href="../../../classes/Sequel.html">Sequel</a> no longer
-            adds superfluous parentheses when constructing SQL strings.  If you are
-            testing for specific SQL, this can cause test failures.</p>
-            </li><li>
-            <p>The pg_array extension no longer recognizes the :typecast_method option
-            when registering an array type.  The option allowed reuse of an existing
-            typecast method, but as that results in an incorrect type at the database
-            level, the option was fundementally broken.</p>
-            </li><li>
-            <p>The internals of the PostgreSQL array parser have changed.  If you were
-            relying on them, you&#39;ll need to update your code.</p>
-            </li><li>
-            <p>Dataset#complex_expression_arg_pairs private method now returns nested
-            expression objects instead of an already literalized string in some cases. 
-            Custom adapters that call this method will probably need to be changed. 
-            It&#39;s recommended that such adapters switch to using the new
-            Dataset#complex_expression_emulate_append method if possible.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.9.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.9.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.9.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2014-04-01 10:01:57 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset::PlaceholderLiteralizer has been added as an optimization
+framework.  This allows you to record changes to a given dataset using
+placeholder arguments, and later quickly execute the query providing values
+for the placeholders.  This is similar in idea to prepared statements,
+except that the SQL for each query can change depending on the values for
+the placeholders.</p>
+
+<p>Using this optimization framework, generating the SQL for query is about 3x
+faster, and since SQL generation time is a significant portion of total
+time for simple queries, simple queries can execute up to 50% faster.</p>
+
+<p>There are two APIs for this optimization framework.  There is a lower level
+dataset API:</p>
+
+<pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.&#x000A; <span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], <span class="ruby-node">%w&quot;foo bar&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id IN (1, 2)) AND</span>&#x000A;<span class="ruby-comment">#   (name NOT IN (&#39;foo&#39;, &#39;bar&#39;))) LIMIT 1</span></pre>
+
+<p>There is also a higher level model API (Model.finder):</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-comment"># Given class method that returns a dataset</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">by_id_and_not_name</span>(<span class="ruby-identifier">id</span>, <span class="ruby-identifier">not_name</span>)&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">not_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Create optimized method that returns first value</span>&#x000A;  <span class="ruby-identifier">finder</span> <span class="ruby-value">:by_id_and_not_name</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Call optimized method</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">first_by_id_and_not_name</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1</span></pre>
+
+<p>Model.finder defaults to creating a method that returns the first matching
+row, but using the :type option you can create methods that call each, all,
+or get.  There is also an option to choose the method name (:name), as well
+as one to specify the number of arguments to use if the method doesn&#39;t
+take a fixed number (:arity).</p>
+
+<p>Finally, Model.find, .first, and .first! now automatically use an optimized
+finder if given a single argument. Model.[] uses an optimized finder if
+given a single hash, and Model.[], .with_pk, and .with_pk! use an optimized
+finder if the model has a composite primary key.  In all of these cases,
+these methods are about 50% faster than before.</p>
+</li><li>
+<p>The pure-ruby PostgreSQL array parser that ships with <a
+href="../../../classes/Sequel.html">Sequel</a> has been replaced with a
+strscan-based parser.  This parser avoids O(n^2) performance for arrays
+with multibyte strings, and in general is much faster.  Parsing an array
+with a single string with 100,000 multibyte characters is about 1000x
+faster, and now about half the speed of the C implementation in sequel_pg.</p>
+</li><li>
+<p>Dataset#paged_each now has a :strategy=&gt;:filter option that dramatically
+improves performance, especially if the columns being ordered by are
+indexed.</p>
+
+<p>Unfortunately, there are enough corner cases to this approach that it
+cannot be used by default.  At the least, the dataset needs to be selecting
+the columns it is ordering by, not aliasing the columns it is ordering by
+in the SELECT clause, not have NULLs in any of the columns being ordered
+by, and not itself use a limit or offset.</p>
+
+<p>If you are ordering by expressions that are not simple column values, you
+can provide a :filter_value option proc that takes the last retrieved row
+and array of order by expressions, and returns  an array of values in the
+last retrieved row for those order by expressions.</p>
+</li><li>
+<p>In the postgres adapter, Dataset#paged_each now automatically uses a cursor
+for improved performance.</p>
+</li><li>
+<p>In the mysql2 adapter, Dataset#paged_each now automatically uses streaming
+for improved performance, if streaming is supported.</p>
+</li><li>
+<p>Dataset#with_sql_{each,all,first,single_value,insert,update} have been
+added.  These methods take specific SQL and execute it on the database,
+returning the appropriate value.  They are significantly faster than the
+previous approach of
+with_sql(SQL).{each,all,first,single_value,insert,update}, as they
+don&#39;t require cloning the dataset.</p>
+</li></ul>
+
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#create_join_table! and create_join_table? have been added, for
+consistency with create_table! and create_table?.</p>
+</li><li>
+<p>A :hold option has been added to Dataset#use_cursor in the postgres
+adapter, which uses WITH HOLD in the query, allowing for usage of the
+cursor outside the enclosing transaction.  When :hold is used, <a
+href="../../../classes/Sequel.html">Sequel</a> does not automatically use a
+transaction around the cursor call.</p>
+</li><li>
+<p>Dataset#where_current_of has been added to the postgres adapter, for
+updating rows based on a cursor&#39;s current position.  This can be used
+to update a large dataset where new values depend on some ruby method,
+without keeping all rows in memory.</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:huge_table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">use_cursor</span>(<span class="ruby-value">:rows_per_fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ruby_method</span>(<span class="ruby-identifier">row</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>A current_datetime_timestamp extension has been added, for creating
+Time/DateTime instances that are literalized as CURRENT_TIMESTAMP.  When
+the dataset uses this extension, models that use the touch and timestamps
+plugins will use CURRENT_TIMESTAMP for the timestamps.</p>
+</li><li>
+<p>The jdbc adapter now supports a :driver option, useful when <a
+href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t have direct
+support for the underlying driver, and where
+java.sql.DriverManager.getConnection does not work correctly due to Java
+class loading issues.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Multiple corner cases in Dataset#eager_graph have been fixed.</p>
+</li><li>
+<p>Calling Dataset#columns when using the eager_each plugin no longer triggers
+eager loading.</p>
+</li><li>
+<p>Database#column_schema_to_ruby_default is now a public method in the
+schema_dumper extension.</p>
+</li><li>
+<p>When validating associated objects for one_to_many and one_to_one
+associations in the nested_attributes plugin, don&#39;t remove column
+values if the association&#39;s foreign key is the associated model&#39;s
+primary key.</p>
+</li><li>
+<p>On PostgreSQL, Dataset#disable_insert_returning has been added back.  This
+disables the automatic use of RETURNING for INSERTs for the dataset.  This
+is necessary in cases where INSERT RETURNING doesn&#39;t work, such as
+PostgreSQL &lt;8.2 (or PostgreSQL variants that forked before 8.2), or when
+using partitioning with trigger functions, or conditional rules.</p>
+
+<p>Note that if you use disable_insert_returning, insert will not return the
+autoincremented primary key.  You need to call currval or lastval manually
+using the same connection to get the value, or use nextval to get the value
+to use before inserting.</p>
+</li><li>
+<p>The pg_array extension now uses the correct database type when typecasting
+values for smallint, oid, real, character, and varchar arrays.  Previously,
+<a href="../../../classes/Sequel.html">Sequel</a> did not use the correct
+database type in some cases (e.g. text[] for a varchar[]), which resulted
+in errors if the value was used in a filter expression.</p>
+</li><li>
+<p>Additional unique constraint violations are now recognized on SQLite.</p>
+</li><li>
+<p>Check constraint violations are now recognized on SQLite &gt;=3.8.2.</p>
+</li><li>
+<p>Adapters that emulate bitwise operators now do so using an append only
+design, similar to how all other queries are built in <a
+href="../../../classes/Sequel.html">Sequel</a>.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>In some cases <a href="../../../classes/Sequel.html">Sequel</a> no longer
+adds superfluous parentheses when constructing SQL strings.  If you are
+testing for specific SQL, this can cause test failures.</p>
+</li><li>
+<p>The pg_array extension no longer recognizes the :typecast_method option
+when registering an array type.  The option allowed reuse of an existing
+typecast method, but as that results in an incorrect type at the database
+level, the option was fundementally broken.</p>
+</li><li>
+<p>The internals of the PostgreSQL array parser have changed.  If you were
+relying on them, you&#39;ll need to update your code.</p>
+</li><li>
+<p>Dataset#complex_expression_arg_pairs private method now returns nested
+expression objects instead of an already literalized string in some cases. 
+Custom adapters that call this method will probably need to be changed. 
+It&#39;s recommended that such adapters switch to using the new
+Dataset#complex_expression_emulate_append method if possible.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

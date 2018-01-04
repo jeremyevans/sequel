@@ -1,383 +1,407 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Postgres::JSONBOp</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::JSONBOp
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="JSONBaseOp.html">JSONBaseOp</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p><a href="JSONBaseOp.html">JSONBaseOp</a> subclass for the jsonb type.</p>
-            
-            <p>In the method documentation examples, assume that:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">jsonb_op</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(:<span class="ruby-identifier">jsonb</span>)</pre>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-2D">-</a></li>
-              <li><a href="#method-i-concat">concat</a></li>
-              <li><a href="#method-i-contain_all">contain_all</a></li>
-              <li><a href="#method-i-contain_any">contain_any</a></li>
-              <li><a href="#method-i-contained_by">contained_by</a></li>
-              <li><a href="#method-i-contains">contains</a></li>
-              <li><a href="#method-i-delete_path">delete_path</a></li>
-              <li><a href="#method-i-has_key-3F">has_key?</a></li>
-              <li><a href="#method-i-insert">insert</a></li>
-              <li><a href="#method-i-pg_jsonb">pg_jsonb</a></li>
-              <li><a href="#method-i-pretty">pretty</a></li>
-              <li><a href="#method-i-set">set</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONCAT</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " || ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONTAINED_BY</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " <@ ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONTAINS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " @> ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONTAIN_ALL</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " ?& ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONTAIN_ANY</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " ?| ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DELETE_PATH</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " #- ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>HAS_KEY</td>
-                    <td>=</td>
-                    <td class='context-item-value'>["(".freeze, " ? ".freeze, ")".freeze].freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='aliases-list'>
-              <h2>Public Instance Aliases</h2>
-              <div class='name-list'>
-                <table summary='Public Instance Aliases'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>include?</td>
-                    <td>-&gt;</td>
-                    <td class='context-item-value'><a href="#method-i-has_key-3F">has_key?</a></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-2D'>
-                <a name='method-i-2D'></a>
-                <div class='synopsis'>
-                  <span class='name'>-</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>jsonb expression for deletion of the given argument from the current jsonb.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span> <span class="ruby-operator">-</span> <span class="ruby-string">&quot;a&quot;</span> <span class="ruby-comment"># (jsonb - &#39;a&#39;)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-2D-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-2D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 299</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">-</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-concat'>
-                <a name='method-i-concat'></a>
-                <div class='synopsis'>
-                  <span class='name'>concat</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>jsonb expression for concatenation of the given jsonb into the current
-                  jsonb.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">concat</span>(:<span class="ruby-identifier">h</span>) <span class="ruby-comment"># (jsonb || h)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-concat-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-concat-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 307</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">concat</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">CONCAT</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-contain_all'>
-                <a name='method-i-contain_all'></a>
-                <div class='synopsis'>
-                  <span class='name'>contain_all</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Check if the receiver contains all of the keys in the given array:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contain_all</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (jsonb ?&amp; a)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-contain_all-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-contain_all-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 314</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_all</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-contain_any'>
-                <a name='method-i-contain_any'></a>
-                <div class='synopsis'>
-                  <span class='name'>contain_any</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Check if the receiver contains any of the keys in the given array:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contain_any</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (jsonb ?| a)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-contain_any-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-contain_any-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 321</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_any</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-contained_by'>
-                <a name='method-i-contained_by'></a>
-                <div class='synopsis'>
-                  <span class='name'>contained_by</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Check if the other jsonb contains all entries in the receiver:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">h</span>) <span class="ruby-comment"># (jsonb &lt;@ h)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-contained_by-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-contained_by-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 335</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-contains'>
-                <a name='method-i-contains'></a>
-                <div class='synopsis'>
-                  <span class='name'>contains</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Check if the receiver contains all entries in the other jsonb:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">h</span>) <span class="ruby-comment"># (jsonb @&gt; h)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-contains-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-contains-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 328</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-delete_path'>
-                <a name='method-i-delete_path'></a>
-                <div class='synopsis'>
-                  <span class='name'>delete_path</span>
-                  <span class='arguments'>(other)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Removes the given path from the receiver.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">delete_path</span>(:<span class="ruby-identifier">h</span>) <span class="ruby-comment"># (jsonb #- h)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-delete_path-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-delete_path-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 342</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete_path</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">DELETE_PATH</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-has_key-3F'>
-                <a name='method-i-has_key-3F'></a>
-                <div class='synopsis'>
-                  <span class='name'>has_key?</span>
-                  <span class='arguments'>(key)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Check if the receiver contains the given key:</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (jsonb ? &#39;a&#39;)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-has_key-3F-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-has_key-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 349</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-insert'>
-                <a name='method-i-insert'></a>
-                <div class='synopsis'>
-                  <span class='name'>insert</span>
-                  <span class='arguments'>(path, other, insert_after=false)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Inserts the given jsonb value at the given path in the receiver. The
-                  default is to insert the value before the given path, but insert_after can
-                  be set to true to insert it after the given path.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">insert</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>) <span class="ruby-comment"># jsonb_insert(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, false)</span>&#x000A;<span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">insert</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>, <span class="ruby-keyword">true</span>) <span class="ruby-comment"># jsonb_insert(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, true)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 360</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">insert_after</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">insert_after</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pg_jsonb'>
-                <a name='method-i-pg_jsonb'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_jsonb</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the receiver, since it is already a <a
-                  href="JSONBOp.html">JSONBOp</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_jsonb-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 365</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pretty'>
-                <a name='method-i-pretty'></a>
-                <div class='synopsis'>
-                  <span class='name'>pretty</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return a pretty printed version of the receiver as a string expression.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">pretty</span> <span class="ruby-comment"># jsonb_pretty(jsonb)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pretty-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pretty-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 372</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pretty</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:pretty</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-set'>
-                <a name='method-i-set'></a>
-                <div class='synopsis'>
-                  <span class='name'>set</span>
-                  <span class='arguments'>(path, other, create_missing=true)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the given jsonb value at the given path in the receiver. By default,
-                  this will create the value if it does not exist, but create_missing can be
-                  set to false to not create a new value.</p>
-                  
-                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">set</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>) <span class="ruby-comment"># jsonb_set(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, true)</span>&#x000A;<span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">set</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>, <span class="ruby-keyword">false</span>) <span class="ruby-comment"># jsonb_set(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, false)</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-set-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 382</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">create_missing</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:set</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">create_missing</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Postgres::JSONBOp</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::JSONBOp
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="JSONBaseOp.html">JSONBaseOp</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p><a href="JSONBaseOp.html">JSONBaseOp</a> subclass for the jsonb type.</p>
+
+<p>In the method documentation examples, assume that:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(<span class="ruby-value">:jsonb</span>)</pre>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-2D">-</a></li>
+<li><a href="#method-i-concat">concat</a></li>
+<li><a href="#method-i-contain_all">contain_all</a></li>
+<li><a href="#method-i-contain_any">contain_any</a></li>
+<li><a href="#method-i-contained_by">contained_by</a></li>
+<li><a href="#method-i-contains">contains</a></li>
+<li><a href="#method-i-delete_path">delete_path</a></li>
+<li><a href="#method-i-has_key-3F">has_key?</a></li>
+<li><a href="#method-i-insert">insert</a></li>
+<li><a href="#method-i-pg_jsonb">pg_jsonb</a></li>
+<li><a href="#method-i-pretty">pretty</a></li>
+<li><a href="#method-i-set">set</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONCAT</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " || ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONTAINED_BY</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " <@ ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONTAINS</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " @> ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONTAIN_ALL</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " ?& ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONTAIN_ANY</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " ?| ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>DELETE_PATH</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " #- ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>HAS_KEY</td>
+<td>=</td>
+<td class='context-item-value'>["(".freeze, " ? ".freeze, ")".freeze].freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='aliases-list'>
+<h2>Public Instance Aliases</h2>
+<div class='name-list'>
+<table summary='Public Instance Aliases'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>include?</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-has_key-3F">has_key?</a></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-2D'>
+<a name='method-i-2D'></a>
+<div class='synopsis'>
+<span class='name'>-</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>jsonb expression for deletion of the given argument from the current jsonb.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span> <span class="ruby-operator">-</span> <span class="ruby-string">&quot;a&quot;</span> <span class="ruby-comment"># (jsonb - &#39;a&#39;)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-2D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 299</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">-</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-concat'>
+<a name='method-i-concat'></a>
+<div class='synopsis'>
+<span class='name'>concat</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>jsonb expression for concatenation of the given jsonb into the current
+jsonb.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-value">:h</span>) <span class="ruby-comment"># (jsonb || h)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-concat-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-concat-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 307</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">concat</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">CONCAT</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-contain_all'>
+<a name='method-i-contain_all'></a>
+<div class='synopsis'>
+<span class='name'>contain_all</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>Check if the receiver contains all of the keys in the given array:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contain_all</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (jsonb ?&amp; a)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-contain_all-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-contain_all-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 314</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contain_all</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-contain_any'>
+<a name='method-i-contain_any'></a>
+<div class='synopsis'>
+<span class='name'>contain_any</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>Check if the receiver contains any of the keys in the given array:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contain_any</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (jsonb ?| a)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-contain_any-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-contain_any-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 321</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contain_any</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-contained_by'>
+<a name='method-i-contained_by'></a>
+<div class='synopsis'>
+<span class='name'>contained_by</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>Check if the other jsonb contains all entries in the receiver:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contained_by</span>(<span class="ruby-value">:h</span>) <span class="ruby-comment"># (jsonb &lt;@ h)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-contained_by-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-contained_by-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 335</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-contains'>
+<a name='method-i-contains'></a>
+<div class='synopsis'>
+<span class='name'>contains</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>Check if the receiver contains all entries in the other jsonb:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contains</span>(<span class="ruby-value">:h</span>) <span class="ruby-comment"># (jsonb @&gt; h)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-contains-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-contains-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 328</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-delete_path'>
+<a name='method-i-delete_path'></a>
+<div class='synopsis'>
+<span class='name'>delete_path</span>
+<span class='arguments'>(other)</span>
+
+</div>
+<div class='description'>
+
+<p>Removes the given path from the receiver.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">delete_path</span>(<span class="ruby-value">:h</span>) <span class="ruby-comment"># (jsonb #- h)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-delete_path-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-delete_path-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 342</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">delete_path</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">json_op</span>(<span class="ruby-constant">DELETE_PATH</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-has_key-3F'>
+<a name='method-i-has_key-3F'></a>
+<div class='synopsis'>
+<span class='name'>has_key?</span>
+<span class='arguments'>(key)</span>
+
+</div>
+<div class='description'>
+
+<p>Check if the receiver contains the given key:</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (jsonb ? &#39;a&#39;)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-has_key-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-has_key-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 349</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_key?</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-insert'>
+<a name='method-i-insert'></a>
+<div class='synopsis'>
+<span class='name'>insert</span>
+<span class='arguments'>(path, other, insert_after=false)</span>
+
+</div>
+<div class='description'>
+
+<p>Inserts the given jsonb value at the given path in the receiver. The
+default is to insert the value before the given path, but insert_after can
+be set to true to insert it after the given path.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">insert</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>) <span class="ruby-comment"># jsonb_insert(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, false)</span>&#x000A;<span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">insert</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>, <span class="ruby-keyword">true</span>) <span class="ruby-comment"># jsonb_insert(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, true)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 360</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">insert_after</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">insert_after</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-pg_jsonb'>
+<a name='method-i-pg_jsonb'></a>
+<div class='synopsis'>
+<span class='name'>pg_jsonb</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return the receiver, since it is already a <a
+href="JSONBOp.html">JSONBOp</a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_jsonb-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 365</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-pretty'>
+<a name='method-i-pretty'></a>
+<div class='synopsis'>
+<span class='name'>pretty</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Return a pretty printed version of the receiver as a string expression.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">pretty</span> <span class="ruby-comment"># jsonb_pretty(jsonb)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pretty-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-pretty-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 372</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pretty</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:pretty</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-set'>
+<a name='method-i-set'></a>
+<div class='synopsis'>
+<span class='name'>set</span>
+<span class='arguments'>(path, other, create_missing=true)</span>
+
+</div>
+<div class='description'>
+
+<p>Set the given jsonb value at the given path in the receiver. By default,
+this will create the value if it does not exist, but create_missing can be
+set to false to not create a new value.</p>
+
+<pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">set</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>) <span class="ruby-comment"># jsonb_set(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, true)</span>&#x000A;<span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">set</span>([<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>], <span class="ruby-identifier">h</span>, <span class="ruby-keyword">false</span>) <span class="ruby-comment"># jsonb_set(jsonb, ARRAY[&#39;a&#39;, &#39;b&#39;], h, false)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-set-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 382</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set</span>(<span class="ruby-identifier">path</span>, <span class="ruby-identifier">other</span>, <span class="ruby-identifier">create_missing</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:set</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">path</span>), <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>), <span class="ruby-identifier">create_missing</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

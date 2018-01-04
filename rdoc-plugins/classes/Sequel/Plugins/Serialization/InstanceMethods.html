@@ -1,115 +1,122 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::Serialization::InstanceMethods</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::Serialization::InstanceMethods
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../../files/lib/sequel/plugins/serialization_rb.html">lib/sequel/plugins/serialization.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-before_validation">before_validation</a></li>
-              <li><a href="#method-i-deserialized_values">deserialized_values</a></li>
-              <li><a href="#method-i-freeze">freeze</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-before_validation'>
-                <a name='method-i-before_validation'></a>
-                <div class='synopsis'>
-                  <span class='name'>before_validation</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Serialize deserialized values before saving</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_validation-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_validation</span>&#x000A;  <span class="ruby-identifier">serialize_deserialized_values</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-deserialized_values'>
-                <a name='method-i-deserialized_values'></a>
-                <div class='synopsis'>
-                  <span class='name'>deserialized_values</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="../../../Hash.html">Hash</a> of deserialized values, used as a
-                  cache.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-deserialized_values-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-deserialized_values-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 172</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">deserialized_values</span>&#x000A;  <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
-                <div class='synopsis'>
-                  <span class='name'>freeze</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Freeze the deserialized values</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::Serialization::InstanceMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::Serialization::InstanceMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/serialization_rb.html">lib/sequel/plugins/serialization.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-before_validation">before_validation</a></li>
+<li><a href="#method-i-deserialized_values">deserialized_values</a></li>
+<li><a href="#method-i-freeze">freeze</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-before_validation'>
+<a name='method-i-before_validation'></a>
+<div class='synopsis'>
+<span class='name'>before_validation</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Serialize deserialized values before saving</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_validation-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;  <span class="ruby-identifier">serialize_deserialized_values</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-deserialized_values'>
+<a name='method-i-deserialized_values'></a>
+<div class='synopsis'>
+<span class='name'>deserialized_values</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../../../Hash.html">Hash</a> of deserialized values, used as a
+cache.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-deserialized_values-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-deserialized_values-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 172</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">deserialized_values</span>&#x000A;  <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-freeze'>
+<a name='method-i-freeze'></a>
+<div class='synopsis'>
+<span class='name'>freeze</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Freeze the deserialized values</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

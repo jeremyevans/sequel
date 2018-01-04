@@ -1,148 +1,150 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.14.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.14.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.14.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset#grep now accepts :all_patterns, :all_columns, and :case_insensitive
-            options.  Previously, grep would use a case sensitive search where it would
-            match if any pattern matched any column.  These three options give you more
-            control over how the pattern matching will work:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>)&#x000A;<span class="ruby-comment"># WHERE ((a LIKE &#39;%test%&#39;) OR (a LIKE &#39;foo&#39;)</span>&#x000A;<span class="ruby-comment">#    OR (b LIKE &#39;%test%&#39;) OR (b LIKE &#39;foo&#39;))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, :<span class="ruby-identifier">all_patterns=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%foo%&#39;))</span>&#x000A;<span class="ruby-comment">#   AND ((a LIKE &#39;%bar%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, :<span class="ruby-identifier">all_columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (a LIKE &#39;%bar%&#39;))</span>&#x000A;<span class="ruby-comment">#   AND ((b LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>,&#x000A;             :<span class="ruby-identifier">all_patterns=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>,:<span class="ruby-identifier">all_columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE ((a LIKE &#39;%foo%&#39;) AND (b LIKE &#39;%foo%&#39;)</span>&#x000A;<span class="ruby-comment">#   AND (a LIKE &#39;%bar%&#39;) AND (b LIKE &#39;%bar%&#39;))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>, :<span class="ruby-identifier">case_insensitive=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE ((a ILIKE &#39;%test%&#39;) OR (a ILIKE &#39;foo&#39;)</span>&#x000A;<span class="ruby-comment">#    OR (b ILIKE &#39;%test%&#39;) OR (b ILIKE &#39;foo&#39;))</span></pre>
-            </li><li>
-            <p>When using the schema plugin, you can now provide a block to the
-            create_table methods to set the schema and create the table in the same
-            call:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">create_table</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;    <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>The tree plugin now accepts a :single_root option, which uses a before_save
-            hook to attempt to ensure that there is only a single root in the tree.  It
-            also adds a Model.root method to get the single root of the tree.</p>
-            </li><li>
-            <p>The tree plugin now adds a Model#root? instance method to check if the
-            current node is a root of the tree.</p>
-            </li><li>
-            <p>Model#save now takes a :raise_on_failure option which will override the
-            object&#39;s raise_on_save_failure setting.  This makes it easier to get
-            the desired behavior (raise or just return false) in library code without
-            using a begin/ensure block.</p>
-            </li><li>
-            <p>The Database#adapter_scheme instance method was added, which operates the
-            same as the class method.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles the
-            literalization of OCI8::CLOB objects in the Oracle adapter.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>When using the timezone support, <a
-            href="../../../classes/Sequel.html">Sequel</a> will now correctly load
-            times and datetimes in standard time when the current timezone is in
-            daylight time, or vice versa.  Previously, if you tried to to load a time
-            or datetime in December when in July in a timezone that used daylight time,
-            it would be off by an hour.</p>
-            </li><li>
-            <p>The rcte_tree plugin now works correctly when a :conditions option is used.</p>
-            </li><li>
-            <p>The single_table_inheritance plugin now works correctly when the class
-            discriminator column has the same name as an existing ruby method (such as
-            type).</p>
-            </li><li>
-            <p>Database#each_server now works correctly when a connection string is used
-            to connect, instead of an options hash.</p>
-            </li><li>
-            <p>Model#destroy now respects the object&#39;s use_transactions setting,
-            instead of always using a transaction.</p>
-            </li><li>
-            <p>Model#exists? now uses a simpler and faster query.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles the aggregate
-            methods such as count and sum correctly on Microsoft SQL Server when using
-            an ordered dataset with a clause such as DISTINCT or GROUP and without a
-            limit.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles rename_table
-            correctly on Microsoft SQL Server when using a case sensitive collation, or
-            when qualifying the table with a schema.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now parses the schema
-            correctly on Oracle when the same table name is used in multiple schemas.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles
-            OCIInvalidHandle errors when disconnecting in the Oracle adapter.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now raises a <a
-            href="../../../classes/Sequel/Error.html">Sequel::Error</a> instead of an
-            ArgumentError if the current or target migration version does not exist.</p>
-            </li><li>
-            <p>When a mismatched number of composite keys are used in associations, <a
-            href="../../../classes/Sequel.html">Sequel</a> now uses a more detailed
-            error message.</p>
-            </li><li>
-            <p>Significant improvements were made to the Dataset and Model RDoc
-            documentation.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Model#valid? now must accept an optional options hash.</p>
-            </li><li>
-            <p>The Model#save_failure private method was renamed to raise_hook_failure.</p>
-            </li><li>
-            <p>The LOCAL_DATETIME_OFFSET_SECS and LOCAL_DATETIME_OFFSET constants have
-            been removed from the <a href="../../../classes/Sequel.html">Sequel</a>
-            module.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses obj.to_json
-            instead of JSON.generate(obj).  This shouldn&#39;t affect backwards
-            compatibility, but did fix a bug in certain cases.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.14.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.14.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.14.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#grep now accepts :all_patterns, :all_columns, and :case_insensitive
+options.  Previously, grep would use a case sensitive search where it would
+match if any pattern matched any column.  These three options give you more
+control over how the pattern matching will work:</p>
+
+<pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>)&#x000A;<span class="ruby-comment"># WHERE ((a LIKE &#39;%test%&#39;) OR (a LIKE &#39;foo&#39;)</span>&#x000A;<span class="ruby-comment">#    OR (b LIKE &#39;%test%&#39;) OR (b LIKE &#39;foo&#39;))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, <span class="ruby-value">:all_patterns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%foo%&#39;))</span>&#x000A;<span class="ruby-comment">#   AND ((a LIKE &#39;%bar%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>, <span class="ruby-value">:all_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE (((a LIKE &#39;%foo%&#39;) OR (a LIKE &#39;%bar%&#39;))</span>&#x000A;<span class="ruby-comment">#   AND ((b LIKE &#39;%foo%&#39;) OR (b LIKE &#39;%bar%&#39;)))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%foo% %bar%&#39;</span>,&#x000A;             <span class="ruby-value">:all_patterns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>,<span class="ruby-value">:all_columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE ((a LIKE &#39;%foo%&#39;) AND (b LIKE &#39;%foo%&#39;)</span>&#x000A;<span class="ruby-comment">#   AND (a LIKE &#39;%bar%&#39;) AND (b LIKE &#39;%bar%&#39;))</span>&#x000A;&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">grep</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], <span class="ruby-node">%w&#39;%test% foo&#39;</span>, <span class="ruby-value">:case_insensitive</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WHERE ((a ILIKE &#39;%test%&#39;) OR (a ILIKE &#39;foo&#39;)</span>&#x000A;<span class="ruby-comment">#    OR (b ILIKE &#39;%test%&#39;) OR (b ILIKE &#39;foo&#39;))</span></pre>
+</li><li>
+<p>When using the schema plugin, you can now provide a block to the
+create_table methods to set the schema and create the table in the same
+call:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">create_table</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>The tree plugin now accepts a :single_root option, which uses a before_save
+hook to attempt to ensure that there is only a single root in the tree.  It
+also adds a Model.root method to get the single root of the tree.</p>
+</li><li>
+<p>The tree plugin now adds a Model#root? instance method to check if the
+current node is a root of the tree.</p>
+</li><li>
+<p>Model#save now takes a :raise_on_failure option which will override the
+object&#39;s raise_on_save_failure setting.  This makes it easier to get
+the desired behavior (raise or just return false) in library code without
+using a begin/ensure block.</p>
+</li><li>
+<p>The Database#adapter_scheme instance method was added, which operates the
+same as the class method.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles the
+literalization of OCI8::CLOB objects in the Oracle adapter.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When using the timezone support, <a
+href="../../../classes/Sequel.html">Sequel</a> will now correctly load
+times and datetimes in standard time when the current timezone is in
+daylight time, or vice versa.  Previously, if you tried to to load a time
+or datetime in December when in July in a timezone that used daylight time,
+it would be off by an hour.</p>
+</li><li>
+<p>The rcte_tree plugin now works correctly when a :conditions option is used.</p>
+</li><li>
+<p>The single_table_inheritance plugin now works correctly when the class
+discriminator column has the same name as an existing ruby method (such as
+type).</p>
+</li><li>
+<p>Database#each_server now works correctly when a connection string is used
+to connect, instead of an options hash.</p>
+</li><li>
+<p>Model#destroy now respects the object&#39;s use_transactions setting,
+instead of always using a transaction.</p>
+</li><li>
+<p>Model#exists? now uses a simpler and faster query.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles the aggregate
+methods such as count and sum correctly on Microsoft SQL Server when using
+an ordered dataset with a clause such as DISTINCT or GROUP and without a
+limit.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles rename_table
+correctly on Microsoft SQL Server when using a case sensitive collation, or
+when qualifying the table with a schema.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now parses the schema
+correctly on Oracle when the same table name is used in multiple schemas.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles
+OCIInvalidHandle errors when disconnecting in the Oracle adapter.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now raises a <a
+href="../../../classes/Sequel/Error.html">Sequel::Error</a> instead of an
+ArgumentError if the current or target migration version does not exist.</p>
+</li><li>
+<p>When a mismatched number of composite keys are used in associations, <a
+href="../../../classes/Sequel.html">Sequel</a> now uses a more detailed
+error message.</p>
+</li><li>
+<p>Significant improvements were made to the Dataset and Model RDoc
+documentation.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Model#valid? now must accept an optional options hash.</p>
+</li><li>
+<p>The Model#save_failure private method was renamed to raise_hook_failure.</p>
+</li><li>
+<p>The LOCAL_DATETIME_OFFSET_SECS and LOCAL_DATETIME_OFFSET constants have
+been removed from the <a href="../../../classes/Sequel.html">Sequel</a>
+module.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now uses obj.to_json
+instead of JSON.generate(obj).  This shouldn&#39;t affect backwards
+compatibility, but did fix a bug in certain cases.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

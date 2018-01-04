@@ -1,147 +1,155 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::ConstraintValidations::Generator</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::ConstraintValidations::Generator
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/extensions/constraint_validations_rb.html">lib/sequel/extensions/constraint_validations.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="../../Object.html">Object</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>This is the DSL class used for the validate block inside create_table and
-            alter_table.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-drop">drop</a></li>
-              <li><a href="#method-i-operator">operator</a></li>
-              <li><a href="#method-i-process">process</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>(generator)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Store the schema generator that encloses this validates block.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">generator</span>)&#x000A;  <span class="ruby-ivar">@generator</span> = <span class="ruby-identifier">generator</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-drop'>
-                <a name='method-i-drop'></a>
-                <div class='synopsis'>
-                  <span class='name'>drop</span>
-                  <span class='arguments'>(constraint)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Given the name of a constraint, drop that constraint from the database, and
-                  remove the related validation metadata.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-drop-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 194</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop</span>(<span class="ruby-identifier">constraint</span>)&#x000A;  <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:drop</span>, <span class="ruby-value">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">constraint</span>})&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-operator'>
-                <a name='method-i-operator'></a>
-                <div class='synopsis'>
-                  <span class='name'>operator</span>
-                  <span class='arguments'>(op, arg, columns, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Create operator validation.  The op should be either <code>:&gt;</code>,
-                  +:&gt;=+, <code>:&lt;</code>, or +:&lt;=+, and the arg should be either a
-                  string or an integer.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-operator-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-operator-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">operator</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid operator (#{op}) used when creating operator validation&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">suffix</span> = <span class="ruby-constant">OPERATORS</span>[<span class="ruby-identifier">op</span>]&#x000A;&#x000A;  <span class="ruby-identifier">prefix</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-string">&quot;str&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-string">&quot;int&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid argument (#{arg.inspect}) used when creating operator validation&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:&quot;#{prefix}_#{suffix}&quot;</span>, <span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-value">:arg=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">arg</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-process'>
-                <a name='method-i-process'></a>
-                <div class='synopsis'>
-                  <span class='name'>process</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Alias of instance_exec for a nicer API.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-process-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-process-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">process</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::ConstraintValidations::Generator</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::ConstraintValidations::Generator
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/constraint_validations_rb.html">lib/sequel/extensions/constraint_validations.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../../Object.html">Object</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>This is the DSL class used for the validate block inside create_table and
+alter_table.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-drop">drop</a></li>
+<li><a href="#method-i-operator">operator</a></li>
+<li><a href="#method-i-process">process</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(generator)</span>
+
+</div>
+<div class='description'>
+
+<p>Store the schema generator that encloses this validates block.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">generator</span>)&#x000A;  <span class="ruby-ivar">@generator</span> = <span class="ruby-identifier">generator</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-drop'>
+<a name='method-i-drop'></a>
+<div class='synopsis'>
+<span class='name'>drop</span>
+<span class='arguments'>(constraint)</span>
+
+</div>
+<div class='description'>
+
+<p>Given the name of a constraint, drop that constraint from the database, and
+remove the related validation metadata.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-drop-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 194</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop</span>(<span class="ruby-identifier">constraint</span>)&#x000A;  <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:drop</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint</span>})&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-operator'>
+<a name='method-i-operator'></a>
+<div class='synopsis'>
+<span class='name'>operator</span>
+<span class='arguments'>(op, arg, columns, opts=OPTS)</span>
+
+</div>
+<div class='description'>
+
+<p>Create operator validation.  The op should be either <code>:&gt;</code>,
++:&gt;=+, <code>:&lt;</code>, or +:&lt;=+, and the arg should be either a
+string or an integer.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-operator-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-operator-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">operator</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid operator (#{op}) used when creating operator validation&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">suffix</span> = <span class="ruby-constant">OPERATORS</span>[<span class="ruby-identifier">op</span>]&#x000A;&#x000A;  <span class="ruby-identifier">prefix</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-string">&quot;str&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-string">&quot;int&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid argument (#{arg.inspect}) used when creating operator validation&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:&quot;#{prefix}_#{suffix}&quot;</span>, <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-value">:arg</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">arg</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-process'>
+<a name='method-i-process'></a>
+<div class='synopsis'>
+<span class='name'>process</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Alias of instance_exec for a nicer API.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-process-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-process-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">process</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

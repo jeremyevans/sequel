@@ -1,322 +1,324 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.45.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.45.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.45.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-04-01 07:17:22 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Dataset mutation is now deprecated.  Users should switch to using the
-            non-mutating methods.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where!</span>(:<span class="ruby-identifier">foo</span>)&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>)</pre>
-            </li><li>
-            <p>Support for the Cubrid, Firebird, Informix, and Progress databases has been
-            deprecated.  Any users of this support should consider creating an external
-            adapter with the current code and maintaining such support themselves.</p>
-            </li><li>
-            <p>The do (DataObjects), swift, and jdbc/as400 adapters have been deprecated. 
-            Any users of these adapters should consider creating an external adapter
-            with the current code and maintaining the adapter themselves.</p>
-            </li><li>
-            <p>Model transaction hooks (after_commit, after_rollback,
-            after_destroy_commit, after_destroy_rollback) are now deprecated. Users
-            should switch to calling the after_commit and after_rollback database
-            transaction hooks directly.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_commit</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">do_something</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">do_something</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>Passing a block to Database#from is now deprecated.  For backwards
-            compatibility, this block affected the WHERE clause instead of the FROM
-            clause.  In <a href="../../../classes/Sequel.html">Sequel</a> 5,
-            Database#from blocks will be treated like Dataset#from blocks, and will
-            affect the FROM clause.  This behavior has been available for years by
-            using the from_block extension.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">foo</span>){<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">foo</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}</pre>
-            </li><li>
-            <p>Passing non-hash arguments and multiple arguments to the model association
-            methods is now deprecated.  Switch to using a hash as an argument.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(<span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>)})&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(:<span class="ruby-identifier">reload=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(:<span class="ruby-identifier">callback=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>)})&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>)}</pre>
-            </li><li>
-            <p>Passing procs as filter arguments is now deprecated.  These should now be
-            passed as blocks instead of arguments.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">proc</span>{<span class="ruby-identifier">foo</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">bar</span>})&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">foo</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">bar</span>}</pre>
-            </li><li>
-            <p>Passing multiple arguments or an array as filter arguments when the
-            array/arguments does not represent a conditions specifier (array of two
-            element arrays, treated like a hash) is now deprecated.  Switch to calling
-            the filter method separately with each argument or using <a
-            href="../../../classes/Sequel.html">Sequel</a>.&amp; to combine the
-            arguments:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">bar</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>([:<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">bar</span>])&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">bar</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">&amp;</span>(:<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">bar</span>))</pre>
-            </li><li>
-            <p>Returning false from model before hooks to cancel an action is now
-            deprecated.  Switch to calling cancel_action instead.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">something</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-identifier">cancel_action</span>(<span class="ruby-string">&#39;something bad&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">something</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>Database#each_server has been deprecated.  Switch to using Database#servers
-            and Database#with_server from server_block extension:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">each_server</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;foo&quot;</span>)}&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">s</span>){<span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;foo&quot;</span>)}}</pre>
-            </li><li>
-            <p>Calling Database#add_servers and Database#remove_servers on a database that
-            does not use the :servers option is now deprecated. Currently, the calls to
-            add_servers and remove_servers are ignored for such databases, which can
-            hide errors.</p>
-            </li><li>
-            <p>Sequel::Postgres::PG_NAMED_TYPES is now deprecated.  Switch to calling
-            Database#add_named_conversion_proc instead.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/adapters/utils/pg_types&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_NAMED_TYPES</span>[:<span class="ruby-identifier">foo</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>)&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_named_conversion_proc</span>(:<span class="ruby-identifier">foo</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}</pre>
-            </li><li>
-            <p>Modifying the identifier mangling settings for a Database or Dataset is now
-            deprecated unless the identifier_mangling extension is explicitly loaded
-            into the Database instance.</p>
-            </li><li>
-            <p>The Sequel::Database.single_threaded accessor is now deprecated. Switch to
-            using Sequel.single_threaded= and Sequel.single_threaded?.</p>
-            </li><li>
-            <p>Sequel::Database.identifier_input_method,
-            Sequel::Database.identifier_output_method, and <a
-            href="../../../classes/Sequel/Database.html#method-i-quote_identifier">Sequel::Database#quote_identifier</a>
-            accessors are now deprecated. Switch to modifying the setting for each
-            Database instance.</p>
-            </li><li>
-            <p>Sequel.identifier_input_method=, Sequel.identifier_output_method=, and
-            Sequel.quote_identifer= setter methods are now deprecated. Switch to
-            modifying the setting for each Database instance.</p>
-            </li><li>
-            <p>Calling Dataset#delete/update/truncate on datasets with limits or offsets
-            is now deprecated, unless the database will respect the limit or offset. 
-            Currently, only MySQL and Microsoft SQL Server have limited support for
-            such deletes and updates.  You should either call unlimited or
-            skip_limit_check before calling delete/update/truncate.</p>
-            </li><li>
-            <p>Deprecate having duplicate column names in subclass tables when using the
-            class_table_inheritance plugin.  The documentation has warned against this
-            for a long time, but the code did not enforce it.</p>
-            </li><li>
-            <p>When using the association_pks plugin setter methods without the :delay_pks
-            association option set, a warning is now issued. In <a
-            href="../../../classes/Sequel.html">Sequel</a> 5, the default will be to
-            assume that the :delay_pks option is :always, and not to make modifications
-            until the object is saved.  If you would like to keep the current behavior,
-            set the :delay_pks=&gt;false association option.</p>
-            
-            <p>The current :delay_pks=&gt;true behavior will be removed in <a
-            href="../../../classes/Sequel.html">Sequel</a> 5, with it being treated
-            like :delay_pks=&gt;:always.  If you are relying on the current behavior of
-            :delay_pks=&gt;true (delay for new objects, immediate for existing
-            objects), you will need to update your code.</p>
-            </li><li>
-            <p>Database#dup/clone are now deprecated.  They have never been handled
-            correctly, since the default implementation from Kernel has been used.</p>
-            </li><li>
-            <p>Model.dup/clone are now deprecated.  They have never been handled
-            correctly, as the default implemenation from Kernel/Module has been used.</p>
-            </li><li>
-            <p>Database#use on MySQL is now deprecated.  Switch to creating a new Database
-            instance instead of modifying the database for an existing instance.</p>
-            </li><li>
-            <p>Database#database_name on MySQL is now deprecated. Switch to asking the
-            database server which database you are connected to:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">database_name</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>{<span class="ruby-constant">DATABASE</span>{}}</pre>
-            </li><li>
-            <p>In the lazy_attributes, nested_attributes, composition, and serialization
-            plugins, the *_module accessors are now deprecated. These were
-            implementation details that should not have been exposed.</p>
-            </li><li>
-            <p>The schema plugin is now deprecated.  Switch to defining the schema before
-            creating the model class using the Database schema methods.</p>
-            </li><li>
-            <p>The scissors plugin is deprecated.  It existed for compatibility with <a
-            href="../../../classes/Sequel.html">Sequel</a> 3, but it is dangerous as it
-            makes it easier to modify all rows when the intent was to modify a single
-            row.</p>
-            </li><li>
-            <p>The prepared_statements_associations and prepared_statements_with_pk
-            plugins are now deprecated.  These plugins generally make things slower.</p>
-            </li><li>
-            <p>Dataset#unbind, Sequel::Unbinder, and Sequel::UnbindDuplicate are now
-            deprecated.  This mostly existed to support the
-            prepared_statements_associations and prepared_statements_with_pk plugins.</p>
-            </li><li>
-            <p>Sequel::Error::* exception class aliases are now deprecated. Switch to
-            using the exception classes in the <a
-            href="../../../classes/Sequel.html">Sequel</a> namespace.</p>
-            </li><li>
-            <p>Sequel::BeforeHookFailed is now deprecated.  Switch to using <a
-            href="../../../classes/Sequel/HookFailed.html">Sequel::HookFailed</a>.</p>
-            </li><li>
-            <p>Calling <a
-            href="../../../classes/Sequel/Qualifier.html#method-c-new">Sequel::Qualifier.new</a>
-            with 2 arguments is now deprecated. Users should switch to calling it with
-            a single argument (the table used for qualifying unqualified identifiers).</p>
-            </li><li>
-            <p>Treating unrecognized prepared statement types as :select is now
-            deprecated.  Switch to using :select as the prepared statement type.</p>
-            </li><li>
-            <p>The @was_new instance variable available in model after_save hooks is now
-            deprecated.  There is no deprecation warning associated with this change.</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@was_new</span>&#x000A;    <span class="ruby-identifier">do_something</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">do_something_else</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">do_something</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">do_something_else</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>The @columns_updated instance variable available in model after_save and
-            after_update hooks is deprecated.  Switch to using the new columns_updated
-            plugin and calling the columns_updated method.</p>
-            </li><li>
-            <p>The Sequel.cache_anonymous_models accessor has been deprecated. Switch to
-            using Sequel::Model.cache_anonymous_models.</p>
-            </li><li>
-            <p>Sequel::Model::ANONYMOUS_MODEL_CLASSES and
-            Sequel::Model::ANONYMOUS_MODEL_CLASSES_MUTEX have been deprecated.</p>
-            </li><li>
-            <p>Sequel::Database::ResetIdentifierMangling has been deprecated.</p>
-            </li></ul>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>A validation_contexts plugin has been added, which adds support for a
-            :validation_context option to Model#save and Model#valid?. The value for
-            this option will be available via the validation_context method inside the
-            validation hooks and validate method.</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_contexts</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">validation_context</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">approve</span>&#x000A;      <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">status_id</span>, <span class="ruby-string">&#39;not 42&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">==</span> <span class="ruby-value">42</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">status_id</span> = <span class="ruby-value">41</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">valid?</span>(:<span class="ruby-identifier">validation_context=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">approve</span>) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">status_id</span> = <span class="ruby-value">42</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">valid?</span>(:<span class="ruby-identifier">validation_context=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">approve</span>) <span class="ruby-comment"># =&gt; true</span></pre>
-            </li><li>
-            <p>A columns_updated plugin has been added, allowing you to get access to the
-            hash used for updating a model instance via the columns_updated method:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">columns_updated</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns_updated</span>.<span class="ruby-identifier">has_key?</span>(:<span class="ruby-identifier">foo</span>)&#x000A;      <span class="ruby-identifier">do_something</span>(<span class="ruby-identifier">columns_updated</span>[:<span class="ruby-identifier">foo</span>])&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>Dataset#delete on Microsoft SQL Server now respects limits.  Note that
-            Microsoft SQL Server does not respect orders for deletes, only limits,
-            which makes this support not very useful.  Currently a deprecation warning
-            will be issued when using a delete with an order and a limit, and in <a
-            href="../../../classes/Sequel.html">Sequel</a> 5 an exception will be
-            raised.</p>
-            </li><li>
-            <p>An odbc/oracle subadapter has been added.</p>
-            </li><li>
-            <p>A Model.dataset_module_class accessor has been added, allowing plugins to
-            add support for custom behavior in dataset_module blocks.</p>
-            </li><li>
-            <p>Support for deprecating constants on Ruby 2.3+ has been added. Note that
-            you will only get warnings for deprecated constant use if you are running
-            on Ruby 2.3+.  If you are running on a previous version of Ruby, you should
-            scan your code manually for deprecated constant use.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Using Model#cancel_action inside validation hooks now works correctly when
-            Model#valid? is called.</p>
-            </li><li>
-            <p>Model#[] now handles columns with false values correctly when using the
-            split_values plugin.</p>
-            </li><li>
-            <p>When calling Dataset#union/intersect/except on a dataset with an offset but
-            no limit, the dataset is wrapped in a subquery, just like a dataset with a
-            limit.</p>
-            </li><li>
-            <p>The dumping of 64-bit autoincrementing primary key columns by the
-            schema_dumper extension is now handled correctly when using the :same_db
-            option.</p>
-            </li><li>
-            <p>The schema_dumper extension now supports the :schema option when dumping
-            schema.</p>
-            </li><li>
-            <p>On Microsoft SQL Server and SQLAnywhere, ORDER BY clauses now come after
-            UNION/INTERSECT/EXCEPT instead of before, fixing issues when the
-            :from_self=&gt;false option is used with union/intersect/except and an
-            order is applied afterward.</p>
-            </li><li>
-            <p>On Microsoft SQL Server, if calling Dataset#union/intersect/except on a
-            dataset with an order and without a limit or offset, the order is removed. 
-            When using UNION/INTERSECT/EXCEPT, Microsoft SQL Server does not guarantee
-            any ordering unless you specify an order for the compound dataset.  As a
-            general rule, you should always apply orders after compounds instead of
-            before.</p>
-            </li><li>
-            <p>On Microsoft SQL Server &lt;2012, when using a dataset with an offset
-            without a limit in a UNION/INTERSECT/EXCEPT query, <a
-            href="../../../classes/Sequel.html">Sequel</a> now uses TOP (100) PERCENT
-            to work around the limitation that using orders in subqueries is not
-            supported unless there is a limit (offsets are emulated by a ROW_NUMBER
-            window function with an order in this case).</p>
-            </li><li>
-            <p>Database#indexes on MySQL now handles qualified identifiers.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now literalizes <a
-            href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> instances
-            with 3 fractional digits in the jdbc/postgresql adapter, fixing issues on
-            JRuby 9.1.8.0+ (the first JRuby version to support greater than millisecond
-            precision).</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>When using the association_proxies plugin and passing a block when loading
-            the plugin, the :proxy_argument option in hash passed to the block is now
-            an empty hash instead of nil if no argument was given to the association
-            method.</p>
-            </li><li>
-            <p>The private Model#_valid? method now takes a single options hash argument,
-            instead of 2 arguments.</p>
-            </li><li>
-            <p>The pg_hstore extension no longer modifies PG_NAMED_TYPES.  This should not
-            affect behavior if the pg_hstore extension is loaded into the Database
-            instance.</p>
-            </li><li>
-            <p>Support for pg &lt;0.8.0 has been dropped.  pg 0.8.0 was released in
-            January 2008.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.45.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.45.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.45.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-04-01 07:17:22 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Deprecated+Features">Deprecated Features<span><a href="#label-Deprecated+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset mutation is now deprecated.  Users should switch to using the
+non-mutating methods.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where!</span>(<span class="ruby-value">:foo</span>)&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>)</pre>
+</li><li>
+<p>Support for the Cubrid, Firebird, Informix, and Progress databases has been
+deprecated.  Any users of this support should consider creating an external
+adapter with the current code and maintaining such support themselves.</p>
+</li><li>
+<p>The do (DataObjects), swift, and jdbc/as400 adapters have been deprecated. 
+Any users of these adapters should consider creating an external adapter
+with the current code and maintaining the adapter themselves.</p>
+</li><li>
+<p>Model transaction hooks (after_commit, after_rollback,
+after_destroy_commit, after_destroy_rollback) are now deprecated. Users
+should switch to calling the after_commit and after_rollback database
+transaction hooks directly.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_commit</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">do_something</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">do_something</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>Passing a block to Database#from is now deprecated.  For backwards
+compatibility, this block affected the WHERE clause instead of the FROM
+clause.  In <a href="../../../classes/Sequel.html">Sequel</a> 5,
+Database#from blocks will be treated like Dataset#from blocks, and will
+affect the FROM clause.  This behavior has been available for years by
+using the from_block extension.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:foo</span>){<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:foo</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}</pre>
+</li><li>
+<p>Passing non-hash arguments and multiple arguments to the model association
+methods is now deprecated.  Switch to using a hash as an argument.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(<span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>)})&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(<span class="ruby-value">:reload</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>(<span class="ruby-value">:callback</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>)})&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>)}</pre>
+</li><li>
+<p>Passing procs as filter arguments is now deprecated.  These should now be
+passed as blocks instead of arguments.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">proc</span>{<span class="ruby-identifier">foo</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">bar</span>})&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">foo</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">bar</span>}</pre>
+</li><li>
+<p>Passing multiple arguments or an array as filter arguments when the
+array/arguments does not represent a conditions specifier (array of two
+element arrays, treated like a hash) is now deprecated.  Switch to calling
+the filter method separately with each argument or using <a
+href="../../../classes/Sequel.html">Sequel</a>.&amp; to combine the
+arguments:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>([<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>])&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:foo</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>))</pre>
+</li><li>
+<p>Returning false from model before hooks to cancel an action is now
+deprecated.  Switch to calling cancel_action instead.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">something</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-identifier">cancel_action</span>(<span class="ruby-string">&#39;something bad&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">something</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>Database#each_server has been deprecated.  Switch to using Database#servers
+and Database#with_server from server_block extension:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">each_server</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;foo&quot;</span>)}&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">s</span>){<span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;foo&quot;</span>)}}</pre>
+</li><li>
+<p>Calling Database#add_servers and Database#remove_servers on a database that
+does not use the :servers option is now deprecated. Currently, the calls to
+add_servers and remove_servers are ignored for such databases, which can
+hide errors.</p>
+</li><li>
+<p>Sequel::Postgres::PG_NAMED_TYPES is now deprecated.  Switch to calling
+Database#add_named_conversion_proc instead.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/adapters/utils/pg_types&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_NAMED_TYPES</span>[<span class="ruby-value">:foo</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>)&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_named_conversion_proc</span>(<span class="ruby-value">:foo</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}</pre>
+</li><li>
+<p>Modifying the identifier mangling settings for a Database or Dataset is now
+deprecated unless the identifier_mangling extension is explicitly loaded
+into the Database instance.</p>
+</li><li>
+<p>The Sequel::Database.single_threaded accessor is now deprecated. Switch to
+using Sequel.single_threaded= and Sequel.single_threaded?.</p>
+</li><li>
+<p>Sequel::Database.identifier_input_method,
+Sequel::Database.identifier_output_method, and <a
+href="../../../classes/Sequel/Database.html#method-i-quote_identifier">Sequel::Database#quote_identifier</a>
+accessors are now deprecated. Switch to modifying the setting for each
+Database instance.</p>
+</li><li>
+<p>Sequel.identifier_input_method=, Sequel.identifier_output_method=, and
+Sequel.quote_identifer= setter methods are now deprecated. Switch to
+modifying the setting for each Database instance.</p>
+</li><li>
+<p>Calling Dataset#delete/update/truncate on datasets with limits or offsets
+is now deprecated, unless the database will respect the limit or offset. 
+Currently, only MySQL and Microsoft SQL Server have limited support for
+such deletes and updates.  You should either call unlimited or
+skip_limit_check before calling delete/update/truncate.</p>
+</li><li>
+<p>Deprecate having duplicate column names in subclass tables when using the
+class_table_inheritance plugin.  The documentation has warned against this
+for a long time, but the code did not enforce it.</p>
+</li><li>
+<p>When using the association_pks plugin setter methods without the :delay_pks
+association option set, a warning is now issued. In <a
+href="../../../classes/Sequel.html">Sequel</a> 5, the default will be to
+assume that the :delay_pks option is :always, and not to make modifications
+until the object is saved.  If you would like to keep the current behavior,
+set the :delay_pks=&gt;false association option.</p>
+
+<p>The current :delay_pks=&gt;true behavior will be removed in <a
+href="../../../classes/Sequel.html">Sequel</a> 5, with it being treated
+like :delay_pks=&gt;:always.  If you are relying on the current behavior of
+:delay_pks=&gt;true (delay for new objects, immediate for existing
+objects), you will need to update your code.</p>
+</li><li>
+<p>Database#dup/clone are now deprecated.  They have never been handled
+correctly, since the default implementation from Kernel has been used.</p>
+</li><li>
+<p>Model.dup/clone are now deprecated.  They have never been handled
+correctly, as the default implemenation from Kernel/Module has been used.</p>
+</li><li>
+<p>Database#use on MySQL is now deprecated.  Switch to creating a new Database
+instance instead of modifying the database for an existing instance.</p>
+</li><li>
+<p>Database#database_name on MySQL is now deprecated. Switch to asking the
+database server which database you are connected to:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">database_name</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">get</span>{<span class="ruby-constant">DATABASE</span>{}}</pre>
+</li><li>
+<p>In the lazy_attributes, nested_attributes, composition, and serialization
+plugins, the *_module accessors are now deprecated. These were
+implementation details that should not have been exposed.</p>
+</li><li>
+<p>The schema plugin is now deprecated.  Switch to defining the schema before
+creating the model class using the Database schema methods.</p>
+</li><li>
+<p>The scissors plugin is deprecated.  It existed for compatibility with <a
+href="../../../classes/Sequel.html">Sequel</a> 3, but it is dangerous as it
+makes it easier to modify all rows when the intent was to modify a single
+row.</p>
+</li><li>
+<p>The prepared_statements_associations and prepared_statements_with_pk
+plugins are now deprecated.  These plugins generally make things slower.</p>
+</li><li>
+<p>Dataset#unbind, Sequel::Unbinder, and Sequel::UnbindDuplicate are now
+deprecated.  This mostly existed to support the
+prepared_statements_associations and prepared_statements_with_pk plugins.</p>
+</li><li>
+<p>Sequel::Error::* exception class aliases are now deprecated. Switch to
+using the exception classes in the <a
+href="../../../classes/Sequel.html">Sequel</a> namespace.</p>
+</li><li>
+<p>Sequel::BeforeHookFailed is now deprecated.  Switch to using <a
+href="../../../classes/Sequel/HookFailed.html">Sequel::HookFailed</a>.</p>
+</li><li>
+<p>Calling <a
+href="../../../classes/Sequel/Qualifier.html#method-c-new">Sequel::Qualifier.new</a>
+with 2 arguments is now deprecated. Users should switch to calling it with
+a single argument (the table used for qualifying unqualified identifiers).</p>
+</li><li>
+<p>Treating unrecognized prepared statement types as :select is now
+deprecated.  Switch to using :select as the prepared statement type.</p>
+</li><li>
+<p>The @was_new instance variable available in model after_save hooks is now
+deprecated.  There is no deprecation warning associated with this change.</p>
+
+<pre class="ruby"><span class="ruby-comment"># Instead of:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@was_new</span>&#x000A;    <span class="ruby-identifier">do_something</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">do_something_else</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># Switch to:</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">do_something</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">do_something_else</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>The @columns_updated instance variable available in model after_save and
+after_update hooks is deprecated.  Switch to using the new columns_updated
+plugin and calling the columns_updated method.</p>
+</li><li>
+<p>The Sequel.cache_anonymous_models accessor has been deprecated. Switch to
+using Sequel::Model.cache_anonymous_models.</p>
+</li><li>
+<p>Sequel::Model::ANONYMOUS_MODEL_CLASSES and
+Sequel::Model::ANONYMOUS_MODEL_CLASSES_MUTEX have been deprecated.</p>
+</li><li>
+<p>Sequel::Database::ResetIdentifierMangling has been deprecated.</p>
+</li></ul>
+
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A validation_contexts plugin has been added, which adds support for a
+:validation_context option to Model#save and Model#valid?. The value for
+this option will be available via the validation_context method inside the
+validation hooks and validate method.</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_contexts</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">validation_context</span> <span class="ruby-operator">==</span> <span class="ruby-value">:approve</span>&#x000A;      <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:status_id</span>, <span class="ruby-string">&#39;not 42&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">==</span> <span class="ruby-value">42</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">status_id</span> = <span class="ruby-value">41</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">valid?</span>(<span class="ruby-value">:validation_context</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:approve</span>) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">status_id</span> = <span class="ruby-value">42</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">valid?</span>(<span class="ruby-value">:validation_context</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:approve</span>) <span class="ruby-comment"># =&gt; true</span></pre>
+</li><li>
+<p>A columns_updated plugin has been added, allowing you to get access to the
+hash used for updating a model instance via the columns_updated method:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:columns_updated</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns_updated</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:foo</span>)&#x000A;      <span class="ruby-identifier">do_something</span>(<span class="ruby-identifier">columns_updated</span>[<span class="ruby-value">:foo</span>])&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>Dataset#delete on Microsoft SQL Server now respects limits.  Note that
+Microsoft SQL Server does not respect orders for deletes, only limits,
+which makes this support not very useful.  Currently a deprecation warning
+will be issued when using a delete with an order and a limit, and in <a
+href="../../../classes/Sequel.html">Sequel</a> 5 an exception will be
+raised.</p>
+</li><li>
+<p>An odbc/oracle subadapter has been added.</p>
+</li><li>
+<p>A Model.dataset_module_class accessor has been added, allowing plugins to
+add support for custom behavior in dataset_module blocks.</p>
+</li><li>
+<p>Support for deprecating constants on Ruby 2.3+ has been added. Note that
+you will only get warnings for deprecated constant use if you are running
+on Ruby 2.3+.  If you are running on a previous version of Ruby, you should
+scan your code manually for deprecated constant use.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Using Model#cancel_action inside validation hooks now works correctly when
+Model#valid? is called.</p>
+</li><li>
+<p>Model#[] now handles columns with false values correctly when using the
+split_values plugin.</p>
+</li><li>
+<p>When calling Dataset#union/intersect/except on a dataset with an offset but
+no limit, the dataset is wrapped in a subquery, just like a dataset with a
+limit.</p>
+</li><li>
+<p>The dumping of 64-bit autoincrementing primary key columns by the
+schema_dumper extension is now handled correctly when using the :same_db
+option.</p>
+</li><li>
+<p>The schema_dumper extension now supports the :schema option when dumping
+schema.</p>
+</li><li>
+<p>On Microsoft SQL Server and SQLAnywhere, ORDER BY clauses now come after
+UNION/INTERSECT/EXCEPT instead of before, fixing issues when the
+:from_self=&gt;false option is used with union/intersect/except and an
+order is applied afterward.</p>
+</li><li>
+<p>On Microsoft SQL Server, if calling Dataset#union/intersect/except on a
+dataset with an order and without a limit or offset, the order is removed. 
+When using UNION/INTERSECT/EXCEPT, Microsoft SQL Server does not guarantee
+any ordering unless you specify an order for the compound dataset.  As a
+general rule, you should always apply orders after compounds instead of
+before.</p>
+</li><li>
+<p>On Microsoft SQL Server &lt;2012, when using a dataset with an offset
+without a limit in a UNION/INTERSECT/EXCEPT query, <a
+href="../../../classes/Sequel.html">Sequel</a> now uses TOP (100) PERCENT
+to work around the limitation that using orders in subqueries is not
+supported unless there is a limit (offsets are emulated by a ROW_NUMBER
+window function with an order in this case).</p>
+</li><li>
+<p>Database#indexes on MySQL now handles qualified identifiers.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now literalizes <a
+href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> instances
+with 3 fractional digits in the jdbc/postgresql adapter, fixing issues on
+JRuby 9.1.8.0+ (the first JRuby version to support greater than millisecond
+precision).</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When using the association_proxies plugin and passing a block when loading
+the plugin, the :proxy_argument option in hash passed to the block is now
+an empty hash instead of nil if no argument was given to the association
+method.</p>
+</li><li>
+<p>The private Model#_valid? method now takes a single options hash argument,
+instead of 2 arguments.</p>
+</li><li>
+<p>The pg_hstore extension no longer modifies PG_NAMED_TYPES.  This should not
+affect behavior if the pg_hstore extension is loaded into the Database
+instance.</p>
+</li><li>
+<p>Support for pg &lt;0.8.0 has been dropped.  pg 0.8.0 was released in
+January 2008.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

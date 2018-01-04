@@ -1,114 +1,121 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Dataset::RoundTimestamps</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Dataset::RoundTimestamps
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/extensions/round_timestamps_rb.html">lib/sequel/extensions/round_timestamps.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-literal_datetime">literal_datetime</a></li>
-              <li><a href="#method-i-literal_sqltime">literal_sqltime</a></li>
-              <li><a href="#method-i-literal_time">literal_time</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-literal_datetime'>
-                <a name='method-i-literal_datetime'></a>
-                <div class='synopsis'>
-                  <span class='name'>literal_datetime</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Round DateTime values before literalizing</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal_datetime-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-literal_datetime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_datetime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Rational</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span><span class="ruby-operator">**</span><span class="ruby-identifier">timestamp_precision</span>)<span class="ruby-operator">/</span><span class="ruby-value">864000</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-literal_sqltime'>
-                <a name='method-i-literal_sqltime'></a>
-                <div class='synopsis'>
-                  <span class='name'>literal_sqltime</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Round Sequel::SQLTime values before literalizing</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal_sqltime-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-literal_sqltime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_sqltime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-literal_time'>
-                <a name='method-i-literal_time'></a>
-                <div class='synopsis'>
-                  <span class='name'>literal_time</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Round Time values before literalizing</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal_time-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-literal_time-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_time</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Dataset::RoundTimestamps</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Dataset::RoundTimestamps
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/extensions/round_timestamps_rb.html">lib/sequel/extensions/round_timestamps.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-literal_datetime">literal_datetime</a></li>
+<li><a href="#method-i-literal_sqltime">literal_sqltime</a></li>
+<li><a href="#method-i-literal_time">literal_time</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-literal_datetime'>
+<a name='method-i-literal_datetime'></a>
+<div class='synopsis'>
+<span class='name'>literal_datetime</span>
+<span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Round DateTime values before literalizing</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-literal_datetime-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-literal_datetime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_datetime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Rational</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span><span class="ruby-operator">**</span><span class="ruby-identifier">timestamp_precision</span>)<span class="ruby-operator">/</span><span class="ruby-value">864000</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-literal_sqltime'>
+<a name='method-i-literal_sqltime'></a>
+<div class='synopsis'>
+<span class='name'>literal_sqltime</span>
+<span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Round Sequel::SQLTime values before literalizing</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-literal_sqltime-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-literal_sqltime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_sqltime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-literal_time'>
+<a name='method-i-literal_time'></a>
+<div class='synopsis'>
+<span class='name'>literal_time</span>
+<span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Round Time values before literalizing</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-literal_time-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-literal_time-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_time</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

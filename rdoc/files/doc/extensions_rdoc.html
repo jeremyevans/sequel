@@ -1,187 +1,189 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>extensions.rdoc</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>extensions.rdoc</h1>
-        <div class='paths'>
-          doc/extensions.rdoc
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-Sequel+Extensions"><a href="../../classes/Sequel.html">Sequel</a> Extensions<span><a href="#label-Sequel+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            
-            <p><a href="../../classes/Sequel.html">Sequel</a> has an official extension
-            system, for adding global, Database, and Dataset extensions.</p>
-            
-            <h2 id="label-Global+Extensions">Global Extensions<span><a href="#label-Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Global extensions can add or modify the behavior of any part of <a
-            href="../../classes/Sequel.html">Sequel</a>.  Technically, they are not
-            limited to affecting <a href="../../classes/Sequel.html">Sequel</a>, as
-            they can also modify code outside of <a
-            href="../../classes/Sequel.html">Sequel</a> (e.g. the blank extension). 
-            However, extensions that modify things outside of <a
-            href="../../classes/Sequel.html">Sequel</a> generally do so only for
-            backwards compatibility.</p>
-            
-            <p>Global extensions are loaded via <code>Sequel.extension</code>:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">named_timezones</span></pre>
-            
-            <p>All this does is require the relevent extension from
-            <code>sequel/extensions/named_timezones</code> somewhere in the ruby path. 
-            Global extensions are just a simpler, consistent way to require code that
-            modifies <a href="../../classes/Sequel.html">Sequel</a>.</p>
-            
-            <h2 id="label-Database+Extensions">Database Extensions<span><a href="#label-Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Database extensions should add or modify the behavior of a single
-            <code>Sequel::Database</code> instance.  They are loaded via
-            <code>Sequel::Database#extension</code>:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span></pre>
-            
-            <p>The first thing that this does is load the relevent extension globally. 
-            However, Database extensions should be structured in a way that loading the
-            relevent extension globally just adds a module with the related behavior,
-            it doesn&#39;t modify any other state.  After loading the extension
-            globally, it modifies the related <code>Sequel::Database</code> object to
-            modify it&#39;s behavior, usually by extending it with a module.</p>
-            
-            <p>If you want a Database extension loaded into all future Database instances,
-            you can use <code>Sequel::Database.extension</code>:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span></pre>
-            
-            <p>All future <code>Sequel::Database</code> instances created afterward will
-            then automatically have the server_block extension loaded.</p>
-            
-            <h2 id="label-Dataset+Extensions">Dataset Extensions<span><a href="#label-Dataset+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Dataset extensions should add or modify the behavior of a single
-            <code>Sequel::Dataset</code> instance.  They are loaded via
-            <code>Sequel::Dataset#extension</code>. 
-            <code>Sequel::Dataset#extension</code> returns a modifies copy of the
-            dataset that includes the extension (similar to how most dataset query
-            methods work):</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
-            
-            <p>The first thing loading a Dataset extension does is load the relevent
-            extension globally.  Similar to Database extensions, loading a Dataset
-            extension globally should not affect state other than maybe adding a
-            module.  After loading the extension globally, it returned a modified copy
-            of the <code>Sequel::Dataset</code> with the extension loaded into it.</p>
-            
-            <p>If you want to load an extension into all future datasets for a given
-            <code>Sequel::Database</code> instance, you can also load it as a Database
-            extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">columns_introspection</span></pre>
-            
-            <p>Likewise, if you want to load an extension into all future datasets for all
-            future databases, you can load it via
-            <code>Sequel::Database.extension</code>:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">columns_introspection</span></pre>
-            
-            <h2 id="label-Creating+Global+Extensions">Creating Global Extensions<span><a href="#label-Creating+Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>If you want to create a global extension, you just need to store your code
-            so that you can require it via
-            <code>sequel/extensions/extension_name</code>.  Then users can load it via:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">extension_name</span></pre>
-            
-            <p>It is recommended you only create a global extension if what you want to do
-            would not work as a Database or Dataset extension.</p>
-            
-            <h2 id="label-Creating+Database+Extensions">Creating Database Extensions<span><a href="#label-Creating+Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Creating Database extensions is similar to global extensions in terms of
-            creating the file.  However, somewhere in the file, you need to call
-            <code>Sequel::Database.register_extension</code>.  Usually you would call
-            this with the module that will be added to the related
-            <code>Sequel::Database</code> instance when the extension is loaded.  For
-            example, the server_block extension uses something like:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">server_block</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ServerBlock</span>)</pre>
-            
-            <p>The first argument is the name of the extension as a symbol, and the second
-            is the module.</p>
-            
-            <p>In some cases, just extending the <code>Sequel::Database</code> instance
-            with a module is not sufficient.  So
-            <code>Sequel::Database.register_extension</code> also accepts a proc
-            instead of a second argument.  This proc is called with the
-            <code>Sequel::Database</code> instance, and can then run any related code:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">arbitrary_servers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ArbitraryServers</span>)}</pre>
-            
-            <h2 id="label-Creating+Dataset+Extensions">Creating Dataset Extensions<span><a href="#label-Creating+Dataset+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
-            
-            <p>Creating Dataset extensions is very similar to creating Database
-            extensions, but instead of calling
-            <code>Sequel::Database.register_extension</code>, you call
-            <code>Sequel::Dataset.register_extension</code>.  In general, you would
-            call this with the module that will be added to the related
-            <code>Sequel::Dataset</code> instance when the extension is loaded.  For
-            example, the columns_introspection extension uses something like:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">columns_introspection</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnsIntrospection</span>)</pre>
-            
-            <p>The first argument is the name of the extension as a symbol, and the second
-            is the module.  When you call the
-            <code>Sequel::Dataset.register_extension</code> method with a module, it in
-            turn calls <code>Sequel::Database.register_extension</code> and adds a
-            Database extension that loads this Dataset extension into all future
-            Datasets created from the Database.</p>
-            
-            <p>You can also call <code>Sequel::Dataset.register_extension</code> with a
-            proc:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">extension_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> }</pre>
-            
-            <p>Note that if you use a proc, a corresponding Database extension will not be
-            created automatically (you can still call
-            <code>Sequel::Database.register_extension</code> manually in this case).</p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>extensions.rdoc</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>extensions.rdoc
+</h1>
+<div class='paths'>
+doc/extensions.rdoc
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-Sequel+Extensions"><a href="../../classes/Sequel.html">Sequel</a> Extensions<span><a href="#label-Sequel+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
+
+<p><a href="../../classes/Sequel.html">Sequel</a> has an official extension
+system, for adding global, Database, and Dataset extensions.</p>
+
+<h2 id="label-Global+Extensions">Global Extensions<span><a href="#label-Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Global extensions can add or modify the behavior of any part of <a
+href="../../classes/Sequel.html">Sequel</a>.  Technically, they are not
+limited to affecting <a href="../../classes/Sequel.html">Sequel</a>, as
+they can also modify code outside of <a
+href="../../classes/Sequel.html">Sequel</a> (e.g. the blank extension). 
+However, extensions that modify things outside of <a
+href="../../classes/Sequel.html">Sequel</a> generally do so only for
+backwards compatibility.</p>
+
+<p>Global extensions are loaded via <code>Sequel.extension</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span></pre>
+
+<p>All this does is require the relevent extension from
+<code>sequel/extensions/named_timezones</code> somewhere in the ruby path. 
+Global extensions are just a simpler, consistent way to require code that
+modifies <a href="../../classes/Sequel.html">Sequel</a>.</p>
+
+<h2 id="label-Database+Extensions">Database Extensions<span><a href="#label-Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Database extensions should add or modify the behavior of a single
+<code>Sequel::Database</code> instance.  They are loaded via
+<code>Sequel::Database#extension</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span></pre>
+
+<p>The first thing that this does is load the relevent extension globally. 
+However, Database extensions should be structured in a way that loading the
+relevent extension globally just adds a module with the related behavior,
+it doesn&#39;t modify any other state.  After loading the extension
+globally, it modifies the related <code>Sequel::Database</code> object to
+modify it&#39;s behavior, usually by extending it with a module.</p>
+
+<p>If you want a Database extension loaded into all future Database instances,
+you can use <code>Sequel::Database.extension</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span></pre>
+
+<p>All future <code>Sequel::Database</code> instances created afterward will
+then automatically have the server_block extension loaded.</p>
+
+<h2 id="label-Dataset+Extensions">Dataset Extensions<span><a href="#label-Dataset+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Dataset extensions should add or modify the behavior of a single
+<code>Sequel::Dataset</code> instance.  They are loaded via
+<code>Sequel::Dataset#extension</code>. 
+<code>Sequel::Dataset#extension</code> returns a modifies copy of the
+dataset that includes the extension (similar to how most dataset query
+methods work):</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)</pre>
+
+<p>The first thing loading a Dataset extension does is load the relevent
+extension globally.  Similar to Database extensions, loading a Dataset
+extension globally should not affect state other than maybe adding a
+module.  After loading the extension globally, it returned a modified copy
+of the <code>Sequel::Dataset</code> with the extension loaded into it.</p>
+
+<p>If you want to load an extension into all future datasets for a given
+<code>Sequel::Database</code> instance, you can also load it as a Database
+extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:columns_introspection</span></pre>
+
+<p>Likewise, if you want to load an extension into all future datasets for all
+future databases, you can load it via
+<code>Sequel::Database.extension</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:columns_introspection</span></pre>
+
+<h2 id="label-Creating+Global+Extensions">Creating Global Extensions<span><a href="#label-Creating+Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>If you want to create a global extension, you just need to store your code
+so that you can require it via
+<code>sequel/extensions/extension_name</code>.  Then users can load it via:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:extension_name</span></pre>
+
+<p>It is recommended you only create a global extension if what you want to do
+would not work as a Database or Dataset extension.</p>
+
+<h2 id="label-Creating+Database+Extensions">Creating Database Extensions<span><a href="#label-Creating+Database+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Creating Database extensions is similar to global extensions in terms of
+creating the file.  However, somewhere in the file, you need to call
+<code>Sequel::Database.register_extension</code>.  Usually you would call
+this with the module that will be added to the related
+<code>Sequel::Database</code> instance when the extension is loaded.  For
+example, the server_block extension uses something like:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:server_block</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ServerBlock</span>)</pre>
+
+<p>The first argument is the name of the extension as a symbol, and the second
+is the module.</p>
+
+<p>In some cases, just extending the <code>Sequel::Database</code> instance
+with a module is not sufficient.  So
+<code>Sequel::Database.register_extension</code> also accepts a proc
+instead of a second argument.  This proc is called with the
+<code>Sequel::Database</code> instance, and can then run any related code:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:arbitrary_servers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ArbitraryServers</span>)}</pre>
+
+<h2 id="label-Creating+Dataset+Extensions">Creating Dataset Extensions<span><a href="#label-Creating+Dataset+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>Creating Dataset extensions is very similar to creating Database
+extensions, but instead of calling
+<code>Sequel::Database.register_extension</code>, you call
+<code>Sequel::Dataset.register_extension</code>.  In general, you would
+call this with the module that will be added to the related
+<code>Sequel::Dataset</code> instance when the extension is loaded.  For
+example, the columns_introspection extension uses something like:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:columns_introspection</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnsIntrospection</span>)</pre>
+
+<p>The first argument is the name of the extension as a symbol, and the second
+is the module.  When you call the
+<code>Sequel::Dataset.register_extension</code> method with a module, it in
+turn calls <code>Sequel::Database.register_extension</code> and adds a
+Database extension that loads this Dataset extension into all future
+Datasets created from the Database.</p>
+
+<p>You can also call <code>Sequel::Dataset.register_extension</code> with a
+proc:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(<span class="ruby-value">:extension_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> }</pre>
+
+<p>Note that if you use a proc, a corresponding Database extension will not be
+created automatically (you can still call
+<code>Sequel::Database.register_extension</code> manually in this case).</p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

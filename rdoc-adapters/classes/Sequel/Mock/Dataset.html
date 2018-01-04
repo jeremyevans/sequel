@@ -1,226 +1,243 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Mock::Dataset</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Mock::Dataset
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/adapters/mock_rb.html">lib/sequel/adapters/mock.rb</a>
-          </li>
-        </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a href="../Dataset.html">Dataset</a></strong>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-_fetch">_fetch</a></li>
-              <li><a href="#method-i-autoid">autoid</a></li>
-              <li><a href="#method-i-columns">columns</a></li>
-              <li><a href="#method-i-fetch_rows">fetch_rows</a></li>
-              <li><a href="#method-i-numrows">numrows</a></li>
-              <li><a href="#method-i-quote_identifiers-3F">quote_identifiers?</a></li>
-              <li><a href="#method-i-with_autoid">with_autoid</a></li>
-              <li><a href="#method-i-with_fetch">with_fetch</a></li>
-              <li><a href="#method-i-with_numrows">with_numrows</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-_fetch'>
-                <a name='method-i-_fetch'></a>
-                <div class='synopsis'>
-                  <span class='name'>_fetch</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The fetch setting for this dataset, if it has been overridden</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-_fetch-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 317</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_fetch</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_fetch</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:fetch</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-autoid'>
-                <a name='method-i-autoid'></a>
-                <div class='synopsis'>
-                  <span class='name'>autoid</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The autoid setting for this dataset, if it has been overridden</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-autoid-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 312</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autoid</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_autoid</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:autoid</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-columns'>
-                <a name='method-i-columns'></a>
-                <div class='synopsis'>
-                  <span class='name'>columns</span>
-                  <span class='arguments'>(*cs)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If arguments are provided, use them to set the columns for this dataset and
-                  return self.  Otherwise, use the default <a
-                  href="../../Sequel.html">Sequel</a> behavior and return the columns.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 329</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-fetch_rows'>
-                <a name='method-i-fetch_rows'></a>
-                <div class='synopsis'>
-                  <span class='name'>fetch_rows</span>
-                  <span class='arguments'>(sql, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 338</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-numrows'>
-                <a name='method-i-numrows'></a>
-                <div class='synopsis'>
-                  <span class='name'>numrows</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>The numrows setting for this dataset, if it has been overridden</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-numrows-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 322</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">numrows</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_numrows</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:numrows</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-quote_identifiers-3F'>
-                <a name='method-i-quote_identifiers-3F'></a>
-                <div class='synopsis'>
-                  <span class='name'>quote_identifiers?</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-quote_identifiers-3F-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-quote_identifiers-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 342</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">quote_identifiers?</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:quote_identifiers</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:quote_identifiers_default</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-with_autoid'>
-                <a name='method-i-with_autoid'></a>
-                <div class='synopsis'>
-                  <span class='name'>with_autoid</span>
-                  <span class='arguments'>(autoid)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return cloned dataset with the autoid setting modified</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_autoid-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-with_autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 347</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_autoid</span>(<span class="ruby-identifier">autoid</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:autoid=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">autoid</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-with_fetch'>
-                <a name='method-i-with_fetch'></a>
-                <div class='synopsis'>
-                  <span class='name'>with_fetch</span>
-                  <span class='arguments'>(fetch)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return cloned dataset with the fetch setting modified</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_fetch-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-with_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 352</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch</span>(<span class="ruby-identifier">fetch</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">fetch</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-with_numrows'>
-                <a name='method-i-with_numrows'></a>
-                <div class='synopsis'>
-                  <span class='name'>with_numrows</span>
-                  <span class='arguments'>(numrows)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return cloned dataset with the numrows setting modified</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_numrows-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-with_numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_numrows</span>(<span class="ruby-identifier">numrows</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:numrows=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">numrows</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Mock::Dataset</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Mock::Dataset
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/mock_rb.html">lib/sequel/adapters/mock.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong><a href="../Dataset.html">Dataset</a></strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-_fetch">_fetch</a></li>
+<li><a href="#method-i-autoid">autoid</a></li>
+<li><a href="#method-i-columns">columns</a></li>
+<li><a href="#method-i-fetch_rows">fetch_rows</a></li>
+<li><a href="#method-i-numrows">numrows</a></li>
+<li><a href="#method-i-quote_identifiers-3F">quote_identifiers?</a></li>
+<li><a href="#method-i-with_autoid">with_autoid</a></li>
+<li><a href="#method-i-with_fetch">with_fetch</a></li>
+<li><a href="#method-i-with_numrows">with_numrows</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-_fetch'>
+<a name='method-i-_fetch'></a>
+<div class='synopsis'>
+<span class='name'>_fetch</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The fetch setting for this dataset, if it has been overridden</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_fetch-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 317</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_fetch</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_fetch</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:fetch</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-autoid'>
+<a name='method-i-autoid'></a>
+<div class='synopsis'>
+<span class='name'>autoid</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The autoid setting for this dataset, if it has been overridden</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-autoid-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 312</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">autoid</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_autoid</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:autoid</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-columns'>
+<a name='method-i-columns'></a>
+<div class='synopsis'>
+<span class='name'>columns</span>
+<span class='arguments'>(*cs)</span>
+
+</div>
+<div class='description'>
+
+<p>If arguments are provided, use them to set the columns for this dataset and
+return self.  Otherwise, use the default <a
+href="../../Sequel.html">Sequel</a> behavior and return the columns.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-columns-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 329</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-fetch_rows'>
+<a name='method-i-fetch_rows'></a>
+<div class='synopsis'>
+<span class='name'>fetch_rows</span>
+<span class='arguments'>(sql, &block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-fetch_rows-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 338</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-numrows'>
+<a name='method-i-numrows'></a>
+<div class='synopsis'>
+<span class='name'>numrows</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The numrows setting for this dataset, if it has been overridden</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-numrows-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 322</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">numrows</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_numrows</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:numrows</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-quote_identifiers-3F'>
+<a name='method-i-quote_identifiers-3F'></a>
+<div class='synopsis'>
+<span class='name'>quote_identifiers?</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-quote_identifiers-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-quote_identifiers-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 342</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quote_identifiers?</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:quote_identifiers</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:quote_identifiers_default</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-with_autoid'>
+<a name='method-i-with_autoid'></a>
+<div class='synopsis'>
+<span class='name'>with_autoid</span>
+<span class='arguments'>(autoid)</span>
+
+</div>
+<div class='description'>
+
+<p>Return cloned dataset with the autoid setting modified</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_autoid-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 347</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_autoid</span>(<span class="ruby-identifier">autoid</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:autoid</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">autoid</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-with_fetch'>
+<a name='method-i-with_fetch'></a>
+<div class='synopsis'>
+<span class='name'>with_fetch</span>
+<span class='arguments'>(fetch)</span>
+
+</div>
+<div class='description'>
+
+<p>Return cloned dataset with the fetch setting modified</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_fetch-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 352</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_fetch</span>(<span class="ruby-identifier">fetch</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">fetch</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-with_numrows'>
+<a name='method-i-with_numrows'></a>
+<div class='synopsis'>
+<span class='name'>with_numrows</span>
+<span class='arguments'>(numrows)</span>
+
+</div>
+<div class='description'>
+
+<p>Return cloned dataset with the numrows setting modified</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_numrows-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_numrows</span>(<span class="ruby-identifier">numrows</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:numrows</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">numrows</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,170 +1,163 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::ADO</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::ADO
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/adapters/ado_rb.html">lib/sequel/adapters/ado.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/ado/access_rb.html">lib/sequel/adapters/ado/access.rb</a>
-          </li>
-          <li class='other'>
-            <a href="../../files/lib/sequel/adapters/ado/mssql_rb.html">lib/sequel/adapters/ado/mssql.rb</a>
-          </li>
-          <li>
-            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The <a href="ADO.html">ADO</a> adapter provides connectivity to <a
-            href="ADO.html">ADO</a> databases in Windows.</p>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="ADO/Access.html">Sequel::ADO::Access</a></li>
-              <li><a href="ADO/MSSQL.html">Sequel::ADO::MSSQL</a></li>
-              <li><a href="ADO/Database.html">Sequel::ADO::Database</a></li>
-              <li><a href="ADO/Dataset.html">Sequel::ADO::Dataset</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdBigInt</td>
-                    <td>=</td>
-                    <td class='context-item-value'>20</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="ADO.html">ADO</a> constants (DataTypeEnum) Source: <a
-                      href="https://msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx">msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx</a></p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdBinary</td>
-                    <td>=</td>
-                    <td class='context-item-value'>128</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdDBDate</td>
-                    <td>=</td>
-                    <td class='context-item-value'>133</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>AdBoolean          = 11 AdBSTR             = 8 AdChapter          = 136
-                      AdChar             = 129 AdCurrency         = 6 AdDate             = 7</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdDBTimeStamp</td>
-                    <td>=</td>
-                    <td class='context-item-value'>135</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>AdDBTime           = 134</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdLongVarBinary</td>
-                    <td>=</td>
-                    <td class='context-item-value'>205</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>AdDecimal          = 14 AdDouble           = 5 AdEmpty            = 0
-                      AdError            = 10 AdFileTime         = 64 AdGUID             = 72
-                      AdIDispatch        = 9 AdInteger          = 3 AdIUnknown         = 13</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdNumeric</td>
-                    <td>=</td>
-                    <td class='context-item-value'>131</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>AdLongVarChar      = 201 AdLongVarWChar     = 203</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdVarBinary</td>
-                    <td>=</td>
-                    <td class='context-item-value'>204</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>AdPropVariant      = 138 AdSingle           = 4 AdSmallInt         = 2
-                      AdTinyInt          = 16 AdUnsignedBigInt   = 21 AdUnsignedInt      = 19
-                      AdUnsignedSmallInt = 18 AdUnsignedTinyInt  = 17 AdUserDefined      = 132</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AdVarNumeric</td>
-                    <td>=</td>
-                    <td class='context-item-value'>139</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>AdVarChar          = 200 AdVariant          = 12</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>CONVERSION_PROCS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>{}</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::ADO</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::ADO
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/adapters/ado_rb.html">lib/sequel/adapters/ado.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/adapters/ado/access_rb.html">lib/sequel/adapters/ado/access.rb</a>
+</li>
+<li class='other'>
+<a href="../../files/lib/sequel/adapters/ado/mssql_rb.html">lib/sequel/adapters/ado/mssql.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The <a href="ADO.html">ADO</a> adapter provides connectivity to <a
+href="ADO.html">ADO</a> databases in Windows.</p>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="ADO/Access.html">Sequel::ADO::Access</a></li>
+<li><a href="ADO/MSSQL.html">Sequel::ADO::MSSQL</a></li>
+<li><a href="ADO/Database.html">Sequel::ADO::Database</a></li>
+<li><a href="ADO/Dataset.html">Sequel::ADO::Dataset</a></li>
+</ol>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdBigInt</td>
+<td>=</td>
+<td class='context-item-value'>20</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p><a href="ADO.html">ADO</a> constants (DataTypeEnum) Source: <a
+href="https://msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx">msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx</a></p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdBinary</td>
+<td>=</td>
+<td class='context-item-value'>128</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdDBDate</td>
+<td>=</td>
+<td class='context-item-value'>133</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>AdBoolean          = 11 AdBSTR             = 8 AdChapter          = 136
+AdChar             = 129 AdCurrency         = 6 AdDate             = 7</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdDBTimeStamp</td>
+<td>=</td>
+<td class='context-item-value'>135</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>AdDBTime           = 134</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdLongVarBinary</td>
+<td>=</td>
+<td class='context-item-value'>205</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>AdDecimal          = 14 AdDouble           = 5 AdEmpty            = 0
+AdError            = 10 AdFileTime         = 64 AdGUID             = 72
+AdIDispatch        = 9 AdInteger          = 3 AdIUnknown         = 13</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdNumeric</td>
+<td>=</td>
+<td class='context-item-value'>131</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>AdLongVarChar      = 201 AdLongVarWChar     = 203</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdVarBinary</td>
+<td>=</td>
+<td class='context-item-value'>204</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>AdPropVariant      = 138 AdSingle           = 4 AdSmallInt         = 2
+AdTinyInt          = 16 AdUnsignedBigInt   = 21 AdUnsignedInt      = 19
+AdUnsignedSmallInt = 18 AdUnsignedTinyInt  = 17 AdUserDefined      = 132</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>AdVarNumeric</td>
+<td>=</td>
+<td class='context-item-value'>139</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>AdVarChar          = 200 AdVariant          = 12</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CONVERSION_PROCS</td>
+<td>=</td>
+<td class='context-item-value'>{}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

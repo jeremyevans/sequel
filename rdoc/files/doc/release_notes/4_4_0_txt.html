@@ -1,133 +1,135 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.4.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.4.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.4.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2013-11-01 07:58:58 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports Sybase
-            SQLAnywhere, via the sqlanywhere and jdbc/sqlanywhere adapters.</p>
-            </li><li>
-            <p>The filter by associations support now handles cases where the association
-            has :conditions or a block (as long as the block does not rely on
-            instance-specific behavior).  This allows you to handle the following:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">popular_tags</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Tag</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">tags__popularity</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">9000</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">popular_tags=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-constant">Tag</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]])</pre>
-            
-            <p>This will return all albums whose popular_tags would include at least one
-            of those two tags.  Previously, the block would be ignored, returning
-            albums containing one those tags even if the tags weren&#39;t popular.</p>
-            </li><li>
-            <p>A table_select plugin has been added that changes the default selection for
-            models from * to table.*.  This is useful for people who want
-            ActiveRecord-like behavior instead of SQL-like behavior, where joining
-            tables doesn&#39;t automatically include columns in the other table.</p>
-            
-            <p>This can fix issues where joining another table that has columns with the
-            same name as columns in the model table without specifying an explicit
-            selection results in model objects being returned where the values in the
-            model object are the values from the joined table instead of the model
-            table.</p>
-            </li><li>
-            <p>Dataset#offset has been added, for specifying offset separately from limit.
-            Previous this was possible via:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">offset</span>)</pre>
-            
-            <p>but this is a friendlier API.</p>
-            </li><li>
-            <p>The jdbc adapter now has support for foreign key parsing.  This is used if
-            there is no specific support for the underlying database.</p>
-            </li><li>
-            <p>Foreign key parsing is now supported on Oracle.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Association add_*/remove_*/remove_all_* methods for pg_array_to_many
-            associations now work on unsaved model objects.</p>
-            </li><li>
-            <p>In the constraint_validations extension, deletes from the metadata table
-            are now processed before inserts, so that dropping an existing constraint
-            and readding a constraint with the same name now works correctly.</p>
-            </li><li>
-            <p>Cloning an association now copies the :eager_block option correctly from
-            the source association if it was passed as the block to the source
-            association method.</p>
-            </li><li>
-            <p>Cloning a cloned association now copies the block for the association.</p>
-            </li><li>
-            <p>The descendants method in the tree plugin no longer modifies an array it is
-            iterating over.</p>
-            </li><li>
-            <p>The jdbc/postgresql adapter now supports PostgreSQL-specific types, with
-            pretty much the same support as the postgres adapter.  When using the pg_*
-            extensions, the dataset will now handle the PostgreSQL types correctly and
-            return instances of the correct Ruby classes (e.g. hstore is returned as
-            Sequel::Postgres::HStore).</p>
-            
-            <p>You should no longer need to use the typecast_on_load or
-            pg_typecast_on_load plugins when using model objects that use these types
-            when using the jdbc/postgresql adapter.</p>
-            </li><li>
-            <p>Offset emulation on Oracle now handles cases where selected columns
-            can&#39;t be ordered.</p>
-            </li><li>
-            <p>Offset emulation on DB2 no longer automatically orders on all columns if
-            the dataset itself is unordered.</p>
-            </li><li>
-            <p>Types containing spaces are now returning correctly when parsing the schema
-            in the oracle adapter.</p>
-            </li><li>
-            <p>Database#tables no longer returns tables in the recycle bin on Oracle.</p>
-            </li><li>
-            <p>add_foreign_key now works correctly on HSQLDB, by splitting the column
-            addition and constraint addition into two separate statements.</p>
-            </li><li>
-            <p>add_primary_key now works correctly on H2.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.4.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.4.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.4.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2013-11-01 07:58:58 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports Sybase
+SQLAnywhere, via the sqlanywhere and jdbc/sqlanywhere adapters.</p>
+</li><li>
+<p>The filter by associations support now handles cases where the association
+has :conditions or a block (as long as the block does not rely on
+instance-specific behavior).  This allows you to handle the following:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:popular_tags</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Tag</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">tags__popularity</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">9000</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:popular_tags</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-constant">Tag</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]])</pre>
+
+<p>This will return all albums whose popular_tags would include at least one
+of those two tags.  Previously, the block would be ignored, returning
+albums containing one those tags even if the tags weren&#39;t popular.</p>
+</li><li>
+<p>A table_select plugin has been added that changes the default selection for
+models from * to table.*.  This is useful for people who want
+ActiveRecord-like behavior instead of SQL-like behavior, where joining
+tables doesn&#39;t automatically include columns in the other table.</p>
+
+<p>This can fix issues where joining another table that has columns with the
+same name as columns in the model table without specifying an explicit
+selection results in model objects being returned where the values in the
+model object are the values from the joined table instead of the model
+table.</p>
+</li><li>
+<p>Dataset#offset has been added, for specifying offset separately from limit.
+Previous this was possible via:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">offset</span>)</pre>
+
+<p>but this is a friendlier API.</p>
+</li><li>
+<p>The jdbc adapter now has support for foreign key parsing.  This is used if
+there is no specific support for the underlying database.</p>
+</li><li>
+<p>Foreign key parsing is now supported on Oracle.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Association add_*/remove_*/remove_all_* methods for pg_array_to_many
+associations now work on unsaved model objects.</p>
+</li><li>
+<p>In the constraint_validations extension, deletes from the metadata table
+are now processed before inserts, so that dropping an existing constraint
+and readding a constraint with the same name now works correctly.</p>
+</li><li>
+<p>Cloning an association now copies the :eager_block option correctly from
+the source association if it was passed as the block to the source
+association method.</p>
+</li><li>
+<p>Cloning a cloned association now copies the block for the association.</p>
+</li><li>
+<p>The descendants method in the tree plugin no longer modifies an array it is
+iterating over.</p>
+</li><li>
+<p>The jdbc/postgresql adapter now supports PostgreSQL-specific types, with
+pretty much the same support as the postgres adapter.  When using the pg_*
+extensions, the dataset will now handle the PostgreSQL types correctly and
+return instances of the correct Ruby classes (e.g. hstore is returned as
+Sequel::Postgres::HStore).</p>
+
+<p>You should no longer need to use the typecast_on_load or
+pg_typecast_on_load plugins when using model objects that use these types
+when using the jdbc/postgresql adapter.</p>
+</li><li>
+<p>Offset emulation on Oracle now handles cases where selected columns
+can&#39;t be ordered.</p>
+</li><li>
+<p>Offset emulation on DB2 no longer automatically orders on all columns if
+the dataset itself is unordered.</p>
+</li><li>
+<p>Types containing spaces are now returning correctly when parsing the schema
+in the oracle adapter.</p>
+</li><li>
+<p>Database#tables no longer returns tables in the recycle bin on Oracle.</p>
+</li><li>
+<p>add_foreign_key now works correctly on HSQLDB, by splitting the column
+addition and constraint addition into two separate statements.</p>
+</li><li>
+<p>add_primary_key now works correctly on H2.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

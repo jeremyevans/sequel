@@ -1,80 +1,80 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::Plugins::InstanceHooks</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Plugins::InstanceHooks
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../../files/lib/sequel/plugins/instance_hooks_rb.html">lib/sequel/plugins/instance_hooks.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The instance_hooks plugin allows you to add hooks to specific instances, by
-            passing a block to a _hook method (e.g. before_save_hook{do_something}).
-            The block is executed when the hook is called (e.g. before_save).</p>
-            
-            <p>All of the standard hooks are supported. Instance level before hooks are
-            executed in reverse order of addition before calling super.  Instance level
-            after hooks are executed in order of addition after calling super.</p>
-            
-            <p>Instance level hooks for before and after are cleared after all related
-            after level instance hooks have run.  This means that if you add a
-            before_create and before_update instance hooks to a new object, the
-            before_create hook will be run the first time you save the object (creating
-            it), and the before_update hook will be run the second time you save the
-            object (updating it), and no hooks will be run the third time you save the
-            object.</p>
-            
-            <p>Validation hooks are not cleared until after a successful save.</p>
-            
-            <p>Usage:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Add the instance hook methods to all model subclass instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">instance_hooks</span>&#x000A;&#x000A;<span class="ruby-comment"># Add the instance hook methods just to Album instances</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">instance_hooks</span></pre>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a href="InstanceHooks/InstanceMethods.html">Sequel::Plugins::InstanceHooks::InstanceMethods</a></li>
-            </ol>
-          </div>
-          <div id='section'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::Plugins::InstanceHooks</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::InstanceHooks
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/instance_hooks_rb.html">lib/sequel/plugins/instance_hooks.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The instance_hooks plugin allows you to add hooks to specific instances, by
+passing a block to a _hook method (e.g. before_save_hook{do_something}).
+The block is executed when the hook is called (e.g. before_save).</p>
+
+<p>All of the standard hooks are supported. Instance level before hooks are
+executed in reverse order of addition before calling super.  Instance level
+after hooks are executed in order of addition after calling super.</p>
+
+<p>Instance level hooks for before and after are cleared after all related
+after level instance hooks have run.  This means that if you add a
+before_create and before_update instance hooks to a new object, the
+before_create hook will be run the first time you save the object (creating
+it), and the before_update hook will be run the second time you save the
+object (updating it), and no hooks will be run the third time you save the
+object.</p>
+
+<p>Validation hooks are not cleared until after a successful save.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Add the instance hook methods to all model subclass instances (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_hooks</span>&#x000A;&#x000A;<span class="ruby-comment"># Add the instance hook methods just to Album instances</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_hooks</span></pre>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="InstanceHooks/InstanceMethods.html">Sequel::Plugins::InstanceHooks::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,101 +1,106 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>Sequel::DatasetPagination</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='class' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::DatasetPagination
-        </h1>
-        <ol class='paths'>
-          <li>
-            <a href="../../files/lib/sequel/extensions/pagination_rb.html">lib/sequel/extensions/pagination.rb</a>
-          </li>
-        </ol>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-each_page">each_page</a></li>
-              <li><a href="#method-i-paginate">paginate</a></li>
-            </ol>
-          </div>
-          <div id='context'>
-          </div>
-          <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-each_page'>
-                <a name='method-i-each_page'></a>
-                <div class='synopsis'>
-                  <span class='name'>each_page</span>
-                  <span class='arguments'>(page_size)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Yields a paginated dataset for each page and returns the receiver. Does a
-                  count to find the total number of records for this dataset. Returns an
-                  enumerator if no block is given.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-each_page-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-each_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each_page</span>(<span class="ruby-identifier">page_size</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;You cannot paginate a dataset that already has a limit&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">to_enum</span>(<span class="ruby-value">:each_page</span>, <span class="ruby-identifier">page_size</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-identifier">record_count</span> = <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">total_pages</span> = (<span class="ruby-identifier">record_count</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">page_size</span>.<span class="ruby-identifier">to_f</span>).<span class="ruby-identifier">ceil</span>&#x000A;  (<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-identifier">total_pages</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">page_no</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">paginate</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-paginate'>
-                <a name='method-i-paginate'></a>
-                <div class='synopsis'>
-                  <span class='name'>paginate</span>
-                  <span class='arguments'>(page_no, page_size, record_count=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Returns a paginated dataset. The returned dataset is limited to the page
-                  size at the correct offset, and extended with the Pagination module.  If a
-                  record count is not provided, does a count of total number of records for
-                  this dataset.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-paginate-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-paginate-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paginate</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;You cannot paginate a dataset that already has a limit&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;&#x000A;  <span class="ruby-identifier">record_count</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">page_count</span> = (<span class="ruby-identifier">record_count</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">page_size</span>.<span class="ruby-identifier">to_f</span>).<span class="ruby-identifier">ceil</span>&#x000A;  <span class="ruby-identifier">page_count</span> = <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">page_count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;&#x000A;  <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">page_size</span>, (<span class="ruby-identifier">page_no</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">page_size</span>).&#x000A;    <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Pagination</span>).&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:page_size=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">page_size</span>, <span class="ruby-value">:current_page=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">page_no</span>, <span class="ruby-value">:pagination_record_count=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">record_count</span>, <span class="ruby-value">:page_count=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">page_count</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>Sequel::DatasetPagination</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::DatasetPagination
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../files/lib/sequel/extensions/pagination_rb.html">lib/sequel/extensions/pagination.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-each_page">each_page</a></li>
+<li><a href="#method-i-paginate">paginate</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-each_page'>
+<a name='method-i-each_page'></a>
+<div class='synopsis'>
+<span class='name'>each_page</span>
+<span class='arguments'>(page_size)</span>
+
+</div>
+<div class='description'>
+
+<p>Yields a paginated dataset for each page and returns the receiver. Does a
+count to find the total number of records for this dataset. Returns an
+enumerator if no block is given.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each_page-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-each_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each_page</span>(<span class="ruby-identifier">page_size</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;You cannot paginate a dataset that already has a limit&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">to_enum</span>(<span class="ruby-value">:each_page</span>, <span class="ruby-identifier">page_size</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-identifier">record_count</span> = <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">total_pages</span> = (<span class="ruby-identifier">record_count</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">page_size</span>.<span class="ruby-identifier">to_f</span>).<span class="ruby-identifier">ceil</span>&#x000A;  (<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-identifier">total_pages</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">page_no</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">paginate</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-paginate'>
+<a name='method-i-paginate'></a>
+<div class='synopsis'>
+<span class='name'>paginate</span>
+<span class='arguments'>(page_no, page_size, record_count=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns a paginated dataset. The returned dataset is limited to the page
+size at the correct offset, and extended with the Pagination module.  If a
+record count is not provided, does a count of total number of records for
+this dataset.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-paginate-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-paginate-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paginate</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;You cannot paginate a dataset that already has a limit&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;&#x000A;  <span class="ruby-identifier">record_count</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">count</span>&#x000A;  <span class="ruby-identifier">page_count</span> = (<span class="ruby-identifier">record_count</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">page_size</span>.<span class="ruby-identifier">to_f</span>).<span class="ruby-identifier">ceil</span>&#x000A;  <span class="ruby-identifier">page_count</span> = <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">page_count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;&#x000A;  <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">page_size</span>, (<span class="ruby-identifier">page_no</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">page_size</span>).&#x000A;    <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Pagination</span>).&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:page_size</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">page_size</span>, <span class="ruby-value">:current_page</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">page_no</span>, <span class="ruby-value">:pagination_record_count</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">record_count</span>, <span class="ruby-value">:page_count</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">page_count</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

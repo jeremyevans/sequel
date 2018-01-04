@@ -1,76 +1,78 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>symbol_aref_refinement.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>symbol_aref_refinement.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/symbol_aref_refinement.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-10-14 13:06:50 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The symbol_aref_refinement extension adds a refinement that makes <a
-            href="../../../../classes/Symbol.html#method-i-5B-5D">Symbol#[]</a> support
-            <a href="../../../../classes/Symbol.html">Symbol</a>,
-            #Sequel::SQL::Indentifier, and Sequel::SQL::QualifiedIdentifier instances,
-            returning appropriate Sequel::SQL::QualifiedIdentifier instances.  It&#39;s
-            designed as a shortcut so that instead of:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>] <span class="ruby-comment"># table.column</span></pre>
-            
-            <p>you can just write:</p>
-            
-            <pre class="ruby">:<span class="ruby-identifier">table</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-comment"># table.column</span></pre>
-            
-            <p>To load the extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">symbol_aref_refinement</span></pre>
-            
-            <p>To enable the refinement for the current file:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SymbolAref</span></pre>
-            
-            <p>If you would like this extension to be enabled globally instead of as a
-            refinement, use the symbol_aref extension.</p>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/SymbolAref.html">Sequel::SymbolAref</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>symbol_aref_refinement.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>symbol_aref_refinement.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/symbol_aref_refinement.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-10-14 13:06:50 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The symbol_aref_refinement extension adds a refinement that makes <a
+href="../../../../classes/Symbol.html#method-i-5B-5D">Symbol#[]</a> support
+<a href="../../../../classes/Symbol.html">Symbol</a>,
+#Sequel::SQL::Indentifier, and Sequel::SQL::QualifiedIdentifier instances,
+returning appropriate Sequel::SQL::QualifiedIdentifier instances.  It&#39;s
+designed as a shortcut so that instead of:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>] <span class="ruby-comment"># table.column</span></pre>
+
+<p>you can just write:</p>
+
+<pre class="ruby"><span class="ruby-value">:table</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># table.column</span></pre>
+
+<p>To load the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:symbol_aref_refinement</span></pre>
+
+<p>To enable the refinement for the current file:</p>
+
+<pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SymbolAref</span></pre>
+
+<p>If you would like this extension to be enabled globally instead of as a
+refinement, use the symbol_aref extension.</p>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/SymbolAref.html">Sequel::SymbolAref</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

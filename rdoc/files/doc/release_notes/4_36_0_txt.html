@@ -1,140 +1,142 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.36.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.36.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.36.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-07-01 07:48:45 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Sequel::Model::Model() has been added, which allows for Sequel::Model()
-            like behavior where the base class used is a subclass of <a
-            href="../../../classes/Sequel/Model.html">Sequel::Model</a>.  To make it
-            easier to use, Sequel::Model.def_Model has also been added, which takes a
-            module and adds a Model() method to the module that calls Model() on the
-            receiver.</p>
-            
-            <p>A :class_namespace association option has been added to make it possible to
-            set a default namespace for the :class option if given as a symbol or
-            string.</p>
-            
-            <p><a
-            href="../../../classes/Sequel/Model.html">Sequel::Model</a>.Model.cache_anonymous_models
-            has been added and controls whether to cache anonymous model subclasses
-            created by Sequel::Model::Model() on a per-class basis.</p>
-            
-            <p>These changes are designed to make it easier to use namespaced models, for
-            example:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Foo</span>&#x000A;   <span class="ruby-constant">Model</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">def_Model</span>(<span class="ruby-keyword">self</span>)&#x000A;   <span class="ruby-constant">DB</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>[<span class="ruby-string">&#39;FOO_DATABASE_URL&#39;</span>])&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements</span>&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span>[:<span class="ruby-identifier">class_namespace</span>] = <span class="ruby-string">&#39;Foo&#39;</span>&#x000A;&#x000A;   <span class="ruby-keyword">class</span> <span class="ruby-constant">Bar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>&#x000A;     <span class="ruby-comment"># Uses Foo::DB[:bars] as dataset</span>&#x000A;&#x000A;     <span class="ruby-comment"># Implicitly uses Foo::Baz as associated class</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">bazes</span>&#x000A;&#x000A;     <span class="ruby-comment"># Uses Foo::Baz due to :class_namespace option</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">oldest_bazes</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Baz</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>&#x000A;   <span class="ruby-keyword">end</span>&#x000A;&#x000A;   <span class="ruby-keyword">class</span> <span class="ruby-constant">Baz</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>(:<span class="ruby-identifier">my_baz</span>)&#x000A;     <span class="ruby-comment"># Uses Foo::DB[:my_baz] as dataset</span>&#x000A;&#x000A;     <span class="ruby-comment"># Implicitly uses Foo::Bar as associated class</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">bars</span>&#x000A;&#x000A;     <span class="ruby-comment"># Uses Foo::Bar due to :class_namespace option</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">oldest_bars</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Bar</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>&#x000A;   <span class="ruby-keyword">end</span>&#x000A; <span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>A string_agg extension has been added for aggregate string concatentation
-            support on PostgreSQL 9+, SQLAnywhere 12+, Oracle11g+, DB 9.7+, MySQL,
-            HSQLDB, H2, and CUBRID:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">string_agg</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(:<span class="ruby-identifier">c</span>))             <span class="ruby-comment"># &#39;,&#39; default separator</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(:<span class="ruby-identifier">c</span>, <span class="ruby-string">&#39; - &#39;</span>))      <span class="ruby-comment"># custom separator</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(:<span class="ruby-identifier">c</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">bar</span>)) <span class="ruby-comment"># force order</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(:<span class="ruby-identifier">c</span>).<span class="ruby-identifier">distinct</span>)    <span class="ruby-comment"># remove duplicates</span></pre>
-            </li><li>
-            <p>A connection_expiration extension has been added, for automatically
-            removing connections from the connection pool after they have been open for
-            a given amount of time (4 hours by default).</p>
-            </li><li>
-            <p>Support for &lt;, &lt;=, &gt;, and &gt;= operator validations when using
-            integer and string arguments has been added to the constraint_validations
-            extension and plugin.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel/SQL/Function.html#method-i-order">Sequel::SQL::Function#order</a>
-            has been added to support ordered aggregate functions:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">bar</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">baz</span>)&#x000A;<span class="ruby-comment"># foo(bar ORDER BY baz)</span></pre>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The validates_operator validation in validation_helpers now considers nil
-            values as invalid unless :allow_nil or a similar option is used. 
-            Previously, using validates_operator with a nil value would probably raise
-            a NoMethodError.  This makes validates_operator more similar to other
-            validations.</p>
-            </li><li>
-            <p>The threaded connection pools no longer hold the pool mutex when
-            disconnecting connections, which is useful if the driver blocks when
-            disconnecting connections.</p>
-            </li><li>
-            <p>The connection_validator extension no longer holds a reference to
-            connections that have been disconnected.</p>
-            </li><li>
-            <p>The connection_validator extension no longer overwrites the
-            connection_validation_timeout if loaded a second time.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now closes cursors as
-            soon as it is done using them in the oracle adapter, instead of waiting for
-            GC to clean them up.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now handles disconnect
-            errors that occur when literalizing strings in the mysql2 and postgres
-            adapters.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Using the Bignum class as a generic type is now deprecated.  As announced
-            in the 4.35.0 release notes, ruby 2.4 is unifying the Fixnum and Bignum
-            classes into Integer, which results in the behavior of the Bignum class
-            changing.  4.35.0 added support for using the :Bignum symbol as a generic
-            64-bit integer type, and <a href="../../../classes/Sequel.html">Sequel</a>
-            users now need to switch to that to avoid the deprecation warning.</p>
-            
-            <p><a href="../../../classes/Sequel.html">Sequel</a> 4.41.0 (to be released in
-            December), will drop support for using the Bignum class as a generic type. 
-            This is being done before the release of ruby 2.4 to hopefully make it
-            unlikely that users will be subject to a behavior changes when upgrading
-            ruby versions.</p>
-            
-            <p>Related to this change, external adapters need to switch from overriding
-            Database#type_literal_generic_bignum to 
-            Database#type_literal_generic_bignum_symbol.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.36.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.36.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.36.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-07-01 07:48:45 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Sequel::Model::Model() has been added, which allows for Sequel::Model()
+like behavior where the base class used is a subclass of <a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a>.  To make it
+easier to use, Sequel::Model.def_Model has also been added, which takes a
+module and adds a Model() method to the module that calls Model() on the
+receiver.</p>
+
+<p>A :class_namespace association option has been added to make it possible to
+set a default namespace for the :class option if given as a symbol or
+string.</p>
+
+<p><a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a>.Model.cache_anonymous_models
+has been added and controls whether to cache anonymous model subclasses
+created by Sequel::Model::Model() on a per-class basis.</p>
+
+<p>These changes are designed to make it easier to use namespaced models, for
+example:</p>
+
+<pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Foo</span>&#x000A;   <span class="ruby-constant">Model</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">def_Model</span>(<span class="ruby-keyword">self</span>)&#x000A;   <span class="ruby-constant">DB</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>[<span class="ruby-string">&#39;FOO_DATABASE_URL&#39;</span>])&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:prepared_statements</span>&#x000A;   <span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span>[<span class="ruby-value">:class_namespace</span>] = <span class="ruby-string">&#39;Foo&#39;</span>&#x000A;&#x000A;   <span class="ruby-keyword">class</span> <span class="ruby-constant">Bar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>&#x000A;     <span class="ruby-comment"># Uses Foo::DB[:bars] as dataset</span>&#x000A;&#x000A;     <span class="ruby-comment"># Implicitly uses Foo::Baz as associated class</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:bazes</span>&#x000A;&#x000A;     <span class="ruby-comment"># Uses Foo::Baz due to :class_namespace option</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:oldest_bazes</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Baz</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>&#x000A;   <span class="ruby-keyword">end</span>&#x000A;&#x000A;   <span class="ruby-keyword">class</span> <span class="ruby-constant">Baz</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Model</span>(<span class="ruby-value">:my_baz</span>)&#x000A;     <span class="ruby-comment"># Uses Foo::DB[:my_baz] as dataset</span>&#x000A;&#x000A;     <span class="ruby-comment"># Implicitly uses Foo::Bar as associated class</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:bars</span>&#x000A;&#x000A;     <span class="ruby-comment"># Uses Foo::Bar due to :class_namespace option</span>&#x000A;     <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:oldest_bars</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Bar</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>&#x000A;   <span class="ruby-keyword">end</span>&#x000A; <span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>A string_agg extension has been added for aggregate string concatentation
+support on PostgreSQL 9+, SQLAnywhere 12+, Oracle11g+, DB 9.7+, MySQL,
+HSQLDB, H2, and CUBRID:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:string_agg</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>))             <span class="ruby-comment"># &#39;,&#39; default separator</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>, <span class="ruby-string">&#39; - &#39;</span>))      <span class="ruby-comment"># custom separator</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:bar</span>)) <span class="ruby-comment"># force order</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_agg</span>(<span class="ruby-value">:c</span>).<span class="ruby-identifier">distinct</span>)    <span class="ruby-comment"># remove duplicates</span></pre>
+</li><li>
+<p>A connection_expiration extension has been added, for automatically
+removing connections from the connection pool after they have been open for
+a given amount of time (4 hours by default).</p>
+</li><li>
+<p>Support for &lt;, &lt;=, &gt;, and &gt;= operator validations when using
+integer and string arguments has been added to the constraint_validations
+extension and plugin.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel/SQL/Function.html#method-i-order">Sequel::SQL::Function#order</a>
+has been added to support ordered aggregate functions:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">:bar</span>).<span class="ruby-identifier">order</span>(<span class="ruby-value">:baz</span>)&#x000A;<span class="ruby-comment"># foo(bar ORDER BY baz)</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The validates_operator validation in validation_helpers now considers nil
+values as invalid unless :allow_nil or a similar option is used. 
+Previously, using validates_operator with a nil value would probably raise
+a NoMethodError.  This makes validates_operator more similar to other
+validations.</p>
+</li><li>
+<p>The threaded connection pools no longer hold the pool mutex when
+disconnecting connections, which is useful if the driver blocks when
+disconnecting connections.</p>
+</li><li>
+<p>The connection_validator extension no longer holds a reference to
+connections that have been disconnected.</p>
+</li><li>
+<p>The connection_validator extension no longer overwrites the
+connection_validation_timeout if loaded a second time.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now closes cursors as
+soon as it is done using them in the oracle adapter, instead of waiting for
+GC to clean them up.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now handles disconnect
+errors that occur when literalizing strings in the mysql2 and postgres
+adapters.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Using the Bignum class as a generic type is now deprecated.  As announced
+in the 4.35.0 release notes, ruby 2.4 is unifying the Fixnum and Bignum
+classes into Integer, which results in the behavior of the Bignum class
+changing.  4.35.0 added support for using the :Bignum symbol as a generic
+64-bit integer type, and <a href="../../../classes/Sequel.html">Sequel</a>
+users now need to switch to that to avoid the deprecation warning.</p>
+
+<p><a href="../../../classes/Sequel.html">Sequel</a> 4.41.0 (to be released in
+December), will drop support for using the Bignum class as a generic type. 
+This is being done before the release of ruby 2.4 to hopefully make it
+unlikely that users will be subject to a behavior changes when upgrading
+ruby versions.</p>
+
+<p>Related to this change, external adapters need to switch from overriding
+Database#type_literal_generic_bignum to 
+Database#type_literal_generic_bignum_symbol.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

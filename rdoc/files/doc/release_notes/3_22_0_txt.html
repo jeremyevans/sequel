@@ -1,90 +1,92 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.22.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.22.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.22.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Support COLLATE in column definitions.  At least MySQL and Microsoft SQL
-            Server support them, and PostgreSQL 9.1 should as well.</p>
-            </li><li>
-            <p>When connecting to Microsoft SQL Server, you can use the
-            mssql_unicode_strings accessor to turn of the default usage of unicode
-            strings (N&#39;&#39;) and use regular strings (&#39;&#39;). This can
-            improve performance, but changes the behavior.  It&#39;s set to true by
-            default for backwards compatibility.  You can change it at both the dataset
-            and database level:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># default for datasets</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># just this dataset</span></pre>
-            </li><li>
-            <p>In the oracle adapter, if Sequel.application_timezone is :utc, set the
-            timezone for the connection to use the 00:00 timezone.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>In the single_table_inheritance plugin, correctly handle a multi-level
-            class hierarchy so that loading instances from a middle level of the
-            hierarchy can return instances of subclasses.</p>
-            </li><li>
-            <p>Don&#39;t use a schema when creating a temporary table, even if
-            default_schema is set.</p>
-            </li><li>
-            <p>Fix the migrator when a default_schema is used.</p>
-            </li><li>
-            <p>In the ado adapter, assume a connection to SQL Server if the :conn_string
-            is given and doesn&#39;t indicate Access/Jet.</p>
-            </li><li>
-            <p>Fix fetching rows in the tinytds adapter when the identifier_output_method
-            is nil.</p>
-            </li><li>
-            <p>The tinytds adapter now checks for disconnect errors, but it might not be
-            reliable until the next release of tiny_tds.</p>
-            </li><li>
-            <p>The odbc adapter now handles ODBC::Time instances correctly.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.22.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.22.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.22.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Support COLLATE in column definitions.  At least MySQL and Microsoft SQL
+Server support them, and PostgreSQL 9.1 should as well.</p>
+</li><li>
+<p>When connecting to Microsoft SQL Server, you can use the
+mssql_unicode_strings accessor to turn of the default usage of unicode
+strings (N&#39;&#39;) and use regular strings (&#39;&#39;). This can
+improve performance, but changes the behavior.  It&#39;s set to true by
+default for backwards compatibility.  You can change it at both the dataset
+and database level:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># default for datasets</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># just this dataset</span></pre>
+</li><li>
+<p>In the oracle adapter, if Sequel.application_timezone is :utc, set the
+timezone for the connection to use the 00:00 timezone.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>In the single_table_inheritance plugin, correctly handle a multi-level
+class hierarchy so that loading instances from a middle level of the
+hierarchy can return instances of subclasses.</p>
+</li><li>
+<p>Don&#39;t use a schema when creating a temporary table, even if
+default_schema is set.</p>
+</li><li>
+<p>Fix the migrator when a default_schema is used.</p>
+</li><li>
+<p>In the ado adapter, assume a connection to SQL Server if the :conn_string
+is given and doesn&#39;t indicate Access/Jet.</p>
+</li><li>
+<p>Fix fetching rows in the tinytds adapter when the identifier_output_method
+is nil.</p>
+</li><li>
+<p>The tinytds adapter now checks for disconnect errors, but it might not be
+reliable until the next release of tiny_tds.</p>
+</li><li>
+<p>The odbc adapter now handles ODBC::Time instances correctly.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,143 +1,145 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>1.3.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>1.3.txt</h1>
-        <div class='paths'>
-          doc/release_notes/1.3.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h3 id="label-Better+model+associations">Better model associations<span><a href="#label-Better+model+associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>The latest release of sequel_model includes a new associations
-            functionality written by Jeremy Evans which replaces the old relations code
-            in previous versions. Please note that this version is not completely
-            backward-compatible and you should therefore upgrade with caution.</p>
-            
-            <p>The new implementation supports three kinds of relations: one_to_many,
-            many_to_one and many_to_many, which correspond to has_many, belongs_to and
-            has_and_belongs_to_many relations in ActiveRecord. In fact, the new
-            implementation includes aliases for ActiveRecord assocation macros and is
-            basically compatible with ActiveRecord conventions. It also supports DRY
-            implicit class name references. Here&#39;s a simple example:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> :<span class="ruby-identifier">books</span> <span class="ruby-comment"># equivalent to one_to_many</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Book</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> :<span class="ruby-identifier">author</span> <span class="ruby-comment"># equivalent to many_to_one</span>&#x000A;  <span class="ruby-identifier">has_and_belongs_to_many</span> :<span class="ruby-identifier">categories</span> <span class="ruby-comment"># equivalent to many_to_many</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Category</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_and_belongs_to_many</span> :<span class="ruby-identifier">books</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>These macros will create the following methods:</p>
-            <ul><li>
-            <p>Author#books, Author#add_book, Author#remove_book</p>
-            </li><li>
-            <p>Book#author, Book#categories, Book#add_category,</p>
-            </li></ul>
-            
-            <p>Book#remove_category</p>
-            <ul><li>
-            <p>Category#books, Category#add_book, Category#remove_book</p>
-            </li></ul>
-            
-            <p>Unlike ActiveRecord, one_to_many and many_to_many association methods
-            return a dataset:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">books</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt; &#39;SELECT * FROM books WHERE (author_id = 1234)&#39;</span></pre>
-            
-            <p>You can also tell <a href="../../../classes/Sequel.html">Sequel</a> to
-            cache the association result set and return it as an array:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> :<span class="ruby-identifier">books</span>, :<span class="ruby-identifier">cache</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>].<span class="ruby-identifier">books</span>.<span class="ruby-identifier">class</span> <span class="ruby-comment">#=&gt; Array</span></pre>
-            
-            <p>You can of course bypass the defaults and specify class names and key
-            names:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> :<span class="ruby-identifier">parent</span>, :<span class="ruby-keyword">class</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Node</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> :<span class="ruby-identifier">session</span>, :<span class="ruby-identifier">key</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">producer_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>Another useful option is :order, which sets the order for the association
-            dataset:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> :<span class="ruby-identifier">books</span>, :<span class="ruby-identifier">order</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">title</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>].<span class="ruby-identifier">books</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt; &#39;SELECT * FROM books WHERE (author_id =</span></pre>
-            
-            <p>1234) ORDER BY title&#39;</p>
-            
-            <p>More information about associations can be found in the <a
-            href="../../../classes/Sequel.html">Sequel</a> documentation.</p>
-            
-            <h3 id="label-Other+changes">Other changes<span><a href="#label-Other+changes">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            <ul><li>
-            <p>Added configuration file for running specs (#186).</p>
-            </li><li>
-            <p>Changed Database#drop_index to accept fixed arity (#173).</p>
-            </li><li>
-            <p>Changed column definition sql to put UNSIGNED constraint before</p>
-            </li></ul>
-            
-            <p>unique in order to satisfy MySQL (#171).</p>
-            <ul><li>
-            <p>Enhanced MySQL adapter to support load data local infile_, added</p>
-            </li></ul>
-            
-            <p>compress option for mysql connection by default (#172).</p>
-            <ul><li>
-            <p>Fixed bug when inserting hashes in array tuples mode.</p>
-            </li><li>
-            <p>Changed SQLite adapter to catch RuntimeError raised when executing a</p>
-            </li></ul>
-            
-            <p>statement and raise Error::InvalidStatement with the offending SQL and
-            error message (#188).</p>
-            <ul><li>
-            <p>Fixed Dataset#reverse to not raise for unordered dataset (#189).</p>
-            </li><li>
-            <p>Added Dataset#unordered method and changed order to remove order if</p>
-            </li></ul>
-            
-            <p>nil is specified (#190).</p>
-            <ul><li>
-            <p>Fixed reversing order of ASC expression (#164).</p>
-            </li><li>
-            <p>Added support for :null =&gt; true option when defining table columns</p>
-            </li></ul>
-            
-            <p>(#192).</p>
-            <ul><li>
-            <p>Fixed Symbol#method_missing to accept variable arity (#185).</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>1.3.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>1.3.txt
+</h1>
+<div class='paths'>
+doc/release_notes/1.3.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h3 id="label-Better+model+associations">Better model associations<span><a href="#label-Better+model+associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>The latest release of sequel_model includes a new associations
+functionality written by Jeremy Evans which replaces the old relations code
+in previous versions. Please note that this version is not completely
+backward-compatible and you should therefore upgrade with caution.</p>
+
+<p>The new implementation supports three kinds of relations: one_to_many,
+many_to_one and many_to_many, which correspond to has_many, belongs_to and
+has_and_belongs_to_many relations in ActiveRecord. In fact, the new
+implementation includes aliases for ActiveRecord assocation macros and is
+basically compatible with ActiveRecord conventions. It also supports DRY
+implicit class name references. Here&#39;s a simple example:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span> <span class="ruby-comment"># equivalent to one_to_many</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Book</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> <span class="ruby-value">:author</span> <span class="ruby-comment"># equivalent to many_to_one</span>&#x000A;  <span class="ruby-identifier">has_and_belongs_to_many</span> <span class="ruby-value">:categories</span> <span class="ruby-comment"># equivalent to many_to_many</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Category</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_and_belongs_to_many</span> <span class="ruby-value">:books</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>These macros will create the following methods:</p>
+<ul><li>
+<p>Author#books, Author#add_book, Author#remove_book</p>
+</li><li>
+<p>Book#author, Book#categories, Book#add_category,</p>
+</li></ul>
+
+<p>Book#remove_category</p>
+<ul><li>
+<p>Category#books, Category#add_book, Category#remove_book</p>
+</li></ul>
+
+<p>Unlike ActiveRecord, one_to_many and many_to_many association methods
+return a dataset:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">books</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt; &#39;SELECT * FROM books WHERE (author_id = 1234)&#39;</span></pre>
+
+<p>You can also tell <a href="../../../classes/Sequel.html">Sequel</a> to
+cache the association result set and return it as an array:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span>, <span class="ruby-value">:cache</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>].<span class="ruby-identifier">books</span>.<span class="ruby-identifier">class</span> <span class="ruby-comment">#=&gt; Array</span></pre>
+
+<p>You can of course bypass the defaults and specify class names and key
+names:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> <span class="ruby-value">:parent</span>, <span class="ruby-value">:class</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Node</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> <span class="ruby-value">:session</span>, <span class="ruby-value">:key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:producer_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>Another useful option is :order, which sets the order for the association
+dataset:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span>, <span class="ruby-value">:order</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:title</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>].<span class="ruby-identifier">books</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt; &#39;SELECT * FROM books WHERE (author_id =</span></pre>
+
+<p>1234) ORDER BY title&#39;</p>
+
+<p>More information about associations can be found in the <a
+href="../../../classes/Sequel.html">Sequel</a> documentation.</p>
+
+<h3 id="label-Other+changes">Other changes<span><a href="#label-Other+changes">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Added configuration file for running specs (#186).</p>
+</li><li>
+<p>Changed Database#drop_index to accept fixed arity (#173).</p>
+</li><li>
+<p>Changed column definition sql to put UNSIGNED constraint before</p>
+</li></ul>
+
+<p>unique in order to satisfy MySQL (#171).</p>
+<ul><li>
+<p>Enhanced MySQL adapter to support load data local infile_, added</p>
+</li></ul>
+
+<p>compress option for mysql connection by default (#172).</p>
+<ul><li>
+<p>Fixed bug when inserting hashes in array tuples mode.</p>
+</li><li>
+<p>Changed SQLite adapter to catch RuntimeError raised when executing a</p>
+</li></ul>
+
+<p>statement and raise Error::InvalidStatement with the offending SQL and
+error message (#188).</p>
+<ul><li>
+<p>Fixed Dataset#reverse to not raise for unordered dataset (#189).</p>
+</li><li>
+<p>Added Dataset#unordered method and changed order to remove order if</p>
+</li></ul>
+
+<p>nil is specified (#190).</p>
+<ul><li>
+<p>Fixed reversing order of ASC expression (#164).</p>
+</li><li>
+<p>Added support for :null =&gt; true option when defining table columns</p>
+</li></ul>
+
+<p>(#192).</p>
+<ul><li>
+<p>Fixed Symbol#method_missing to accept variable arity (#185).</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

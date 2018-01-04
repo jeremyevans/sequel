@@ -1,126 +1,128 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.38.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.38.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.38.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-09-01 11:38:43 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a
-            href="../../../classes/Sequel/SQL/NumericMethods.html#method-i-coerce">Sequel::SQL::NumericMethods#coerce</a>
-            has been added, which adds support for ruby&#39;s coercion protocol when
-            performing numeric operations.  Previously, <a
-            href="../../../classes/Sequel.html">Sequel</a> supported code like:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>}</pre>
-            
-            <p>This is because a in this case returns a Sequel::SQL::Indentifier, which
-            defines #- to return a <a
-            href="../../../classes/Sequel/SQL/NumericExpression.html">Sequel::SQL::NumericExpression</a>.
-            By supporting coerce, the following code now also works:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span>}</pre>
-            
-            <p>This is because Integer#- calls coerce on the argument if it is defined
-            (ruby&#39;s coercion protocol).  Previously, you had to handle this
-            differently, using something like:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>)</pre>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the **
-            operator for exponentiation on expressions, similar to the +, -, *, and /
-            operators.  <a href="../../../classes/Sequel.html">Sequel</a> uses the
-            database power function to implement this by default on the databases that
-            support it (most of them).  On Access, it uses the ^ operator, on Derby it
-            is emulated using a combination of exp/ln (with some loss of precision). 
-            SQLite doesn&#39;t support a power function at all, but <a
-            href="../../../classes/Sequel.html">Sequel</a> emulates it using
-            multiplication for known integer exponents.</p>
-            </li><li>
-            <p>Sequel::SQLTime.date= has been added, which allows you to set the date used
-            for <a href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a>
-            instances.  <a
-            href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> is a
-            subclass of Time that is literalized using only the time components, and is
-            the ruby class used to store values of database time columns on most
-            adapters.  <a
-            href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> defaults to
-            using the current date, but you can now set a specific date, for more
-            consistency with some drivers (Mysql2 uses 2000-01-01, tiny_tds uses
-            1900-01-01).</p>
-            </li><li>
-            <p>The postgres adapter now supports a :driver_options option when using the
-            pg driver, which is passed directly to pg.  This can be used to specify a
-            client SSL certificate or to specify the certificate authority root
-            certificate when using :sslmode=&gt;&#39;verify-full&#39;.</p>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses
-            after_commit/rollback database hooks by default if the
-            after_commit/after_rollback model methods are not overridden. This provides
-            a performance speedup, but the main benefit is that it no longer causes
-            memory issues when saving a large number of model instances in a single
-            transaction, and it also works with prepared transactions/2 phase commit. 
-            You can still set use_after_commit_rollback= manually to force the
-            after_commit/rollback setting.</p>
-            
-            <p>Note that <a href="../../../classes/Sequel.html">Sequel</a> 5 will move
-            after_commit/rollback model hooks to a plugin, and the default and
-            recommended approach will be to use the database after_commit/rollback
-            hooks in the after_save or similar model hooks.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>
-            use_after_commit_rollback class and instance methods now return nil by
-            default instead of true.  nil now indicates the default behavior of
-            checking whether the appropriate model hook has been defined, and only
-            adding a database hook if so.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.38.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.38.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.38.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-09-01 11:38:43 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a
+href="../../../classes/Sequel/SQL/NumericMethods.html#method-i-coerce">Sequel::SQL::NumericMethods#coerce</a>
+has been added, which adds support for ruby&#39;s coercion protocol when
+performing numeric operations.  Previously, <a
+href="../../../classes/Sequel.html">Sequel</a> supported code like:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>}</pre>
+
+<p>This is because a in this case returns a Sequel::SQL::Indentifier, which
+defines #- to return a <a
+href="../../../classes/Sequel/SQL/NumericExpression.html">Sequel::SQL::NumericExpression</a>.
+By supporting coerce, the following code now also works:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span>}</pre>
+
+<p>This is because Integer#- calls coerce on the argument if it is defined
+(ruby&#39;s coercion protocol).  Previously, you had to handle this
+differently, using something like:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>)</pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the **
+operator for exponentiation on expressions, similar to the +, -, *, and /
+operators.  <a href="../../../classes/Sequel.html">Sequel</a> uses the
+database power function to implement this by default on the databases that
+support it (most of them).  On Access, it uses the ^ operator, on Derby it
+is emulated using a combination of exp/ln (with some loss of precision). 
+SQLite doesn&#39;t support a power function at all, but <a
+href="../../../classes/Sequel.html">Sequel</a> emulates it using
+multiplication for known integer exponents.</p>
+</li><li>
+<p>Sequel::SQLTime.date= has been added, which allows you to set the date used
+for <a href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a>
+instances.  <a
+href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> is a
+subclass of Time that is literalized using only the time components, and is
+the ruby class used to store values of database time columns on most
+adapters.  <a
+href="../../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> defaults to
+using the current date, but you can now set a specific date, for more
+consistency with some drivers (Mysql2 uses 2000-01-01, tiny_tds uses
+1900-01-01).</p>
+</li><li>
+<p>The postgres adapter now supports a :driver_options option when using the
+pg driver, which is passed directly to pg.  This can be used to specify a
+client SSL certificate or to specify the certificate authority root
+certificate when using :sslmode=&gt;&#39;verify-full&#39;.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses
+after_commit/rollback database hooks by default if the
+after_commit/after_rollback model methods are not overridden. This provides
+a performance speedup, but the main benefit is that it no longer causes
+memory issues when saving a large number of model instances in a single
+transaction, and it also works with prepared transactions/2 phase commit. 
+You can still set use_after_commit_rollback= manually to force the
+after_commit/rollback setting.</p>
+
+<p>Note that <a href="../../../classes/Sequel.html">Sequel</a> 5 will move
+after_commit/rollback model hooks to a plugin, and the default and
+recommended approach will be to use the database after_commit/rollback
+hooks in the after_save or similar model hooks.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>
+use_after_commit_rollback class and instance methods now return nil by
+default instead of true.  nil now indicates the default behavior of
+checking whether the appropriate model hook has been defined, and only
+adding a database hook if so.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

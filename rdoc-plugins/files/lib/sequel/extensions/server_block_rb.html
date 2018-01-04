@@ -1,84 +1,86 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>server_block.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>server_block.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/server_block.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-05-16 17:16:37 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The server_block extension adds the Database#with_server method, which
-            takes a shard argument and a block, and makes it so that access inside the
-            block will use the specified shard by default.</p>
-            
-            <p>First, you need to enable it on the database object:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span></pre>
-            
-            <p>Then you can call with_server:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">shard2</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses default</span></pre>
-            
-            <p>You can nest calls to with_server:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard2</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses default</span></pre>
-            
-            <p>Note that if you pass the nil, :default, or :read_only server/shard names
-            to Dataset#server inside a with_server block, they will be ignored and the
-            server/shard given to with_server will be used:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">shard2</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-keyword">nil</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">default</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">read_only</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>If you pass two separate shards to with_server, the second shard will be
-            used instead of the :read_only shard, and the first shard will be used
-            instead of the :default shard:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard1</span>, :<span class="ruby-identifier">shard2</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">shard3</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard3</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">shard3</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard3</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">default</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">read_only</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>Related modules: <a
-            href="../../../../classes/Sequel/ServerBlock.html">Sequel::ServerBlock</a>,
-            <a
-            href="../../../../classes/Sequel/UnthreadedServerBlock.html">Sequel::UnthreadedServerBlock</a>,
-            <a
-            href="../../../../classes/Sequel/ThreadedServerBlock.html">Sequel::ThreadedServerBlock</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>server_block.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>server_block.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/server_block.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-05-16 17:16:37 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The server_block extension adds the Database#with_server method, which
+takes a shard argument and a block, and makes it so that access inside the
+block will use the specified shard by default.</p>
+
+<p>First, you need to enable it on the database object:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span></pre>
+
+<p>Then you can call with_server:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:shard2</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses default</span></pre>
+
+<p>You can nest calls to with_server:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:shard2</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses default</span></pre>
+
+<p>Note that if you pass the nil, :default, or :read_only server/shard names
+to Dataset#server inside a with_server block, they will be ignored and the
+server/shard given to with_server will be used:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:shard2</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-keyword">nil</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>If you pass two separate shards to with_server, the second shard will be
+used instead of the :read_only shard, and the first shard will be used
+instead of the :default shard:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:shard3</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard3</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:shard3</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard3</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>Related modules: <a
+href="../../../../classes/Sequel/ServerBlock.html">Sequel::ServerBlock</a>,
+<a
+href="../../../../classes/Sequel/UnthreadedServerBlock.html">Sequel::UnthreadedServerBlock</a>,
+<a
+href="../../../../classes/Sequel/ThreadedServerBlock.html">Sequel::ThreadedServerBlock</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

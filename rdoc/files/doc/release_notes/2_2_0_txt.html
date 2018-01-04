@@ -1,267 +1,269 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>2.2.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>2.2.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/2.2.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2013-11-10 14:46:11 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The Most Powerful and Flexible Associations of Any Ruby ORM</p>
-            <hr>
-            
-            <p><a href="../../../classes/Sequel.html">Sequel</a> can now support any
-            association type supported by ActiveRecord, and many association types
-            ActiveRecord doesn&#39;t support.</p>
-            
-            <p>Association callbacks (:before_add, :after_add, :before_remove,
-            :after_remove) have been added, and work for all association types.  Each
-            of the callback options can be a Symbol specifying an instance method that
-            takes one argument (the associated object), or a Proc that takes two
-            arguments (the current object and the associated object), or an array of
-            Symbols and Procs.  Additionally, an :after_load callback is available,
-            which is running after loading the associated record(s) from the database.</p>
-            
-            <p>Association extensions are now supported:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">FindOrCreate</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">find_or_create</span>(<span class="ruby-identifier">vals</span>)&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">authorships</span>, :<span class="ruby-identifier">extend=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">FindOrCreate</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
-            
-            <p><a href="../../../classes/Sequel.html">Sequel</a> has been able to support
-            most has_many :through style associations since 1.3, via many_to_many
-            (since it doesn&#39;t break on join tables that are also model tables,
-            unlike ActiveRecord&#39;s has_and_belongs_to_many).  Now it can also
-            support has_many :through style associations where it goes through a
-            has_many association.</p>
-            
-            <p><a href="../../../classes/Sequel.html">Sequel</a> can now support
-            polymorphic associations.  Polymorphic associations are really a design
-            flaw, so <a href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t
-            support them directly, but the tools that <a
-            href="../../../classes/Sequel.html">Sequel</a> gives you make them pretty
-            easy to implement.</p>
-            
-            <p><a href="../../../classes/Sequel.html">Sequel</a> can also support
-            associations that ActiveRecord does not.  For example, a belongs_to
-            association where the column referenced in the associated table is not the
-            primary key, an association that depends on multiple columns in each table,
-            or even situations where the association has a column in the primary table
-            that can be referenced by any of multiple columns in a second table that
-            has a has_one style association with the table you want to associate with.</p>
-            
-            <p>Some of those associations can be supported for a single object using
-            custom SQL in ActiveRecord, but none are supported when eager loading or
-            allow further filtering.</p>
-            
-            <p>Not only can all of these cases be supported with <a
-            href="../../../classes/Sequel/Model.html">Sequel::Model</a>, all can be
-            supported with eager loading, and can allow for further filtering. See <a
-            href="http://sequel.rubyforge.org/files/sequel/doc/advanced_associations_rdoc.html">sequel.rubyforge.org/files/sequel/doc/advanced_associations_rdoc.html</a>
-            for details and example code for all association types covered above.</p>
-            
-            <p>There have also been many additional options added for controlling eager
-            loading via eager_graph.  Every part of the SQL JOINs can now be controlled
-            via one of the options, so you can use JOIN USING, NATURAL JOIN, or
-            arbitrary JOIN ON conditions.</p>
-            
-            <p>Finally, just to show off the power that <a
-            href="../../../classes/Sequel.html">Sequel</a> gives you when eager
-            loading, here is example code that will eagerly load all descendants and
-            ancestors in a tree structure, without knowing the depth of the tree:</p>
-            
-            <pre>class Node &lt; Sequel::Model&#x000A;  set_schema do&#x000A;    primary_key :id&#x000A;    foreign_key :parent_id, :nodes&#x000A;  end&#x000A;  create_table&#x000A;  many_to_one :parent&#x000A;  one_to_many :children, :key=&gt;:parent_id&#x000A;&#x000A;  # Only useful when eager loading&#x000A;  many_to_one :ancestors, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
-            
-            <p>associations|</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Handle cases where the root node has the same parent_id as</span></pre>
-            
-            <p>primary_key</p>
-            
-            <pre># and also when it is NULL&#x000A;non_root_nodes = nodes.reject do |n|&#x000A;  if [nil, n.pk].include?(n.parent_id)&#x000A;    # Make sure root nodes have their parent association set to</pre>
-            
-            <p>nil</p>
-            
-            <pre>    n.associations[:parent] = nil&#x000A;    true&#x000A;  else&#x000A;    false&#x000A;  end&#x000A;end&#x000A;unless non_root_nodes.empty?&#x000A;  id_map = {}&#x000A;  # Create an map of parent_ids to nodes that have that parent id&#x000A;  non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) &lt;&lt; n}&#x000A;  # Doesn&#39;t cause an infinte loop, because when only the root node&#x000A;  # is left, this is not called.&#x000A;  Node.filter(Node.primary_key=&gt;id_map.keys).eager(:ancestors).all</pre>
-            
-            <p>do |node|</p>
-            
-            <pre>      # Populate the parent association for each node&#x000A;      id_map[node.pk].each{|n| n.associations[:parent] = node}&#x000A;    end&#x000A;  end&#x000A;end)&#x000A;many_to_one :descendants, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
-            
-            <p>associations|</p>
-            
-            <pre>id_map = {}&#x000A;nodes.each do |n|&#x000A;  # Initialize an empty array of child associations for each</pre>
-            
-            <p>parent node</p>
-            
-            <pre>  n.associations[:children] = []&#x000A;  # Populate identity map of nodes&#x000A;  id_map[n.pk] = n&#x000A;end&#x000A;# Doesn&#39;t cause an infinite loop, because the :eager_loader is not</pre>
-            
-            <p>called</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># if no records are returned.  Exclude id = parent_id to avoid</span></pre>
-            
-            <p>infinite loop</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># if the root note is one of the returned records and it has</span></pre>
-            
-            <p>parent_id = id</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># instead of parent_id = NULL.</span>&#x000A;<span class="ruby-constant">Node</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">parent_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">parent_id</span>).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">descendants</span>).<span class="ruby-identifier">all</span></pre>
-            
-            <p>do |node|</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Get the parent from the identity map</span>&#x000A;<span class="ruby-identifier">parent</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent_id</span>]&#x000A;<span class="ruby-comment"># Set the child&#39;s parent association to the parent</span>&#x000A;<span class="ruby-identifier">node</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">parent</span>] = <span class="ruby-identifier">parent</span>&#x000A;<span class="ruby-comment"># Add the child association to the array of children in the</span></pre>
-            
-            <p>parent</p>
-            
-            <pre>      parent.associations[:children] &lt;&lt; node&#x000A;    end&#x000A;  end)&#x000A;end&#x000A;nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
-            
-            <p>New Adapter Features</p>
-            <hr>
-            <ul><li>
-            <p>PostgreSQL bytea fields are now fully supported.</p>
-            </li><li>
-            <p>The PostgreSQL adapter now uses the safer connection-specific string
-            escaping if you are using ruby-pg.</p>
-            </li><li>
-            <p>The SQLite adapter supports drop_column and add_index.</p>
-            </li><li>
-            <p>You can now use URL parameters in the connection string, enabling you to
-            connect to PostgreSQL via a socket using
-            postgres://user:password@blah/database?host=/tmp</p>
-            </li></ul>
-            
-            <p>Other New Features</p>
-            <hr>
-            <ul><li>
-            <p>Dataset#graph now takes a block which it passes to join_table.</p>
-            </li><li>
-            <p>Symbol#identifier has been added, which can be used if another library
-            defines the same operator(s) on Symbol that <a
-            href="../../../classes/Sequel.html">Sequel</a> defines.</p>
-            </li><li>
-            <p>Filter blocks now yield a VirtualRow instance, which can yield Identifiers,
-            QualifiedIdentifiers, or Functions.  Like Symbol#identifier, this is useful
-            if another library defines the same operator(s) on Symbol that <a
-            href="../../../classes/Sequel.html">Sequel</a> defines.</p>
-            </li><li>
-            <p>You can now call Model.to_hash to get an identity map for all rows (before
-            this required Model.dataset.to_hash).</p>
-            </li><li>
-            <p>A model that can get it&#39;s column information from the schema will set
-            it in the dataset, potentially saving many queries.</p>
-            </li><li>
-            <p>Model.validates_presence_of now works correctly for boolean columns.</p>
-            </li></ul>
-            
-            <p>Notable Bug Fixes</p>
-            <hr>
-            <ul><li>
-            <p>Caching now works with Model subclasses.</p>
-            </li><li>
-            <p>Model validation methods now work with source reloading.</p>
-            </li><li>
-            <p>The PostgreSQL adapter no longer raises an Error if you try to insert a
-            record with the primary key already specified.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> no longer messes with the
-            native MySQL adapter, so you can use <a
-            href="../../../classes/Sequel.html">Sequel</a> and ActiveRecord with MySQL
-            in the same process.</p>
-            </li><li>
-            <p>Dataset#count now works correctly for limited dataset.</p>
-            </li><li>
-            <p>PostgreSQL Database#transaction method yields a connection, similar to the
-            other adapters.</p>
-            </li><li>
-            <p>Using a hash argument in distinct, order, or group is treated as an
-            expression instead of a column alias.</p>
-            </li><li>
-            <p>Cloned datasets no longer ignore the existing columns unless it is
-            necessary.</p>
-            </li><li>
-            <p>The :quote_identifiers and :single_threaded Database options now work
-            correctly.</p>
-            </li></ul>
-            
-            <p>Backwards Incompatible Changes</p>
-            <hr>
-            <ul><li>
-            <p>ParseTree support, deprecated in 2.1.0, has been removed in 2.2.0. You
-            should use the expression filter syntax instead, perferably without the
-            block (though it can be used inside a block as well). This usually involves
-            the following types of changes:</p>
-            
-            <pre>filter{:x == :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &lt;&lt; :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &amp;&amp; :y} =&gt; filter(:x &amp; :y) # Don&#39;t forget about change&#x000A;filter{:x || :y} =&gt; filter(:x | :y) #  in operator precedence&#x000A;filter{:x.like?(&#39;%blah%&#39;)} =&gt; filter(:x.like(&#39;%blah%&#39;))&#x000A;filter do =&gt; filter((:x &gt; 1) &amp; (:y &lt; 2))&#x000A;  :x &gt; 1&#x000A;  :y &lt; 2&#x000A;end</pre>
-            </li><li>
-            <p>Attempts to save an invalid Model instance will raise an error by default. 
-            To revert to returning a nil value, use:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Instance</span></pre>
-            
-            <p>Note that before, save would return false where now it returns nil if you
-            disable raising on save failure.</p>
-            </li><li>
-            <p>Dataset#update no longer takes a block, as it&#39;s use of the block
-            depended on ParseTree.  With the introduction of the expression syntax in
-            2.0.0, it&#39;s no longer necessary.  You should use a hash with an
-            expression as the value instead:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
-            </li><li>
-            <p>validates_presence of now considers false as present instead of absent. 
-            This is so it works with boolean columns.</p>
-            </li><li>
-            <p>Dataset#graph ignores any previously selected columns when it is called for
-            the first time.</p>
-            </li><li>
-            <p>Dataset#columns ignores any filtering, ordering, or distinct clauses.  This
-            shouldn&#39;t cause issues unless you were using SQL functions with side
-            effects and expecting them to be called when columns was called (unlikely
-            at best).</p>
-            </li></ul>
-            
-            <p>One significant point of note is that the 2.2.0 release will be the last
-            release with both a sequel_core and sequel gem.  Starting with 2.3.0 they
-            will be combined into one sequel gem.  You will still be able to get just
-            the sequel_core part by requiring &#39;sequel_core&#39;, but they will be
-            packaged together.</p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>2.2.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>2.2.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/2.2.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2013-11-10 14:46:11 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The Most Powerful and Flexible Associations of Any Ruby ORM</p>
+<hr>
+
+<p><a href="../../../classes/Sequel.html">Sequel</a> can now support any
+association type supported by ActiveRecord, and many association types
+ActiveRecord doesn&#39;t support.</p>
+
+<p>Association callbacks (:before_add, :after_add, :before_remove,
+:after_remove) have been added, and work for all association types.  Each
+of the callback options can be a Symbol specifying an instance method that
+takes one argument (the associated object), or a Proc that takes two
+arguments (the current object and the associated object), or an array of
+Symbols and Procs.  Additionally, an :after_load callback is available,
+which is running after loading the associated record(s) from the database.</p>
+
+<p>Association extensions are now supported:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">FindOrCreate</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_create</span>(<span class="ruby-identifier">vals</span>)&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:authorships</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">FindOrCreate</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
+
+<p><a href="../../../classes/Sequel.html">Sequel</a> has been able to support
+most has_many :through style associations since 1.3, via many_to_many
+(since it doesn&#39;t break on join tables that are also model tables,
+unlike ActiveRecord&#39;s has_and_belongs_to_many).  Now it can also
+support has_many :through style associations where it goes through a
+has_many association.</p>
+
+<p><a href="../../../classes/Sequel.html">Sequel</a> can now support
+polymorphic associations.  Polymorphic associations are really a design
+flaw, so <a href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t
+support them directly, but the tools that <a
+href="../../../classes/Sequel.html">Sequel</a> gives you make them pretty
+easy to implement.</p>
+
+<p><a href="../../../classes/Sequel.html">Sequel</a> can also support
+associations that ActiveRecord does not.  For example, a belongs_to
+association where the column referenced in the associated table is not the
+primary key, an association that depends on multiple columns in each table,
+or even situations where the association has a column in the primary table
+that can be referenced by any of multiple columns in a second table that
+has a has_one style association with the table you want to associate with.</p>
+
+<p>Some of those associations can be supported for a single object using
+custom SQL in ActiveRecord, but none are supported when eager loading or
+allow further filtering.</p>
+
+<p>Not only can all of these cases be supported with <a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a>, all can be
+supported with eager loading, and can allow for further filtering. See <a
+href="http://sequel.rubyforge.org/files/sequel/doc/advanced_associations_rdoc.html">sequel.rubyforge.org/files/sequel/doc/advanced_associations_rdoc.html</a>
+for details and example code for all association types covered above.</p>
+
+<p>There have also been many additional options added for controlling eager
+loading via eager_graph.  Every part of the SQL JOINs can now be controlled
+via one of the options, so you can use JOIN USING, NATURAL JOIN, or
+arbitrary JOIN ON conditions.</p>
+
+<p>Finally, just to show off the power that <a
+href="../../../classes/Sequel.html">Sequel</a> gives you when eager
+loading, here is example code that will eagerly load all descendants and
+ancestors in a tree structure, without knowing the depth of the tree:</p>
+
+<pre>class Node &lt; Sequel::Model&#x000A;  set_schema do&#x000A;    primary_key :id&#x000A;    foreign_key :parent_id, :nodes&#x000A;  end&#x000A;  create_table&#x000A;  many_to_one :parent&#x000A;  one_to_many :children, :key=&gt;:parent_id&#x000A;&#x000A;  # Only useful when eager loading&#x000A;  many_to_one :ancestors, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
+
+<p>associations|</p>
+
+<pre class="ruby"><span class="ruby-comment"># Handle cases where the root node has the same parent_id as</span></pre>
+
+<p>primary_key</p>
+
+<pre># and also when it is NULL&#x000A;non_root_nodes = nodes.reject do |n|&#x000A;  if [nil, n.pk].include?(n.parent_id)&#x000A;    # Make sure root nodes have their parent association set to</pre>
+
+<p>nil</p>
+
+<pre>    n.associations[:parent] = nil&#x000A;    true&#x000A;  else&#x000A;    false&#x000A;  end&#x000A;end&#x000A;unless non_root_nodes.empty?&#x000A;  id_map = {}&#x000A;  # Create an map of parent_ids to nodes that have that parent id&#x000A;  non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) &lt;&lt; n}&#x000A;  # Doesn&#39;t cause an infinte loop, because when only the root node&#x000A;  # is left, this is not called.&#x000A;  Node.filter(Node.primary_key=&gt;id_map.keys).eager(:ancestors).all</pre>
+
+<p>do |node|</p>
+
+<pre>      # Populate the parent association for each node&#x000A;      id_map[node.pk].each{|n| n.associations[:parent] = node}&#x000A;    end&#x000A;  end&#x000A;end)&#x000A;many_to_one :descendants, :eager_loader=&gt;(proc do |key_hash, nodes,</pre>
+
+<p>associations|</p>
+
+<pre>id_map = {}&#x000A;nodes.each do |n|&#x000A;  # Initialize an empty array of child associations for each</pre>
+
+<p>parent node</p>
+
+<pre>  n.associations[:children] = []&#x000A;  # Populate identity map of nodes&#x000A;  id_map[n.pk] = n&#x000A;end&#x000A;# Doesn&#39;t cause an infinite loop, because the :eager_loader is not</pre>
+
+<p>called</p>
+
+<pre class="ruby"><span class="ruby-comment"># if no records are returned.  Exclude id = parent_id to avoid</span></pre>
+
+<p>infinite loop</p>
+
+<pre class="ruby"><span class="ruby-comment"># if the root note is one of the returned records and it has</span></pre>
+
+<p>parent_id = id</p>
+
+<pre class="ruby"><span class="ruby-comment"># instead of parent_id = NULL.</span>&#x000A;<span class="ruby-constant">Node</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:parent_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:parent_id</span>).<span class="ruby-identifier">eager</span>(<span class="ruby-value">:descendants</span>).<span class="ruby-identifier">all</span></pre>
+
+<p>do |node|</p>
+
+<pre class="ruby"><span class="ruby-comment"># Get the parent from the identity map</span>&#x000A;<span class="ruby-identifier">parent</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent_id</span>]&#x000A;<span class="ruby-comment"># Set the child&#39;s parent association to the parent</span>&#x000A;<span class="ruby-identifier">node</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-value">:parent</span>] = <span class="ruby-identifier">parent</span>&#x000A;<span class="ruby-comment"># Add the child association to the array of children in the</span></pre>
+
+<p>parent</p>
+
+<pre>      parent.associations[:children] &lt;&lt; node&#x000A;    end&#x000A;  end)&#x000A;end&#x000A;nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
+
+<p>New Adapter Features</p>
+<hr>
+<ul><li>
+<p>PostgreSQL bytea fields are now fully supported.</p>
+</li><li>
+<p>The PostgreSQL adapter now uses the safer connection-specific string
+escaping if you are using ruby-pg.</p>
+</li><li>
+<p>The SQLite adapter supports drop_column and add_index.</p>
+</li><li>
+<p>You can now use URL parameters in the connection string, enabling you to
+connect to PostgreSQL via a socket using
+postgres://user:password@blah/database?host=/tmp</p>
+</li></ul>
+
+<p>Other New Features</p>
+<hr>
+<ul><li>
+<p>Dataset#graph now takes a block which it passes to join_table.</p>
+</li><li>
+<p>Symbol#identifier has been added, which can be used if another library
+defines the same operator(s) on Symbol that <a
+href="../../../classes/Sequel.html">Sequel</a> defines.</p>
+</li><li>
+<p>Filter blocks now yield a VirtualRow instance, which can yield Identifiers,
+QualifiedIdentifiers, or Functions.  Like Symbol#identifier, this is useful
+if another library defines the same operator(s) on Symbol that <a
+href="../../../classes/Sequel.html">Sequel</a> defines.</p>
+</li><li>
+<p>You can now call Model.to_hash to get an identity map for all rows (before
+this required Model.dataset.to_hash).</p>
+</li><li>
+<p>A model that can get it&#39;s column information from the schema will set
+it in the dataset, potentially saving many queries.</p>
+</li><li>
+<p>Model.validates_presence_of now works correctly for boolean columns.</p>
+</li></ul>
+
+<p>Notable Bug Fixes</p>
+<hr>
+<ul><li>
+<p>Caching now works with Model subclasses.</p>
+</li><li>
+<p>Model validation methods now work with source reloading.</p>
+</li><li>
+<p>The PostgreSQL adapter no longer raises an Error if you try to insert a
+record with the primary key already specified.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> no longer messes with the
+native MySQL adapter, so you can use <a
+href="../../../classes/Sequel.html">Sequel</a> and ActiveRecord with MySQL
+in the same process.</p>
+</li><li>
+<p>Dataset#count now works correctly for limited dataset.</p>
+</li><li>
+<p>PostgreSQL Database#transaction method yields a connection, similar to the
+other adapters.</p>
+</li><li>
+<p>Using a hash argument in distinct, order, or group is treated as an
+expression instead of a column alias.</p>
+</li><li>
+<p>Cloned datasets no longer ignore the existing columns unless it is
+necessary.</p>
+</li><li>
+<p>The :quote_identifiers and :single_threaded Database options now work
+correctly.</p>
+</li></ul>
+
+<p>Backwards Incompatible Changes</p>
+<hr>
+<ul><li>
+<p>ParseTree support, deprecated in 2.1.0, has been removed in 2.2.0. You
+should use the expression filter syntax instead, perferably without the
+block (though it can be used inside a block as well). This usually involves
+the following types of changes:</p>
+
+<pre>filter{:x == :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &lt;&lt; :y} =&gt; filter(:x =&gt; :y)&#x000A;filter{:x &amp;&amp; :y} =&gt; filter(:x &amp; :y) # Don&#39;t forget about change&#x000A;filter{:x || :y} =&gt; filter(:x | :y) #  in operator precedence&#x000A;filter{:x.like?(&#39;%blah%&#39;)} =&gt; filter(:x.like(&#39;%blah%&#39;))&#x000A;filter do =&gt; filter((:x &gt; 1) &amp; (:y &lt; 2))&#x000A;  :x &gt; 1&#x000A;  :y &lt; 2&#x000A;end</pre>
+</li><li>
+<p>Attempts to save an invalid Model instance will raise an error by default. 
+To revert to returning a nil value, use:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Instance</span></pre>
+
+<p>Note that before, save would return false where now it returns nil if you
+disable raising on save failure.</p>
+</li><li>
+<p>Dataset#update no longer takes a block, as it&#39;s use of the block
+depended on ParseTree.  With the introduction of the expression syntax in
+2.0.0, it&#39;s no longer necessary.  You should use a hash with an
+expression as the value instead:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
+</li><li>
+<p>validates_presence of now considers false as present instead of absent. 
+This is so it works with boolean columns.</p>
+</li><li>
+<p>Dataset#graph ignores any previously selected columns when it is called for
+the first time.</p>
+</li><li>
+<p>Dataset#columns ignores any filtering, ordering, or distinct clauses.  This
+shouldn&#39;t cause issues unless you were using SQL functions with side
+effects and expecting them to be called when columns was called (unlikely
+at best).</p>
+</li></ul>
+
+<p>One significant point of note is that the 2.2.0 release will be the last
+release with both a sequel_core and sequel gem.  Starting with 2.3.0 they
+will be combined into one sequel gem.  You will still be able to get just
+the sequel_core part by requiring &#39;sequel_core&#39;, but they will be
+packaged together.</p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

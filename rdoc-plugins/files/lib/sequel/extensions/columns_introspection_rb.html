@@ -1,69 +1,71 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>columns_introspection.rb</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>columns_introspection.rb</h1>
-        <div class='paths'>
-          lib/sequel/extensions/columns_introspection.rb
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-12-07 16:34:05 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>The columns_introspection extension attempts to introspect the selected
-            columns for a dataset before issuing a query.  If it thinks it can guess
-            correctly at the columns the query will use, it will return the columns
-            without issuing a database query.</p>
-            
-            <p>This method is not fool-proof, it&#39;s possible that some databases will
-            use column names that <a href="../../../../classes/Sequel.html">Sequel</a>
-            does not expect.  Also, it may not correctly handle all cases.</p>
-            
-            <p>To attempt to introspect columns for a single dataset:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
-            
-            <p>To attempt to introspect columns for all datasets on a single database:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
-            
-            <p>Related module: <a
-            href="../../../../classes/Sequel/ColumnsIntrospection.html">Sequel::ColumnsIntrospection</a></p>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>columns_introspection.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>columns_introspection.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/columns_introspection.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-12-07 16:34:05 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The columns_introspection extension attempts to introspect the selected
+columns for a dataset before issuing a query.  If it thinks it can guess
+correctly at the columns the query will use, it will return the columns
+without issuing a database query.</p>
+
+<p>This method is not fool-proof, it&#39;s possible that some databases will
+use column names that <a href="../../../../classes/Sequel.html">Sequel</a>
+does not expect.  Also, it may not correctly handle all cases.</p>
+
+<p>To attempt to introspect columns for a single dataset:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)</pre>
+
+<p>To attempt to introspect columns for all datasets on a single database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)</pre>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/ColumnsIntrospection.html">Sequel::ColumnsIntrospection</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

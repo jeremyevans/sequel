@@ -1,98 +1,100 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.37.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.37.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.37.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2016-08-01 07:21:11 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Database#values has been added on SQLite#3.8.3+, operating similarly to the
-            support on PostgreSQL:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]).<span class="ruby-identifier">select_map</span>([:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>])&#x000A;<span class="ruby-comment"># =&gt; [[1, 2], [3, 4]]</span></pre>
-            </li><li>
-            <p>Regular expressions in dataset filters are now supported on Oracle 10g+:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/re/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;T&quot; WHERE REGEXP_LIKE(&quot;C&quot;,&#39;re&#39;)</span></pre>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the use of
-            native prepared statements and bound variables in the mysql2 adapter, when
-            mysql2 0.4+ is used. Previously, the mysql2 adapter supported database
-            prepared statements, but variables were always literalized.  That is still
-            supported when mysql2 &lt;0.4 is used.</p>
-            </li><li>
-            <p>The connection pool now removes connections if it detects a disconnect
-            error that is not raised as a Sequel::DatabaseDisconnectError.  Such
-            exceptions are reraised without converted them to
-            Sequel::DatabaseDisconnectError, but the related connection is now removed
-            from the pool.</p>
-            </li><li>
-            <p>The reversible migration support now handles add_constraint with an options
-            hash as the first argument.</p>
-            </li><li>
-            <p>ASTTransformer now handles Sequel.extract, allowing Dataset#qualify and
-            other uses of ASTTransformer to work with such values.</p>
-            </li><li>
-            <p>The create_view :columns option is now suppported on SQLite 3.9.0+.</p>
-            </li><li>
-            <p>An additional disconnect error is now recognized in the postgres adapter.</p>
-            </li><li>
-            <p>A frozen string literal issue has been fixed when multiple different 
-            database connection approaches have failed in the jdbc adapter.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>External database adapters need to make sure that
-            Database#database_error_classes returns a valid result if called during
-            Database#initialize.  If you have an external adapter where one of the
-            error classes depends on an argument given when connecting (such as the
-            connection string), you may have to make some changes.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.37.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.37.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.37.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2016-08-01 07:21:11 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#values has been added on SQLite#3.8.3+, operating similarly to the
+support on PostgreSQL:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]).<span class="ruby-identifier">select_map</span>([<span class="ruby-value">:column1</span>, <span class="ruby-value">:column2</span>])&#x000A;<span class="ruby-comment"># =&gt; [[1, 2], [3, 4]]</span></pre>
+</li><li>
+<p>Regular expressions in dataset filters are now supported on Oracle 10g+:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-regexp">/re/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;T&quot; WHERE REGEXP_LIKE(&quot;C&quot;,&#39;re&#39;)</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the use of
+native prepared statements and bound variables in the mysql2 adapter, when
+mysql2 0.4+ is used. Previously, the mysql2 adapter supported database
+prepared statements, but variables were always literalized.  That is still
+supported when mysql2 &lt;0.4 is used.</p>
+</li><li>
+<p>The connection pool now removes connections if it detects a disconnect
+error that is not raised as a Sequel::DatabaseDisconnectError.  Such
+exceptions are reraised without converted them to
+Sequel::DatabaseDisconnectError, but the related connection is now removed
+from the pool.</p>
+</li><li>
+<p>The reversible migration support now handles add_constraint with an options
+hash as the first argument.</p>
+</li><li>
+<p>ASTTransformer now handles Sequel.extract, allowing Dataset#qualify and
+other uses of ASTTransformer to work with such values.</p>
+</li><li>
+<p>The create_view :columns option is now suppported on SQLite 3.9.0+.</p>
+</li><li>
+<p>An additional disconnect error is now recognized in the postgres adapter.</p>
+</li><li>
+<p>A frozen string literal issue has been fixed when multiple different 
+database connection approaches have failed in the jdbc adapter.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>External database adapters need to make sure that
+Database#database_error_classes returns a valid result if called during
+Database#initialize.  If you have an external adapter where one of the
+error classes depends on an argument given when connecting (such as the
+connection string), you may have to make some changes.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

@@ -1,496 +1,498 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>3.5.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>3.5.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/3.5.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>New Plugins</p>
-            <hr>
-            <ul><li>
-            <p>A class_table_inheritance plugin has been added, supporting model
-            inheritance in the database using a table-per-model-class approach. Each
-            table stores only attributes unique to that model or subclass hierarchy.</p>
-            
-            <p>For example, with this hierarchy:</p>
-            
-            <pre>    Employee&#x000A;   /        \&#x000A;Staff     Manager&#x000A;             |&#x000A;          Executive</pre>
-            
-            <p>the following database schema may be used (table - columns):</p>
-            <ul><li>
-            <p>employees - id, name, kind</p>
-            </li><li>
-            <p>staff - id, manager_id</p>
-            </li><li>
-            <p>managers - id, num_staff</p>
-            </li><li>
-            <p>executives - id, num_managers</p>
-            </li></ul>
-            
-            <p>The class_table_inheritance plugin assumes that the main table (e.g.
-            employees) has a primary key field (usually autoincrementing), and all
-            other tables have a foreign key of the same name that points to the same
-            key in their superclass&#39;s table. For example:</p>
-            <ul><li>
-            <p>employees.id  - primary key, autoincrementing</p>
-            </li><li>
-            <p>staff.id - foreign key referencing employees(id)</p>
-            </li><li>
-            <p>managers.id - foreign key referencing employees(id)</p>
-            </li><li>
-            <p>executives.id - foreign key referencing managers(id)</p>
-            </li></ul>
-            
-            <p>When using the class_table_inheritance plugin, subclasses use joined
-            datasets:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>  <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>   <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN managers USING (id)</span>&#x000A;<span class="ruby-constant">Executive</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN managers USING (id)</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN executives USING (id)</span></pre>
-            
-            <p>This allows Executive.all to return instances with all attributes loaded. 
-            The plugin overrides deleting, inserting, and updating in the model to work
-            with multiple tables, by handling each table individually.</p>
-            
-            <p>This plugin allows and encourages the use of a :key option to mark a column
-            holding the class name.  This allows methods on the superclass to return
-            instances of specific subclasses.</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span></pre>
-            
-            <p>This plugin requires the lazy_attributes plugin and uses it to handle
-            subclass specific attributes that would not be loaded when calling
-            superclass methods (since those wouldn&#39;t join to the subclass tables). 
-            For example:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Staff&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">manager_id</span> <span class="ruby-comment"># Loads the manager_id attribute from the</span>&#x000A;                   <span class="ruby-comment"># database</span></pre>
-            
-            <p>The class_table_inheritance plugin requires JOIN USING and therefore is not
-            supported on H2 or Microsoft SQL Server, which do not support that SQL-92
-            feature.</p>
-            </li><li>
-            <p>An associations_dependencies plugin was added for deleting, destroying, or
-            nullifying associated objects when destroying a model object.  This just
-            gives an easy way to add the necessary before and after destroy hooks.  The
-            following association types support the following dependency actions:</p>
-            <ul><li>
-            <p>:many_to_many - :nullify (removes all related entries in join table)</p>
-            </li><li>
-            <p>:many_to_one - :delete, :destroy</p>
-            </li><li>
-            <p>:one_to_many - :delete, :destroy, :nullify (sets foreign key to NULL for
-            all associated objects)</p>
-            </li></ul>
-            
-            <p>This plugin works directly with the association datasets and does not use
-            any cached association values.  The :delete action will delete all
-            associated objects from the database in a single SQL call. The :destroy
-            action will load each associated object from the database and call the
-            destroy method on it.</p>
-            
-            <p>The plugin call takes a hash of association symbol keys and  dependency
-            action symbol values.  Alternatively, you can specify additional
-            dependencies later using add_association_dependencies:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>, :<span class="ruby-identifier">address=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_dependencies</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> :<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">destroy</span>,&#x000A;  :<span class="ruby-identifier">reviews=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">delete</span>, :<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">nullify</span></pre>
-            </li><li>
-            <p>A force_encoding plugin was added that forces the encoding of strings used
-            in model instances.  When model instances are loaded from the database, all
-            values in the hash that are strings are forced to the given encoding. 
-            Whenever you update a model column attribute, the resulting value is forced
-            to a given encoding if the value is a string.  There are two ways to
-            specify the encoding. You can either do so in the plugin call itself, or
-            via the forced_encoding class accessor:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">force_encoding</span>, <span class="ruby-string">&#39;UTF-8&#39;</span>&#x000A;  <span class="ruby-comment"># or</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">force_encoding</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">forced_encoding</span> = <span class="ruby-string">&#39;UTF-8&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <p>This plugin only works on ruby 1.9, since strings don&#39;t have encodings
-            in 1.8.</p>
-            </li><li>
-            <p>A typecast_on_load plugin was added, for fixing bad database typecasting
-            when loading model objects. Most of Sequel&#39;s database adapters
-            don&#39;t have complete control over typecasting, and may return columns
-            that aren&#39;t typecast correctly (with correct being defined as how the
-            model object would typecast the same column values).</p>
-            
-            <p>This plugin modifies Model.load to call the setter methods (which typecast
-            by default) for all columns given.  You can either specify the columns to
-            typecast on load in the plugin call itself, or afterwards using
-            add_typecast_on_load_columns:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">typecast_on_load</span>, :<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">record_date</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">typecast_on_load</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_typecast_on_load_columns</span> :<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">record_date</span></pre>
-            
-            <p>If the database returns release_date and record_date columns as strings
-            instead of dates, this will ensure that if you access those columns through
-            the model object, you&#39;ll get Date objects instead of strings.</p>
-            </li><li>
-            <p>A touch plugin was added, which adds Model#touch for updating an
-            instance&#39;s timestamp, as well as touching associations when an instance
-            is updated or destroyed.</p>
-            
-            <p>The Model#touch instance method saves the object with a modified timestamp.
-            By default, it uses the :updated_at column, but you can set which column to
-            use. It also supports touching of associations, so that when the current
-            model object is updated or destroyed, the associated rows in the database
-            can have their modified timestamp updated to the current timestamp. 
-            Example:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">touch</span>, :<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">modified_on</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>A subclasses plugin was added, for recording all of a models subclasses and
-            descendent classes.  Direct subclasses are available via the subclasses
-            method, and all descendent classes are available via the descendents
-            method:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subclasses</span>&#x000A;<span class="ruby-identifier">sc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">sc2</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ssc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sc1</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">subclasses</span>    <span class="ruby-comment"># [sc1, sc2]</span>&#x000A;<span class="ruby-identifier">sc1</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># [ssc1]</span>&#x000A;<span class="ruby-identifier">sc2</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">ssc1</span>.<span class="ruby-identifier">subclasses</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">descendents</span>   <span class="ruby-comment"># [sc1, ssc1, sc2]</span></pre>
-            
-            <p>The main use case for this is if you want to modify all models after the
-            model subclasses have been created.  Since mutable options are copied when
-            subclassing, modifying parent classes does not affect current subclasses,
-            only future ones.  The subclasses plugin allows you get all subclasses so
-            that you can easily modify them.  The plugin only records subclasses
-            created after the plugin call, though.</p>
-            </li><li>
-            <p>An active_model plugin was added, giving <a
-            href="../../../classes/Sequel/Model.html">Sequel::Model</a> an ActiveModel
-            complaint API, in so much as it passes the ActiveModel::Lint tests.</p>
-            </li></ul>
-            
-            <p>New Extensions</p>
-            <hr>
-            <ul><li>
-            <p>A named_timezones extension was added, allowing you to use named timezones
-            such as “America/Los_Angeles” (the default <a
-            href="../../../classes/Sequel.html">Sequel</a> timezone support only
-            supports UTC or local time). This extension requires TZInfo.  It also sets
-            the <a
-            href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>
-            to  DateTime, so database timestamps will be returned as DateTime instances
-            instead of Time instances.  This is because ruby&#39;s Time class
-            doesn&#39;t support timezones other than UTC and local time.</p>
-            
-            <p>This plugin allows you to pass either strings or TZInfo::Timezone instance
-            to Sequel.database_timezone=, application_timezone=, and
-            typecast_timezone=.  If a string is passed, it is converted to a
-            TZInfo::Timezone using TZInfo::Timezone.get.</p>
-            
-            <p>Let&#39;s say you have the database server in New York and the application
-            server in Los Angeles.  For historical reasons, data is stored in local New
-            York time, but the application server only services clients in Los Angeles,
-            so you want to use New York time in the database and Los Angeles time in
-            the application.  This is easily done via:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
-            
-            <p>Then, before timestamps are stored in the database, they are converted to
-            New York time.  When timestamps are retrieved from the database, they are
-            converted to Los Angeles time.</p>
-            </li><li>
-            <p>A thread_local_timezones extension was added.  This allows you to set a
-            per-thread timezone that will override the default global timezone while
-            the thread is executing.  The main use case is for web applications that
-            execute each request in its own thread, and want to set the timezones based
-            on the request.  The most common example is having the database always
-            store time in UTC, but have the application deal with the timezone of the
-            current user.  That can be done with:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = :<span class="ruby-identifier">utc</span>&#x000A;<span class="ruby-comment"># In each thread:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = <span class="ruby-identifier">current_user</span>.<span class="ruby-identifier">timezone</span></pre>
-            
-            <p>This extension is designed to work with the named_timezones extension.</p>
-            </li><li>
-            <p>An sql_expr extension was added that adds .sql_expr methods to all objects,
-            giving them easy access to Sequel&#39;s DSL:</p>
-            
-            <pre class="ruby"><span class="ruby-value">1</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&lt;</span> :<span class="ruby-identifier">a</span>     <span class="ruby-comment"># 1 &lt; a</span>&#x000A;<span class="ruby-keyword">false</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">a</span> <span class="ruby-comment"># FALSE AND a</span>&#x000A;<span class="ruby-keyword">true</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># TRUE OR a</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-keyword">nil</span>.<span class="ruby-identifier">sql_expr</span>       <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;b&quot;</span>  <span class="ruby-comment"># &#39;a&#39; || &#39;b&#39;</span></pre>
-            
-            <p>Proc#sql_expr uses a virtual row:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">proc</span>{[[<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], [<span class="ruby-identifier">a</span>, <span class="ruby-identifier">c</span>]]}.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">x</span>&#x000A;<span class="ruby-comment"># (((a = b) AND (a = c)) OR x)</span></pre>
-            </li><li>
-            <p>A looser_typecasting extension was added, for using to_f and to_i instead
-            of the more strict Kernel.Float and Kernel.Integer when typecasting floats
-            and integers. To use it, you should extend the database with the
-            Sequel::LooserTypecasting module after loading the extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">looser_typecasting</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LooserTypecasting</span>)</pre>
-            
-            <p>This makes the behavior more like ActiveRecord:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">num_albums=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">num_albums</span> <span class="ruby-comment"># =&gt; 0</span></pre>
-            </li></ul>
-            
-            <p>Other New Features</p>
-            <hr>
-            <ul><li>
-            <p>Associations now support composite keys.  All of the :*key options options
-            now accept arrays of symbols instead of plain symbols. Example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">primary_key</span> <span class="ruby-comment"># [:name, :city]</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_city</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">artist_name</span>, :<span class="ruby-identifier">artist_city</span>]</pre>
-            
-            <p>All association types are supported, including the built-in many_to_many
-            association and the many_through_many plugin.  Both methods of eager
-            loading work with composite keys for all association types. Setter and
-            add/remove/remove_all methods also now work with composite keys.</p>
-            </li><li>
-            <p>Associations now respect a :validate option, which can be set to false to
-            not validate when implicitly saving associated objects.</p>
-            
-            <p>There isn&#39;t a lot of implicit saving in Sequel&#39;s association
-            methods, but this gives the user the control over validation when the
-            association methods implicitly save an object.</p>
-            </li><li>
-            <p>In addition to the regular association methods, the nested_attributes
-            plugin was also updated to respect the :validate_association option. It was
-            also modified to not validate associated objects twice, once when the
-            parent object was validated and again when the associated object was saved.
-            Additionally, if you pass :validate=&gt;false to the save method when
-            saving the parent object, it will not longer attempt to validate associated
-            objects when saving them.</p>
-            </li><li>
-            <p>Dataset#insert and insert_sql were refactored and now support the following
-            API:</p>
-            <ul><li>
-            <p>No arguments - Treat as a single empty hash argument</p>
-            </li><li>
-            <p>Single argument:</p>
-            <ul><li>
-            <p>Hash - Use keys as columns and values as values</p>
-            </li><li>
-            <p>Array - Use as values, without specifying columns</p>
-            </li><li>
-            <p>Dataset - Use a subselect, without specifying columns</p>
-            </li><li>
-            <p>LiteralString - Use as the values</p>
-            </li></ul>
-            </li><li>
-            <p>2 arguments:</p>
-            <ul><li>
-            <p>Array, Array - Use first array as keys, second as values</p>
-            </li><li>
-            <p>Array, Dataset - Use a subselect, with the array as columns</p>
-            </li><li>
-            <p>Array, LiteralString - Use LiteralString as the values, with the array as
-            the columns</p>
-            </li></ul>
-            </li><li>
-            <p>Anything else: Treat all given values an an array of values</p>
-            </li></ul>
-            </li><li>
-            <p>Graphing now works with previously joined datasets.  The main use case of
-            this is when eagerly loading (via eager_graph) model associations for
-            models backed by joined datasets, such as those created by the
-            class_table_inheritance plugin.</p>
-            </li><li>
-            <p><a
-            href="../../../classes/Sequel.html#method-c-virtual_row">Sequel.virtual_row</a>
-            was added allowing you to easily use the VirtualRow support outside of
-            select, order, and filter calls:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">net_benefit</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">revenue</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cost</span>}&#x000A;<span class="ruby-identifier">good_employee</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">num_commendations</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-identifier">fire</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span><span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">demote</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">promote</span> = <span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">fire</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">employed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">demote</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">rank=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">rank</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">promote</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">rank=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">rank</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>)</pre>
-            </li><li>
-            <p>When <a href="../../../classes/Sequel.html">Sequel</a> wraps exception in
-            its own classes (to provide database independence), it now keeps the
-            wrapped exception available in a wrapped_exception accessor.  This allows
-            you to more easily determine the wrapped exception class, without resorting
-            to parsing the exception message.</p>
-            
-            <pre>begin&#x000A;  DB.run(&#39;...&#39;)&#x000A;rescue Sequel::DatabaseError =&gt; e&#x000A;  case e.wrapped_exception&#x000A;  when Mysql::Error&#x000A;    ...&#x000A;  when PGError&#x000A;    ...&#x000A;  end&#x000A;end</pre>
-            </li><li>
-            <p>The MySQL adapter now supports a Dataset#split_multiple_result_sets method
-            that yields arrays of rows (one per result set), instead of rows.  This
-            allows you to submit multiple statements at the same time (or call a stored
-            procedure that returns multiple result sets), and know which rows are
-            related to which result sets.</p>
-            
-            <p>This violates a lot of Sequel&#39;s internal assumptions and should be used
-            with care.  Existing row_procs are modified to work correctly, but graphing
-            will not work on these datasets.</p>
-            </li><li>
-            <p>The ADO adapter now accepts a :conn_string option and uses that as the full
-            ADO connection string.  This can be used to connect to any datasource ADO
-            supports, such as Microsoft Excel.</p>
-            </li><li>
-            <p>The Microsoft SQL Server shared adapter now supports a
-            Database#server_version method.</p>
-            </li><li>
-            <p>The Microsoft SQL Server shared adapter now supports updating and deleting
-            from joined datasets.</p>
-            </li><li>
-            <p>The Microsoft SQL Server shared adapter now supports a Dataset#output
-            method that uses the OUTPUT clause.</p>
-            </li><li>
-            <p>Model#_save now calls either Model#_insert or Model#_update for
-            inserting/updating the row in the database.  This allows for easier
-            overriding when you want to allow creating and updating model objects
-            backed by a joined dataset.</p>
-            </li><li>
-            <p>Dataset#graph now takes a :from_self_alias option specifying the alias to
-            use for the subselect created if the receiver is a joined but not yet
-            graphed dataset.  It defaults to the first source table in the receiver.</p>
-            </li></ul>
-            
-            <p>Other Improvements</p>
-            <hr>
-            <ul><li>
-            <p>Typecasting model attributes is now done before checking existing values,
-            instead of after.  Before, the code for the model attribute setters would
-            compare the given value to the existing entry.  If it didn&#39;t match, the
-            value was typecasted and then assigned.  That led to the following
-            situation:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">num_tracks</span> <span class="ruby-comment"># =&gt; 10</span>&#x000A;<span class="ruby-identifier">params</span> <span class="ruby-comment"># =&gt; {&#39;num_tracks&#39;=&gt;&#39;10&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">params</span>)&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">changed_columns</span> <span class="ruby-comment"># =&gt; [:num_tracks]</span></pre>
-            
-            <p>The new behavior typecasts the value first, and only sets it and records
-            the column as changed if it doesn&#39;t match the typecasted value.</p>
-            </li><li>
-            <p>Model#modified? is now always true if the record is new.  modified?
-            indicates the instance&#39;s status relative to the database, and since a
-            new object is not yet in the database, and saving the object would add it,
-            the object is considered modified. A consequence of this is that
-            Model#save_changes now always saves if the object is new.</p>
-            
-            <p>If you want to check if there were changes to columns since the object was
-            first initialized, you should use !changed_columns.empty?, which was the
-            historical way to handle the situation.</p>
-            </li><li>
-            <p>The DataObjects (do) adpater now supports DataObjects 0.10.</p>
-            </li><li>
-            <p>Dataset#select_more and Dataset#order_more no longer affect the receiver. 
-            They are supposed to just return a modified copy of the receiver instead of
-            modifying the receiver itself.  For a few versions they have been broken in
-            that they modified the receiver in addition to returning a modified copy.</p>
-            </li><li>
-            <p>Performance was increased for execution of prepared statements with
-            multiple bound variables on MySQL.</p>
-            </li><li>
-            <p>On MySQL, database errors raised when preparing statements or setting bound
-            variable values are now caught and raised as Sequel::DatabaseErrors.</p>
-            </li><li>
-            <p>On MySQL, more types of disconnection errors are detected.</p>
-            </li><li>
-            <p>When altering columns in MySQL, options such as :unsigned, :elements, and
-            :size that are given in the call are now respected.</p>
-            </li><li>
-            <p>MySQL enum defaults are now handled correctly in the schema dumper.</p>
-            </li><li>
-            <p>The schema dumper no longer attempts to use unparseable defaults as
-            literals on MySQL, since MySQL does not provide defaults as valid literals.</p>
-            </li><li>
-            <p>The emulated offset support in the shared Microsoft SQL Server adapter now
-            works better with model classes (or any datasets with row_procs).</p>
-            </li><li>
-            <p>Microsoft SQL Server now supports using the WITH clause in delete, update,
-            and insert calls.</p>
-            </li><li>
-            <p>Parsed indexes when connecting to Microsoft SQL Server via JDBC no longer
-            include primary key indexes.</p>
-            </li><li>
-            <p>Dataset#insert_select now returns nil if disable_insert_returning is used
-            in the shared PostgreSQL adapter.  This makes it work as expected with
-            model object creation.</p>
-            </li><li>
-            <p>Calling Model.set_primary_key with an array of symbols to set a composite
-            primary key is now supported.  You can also provide multiple symbol
-            arguments to do the same thing.  Before, specifying an array of symbols
-            broke the Model.[] optimization.</p>
-            </li><li>
-            <p>Literalization of timezones in timestamps now works correctly on Oracle.</p>
-            </li><li>
-            <p>__FILE__ and __LINE__ are now used everywhere that eval is called with a
-            string, which makes for better backtraces.</p>
-            </li><li>
-            <p>The native MySQL adapter now correctly handles returning before yielding
-            all result sets.  Previously, this caused a commands out of sync error.</p>
-            </li><li>
-            <p>Table names in common table expressions are now quoted.</p>
-            </li><li>
-            <p>The Oracle adapter&#39;s Dataset#except now accepts a hash, giving it the
-            same API as the default Dataset#except.</p>
-            </li><li>
-            <p>When connecting to Microsoft SQL Server via ADO, allow Dataset#insert to
-            take multiple arguments.</p>
-            </li><li>
-            <p>Fractional timestamps are no longer used on ODBC.</p>
-            </li><li>
-            <p>Schema parsing now works on MSSQL when the database is set to not quote
-            identifiers.</p>
-            </li><li>
-            <p>Timezone offsets are no longer used on Microsoft SQL Server, since they
-            only work for the datetimeoffset type.</p>
-            </li><li>
-            <p>Only 3 fractional digits in timestamps are used in Microsoft SQL Server,
-            since an error is raised if the use the datetime type with more than that.</p>
-            </li><li>
-            <p>The integration test suite now has guards for expected failures when run on
-            known databases.  Expected failures are marked as pending.</p>
-            </li></ul>
-            
-            <p>Backwards Compatibility</p>
-            <hr>
-            <ul><li>
-            <p>Graphing to an previously joined (but not graphed) dataset now causes the
-            receiver to be wrapped in a subselect, so if you graph a dataset to a
-            previously joined dataset, and then filter the dataset referring to tables
-            that were in the joined dataset (other than the first table), the SQL
-            produced will probably no longer be valid.  You should either filter the
-            dataset before graphing or use the name of the first source of the joined
-            dataset (which is what the subselected is aliased to) if filtering
-            afterward.</p>
-            
-            <p>In certain cases, this change can cause tables to be aliased differently,
-            so if you were graphing previously joined datasets and then filtering using
-            the automatically generated aliases, you might need to modify your code.</p>
-            </li><li>
-            <p>The DataObjects (do) adpater no longer supports DataObjects 0.9.x.</p>
-            </li><li>
-            <p>The Dataset#virtual_row_block_call private instance method has been
-            removed.</p>
-            </li><li>
-            <p>Sequel&#39;s timezone support was significantly refactored, so if you had
-            any custom modifications to the timezone support, they might need to be
-            refactored as well.</p>
-            </li><li>
-            <p>The SQL generation code was significantly refactored, so if you had any
-            custom modifications in that area, you might need to refactor as well.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>3.5.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>3.5.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/3.5.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>New Plugins</p>
+<hr>
+<ul><li>
+<p>A class_table_inheritance plugin has been added, supporting model
+inheritance in the database using a table-per-model-class approach. Each
+table stores only attributes unique to that model or subclass hierarchy.</p>
+
+<p>For example, with this hierarchy:</p>
+
+<pre>    Employee&#x000A;   /        \&#x000A;Staff     Manager&#x000A;             |&#x000A;          Executive</pre>
+
+<p>the following database schema may be used (table - columns):</p>
+<ul><li>
+<p>employees - id, name, kind</p>
+</li><li>
+<p>staff - id, manager_id</p>
+</li><li>
+<p>managers - id, num_staff</p>
+</li><li>
+<p>executives - id, num_managers</p>
+</li></ul>
+
+<p>The class_table_inheritance plugin assumes that the main table (e.g.
+employees) has a primary key field (usually autoincrementing), and all
+other tables have a foreign key of the same name that points to the same
+key in their superclass&#39;s table. For example:</p>
+<ul><li>
+<p>employees.id  - primary key, autoincrementing</p>
+</li><li>
+<p>staff.id - foreign key referencing employees(id)</p>
+</li><li>
+<p>managers.id - foreign key referencing employees(id)</p>
+</li><li>
+<p>executives.id - foreign key referencing managers(id)</p>
+</li></ul>
+
+<p>When using the class_table_inheritance plugin, subclasses use joined
+datasets:</p>
+
+<pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>  <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>   <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN managers USING (id)</span>&#x000A;<span class="ruby-constant">Executive</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN managers USING (id)</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN executives USING (id)</span></pre>
+
+<p>This allows Executive.all to return instances with all attributes loaded. 
+The plugin overrides deleting, inserting, and updating in the model to work
+with multiple tables, by handling each table individually.</p>
+
+<p>This plugin allows and encourages the use of a :key option to mark a column
+holding the class name.  This allows methods on the superclass to return
+instances of specific subclasses.</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span></pre>
+
+<p>This plugin requires the lazy_attributes plugin and uses it to handle
+subclass specific attributes that would not be loaded when calling
+superclass methods (since those wouldn&#39;t join to the subclass tables). 
+For example:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Staff&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">manager_id</span> <span class="ruby-comment"># Loads the manager_id attribute from the</span>&#x000A;                   <span class="ruby-comment"># database</span></pre>
+
+<p>The class_table_inheritance plugin requires JOIN USING and therefore is not
+supported on H2 or Microsoft SQL Server, which do not support that SQL-92
+feature.</p>
+</li><li>
+<p>An associations_dependencies plugin was added for deleting, destroying, or
+nullifying associated objects when destroying a model object.  This just
+gives an easy way to add the necessary before and after destroy hooks.  The
+following association types support the following dependency actions:</p>
+<ul><li>
+<p>:many_to_many - :nullify (removes all related entries in join table)</p>
+</li><li>
+<p>:many_to_one - :delete, :destroy</p>
+</li><li>
+<p>:one_to_many - :delete, :destroy, :nullify (sets foreign key to NULL for
+all associated objects)</p>
+</li></ul>
+
+<p>This plugin works directly with the association datasets and does not use
+any cached association values.  The :delete action will delete all
+associated objects from the database in a single SQL call. The :destroy
+action will load each associated object from the database and call the
+destroy method on it.</p>
+
+<p>The plugin call takes a hash of association symbol keys and  dependency
+action symbol values.  Alternatively, you can specify additional
+dependencies later using add_association_dependencies:</p>
+
+<pre class="ruby"><span class="ruby-constant">Business</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>, <span class="ruby-value">:address</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:delete</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_dependencies</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">add_association_dependencies</span> <span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:destroy</span>,&#x000A;  <span class="ruby-value">:reviews</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:delete</span>, <span class="ruby-value">:tags</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:nullify</span></pre>
+</li><li>
+<p>A force_encoding plugin was added that forces the encoding of strings used
+in model instances.  When model instances are loaded from the database, all
+values in the hash that are strings are forced to the given encoding. 
+Whenever you update a model column attribute, the resulting value is forced
+to a given encoding if the value is a string.  There are two ways to
+specify the encoding. You can either do so in the plugin call itself, or
+via the forced_encoding class accessor:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:force_encoding</span>, <span class="ruby-string">&#39;UTF-8&#39;</span>&#x000A;  <span class="ruby-comment"># or</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:force_encoding</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">forced_encoding</span> = <span class="ruby-string">&#39;UTF-8&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>This plugin only works on ruby 1.9, since strings don&#39;t have encodings
+in 1.8.</p>
+</li><li>
+<p>A typecast_on_load plugin was added, for fixing bad database typecasting
+when loading model objects. Most of Sequel&#39;s database adapters
+don&#39;t have complete control over typecasting, and may return columns
+that aren&#39;t typecast correctly (with correct being defined as how the
+model object would typecast the same column values).</p>
+
+<p>This plugin modifies Model.load to call the setter methods (which typecast
+by default) for all columns given.  You can either specify the columns to
+typecast on load in the plugin call itself, or afterwards using
+add_typecast_on_load_columns:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:typecast_on_load</span>, <span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:typecast_on_load</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_typecast_on_load_columns</span> <span class="ruby-value">:release_date</span>, <span class="ruby-value">:record_date</span></pre>
+
+<p>If the database returns release_date and record_date columns as strings
+instead of dates, this will ensure that if you access those columns through
+the model object, you&#39;ll get Date objects instead of strings.</p>
+</li><li>
+<p>A touch plugin was added, which adds Model#touch for updating an
+instance&#39;s timestamp, as well as touching associations when an instance
+is updated or destroyed.</p>
+
+<p>The Model#touch instance method saves the object with a modified timestamp.
+By default, it uses the :updated_at column, but you can set which column to
+use. It also supports touching of associations, so that when the current
+model object is updated or destroyed, the associated rows in the database
+can have their modified timestamp updated to the current timestamp. 
+Example:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:touch</span>, <span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:modified_on</span>, <span class="ruby-value">:associations</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>A subclasses plugin was added, for recording all of a models subclasses and
+descendent classes.  Direct subclasses are available via the subclasses
+method, and all descendent classes are available via the descendents
+method:</p>
+
+<pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="ruby-identifier">sc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">sc2</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ssc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sc1</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">subclasses</span>    <span class="ruby-comment"># [sc1, sc2]</span>&#x000A;<span class="ruby-identifier">sc1</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># [ssc1]</span>&#x000A;<span class="ruby-identifier">sc2</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">ssc1</span>.<span class="ruby-identifier">subclasses</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">descendents</span>   <span class="ruby-comment"># [sc1, ssc1, sc2]</span></pre>
+
+<p>The main use case for this is if you want to modify all models after the
+model subclasses have been created.  Since mutable options are copied when
+subclassing, modifying parent classes does not affect current subclasses,
+only future ones.  The subclasses plugin allows you get all subclasses so
+that you can easily modify them.  The plugin only records subclasses
+created after the plugin call, though.</p>
+</li><li>
+<p>An active_model plugin was added, giving <a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a> an ActiveModel
+complaint API, in so much as it passes the ActiveModel::Lint tests.</p>
+</li></ul>
+
+<p>New Extensions</p>
+<hr>
+<ul><li>
+<p>A named_timezones extension was added, allowing you to use named timezones
+such as “America/Los_Angeles” (the default <a
+href="../../../classes/Sequel.html">Sequel</a> timezone support only
+supports UTC or local time). This extension requires TZInfo.  It also sets
+the <a
+href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>
+to  DateTime, so database timestamps will be returned as DateTime instances
+instead of Time instances.  This is because ruby&#39;s Time class
+doesn&#39;t support timezones other than UTC and local time.</p>
+
+<p>This plugin allows you to pass either strings or TZInfo::Timezone instance
+to Sequel.database_timezone=, application_timezone=, and
+typecast_timezone=.  If a string is passed, it is converted to a
+TZInfo::Timezone using TZInfo::Timezone.get.</p>
+
+<p>Let&#39;s say you have the database server in New York and the application
+server in Los Angeles.  For historical reasons, data is stored in local New
+York time, but the application server only services clients in Los Angeles,
+so you want to use New York time in the database and Los Angeles time in
+the application.  This is easily done via:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
+
+<p>Then, before timestamps are stored in the database, they are converted to
+New York time.  When timestamps are retrieved from the database, they are
+converted to Los Angeles time.</p>
+</li><li>
+<p>A thread_local_timezones extension was added.  This allows you to set a
+per-thread timezone that will override the default global timezone while
+the thread is executing.  The main use case is for web applications that
+execute each request in its own thread, and want to set the timezones based
+on the request.  The most common example is having the database always
+store time in UTC, but have the application deal with the timezone of the
+current user.  That can be done with:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-value">:utc</span>&#x000A;<span class="ruby-comment"># In each thread:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = <span class="ruby-identifier">current_user</span>.<span class="ruby-identifier">timezone</span></pre>
+
+<p>This extension is designed to work with the named_timezones extension.</p>
+</li><li>
+<p>An sql_expr extension was added that adds .sql_expr methods to all objects,
+giving them easy access to Sequel&#39;s DSL:</p>
+
+<pre class="ruby"><span class="ruby-value">1</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">:a</span>     <span class="ruby-comment"># 1 &lt; a</span>&#x000A;<span class="ruby-keyword">false</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">:a</span> <span class="ruby-comment"># FALSE AND a</span>&#x000A;<span class="ruby-keyword">true</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> <span class="ruby-value">:a</span>  <span class="ruby-comment"># TRUE OR a</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-keyword">nil</span>.<span class="ruby-identifier">sql_expr</span>       <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;b&quot;</span>  <span class="ruby-comment"># &#39;a&#39; || &#39;b&#39;</span></pre>
+
+<p>Proc#sql_expr uses a virtual row:</p>
+
+<pre class="ruby"><span class="ruby-identifier">proc</span>{[[<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], [<span class="ruby-identifier">a</span>, <span class="ruby-identifier">c</span>]]}.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> <span class="ruby-value">:x</span>&#x000A;<span class="ruby-comment"># (((a = b) AND (a = c)) OR x)</span></pre>
+</li><li>
+<p>A looser_typecasting extension was added, for using to_f and to_i instead
+of the more strict Kernel.Float and Kernel.Integer when typecasting floats
+and integers. To use it, you should extend the database with the
+Sequel::LooserTypecasting module after loading the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:looser_typecasting</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LooserTypecasting</span>)</pre>
+
+<p>This makes the behavior more like ActiveRecord:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:num_albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">num_albums</span> <span class="ruby-comment"># =&gt; 0</span></pre>
+</li></ul>
+
+<p>Other New Features</p>
+<hr>
+<ul><li>
+<p>Associations now support composite keys.  All of the :*key options options
+now accept arrays of symbols instead of plain symbols. Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">primary_key</span> <span class="ruby-comment"># [:name, :city]</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:artist_name</span>, <span class="ruby-value">:artist_city</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:artist_name</span>, <span class="ruby-value">:artist_city</span>]</pre>
+
+<p>All association types are supported, including the built-in many_to_many
+association and the many_through_many plugin.  Both methods of eager
+loading work with composite keys for all association types. Setter and
+add/remove/remove_all methods also now work with composite keys.</p>
+</li><li>
+<p>Associations now respect a :validate option, which can be set to false to
+not validate when implicitly saving associated objects.</p>
+
+<p>There isn&#39;t a lot of implicit saving in Sequel&#39;s association
+methods, but this gives the user the control over validation when the
+association methods implicitly save an object.</p>
+</li><li>
+<p>In addition to the regular association methods, the nested_attributes
+plugin was also updated to respect the :validate_association option. It was
+also modified to not validate associated objects twice, once when the
+parent object was validated and again when the associated object was saved.
+Additionally, if you pass :validate=&gt;false to the save method when
+saving the parent object, it will not longer attempt to validate associated
+objects when saving them.</p>
+</li><li>
+<p>Dataset#insert and insert_sql were refactored and now support the following
+API:</p>
+<ul><li>
+<p>No arguments - Treat as a single empty hash argument</p>
+</li><li>
+<p>Single argument:</p>
+<ul><li>
+<p>Hash - Use keys as columns and values as values</p>
+</li><li>
+<p>Array - Use as values, without specifying columns</p>
+</li><li>
+<p>Dataset - Use a subselect, without specifying columns</p>
+</li><li>
+<p>LiteralString - Use as the values</p>
+</li></ul>
+</li><li>
+<p>2 arguments:</p>
+<ul><li>
+<p>Array, Array - Use first array as keys, second as values</p>
+</li><li>
+<p>Array, Dataset - Use a subselect, with the array as columns</p>
+</li><li>
+<p>Array, LiteralString - Use LiteralString as the values, with the array as
+the columns</p>
+</li></ul>
+</li><li>
+<p>Anything else: Treat all given values an an array of values</p>
+</li></ul>
+</li><li>
+<p>Graphing now works with previously joined datasets.  The main use case of
+this is when eagerly loading (via eager_graph) model associations for
+models backed by joined datasets, such as those created by the
+class_table_inheritance plugin.</p>
+</li><li>
+<p><a
+href="../../../classes/Sequel.html#method-c-virtual_row">Sequel.virtual_row</a>
+was added allowing you to easily use the VirtualRow support outside of
+select, order, and filter calls:</p>
+
+<pre class="ruby"><span class="ruby-identifier">net_benefit</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">revenue</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cost</span>}&#x000A;<span class="ruby-identifier">good_employee</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">num_commendations</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-identifier">fire</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span><span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">demote</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">promote</span> = <span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">fire</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:employed</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">demote</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:rank</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:rank</span><span class="ruby-value">-1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">promote</span>).<span class="ruby-identifier">update</span>(<span class="ruby-value">:rank</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:rank</span><span class="ruby-value">+1</span>)</pre>
+</li><li>
+<p>When <a href="../../../classes/Sequel.html">Sequel</a> wraps exception in
+its own classes (to provide database independence), it now keeps the
+wrapped exception available in a wrapped_exception accessor.  This allows
+you to more easily determine the wrapped exception class, without resorting
+to parsing the exception message.</p>
+
+<pre>begin&#x000A;  DB.run(&#39;...&#39;)&#x000A;rescue Sequel::DatabaseError =&gt; e&#x000A;  case e.wrapped_exception&#x000A;  when Mysql::Error&#x000A;    ...&#x000A;  when PGError&#x000A;    ...&#x000A;  end&#x000A;end</pre>
+</li><li>
+<p>The MySQL adapter now supports a Dataset#split_multiple_result_sets method
+that yields arrays of rows (one per result set), instead of rows.  This
+allows you to submit multiple statements at the same time (or call a stored
+procedure that returns multiple result sets), and know which rows are
+related to which result sets.</p>
+
+<p>This violates a lot of Sequel&#39;s internal assumptions and should be used
+with care.  Existing row_procs are modified to work correctly, but graphing
+will not work on these datasets.</p>
+</li><li>
+<p>The ADO adapter now accepts a :conn_string option and uses that as the full
+ADO connection string.  This can be used to connect to any datasource ADO
+supports, such as Microsoft Excel.</p>
+</li><li>
+<p>The Microsoft SQL Server shared adapter now supports a
+Database#server_version method.</p>
+</li><li>
+<p>The Microsoft SQL Server shared adapter now supports updating and deleting
+from joined datasets.</p>
+</li><li>
+<p>The Microsoft SQL Server shared adapter now supports a Dataset#output
+method that uses the OUTPUT clause.</p>
+</li><li>
+<p>Model#_save now calls either Model#_insert or Model#_update for
+inserting/updating the row in the database.  This allows for easier
+overriding when you want to allow creating and updating model objects
+backed by a joined dataset.</p>
+</li><li>
+<p>Dataset#graph now takes a :from_self_alias option specifying the alias to
+use for the subselect created if the receiver is a joined but not yet
+graphed dataset.  It defaults to the first source table in the receiver.</p>
+</li></ul>
+
+<p>Other Improvements</p>
+<hr>
+<ul><li>
+<p>Typecasting model attributes is now done before checking existing values,
+instead of after.  Before, the code for the model attribute setters would
+compare the given value to the existing entry.  If it didn&#39;t match, the
+value was typecasted and then assigned.  That led to the following
+situation:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">num_tracks</span> <span class="ruby-comment"># =&gt; 10</span>&#x000A;<span class="ruby-identifier">params</span> <span class="ruby-comment"># =&gt; {&#39;num_tracks&#39;=&gt;&#39;10&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">params</span>)&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">changed_columns</span> <span class="ruby-comment"># =&gt; [:num_tracks]</span></pre>
+
+<p>The new behavior typecasts the value first, and only sets it and records
+the column as changed if it doesn&#39;t match the typecasted value.</p>
+</li><li>
+<p>Model#modified? is now always true if the record is new.  modified?
+indicates the instance&#39;s status relative to the database, and since a
+new object is not yet in the database, and saving the object would add it,
+the object is considered modified. A consequence of this is that
+Model#save_changes now always saves if the object is new.</p>
+
+<p>If you want to check if there were changes to columns since the object was
+first initialized, you should use !changed_columns.empty?, which was the
+historical way to handle the situation.</p>
+</li><li>
+<p>The DataObjects (do) adpater now supports DataObjects 0.10.</p>
+</li><li>
+<p>Dataset#select_more and Dataset#order_more no longer affect the receiver. 
+They are supposed to just return a modified copy of the receiver instead of
+modifying the receiver itself.  For a few versions they have been broken in
+that they modified the receiver in addition to returning a modified copy.</p>
+</li><li>
+<p>Performance was increased for execution of prepared statements with
+multiple bound variables on MySQL.</p>
+</li><li>
+<p>On MySQL, database errors raised when preparing statements or setting bound
+variable values are now caught and raised as Sequel::DatabaseErrors.</p>
+</li><li>
+<p>On MySQL, more types of disconnection errors are detected.</p>
+</li><li>
+<p>When altering columns in MySQL, options such as :unsigned, :elements, and
+:size that are given in the call are now respected.</p>
+</li><li>
+<p>MySQL enum defaults are now handled correctly in the schema dumper.</p>
+</li><li>
+<p>The schema dumper no longer attempts to use unparseable defaults as
+literals on MySQL, since MySQL does not provide defaults as valid literals.</p>
+</li><li>
+<p>The emulated offset support in the shared Microsoft SQL Server adapter now
+works better with model classes (or any datasets with row_procs).</p>
+</li><li>
+<p>Microsoft SQL Server now supports using the WITH clause in delete, update,
+and insert calls.</p>
+</li><li>
+<p>Parsed indexes when connecting to Microsoft SQL Server via JDBC no longer
+include primary key indexes.</p>
+</li><li>
+<p>Dataset#insert_select now returns nil if disable_insert_returning is used
+in the shared PostgreSQL adapter.  This makes it work as expected with
+model object creation.</p>
+</li><li>
+<p>Calling Model.set_primary_key with an array of symbols to set a composite
+primary key is now supported.  You can also provide multiple symbol
+arguments to do the same thing.  Before, specifying an array of symbols
+broke the Model.[] optimization.</p>
+</li><li>
+<p>Literalization of timezones in timestamps now works correctly on Oracle.</p>
+</li><li>
+<p>__FILE__ and __LINE__ are now used everywhere that eval is called with a
+string, which makes for better backtraces.</p>
+</li><li>
+<p>The native MySQL adapter now correctly handles returning before yielding
+all result sets.  Previously, this caused a commands out of sync error.</p>
+</li><li>
+<p>Table names in common table expressions are now quoted.</p>
+</li><li>
+<p>The Oracle adapter&#39;s Dataset#except now accepts a hash, giving it the
+same API as the default Dataset#except.</p>
+</li><li>
+<p>When connecting to Microsoft SQL Server via ADO, allow Dataset#insert to
+take multiple arguments.</p>
+</li><li>
+<p>Fractional timestamps are no longer used on ODBC.</p>
+</li><li>
+<p>Schema parsing now works on MSSQL when the database is set to not quote
+identifiers.</p>
+</li><li>
+<p>Timezone offsets are no longer used on Microsoft SQL Server, since they
+only work for the datetimeoffset type.</p>
+</li><li>
+<p>Only 3 fractional digits in timestamps are used in Microsoft SQL Server,
+since an error is raised if the use the datetime type with more than that.</p>
+</li><li>
+<p>The integration test suite now has guards for expected failures when run on
+known databases.  Expected failures are marked as pending.</p>
+</li></ul>
+
+<p>Backwards Compatibility</p>
+<hr>
+<ul><li>
+<p>Graphing to an previously joined (but not graphed) dataset now causes the
+receiver to be wrapped in a subselect, so if you graph a dataset to a
+previously joined dataset, and then filter the dataset referring to tables
+that were in the joined dataset (other than the first table), the SQL
+produced will probably no longer be valid.  You should either filter the
+dataset before graphing or use the name of the first source of the joined
+dataset (which is what the subselected is aliased to) if filtering
+afterward.</p>
+
+<p>In certain cases, this change can cause tables to be aliased differently,
+so if you were graphing previously joined datasets and then filtering using
+the automatically generated aliases, you might need to modify your code.</p>
+</li><li>
+<p>The DataObjects (do) adpater no longer supports DataObjects 0.9.x.</p>
+</li><li>
+<p>The Dataset#virtual_row_block_call private instance method has been
+removed.</p>
+</li><li>
+<p>Sequel&#39;s timezone support was significantly refactored, so if you had
+any custom modifications to the timezone support, they might need to be
+refactored as well.</p>
+</li><li>
+<p>The SQL generation code was significantly refactored, so if you had any
+custom modifications in that area, you might need to refactor as well.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

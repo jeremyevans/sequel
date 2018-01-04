@@ -1,143 +1,145 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>4.44.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>4.44.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/4.44.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2017-03-01 10:48:38 -0800</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Model.freeze is now supported and recommended in production and during
-            testing.  It freezes all class-level metadata, preventing possible
-            thread-safety issues at runtime.</p>
-            </li><li>
-            <p>Model.finalize_associations has been added, speeding up some association
-            reflection methods by about 10x.  This method should be called after all
-            associated models have been loaded. This can speed up the retrieval of
-            associated objects for small datasets by 5-10%.</p>
-            
-            <p>One advantage of using this is it will raise an exception if it recognizes
-            that any of your associations are not defined correctly, such as
-            referencing an associated class that doesn&#39;t exist.</p>
-            </li><li>
-            <p>Model.freeze_descendents has been added to the subclasses plugin. This
-            method finalizes associations for all descendent classes, then freezes the
-            descendent class.  It&#39;s designed to make it easy to freeze all model
-            classes in use:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subclasses</span>&#x000A;<span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendents</span></pre>
-            </li><li>
-            <p>An implicit_subquery dataset extension has been added, which implicitly
-            uses a subquery if you have a dataset with raw SQL and you call a method
-            that would modify the SQL used:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">bar=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM foo</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">implicit_subquery</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">bar=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM foo) AS t1 WHERE (bar = 1)</span></pre>
-            </li><li>
-            <p>Model datasets now have where_all, where_each, and where_single_value
-            methods for returning data:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_all</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>])&#x000A;<span class="ruby-comment"># =&gt; [Album[1], Album[3], Album[2]]</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_each</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where_single_value</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># &quot;Album&#39;s Name&quot;</span></pre>
-            
-            <p>These methods are designed for use by other dataset methods you define, and
-            are optimized for frozen datasets if the methods will be called multiple
-            times on the same dataset.  where_all and where_each can increase
-            performance by up to 40% for small datasets compared to where.all and
-            where.each.  where_single_value can be up to twice as fast as
-            where.single_value.</p>
-            </li><li>
-            <p>Model.dataset_module now supports an eager method for eager loading:</p>
-            
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>&#x000A;&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">eager</span> :<span class="ruby-identifier">with_artist</span>, :<span class="ruby-identifier">artist</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_artist</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># eagerly loads artist association</span></pre>
-            </li></ul>
-            
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>The jdbc adapter now supports Database#freeze.  Possible thread-safety
-            issues when initializing multiple jdbc Database instances in separate
-            threads at the same time have been fixed.</p>
-            </li><li>
-            <p>The postgres adapter now raises an exception if it recognizes that the
-            loaded version of sequel_pg is incompatible.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> classes that are
-            subclasses of core classes now define custom inspect methods so instances
-            can easily be differentiated from core class instances.  For example:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::Blob:0xa6f3a3c3710 bytes=1 content=&quot;a&quot;&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">now</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQLTime 10:03:06&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::LiteralString &quot;foo&quot;&gt;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Album.many_to_one :artist&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]])&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::ValueList [[1, 2]]&gt;</span></pre>
-            </li><li>
-            <p>Dataset#from_self now copies the columns from the current dataset if they
-            are present, since wrapping a dataset in a subquery should not change the
-            columns returned.</p>
-            </li><li>
-            <p>On PostgreSQL, array type conversion now correctly handles false values.</p>
-            </li><li>
-            <p>Another disconnect error is now recognized by the jdbc/as400 adapter.</p>
-            </li><li>
-            <p>Modifications to Sequel::Model::Associations::ASSOCIATION_TYPES are now
-            thread safe, fixing issues if separate threads attempt to load separate
-            model plugins that modify this hash.</p>
-            </li><li>
-            <p>The force_encoding plugin no longer modifies the encoding of <a
-            href="../../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a>
-            instances.</p>
-            </li><li>
-            <p>Many plugins were updated so they no longer add constants to the namespace
-            of the model that loads them.</p>
-            </li></ul>
-            
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Maintainers of external model plugins should update their code to support
-            Model.freeze.</p>
-            </li></ul>
-            
-            <h1 id="label-Upcoming+Deprecation">Upcoming Deprecation<span><a href="#label-Upcoming+Deprecation">&para;</a> <a href="#top">&uarr;</a></span></h1>
-            <ul><li>
-            <p>Starting in <a href="../../../classes/Sequel.html">Sequel</a> 4.45.0, <a
-            href="../../../classes/Sequel.html">Sequel</a> will be adding deprecation
-            warnings for features that will be removed or where behavior will change in
-            <a href="../../../classes/Sequel.html">Sequel</a> 5.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>4.44.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>4.44.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/4.44.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2017-03-01 10:48:38 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Model.freeze is now supported and recommended in production and during
+testing.  It freezes all class-level metadata, preventing possible
+thread-safety issues at runtime.</p>
+</li><li>
+<p>Model.finalize_associations has been added, speeding up some association
+reflection methods by about 10x.  This method should be called after all
+associated models have been loaded. This can speed up the retrieval of
+associated objects for small datasets by 5-10%.</p>
+
+<p>One advantage of using this is it will raise an exception if it recognizes
+that any of your associations are not defined correctly, such as
+referencing an associated class that doesn&#39;t exist.</p>
+</li><li>
+<p>Model.freeze_descendents has been added to the subclasses plugin. This
+method finalizes associations for all descendent classes, then freezes the
+descendent class.  It&#39;s designed to make it easy to freeze all model
+classes in use:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendents</span></pre>
+</li><li>
+<p>An implicit_subquery dataset extension has been added, which implicitly
+uses a subquery if you have a dataset with raw SQL and you call a method
+that would modify the SQL used:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM foo</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:implicit_subquery</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:bar</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM foo) AS t1 WHERE (bar = 1)</span></pre>
+</li><li>
+<p>Model datasets now have where_all, where_each, and where_single_value
+methods for returning data:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_all</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>])&#x000A;<span class="ruby-comment"># =&gt; [Album[1], Album[3], Album[2]]</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where_each</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:name</span>).<span class="ruby-identifier">where_single_value</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># &quot;Album&#39;s Name&quot;</span></pre>
+
+<p>These methods are designed for use by other dataset methods you define, and
+are optimized for frozen datasets if the methods will be called multiple
+times on the same dataset.  where_all and where_each can increase
+performance by up to 40% for small datasets compared to where.all and
+where.each.  where_single_value can be up to twice as fast as
+where.single_value.</p>
+</li><li>
+<p>Model.dataset_module now supports an eager method for eager loading:</p>
+
+<pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">eager</span> <span class="ruby-value">:with_artist</span>, <span class="ruby-value">:artist</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_artist</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># eagerly loads artist association</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The jdbc adapter now supports Database#freeze.  Possible thread-safety
+issues when initializing multiple jdbc Database instances in separate
+threads at the same time have been fixed.</p>
+</li><li>
+<p>The postgres adapter now raises an exception if it recognizes that the
+loaded version of sequel_pg is incompatible.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> classes that are
+subclasses of core classes now define custom inspect methods so instances
+can easily be differentiated from core class instances.  For example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::Blob:0xa6f3a3c3710 bytes=1 content=&quot;a&quot;&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">now</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQLTime 10:03:06&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::LiteralString &quot;foo&quot;&gt;</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::Model::Associations::ManyToOneAssociationReflection Album.many_to_one :artist&gt;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]])&#x000A;<span class="ruby-comment"># =&gt; #&lt;Sequel::SQL::ValueList [[1, 2]]&gt;</span></pre>
+</li><li>
+<p>Dataset#from_self now copies the columns from the current dataset if they
+are present, since wrapping a dataset in a subquery should not change the
+columns returned.</p>
+</li><li>
+<p>On PostgreSQL, array type conversion now correctly handles false values.</p>
+</li><li>
+<p>Another disconnect error is now recognized by the jdbc/as400 adapter.</p>
+</li><li>
+<p>Modifications to Sequel::Model::Associations::ASSOCIATION_TYPES are now
+thread safe, fixing issues if separate threads attempt to load separate
+model plugins that modify this hash.</p>
+</li><li>
+<p>The force_encoding plugin no longer modifies the encoding of <a
+href="../../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a>
+instances.</p>
+</li><li>
+<p>Many plugins were updated so they no longer add constants to the namespace
+of the model that loads them.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Maintainers of external model plugins should update their code to support
+Model.freeze.</p>
+</li></ul>
+
+<h1 id="label-Upcoming+Deprecation">Upcoming Deprecation<span><a href="#label-Upcoming+Deprecation">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Starting in <a href="../../../classes/Sequel.html">Sequel</a> 4.45.0, <a
+href="../../../classes/Sequel.html">Sequel</a> will be adding deprecation
+warnings for features that will be removed or where behavior will change in
+<a href="../../../classes/Sequel.html">Sequel</a> 5.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>

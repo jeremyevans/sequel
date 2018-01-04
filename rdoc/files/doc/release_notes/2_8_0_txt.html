@@ -1,199 +1,201 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
-  <head>
-    <title>2.8.0.txt</title>
-    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
-    <script type='text/javascript'>
-      function popupCode(url) {
-        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-      }
-      
-      function toggleCode(id) {
-        var code = document.getElementById(id)
-      
-        code.style.display = code.style.display != 'block' ? 'block' : 'none'
-        return true
-      }
-      
-      // Make codeblocks hidden by default
-      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-    </script>
-  </head>
-  <body class='page'>
-    <div class='file' id='wrapper'>
-      <div class='header'>
-        <h1 class='name'>2.8.0.txt</h1>
-        <div class='paths'>
-          doc/release_notes/2.8.0.txt
-        </div>
-        <div class='last-update'>
-          Last Update:
-          <span class='datetime'>2011-07-16 11:31:03 -0700</span>
-        </div>
-      </div>
-      <div id='content'>
-        <div id='text'>
-          <div id='description'>
-            
-            <p>New Features</p>
-            <hr>
-            <ul><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now supports database
-            stored procedures similar to its support for prepared statements.  The API
-            is as follows:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">call_sproc</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">mysp</span>, <span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-identifier">sp</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">prepare_sproc</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">mysp</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param3&#39;</span>, <span class="ruby-string">&#39;param4&#39;</span>)</pre>
-            
-            <p>This works with Model datasets as well, allowing them to return model
-            objects:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">call_sproc</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">new_albums</span>)&#x000A;<span class="ruby-comment">#=&gt; [#&lt;Album ...&gt;, #&lt;Album ...&gt;]</span></pre>
-            
-            <p>You can call a stored procedure directly on the Database object if you want
-            to, but the results and API are adapter dependent, and you definitely
-            shouldn&#39;t do it if the stored procedure returns rows:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_sproc</span>(:<span class="ruby-identifier">mysp</span>, :<span class="ruby-identifier">args=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>])</pre>
-            
-            <p>Currently, the MySQL and JDBC adapters support stored procedures. Other
-            adapters may support them in a future version.</p>
-            </li><li>
-            <p>The connection pool code can now remove connections if the adapter raises a
-            Sequel::DatabaseDisconnectError indicating that the connection has been
-            lost.  When a query is attempted and the adapter raises this error, the
-            connection pool removes the connection from the pool, and reraises the
-            error.  The Oracle and PostgreSQL adapters currently support this, and
-            other adapters may support it in a future version.</p>
-            </li><li>
-            <p>Whether to upcase or quote identifiers can now be set separately.
-            Previously, upcasing was done when quoting except when using SQLite,
-            PostgreSQL, or MySQL.  Now, you can turn upcasing off while still quoting. 
-            This may be necessary if you are using a MSSQL database that has lower case
-            table names that conflict with reserved words. It also allows you to
-            uppercase identifiers when using SQLite, PostgreSQL, or MySQL, which may be
-            beneficial in certain cases.</p>
-            
-            <p>To turn upcasing on or off:</p>
-            
-            <pre class="ruby"><span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-comment"># Database</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&quot;postgres://...&quot;</span>, :<span class="ruby-identifier">upcase_identifiers=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Dataset</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span></pre>
-            </li><li>
-            <p>Options are now supported when altering a columns type:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">score</span>, :<span class="ruby-identifier">integer</span>, :<span class="ruby-identifier">unsigned=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">score</span>, :<span class="ruby-identifier">varchar</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">30</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">score</span>, :<span class="ruby-identifier">enum</span>, :<span class="ruby-identifier">elements=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
-            </li><li>
-            <p>Standard conforming strings are now turned on by default in the PostgreSQL
-            adapter.  This makes PostgreSQL not interpret backslash escapes.  This is
-            the PostgreSQL recommended setting, which will be the default setting in a
-            future version of PostgreSQL.  If you don&#39;t want for force the use of
-            standard strings, use:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> = <span class="ruby-keyword">false</span></pre>
-            
-            <p>You need to do that after you call <a
-            href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a> but
-            before you use the database for anything, since that setting is set on
-            initial connection.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now raises an error if
-            you attempt to use EXCEPT [ALL] or INTERSECT [ALL] on a database that
-            doesn&#39;t support it.</p>
-            </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now raises an error if
-            you attempt to use DISTINCT ON with MySQL or Oracle, which don&#39;t
-            support it.</p>
-            </li><li>
-            <p>A subadapter for the Progress RDBMS was added to the ODBC adapter. To
-            connect to a Progress database, use the :db_type=&gt;&#39;progress&#39;
-            option.  This adapter targets Progress 9.</p>
-            </li><li>
-            <p>The ODBC adapter now supports transactions.</p>
-            </li><li>
-            <p>The MSSQL shared adapter now supports multi_insert (for inserting multiple
-            rows at once), and unicode string literals.</p>
-            </li></ul>
-            
-            <p>Other Improvements</p>
-            <hr>
-            <ul><li>
-            <p>There were many improvements related to using schemas in databases. Using
-            schema-qualified tables should work in most if not all cases now.  Model
-            associations, getting the schema, joins, and many other parts of <a
-            href="../../../classes/Sequel.html">Sequel</a> were modified to allow the
-            use of schema-qualifed tables.</p>
-            </li><li>
-            <p>You can now use literal strings with placeholders as well as subselects
-            when using prepared statements.  For example, the following all work now:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, :<span class="ruby-identifier">$i</span>).<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">i=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>)   .<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$i</span>)).<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">i=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE id = ?&quot;</span>, :<span class="ruby-identifier">$i</span>].<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">i=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)</pre>
-            </li><li>
-            <p>Model#initialize received a few more micro-optimizations.</p>
-            </li><li>
-            <p>Model#refresh now clears the changed columns as well as the associations.</p>
-            </li><li>
-            <p>You can now drop columns inside a transaction when using SQLite.</p>
-            </li><li>
-            <p>You can now submit multiple SQL queries at once in the MySQL adapter:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT 1; SELECT 2&#39;</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment">#=&gt; [{:&quot;1&quot;=&gt;1, :&quot;2&quot;=&gt;2}]</span></pre>
-            
-            <p>This may fix issues if you&#39;ve seen a MySQL “commands out of sync”
-            message.  Note that this doesn&#39;t work if you are connecting to MySQL
-            via JDBC.</p>
-            </li><li>
-            <p>You can now use AliasedExpressions directly in table names given to
-            join_table:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">i</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">j</span>)).<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">k</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">l</span>), :<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-comment">#=&gt; ... FROM i AS j INNER JOIN k AS l ON (l.a = j.b)</span></pre>
-            </li><li>
-            <p>Database#rename_table once again works on PostgreSQL.  It was broken in
-            2.7.0.</p>
-            </li><li>
-            <p>The interval type is now treated as it&#39;s own type. It was previously
-            treated as an integer type.</p>
-            </li><li>
-            <p>Subselects are now aliased correctly when using Oracle.</p>
-            </li><li>
-            <p>UNION, INTERSECT, and EXCEPT statements now appear before ORDER and LIMIT
-            on most databases.  If you use these constructs, please test and make sure
-            that they work correctly with your database.</p>
-            </li><li>
-            <p>SQL EXCEPT clause now works on Oracle, which uses MINUS instead.</p>
-            </li><li>
-            <p>Dataset#exists now returns a LiteralString, to make it easier to use.</p>
-            </li><li>
-            <p>The Sequel.odbc_mssql method was removed, as the odbc_mssql adapter was
-            removed in a previous version.  Instead, use:</p>
-            
-            <pre>Sequel.odbc(..., :db_type=&gt;&#39;mssql&#39;)</pre>
-            </li></ul>
-            
-            <p>Backwards Compatibilty</p>
-            <hr>
-            <ul><li>
-            <p>The hash returned by Database#schema when no table name is provided uses
-            quoted strings instead of symbols as keys.  The hash has a default proc, so
-            using the symbol will return the same value as before, but if you use each
-            to iterate through the hash, the keys will be different.  This was
-            necessary to handle schema-qualified tables.</p>
-            </li><li>
-            <p>Database#table_exists? no longer checks the output of Database#tables.  If
-            the table exists in the schema, it returns true, otherwise, it does a
-            query.  This was necessary because table_exists? accepts multiple formats
-            for table names and Database#tables is an array of symbols.</p>
-            </li><li>
-            <p>When getting the schema on PostgreSQL, the default schema is now used even
-            if the :schema=&gt;nil option is used.</p>
-            </li></ul>
-          </div>
-          <div id='context'>
-          </div>
-        </div>
-      </div>
-      <div id='footer-push'></div>
-    </div>
-    <div id='footer'>
-      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
-    </div>
-  </body>
+<head>
+<title>2.8.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>2.8.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/2.8.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2011-07-16 11:31:03 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>New Features</p>
+<hr>
+<ul><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now supports database
+stored procedures similar to its support for prepared statements.  The API
+is as follows:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:mysp</span>, <span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-identifier">sp</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:mysp</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param3&#39;</span>, <span class="ruby-string">&#39;param4&#39;</span>)</pre>
+
+<p>This works with Model datasets as well, allowing them to return model
+objects:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:new_albums</span>)&#x000A;<span class="ruby-comment">#=&gt; [#&lt;Album ...&gt;, #&lt;Album ...&gt;]</span></pre>
+
+<p>You can call a stored procedure directly on the Database object if you want
+to, but the results and API are adapter dependent, and you definitely
+shouldn&#39;t do it if the stored procedure returns rows:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_sproc</span>(<span class="ruby-value">:mysp</span>, <span class="ruby-value">:args</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>])</pre>
+
+<p>Currently, the MySQL and JDBC adapters support stored procedures. Other
+adapters may support them in a future version.</p>
+</li><li>
+<p>The connection pool code can now remove connections if the adapter raises a
+Sequel::DatabaseDisconnectError indicating that the connection has been
+lost.  When a query is attempted and the adapter raises this error, the
+connection pool removes the connection from the pool, and reraises the
+error.  The Oracle and PostgreSQL adapters currently support this, and
+other adapters may support it in a future version.</p>
+</li><li>
+<p>Whether to upcase or quote identifiers can now be set separately.
+Previously, upcasing was done when quoting except when using SQLite,
+PostgreSQL, or MySQL.  Now, you can turn upcasing off while still quoting. 
+This may be necessary if you are using a MSSQL database that has lower case
+table names that conflict with reserved words. It also allows you to
+uppercase identifiers when using SQLite, PostgreSQL, or MySQL, which may be
+beneficial in certain cases.</p>
+
+<p>To turn upcasing on or off:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-comment"># Database</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&quot;postgres://...&quot;</span>, <span class="ruby-value">:upcase_identifiers</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Dataset</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">upcase_identifiers</span> = <span class="ruby-keyword">true</span></pre>
+</li><li>
+<p>Options are now supported when altering a columns type:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:items</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:integer</span>, <span class="ruby-value">:unsigned</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:varchar</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">30</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> <span class="ruby-value">:score</span>, <span class="ruby-value">:enum</span>, <span class="ruby-value">:elements</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>Standard conforming strings are now turned on by default in the PostgreSQL
+adapter.  This makes PostgreSQL not interpret backslash escapes.  This is
+the PostgreSQL recommended setting, which will be the default setting in a
+future version of PostgreSQL.  If you don&#39;t want for force the use of
+standard strings, use:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> = <span class="ruby-keyword">false</span></pre>
+
+<p>You need to do that after you call <a
+href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a> but
+before you use the database for anything, since that setting is set on
+initial connection.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now raises an error if
+you attempt to use EXCEPT [ALL] or INTERSECT [ALL] on a database that
+doesn&#39;t support it.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now raises an error if
+you attempt to use DISTINCT ON with MySQL or Oracle, which don&#39;t
+support it.</p>
+</li><li>
+<p>A subadapter for the Progress RDBMS was added to the ODBC adapter. To
+connect to a Progress database, use the :db_type=&gt;&#39;progress&#39;
+option.  This adapter targets Progress 9.</p>
+</li><li>
+<p>The ODBC adapter now supports transactions.</p>
+</li><li>
+<p>The MSSQL shared adapter now supports multi_insert (for inserting multiple
+rows at once), and unicode string literals.</p>
+</li></ul>
+
+<p>Other Improvements</p>
+<hr>
+<ul><li>
+<p>There were many improvements related to using schemas in databases. Using
+schema-qualified tables should work in most if not all cases now.  Model
+associations, getting the schema, joins, and many other parts of <a
+href="../../../classes/Sequel.html">Sequel</a> were modified to allow the
+use of schema-qualifed tables.</p>
+</li><li>
+<p>You can now use literal strings with placeholders as well as subselects
+when using prepared statements.  For example, the following all work now:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, <span class="ruby-value">:$i</span>).<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>)\&#x000A;  .<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$i</span>)).<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE id = ?&quot;</span>, <span class="ruby-value">:$i</span>].<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:i</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)</pre>
+</li><li>
+<p>Model#initialize received a few more micro-optimizations.</p>
+</li><li>
+<p>Model#refresh now clears the changed columns as well as the associations.</p>
+</li><li>
+<p>You can now drop columns inside a transaction when using SQLite.</p>
+</li><li>
+<p>You can now submit multiple SQL queries at once in the MySQL adapter:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT 1; SELECT 2&#39;</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment">#=&gt; [{:&quot;1&quot;=&gt;1, :&quot;2&quot;=&gt;2}]</span></pre>
+
+<p>This may fix issues if you&#39;ve seen a MySQL “commands out of sync”
+message.  Note that this doesn&#39;t work if you are connecting to MySQL
+via JDBC.</p>
+</li><li>
+<p>You can now use AliasedExpressions directly in table names given to
+join_table:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:i</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:j</span>)).<span class="ruby-identifier">join</span>(<span class="ruby-value">:k</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:l</span>), <span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:b</span>)&#x000A;<span class="ruby-comment">#=&gt; ... FROM i AS j INNER JOIN k AS l ON (l.a = j.b)</span></pre>
+</li><li>
+<p>Database#rename_table once again works on PostgreSQL.  It was broken in
+2.7.0.</p>
+</li><li>
+<p>The interval type is now treated as it&#39;s own type. It was previously
+treated as an integer type.</p>
+</li><li>
+<p>Subselects are now aliased correctly when using Oracle.</p>
+</li><li>
+<p>UNION, INTERSECT, and EXCEPT statements now appear before ORDER and LIMIT
+on most databases.  If you use these constructs, please test and make sure
+that they work correctly with your database.</p>
+</li><li>
+<p>SQL EXCEPT clause now works on Oracle, which uses MINUS instead.</p>
+</li><li>
+<p>Dataset#exists now returns a LiteralString, to make it easier to use.</p>
+</li><li>
+<p>The Sequel.odbc_mssql method was removed, as the odbc_mssql adapter was
+removed in a previous version.  Instead, use:</p>
+
+<pre>Sequel.odbc(..., :db_type=&gt;&#39;mssql&#39;)</pre>
+</li></ul>
+
+<p>Backwards Compatibilty</p>
+<hr>
+<ul><li>
+<p>The hash returned by Database#schema when no table name is provided uses
+quoted strings instead of symbols as keys.  The hash has a default proc, so
+using the symbol will return the same value as before, but if you use each
+to iterate through the hash, the keys will be different.  This was
+necessary to handle schema-qualified tables.</p>
+</li><li>
+<p>Database#table_exists? no longer checks the output of Database#tables.  If
+the table exists in the schema, it returns true, otherwise, it does a
+query.  This was necessary because table_exists? accepts multiple formats
+for table names and Database#tables is an array of symbols.</p>
+</li><li>
+<p>When getting the schema on PostgreSQL, the default schema is now used even
+if the :schema=&gt;nil option is used.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
 </html>
