@@ -1,4 +1,4 @@
-Fri, 01 Dec 2017 07:58:24 -0800
+Thu, 04 Jan 2018 07:17:20 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -13,7 +13,8 @@ lib/sequel/extensions/core_extensions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/core_refinements.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/current_datetime_timestamp.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/dataset_source_alias.rb	Thu, 11 Feb 2016 15:50:14 -0800
-lib/sequel/extensions/date_arithmetic.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/date_arithmetic.rb	Mon, 18 Dec 2017 14:45:05 -0800
+lib/sequel/extensions/datetime_parse_to_time.rb	Fri, 01 Dec 2017 10:11:33 -0800
 lib/sequel/extensions/duplicate_columns_handler.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/empty_array_consider_nulls.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/error_sql.rb	Thu, 12 May 2016 12:28:13 -0700
@@ -23,13 +24,14 @@ lib/sequel/extensions/from_block.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/graph_each.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/identifier_mangling.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/implicit_subquery.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/index_caching.rb	Tue, 19 Dec 2017 10:23:31 -0800
 lib/sequel/extensions/inflector.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/looser_typecasting.rb	Thu, 19 Jan 2017 10:04:33 -0800
 lib/sequel/extensions/migration.rb	Sun, 10 Sep 2017 11:56:28 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/extensions/null_dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/null_dataset.rb	Fri, 08 Dec 2017 12:55:50 -0800
 lib/sequel/extensions/pagination.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_array.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_array_ops.rb	Tue, 13 Sep 2016 13:21:30 -0700
@@ -48,6 +50,7 @@ lib/sequel/extensions/pg_range_ops.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_row_ops.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_static_cache_updater.rb	Thu, 11 Feb 2016 15:50:14 -0800
+lib/sequel/extensions/pg_timestamptz.rb	Mon, 18 Dec 2017 14:45:05 -0800
 lib/sequel/extensions/pretty_table.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/query.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/extensions/round_timestamps.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -83,7 +86,7 @@ lib/sequel/plugins/blacklist_security.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_readers.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_subsets.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/caching.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/class_table_inheritance.rb	Sun, 17 Sep 2017 07:40:05 -0700
+lib/sequel/plugins/class_table_inheritance.rb	Thu, 14 Dec 2017 13:33:39 -0800
 lib/sequel/plugins/column_conflicts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/column_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/columns_updated.rb	Tue, 28 Mar 2017 16:44:29 -0700
@@ -105,7 +108,7 @@ lib/sequel/plugins/insert_returning_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_filters.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_hooks.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/inverted_subsets.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/json_serializer.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/json_serializer.rb	Mon, 11 Dec 2017 12:58:35 -0800
 lib/sequel/plugins/lazy_attributes.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/list.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/many_through_many.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -145,5 +148,5 @@ lib/sequel/plugins/validation_class_methods.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/validation_contexts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/validation_helpers.rb	Fri, 24 Nov 2017 19:47:56 -0800
 lib/sequel/plugins/whitelist_security.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/xml_serializer.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/xml_serializer.rb	Mon, 11 Dec 2017 12:58:35 -0800
 doc/core_extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700

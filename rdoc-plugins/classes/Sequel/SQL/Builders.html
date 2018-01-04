@@ -106,36 +106,42 @@
                 <a name='method-i-date_add'></a>
                 <div class='synopsis'>
                   <span class='name'>date_add</span>
-                  <span class='arguments'>(expr, interval)</span>
+                  <span class='arguments'>(expr, interval, opts=OPTS)</span>
                 </div>
                 <div class='description'>
                   
                   <p>Return a <a href="DateAdd.html">DateAdd</a> expression, adding an interval
-                  to the date/timestamp expr.</p>
+                  to the date/timestamp expr. Options:</p>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:cast </td><td>
+                  <p>Cast to the specified type instead of the default if casting</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-date_add-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-date_add-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date_add</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>)&#x000A;  <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-date_add-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date_add</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-date_sub'>
                 <a name='method-i-date_sub'></a>
                 <div class='synopsis'>
                   <span class='name'>date_sub</span>
-                  <span class='arguments'>(expr, interval)</span>
+                  <span class='arguments'>(expr, interval, opts=OPTS)</span>
                 </div>
                 <div class='description'>
                   
                   <p>Return a <a href="DateAdd.html">DateAdd</a> expression, adding the negative
-                  of the interval to the date/timestamp expr.</p>
+                  of the interval to the date/timestamp expr. Options:</p>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:cast </td><td>
+                  <p>Cast to the specified type instead of the default if casting</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-date_sub-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-date_sub-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date_sub</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>)&#x000A;  <span class="ruby-identifier">interval</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;    <span class="ruby-identifier">h</span> = {}&#x000A;    <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-operator">-</span><span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}&#x000A;    <span class="ruby-identifier">h</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-operator">-</span><span class="ruby-identifier">interval</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-date_sub-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date_sub</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">interval</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;    <span class="ruby-identifier">h</span> = {}&#x000A;    <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-operator">-</span><span class="ruby-identifier">v</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>}&#x000A;    <span class="ruby-identifier">h</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-operator">-</span><span class="ruby-identifier">interval</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">DateAdd</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hstore'>

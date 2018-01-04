@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>mysql.rb</title>
+    <title>datetime_parse_to_time.rb</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       function popupCode(url) {
         window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
@@ -23,18 +23,30 @@
   <body class='page'>
     <div class='file' id='wrapper'>
       <div class='header'>
-        <h1 class='name'>mysql.rb</h1>
+        <h1 class='name'>datetime_parse_to_time.rb</h1>
         <div class='paths'>
-          lib/sequel/adapters/shared/mysql.rb
+          lib/sequel/extensions/datetime_parse_to_time.rb
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-12-18 14:45:05 -0800</span>
+          <span class='datetime'>2017-12-01 10:11:33 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>This switches the default parsing of strings into Time values from using
+            Time.parse to using DateTime.parse.to_time.  This fixes issues when the
+            times being parsed have no timezone information, the implicit timezone for
+            the Database instance is set to <code>:utc</code>, and the timestamps being
+            used include values not valid in the local timezone, such as during a
+            daylight savings time switch.</p>
+            
+            <p>To load the extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">datetime_parse_to_time</span></pre>
+          </div>
           <div id='context'>
           </div>
         </div>

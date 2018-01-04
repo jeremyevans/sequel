@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>mysql.rb</title>
+    <title>pg_timestamptz.rb</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       function popupCode(url) {
         window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
@@ -23,9 +23,9 @@
   <body class='page'>
     <div class='file' id='wrapper'>
       <div class='header'>
-        <h1 class='name'>mysql.rb</h1>
+        <h1 class='name'>pg_timestamptz.rb</h1>
         <div class='paths'>
-          lib/sequel/adapters/shared/mysql.rb
+          lib/sequel/extensions/pg_timestamptz.rb
         </div>
         <div class='last-update'>
           Last Update:
@@ -34,7 +34,20 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>The pg_timestamptz extension changes the default timestamp type for the
+            database to be <code>timestamptz</code> (+timestamp with time zone+)
+            instead of <code>timestamp</code> (+timestamp without time zone+).  This is
+            recommended if you are dealing with multiple timezones in your application.</p>
+            
+            <p>To load the extension into the database:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_timestamptz</span></pre>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/Postgres/Timestamptz.html">Sequel::Postgres::Timestamptz</a></p>
+          </div>
           <div id='context'>
           </div>
         </div>

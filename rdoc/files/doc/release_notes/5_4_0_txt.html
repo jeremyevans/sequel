@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>5.4.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>5.4.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/5.4.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2018-01-04 07:14:17 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>An index_caching extension has been added, which makes Database#indexes use
+            a cache similar to Database#schema, and also offers methods for saving and
+            loading the cache from a file, similar to the schema_caching extension.</p>
+            
+            <p>This can speed up model loaded in certain cases when the auto_validations
+            plugin is used.</p>
+            </li><li>
+            <p>A datetime_parse_to_time extension has been added, which parses strings
+            without timezone offsets using DateTime.parse intead of Time.parse.  This
+            can fix problems when the string being parsed represents a time not valid
+            in the local timezone due to daylight savings time shifts.  Time.parse
+            silently shifts such times by 1 hour instead of raising an exception,
+            resulting in incorrect behavior in that case.</p>
+            
+            <p>It only makes sense to use this extension when the times in the database
+            are stored in UTC but not returned with timezone information, the timezone
+            for the Database instance (or Sequel.database_timezone) is set to :utc (not
+            the default), and Time is used as the datetime_class (the default).</p>
+            </li><li>
+            <p>A pg_timestamptz extension has been added for switching the default generic
+            timestamp type from timestamp to timestamptz.</p>
+            </li><li>
+            <p>Sequel.date_{add,sub} in the date_arithmetic extension now supports a :cast
+            option for setting the cast type.  This value defaults to Time for
+            backwards compatibility, which uses the default generic timestamp type for
+            the database.</p>
+            </li><li>
+            <p>The class_table_inheritance plugin now supports an :ignore_subclass_columns
+            option which takes an array of column symbols to ignore in subclasses. 
+            This allows you to use the plugin when your table inheritance hierarchy
+            includes non-primary key columns with the same name in different tables.</p>
+            </li></ul>
+            
+            <h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Dataset#insert_select now returns false instead of nil if it runs an INSERT
+            statement but does not return a value on Microsoft SQL Server or
+            PostgreSQL.  This can happen on both databases if triggers are used.</p>
+            
+            <p>Model#save now checks for a false value returned by Dataset#insert_select,
+            and does not issue another INSERT statement in that case.</p>
+            </li><li>
+            <p>Database#indexes now correctly handles SQL::Identifier arguments on SQLite,
+            Microsoft SQL Server, SQLAnywhere, and DB2.</p>
+            </li><li>
+            <p>Dataset#to_json in the json_serializer plugin and Dataset#to_xml in the
+            xml_serializer plugin now both handle datasets that use eager_graph.</p>
+            </li><li>
+            <p>Dataset#nullify now caches the dataset it returns, for better performance
+            if it is called more than once on the same dataset.</p>
+            </li><li>
+            <p>Database#synchronize is now optimized on ruby 2.5+ and is about 10% faster
+            by relying on the new lazy proc allocation feature.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Fractional second timestamps are now enabled on DB2.  If you are connecting
+            to a DB2 database that does not support fractional seconds, you should add
+            the following code (where DB is your <a
+            href="../../../classes/Sequel/Database.html">Sequel::Database</a>
+            instance):</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_timestamp_usecs?</span>&#x000A;    <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li><li>
+            <p>Calling a filtering method with no argument and a virtual row block that
+            returns nil on a dataset with no existing filter now adds a WHERE NULL
+            filter, to match the behavior if given a nil argument.  Previously, a
+            deprecation warning was issued and a dataset with no filter was returned.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

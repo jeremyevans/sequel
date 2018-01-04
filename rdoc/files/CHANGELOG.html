@@ -29,12 +29,57 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-12-01 07:52:45 -0800</span>
+          <span class='datetime'>2018-01-04 07:14:17 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-5.4.0+-282018-01-04-29">5.4.0 (2018-01-04)<span><a href="#label-5.4.0+-282018-01-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Enable fractional seconds in timestamps on DB2 (jeremyevans) (#1463)</p>
+            </li><li>
+            <p>Don&#39;t attempt to insert a second time if insert_select runs a query
+            that doesn&#39;t return results, which can happen when triggers are used
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#insert_select on PostgreSQL and MSSQL return false instead of
+            nil if the INSERT query is sent to the database but returns no rows
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add index_caching extension for caching calls to Database#indexes
+            (kenaniah, jeremyevans) (#1461)</p>
+            </li><li>
+            <p>Allow Database#indexes on SQLite, MSSQL, SQLAnywhere, and DB2 to handle
+            SQL::Identifier values (jeremyevans)</p>
+            </li><li>
+            <p>Add pg_timestamptz extension for using timestamptz (timestamp with time
+            zone) as the default timestamp type (jeremyevans)</p>
+            </li><li>
+            <p>Support Sequel.date_{add,sub} :cast option for setting cast type in
+            date_arithmetic extension (jeremyevans)</p>
+            </li><li>
+            <p>Optimize Database#synchronize implementation on ruby 2.5+ (jeremyevans)</p>
+            </li><li>
+            <p>Add class_table_inheritance plugin :ignore_subclass_columns option
+            (brianphillips) (#1459)</p>
+            </li><li>
+            <p>Make Dataset#to_xml in xml_serializer work with eager_graphed datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#to_json in json_serializer work with eager_graphed datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Cache Dataset#nullify dataset in the null_dataset extension (chanks)
+            (#1456)</p>
+            </li><li>
+            <p>Add datetime_parse_to_time extension, for parsing timestamp strings without
+            offsets using DateTime.parse.to_time (jeremyevans) (#1455)</p>
+            </li><li>
+            <p>Add WHERE NULL filter for Dataset#where calls with no existing filter, no
+            argument, and where the virtual row block returns nil (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-5.3.0+-282017-12-01-29">5.3.0 (2017-12-01)<span><a href="#label-5.3.0+-282017-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

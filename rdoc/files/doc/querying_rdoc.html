@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
+          <span class='datetime'>2017-12-21 07:13:29 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -95,7 +95,7 @@
             
             <h4 id="label-Using+first">Using <code>first</code><span><a href="#label-Using+first">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>If you just want the first record in the dataset,
+            <p>If you want the first record in the dataset,
             <code>Sequel::Dataset#first</code> is probably the most obvious method to
             use:</p>
             
@@ -119,21 +119,28 @@
             <h4 id="label-Using+last">Using <code>last</code><span><a href="#label-Using+last">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>If you want the last record in the dataset,
-            <code>Sequel::Dataset#last</code> is an obvious method to use.  Note that
-            last requires that the dataset be ordered, unless the dataset is a model
-            dataset.  For a model dataset, <code>last</code> will do a reverse order by
+            <code>Sequel::Dataset#last</code> is an obvious method to use. 
+            <code>last</code> requires the dataset be ordered, unless the dataset is a
+            model dataset in which case <code>last</code> will do a reverse order by
             the primary key field:</p>
             
             <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY id DESC LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
-            <p>Note that what <code>last</code> does is reverse the order of the dataset
-            and then call <code>first</code>.  This is why <code>last</code> raises a
-            <a href="../../classes/Sequel/Error.html">Sequel::Error</a> if there is no
-            order on a plain dataset, because otherwise it would provide the same
-            record as <code>first</code>, and most users would find that confusing.</p>
-            
-            <p>Note that <code>last</code> is not necessarily going to give you the last
-            record in the dataset unless you give the dataset an unambiguous order.</p>
+            <p>Note:</p>
+            <ol><li>
+            <p><code>last</code> is equivalent to running a <code>reverse.first</code>
+            query, in other words it reverses the order of the dataset and then calls
+            <code>first</code>.  This is why <code>last</code> raises a <a
+            href="../../classes/Sequel/Error.html">Sequel::Error</a> when there is no
+            order on a plain dataset - because it will provide the same record as
+            <code>first</code>, and most users will find that confusing.</p>
+            </li><li>
+            <p><code>last</code> is not necessarily going to give you the last record in
+            the dataset unless you give the dataset an unambiguous order.</p>
+            </li><li>
+            <p><code>last</code> will ignore <code>limit</code> if chained together in a
+            query because it sets a limit of 1 if no arguments are given.</p>
+            </li></ol>
             
             <h4 id="label-Retrieving+a+Single+Column+Value">Retrieving a Single Column Value<span><a href="#label-Retrieving+a+Single+Column+Value">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

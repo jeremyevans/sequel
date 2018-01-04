@@ -52,6 +52,7 @@
             </ol>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#attribute-i-cast_type">cast_type</a></li>
               <li><a href="#attribute-i-expr">expr</a></li>
               <li><a href="#attribute-i-interval">interval</a></li>
             </ol>
@@ -69,6 +70,17 @@
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
                 <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-cast_type'>cast_type</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The type to cast the expression to.  nil if not overridden, in which cast
+                      the generic timestamp type for the database will be used.</p>
+                    </td>
+                  </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>
                       <a name='attribute-i-expr'>expr</a>
@@ -98,7 +110,7 @@
                 <a name='method-c-new'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(expr, interval)</span>
+                  <span class='arguments'>(expr, interval, opts=OPTS)</span>
                 </div>
                 <div class='description'>
                   
@@ -113,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>)&#x000A;  <span class="ruby-ivar">@expr</span> = <span class="ruby-identifier">expr</span>&#x000A;  <span class="ruby-ivar">@interval</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;    <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;       <span class="ruby-comment"># Attempt to prevent SQL injection by users who pass untrusted strings</span>&#x000A;       <span class="ruby-comment"># as interval values. </span>&#x000A;       <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>)&#x000A;         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;cannot provide String value as interval part: #{v.inspect}&quot;</span>&#x000A;       <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">interval</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)&#x000A;    <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">parts</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">unit</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">unit</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">value</span>}&#x000A;    <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">h</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-ivar">@interval</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/date_arithmetic.rb, line 186</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expr</span>, <span class="ruby-identifier">interval</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@expr</span> = <span class="ruby-identifier">expr</span>&#x000A;  <span class="ruby-ivar">@interval</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;    <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;       <span class="ruby-comment"># Attempt to prevent SQL injection by users who pass untrusted strings</span>&#x000A;       <span class="ruby-comment"># as interval values. </span>&#x000A;       <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>)&#x000A;         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">InvalidValue</span>, <span class="ruby-node">&quot;cannot provide String value as interval part: #{v.inspect}&quot;</span>&#x000A;       <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">interval</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)&#x000A;    <span class="ruby-identifier">interval</span>.<span class="ruby-identifier">parts</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">unit</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">unit</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">value</span>}&#x000A;    <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">h</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-ivar">@interval</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@cast_type</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cast</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cast</span>]&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

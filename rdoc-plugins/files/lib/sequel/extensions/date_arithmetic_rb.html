@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
+          <span class='datetime'>2017-12-18 14:45:05 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -53,6 +53,11 @@
             specifying the interval as an ActiveSupport::Duration object:</p>
             
             <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;active_support/all&#39;</span>&#x000A;<span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, <span class="ruby-value">1</span>.<span class="ruby-identifier">years</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>.<span class="ruby-identifier">months</span> <span class="ruby-operator">+</span> <span class="ruby-value">3</span>.<span class="ruby-identifier">days</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(:<span class="ruby-identifier">date_column</span>, <span class="ruby-value">1</span>.<span class="ruby-identifier">hours</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>.<span class="ruby-identifier">minutes</span> <span class="ruby-operator">+</span> <span class="ruby-value">3</span>.<span class="ruby-identifier">seconds</span>)</pre>
+            
+            <p>By default, values are casted to the generic timestamp type for the
+            database.  You can override the cast type using the :cast option:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, {<span class="ruby-identifier">years</span><span class="ruby-operator">:</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">months</span><span class="ruby-operator">:</span> <span class="ruby-value">2</span>, <span class="ruby-identifier">days</span><span class="ruby-operator">:</span> <span class="ruby-value">3</span>}, :<span class="ruby-identifier">cast=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">timestamptz</span>)</pre>
             
             <p>These expressions can be used in your datasets, or anywhere else that <a
             href="../../../../classes/Sequel.html">Sequel</a> expressions are allowed:</p>

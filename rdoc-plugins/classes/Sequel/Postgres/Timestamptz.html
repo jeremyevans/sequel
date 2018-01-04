@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::Dataset::Nullifiable</title>
+    <title>Sequel::Postgres::Timestamptz</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -25,11 +25,11 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::Dataset::Nullifiable
+          Sequel::Postgres::Timestamptz
         </h1>
         <ol class='paths'>
           <li>
-            <a href="../../../files/lib/sequel/extensions/null_dataset_rb.html">lib/sequel/extensions/null_dataset.rb</a>
+            <a href="../../../files/lib/sequel/extensions/pg_timestamptz_rb.html">lib/sequel/extensions/pg_timestamptz.rb</a>
           </li>
         </ol>
       </div>
@@ -40,7 +40,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a href="#method-i-nullify">nullify</a></li>
+              <li><a href="#method-i-type_literal_generic_datetime">type_literal_generic_datetime</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -48,21 +48,21 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-nullify'>
-                <a name='method-i-nullify'></a>
+              <div class='method public-instance' id='method-method-i-type_literal_generic_datetime'>
+                <a name='method-i-type_literal_generic_datetime'></a>
                 <div class='synopsis'>
-                  <span class='name'>nullify</span>
-                  <span class='arguments'>()</span>
+                  <span class='name'>type_literal_generic_datetime</span>
+                  <span class='arguments'>(column)</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Return a cloned nullified dataset.</p>
+                  <p>Use timestamptz by default for generic timestamp value.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-nullify-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-type_literal_generic_datetime-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-nullify-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nullify</span>&#x000A;  <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_nullify_ds</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">NullDataset</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-type_literal_generic_datetime-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_timestamptz.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_literal_generic_datetime</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-value">:timestamptz</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

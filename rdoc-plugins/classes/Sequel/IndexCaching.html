@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::IndexCaching</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::IndexCaching
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/sequel/extensions/index_caching_rb.html">lib/sequel/extensions/index_caching.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a href="#method-c-extended">extended</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a href="#method-i-dump_index_cache">dump_index_cache</a></li>
+              <li><a href="#method-i-dump_index_cache-3F">dump_index_cache?</a></li>
+              <li><a href="#method-i-indexes">indexes</a></li>
+              <li><a href="#method-i-load_index_cache">load_index_cache</a></li>
+              <li><a href="#method-i-load_index_cache-3F">load_index_cache?</a></li>
+              <li><a href="#method-i-remove_cached_schema">remove_cached_schema</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-extended'>
+                <a name='method-c-extended'></a>
+                <div class='synopsis'>
+                  <span class='name'>extended</span>
+                  <span class='arguments'>(db)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set index cache to the empty hash.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@indexes</span>, {})&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-dump_index_cache'>
+                <a name='method-i-dump_index_cache'></a>
+                <div class='synopsis'>
+                  <span class='name'>dump_index_cache</span>
+                  <span class='arguments'>(file)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Dump the index cache to the filename given in Marshal format.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-dump_index_cache-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-dump_index_cache-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dump_index_cache</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-ivar">@indexes</span>))}&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-dump_index_cache-3F'>
+                <a name='method-i-dump_index_cache-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>dump_index_cache?</span>
+                  <span class='arguments'>(file)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Dump the index cache to the filename given unless the file already exists.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-dump_index_cache-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-dump_index_cache-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dump_index_cache?</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-identifier">dump_index_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-indexes'>
+                <a name='method-i-indexes'></a>
+                <div class='synopsis'>
+                  <span class='name'>indexes</span>
+                  <span class='arguments'>(table, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If no options are provided and there is cached index information for the
+                  table, return the cached information instead of querying the database.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 91</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">empty?</span>&#x000A;&#x000A;  <span class="ruby-identifier">quoted_name</span> = <span class="ruby-identifier">literal</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@indexes</span>[<span class="ruby-identifier">quoted_name</span>]}&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">result</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@indexes</span>[<span class="ruby-identifier">quoted_name</span>] = <span class="ruby-identifier">result</span>}&#x000A;  <span class="ruby-identifier">result</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-load_index_cache'>
+                <a name='method-i-load_index_cache'></a>
+                <div class='synopsis'>
+                  <span class='name'>load_index_cache</span>
+                  <span class='arguments'>(file)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Replace the index cache with the data from the given file, which should be
+                  in Marshal format.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-load_index_cache-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-load_index_cache-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">load_index_cache</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-ivar">@indexes</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>))&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-load_index_cache-3F'>
+                <a name='method-i-load_index_cache-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>load_index_cache?</span>
+                  <span class='arguments'>(file)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Replace the index cache with the data from the given file if the file
+                  exists.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-load_index_cache-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-load_index_cache-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">load_index_cache?</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-identifier">load_index_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-remove_cached_schema'>
+                <a name='method-i-remove_cached_schema'></a>
+                <div class='synopsis'>
+                  <span class='name'>remove_cached_schema</span>
+                  <span class='arguments'>(table)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Remove the index cache for the given schema name</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-remove_cached_schema-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-remove_cached_schema-source'><span class="ruby-comment"># File lib/sequel/extensions/index_caching.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">k</span> = <span class="ruby-identifier">quote_schema_table</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-ivar">@indexes</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">k</span>)}&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

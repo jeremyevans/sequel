@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-08-01 08:12:00 -0700</span>
+          <span class='datetime'>2017-12-18 09:44:38 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -102,7 +102,7 @@
             
             <p>This works with other hash values, such as arrays and ranges:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>({<span class="ruby-identifier">category</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-string">&#39;other&#39;</span>]}, (<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>))}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category IN (&#39;ruby&#39;, &#39;other&#39;)) OR ((price - 100) &lt;= 200))&quot;</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">=~</span> (<span class="ruby-value">100</span><span class="ruby-operator">..</span><span class="ruby-value">200</span>)) <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">active</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price &gt;= 100 AND price &lt;= 200) AND active)&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>({<span class="ruby-identifier">category</span><span class="ruby-operator">:</span> [<span class="ruby-string">&#39;ruby&#39;</span>, <span class="ruby-string">&#39;other&#39;</span>]}, (<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>))}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category IN (&#39;ruby&#39;, &#39;other&#39;)) OR ((price - 100) &gt; 200))&quot;</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">=~</span> (<span class="ruby-value">100</span><span class="ruby-operator">..</span><span class="ruby-value">200</span>)) <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">active</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price &gt;= 100 AND price &lt;= 200) AND active)&quot;</span></pre>
             
             <h2 id="label-Filtering+using+a+custom+filter+string">Filtering using a custom filter string<span><a href="#label-Filtering+using+a+custom+filter+string">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
