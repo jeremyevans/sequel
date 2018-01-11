@@ -60,6 +60,15 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @db.sqls.must_equal ["INSERT INTO foo (a) VALUES (CURRENT_TIMESTAMP)", "SELECT * FROM foo WHERE id = 1"]
   end
 
+  it "should cache default values if :cache plugin option is used" do
+    @c.plugin :defaults_setter, :cache => true
+    @c.default_values[:a] = 'a'
+    o = @c.new
+    o.a.must_equal 'a'
+    o.values[:a].must_equal 'a'
+    o.a.must_be_same_as(o.a)
+  end
+
   it "should not override a given value" do
     @pr.call(2)
     @c.new('a'=>3).a.must_equal 3

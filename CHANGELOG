@@ -1,5 +1,7 @@
 === master
 
+* Add defaults_setter plugin :cache option for caching default values returned (jeremyevans)
+
 * Freeze string values in hashes returned by Database#schema (jeremyevans)
 
 === 5.4.0 (2018-01-04)

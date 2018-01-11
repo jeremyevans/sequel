@@ -23,6 +23,24 @@ module Sequel
     #
     #   Album.default_values[:a] = lambda{Date.today}
     #   Album.new.a # => Date.today
+    #
+    # By default, default values returned are not cached:
+    #
+    #   Album.new.a.equal?(Album.new.a) # => false
+    #
+    # However, you can turn on caching of default values:
+    #
+    #   Album.plugin :defaults_setter, cache: true
+    #   Album.new.a.equal?(Album.new.a) # => false
+    #
+    # Note that if the cache is turned on, the cached values are stored in
+    # the values hash:
+    #
+    #   Album.plugin :defaults_setter, cache: true
+    #   album = Album.new
+    #   album.values # => {}
+    #   album.a
+    #   album.values # => {:a => Date.today}
     # 
     # Usage:
     #
@@ -32,22 +50,31 @@ module Sequel
     #   # Make the Album class set defaults 
     #   Album.plugin :defaults_setter
     module DefaultsSetter
-      # Set the default values based on the model schema
-      def self.configure(model)
-        model.send(:set_default_values)
+      # Set the default values based on the model schema. Options:
+      # :cache :: Cache default values returned in the model's values hash.
+      def self.configure(model, opts=OPTS)
+        model.instance_exec do
+          set_default_values
+          @cache_default_values = opts[:cache] if opts.has_key?(:cache)
+        end
       end
 
       module ClassMethods
-        # The default values to set in initialize for this model.  A hash with column symbol
+        # The default values to use for this model.  A hash with column symbol
         # keys and default values.  If the default values respond to +call+, it will be called
         # to get the value, otherwise the value will be used directly.  You can manually modify
         # this hash to set specific default values, by default the ones will be parsed from the database.
         attr_reader :default_values
-        
+
         Plugins.after_set_dataset(self, :set_default_values)
 
-        Plugins.inherited_instance_variables(self, :@default_values=>:dup)
+        Plugins.inherited_instance_variables(self, :@default_values=>:dup, :@cache_default_values=>nil)
 
+        # Whether default values should be cached in the values hash after being retrieved.
+        def cache_default_values?
+          @cache_default_values
+        end
+        
         # Freeze default values when freezing model class
         def freeze
           @default_values.freeze
@@ -82,7 +109,9 @@ module Sequel
         def [](k)
           if new? && !values.has_key?(k)
             v = model.default_values[k]
-            v.respond_to?(:call) ? v.call : v
+            v = v.call if v.respond_to?(:call)
+            values[k] = v if model.cache_default_values?
+            v
           else
             super
           end
