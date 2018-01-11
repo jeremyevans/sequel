@@ -175,6 +175,10 @@ module Sequel
         if !c[:max_length] && c[:type] == :string && (max_length = column_schema_max_length(c[:db_type]))
           c[:max_length] = max_length
         end
+
+        c.each_value do |v|
+          v.freeze if v.is_a?(String)
+        end
       end
       Sequel.synchronize{@schemas[quoted_name] = cols} if cache_schema
       cols

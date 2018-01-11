@@ -1619,6 +1619,16 @@ describe "Schema Parser" do
     @db.schema(:x).wont_be_same_as(@db.schema(:x))
   end
 
+  it "should freeze string values in resulting hash" do
+    @db.define_singleton_method(:schema_parse_table) do |t, opts|
+      [[:a, {:oid=>1, :db_type=>'integer'.dup, :default=>"'a'".dup, :ruby_default=>'a'.dup}]]
+    end
+    c = @db.schema(:x)[0][1]
+    c[:db_type].frozen?.must_equal true
+    c[:default].frozen?.must_equal true
+    c[:ruby_default].frozen?.must_equal true
+  end
+
   it "should provide options if given a table name" do
     c = nil
     @db.define_singleton_method(:schema_parse_table) do |t, opts|
