@@ -209,6 +209,17 @@ describe "pg_array extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :integer_array, :real_array, :decimal_array, :string_array]
   end
 
+  it "should set :callable_default schema entries if default value is recognized" do
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:name=>'t', :db_type=>'text[]', :default=>"'{}'::text[]"}]
+    s = @db.schema(:items)
+    s[0][1][:callable_default].must_be_nil
+    v = s[1][1][:callable_default].call
+    Sequel::Postgres::PGArray.===(v).must_equal true
+    @db.literal(v).must_equal "'{}'::text[]"
+    v << 'a'
+    @db.literal(v).must_equal "ARRAY['a']::text[]"
+  end
+
   it "should support typecasting of the various array types" do
     {
       :integer=>{:class=>Integer, :convert=>['1', 1, '1']},

@@ -2362,6 +2362,19 @@ describe 'PostgreSQL array handling' do
     c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.must_equal [o]
   end
 
+  it 'with empty array default values and defaults_setter plugin' do
+    @db.create_table!(:items) do
+      column :n, 'integer[]', :default=>[]
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :defaults_setter, :cache=>true
+    o = c.new
+    o.n.class.must_equal(Sequel::Postgres::PGArray)
+    o.n.to_a.must_be_same_as(o.n.to_a)
+    o.n << 1
+    o.save.n.must_equal [1]
+  end
+
   it 'operations/functions with pg_array_ops' do
     Sequel.extension :pg_array_ops
     @db.create_table!(:items){column :i, 'integer[]'; column :i2, 'integer[]'; column :i3, 'integer[]'; column :i4, 'integer[]'; column :i5, 'integer[]'}

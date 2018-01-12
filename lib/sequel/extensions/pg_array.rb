@@ -253,6 +253,17 @@ module Sequel
           end
         end
 
+        # Set the :callable_default value if the default value is recognized as an empty array.
+        def schema_parse_table(*)
+          super.each do |a|
+            h = a[1]
+            if h[:default] =~ /\A(?:'\{\}'|ARRAY\[\])::([\w ]+)\[\]\z/
+              type = $1.freeze
+              h[:callable_default] = lambda{Sequel.pg_array([], type)}
+            end
+          end
+        end
+
         # Convert ruby arrays to PostgreSQL arrays when used as default values.
         def column_definition_default_sql(sql, column)
           if (d = column[:default]) && d.is_a?(Array) && !Sequel.condition_specifier?(d)
