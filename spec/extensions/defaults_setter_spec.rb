@@ -41,6 +41,15 @@ describe "Sequel::Plugins::DefaultsSetter" do
     (t - Time.now).must_be :<,  1
   end
 
+  it "should handle :callable_default values in schema in preference to :ruby_default" do
+    @db.define_singleton_method(:schema) do |*|
+      [[:id, {:primary_key=>true}],
+       [:a, {:ruby_default => Time.now, :callable_default=>lambda{Date.today}, :primary_key=>false}]]
+    end
+    @c.dataset = @c.dataset
+    @c.new.a.must_equal Date.today
+  end
+
   it "should handle Sequel::CURRENT_TIMESTAMP default by using the current DateTime if Sequel.datetime_class is DateTime" do
     Sequel.datetime_class = DateTime
     t = @pr.call(Sequel::CURRENT_TIMESTAMP).new.a

@@ -86,7 +86,15 @@ module Sequel
         # Parse the cached database schema for this model and set the default values appropriately.
         def set_default_values
           h = {}
-          @db_schema.each{|k, v| h[k] = convert_default_value(v[:ruby_default]) unless v[:ruby_default].nil?} if @db_schema
+          if @db_schema
+            @db_schema.each do |k, v|
+              if v[:callable_default]
+                h[k] = v[:callable_default]
+              elsif !v[:ruby_default].nil?
+                h[k] = convert_default_value(v[:ruby_default])
+              end
+            end
+          end
           @default_values = h.merge!(@default_values || {})
         end
 
