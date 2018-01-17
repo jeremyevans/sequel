@@ -154,6 +154,16 @@ module Sequel
           db_type == 'hstore' ? :hstore : super
         end
 
+        # Set the :callable_default value if the default value is recognized as an empty hstore.
+        def schema_parse_table(*)
+          super.each do |a|
+            h = a[1]
+            if h[:type] == :hstore && h[:default] =~ /\A''::hstore\z/
+              h[:callable_default] = lambda{HStore.new({})}
+            end
+          end
+        end
+
         # Typecast value correctly to HStore.  If already an
         # HStore instance, return as is.  If a hash, return
         # an HStore version of it.  If a string, assume it is

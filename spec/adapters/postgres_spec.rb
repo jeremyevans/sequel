@@ -2612,6 +2612,19 @@ describe 'PostgreSQL hstore handling' do
     c.filter(:mtm_items=>c.filter(:id=>o.id)).all.must_equal [o]
   end
 
+  it 'with empty hstore default values and defaults_setter plugin' do
+    @db.create_table!(:items) do
+      hstore :h, :default=>Sequel.hstore({})
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :defaults_setter, :cache=>true
+    o = c.new
+    o.h.class.must_equal(Sequel::Postgres::HStore)
+    o.h.to_hash.must_be_same_as(o.h.to_hash)
+    o.h['a'] = 'b'
+    o.save.h.must_equal('a'=>'b')
+  end
+
   it 'operations/functions with pg_hstore_ops' do
     Sequel.extension :pg_hstore_ops, :pg_array_ops
     @db.create_table!(:items){hstore :h1; hstore :h2; hstore :h3; String :t}

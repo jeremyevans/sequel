@@ -1,6 +1,8 @@
 === master
 
-* Make pg_array extension set :callable_default schema value for recognized empty arrays (jeremyevans) (#1466)
+* Make pg_hstore extension set :callable_default schema value for empty hstore defaults (jeremyevans)
+
+* Make pg_array extension set :callable_default schema value for recognized empty array defaults (jeremyevans) (#1466)
 
 * Make defaults_setter plugin prefer :callable_default db_schema values over :ruby_default db_schema values (jeremyevans)
 

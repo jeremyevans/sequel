@@ -186,6 +186,17 @@ describe "pg_hstore extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :hstore]
   end
 
+  it "should set :callable_default schema entries if default value is recognized" do
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:name=>'t', :db_type=>'hstore', :default=>"''::hstore"}]
+    s = @db.schema(:items)
+    s[0][1][:callable_default].must_be_nil
+    v = s[1][1][:callable_default].call
+    Sequel::Postgres::HStore.===(v).must_equal true
+    @db.literal(v).must_equal "''::hstore"
+    v['a'] = 'b'
+    @db.literal(v).must_equal "'\"a\"=>\"b\"'::hstore"
+  end
+
   it "should support typecasting for the hstore type" do
     h = Sequel.hstore(1=>2)
     @db.typecast_value(:hstore, h).object_id.must_equal(h.object_id)
