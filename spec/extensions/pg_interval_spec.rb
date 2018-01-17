@@ -66,6 +66,12 @@ describe "pg_interval extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :interval]
   end
 
+  it "should set :ruby_default schema entries if default value is recognized" do
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:name=>'t', :db_type=>'interval', :default=>"'3 days'::interval"}]
+    s = @db.schema(:items)
+    s[1][1][:ruby_default].must_equal ActiveSupport::Duration.new(3*86400, :days=>3)
+  end
+
   it "should support typecasting for the interval type" do
     d = ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
     @db.typecast_value(:interval, d).object_id.must_equal d.object_id

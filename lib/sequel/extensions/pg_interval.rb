@@ -146,6 +146,16 @@ module Sequel
         end
       end
 
+      # Set the :ruby_default value if the default value is recognized as an interval.
+      def schema_parse_table(*)
+        super.each do |a|
+          h = a[1]
+          if h[:type] == :interval && h[:default] =~ /\A'([\w ]+)'::interval\z/
+            h[:ruby_default] = PARSER.call($1)
+          end
+        end
+      end
+
       # Typecast value correctly to an ActiveSupport::Duration instance.
       # If already an ActiveSupport::Duration, return it. 
       # If a numeric argument is given, assume it represents a number

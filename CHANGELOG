@@ -1,5 +1,7 @@
 === master
 
+* Make pg_interval extension set :ruby_default schema value for recognized interval defaults (jeremyevans)
+
 * Make pg_json extension set :callable_default schema value for empty json/jsonb array/hash defaults (jeremyevans)
 
 * Make pg_inet extension set :ruby_default schema value for recognized inet/cidr defaults (jeremyevans)

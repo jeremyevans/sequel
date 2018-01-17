@@ -523,11 +523,6 @@ describe "A PostgreSQL dataset" do
     @db[:atest].get(Sequel.extract(:year, :t)).must_equal 2010
   end
 
-  it "should be able to parse the default value for an interval type" do
-    @db.create_table!(:atest){interval :t, :default=>'1 week'}
-    @db.schema(:atest).first.last[:ruby_default].must_equal '7 days'
-  end
-
   it "should have #transaction support various types of synchronous options" do
     @db.transaction(:synchronous=>:on){}
     @db.transaction(:synchronous=>true){}
@@ -3334,6 +3329,15 @@ describe 'PostgreSQL interval types' do
     @ds.filter(:i=>:$i).call(:first, :i=>[]).must_be_nil
     @ds.filter(:i=>:$i).call(:delete, :i=>[d]).must_equal 1
   end if uses_pg_or_jdbc
+
+  it 'parse default values for schema' do
+    @db.create_table!(:items) do
+      Integer :j
+      interval :i, :default=>ActiveSupport::Duration.new(3*86400, :days=>3)
+    end
+    @db.schema(:items)[0][1][:ruby_default].must_be_nil
+    @db.schema(:items)[1][1][:ruby_default].must_equal ActiveSupport::Duration.new(3*86400, :days=>3)
+  end
 
   it 'with models' do
     @db.create_table!(:items) do
