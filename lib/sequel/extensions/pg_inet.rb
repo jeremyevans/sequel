@@ -85,6 +85,16 @@ module Sequel
         end
       end
 
+      # Set the :ruby_default value if the default value is recognized as an ip address.
+      def schema_parse_table(*)
+        super.each do |a|
+          h = a[1]
+          if h[:type] == :ipaddr && h[:default] =~ /\A'([:a-fA-F0-9\.\/]+)'::(?:inet|cidr)\z/
+            h[:ruby_default] = IPAddr.new($1)
+          end
+        end
+      end
+
       # Typecast the given value to an IPAddr object.
       def typecast_value_ipaddr(value)
         case value

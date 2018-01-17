@@ -51,6 +51,12 @@ describe "pg_inet extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :ipaddr, :ipaddr]
   end
 
+  it "should set :ruby_default schema entries if default value is recognized" do
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:name=>'t', :db_type=>'inet', :default=>"'127.0.0.1'::inet"}]
+    s = @db.schema(:items)
+    s[1][1][:ruby_default].must_equal IPAddr.new('127.0.0.1')
+  end
+
   it "should support typecasting for the ipaddr type" do
     ip = IPAddr.new('127.0.0.1')
     @db.typecast_value(:ipaddr, ip).must_be_same_as(ip)

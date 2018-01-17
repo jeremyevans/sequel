@@ -1,5 +1,7 @@
 === master
 
+* Make pg_inet extension set :ruby_default schema value for recognized inet/cidr defaults (jeremyevans)
+
 * Make pg_hstore extension set :callable_default schema value for empty hstore defaults (jeremyevans)
 
 * Make pg_array extension set :callable_default schema value for recognized empty array defaults (jeremyevans) (#1466)

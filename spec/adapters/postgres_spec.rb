@@ -2982,6 +2982,15 @@ describe 'PostgreSQL inet/cidr types' do
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal 1
   end if uses_pg_or_jdbc
 
+  it 'parse default values for schema' do
+    @db.create_table!(:items) do
+      inet :i, :default=>IPAddr.new('127.0.0.1')
+      cidr :c, :default=>IPAddr.new('127.0.0.1')
+    end
+    @db.schema(:items)[0][1][:ruby_default].must_equal IPAddr.new('127.0.0.1')
+    @db.schema(:items)[1][1][:ruby_default].must_equal IPAddr.new('127.0.0.1')
+  end
+
   it 'with models' do
     @db.create_table!(:items) do
       primary_key :id
