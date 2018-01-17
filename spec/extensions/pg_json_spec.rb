@@ -183,6 +183,35 @@ describe "pg_json extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :jsonb]
   end
 
+  it "should set :callable_default schema entries if default value is recognized" do
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:name=>'jh', :db_type=>'json', :default=>"'{}'::json"}, {:name=>'ja', :db_type=>'json', :default=>"'[]'::json"}, {:name=>'jbh', :db_type=>'jsonb', :default=>"'{}'::jsonb"}, {:name=>'jba', :db_type=>'jsonb', :default=>"'[]'::jsonb"}]
+    s = @db.schema(:items)
+    s[0][1][:callable_default].must_be_nil
+    v = s[1][1][:callable_default].call
+    Sequel::Postgres::JSONHash.===(v).must_equal true
+    @db.literal(v).must_equal "'{}'::json"
+    v['a'] = 'b'
+    @db.literal(v).must_equal "'{\"a\":\"b\"}'::json"
+
+    v = s[2][1][:callable_default].call
+    Sequel::Postgres::JSONArray.===(v).must_equal true
+    @db.literal(v).must_equal "'[]'::json"
+    v << 1
+    @db.literal(v).must_equal "'[1]'::json"
+
+    v = s[3][1][:callable_default].call
+    Sequel::Postgres::JSONBHash.===(v).must_equal true
+    @db.literal(v).must_equal "'{}'::jsonb"
+    v['a'] = 'b'
+    @db.literal(v).must_equal "'{\"a\":\"b\"}'::jsonb"
+
+    v = s[4][1][:callable_default].call
+    Sequel::Postgres::JSONBArray.===(v).must_equal true
+    @db.literal(v).must_equal "'[]'::jsonb"
+    v << 1
+    @db.literal(v).must_equal "'[1]'::jsonb"
+  end
+
   it "should support typecasting for the json type" do
     h = Sequel.pg_json(1=>2)
     a = Sequel.pg_json([1])

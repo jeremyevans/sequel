@@ -214,6 +214,30 @@ module Sequel
         end
       end
 
+      # Set the :callable_default value if the default value is recognized as an empty json/jsonb array/hash.
+      def schema_parse_table(*)
+        super.each do |a|
+          h = a[1]
+          if (h[:type] == :json || h[:type] == :jsonb) && h[:default] =~ /\A'(\{\}|\[\])'::jsonb?\z/
+            is_array = $1 == '[]'
+
+            klass = if h[:type] == :json
+              if is_array
+                JSONArray
+              else
+                JSONHash
+              end
+            elsif is_array
+              JSONBArray
+            else
+              JSONBHash
+            end
+
+            h[:callable_default] = lambda{klass.new(is_array ? [] : {})}
+          end
+        end
+      end
+
       # Convert the value given to a JSONArray or JSONHash
       def typecast_value_json(value)
         case value

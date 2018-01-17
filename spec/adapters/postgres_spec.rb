@@ -2721,11 +2721,10 @@ describe 'PostgreSQL json type' do
   json_types.each do |json_type|
     json_array_type = "#{json_type}[]"
     pg_json = lambda{|v| Sequel.send(:"pg_#{json_type}", v)}
+    hash_class = json_type == :jsonb ? Sequel::Postgres::JSONBHash : Sequel::Postgres::JSONHash
+    array_class = json_type == :jsonb ? Sequel::Postgres::JSONBArray : Sequel::Postgres::JSONArray
 
     it 'insert and retrieve json values' do
-      hash_class = json_type == :jsonb ? Sequel::Postgres::JSONBHash : Sequel::Postgres::JSONHash
-      array_class = json_type == :jsonb ? Sequel::Postgres::JSONBArray : Sequel::Postgres::JSONArray
-
       @db.create_table!(:items){column :j, json_type}
       @ds.insert(pg_json.call(@h))
       @ds.count.must_equal 1
@@ -2777,6 +2776,25 @@ describe 'PostgreSQL json type' do
       c = Class.new(Sequel::Model(@db[:items]))
       c.create(:h=>pg_json.call(@h)).h.must_equal @h
       c.create(:h=>pg_json.call(@a)).h.must_equal @a
+    end
+
+    it 'with empty json default values and defaults_setter plugin' do
+      @db.create_table!(:items) do
+        column :h, json_type, :default=>hash_class.new({})
+        column :a, json_type, :default=>array_class.new([])
+      end
+      c = Class.new(Sequel::Model(@db[:items]))
+      c.plugin :defaults_setter, :cache=>true
+      o = c.new
+      o.h.class.must_equal(hash_class)
+      o.a.class.must_equal(array_class)
+      o.h.to_hash.must_be_same_as(o.h.to_hash)
+      o.a.to_a.must_be_same_as(o.a.to_a)
+      o.h['a'] = 'b'
+      o.a << 1
+      o.save
+      o.h.must_equal('a'=>'b')
+      o.a.must_equal([1])
     end
 
     it 'use json in bound variables' do
