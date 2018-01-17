@@ -3161,6 +3161,15 @@ describe 'PostgreSQL range types' do
     @ds.filter(h).call(:delete, @ra).must_equal 1
   end if uses_pg_or_jdbc
 
+  it 'parse default values for schema' do
+    @db.create_table!(:items) do
+      Integer :j
+      int4range :i, :default=>1..4
+    end
+    @db.schema(:items)[0][1][:ruby_default].must_be_nil
+    @db.schema(:items)[1][1][:ruby_default].must_equal Sequel::Postgres::PGRange.new(1, 5, :exclude_end=>true, :db_type=>'int4range')
+  end
+
   it 'with models' do
     @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
     c = Class.new(Sequel::Model(@db[:items]))

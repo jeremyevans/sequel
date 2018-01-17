@@ -262,6 +262,20 @@ module Sequel
           end
         end
 
+        # Set the :ruby_default value if the default value is recognized as a range.
+        def schema_parse_table(*)
+          super.each do |a|
+            h = a[1]
+            db_type = h[:db_type]
+            if @pg_range_schema_types[db_type] && h[:default] =~ /\A'([^']+)'::#{db_type}\z/
+              default = $1
+              if convertor = conversion_procs[h[:oid]]
+                h[:ruby_default] = convertor.call($1)
+              end
+            end
+          end
+        end
+
         # Typecast value correctly to a PGRange.  If already an
         # PGRange instance with the same db_type, return as is.
         # If a PGRange with a different subtype, return a new

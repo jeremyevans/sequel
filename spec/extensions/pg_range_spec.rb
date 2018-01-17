@@ -93,6 +93,12 @@ describe "pg_range extension" do
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :int4range_array, :int8range_array, :numrange_array, :daterange_array, :tsrange_array, :tstzrange_array]
   end
 
+  it "should set :ruby_default schema entries if default value is recognized" do
+    @db.fetch = [{:name=>'id', :db_type=>'integer', :default=>'1'}, {:oid=>3904, :name=>'t', :db_type=>'int4range', :default=>"'[1,5)'::int4range"}]
+    s = @db.schema(:items)
+    s[1][1][:ruby_default].must_equal Sequel::Postgres::PGRange.new(1, 5, :exclude_end=>true, :db_type=>'int4range')
+  end
+
   describe "database typecasting" do
     before do
       @o = @R.new(1, 2, :db_type=>'int4range')
