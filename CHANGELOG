@@ -1,5 +1,7 @@
 === master
 
+* Cache results of changed_columns method in local variables in many places for better performance (jeremyevans)
+
 * Make modification_detection plugin not break column change detection for new objects (jeremyevans) (#1468)
 
 * Make pg_range extension set :ruby_default schema value for recognized range defaults (jeremyevans)

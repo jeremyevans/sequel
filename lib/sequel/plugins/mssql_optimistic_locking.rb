@@ -75,7 +75,8 @@ module Sequel
         # it to be assigned.
         def _save_update_all_columns_hash
           v = @values.dup
-          Array(primary_key).each{|x| v.delete(x) unless changed_columns.include?(x)}
+          cc = changed_columns
+          Array(primary_key).each{|x| v.delete(x) unless cc.include?(x)}
           v.delete(model.lock_column)
           v
         end

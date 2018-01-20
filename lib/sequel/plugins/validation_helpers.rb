@@ -252,7 +252,8 @@ module Sequel
           atts.each do |a|
             arr = Array(a)
             next if arr.any?{|x| errors.on(x)}
-            next if opts.fetch(:only_if_modified, true) && !new? && !arr.any?{|x| changed_columns.include?(x)}
+            cc = changed_columns
+            next if opts.fetch(:only_if_modified, true) && !new? && !arr.any?{|x| cc.include?(x)}
             ds = opts[:dataset] || model.dataset
             ds = if where
               where.call(ds, self, arr)

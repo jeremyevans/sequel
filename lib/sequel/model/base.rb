@@ -1060,7 +1060,7 @@ module Sequel
         @new = true
         @modified = true
         initialize_set(values)
-        changed_columns.clear 
+        _changed_columns.clear
         yield self if block_given?
       end
 
@@ -1137,9 +1137,9 @@ module Sequel
       #   a.name = 'Bob'
       #   a.changed_columns # => [:name]
       def changed_columns
-        @changed_columns ||= []
+        _changed_columns
       end
-  
+
       # Deletes and returns +self+.  Does not run destroy hooks.
       # Look into using +destroy+ instead.
       #
@@ -1212,7 +1212,7 @@ module Sequel
       # errors, or dataset.
       def freeze
         values.freeze
-        changed_columns.freeze
+        _changed_columns.freeze
         unless errors.frozen?
           validate
           errors.freeze
@@ -1316,9 +1316,7 @@ module Sequel
       #   a.modified!(:name)
       #   a.name.gsub!(/[aeou]/, 'i')
       def modified!(column=nil)
-        if column && !changed_columns.include?(column)
-          changed_columns << column
-        end
+        _add_changed_column(column) if column
         @modified = true
       end
 
@@ -1583,6 +1581,17 @@ module Sequel
 
       private
       
+      # Add a column as a changed column.
+      def _add_changed_column(column)
+        cc = _changed_columns
+        cc << column unless cc.include?(column)
+      end
+
+      # Internal changed_columns method that just returns stored array.
+      def _changed_columns
+        @changed_columns ||= []
+      end
+  
       # Do the deletion of the object's dataset, and check that the row
       # was actually deleted.
       def _delete
@@ -1672,7 +1681,7 @@ module Sequel
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
         _refresh_set_values(_refresh_get(dataset) || raise(NoExistingObject, "Record not found"))
-        changed_columns.clear
+        _changed_columns.clear
       end
 
       # Get the row of column data from the database.
@@ -1710,7 +1719,7 @@ module Sequel
               @this = nil
               @new = false
               @modified = false
-              pk ? _save_refresh : changed_columns.clear
+              pk ? _save_refresh : _changed_columns.clear
               after_create
               true
             end
@@ -1721,16 +1730,18 @@ module Sequel
               before_update
               columns = opts[:columns]
               if columns.nil?
-                columns_updated = if opts[:changed]
-                  @values.reject{|k,v| !changed_columns.include?(k)}
+                if opts[:changed]
+                  cc = changed_columns
+                  columns_updated = @values.reject{|k,v| !cc.include?(k)}
+                  cc.clear
                 else
-                  _save_update_all_columns_hash
+                  columns_updated = _save_update_all_columns_hash
+                  _changed_columns.clear
                 end
-                changed_columns.clear
               else # update only the specified columns
                 columns = Array(columns)
                 columns_updated = @values.reject{|k, v| !columns.include?(k)}
-                changed_columns.reject!{|c| columns.include?(c)}
+                _changed_columns.reject!{|c| columns.include?(c)}
               end
               _update_columns(columns_updated)
               @this = nil
@@ -1752,7 +1763,7 @@ module Sequel
       # can be overridden to avoid the refresh.
       def _save_refresh
         _save_set_values(_refresh_get(this.server?(:default)) || raise(NoExistingObject, "Record not found"))
-        changed_columns.clear
+        _changed_columns.clear
       end
 
       # Set values to the provided hash.  Called after a create,
@@ -1769,7 +1780,8 @@ module Sequel
       # to their existing values.
       def _save_update_all_columns_hash
         v = Hash[@values]
-        Array(primary_key).each{|x| v.delete(x) unless changed_columns.include?(x)}
+        cc = changed_columns
+        Array(primary_key).each{|x| v.delete(x) unless cc.include?(x)}
         v
       end
 
@@ -1847,8 +1859,7 @@ module Sequel
 
       # Change the value of the column to given value, recording the change.
       def change_column_value(column, value)
-        cc = changed_columns
-        cc << column unless cc.include?(column)
+        _add_changed_column(column)
         @values[column] = value
       end
 
