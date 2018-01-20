@@ -11,6 +11,13 @@ describe "serialization_modification_detection plugin" do
     @ds.db.sqls
   end
   
+  it "should detect setting new column values on new objects" do
+    @o = @c.new
+    @o.changed_columns.must_equal []
+    @o.a = 'c'
+    @o.changed_columns.must_equal [:a]
+  end
+
   it "should only detect columns that have been changed" do
     @o.changed_columns.must_equal []
     @o.a << 'b'
@@ -32,6 +39,12 @@ describe "serialization_modification_detection plugin" do
     @o.changed_columns.must_equal []
   end
   
+  it "should detect columns that have been changed on frozen objects" do
+    @o.freeze
+    @o.a << 'b'
+    @o.changed_columns.must_equal [:a]
+  end
+
   it "should not list a column twice" do
     @o.a = 'b'.dup
     @o.a << 'a'

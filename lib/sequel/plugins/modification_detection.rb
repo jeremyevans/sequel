@@ -58,13 +58,20 @@ module Sequel
         # Detect which columns have been modified by comparing the cached hash
         # value to the hash of the current value.
         def changed_columns
-          cc = super
-          changed = []
-          v = @values
+          changed = super
           if vh = @values_hashes
-            (vh.keys - cc).each{|c| changed << c unless v.has_key?(c) && vh[c] == v[c].hash}
+            values = @values
+            changed = changed.dup if frozen?
+            vh.each do |c, v|
+              match = values.has_key?(c) && v == values[c].hash
+              if changed.include?(c)
+                changed.delete(c) if match
+              else
+                changed << c unless match
+              end
+            end
           end
-          cc + changed
+          changed
         end
 
         private

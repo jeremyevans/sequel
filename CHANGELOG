@@ -1,5 +1,7 @@
 === master
 
+* Make modification_detection plugin not break column change detection for new objects (jeremyevans) (#1468)
+
 * Make pg_range extension set :ruby_default schema value for recognized range defaults (jeremyevans)
 
 * Make pg_interval extension set :ruby_default schema value for recognized interval defaults (jeremyevans)
