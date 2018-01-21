@@ -1872,6 +1872,11 @@ if uses_pg_or_jdbc && DB.server_version >= 90000
       e.wrapped_exception.must_be_kind_of ArgumentError
       e.message.must_include "foo"
     end
+
+    it "should handle errors raised during row processing" do
+      proc{@db.copy_table(@db[:test_copy].select(Sequel[1]/(Sequel[:x] - 3)))}.must_raise Sequel::DatabaseError
+      @db.get(1).must_equal 1
+    end
   end
 end
 

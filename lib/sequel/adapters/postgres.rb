@@ -309,12 +309,18 @@ module Sequel
                 while buf = conn.get_copy_data
                   yield buf
                 end
-                nil
+                b = nil
               else
                 b = String.new
                 b << buf while buf = conn.get_copy_data
-                b
               end
+
+              res = conn.get_last_result
+              if !res || res.result_status != 1
+                raise PG::NotAllCopyDataRetrieved, "Not all COPY data retrieved"
+              end
+
+              b
             rescue => e
               raise_error(e, :disconnect=>true)
             ensure

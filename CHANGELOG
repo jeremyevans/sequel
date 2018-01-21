@@ -1,5 +1,7 @@
 === master
 
+* Make Database#copy_table in the postgres adapter handle errors that occur while processing rows (jeremyevans) (#1470)
+
 * Cache results of changed_columns method in local variables in many places for better performance (jeremyevans)
 
 * Make modification_detection plugin not break column change detection for new objects (jeremyevans) (#1468)
