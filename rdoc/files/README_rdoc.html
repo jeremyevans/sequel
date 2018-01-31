@@ -30,7 +30,7 @@ README.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2018-01-29 12:40:57 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -177,7 +177,7 @@ or loggers for logging SQL queries:</p>
 <p>It is also possible to use a hash instead of a connection URL, but make
 sure to include the :adapter option in this case:</p>
 
-<pre>DB = Sequel.connect(adapter: :postgres, user: &#39;user&#39;, password: &#39;password&#39;, host: &#39;host&#39;, port: port,&#x000A;  database: &#39;database_name&quot;, max_connections: 10, logger: Logger.new(&#39;log/db.log&#39;))</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-value">adapter:</span> <span class="ruby-value">:postgres</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>, <span class="ruby-value">host:</span> <span class="ruby-string">&#39;host&#39;</span>, <span class="ruby-value">port:</span> <span class="ruby-identifier">port</span>,&#x000A;  <span class="ruby-value">database:</span> <span class="ruby-string">&#39;database_name&#39;</span>, <span class="ruby-value">max_connections:</span> <span class="ruby-value">10</span>, <span class="ruby-value">logger:</span> <span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;log/db.log&#39;</span>))</pre>
 
 <p>You can specify a block to connect, which will disconnect from the database
 after it completes:</p>

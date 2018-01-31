@@ -39,6 +39,7 @@ Sequel::Plugins::DefaultsSetter::ClassMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#method-i-cache_default_values-3F">cache_default_values?</a></li>
 <li><a href="#attribute-i-default_values">default_values</a></li>
 <li><a href="#method-i-freeze">freeze</a></li>
 </ol>
@@ -56,11 +57,11 @@ Sequel::Plugins::DefaultsSetter::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The default values to set in initialize for this model.  A hash with column
-symbol keys and default values.  If the default values respond to
-<code>call</code>, it will be called to get the value, otherwise the value
-will be used directly.  You can manually modify this hash to set specific
-default values, by default the ones will be parsed from the database.</p>
+<p>The default values to use for this model.  A hash with column symbol keys
+and default values.  If the default values respond to <code>call</code>, it
+will be called to get the value, otherwise the value will be used directly.
+You can manually modify this hash to set specific default values, by
+default the ones will be parsed from the database.</p>
 </td>
 </tr>
 </table>
@@ -68,6 +69,26 @@ default values, by default the ones will be parsed from the database.</p>
 </div>
 <div id='methods'>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-cache_default_values-3F'>
+<a name='method-i-cache_default_values-3F'></a>
+<div class='synopsis'>
+<span class='name'>cache_default_values?</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Whether default values should be cached in the values hash after being
+retrieved.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_default_values-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-cache_default_values-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_default_values?</span>&#x000A;  <span class="ruby-ivar">@cache_default_values</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-freeze'>
 <a name='method-i-freeze'></a>
 <div class='synopsis'>
@@ -84,7 +105,7 @@ default values, by default the ones will be parsed from the database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@default_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@default_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

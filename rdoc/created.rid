@@ -1,7 +1,7 @@
-Thu, 04 Jan 2018 07:18:29 -0800
-README.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-CHANGELOG	Thu, 04 Jan 2018 07:14:17 -0800
-MIT-LICENSE	Thu, 19 Jan 2017 10:04:33 -0800
+Wed, 31 Jan 2018 11:57:25 -0800
+README.rdoc	Mon, 29 Jan 2018 12:40:57 -0800
+CHANGELOG	Wed, 31 Jan 2018 11:08:15 -0800
+MIT-LICENSE	Fri, 26 Jan 2018 06:42:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool.rb	Mon, 30 Oct 2017 13:46:56 -0700
@@ -13,7 +13,7 @@ lib/sequel/exceptions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
-lib/sequel/version.rb	Thu, 04 Jan 2018 07:14:17 -0800
+lib/sequel/version.rb	Wed, 31 Jan 2018 11:08:15 -0800
 lib/sequel/connection_pool/sharded_single.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -24,7 +24,7 @@ lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/misc.rb	Mon, 30 Oct 2017 13:46:56 -0700
-lib/sequel/database/query.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/database/query.rb	Thu, 11 Jan 2018 16:42:57 -0800
 lib/sequel/database/schema_generator.rb	Wed, 20 Sep 2017 16:54:19 -0700
 lib/sequel/database/schema_methods.rb	Mon, 18 Dec 2017 14:45:05 -0800
 lib/sequel/database/transactions.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -38,7 +38,7 @@ lib/sequel/dataset/prepared_statements.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/query.rb	Fri, 01 Dec 2017 10:11:33 -0800
 lib/sequel/dataset/sql.rb	Mon, 20 Nov 2017 16:04:32 -0800
 lib/sequel/model/associations.rb	Mon, 13 Nov 2017 11:41:23 -0800
-lib/sequel/model/base.rb	Wed, 20 Dec 2017 11:07:53 -0800
+lib/sequel/model/base.rb	Sat, 20 Jan 2018 09:58:09 -0800
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -197,4 +197,5 @@ doc/release_notes/5.1.0.txt	Sun, 01 Oct 2017 09:19:35 -0700
 doc/release_notes/5.2.0.txt	Fri, 27 Oct 2017 08:36:52 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
+doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 lib/sequel/extensions/migration.rb	Sun, 10 Sep 2017 11:56:28 -0700

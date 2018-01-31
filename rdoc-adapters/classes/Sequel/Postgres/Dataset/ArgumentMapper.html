@@ -72,7 +72,7 @@ hash to a array with numbered arguments.  Only used with the pg driver.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-map_to_prepared_args-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-map_to_prepared_args-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 620</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_sym</span>]}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-map_to_prepared_args-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 626</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">map_to_prepared_args</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_sym</span>]}&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

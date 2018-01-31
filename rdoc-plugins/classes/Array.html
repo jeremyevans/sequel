@@ -118,7 +118,7 @@ that didn&#39;t come from the database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_array-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 491</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 502</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_json'>
@@ -140,7 +140,7 @@ JSONArray objects that didn&#39;t come from the database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_json-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 305</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 329</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_jsonb'>
@@ -162,7 +162,7 @@ JSONArray objects that didn&#39;t come from the database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_jsonb-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 312</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 336</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_row'>
