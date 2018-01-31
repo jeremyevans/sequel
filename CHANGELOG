@@ -1,4 +1,4 @@
-=== master
+=== 5.5.0 (2018-01-31)
 
 * Make Database#copy_table in the postgres adapter handle errors that occur while processing rows (jeremyevans) (#1470)
 
