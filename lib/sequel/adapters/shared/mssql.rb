@@ -260,7 +260,7 @@ module Sequel
           add_drop_default_constraint_sql(sqls, table, op[:name])
           sqls << super
         when :rename_column
-          "sp_rename #{literal("#{quote_schema_table(table)}.#{quote_identifier(op[:name])}")}, #{literal(op[:new_name].to_s)}, 'COLUMN'"
+          "sp_rename #{literal("#{quote_schema_table(table)}.#{quote_identifier(op[:name])}")}, #{literal(metadata_dataset.with_quote_identifiers(false).quote_identifier(op[:new_name]))}, 'COLUMN'"
         when :set_column_type
           sqls = []
           if sch = schema(table)
