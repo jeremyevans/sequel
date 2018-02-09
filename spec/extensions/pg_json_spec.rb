@@ -91,7 +91,7 @@ describe "pg_json extension" do
     @db.literal(Sequel.pg_json('a'=>'b')).must_equal "'{\"a\":\"b\"}'::json"
   end
 
-  it "should literalize JSONHash and JSONArray to strings correctly" do
+  it "should literalize JSONBHash and JSONBArray to strings correctly" do
     @db.literal(Sequel.pg_jsonb([])).must_equal "'[]'::jsonb"
     @db.literal(Sequel.pg_jsonb([1, [2], {'a'=>'b'}])).must_equal "'[1,[2],{\"a\":\"b\"}]'::jsonb"
     @db.literal(Sequel.pg_jsonb({})).must_equal "'{}'::jsonb"
