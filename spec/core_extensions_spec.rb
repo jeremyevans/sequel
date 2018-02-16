@@ -1,3 +1,5 @@
+require_relative "sequel_warning"
+
 if ENV['COVERAGE']
   require_relative "sequel_coverage"
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/extensions/core_extensions\.rb\z})

@@ -53,16 +53,16 @@ describe "pg_extended_date_support extension" do
       @db.convert_infinite_timestamps = v
       d.(pi).must_equal Date::Infinity.new
       t.(pi).must_equal Date::Infinity.new
-      d.(ni).must_equal -Date::Infinity.new
-      t.(ni).must_equal -Date::Infinity.new
+      d.(ni).must_equal(-Date::Infinity.new)
+      t.(ni).must_equal(-Date::Infinity.new)
     end
 
     [:float, 'float', 't', true].each do |v|
       @db.convert_infinite_timestamps = v
       d.(pi).must_equal 1.0/0.0
       t.(pi).must_equal 1.0/0.0
-      d.(ni).must_equal -1.0/0.0
-      t.(ni).must_equal -1.0/0.0
+      d.(ni).must_equal(-1.0/0.0)
+      t.(ni).must_equal(-1.0/0.0)
     end
 
     ['f', false].each do |v|

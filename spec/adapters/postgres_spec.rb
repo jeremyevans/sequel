@@ -788,7 +788,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.convert_infinite_timestamps = :string
     @db[:test3].get(:time).must_equal '-infinity'
     @db.convert_infinite_timestamps = :date
-    @db[:test3].get(:time).must_equal -Date::Infinity.new
+    @db[:test3].get(:time).must_equal(-Date::Infinity.new)
     @db.convert_infinite_timestamps = :float
     @db[:test3].get(:time).must_equal(-1.0/0.0)
   end

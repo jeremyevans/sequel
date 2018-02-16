@@ -270,7 +270,7 @@ module Sequel
             if @pg_range_schema_types[db_type] && h[:default] =~ /\A'([^']+)'::#{db_type}\z/
               default = $1
               if convertor = conversion_procs[h[:oid]]
-                h[:ruby_default] = convertor.call($1)
+                h[:ruby_default] = convertor.call(default)
               end
             end
           end

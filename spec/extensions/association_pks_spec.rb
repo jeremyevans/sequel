@@ -266,7 +266,7 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should not automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
     @Tag.db_schema[:id][:type] = :string
     @Album.load(:id=>2).tag_pks = %w'1 3'
-    sqls = @db.sqls.must_equal [
+    @db.sqls.must_equal [
       "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))",
       'SELECT tag_id FROM albums_tags WHERE (album_id = 2)',
       'BEGIN',

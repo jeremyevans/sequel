@@ -28,7 +28,7 @@ describe "synchronize_sql extension" do
   end
 
   it 'does not checkout a connection if SQL is given as a string' do
-    extds = @ds.extension(:synchronize_sql).with_sql('SELECT 1').sql
+    @ds.extension(:synchronize_sql).with_sql('SELECT 1').sql
     @db.pool.times_connection_acquired.must_equal 0
   end
 

@@ -354,16 +354,16 @@ ThreadedConnectionPoolSpecs = shared_description do
     @pool.disconnect
     b = @icpp
 
-    t = Time.now
+    time = Time.now
     cc = {}
     threads = []
     results = []
-    i = 0
+    j = 0
     q, q1, q2, q3, q4 = Queue.new, Queue.new, Queue.new, Queue.new, Queue.new
     m = @m
     @pool.db.define_singleton_method(:connect) do |server|
       q1.pop
-      m.synchronize{q3.push(i += 1)}
+      m.synchronize{q3.push(j += 1)}
       q4.pop
       b.call
     end
@@ -375,7 +375,7 @@ ThreadedConnectionPoolSpecs = shared_description do
     5.times{|i| q.pop}
     results.sort.must_equal (1..5).to_a
     threads.each(&:join)
-    (Time.now - t).must_be :<, 0.75
+    (Time.now - time).must_be :<, 0.75
 
     threads.each{|t| t.wont_be :alive?}
     cc.size.must_equal 5
