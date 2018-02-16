@@ -176,8 +176,8 @@ module Sequel
           c[:max_length] = max_length
         end
 
-        c.each_value do |v|
-          v.freeze if v.is_a?(String)
+        c.each_value do |val|
+          val.freeze if val.is_a?(String)
         end
       end
       Sequel.synchronize{@schemas[quoted_name] = cols} if cache_schema
