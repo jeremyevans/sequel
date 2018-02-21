@@ -25,7 +25,7 @@ method you can use.
 === Sequel::Dataset
 
 If you are new to Sequel and aren't familiar with Sequel, you should probably
-read the {"Dataset Basics" guide}[rdoc-ref:doc/dataset_basics.rdoc],
+read the {"Dataset Basics" guide}[https://github.com/jeremyevans/sequel/blob/master/doc/dataset_basics.rdoc],
 then come back here.
 
 === Retrieving a Single Object
