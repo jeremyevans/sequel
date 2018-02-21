@@ -352,6 +352,9 @@ module Sequel
   class Migrator
     MIGRATION_FILE_PATTERN = /\A(\d+)_.+\.rb\z/i.freeze
 
+    # Mutex used around migration file loading
+    MUTEX = Mutex.new
+
     # Exception class raised when there is an error with the migrator's
     # file structure, database, or arguments.
     class Error < Sequel::Error
@@ -476,19 +479,16 @@ module Sequel
     # Load the migration file, raising an exception if the file does not define
     # a single migration.
     def load_migration_file(file)
-      n = Migration.descendants.length
-      load(file)
-      raise Error, "Migration file #{file.inspect} not containing a single migration detected" unless n + 1 == Migration.descendants.length
-    end
-
-    # Remove all migration classes.  Done by the migrator to ensure that
-    # the correct migration classes are picked up.
-    def remove_migration_classes
-      # Remove class definitions
-      Migration.descendants.each do |c|
-        Object.send(:remove_const, c.name) if c.is_a?(Class) && !c.name.to_s.empty? && Object.const_defined?(c.name)
+      MUTEX.synchronize do
+        n = Migration.descendants.length
+        load(file)
+        raise Error, "Migration file #{file.inspect} not containing a single migration detected" unless n + 1 == Migration.descendants.length
+        c = Migration.descendants.pop
+        if c.is_a?(Class) && !c.name.to_s.empty? && Object.const_defined?(c.name)
+          Object.send(:remove_const, c.name)
+        end
+        c
       end
-      Migration.descendants.clear # remove any defined migration classes
     end
 
     # Return the integer migration version based on the filename.
@@ -597,13 +597,7 @@ module Sequel
     # Returns a list of migration classes filtered for the migration range and
     # ordered according to the migration direction.
     def get_migrations
-      remove_migration_classes
-
-      # load migration files
-      version_numbers.each{|n| load_migration_file(files[n])}
-      
-      # get migration classes
-      Migration.descendants
+      version_numbers.map{|n| load_migration_file(files[n])}
     end
     
     # Returns the latest version available in the specified directory.
@@ -740,7 +734,6 @@ module Sequel
     
     # Returns tuples of migration, filename, and direction
     def get_migration_tuples
-      remove_migration_classes
       up_mts = []
       down_mts = []
       ms = Migration.descendants
@@ -750,16 +743,13 @@ module Sequel
         if target
           if migration_version_from_file(f) > target
             if applied_migrations.include?(fi)
-              load_migration_file(path)
-              down_mts << [ms.last, f, :down]
+              down_mts << [load_migration_file(path), f, :down]
             end
           elsif !applied_migrations.include?(fi)
-            load_migration_file(path)
-            up_mts << [ms.last, f, :up]
+            up_mts << [load_migration_file(path), f, :up]
           end
         elsif !applied_migrations.include?(fi)
-          load_migration_file(path)
-          up_mts << [ms.last, f, :up]
+          up_mts << [load_migration_file(path), f, :up]
         end
       end
       up_mts + down_mts.reverse

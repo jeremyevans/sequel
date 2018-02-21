@@ -463,11 +463,10 @@ end
 
 describe "Sequel::TimestampMigrator" do
   before do
-    sequel_migration_version = 0
     @dsc = dsc = Class.new(Sequel::Mock::Dataset) do
-      self::FILES =[]
-      define_method(:sequel_migration_version){sequel_migration_version}
-      define_method(:sequel_migration_version=){|v| sequel_migration_version = v}
+      def files
+        db.files
+      end
 
       def columns
         super
@@ -485,11 +484,11 @@ describe "Sequel::TimestampMigrator" do
         super
         case opts[:from].first
         when :schema_info, 'schema_info'
-          yield({:version=>sequel_migration_version})
+          yield({:version=>db.sequel_migration_version})
         when :schema_migrations, 'schema_migrations'
-          self.class::FILES.sort.each{|f| yield(:filename=>f)}
+          files.sort.each{|f| yield(:filename=>f)}
         when :sm, 'sm'
-          self.class::FILES.sort.each{|f| yield(:fn=>f)}
+          files.sort.each{|f| yield(:fn=>f)}
         end
       end
 
@@ -497,9 +496,9 @@ describe "Sequel::TimestampMigrator" do
         super
         case opts[:from].first
         when :schema_info, 'schema_info'
-          self.sequel_migration_version = h.values.first
+          db.sequel_migration_version = h.values.first
         when :schema_migrations, :sm, 'schema_migrations', 'sm'
-          self.class::FILES << h.values.first
+          files << h.values.first
         end
       end
 
@@ -507,7 +506,7 @@ describe "Sequel::TimestampMigrator" do
         super
         case opts[:from].first
         when :schema_info, 'schema_info'
-          self.sequel_migration_version = h.values.first
+          db.sequel_migration_version = h.values.first
         end
       end
 
@@ -515,15 +514,27 @@ describe "Sequel::TimestampMigrator" do
         super
         case opts[:from].first
         when :schema_migrations, :sm, 'schema_migrations', 'sm'
-          self.class::FILES.delete(opts[:where].args.last)
+          files.delete(opts[:where].args.last)
         end
       end
     end
     dbc = Class.new(Sequel::Mock::Database) do
-      self::Tables = tables= {}
+      def files
+        @files ||= []
+      end
+
+      def tables
+        @tables ||= {}
+      end
+
+      def sequel_migration_version
+        @sequel_migration_version ||= 0
+      end
+      attr_writer :sequel_migration_version
+
       def create_table(name, *args, &block)
         super
-        self.class::Tables[name.to_sym] = true
+        tables[name.to_sym] = true
       end
       define_method(:drop_table){|*names| super(*names); names.each{|n| tables.delete(n.to_sym)}}
       define_method(:table_exists?){|name| super(name); tables.has_key?(name.to_sym)}
@@ -567,6 +578,31 @@ describe "Sequel::TimestampMigrator" do
     [:sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
     @db.table_exists?(:sm1111).must_equal true
     @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb'
+  end
+
+  it "should work correctly when multithreaded" do
+    range = 0..4
+    dbs = range.map do
+      db = @db.class.new
+      db.dataset_class = @db.dataset_class
+      db
+    end
+
+    q1, q2  = Queue.new, Queue.new
+    @dir = 'spec/files/timestamped_migrations'
+    threads = dbs.map do |db|
+      Thread.new do 
+        q1.pop
+        @m.apply(db, @dir)
+        [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| _(db.table_exists?(n)).must_equal true}
+        _(db[:schema_migrations].select_order_map(:filename)).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+        q2.push db
+      end
+    end
+
+    range.each{q1.push nil}
+    (dbs - range.map{q2.pop}).must_be :empty?
+    threads.each(&:join)
   end
 
   it "should not be current when there are migrations to apply" do
