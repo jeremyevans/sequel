@@ -254,7 +254,7 @@ module Sequel
         end
 
         # Set the :callable_default value if the default value is recognized as an empty array.
-        def schema_parse_table(*)
+        def schema_post_process(_)
           super.each do |a|
             h = a[1]
             if h[:default] =~ /\A(?:'\{\}'|ARRAY\[\])::([\w ]+)\[\]\z/

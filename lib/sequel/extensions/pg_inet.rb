@@ -86,7 +86,7 @@ module Sequel
       end
 
       # Set the :ruby_default value if the default value is recognized as an ip address.
-      def schema_parse_table(*)
+      def schema_post_process(_)
         super.each do |a|
           h = a[1]
           if h[:type] == :ipaddr && h[:default] =~ /\A'([:a-fA-F0-9\.\/]+)'::(?:inet|cidr)\z/

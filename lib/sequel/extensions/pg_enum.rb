@@ -131,7 +131,7 @@ module Sequel
 
       # For schema entries that are enums, set the type to
       # :enum and add a :enum_values entry with the enum values.
-      def schema_parse_table(*)
+      def schema_post_process(_)
         super.each do |_, s|
           if values = @enum_labels[s[:oid]]
             s[:type] = :enum

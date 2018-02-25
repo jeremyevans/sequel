@@ -155,7 +155,7 @@ module Sequel
         end
 
         # Set the :callable_default value if the default value is recognized as an empty hstore.
-        def schema_parse_table(*)
+        def schema_post_process(_)
           super.each do |a|
             h = a[1]
             if h[:type] == :hstore && h[:default] =~ /\A''::hstore\z/

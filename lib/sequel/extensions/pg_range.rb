@@ -263,7 +263,7 @@ module Sequel
         end
 
         # Set the :ruby_default value if the default value is recognized as a range.
-        def schema_parse_table(*)
+        def schema_post_process(_)
           super.each do |a|
             h = a[1]
             db_type = h[:db_type]

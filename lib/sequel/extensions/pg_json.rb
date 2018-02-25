@@ -215,7 +215,7 @@ module Sequel
       end
 
       # Set the :callable_default value if the default value is recognized as an empty json/jsonb array/hash.
-      def schema_parse_table(*)
+      def schema_post_process(_)
         super.each do |a|
           h = a[1]
           if (h[:type] == :json || h[:type] == :jsonb) && h[:default] =~ /\A'(\{\}|\[\])'::jsonb?\z/
