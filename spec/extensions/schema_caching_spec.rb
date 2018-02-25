@@ -18,6 +18,18 @@ describe "schema_caching extension" do
     File.size(@filename).must_be :>,  0
   end
 
+  it "Database#dump_schema_cache/load_schema_cache should work with :callable_default values set in schema_post_process" do
+    @schemas['"table"'][0][1][:callable_default] = lambda{1}
+    @schemas['"table"'][0][1][:default] = 'call_1'
+    @db.dump_schema_cache(@filename)
+    db = Sequel.mock(:host=>'postgres').extension(:schema_caching)
+    def db.schema_post_process(_)
+      super.each{|_, c| c[:callable_default] = lambda{1} if c[:default] == 'call_1'}
+    end
+    db.load_schema_cache(@filename)
+    db.schema(:table)[0][1][:callable_default].call.must_equal 1
+  end
+
   it "Database#load_schema_cache should load cached schema from the given file dumped by #dump_schema_cache" do
     @db.dump_schema_cache(@filename)
     db = Sequel::Database.new.extension(:schema_caching)
