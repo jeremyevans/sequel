@@ -1672,6 +1672,15 @@ describe "Schema Parser" do
     @sqls.must_equal ['x', 'x']
   end
 
+  it "should dedup :db_type strings" do
+    @db.define_singleton_method(:schema_parse_table) do |t, opts|
+      [[:a, {:db_type=>t.to_s.dup}], [:b, {:db_type=>t.to_s.dup}]]
+    end
+    sch = @db.schema(:x)
+    sch.must_equal [[:a, {:db_type=>"x", :ruby_default=>nil}], [:b, {:db_type=>"x", :ruby_default=>nil}]]
+    sch[0][1][:db_type].must_be_same_as(sch[1][1][:db_type])
+  end if RUBY_VERSION >= '2.5'
+
   it "should set :auto_increment to true by default if unset and a single integer primary key is used" do
     @db.define_singleton_method(:schema_parse_table){|*| [[:a, {:primary_key=>true, :db_type=>'integer'}]]}
     @db.schema(:x).first.last[:auto_increment].must_equal true

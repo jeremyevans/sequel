@@ -344,6 +344,15 @@ module Sequel
 
     # Post process the schema values.  
     def schema_post_process(cols)
+      if RUBY_VERSION >= '2.5'
+        cols.each do |_, h|
+          db_type = h[:db_type]
+          if db_type.is_a?(String)
+            h[:db_type] = -db_type
+          end
+        end
+      end
+
       cols.each do |_,c|
         c.each_value do |val|
           val.freeze if val.is_a?(String)

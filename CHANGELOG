@@ -1,5 +1,7 @@
 === master
 
+* Dedup :db_type strings in schema hashes on Ruby 2.5+ (jeremyevans)
+
 * Make schema_caching extension work with :callable_default schema values (jeremyevans)
 
 * Freeze string valuse in hashes returned by Database#schema when using the schema_caching extension (jeremyevans)
