@@ -1,5 +1,7 @@
 === master
 
+* Freeze string valuse in hashes returned by Database#schema when using the schema_caching extension (jeremyevans)
+
 * Protect migration file loading with a mutex to not break when multiple threads load migration files simultaneously (jeremyevans)
 
 * Respect identifier mangling rules when renaming columns on Microsoft SQL Server (jeremyevans)

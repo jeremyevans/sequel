@@ -25,6 +25,17 @@ describe "schema_caching extension" do
     @db.instance_variable_get(:@schemas).must_equal @schemas
   end
 
+  it "Database#load_schema_cache should have frozen string values in the schema caches" do
+    @db.dump_schema_cache(@filename)
+    db = Sequel.mock(:host=>'postgres').extension(:schema_caching)
+    db.load_schema_cache(@filename)
+    h = db.schema(:table)[0][1]
+    h[:db_type].must_equal 'integer'
+    h[:db_type].frozen?.must_equal true
+    h[:default].must_equal "nextval('table_id_seq'::regclass)"
+    h[:default].frozen?.must_equal true
+  end
+
   it "Database#dump_schema_cache? should dump cached schema to the given file unless the file exists" do
     File.open(@filename, 'wb'){|f|}
     File.size(@filename).must_equal 0

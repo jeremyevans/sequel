@@ -65,6 +65,7 @@ module Sequel
     # should be in Marshal format.
     def load_schema_cache(file)
       @schemas = Marshal.load(File.read(file))
+      @schemas.each_value{|v| schema_post_process(v)}
       nil
     end
 
