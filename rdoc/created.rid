@@ -1,6 +1,6 @@
-Wed, 31 Jan 2018 11:57:25 -0800
+Thu, 01 Mar 2018 10:45:47 -0800
 README.rdoc	Mon, 29 Jan 2018 12:40:57 -0800
-CHANGELOG	Wed, 31 Jan 2018 11:08:15 -0800
+CHANGELOG	Thu, 01 Mar 2018 10:41:16 -0800
 MIT-LICENSE	Fri, 26 Jan 2018 06:42:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -13,7 +13,7 @@ lib/sequel/exceptions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
-lib/sequel/version.rb	Wed, 31 Jan 2018 11:08:15 -0800
+lib/sequel/version.rb	Thu, 01 Mar 2018 10:41:16 -0800
 lib/sequel/connection_pool/sharded_single.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -24,7 +24,7 @@ lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/logging.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/misc.rb	Mon, 30 Oct 2017 13:46:56 -0700
-lib/sequel/database/query.rb	Thu, 11 Jan 2018 16:42:57 -0800
+lib/sequel/database/query.rb	Sun, 25 Feb 2018 09:26:37 -0800
 lib/sequel/database/schema_generator.rb	Wed, 20 Sep 2017 16:54:19 -0700
 lib/sequel/database/schema_methods.rb	Mon, 18 Dec 2017 14:45:05 -0800
 lib/sequel/database/transactions.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -198,4 +198,5 @@ doc/release_notes/5.2.0.txt	Fri, 27 Oct 2017 08:36:52 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
-lib/sequel/extensions/migration.rb	Sun, 10 Sep 2017 11:56:28 -0700
+doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
+lib/sequel/extensions/migration.rb	Wed, 21 Feb 2018 16:20:18 -0800

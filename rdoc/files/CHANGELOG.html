@@ -30,12 +30,29 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-01-31 11:08:15 -0800</span>
+<span class='datetime'>2018-03-01 10:41:16 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.6.0+-282018-03-01-29">5.6.0 (2018-03-01)<span><a href="#label-5.6.0+-282018-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Dedup :db_type strings in schema hashes on Ruby 2.5+ (jeremyevans)</p>
+</li><li>
+<p>Make schema_caching extension work with :callable_default schema values
+(jeremyevans)</p>
+</li><li>
+<p>Freeze string valuse in hashes returned by Database#schema when using the
+schema_caching extension (jeremyevans)</p>
+</li><li>
+<p>Protect migration file loading with a mutex to not break when multiple
+threads load migration files simultaneously (jeremyevans)</p>
+</li><li>
+<p>Respect identifier mangling rules when renaming columns on Microsoft SQL
+Server (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.5.0+-282018-01-31-29">5.5.0 (2018-01-31)<span><a href="#label-5.5.0+-282018-01-31-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Make Database#copy_table in the postgres adapter handle errors that occur
