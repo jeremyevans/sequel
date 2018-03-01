@@ -1,4 +1,4 @@
-=== master
+=== 5.6.0 (2018-03-01)
 
 * Dedup :db_type strings in schema hashes on Ruby 2.5+ (jeremyevans)
 
