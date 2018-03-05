@@ -16,6 +16,24 @@ module Sequel
     #
     #   # Make the Album class support validating associated objects
     #   Album.plugin :validate_associated
+    #
+    #   class Album
+    #     many_to_one :artist
+    #     many_to_many :tags
+    #
+    #     # Always validate associated artist when saving the album
+    #     def validate
+    #       super
+    #       if artist
+    #         validate_associated_object(model.association_reflection(:artist), artist)
+    #       end
+    #     end
+    #
+    #     # When saving after calling this method, validate the given tag as well.
+    #     def check_tag!(tag)
+    #       delay_validate_associated_object(model.association_reflection(:tags), tag)
+    #     end
+    #   end
     module ValidateAssociated
       # Depend on the instance_hooks plugin.
       def self.apply(mod)
