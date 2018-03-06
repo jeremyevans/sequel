@@ -736,7 +736,6 @@ module Sequel
     def get_migration_tuples
       up_mts = []
       down_mts = []
-      ms = Migration.descendants
       files.each do |path|
         f = File.basename(path)
         fi = f.downcase
