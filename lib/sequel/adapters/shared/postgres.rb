@@ -709,6 +709,17 @@ module Sequel
         end
       end
 
+      # Support identity columns, but only use the identity SQL syntax if no
+      # default value is given.
+      def column_definition_default_sql(sql, column)
+        super
+        if !column[:default] && (identity = column[:identity])
+          sql << " GENERATED "
+          sql << (identity == :always ? "ALWAYS" : "BY DEFAULT")
+          sql << " AS IDENTITY"
+        end
+      end
+
       # Handle PostgreSQL specific default format.
       def column_schema_normalize_default(default, type)
         if m = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/.match(default)
