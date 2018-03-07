@@ -1436,6 +1436,19 @@ module Sequel
         nil
       end
 
+      # Use OVERRIDING USER VALUE for INSERT statements, so that identity columns
+      # always use the user supplied value, and an error is not raised for identity
+      # columns that are GENERATED ALWAYS.
+      def overriding_system_value
+        clone(:override=>:system)
+      end
+
+      # Use OVERRIDING USER VALUE for INSERT statements, so that identity columns
+      # always use the sequence value instead of the user supplied value.
+      def overriding_user_value
+        clone(:override=>:user)
+      end
+
       def supports_cte?(type=:select)
         if type == :select
           server_version >= 80400
@@ -1630,6 +1643,17 @@ module Sequel
             end
           end
         end
+      end
+
+      # Support OVERRIDING SYSTEM|USER VALUE in insert statements
+      def insert_values_sql(sql)
+        case opts[:override]
+        when :system
+          sql << " OVERRIDING SYSTEM VALUE"
+        when :user
+          sql << " OVERRIDING USER VALUE"
+        end
+        super
       end
 
       # For multiple table support, PostgreSQL requires at least

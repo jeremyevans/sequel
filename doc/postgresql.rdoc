@@ -255,6 +255,22 @@ conditions, the constraint violation will be ignored, but the row will not be up
   # ON CONFLICT ON CONSTRAINT table_a_uidx
   # DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
 
+=== INSERT OVERRIDING SYSTEM|USER VALUE Support
+
+PostgreSQL 10+ supports identity columns, which are designed to replace the serial
+columns previously used for autoincrementing primary keys.  You can use
+Dataset#overriding_system_value and Dataset#overriding_user_value to use this new
+syntax:
+
+  DB.create_table(:table){primary_key :id}
+  # Ignore the given value for id, using the identity's sequence value
+  DB[:table].overriding_user_value.insert(:id=>1)
+
+  DB.create_table(:table){primary_key :id, :identity=>:always}
+  # Force the use of the given value for id, because otherwise the insert will
+  # raise an error, since GENERATED ALWAYS was using when creating the column.
+  DB[:table].overriding_system_value.insert(:id=>1)
+
 === Distinct On Specific Columns
 
 Sequel allows passing columns to <tt>Dataset#distinct</tt>, which will make the dataset return

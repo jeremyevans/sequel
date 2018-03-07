@@ -1,5 +1,7 @@
 === master
 
+* Add Dataset#overriding_{system,user}_value on PostgreSQL for use with PostgreSQL 10+ identity columns (jeremyevans)
+
 * Set :auto_increment schema entry correctly for PostgreSQL 10+ identity columns (jeremyevans)
 
 === 5.6.0 (2018-03-01)
