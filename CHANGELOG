@@ -1,5 +1,7 @@
 === master
 
+* Use identity columns instead of serial columns for primary keys on PostgreSQL 10+ (jeremyevans)
+
 * Support :identity option when creating columns on PostgreSQL 10+ to create identity columns (jeremyevans)
 
 * Add Dataset#overriding_{system,user}_value on PostgreSQL for use with PostgreSQL 10+ identity columns (jeremyevans)

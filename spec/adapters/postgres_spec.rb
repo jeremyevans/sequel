@@ -107,6 +107,33 @@ describe "PostgreSQL", '#create_table' do
     end
   end if DB.server_version >= 90000
 
+  it "should support creating identity columns on non-primary key tables" do
+    @db.create_table(:tmp_dolls){Integer :a, :identity=>true}
+    2.times do
+      @db[:tmp_dolls].insert
+    end
+    @db[:tmp_dolls].select_order_map(:a).must_equal [1, 2]
+    @db[:tmp_dolls].insert(:a=>2)
+    @db[:tmp_dolls].select_order_map(:a).must_equal [1, 2, 2]
+    @db[:tmp_dolls].insert(:a=>4)
+    @db[:tmp_dolls].select_order_map(:a).must_equal [1, 2, 2, 4]
+    @db[:tmp_dolls].overriding_user_value.insert(:a=>5)
+    @db[:tmp_dolls].select_order_map(:a).must_equal [1, 2, 2, 3, 4]
+  end if DB.server_version >= 100000
+
+  it "should support creating identity columns generated always" do
+    @db.create_table(:tmp_dolls){primary_key :id, :identity=>:always}
+    2.times do
+      @db[:tmp_dolls].insert
+    end
+    @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2]
+    proc{@db[:tmp_dolls].insert(:id=>2)}.must_raise Sequel::DatabaseError
+    @db[:tmp_dolls].overriding_system_value.insert(:id=>4)
+    @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 4]
+    @db[:tmp_dolls].insert
+    @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 3, 4]
+  end if DB.server_version >= 100000
+
   it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}
