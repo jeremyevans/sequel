@@ -1115,6 +1115,11 @@ module Sequel
           where{pg_attribute[:attnum] > 0}.
           where{{pg_class[:oid]=>oid}}.
           order{pg_attribute[:attnum]}
+
+        if server_version > 100000
+          ds = ds.select_append{pg_attribute[:attidentity]}
+        end
+
         ds.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           if row[:base_oid]
@@ -1127,8 +1132,9 @@ module Sequel
             row.delete(:db_base_type)
           end
           row[:type] = schema_column_type(row[:db_type])
+          identity = row.delete(:attidentity)
           if row[:primary_key]
-            row[:auto_increment] = !!(row[:default] =~ /\Anextval/io)
+            row[:auto_increment] = !!(row[:default] =~ /\A(?:nextval)/i) || identity == 'a' || identity == 'd'
           end
           [m.call(row.delete(:name)), row]
         end
