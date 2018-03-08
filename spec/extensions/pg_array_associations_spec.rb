@@ -565,7 +565,19 @@ describe Sequel::Model, "pg_array_associations" do
     @db.sqls.must_equal ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
 
     @o2.remove_all_artists
-    @db.sqls.must_equal ["UPDATE artists SET tag_ids = array_remove(tag_ids, 2) WHERE (tag_ids @> ARRAY[2])"]
+    @db.sqls.must_equal ["UPDATE artists SET tag_ids = array_remove(tag_ids, CAST(2 AS integer)) WHERE (tag_ids @> ARRAY[2]::integer[])"]
+  end
+
+  it "should define a remove_all_ method for removing all associated objects respecting database type" do
+    @c2.many_to_pg_array :artists, :clone=>:artists, :array_type=>:bigint
+    @o1.remove_all_tags
+    @o1.tag_ids.must_equal []
+    @db.sqls.must_equal []
+    @o1.save_changes
+    @db.sqls.must_equal ["UPDATE artists SET tag_ids = ARRAY[] WHERE (id = 1)"]
+
+    @o2.remove_all_artists
+    @db.sqls.must_equal ["UPDATE artists SET tag_ids = array_remove(tag_ids, CAST(2 AS bigint)) WHERE (tag_ids @> ARRAY[2]::bigint[])"]
   end
 
   it "should allow calling add_ and remove_ methods on new objects for pg_array_to_many associations" do

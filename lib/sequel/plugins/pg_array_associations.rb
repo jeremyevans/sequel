@@ -400,7 +400,9 @@ module Sequel
           end
 
           opts[:clearer] ||= proc do
-            opts.associated_dataset.where(Sequel.pg_array_op(key).contains([get_column_value(pk)])).update(key=>Sequel.function(:array_remove, key, get_column_value(pk)))
+            pk_value = get_column_value(pk)
+            db_type = opts.array_type
+            opts.associated_dataset.where(Sequel.pg_array_op(key).contains(Sequel.pg_array([pk_value], db_type))).update(key=>Sequel.function(:array_remove, key, Sequel.cast(pk_value, db_type)))
           end
         end
 
