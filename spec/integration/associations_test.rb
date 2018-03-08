@@ -2251,7 +2251,7 @@ end
 
 describe "Sequel::Model pg_array_to_many" do
   before(:all) do
-    @db = DB
+    db = @db = DB
     @db.extension :pg_array unless @db.frozen?
     Sequel.extension :pg_array_ops
     @db.drop_table?(:tags, :albums, :artists)
@@ -2263,7 +2263,7 @@ describe "Sequel::Model pg_array_to_many" do
       primary_key :id
       String :name
       foreign_key :artist_id, :artists
-      column :tag_ids, 'int4[]'
+      column :tag_ids, "#{db.send(:type_literal, :type=>Integer)}[]"
     end
     @db.create_table(:tags) do
       primary_key :id
@@ -2332,7 +2332,7 @@ end if DB.database_type == :postgres && [:postgres, :jdbc].include?(DB.adapter_s
 
 describe "Sequel::Model many_to_pg_array" do
   before(:all) do
-    @db = DB
+    db = @db = DB
     @db.extension :pg_array unless @db.frozen?
     Sequel.extension :pg_array_ops
     @db.drop_table?(:tags, :albums, :artists)
@@ -2348,7 +2348,7 @@ describe "Sequel::Model many_to_pg_array" do
     @db.create_table(:tags) do
       primary_key :id
       String :name
-      column :album_ids, 'int4[]'
+      column :album_ids, "#{db.send(:type_literal, :type=>Integer)}[]"
     end
   end
   before do

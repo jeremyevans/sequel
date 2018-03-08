@@ -1,5 +1,7 @@
 === master
 
+* Add integer64 extension for treating Integer as a 64-bit integer when used as a generic type (jeremyevans)
+
 * Allow many_to_pg_array remove_all_* method cast appropriately to work correctly for non-integer types (jeremyevans)
 
 * Fix array_type for pg_array_to_many and many_to_pg_array associations in pg_array_associations plugin (jeremyevans)

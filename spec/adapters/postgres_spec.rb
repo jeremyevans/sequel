@@ -351,7 +351,7 @@ describe "A PostgreSQL database" do
   end
 
   it "should correctly parse the schema" do
-    @db.schema(Sequel[:public][:testfk], :reload=>true).map{|c,s| [c, s[:oid]]}.must_equal [[:id, 23], [:i, 23]]
+    [[[:id, 23], [:i, 23]], [[:id, 20], [:i, 20]]].must_include @db.schema(Sequel[:public][:testfk], :reload=>true).map{|c,s| [c, s[:oid]]}
   end
 
   it "should parse foreign keys for tables in a schema" do

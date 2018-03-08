@@ -1332,6 +1332,8 @@ describe "Sequel::Dataset DSL support" do
   
   cspecify "should work with bitwise shift operators", :derby do
     @ds.insert(3, 2)
+    b = Sequel[:b]
+    b = b.cast(:integer) if @db.database_type == :postgres
     @ds.get{a.sql_number << b}.to_i.must_equal 12
     @ds.get{a.sql_number >> b}.to_i.must_equal 0
     @ds.get{a.sql_number << b << 1}.to_i.must_equal 24
