@@ -528,7 +528,7 @@ module Sequel
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
-        auto_increment_key = server_version >= 100000 ? :identity : :serial
+        auto_increment_key = server_version >= 100200 ? :identity : :serial
         {:primary_key => true, auto_increment_key => true, :type=>Integer}
       end
 

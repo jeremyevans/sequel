@@ -6,7 +6,7 @@
 
 * Fix array_type for pg_array_to_many and many_to_pg_array associations in pg_array_associations plugin (jeremyevans)
 
-* Use identity columns instead of serial columns for primary keys on PostgreSQL 10+ (jeremyevans)
+* Use identity columns instead of serial columns for primary keys on PostgreSQL 10.2+ (jeremyevans)
 
 * Support :identity option when creating columns on PostgreSQL 10+ to create identity columns (jeremyevans)
 
