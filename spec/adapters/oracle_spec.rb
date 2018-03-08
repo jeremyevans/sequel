@@ -113,7 +113,7 @@ describe "An Oracle database" do
   it "should create a temporary table" do
     DB.create_table! :test_tmp, :temp => true do
       varchar2 :name, :size => 50
-      primary_key :id, :integer, :null => false
+      primary_key :id, :null => false
       index :name, :unique => true
     end
     DB.drop_table?(:test_tmp)
