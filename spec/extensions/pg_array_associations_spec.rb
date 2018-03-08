@@ -686,7 +686,7 @@ describe Sequel::Model, "pg_array_associations" do
   end
 
   it "should automatically determine the array type by looking at the schema" do
-    @c1.db_schema[:tag_ids][:db_type] = 'int8'
+    @c1.db_schema[:tag_ids][:db_type] = 'int8[]'
     @c2.many_to_pg_array :artists, :clone=>:artists
     @c1.pg_array_to_many :tags, :clone=>:tags, :save_after_modify=>true
     @c2.load(:id=>1).artists_dataset.sql.must_equal 'SELECT * FROM artists WHERE (artists.tag_ids @> ARRAY[1]::int8[])'

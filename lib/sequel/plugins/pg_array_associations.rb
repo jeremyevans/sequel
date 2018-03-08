@@ -80,7 +80,7 @@ module Sequel
         def array_type
           cached_fetch(:array_type) do
             if (sch = associated_class.db_schema) && (s = sch[self[:key]]) && (t = s[:db_type])
-              t
+              t.sub(/\[\]\z/, '').freeze
             else
               :integer
             end
@@ -189,7 +189,7 @@ module Sequel
         def array_type
           cached_fetch(:array_type) do
             if (sch = self[:model].db_schema) && (s = sch[self[:key]]) && (t = s[:db_type])
-              t
+              t.sub(/\[\]\z/, '').freeze
             else
               :integer
             end
