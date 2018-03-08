@@ -274,7 +274,7 @@ describe "A MySQL database" do
     @db = DB
     @db.create_table! :test2 do
       text :name
-      integer :value
+      Integer :value
     end
   end
   after(:all) do

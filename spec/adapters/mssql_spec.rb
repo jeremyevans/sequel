@@ -636,18 +636,18 @@ describe "Database#foreign_key_list" do
   before(:all) do
     DB.create_table! :items do
       primary_key :id
-      integer     :sku
+      Integer     :sku
     end
     DB.create_table! :prices do
-      integer     :item_id
+      Integer     :item_id
       datetime    :valid_from
       float       :price
       primary_key [:item_id, :valid_from]
       foreign_key [:item_id], :items, :key => :id, :name => :fk_prices_items
     end
     DB.create_table! :sales do
-      integer  :id
-      integer  :price_item_id
+      Integer  :id
+      Integer  :price_item_id
       datetime :price_valid_from
       foreign_key [:price_item_id, :price_valid_from], :prices, :key => [:item_id, :valid_from], :name => :fk_sales_prices, :on_delete => :cascade
     end
@@ -682,8 +682,8 @@ describe "Database#foreign_key_list" do
         varchar     :name
       end
       DB.create_table! Sequel[:vendor][:mapping] do
-        integer :vendor_id
-        integer :item_id
+        Integer :vendor_id
+        Integer :item_id
         foreign_key [:vendor_id], Sequel[:vendor][:vendors], :name => :fk_mapping_vendor
         foreign_key [:item_id], :items, :name => :fk_mapping_item
       end
