@@ -36,7 +36,7 @@ module Sequel
 
         # Derby uses an IDENTITY sequence for autoincrementing columns.
         def serial_primary_key_options
-          {:primary_key => true, :type => :integer, :identity=>true, :start_with=>1}
+          {:primary_key => true, :type => Integer, :identity=>true, :start_with=>1}
         end
 
         # The SVN version of the database.
