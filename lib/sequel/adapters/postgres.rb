@@ -45,6 +45,7 @@ module Sequel
       DISCONNECT_ERROR_CLASSES.freeze
       
       disconnect_errors = [
+        'ERROR:  cached plan must not change result type',
         'could not receive data from server',
         'no connection to the server',
         'connection not open',
