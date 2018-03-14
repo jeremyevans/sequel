@@ -311,3 +311,17 @@ describe "An Oracle database" do
     DB[:books].select(:title).group_by(:title).count.must_equal 2
   end
 end
+
+describe "An Oracle database with xml types" do
+  before(:all) do
+    DB.create_table!(:xml_test){xmltype :xml_col}
+  end
+  after(:all) do
+    DB.drop_table(:xml_test)
+  end
+
+  it "should work correctly with temporary clobs" do
+    DB[:xml_test].insert("<a href='b'>c</a>")
+    DB.from(Sequel.lit('xml_test x')).select(Sequel.lit("x.xml_col.getCLOBVal() v")).all.must_equal [{:v=>"<a href=\"b\">c</a>\n"}]
+  end
+end

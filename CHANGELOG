@@ -1,5 +1,7 @@
 === master
 
+* Free temporary clobs in the jdbc/oracle adapter to prevent a memory leak (jeremyevans) (#1482)
+
 * Treat prepared statement errors due to changing types as disconnect errors (jeremyevans) (#1481)
 
 * Add integer64 extension for treating Integer as a 64-bit integer when used as a generic type (jeremyevans)

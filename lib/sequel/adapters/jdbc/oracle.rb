@@ -28,6 +28,13 @@ module Sequel
         end
       end 
 
+      def self.OracleClob(r, i)
+        clob = r.getClob(i)
+        str = clob.getSubString(1, clob.length)
+        clob.freeTemporary if clob.isTemporary
+        str
+      end
+
       module DatabaseMethods
         include Sequel::Oracle::DatabaseMethods
         include Sequel::JDBC::Transactions
@@ -104,6 +111,7 @@ module Sequel
         def setup_type_convertor_map
           super
           @type_convertor_map[:OracleDecimal] = Oracle.method(:OracleDecimal)
+          @type_convertor_map[:OracleClob] = Oracle.method(:OracleClob)
         end
       end
       
@@ -112,6 +120,7 @@ module Sequel
 
         NUMERIC_TYPE = Java::JavaSQL::Types::NUMERIC
         TIMESTAMP_TYPE = Java::JavaSQL::Types::TIMESTAMP
+        CLOB_TYPE = Java::JavaSQL::Types::CLOB
         TIMESTAMPTZ_TYPES = [Java::oracle.jdbc.OracleTypes::TIMESTAMPTZ, Java::oracle.jdbc.OracleTypes::TIMESTAMPLTZ].freeze
 
         def type_convertor(map, meta, type, i)
@@ -124,6 +133,8 @@ module Sequel
             end
           when *TIMESTAMPTZ_TYPES
             map[TIMESTAMP_TYPE]
+          when CLOB_TYPE 
+            map[:OracleClob]
           else
             super
           end
