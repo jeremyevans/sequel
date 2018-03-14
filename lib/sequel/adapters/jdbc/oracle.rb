@@ -29,7 +29,7 @@ module Sequel
       end 
 
       def self.OracleClob(r, i)
-        clob = r.getClob(i)
+        return unless clob = r.getClob(i)
         str = clob.getSubString(1, clob.length)
         clob.freeTemporary if clob.isTemporary
         str
