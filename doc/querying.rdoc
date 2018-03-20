@@ -111,8 +111,8 @@ you want:
 If you want the value for multiple columns, you can pass an array to
 <tt>Sequel::Dataset#get</tt>:
 
-  artist_id, artist_name,  = Artist.get([:id, :name])
-  # SELECT name FROM artists LIMIT 1
+  artist_id, artist_name = Artist.get([:id, :name])
+  # SELECT id, name FROM artists LIMIT 1
   # => [1, "YJM"]
 
 === Retrieving Multiple Objects
