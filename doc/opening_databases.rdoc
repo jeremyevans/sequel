@@ -230,8 +230,6 @@ The following additional options are supported:
 There are a few issues with specific jdbc driver gems:
 
 jdbc-h2 :: jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working correctly in some cases.
-jdbc-postgres :: jdbc-postgres 9.4.1204 has issues using PostgreSQL-specific types in bound variables.
-                 Use jdbc-postgres 9.4.1200 or below.
 
 === mysql 
 
