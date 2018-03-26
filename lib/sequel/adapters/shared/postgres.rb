@@ -528,24 +528,16 @@ module Sequel
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
-        auto_increment_key = server_version >= 100200 ? :identity : :serial
+        auto_increment_key = server_version >= 100002 ? :identity : :serial
         {:primary_key => true, auto_increment_key => true, :type=>Integer}
       end
 
       # The version of the PostgreSQL server, used for determining capability.
       def server_version(server=nil)
         return @server_version if @server_version
-        @server_version = synchronize(server) do |conn|
-          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
-        end
-        unless @server_version
-          @server_version = if m = /PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/.match(fetch('SELECT version()').single_value)
-            (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
-          else
-            0
-          end
-        end
-        @server_version
+        ds = DB.dataset
+        ds = ds.server(server) if server
+        @server_version ||= ds.with_sql("SELECT CAST(current_setting('server_version_num') AS integer) AS v").single_value rescue 0
       end
 
       # PostgreSQL supports CREATE TABLE IF NOT EXISTS on 9.1+

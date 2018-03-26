@@ -1,5 +1,7 @@
 === master
 
+* Fix Database#server_version when connecting to PostgreSQL 10.1+ in certain cases (jeremyevans)
+
 * Free temporary clobs in the jdbc/oracle adapter to prevent a memory leak (jeremyevans) (#1482)
 
 * Treat prepared statement errors due to changing types as disconnect errors (jeremyevans) (#1481)

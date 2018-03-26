@@ -119,7 +119,7 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].select_order_map(:a).must_equal [1, 2, 2, 4]
     @db[:tmp_dolls].overriding_user_value.insert(:a=>5)
     @db[:tmp_dolls].select_order_map(:a).must_equal [1, 2, 2, 3, 4]
-  end if DB.server_version >= 100200
+  end if DB.server_version >= 100002
 
   it "should support creating identity columns generated always" do
     @db.create_table(:tmp_dolls){primary_key :id, :identity=>:always}
@@ -132,7 +132,7 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 4]
     @db[:tmp_dolls].insert
     @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 3, 4]
-  end if DB.server_version >= 100200
+  end if DB.server_version >= 100002
 
   it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
