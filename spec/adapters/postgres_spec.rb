@@ -134,6 +134,56 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 3, 4]
   end if DB.server_version >= 100002
 
+  it "should support converting serial columns to identity columns" do
+    @db.create_table(:tmp_dolls){primary_key :id, :identity=>false, :serial=>true}
+    sch = @db.schema(:tmp_dolls)[0][1]
+    sch[:default].must_match(/nextval/)
+    sch[:auto_increment].must_equal true
+
+    2.times do
+      @db[:tmp_dolls].insert
+    end
+
+    @db.convert_serial_to_identity(:tmp_dolls)
+    sch = @db.schema(:tmp_dolls)[0][1]
+    sch[:default].must_be_nil
+    sch[:auto_increment].must_equal true
+
+    @db[:tmp_dolls].insert
+    @db[:tmp_dolls].insert(5)
+    @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 3, 5]
+
+    # Make sure it doesn't break if already converted
+    @db.convert_serial_to_identity(:tmp_dolls)
+  end if DB.server_version >= 100002 && DB.get{current_setting('is_superuser')} == 'on'
+
+  it "should support converting serial columns to identity columns when using the :column option" do
+    @db.create_table(:tmp_dolls){Integer :i, :primary_key=>true; serial :id}
+    sch = @db.schema(:tmp_dolls)[1][1]
+    sch[:default].must_match(/nextval/)
+
+    2.times do |i|
+      @db[:tmp_dolls].insert(:i=>-i)
+    end
+
+    # Automatic conversion should not work
+    proc{@db.convert_serial_to_identity(:tmp_dolls)}.must_raise Sequel::Error
+
+    # Conversion of type without related sequence should not work
+    proc{@db.convert_serial_to_identity(:tmp_dolls, :column=>:i)}.must_raise Sequel::Error
+
+    @db.convert_serial_to_identity(:tmp_dolls, :column=>:id)
+    sch = @db.schema(:tmp_dolls)[1][1]
+    sch[:default].must_be_nil
+
+    @db[:tmp_dolls].insert(:i=>200)
+    @db[:tmp_dolls].insert(:i=>300, :id=>5)
+    @db[:tmp_dolls].select_order_map(:id).must_equal [1, 2, 3, 5]
+
+    # Make sure it doesn't break if already converted
+    @db.convert_serial_to_identity(:tmp_dolls, :column=>:id)
+  end if DB.server_version >= 100002 && DB.get{current_setting('is_superuser')} == 'on'
+
   it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}

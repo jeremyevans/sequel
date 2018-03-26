@@ -213,6 +213,69 @@ module Sequel
         run("COMMIT PREPARED #{literal(transaction_id)}", opts)
       end
 
+      # Convert the first primary key column in the +table+ from being a serial column to being an identity column.
+      # If the column is already an identity column, assume it was already converted and make no changes.
+      #
+      # Only supported on PostgreSQL 10.2+, since on those versions Sequel will use identity columns
+      # instead of serial columns for auto incrementing primary keys. Only supported when running as
+      # a superuser, since regular users cannot modify system tables, and there is no way to keep an
+      # existing sequence when changing an existing column to be an identity column.
+      #
+      # Options:
+      # :column :: Specify the column to convert instead of using the first primary key column
+      # :server :: Run the SQL on the given server
+      def convert_serial_to_identity(table, opts=OPTS)
+        raise Error, "convert_serial_to_identity is only supported on PostgreSQL 10.2+" unless server_version >= 100002
+
+        server = opts[:server]
+        server_hash = server ? {:server=>server} : {}
+        ds = dataset
+        ds = ds.server(server) if server
+
+        raise Error, "convert_serial_to_identity requires superuser permissions" unless ds.get{current_setting('is_superuser')} == 'on'
+
+        table_oid = regclass_oid(table)
+        im = input_identifier_meth
+        unless column = im.call(opts[:column] || ((sch = schema(table).find{|col, sch| sch[:primary_key] && sch[:auto_increment]}) && sch[0]))
+          raise Error, "could not determine column to convert from serial to identity automatically"
+        end
+
+        column_num = ds.from(:pg_attribute).
+          where(:attrelid=>table_oid, :attname=>column).
+          get(:attnum)
+
+        pg_class = Sequel.cast('pg_class', :regclass)
+        res = ds.from(:pg_depend).
+          where(:refclassid=>pg_class, :refobjid=>table_oid, :refobjsubid=>column_num, :classid=>pg_class, :objsubid=>0, :deptype=>%w'a i').
+          select_map([:objid, Sequel.as({:deptype=>'i'}, :v)])
+
+        case res.length
+        when 0
+          raise Error, "unable to find related sequence when converting serial to identity"
+        when 1
+          seq_oid, already_identity = res.first
+        else
+          raise Error, "more than one linked sequence found when converting serial to identity"
+        end
+
+        return if already_identity
+
+        transaction(server_hash) do
+          run("ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(column)} DROP DEFAULT", server_hash)
+
+          ds.from(:pg_depend).
+            where(:classid=>pg_class, :objid=>seq_oid, :objsubid=>0, :deptype=>'a').
+            update(:deptype=>'i')
+
+          ds.from(:pg_attribute).
+            where(:attrelid=>table_oid, :attname=>column).
+            update(:attidentity=>'d')
+        end
+
+        remove_cached_schema(table)
+        nil
+      end
+
       # Creates the function in the database.  Arguments:
       # name :: name of the function to create
       # definition :: string definition of the function, or object file for a dynamically loaded C function.

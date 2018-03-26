@@ -1,5 +1,7 @@
 === master
 
+* Add Database#convert_serial_to_identity on PostgreSQL 10.2+, which requires superuser access (jeremyevans)
+
 * Fix Database#server_version when connecting to PostgreSQL 10.1+ in certain cases (jeremyevans)
 
 * Free temporary clobs in the jdbc/oracle adapter to prevent a memory leak (jeremyevans) (#1482)
