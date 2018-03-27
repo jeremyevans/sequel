@@ -17,6 +17,7 @@ end
 
 require_relative '../lib/sequel'
 
+Sequel::DB = nil
 File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
 File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
 DB = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB}", :test=>false)

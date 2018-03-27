@@ -14,6 +14,7 @@ begin
 rescue LoadError
 end
 
+Sequel::DB = nil
 Sequel.split_symbols = true if ENV['SEQUEL_SPLIT_SYMBOLS']
 Sequel::Database.extension :duplicate_column_handler if ENV['SEQUEL_DUPLICATE_COLUMN_HANDLER']
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']

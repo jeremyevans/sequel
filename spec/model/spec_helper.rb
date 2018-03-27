@@ -25,6 +25,7 @@ class << Sequel::Model
   end
 end
 
+Sequel::DB = nil
 Sequel::Model.use_transactions = false
 Sequel::Model.cache_anonymous_models = false
 
