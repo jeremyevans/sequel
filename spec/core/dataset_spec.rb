@@ -3789,6 +3789,16 @@ describe "Dataset#with_sql_*" do
     @ds.with_sql_single_value('SELECT * FROM foo').must_be_nil
     @db.sqls.must_equal ["SELECT * FROM foo -- read_only"]
   end
+
+  it "#with_sql_* should not modify the columns of the receiver" do
+    @ds = @ds.with_extend{def fetch_rows(sql) self.columns = [:id]; super end}
+    @ds.send(:columns=, [:x])
+    @ds.with_sql_all('SELECT * FROM foo')
+    @ds.with_sql_each('SELECT * FROM foo'){}.must_be_same_as @ds
+    @ds.with_sql_first('SELECT * FROM foo')
+    @ds.with_sql_single_value('SELECT * FROM foo')
+    @ds.columns.must_equal [:x]
+  end
 end
 
 describe "Dataset prepared statements and bound variables " do

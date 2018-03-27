@@ -929,14 +929,11 @@ module Sequel
     alias with_sql_update with_sql_delete
 
     # Run the given SQL and yield each returned row to the block.
-    #
-    # This method should not be called on a shared dataset if the columns selected
-    # in the given SQL do not match the columns in the receiver.
     def with_sql_each(sql)
       if rp = row_proc
-        fetch_rows(sql){|r| yield rp.call(r)}
+        _with_sql_dataset.fetch_rows(sql){|r| yield rp.call(r)}
       else
-        fetch_rows(sql){|r| yield r}
+        _with_sql_dataset.fetch_rows(sql){|r| yield r}
       end
       self
     end
@@ -1217,6 +1214,19 @@ module Sequel
         end
       else
         c
+      end
+    end
+
+    # Cached dataset to use for with_sql_#{all,each,first,single_value}.
+    # This is used so that the columns returned by the given SQL do not
+    # affect the receiver of the with_sql_* method.
+    def _with_sql_dataset
+      if @opts[:_with_sql_ds]
+        self
+      else
+        cached_dataset(:_with_sql_ds) do
+          clone(:_with_sql_ds=>true)
+        end
       end
     end
   end
