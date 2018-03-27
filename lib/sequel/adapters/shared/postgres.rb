@@ -598,7 +598,7 @@ module Sequel
       # The version of the PostgreSQL server, used for determining capability.
       def server_version(server=nil)
         return @server_version if @server_version
-        ds = DB.dataset
+        ds = dataset
         ds = ds.server(server) if server
         @server_version ||= ds.with_sql("SELECT CAST(current_setting('server_version_num') AS integer) AS v").single_value rescue 0
       end
