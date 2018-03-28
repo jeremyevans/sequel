@@ -37,14 +37,15 @@ module Sequel
     def log_connection_yield(sql, conn, args=nil)
       return yield if @loggers.empty?
       sql = "#{connection_info(conn) if conn && log_connection_info}#{sql}#{"; #{args.inspect}" if args}"
-      start = Time.now
+      timer = Sequel.start_timer
+
       begin
         yield
       rescue => e
         log_exception(e, sql)
         raise
       ensure
-        log_duration(Time.now - start, sql) unless e
+        log_duration(Sequel.elapsed_seconds_since(timer), sql) unless e
       end
     end
 

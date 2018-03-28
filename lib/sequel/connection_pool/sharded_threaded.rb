@@ -185,24 +185,25 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       return conn
     end
 
-    time = Time.now
+    timeout = @timeout
+    timer = Sequel.start_timer
 
     sync do
-      @waiters[server].wait(@mutex, @timeout)
+      @waiters[server].wait(@mutex, timeout)
       if conn = next_available(server)
         return(allocated(server)[thread] = conn)
       end
     end
 
     until conn = assign_connection(thread, server)
-      deadline ||= time + @timeout
-      current_time = Time.now
-      raise_pool_timeout(current_time - time, server) if current_time > deadline
+      elapsed = Sequel.elapsed_seconds_since(timer)
+      raise_pool_timeout(elapsed, server) if elapsed > timeout
+
       # :nocov:
       # It's difficult to get to this point, it can only happen if there is a race condition
       # where a connection cannot be acquired even after the thread is signalled by the condition
       sync do
-        @waiters[server].wait(@mutex, deadline - current_time)
+        @waiters[server].wait(@mutex, timeout - elapsed)
         if conn = next_available(server)
           return(allocated(server)[thread] = conn)
         end

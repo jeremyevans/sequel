@@ -1,5 +1,7 @@
 === master
 
+* Add Sequel.start_timer and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)
+
 * Run Dataset#with_sql_{all,each,first,single_value} using a cached dataset to avoid clobbering the dataset's columns (jeremyevans)
 
 * Add Database#convert_serial_to_identity on PostgreSQL 10.2+, which requires superuser access (jeremyevans)

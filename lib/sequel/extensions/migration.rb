@@ -548,13 +548,13 @@ module Sequel
     # Apply all migrations on the database
     def run
       migrations.zip(version_numbers).each do |m, v|
-        t = Time.now
+        timer = Sequel.start_timer
         db.log_info("Begin applying migration version #{v}, direction: #{direction}")
         checked_transaction(m) do
           m.apply(db, direction)
           set_migration_version(up? ? v : v-1)
         end
-        db.log_info("Finished applying migration version #{v}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
+        db.log_info("Finished applying migration version #{v}, direction: #{direction}, took #{sprintf('%0.6f', Sequel.elapsed_seconds_since(timer))} seconds")
       end
       
       target

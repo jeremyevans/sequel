@@ -59,7 +59,7 @@ module Sequel
     # Record the time the connection was created.
     def make_new(*)
       conn = super
-      @connection_expiration_timestamps[conn] = Time.now
+      @connection_expiration_timestamps[conn] = Sequel.start_timer
       conn
     end
 
@@ -69,8 +69,8 @@ module Sequel
     def acquire(*a)
       begin
         if (conn = super) &&
-           (t = sync{@connection_expiration_timestamps[conn]}) &&
-           Time.now - t > @connection_expiration_timeout
+           (timer = sync{@connection_expiration_timestamps[conn]}) &&
+           Sequel.elapsed_seconds_since(timer) > @connection_expiration_timeout
 
           if pool_type == :sharded_threaded
             sync{allocated(a.last).delete(Thread.current)}

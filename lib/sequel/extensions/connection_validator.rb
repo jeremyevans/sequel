@@ -79,7 +79,7 @@ module Sequel
     # Record the time the connection was checked back into the pool.
     def checkin_connection(*)
       conn = super
-      @connection_timestamps[conn] = Time.now
+      @connection_timestamps[conn] = Sequel.start_timer
       conn
     end
 
@@ -96,8 +96,8 @@ module Sequel
     def acquire(*a)
       begin
         if (conn = super) &&
-           (t = sync{@connection_timestamps.delete(conn)}) &&
-           Time.now - t > @connection_validation_timeout &&
+           (timer = sync{@connection_timestamps.delete(conn)}) &&
+           Sequel.elapsed_seconds_since(timer) > @connection_validation_timeout &&
            !db.valid_connection?(conn)
 
           if pool_type == :sharded_threaded

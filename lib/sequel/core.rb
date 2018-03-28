@@ -303,6 +303,26 @@ module Sequel
     @single_threaded ? yield : @data_mutex.synchronize(&block)
   end
 
+  if RUBY_VERSION >= '2.1'
+    # A timer object that can be passed to Sequel.elapsed_seconds_since
+    # to return the number of seconds elapsed.
+    def self.start_timer
+      Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    end
+  else
+    # :nocov:
+    def self.start_timer # :nodoc:
+      Time.now
+    end
+    # :nocov:
+  end
+
+  # The elapsed seconds since the given timer object was created.  The
+  # timer object should have been created via Sequel.start_timer.
+  def self.elapsed_seconds_since(timer)
+    start_timer - timer
+  end
+
   # Uses a transaction on all given databases with the given options. This:
   #
   #   Sequel.transaction([DB1, DB2, DB3]){}
