@@ -221,6 +221,13 @@ module Sequel
       # a superuser, since regular users cannot modify system tables, and there is no way to keep an
       # existing sequence when changing an existing column to be an identity column.
       #
+      # This method can raise an exception in at least the following cases where it may otherwise succeed
+      # (there may be additional cases not listed here):
+      #
+      # * The serial column was added after table creation using PostgreSQL <7.3
+      # * A regular index also exists on the column (such an index can probably be dropped as the
+      #   primary key index should suffice)
+      #
       # Options:
       # :column :: Specify the column to convert instead of using the first primary key column
       # :server :: Run the SQL on the given server
