@@ -23,4 +23,5 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.add_development_dependency "tzinfo"
   s.add_development_dependency "activemodel"
   s.add_development_dependency "nokogiri"
+  s.add_development_dependency "warning"
 end
