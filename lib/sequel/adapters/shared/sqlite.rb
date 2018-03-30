@@ -243,7 +243,7 @@ module Sequel
       end
 
       def begin_new_transaction(conn, opts)
-        mode = opts[:mode] || @transaction_mode
+        mode = opts[:mode] || transaction_mode
         sql = TRANSACTION_MODE[mode] or raise Error, "transaction :mode must be one of: :deferred, :immediate, :exclusive, nil"
         log_connection_execute(conn, sql)
         set_transaction_isolation(conn, opts)
