@@ -1,4 +1,4 @@
-=== master
+=== 5.7.0 (2018-04-01)
 
 * Add Sequel.start_timer and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)
 
@@ -10,7 +10,7 @@
 
 * Free temporary clobs in the jdbc/oracle adapter to prevent a memory leak (jeremyevans) (#1482)
 
-* Treat prepared statement errors due to changing types as disconnect errors (jeremyevans) (#1481)
+* Treat prepared statement errors due to changing types as disconnect errors in the postgres adapter (jeremyevans) (#1481)
 
 * Add integer64 extension for treating Integer as a 64-bit integer when used as a generic type (jeremyevans)
 
