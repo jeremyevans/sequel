@@ -1,3 +1,7 @@
+=== master
+
+* Cache Dataset#distinct datasets if no arguments or block is given (jeremyevans)
+
 === 5.7.0 (2018-04-01)
 
 * Add Sequel.start_timer and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)

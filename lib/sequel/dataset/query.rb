@@ -116,8 +116,12 @@ module Sequel
     #  DB[:items].order(:id).distinct{func(:id)} # SQL: SELECT DISTINCT ON (func(id)) * FROM items ORDER BY id
     def distinct(*args, &block)
       virtual_row_columns(args, block)
-      raise(InvalidOperation, "DISTINCT ON not supported") if !args.empty? && !supports_distinct_on?
-      clone(:distinct => args.freeze)
+      if args.empty?
+        cached_dataset(:_distinct_ds){clone(:distinct => EMPTY_ARRAY)}
+      else
+        raise(InvalidOperation, "DISTINCT ON not supported") unless supports_distinct_on?
+        clone(:distinct => args.freeze)
+      end
     end
 
     # Adds an EXCEPT clause using a second dataset object.
