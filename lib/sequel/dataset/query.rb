@@ -851,7 +851,7 @@ module Sequel
     #   DB[:items].select_all(:items, :foo) # SELECT items.*, foo.* FROM items
     def select_all(*tables)
       if tables.empty?
-        clone(:select => nil)
+        cached_dataset(:_select_all_ds){clone(:select => nil)}
       else
         select(*tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze)
       end

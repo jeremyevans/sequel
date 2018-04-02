@@ -1,5 +1,7 @@
 === master
 
+* Cache Dataset#select_all datasets if no arguments are given (jeremyevans)
+
 * Cache Dataset#returning datasets if no arguments are given (jeremyevans)
 
 * Cache Dataset#qualify datasets if no argument is given (jeremyevans)
