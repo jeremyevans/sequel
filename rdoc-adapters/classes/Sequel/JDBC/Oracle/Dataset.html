@@ -60,6 +60,13 @@ Superclass:
 <div class='name-list'>
 <table summary='Constants'>
 <tr class='top-aligned-row context-row'>
+<td class='context-item-name'>CLOB_TYPE</td>
+<td>=</td>
+<td class='context-item-value'>Java::JavaSQL::Types::CLOB</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
 <td class='context-item-name'>NUMERIC_TYPE</td>
 <td>=</td>
 <td class='context-item-value'>Java::JavaSQL::Types::NUMERIC</td>
@@ -99,7 +106,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-type_convertor-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">NUMERIC_TYPE</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getScale</span>(<span class="ruby-identifier">i</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">map</span>[<span class="ruby-value">:OracleDecimal</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">TIMESTAMPTZ_TYPES</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">TIMESTAMP_TYPE</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">NUMERIC_TYPE</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getScale</span>(<span class="ruby-identifier">i</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">map</span>[<span class="ruby-value">:OracleDecimal</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">TIMESTAMPTZ_TYPES</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">TIMESTAMP_TYPE</span>]&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">CLOB_TYPE</span> &#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-value">:OracleClob</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

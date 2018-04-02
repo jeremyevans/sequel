@@ -30,7 +30,7 @@ doc/querying.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-12-21 07:13:29 -0800</span>
+<span class='datetime'>2018-03-22 21:49:57 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -155,7 +155,7 @@ you want:</p>
 <p>If you want the value for multiple columns, you can pass an array to
 <code>Sequel::Dataset#get</code>:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist_id</span>, <span class="ruby-identifier">artist_name</span>,  = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>([<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>])&#x000A;<span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; [1, &quot;YJM&quot;]</span></pre>
+<pre class="ruby"><span class="ruby-identifier">artist_id</span>, <span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>([<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>])&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; [1, &quot;YJM&quot;]</span></pre>
 
 <h3 id="label-Retrieving+Multiple+Objects">Retrieving Multiple Objects<span><a href="#label-Retrieving+Multiple+Objects">&para;</a> <a href="#top">&uarr;</a></span></h3>
 

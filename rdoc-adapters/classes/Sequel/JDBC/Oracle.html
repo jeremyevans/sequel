@@ -39,6 +39,7 @@ Sequel::JDBC::Oracle
 <h2>Methods</h2>
 <h3>Public Class</h3>
 <ol>
+<li><a href="#method-c-OracleClob">OracleClob</a></li>
 <li><a href="#method-c-OracleDecimal">OracleDecimal</a></li>
 </ol>
 </div>
@@ -68,6 +69,23 @@ Sequel::JDBC::Oracle
 </div>
 <div id='methods'>
 <h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-OracleClob'>
+<a name='method-c-OracleClob'></a>
+<div class='synopsis'>
+<span class='name'>OracleClob</span>
+<span class='arguments'>(r, i)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-OracleClob-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-OracleClob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">OracleClob</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">clob</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getClob</span>(<span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-identifier">str</span> = <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">length</span>)&#x000A;  <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">freeTemporary</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">isTemporary</span>&#x000A;  <span class="ruby-identifier">str</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-class' id='method-method-c-OracleDecimal'>
 <a name='method-c-OracleDecimal'></a>
 <div class='synopsis'>

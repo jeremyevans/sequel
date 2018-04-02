@@ -1,4 +1,4 @@
-Thu, 01 Mar 2018 10:46:53 -0800
+Sun, 01 Apr 2018 20:03:27 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -6,8 +6,8 @@ lib/sequel/extensions/arbitrary_servers.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/auto_literal_strings.rb	Wed, 19 Apr 2017 16:07:09 -0700
 lib/sequel/extensions/blank.rb	Mon, 25 Jan 2016 14:10:57 -0800
 lib/sequel/extensions/columns_introspection.rb	Wed, 07 Dec 2016 16:34:05 -0800
-lib/sequel/extensions/connection_expiration.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/extensions/connection_validator.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/connection_expiration.rb	Sun, 01 Apr 2018 19:38:21 -0700
+lib/sequel/extensions/connection_validator.rb	Sun, 01 Apr 2018 19:38:21 -0700
 lib/sequel/extensions/constraint_validations.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/core_extensions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/core_refinements.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -26,8 +26,9 @@ lib/sequel/extensions/identifier_mangling.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/implicit_subquery.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/index_caching.rb	Tue, 19 Dec 2017 10:23:31 -0800
 lib/sequel/extensions/inflector.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/integer64.rb	Thu, 08 Mar 2018 15:45:42 -0800
 lib/sequel/extensions/looser_typecasting.rb	Thu, 19 Jan 2017 10:04:33 -0800
-lib/sequel/extensions/migration.rb	Wed, 21 Feb 2018 16:20:18 -0800
+lib/sequel/extensions/migration.rb	Sun, 01 Apr 2018 19:38:21 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -116,7 +117,7 @@ lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Sat, 20 Jan 2018 09:44:46 -0800
 lib/sequel/plugins/nested_attributes.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/optimistic_locking.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/pg_array_associations.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/pg_array_associations.rb	Thu, 08 Mar 2018 15:45:42 -0800
 lib/sequel/plugins/pg_row.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/prepared_statements.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/prepared_statements_safe.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -143,7 +144,7 @@ lib/sequel/plugins/update_or_create.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/update_primary_key.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/plugins/update_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/uuid.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/validate_associated.rb	Thu, 21 Jan 2016 12:21:53 -0800
+lib/sequel/plugins/validate_associated.rb	Mon, 05 Mar 2018 12:07:45 -0800
 lib/sequel/plugins/validation_class_methods.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/validation_contexts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/validation_helpers.rb	Sat, 20 Jan 2018 09:43:24 -0800

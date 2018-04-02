@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
 <head>
-<title>threaded.rb</title>
+<title>integer64.rb</title>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -23,22 +23,35 @@
 <body class='page'>
 <div class='file' id='wrapper'>
 <div class='header'>
-<h1 class='name'>threaded.rb
+<h1 class='name'>integer64.rb
 </h1>
 <div class='paths'>
-lib/sequel/connection_pool/threaded.rb
+lib/sequel/extensions/integer64.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-04-01 19:38:21 -0700</span>
+<span class='datetime'>2018-03-08 15:45:42 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>A connection pool allowing multi-threaded access to a pool of connections.
-This is the default connection pool used by <a
-href="../../../../classes/Sequel.html">Sequel</a>.</p>
+<p>The integer64 extension changes the default type used for Integer to be the
+same type as used for :Bignum.  In general, this means that instead of
+Integer resulting in a 32-bit database integer type, it will result in a
+64-bit database integer type.  This affects the default type used for
+primary_key and foreign_key when using the schema modification methods.</p>
+
+<p>Note that it doesn&#39;t make sense to use this extension on SQLite, since
+the integer type will automatically handle 64-bit integers, and it treats
+the integer type specially when the column is also the primary key.</p>
+
+<p>To load the extension into the database:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:integer64</span></pre>
+
+<p>Related module: <a
+href="../../../../classes/Sequel/Integer64.html">Sequel::Integer64</a></p>
 </div>
 <div id='context'>
 </div>
