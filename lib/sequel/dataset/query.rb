@@ -278,11 +278,15 @@ module Sequel
     def from_self(opts=OPTS)
       fs = {}
       @opts.keys.each{|k| fs[k] = nil unless non_sql_option?(k)}
-      c = clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
-      if cols = _columns
-        c.send(:columns=, cols)
+      pr = proc do
+        c = clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
+        if cols = _columns
+          c.send(:columns=, cols)
+        end
+        c
       end
-      c
+
+      cache ? cached_dataset(:_from_self_ds, &pr) : pr.call
     end
 
     # Match any of the columns to any of the patterns. The terms can be

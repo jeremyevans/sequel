@@ -1,5 +1,7 @@
 === master
 
+* Cache Dataset#from_self datasets if no options are given (jeremyevans)
+
 * Cache Dataset#distinct datasets if no arguments or block is given (jeremyevans)
 
 === 5.7.0 (2018-04-01)
