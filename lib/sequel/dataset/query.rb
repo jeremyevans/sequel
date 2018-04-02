@@ -798,8 +798,15 @@ module Sequel
     #     # hash for each row deleted, with values for all columns
     #   end
     def returning(*values)
-      raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
-      clone(:returning=>values.freeze)
+      if values.empty?
+        cached_dataset(:_returning_ds) do
+          raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
+          clone(:returning=>EMPTY_ARRAY)
+        end
+      else
+        raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
+        clone(:returning=>values.freeze)
+      end
     end
 
     # Returns a copy of the dataset with the order reversed. If no order is
