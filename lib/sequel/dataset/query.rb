@@ -624,7 +624,7 @@ module Sequel
     #   DB.from(:a, DB[:b].where(Sequel[:a][:c]=>Sequel[:b][:d]).lateral)
     #   # SELECT * FROM a, LATERAL (SELECT * FROM b WHERE (a.c = b.d))
     def lateral
-      clone(:lateral=>true)
+      cached_dataset(:_lateral_ds){clone(:lateral=>true)}
     end
 
     # If given an integer, the dataset will contain only the first l results.
