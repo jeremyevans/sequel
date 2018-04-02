@@ -763,15 +763,20 @@ module Sequel
     #
     #   DB[:items].where(id: 1).qualify(:i)
     #   # SELECT i.* FROM items WHERE (i.id = 1)
-    def qualify(table=first_source)
+    def qualify(table=(cache=true; first_source))
       o = @opts
       return self if o[:sql]
-      h = {}
-      (o.keys & QUALIFY_KEYS).each do |k|
-        h[k] = qualified_expression(o[k], table)
+
+      pr = proc do
+        h = {}
+        (o.keys & QUALIFY_KEYS).each do |k|
+          h[k] = qualified_expression(o[k], table)
+        end
+        h[:select] = [SQL::ColumnAll.new(table)].freeze if !o[:select] || o[:select].empty?
+        clone(h)
       end
-      h[:select] = [SQL::ColumnAll.new(table)].freeze if !o[:select] || o[:select].empty?
-      clone(h)
+
+      cache ? cached_dataset(:_qualify_ds, &pr) : pr.call
     end
 
     # Modify the RETURNING clause, only supported on a few databases.  If returning
