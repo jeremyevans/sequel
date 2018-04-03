@@ -80,6 +80,7 @@ the following methods:
 * +alter_table+ (supporting the following methods in the +alter_table+ block):
   * +add_column+
   * +add_constraint+
+  * +add_unique_constraint+
   * +add_foreign_key+ (with a symbol, not an array)
   * +add_primary_key+ (with a symbol, not an array)
   * +add_index+
