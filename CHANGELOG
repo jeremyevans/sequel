@@ -1,3 +1,7 @@
+=== 5.7.1 (2018-04-04)
+
+* Don't use identity columns if :serial=>true or :type=>:serial|:bigserial column options are used (#1490) (jeremyevans)
+
 === 5.7.0 (2018-04-01)
 
 * Add Sequel.start_timer and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)
