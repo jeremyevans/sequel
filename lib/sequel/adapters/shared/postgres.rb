@@ -776,7 +776,7 @@ module Sequel
       # default value is given.
       def column_definition_default_sql(sql, column)
         super
-        if !column[:default] && (identity = column[:identity])
+        if !column[:serial] && !['serial', 'bigserial'].include?(column[:type].to_s) && !column[:default] && (identity = column[:identity])
           sql << " GENERATED "
           sql << (identity == :always ? "ALWAYS" : "BY DEFAULT")
           sql << " AS IDENTITY"

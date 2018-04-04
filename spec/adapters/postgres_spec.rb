@@ -107,6 +107,20 @@ describe "PostgreSQL", '#create_table' do
     end
   end if DB.server_version >= 90000
 
+  it "should support primary_key with :type=>:serial or :type=>:bigserial" do
+    [:serial, :bigserial, 'serial', 'bigserial'].each do |type|
+      @db.create_table!(:tmp_dolls){primary_key :id, :type=>type}
+      @db[:tmp_dolls].insert
+      @db[:tmp_dolls].get(:id).must_equal 1
+    end
+  end if DB.server_version >= 100002
+
+  it "should support primary_key with :serial=>true" do
+    @db.create_table!(:tmp_dolls){primary_key :id, :serial=>true}
+    @db[:tmp_dolls].insert
+    @db[:tmp_dolls].get(:id).must_equal 1
+  end if DB.server_version >= 100002
+
   it "should support creating identity columns on non-primary key tables" do
     @db.create_table(:tmp_dolls){Integer :a, :identity=>true}
     2.times do
