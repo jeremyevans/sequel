@@ -1,5 +1,7 @@
 === master
 
+* Don't use identity columns if :serial=>true or :type=>:serial|:bigserial column options are used (#1490) (jeremyevans)
+
 * Cache Dataset#select_all datasets if no arguments are given (jeremyevans)
 
 * Cache Dataset#returning datasets if no arguments are given (jeremyevans)
