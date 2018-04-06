@@ -440,6 +440,34 @@ handle locking:
   # INSERT INTO "table" ("id") VALUES (2) RETURNING NULL;
   # COMMIT;
 
+== Extended Error Info (<tt>postgres/pg only</tt>)
+
+If you run a query that raises a Sequel::DatabaseError, you can pass the exception object to
+<tt>Database#error_info</tt>, and that will return a hash with metadata regarding the error,
+such as the related table and column or constraint.
+
+  DB.create_table(:test1){primary_key :id}
+  DB.create_table(:test2){primary_key :id; foreign_key :test1_id, :test1}
+  DB[:test2].insert(:test1_id=>1) rescue DB.error_info($!)
+  # => {
+  #  :schema=>"public",
+  #  :table=>"test2",
+  #  :column=>nil,
+  #  :constraint=>"test2_test1_id_fkey",
+  #  :type=>nil,
+  #  :severity=>"ERROR",
+  #  :sql_state=>"23503",
+  #  :message_primary=>"insert or update on table \"test2\" violates foreign key constraint \"test2_test1_id_fkey\"",
+  #  :message_detail=>"Key (test1_id)=(1) is not present in table \"test1\"."
+  #  :message_hint=>nil,
+  #  :statement_position=>nil,
+  #  :internal_position=>nil,
+  #  :internal_query=>nil,
+  #  :source_file=>"ri_triggers.c",
+  #  :source_line=>"3321",
+  #  :source_function=>"ri_ReportViolation"
+  # }
+
 == sequel_pg (<tt>postgres/pg only</tt>)
 
 When the postgres adapter is used with the pg driver, Sequel automatically checks for sequel_pg, and

@@ -247,26 +247,48 @@ module Sequel
 
       if USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
         # Return a hash of information about the related PGError (or Sequel::DatabaseError that
-        # wraps a PGError), with the following entries:
+        # wraps a PGError), with the following entries (any of which may be +nil+):
         #
         # :schema :: The schema name related to the error
         # :table :: The table name related to the error
         # :column :: the column name related to the error
         # :constraint :: The constraint name related to the error
         # :type :: The datatype name related to the error
+        # :severity :: The severity of the error (e.g. "ERROR")
+        # :sql_state :: The SQL state code related to the error
+        # :message_primary :: A single line message related to the error
+        # :message_detail :: Any detail supplementing the primary message
+        # :message_hint :: Possible suggestion about how to fix the problem
+        # :statement_position :: Character offset in statement submitted by client where error occurred (starting at 1)
+        # :internal_position :: Character offset in internal statement where error occurred (starting at 1)
+        # :internal_query :: Text of internally-generated statement where error occurred
+        # :source_file :: PostgreSQL source file where the error occurred
+        # :source_line :: Line number of PostgreSQL source file where the error occurred
+        # :source_function :: Function in PostgreSQL source file where the error occurred
         #
         # This requires a PostgreSQL 9.3+ server and 9.3+ client library,
         # and ruby-pg 0.16.0+ to be supported.
         def error_info(e)
           e = e.wrapped_exception if e.is_a?(DatabaseError)
           r = e.result
-          h = {}
-          h[:schema] = r.error_field(::PG::PG_DIAG_SCHEMA_NAME)
-          h[:table] = r.error_field(::PG::PG_DIAG_TABLE_NAME)
-          h[:column] = r.error_field(::PG::PG_DIAG_COLUMN_NAME)
-          h[:constraint] = r.error_field(::PG::PG_DIAG_CONSTRAINT_NAME)
-          h[:type] = r.error_field(::PG::PG_DIAG_DATATYPE_NAME)
-          h
+          h = {
+            :schema => r.error_field(::PG::PG_DIAG_SCHEMA_NAME),
+            :table => r.error_field(::PG::PG_DIAG_TABLE_NAME),
+            :column => r.error_field(::PG::PG_DIAG_COLUMN_NAME),
+            :constraint => r.error_field(::PG::PG_DIAG_CONSTRAINT_NAME),
+            :type => r.error_field(::PG::PG_DIAG_DATATYPE_NAME),
+            :severity => r.error_field(::PG::PG_DIAG_SEVERITY),
+            :sql_state => r.error_field(::PG::PG_DIAG_SQLSTATE),
+            :message_primary => r.error_field(::PG::PG_DIAG_MESSAGE_PRIMARY),
+            :message_detail => r.error_field(::PG::PG_DIAG_MESSAGE_DETAIL),
+            :message_hint => r.error_field(::PG::PG_DIAG_MESSAGE_HINT),
+            :statement_position => r.error_field(::PG::PG_DIAG_STATEMENT_POSITION),
+            :internal_position => r.error_field(::PG::PG_DIAG_INTERNAL_POSITION),
+            :internal_query => r.error_field(::PG::PG_DIAG_INTERNAL_QUERY),
+            :source_file => r.error_field(::PG::PG_DIAG_SOURCE_FILE),
+            :source_line => r.error_field(::PG::PG_DIAG_SOURCE_LINE),
+            :source_function => r.error_field(::PG::PG_DIAG_SOURCE_FUNCTION)
+          }
         end
       end
       

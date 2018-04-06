@@ -1,5 +1,7 @@
 === master
 
+* Include more diagnostic information in Database#error_info on PostgreSQL (jeremyevans)
+
 * Support Database#foreign_key_list :reverse option on PostgreSQL for parsing foreign key constraints that reference a given table (jeremyevans)
 
 * Add Database#check_constraints on PostgreSQL for parsing CHECK constraints (jeremyevans)
