@@ -431,6 +431,7 @@ describe "A PostgreSQL database" do
 
   it "should parse foreign keys for tables in a schema" do
     @db.foreign_key_list(Sequel[:public][:testfk]).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
+    @db.foreign_key_list(Sequel[:public][:testfk], :schema=>false).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>:testfk, :name=>:testfk_i_fkey, :schema=>:public}]
   end
 
   it "should return uuid fields as strings" do
@@ -449,6 +450,32 @@ describe "A PostgreSQL database" do
     Sequel.connect(DB.opts.merge(:notice_receiver=>proc{|r| a = r.result_error_message})){|db| db.do("BEGIN\nRAISE WARNING 'foo';\nEND;")}
     a.must_equal "WARNING:  foo\n"
   end if uses_pg && DB.server_version >= 90000
+end
+
+describe "A PostgreSQL database " do
+  after do
+    DB.drop_table?(:b, :a)
+  end
+
+  it "should parse foreign keys referencing current table using :reverse option" do
+    DB.create_table!(:a) do
+      primary_key :id
+      Integer :i
+      Integer :j
+      foreign_key :a_id, :a, :foreign_key_constraint_name=>:a_a
+      unique [:i, :j]
+    end
+    DB.create_table!(:b) do
+      foreign_key :a_id, :a, :foreign_key_constraint_name=>:a_a
+      Integer :c
+      Integer :d
+      foreign_key [:c, :d], :a, :key=>[:j, :i], :name=>:a_c_d
+    end
+    DB.foreign_key_list(:a, :reverse=>true).must_equal [
+      {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :schema=>:public},
+      {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public},
+      {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public}]
+  end
 end
 
 describe "A PostgreSQL database with domain types" do
@@ -1347,7 +1374,7 @@ describe "Postgres::Database schema qualified tables" do
       h.last.first.must_equal :j
 
       @db.indexes(:schema_test).must_equal(:public_test_sti=>{:unique=>false, :columns=>[:j], :deferrable=>nil})
-      @db.foreign_key_list(:schema_test).must_equal [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey}]
+      @db.foreign_key_list(:schema_test).must_equal [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey, :schema=>:public}]
     ensure
       @db.drop_table?(Sequel[:public][:schema_test])
     end

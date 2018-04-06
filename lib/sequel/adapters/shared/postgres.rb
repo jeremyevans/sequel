@@ -422,67 +422,95 @@ module Sequel
 
       # Return full foreign key information using the pg system tables, including
       # :name, :on_delete, :on_update, and :deferrable entries in the hashes.
+      #
+      # Supports additional options:
+      # :reverse :: Instead of returning foreign keys in the current table, return
+      #             foreign keys in other tables that reference the current table.
+      # :schema :: Set to true to have the :table value in the hashes be a qualified
+      #            identifier.  Set to false to use a separate :schema value with
+      #            the related schema.  Defaults to whether the given table argument
+      #            is a qualified identifier.
       def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth
         schema, _ = opts.fetch(:schema, schema_and_table(table))
         oid = regclass_oid(table)
+        reverse = opts[:reverse]
+
+        if reverse
+          ctable = Sequel[:att2]
+          cclass = Sequel[:cl2]
+          rtable = Sequel[:att]
+          rclass = Sequel[:cl]
+        else
+          ctable = Sequel[:att]
+          cclass = Sequel[:cl]
+          rtable = Sequel[:att2]
+          rclass = Sequel[:cl2]
+        end
 
         if server_version >= 90500
-          cpos = Sequel.expr{array_position(co[:conkey], att[:attnum])}
-          rpos = Sequel.expr{array_position(co[:confkey], att2[:attnum])}
+          cpos = Sequel.expr{array_position(co[:conkey], ctable[:attnum])}
+          rpos = Sequel.expr{array_position(co[:confkey], rtable[:attnum])}
         else
           range = 0...32
-          cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, att[:attnum])}
-          rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, att2[:attnum])}
+          cpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, ctable[:attnum])}
+          rpos = Sequel.expr{SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, rtable[:attnum])}
         end
 
         ds = metadata_dataset.
           from{pg_constraint.as(:co)}.
-          join(Sequel[:pg_class].as(:cl), :oid=>:conrelid).
-          join(Sequel[:pg_attribute].as(:att), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
-          join(Sequel[:pg_class].as(:cl2), :oid=>Sequel[:co][:confrelid]).
-          join(Sequel[:pg_attribute].as(:att2), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
+          join(Sequel[:pg_class].as(cclass), :oid=>:conrelid).
+          join(Sequel[:pg_attribute].as(ctable), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+          join(Sequel[:pg_class].as(rclass), :oid=>Sequel[:co][:confrelid]).
+          join(Sequel[:pg_attribute].as(rtable), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
+          join(Sequel[:pg_namespace].as(:nsp), :oid=>Sequel[:cl2][:relnamespace]).
           order{[co[:conname], cpos]}.
           where{{
             cl[:relkind]=>'r',
             co[:contype]=>'f',
             cl[:oid]=>oid,
             cpos=>rpos
-            }}.
+          }}.
           select{[
             co[:conname].as(:name),
-            att[:attname].as(:column),
+            ctable[:attname].as(:column),
             co[:confupdtype].as(:on_update),
             co[:confdeltype].as(:on_delete),
             cl2[:relname].as(:table),
-            att2[:attname].as(:refcolumn),
-            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable)
+            rtable[:attname].as(:refcolumn),
+            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable),
+            nsp[:nspname].as(:schema)
           ]}
-
-        # If a schema is given, we only search in that schema, and the returned :table
-        # entry is schema qualified as well.
-        if schema
-          ds = ds.join(Sequel[:pg_namespace].as(:nsp2), :oid=>Sequel[:cl2][:relnamespace]).
-            select_append{nsp2[:nspname].as(:schema)}
-        end
 
         h = {}
         fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
 
         ds.each do |row|
-          if r = h[row[:name]]
+          if reverse
+            key = [row[:schema], row[:table], row[:name]]
+          else
+            key = row[:name]
+          end
+
+          if r = h[key]
             r[:columns] << m.call(row[:column])
             r[:key] << m.call(row[:refcolumn])
           else
-            h[row[:name]] = {
+            entry = h[key] = {
               :name=>m.call(row[:name]),
               :columns=>[m.call(row[:column])],
               :key=>[m.call(row[:refcolumn])],
               :on_update=>fklod_map[row[:on_update]],
               :on_delete=>fklod_map[row[:on_delete]],
               :deferrable=>row[:deferrable],
-              :table=>schema ? SQL::QualifiedIdentifier.new(m.call(row[:schema]), m.call(row[:table])) : m.call(row[:table])
+              :table=>schema ? SQL::QualifiedIdentifier.new(m.call(row[:schema]), m.call(row[:table])) : m.call(row[:table]),
             }
+
+            unless schema
+              # If not combining schema information into the :table entry
+              # include it as a separate entry.
+              entry[:schema] = m.call(row[:schema])
+            end
           end
         end
 

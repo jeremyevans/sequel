@@ -207,6 +207,31 @@ Sequel has support for parsing CHECK constraints on PostgreSQL using <tt>Sequel:
   #  :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j]}
   # }
 
+=== Parsing Foreign Key Constraints Referencing A Given Table
+
+Sequel has support for parsing FOREIGN KEY constraints that reference a given table, using the +:reverse+
+option to +foreign_key_list+:
+
+  DB.create_table!(:a) do
+    primary_key :id
+    Integer :i
+    Integer :j
+    foreign_key :a_id, :a, :foreign_key_constraint_name=>:a_a
+    unique [:i, :j]
+  end
+  DB.create_table!(:b) do
+    foreign_key :a_id, :a, :foreign_key_constraint_name=>:a_a
+    Integer :c
+    Integer :d
+    foreign_key [:c, :d], :a, :key=>[:j, :i], :name=>:a_c_d
+  end
+  DB.foreign_key_list(:a, :reverse=>true)
+  # => [
+  #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :schema=>:public},
+  #  {:name=>:a_a, :columns=>[:a_id], :key=>[:id], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public},
+  #  {:name=>:a_c_d, :columns=>[:c, :d], :key=>[:j, :i], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:b, :schema=>:public}
+  # ]
+
 == PostgreSQL-specific DML Support
 
 === Returning Rows From Insert, Update, and Delete Statements

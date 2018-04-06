@@ -1,5 +1,7 @@
 === master
 
+* Support Database#foreign_key_list :reverse option on PostgreSQL for parsing foreign key constraints that reference a given table (jeremyevans)
+
 * Add Database#check_constraints on PostgreSQL for parsing CHECK constraints (jeremyevans)
 
 * Don't use identity columns if :serial=>true or :type=>:serial|:bigserial column options are used (#1490) (jeremyevans)
