@@ -93,6 +93,17 @@ describe "PostgreSQL", '#create_table' do
     end
   end
 
+  it "should have #check_constraints method for getting check constraints" do
+    @db.create_table(:tmp_dolls) do
+      Integer :i
+      Integer :j
+      constraint(:ic, Sequel[:i] > 2)
+      constraint(:jc, Sequel[:j] > 2)
+      constraint(:ijc, Sequel[:i] - Sequel[:j] > 2)
+    end
+    @db.check_constraints(:tmp_dolls).must_equal(:ic=>{:definition=>"CHECK ((i > 2))", :columns=>[:i]}, :jc=>{:definition=>"CHECK ((j > 2))", :columns=>[:j]}, :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j]})
+  end
+
   it "should not allow to pass both :temp and :unlogged" do
     proc do
       @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}

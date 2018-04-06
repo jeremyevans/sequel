@@ -189,6 +189,24 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
 
 However, you may want to consider just use <tt>Database#run</tt> with the necessary SQL code, at least for functions and triggers.
 
+=== Parsing Check Constraints
+
+Sequel has support for parsing CHECK constraints on PostgreSQL using <tt>Sequel::Database#check_constraints</tt>:
+
+  DB.create_table(:foo) do
+    Integer :i
+    Integer :j
+    constraint(:ic, Sequel[:i] > 2)
+    constraint(:jc, Sequel[:j] > 2)
+    constraint(:ijc, Sequel[:i] - Sequel[:j] > 2)
+  end
+  DB.check_constraints(:foo)
+  # => {
+  #  :ic=>{:definition=>"CHECK ((i > 2))", :columns=>[:i]},
+  #  :jc=>{:definition=>"CHECK ((j > 2))", :columns=>[:j]},
+  #  :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j]}
+  # }
+
 == PostgreSQL-specific DML Support
 
 === Returning Rows From Insert, Update, and Delete Statements
