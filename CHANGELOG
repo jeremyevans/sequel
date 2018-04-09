@@ -1,5 +1,7 @@
 === master
 
+* Support Database#indexes :include_partial option on PostgreSQL for including partial indexes (jeremyevans)
+
 * Include more diagnostic information in Database#error_info on PostgreSQL (jeremyevans)
 
 * Support Database#foreign_key_list :reverse option on PostgreSQL for parsing foreign key constraints that reference a given table (jeremyevans)

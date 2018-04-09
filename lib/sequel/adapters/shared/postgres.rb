@@ -548,12 +548,12 @@ module Sequel
             indc[:relkind]=>'i',
             ind[:indisprimary]=>false,
             :indexprs=>nil,
-            :indpred=>nil,
             :indisvalid=>true,
             tab[:oid]=>oid}}.
           order(*order).
           select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
+        ds = ds.where(:indpred=>nil) unless opts[:include_partial]
         ds = ds.where(:indisready=>true) if server_version >= 80300
         ds = ds.where(:indislive=>true) if server_version >= 90300
 

@@ -684,8 +684,14 @@ describe "A PostgreSQL dataset" do
     @db.transaction(:isolation=>:serializable, :deferrable=>false, :read_only=>false){}
   end if DB.server_version >= 90100
 
+  it "should support parsing partial indexes with :include_partial option" do
+    @db.add_index :test, [:name, :value], :where=>(Sequel[:value] > 10), :name=>:tnv_partial
+    @db.indexes(:test)[:tnv_partial].must_be_nil
+    @db.indexes(:test, :include_partial=>true)[:tnv_partial].must_equal(:columns=>[:name, :value], :unique=>false, :deferrable=>nil)
+  end
+
   it "should support creating indexes concurrently" do
-    @db.add_index :test, [:name, :value], :concurrently=>true
+    @db.add_index :test, [:name, :value], :concurrently=>true, :name=>'tnv0'
   end
 
   it "should support dropping indexes only if they already exist" do
