@@ -1,5 +1,7 @@
 === master
 
+* Add pg_auto_constraint_validations plugin, for automatically converting constraint violations to validation failures on PostgreSQL (jeremyevans)
+
 * Don't make Model#_valid? public in the error_splitter plugin (jeremyevans)
 
 * Support Database#indexes :include_partial option on PostgreSQL for including partial indexes (jeremyevans)

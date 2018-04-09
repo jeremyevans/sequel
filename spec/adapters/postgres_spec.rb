@@ -3877,3 +3877,116 @@ describe "PostgreSQL stored procedures for datasets" do
     @ds.call(:all).must_equal [{:id=>1, :numb=>100}]
   end
 end if DB.adapter_scheme == :jdbc
+
+describe "pg_auto_constraint_validations plugin" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:test1) do
+      Integer :id, :primary_key=>true
+      Integer :i, :unique=>true, :null=>false
+      constraint :valid_i, Sequel[:i] < 10
+      constraint(:valid_i_id, Sequel[:i] + Sequel[:id] < 20)
+    end
+    @db.create_table!(:test2) do
+      Integer :test2_id, :primary_key=>true
+      foreign_key :test1_id, :test1
+      index [:test1_id], :unique=>true, :where=>(Sequel[:test1_id] < 10)
+    end
+    @c1 = Sequel::Model(:test1)
+    @c2 = Sequel::Model(:test2)
+    @c1.plugin :update_primary_key
+    @c1.plugin :pg_auto_constraint_validations
+    @c2.plugin :pg_auto_constraint_validations
+    @c1.unrestrict_primary_key
+    @c2.unrestrict_primary_key
+  end
+  before do
+    @c2.dataset.delete
+    @c1.dataset.delete
+    @c1.insert(:id=>1, :i=>2)
+    @c2.insert(:test2_id=>3, :test1_id=>1)
+  end
+  after(:all) do
+    @db.drop_table?(:test2, :test1)
+  end
+
+  it "should handle check constraint failures as validation errors when creating" do
+    o = @c1.new(:id=>5, :i=>12)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is invalid'])
+  end
+
+  it "should handle check constraint failures as validation errors when updating" do
+    o = @c1.new(:id=>5, :i=>3)
+    o.save
+    proc{o.update(:i=>12)}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is invalid'])
+  end
+
+  it "should handle unique constraint failures as validation errors when creating" do
+    o = @c1.new(:id=>5, :i=>2)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is already taken'])
+  end
+
+  it "should handle unique constraint failures as validation errors when updating" do
+    o = @c1.new(:id=>5, :i=>3)
+    o.save
+    proc{o.update(:i=>2)}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is already taken'])
+  end
+
+  it "should handle unique constraint failures as validation errors for partial unique indexes" do
+    @c1.create(:id=>2, :i=>3)
+    @c2.create(:test2_id=>6, :test1_id=>2)
+    o = @c2.new(:test2_id=>5, :test1_id=>2)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:test1_id=>['is already taken'])
+  end
+
+  it "should handle not null constraint failures as validation errors when creating" do
+    o = @c1.new(:id=>5)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is not present'])
+  end
+
+  it "should handle not null constraint failures as validation errors when updating" do
+    o = @c1.new(:id=>5, :i=>3)
+    o.save
+    proc{o.update(:i=>nil)}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is not present'])
+  end
+
+  it "should handle foreign key constraint failures as validation errors when creating" do
+    o = @c2.new(:test2_id=>4, :test1_id=>2)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:test1_id=>['is invalid'])
+  end
+
+  it "should handle foreign key constraint failures as validation errors when updating" do
+    o = @c2.first
+    proc{o.update(:test1_id=>2)}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:test1_id=>['is invalid'])
+  end
+
+  it "should handle foreign key constraint failures in other tables as validation errors when updating" do
+    o = @c1[1]
+    proc{o.update(:id=>2)}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:id=>['cannot be changed currently'])
+  end
+
+  it "should handle multi-column constraint failures as validation errors" do
+    c = Class.new(@c1)
+    o = c.new(:id=>18, :i=>8)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    [{[:i, :id]=>['is invalid']}, {[:id, :i]=>['is invalid']}].must_include o.errors
+  end
+
+  it "should handle multi-column constraint failures as validation errors when using the error_splitter plugin" do
+    c = Class.new(@c1)
+    c.plugin :error_splitter
+    o = c.new(:id=>18, :i=>8)
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['is invalid'], :id=>['is invalid'])
+  end
+end if DB.respond_to?(:error_info)
