@@ -1,5 +1,7 @@
 === master
 
+* Don't make Model#_valid? public in the error_splitter plugin (jeremyevans)
+
 * Support Database#indexes :include_partial option on PostgreSQL for including partial indexes (jeremyevans)
 
 * Include more diagnostic information in Database#error_info on PostgreSQL (jeremyevans)

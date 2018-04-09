@@ -32,25 +32,30 @@ module Sequel
     #   Album.plugin :error_splitter
     module ErrorSplitter
       module InstanceMethods
-        # If the model instance is not valid, go through all of the errors entries.  For
-        # any that apply to multiple columns, remove them and add separate error entries,
-        # one per column.
+        private
+
+        # If the model instance is not valid, split the errors before returning.
         def _valid?(opts)
           v = super
           unless v
-            errors.keys.select{|k| k.is_a?(Array)}.each do |ks|
-              msgs = errors.delete(ks)
-              ks.each do |k|
-                msgs.each do |msg|
-                  errors.add(k, msg)
-                end
+            split_validation_errors(errors)
+          end
+          v
+        end
+
+        # Go through all of the errors entries.  For any that apply to multiple columns,
+        # remove them and add separate error entries, one per column.
+        def split_validation_errors(errors)
+          errors.keys.select{|k| k.is_a?(Array)}.each do |ks|
+            msgs = errors.delete(ks)
+            ks.each do |k|
+              msgs.each do |msg|
+                errors.add(k, msg)
               end
             end
           end
-          v
         end
       end
     end
   end
 end
-
