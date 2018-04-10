@@ -1,5 +1,7 @@
 === master
 
+* Make tactical_eager_loading plugin respect the :allow_eager association option (jeremyevans) (#1494)
+
 * Add pg_auto_constraint_validations plugin, for automatically converting constraint violations to validation failures on PostgreSQL (jeremyevans)
 
 * Don't make Model#_valid? public in the error_splitter plugin (jeremyevans)

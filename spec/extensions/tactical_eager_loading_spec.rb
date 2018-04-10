@@ -28,6 +28,8 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
           [{:id=>$1.to_i, :parent_id=>nil}]
         elsif sql =~ /WHERE.*\bid IN \(([\d, ]*)\)/
           $1.split(', ').map{|x| {:id=>x.to_i, :parent_id=>nil}}
+        elsif sql =~ /WHERE.*\bparent_id = (\d+)/
+           {:id=>$1.to_i - 100, :parent_id=>$1.to_i} if $1.to_i > 100
         elsif sql =~ /WHERE.*\bparent_id IN \(([\d, ]*)\)/
           $1.split(', ').map{|x| {:id=>x.to_i - 100, :parent_id=>x.to_i} if x.to_i > 100}.compact
         end
@@ -103,6 +105,15 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     sql_match(/\ASELECT \* FROM t WHERE \(\(t\.id IN \(10[12], 10[12]\)\) AND \(name > 'M'\)\)\z/, /\ASELECT \* FROM t WHERE \(t\.parent_id IN/)
     parents.must_equal [ts[2], ts[3], nil, nil]
     parents[0..1].map{|x| x.children}.must_equal [[ts[0]], [ts[1]]]
+  end
+
+  it "should not eager load when association uses :allow_eager=>false option" do
+    @c.many_to_one :parent, :clone=>:parent, :allow_eager=>false
+    @c.one_to_many :children, :clone=>:children, :allow_eager=>false
+    ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
+    sql_match('SELECT * FROM t WHERE id = 101', 'SELECT * FROM t WHERE id = 102')
+    ts.map{|x| x.children}.must_equal [[], [], [ts[0]], [ts[1]]]
+    sql_match('SELECT * FROM t WHERE (t.parent_id = 1)', 'SELECT * FROM t WHERE (t.parent_id = 2)', 'SELECT * FROM t WHERE (t.parent_id = 101)', 'SELECT * FROM t WHERE (t.parent_id = 102)')
   end
 
   it "should handle case where an association is valid on an instance, but not on all instances" do

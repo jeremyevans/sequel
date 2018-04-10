@@ -94,7 +94,7 @@ module Sequel
         def load_associated_objects(opts, dynamic_opts=OPTS, &block)
           dynamic_opts = load_association_objects_options(dynamic_opts, &block)
           name = opts[:name]
-          if (!associations.include?(name) || dynamic_opts[:eager_reload]) && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
+          if (!associations.include?(name) || dynamic_opts[:eager_reload]) && opts[:allow_eager] != false && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
             begin
               retrieved_by.send(:eager_load, retrieved_with.reject(&:frozen?), name=>dynamic_opts[:eager] || {})
             rescue Sequel::UndefinedAssociation
