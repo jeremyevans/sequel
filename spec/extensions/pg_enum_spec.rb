@@ -42,6 +42,13 @@ describe "pg_enum extension" do
     @db.sqls.first.must_equal "CREATE TYPE sch.foo AS ENUM ('a', 'b', 'c')"
   end
 
+  it "should support #rename_enum method for renameing an enum" do
+    @db.rename_enum(:foo, :bar)
+    @db.sqls.first.must_equal "ALTER TYPE foo RENAME TO bar"
+    @db.rename_enum(Sequel[:sch][:foo], Sequel[:sch][:bar])
+    @db.sqls.first.must_equal "ALTER TYPE sch.foo RENAME TO sch.bar"
+  end
+
   it "should support #drop_enum method for dropping an enum" do
     @db.drop_enum(:foo)
     @db.sqls.first.must_equal "DROP TYPE foo"
@@ -104,6 +111,34 @@ describe "pg_enum extension" do
     db.actions.must_equal [
       [:create_enum, :type_name, ["value1", "value2", "value3"] ],
       [:drop_enum, :type_name]
+    ]
+  end
+
+  it "should reverse a rename_enum directive in a migration" do
+    c = Class.new do
+      attr_reader :actions
+
+      def initialize(&block)
+        @actions = []
+      end
+
+      def method_missing(*args)
+        @actions << args
+      end
+    end
+
+    db = c.new
+
+    p = proc do
+      rename_enum(:old_type_name, :new_type_name)
+    end
+
+    Sequel.migration{change(&p)}.apply(db, :up)
+    Sequel.migration{change(&p)}.apply(db, :down)
+
+    db.actions.must_equal [
+      [:rename_enum, :old_type_name, :new_type_name],
+      [:rename_enum, :new_type_name, :old_type_name]
     ]
   end
 end

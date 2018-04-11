@@ -3802,7 +3802,8 @@ end if uses_pg && DB.server_version >= 90000
 describe 'PostgreSQL enum types' do
   before do
     @db = DB
-    @db.create_enum(:test_enum, %w'a b c d')
+    @initial_enum_values = %w'a b c d'
+    @db.create_enum(:test_enum, @initial_enum_values)
 
     @db.create_table!(:test_enumt) do
       test_enum  :t
@@ -3816,7 +3817,7 @@ describe 'PostgreSQL enum types' do
   it "should return correct entries in the schema" do
     s = @db.schema(:test_enumt)
     s.first.last[:type].must_equal :enum
-    s.first.last[:enum_values].must_equal %w'a b c d'
+    s.first.last[:enum_values].must_equal @initial_enum_values
   end
 
   it "should add array parsers for enum values" do
@@ -3837,6 +3838,13 @@ describe 'PostgreSQL enum types' do
     @db.add_enum_value(:test_enum, 'a', :if_not_exists=>true) if @db.server_version >= 90300
     @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal %w'a f g b c d e'
   end if DB.server_version >= 90100
+
+  it "should rename existing enum" do
+    @db.rename_enum(:test_enum, :new_enum)
+    @db.schema(:test_enumt, :reload=>true).first.last[:db_type].must_equal 'new_enum'
+    @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal @initial_enum_values
+    @db.rename_enum(:new_enum, :test_enum)
+  end
 end
 
 describe "PostgreSQL stored procedures for datasets" do

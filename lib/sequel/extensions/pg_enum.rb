@@ -13,6 +13,10 @@
 #
 #   DB.add_enum_value(:enum_type_name, 'value4')
 #
+# If you want to rename an enum type, you can use rename_enum:
+#
+#   DB.rename_enum(:enum_type_name, :enum_type_another_name)
+#
 # If you want to drop an enum type, you can use drop_enum:
 #
 #   DB.drop_enum(:enum_type_name)
@@ -92,6 +96,15 @@ module Sequel
         nil
       end
 
+      # Run the SQL to rename the enum type with the given name
+      # to the another given name.
+      def rename_enum(enum, new_name)
+        sql = "ALTER TYPE #{quote_schema_table(enum)} RENAME TO #{quote_schema_table(new_name)}"
+        run sql
+        parse_enum_labels
+        nil
+      end
+
       # Run the SQL to drop the enum type with the given name.
       # Options:
       # :if_exists :: Do not raise an error if the enum type does not exist
@@ -153,6 +166,10 @@ module Sequel
       private
       def create_enum(name, _)
         @actions << [:drop_enum, name]
+      end
+
+      def rename_enum(old_name, new_name)
+        @actions << [:rename_enum, new_name, old_name]
       end
     end
   end
