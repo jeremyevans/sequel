@@ -89,56 +89,25 @@ describe "pg_enum extension" do
   end
 
   it "should reverse a create_enum directive in a migration" do
-    c = Class.new do
-      attr_reader :actions
-      def initialize(&block)
-        @actions = []
-      end
-      def method_missing(*args)
-        @actions << args
-      end
-    end
-
-    db = c.new
-
-    p = Proc.new do
-      create_enum(:type_name, %w'value1 value2 value3')
-    end
-
-    Sequel.migration{change(&p)}.apply(db, :up)
-    Sequel.migration{change(&p)}.apply(db, :down)
-
-    db.actions.must_equal [
-      [:create_enum, :type_name, ["value1", "value2", "value3"] ],
-      [:drop_enum, :type_name]
-    ]
+    m = Sequel.migration{change{create_enum(:type_name, %w'value1 value2 value3')}}
+    m.apply(@db, :up)
+    @db.sqls.must_equal ["CREATE TYPE type_name AS ENUM ('value1', 'value2', 'value3')",
+      "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+    m.apply(@db, :down)
+    @db.sqls.must_equal ["DROP TYPE type_name", "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
   end
 
   it "should reverse a rename_enum directive in a migration" do
-    c = Class.new do
-      attr_reader :actions
-
-      def initialize(&block)
-        @actions = []
-      end
-
-      def method_missing(*args)
-        @actions << args
-      end
-    end
-
-    db = c.new
-
-    p = proc do
-      rename_enum(:old_type_name, :new_type_name)
-    end
-
-    Sequel.migration{change(&p)}.apply(db, :up)
-    Sequel.migration{change(&p)}.apply(db, :down)
-
-    db.actions.must_equal [
-      [:rename_enum, :old_type_name, :new_type_name],
-      [:rename_enum, :new_type_name, :old_type_name]
-    ]
+    m = Sequel.migration{change{rename_enum(:old_type_name, :new_type_name)}}
+    m.apply(@db, :up)
+    @db.sqls.must_equal ["ALTER TYPE old_type_name RENAME TO new_type_name",
+      "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
+    m.apply(@db, :down)
+    @db.sqls.must_equal ["ALTER TYPE new_type_name RENAME TO old_type_name",
+      "SELECT CAST(enumtypid AS integer) AS v, enumlabel FROM pg_enum ORDER BY enumtypid, enumsortorder",
+      "SELECT typname, CAST(typarray AS integer) AS v FROM pg_type WHERE ((1 = 0) AND (typarray != 0))"]
   end
 end
