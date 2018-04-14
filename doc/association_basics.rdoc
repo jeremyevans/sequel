@@ -859,13 +859,13 @@ The defaults for any of these options can be set at the class level using
 <tt>Sequel::Model.default_association_options</tt>.  To make
 associations read only by default:
 
-Sequel::Model.default_association_options[:read_only] = true
+  Sequel::Model.default_association_options[:read_only] = true
 
 Many of these options are specific to particular association types, and
 the defaults can be set on a per association type basis.  To make one_to_many
 associations read only by default:
 
-Sequel::Model.default_association_type_options[:one_to_many] = {read_only: true}
+  Sequel::Model.default_association_type_options[:one_to_many] = {read_only: true}
 
 === Association Dataset Modification Options
 
