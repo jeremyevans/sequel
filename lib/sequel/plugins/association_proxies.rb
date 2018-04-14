@@ -63,9 +63,15 @@ module Sequel
       class AssociationProxy < BasicObject
         array = []
 
-        # Default proc used to determine whether to sent the method to the dataset.
+        # Default proc used to determine whether to send the method to the dataset.
         # If the array would respond to it, sends it to the array instead of the dataset.
-        DEFAULT_PROXY_TO_DATASET = proc{|opts| !array.respond_to?(opts[:method])}
+        DEFAULT_PROXY_TO_DATASET = proc do |opts|
+          array_method = array.respond_to?(opts[:method])
+          if !array_method && opts[:method] == :filter
+            warn "The behavior of the :filter method will change in Ruby 2.6. Switch to calling :where to conserve current behavior."
+          end
+          !array_method
+        end
 
         # Set the association reflection to use, and whether the association should be
         # reloaded if an array method is called.
