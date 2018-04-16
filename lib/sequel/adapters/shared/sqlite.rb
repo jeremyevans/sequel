@@ -179,7 +179,12 @@ module Sequel
         fks = fetch("PRAGMA foreign_keys")
         run "PRAGMA foreign_keys = 0" if fks
         transaction do 
-          if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint}
+          if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint || op[:op] == :set_column_null}
+            null_ops, ops = ops.partition{|op| op[:op] == :set_column_null}
+
+            # Apply NULL/NOT NULL ops first, since those should be purely idependent of the constraints.
+            null_ops.each{|op| alter_table_sql_list(table, [op]).flatten.each{|sql| execute_ddl(sql)}}
+
             # If you are just doing constraints, apply all of them at the same time,
             # as otherwise all but the last one get lost.
             alter_table_sql_list(table, [{:op=>:add_constraints, :ops=>ops}]).flatten.each{|sql| execute_ddl(sql)}

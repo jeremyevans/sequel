@@ -580,6 +580,19 @@ describe "A SQLite database" do
     proc{@db[:test2].insert(:name=>'a')}.must_raise(Sequel::ConstraintViolation, Sequel::UniqueConstraintViolation)
   end
 
+  it "should not ignore adding new constraints when adding not null constraints" do
+    @db.alter_table :test2 do
+      set_column_not_null :value
+      add_constraint(:value_range1, :value => 3..5)
+      add_constraint(:value_range2, :value => 0..9)
+    end
+
+    @db[:test2].insert(:value => 4)
+    proc{@db[:test2].insert(:value => 1)}.must_raise(Sequel::ConstraintViolation)
+    proc{@db[:test2].insert(:value => nil)}.must_raise(Sequel::ConstraintViolation)
+    @db[:test2].select_order_map(:value).must_equal [4]
+  end
+
   it "should show unique constraints in Database#indexes" do
     @db.alter_table(:test2){add_unique_constraint :name}
     @db.indexes(:test2).values.first[:columns].must_equal [:name]

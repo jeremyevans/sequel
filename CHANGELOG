@@ -1,5 +1,7 @@
 === master
 
+* Handle multiple add_constraint calls and a set_column_null call in the same alter_table block on SQLite (jeremyevans) (#1498)
+
 * Add Database#rename_enum to the pg_enum extension (AlexWayfer) (#1495)
 
 * Make tactical_eager_loading plugin respect the :allow_eager association option (jeremyevans) (#1494)
