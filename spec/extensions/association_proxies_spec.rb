@@ -23,9 +23,23 @@ describe "Sequel::Plugins::AssociationProxies" do
     @i.associations.has_key?(:tags).must_equal true
   end
   
+  if RUBY_VERSION < '2.6'
+    deprecated "should issue deprecation warning when using filter on association proxy on ruby <2.6" do
+      @i.associations.has_key?(:tags).must_equal false
+      @t.filter{|x| false}.sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND 'f')"
+      @i.associations.has_key?(:tags).must_equal false
+    end
+  else
+    it "should treat filter on association proxy as array method on ruby 2.6+" do
+      @i.associations.has_key?(:tags).must_equal false
+      @t.filter{|x| false}.must_equal []
+      @i.associations.has_key?(:tags).must_equal true
+    end
+  end
+  
   it "should send method calls to the association dataset if sent a non-array method" do
     @i.associations.has_key?(:tags).must_equal false
-    @t.filter(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.where(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
     @i.associations.has_key?(:tags).must_equal false
   end
   
@@ -35,8 +49,8 @@ describe "Sequel::Plugins::AssociationProxies" do
     end
     @i.associations.has_key?(:tags).must_equal false
     @t.where(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
-    @t.filter(Sequel.lit('a = 1')).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
-    @t.filter{{:a=>1}}.sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.where(Sequel.lit('a = 1')).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.where{{:a=>1}}.sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
 
     @i.associations.has_key?(:tags).must_equal false
     Item.plugin :association_proxies do |opts|
@@ -63,16 +77,16 @@ describe "Sequel::Plugins::AssociationProxies" do
     Item.db.sqls.length.must_equal 0
     @i.tags(:reload=>true).select{|x| false}.must_equal []
     Item.db.sqls.length.must_equal 1
-    @t.filter(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.where(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
     Item.db.sqls.length.must_equal 0
   end
   
   it "should not return a proxy object for associations that do not return an array" do
     Item.many_to_one :tag
-    proc{@i.tag.filter(:a=>1)}.must_raise(NoMethodError)
+    proc{@i.tag.where(:a=>1)}.must_raise(NoMethodError)
     
     Tag.one_to_one :item
-    proc{Tag.load(:id=>1, :item_id=>2).item.filter(:a=>1)}.must_raise(NoMethodError)
+    proc{Tag.load(:id=>1, :item_id=>2).item.where(:a=>1)}.must_raise(NoMethodError)
   end
 
   it "should work correctly in subclasses" do
@@ -80,7 +94,7 @@ describe "Sequel::Plugins::AssociationProxies" do
     i.associations.has_key?(:tags).must_equal false
     i.tags.select{|x| false}.must_equal []
     i.associations.has_key?(:tags).must_equal true
-    i.tags.filter(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    i.tags.where(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
   end
   
 end

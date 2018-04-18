@@ -61,16 +61,22 @@ module Sequel
       # associated objects and call the method on the associated object array.
       # Calling any other method will call that method on the association's dataset.
       class AssociationProxy < BasicObject
-        array = []
+        array = [].freeze
 
-        # Default proc used to determine whether to send the method to the dataset.
-        # If the array would respond to it, sends it to the array instead of the dataset.
-        DEFAULT_PROXY_TO_DATASET = proc do |opts|
-          array_method = array.respond_to?(opts[:method])
-          if !array_method && opts[:method] == :filter
-            warn "The behavior of the :filter method will change in Ruby 2.6. Switch to calling :where to conserve current behavior."
+        if RUBY_VERSION < '2.6'
+          # Default proc used to determine whether to send the method to the dataset.
+          # If the array would respond to it, sends it to the array instead of the dataset.
+          DEFAULT_PROXY_TO_DATASET = proc do |opts|
+            array_method = array.respond_to?(opts[:method])
+            if !array_method && opts[:method] == :filter
+              Sequel::Deprecation.deprecate "The behavior of the #filter method for association proxies will change in Ruby 2.6. Switch from using #filter to using #where to conserve current behavior."
+            end
+            !array_method
           end
-          !array_method
+        else
+          # :nocov:
+          DEFAULT_PROXY_TO_DATASET = proc{|opts| !array.respond_to?(opts[:method])}
+          # :nocov:
         end
 
         # Set the association reflection to use, and whether the association should be
