@@ -17,6 +17,7 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.require_path = "lib"
   s.bindir = 'bin'
   s.executables << 'sequel'
+  s.add_development_dependency "rake"
   s.add_development_dependency "minitest", '>=5.7.0'
   s.add_development_dependency "minitest-hooks"
   s.add_development_dependency "minitest-shared_description"
