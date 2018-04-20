@@ -42,6 +42,7 @@ If you have any comments or suggestions please post to the Google group.
   
 == A Short Example
 
+```ruby
   require 'sequel'
   
   DB = Sequel.sqlite # memory database, requires sqlite3
@@ -64,6 +65,7 @@ If you have any comments or suggestions please post to the Google group.
   
   # Print out the average price
   puts "The average price is: #{items.avg(:price)}"
+```
 
 == The Sequel Console
 
