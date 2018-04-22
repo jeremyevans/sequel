@@ -88,7 +88,6 @@ module Sequel
           c.clear_columns_cache
         end
         c.freeze
-        c
       end
     else
       # :nocov:
@@ -194,7 +193,6 @@ module Sequel
         c = _clone(:freeze=>false)
         c.send(:_extension!, a)
         c.freeze
-        c
       end
     else
       # :nocov:
@@ -1087,7 +1085,6 @@ module Sequel
         c.extend(*mods) unless mods.empty?
         c.extend(DatasetModule.new(&block)) if block
         c.freeze
-        c
       end
     else
       # :nocov:
