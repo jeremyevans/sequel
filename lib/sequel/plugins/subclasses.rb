@@ -21,7 +21,7 @@ module Sequel
     # You can also finalize the associations and then freeze the classes
     # in all descendent classes.  Doing so is a recommended practice after
     # all models have been defined in production and testing, and this makes
-    # it easier that keeping track of the classes to finalize and freeze
+    # it easier than keeping track of the classes to finalize and freeze
     # manually:
     #
     #   c.freeze_descendants
