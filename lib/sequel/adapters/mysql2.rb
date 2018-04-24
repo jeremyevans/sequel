@@ -195,7 +195,8 @@ module Sequel
       end
 
       def database_exception_sqlstate(exception, opts)
-        exception.sql_state
+        state = exception.sql_state
+        state unless state == 'HY000'
       end
 
       def dataset_class_default
