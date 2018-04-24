@@ -2047,7 +2047,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
       @ds.insert(@valid_row)
 
       # Test for unique constraint
-      proc{@ds.insert(@valid_row)}.must_raise(Sequel::DatabaseError, Sequel::UniqueConstraintViolation, Sequel::ConstraintViolation)
+      proc{@ds.insert(@valid_row)}.must_raise(Sequel::DatabaseError)
 
       @ds.delete
       @violations.each do |col, vals|
@@ -2057,7 +2057,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
           next if val.nil? && @validation_opts[:allow_nil]
           next if val == '' && @validation_opts[:allow_nil] && @db.database_type == :oracle
           try[col] = val
-          proc{@ds.insert(try)}.must_raise(Sequel::DatabaseError, Sequel::CheckConstraintViolation, Sequel::ConstraintViolation)
+          proc{@ds.insert(try)}.must_raise(Sequel::DatabaseError)
         end
       end
 
