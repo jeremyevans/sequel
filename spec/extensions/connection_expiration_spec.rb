@@ -69,7 +69,9 @@ connection_expiration_specs = shared_description do
       c2 = @db.synchronize{|c| c}
       c2.wont_be_same_as(c1)
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).must_include(c2)
+      @db.pool.instance_variable_get(:@connection_expiration_random_delays).must_include(c2)
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).wont_include(c1)
+      @db.pool.instance_variable_get(:@connection_expiration_random_delays).wont_include(c1)
     end
 
     it "should not leak connection references during disconnect" do
