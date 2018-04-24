@@ -1,5 +1,7 @@
 === master
 
+* Make schema modification methods in the pg_enum extension work on a frozen Database object (jeremyevans)
+
 * Support common table expressions and window functions on MySQL 8+ (jeremyevans)
 
 * Ignore Dataset#explain :extended option on MySQL 5.7+, since extended output is then the MySQL default (jeremyevans)
