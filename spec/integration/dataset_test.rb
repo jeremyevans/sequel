@@ -183,6 +183,24 @@ describe "Simple Dataset operations" do
     end
   end if DB.dataset.supports_skip_locked?
   
+  it "should raise error instead of waiting for rows correctly" do
+    @ds.insert(:number=>10)
+    q1 = Queue.new
+    q2 = Queue.new
+    ds = @ds.order(:id).for_update.nowait
+    begin
+      t = Thread.new{@db.transaction(:isolation=>:committed){q2.push(ds.get(:id)); q1.pop}}
+      q2.pop.must_equal 1
+      # Some databases do row level locking, others do page level locking
+      proc{@db.transaction(:isolation=>:committed){ds.get(:id)}}.must_raise Sequel::DatabaseLockTimeout
+    ensure
+      q1.push(nil)
+      t.join
+      # Keep only one active connection, as some other specs expect that
+      @db.disconnect
+    end
+  end if DB.dataset.supports_nowait?
+  
   it "should raise exception if raising on duplication columns" do
     proc{@ds.select_map([:id, :id])}.must_raise Sequel::DuplicateColumnError
   end if DB.opts[:on_duplicate_columns] == :raise

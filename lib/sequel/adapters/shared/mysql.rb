@@ -408,6 +408,7 @@ module Sequel
         /cannot be null/ => NotNullConstraintViolation,
         /Deadlock found when trying to get lock; try restarting transaction/ => SerializationFailure,
         /CONSTRAINT .+ failed for/ => CheckConstraintViolation,
+        /\AStatement aborted because lock\(s\) could not be acquired immediately and NOWAIT is set\./ => DatabaseLockTimeout,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
@@ -781,6 +782,11 @@ module Sequel
         true
       end
 
+      # MySQL 8+ supports NOWAIT.
+      def supports_nowait?
+        !db.mariadb? && db.server_version >= 80000
+      end
+
       # MySQL's DISTINCT ON emulation using GROUP BY does not respect the
       # query's ORDER BY clause.
       def supports_ordered_distinct_on?
@@ -969,7 +975,8 @@ module Sequel
       # Support FOR SHARE locking when using the :share lock style.
       # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
-        if @opts[:lock] == :share
+        lock = @opts[:lock]
+        if lock == :share
           if !db.mariadb? && db.server_version >= 80000
             sql << ' FOR SHARE'
           else
@@ -979,8 +986,12 @@ module Sequel
           super
         end
 
-        if @opts[:skip_locked]
-          sql << " SKIP LOCKED"
+        if lock
+          if @opts[:skip_locked]
+            sql << " SKIP LOCKED"
+          elsif @opts[:nowait]
+            sql << " NOWAIT"
+          end
         end
       end
 

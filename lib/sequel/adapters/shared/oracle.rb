@@ -225,6 +225,7 @@ module Sequel
         /check constraint .+ violated/ => CheckConstraintViolation,
         /cannot insert NULL into|cannot update .+ to NULL/ => NotNullConstraintViolation,
         /can't serialize access for this transaction/ => SerializationFailure,
+        /resource busy and acquire with NOWAIT specified or timeout/ => DatabaseLockTimeout,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
@@ -487,6 +488,11 @@ module Sequel
         false
       end
     
+      # Oracle supports NOWAIT.
+      def supports_nowait?
+        true
+      end
+
       # Oracle does not support offsets in correlated subqueries.
       def supports_offsets_in_correlated_subqueries?
         false
@@ -622,8 +628,12 @@ module Sequel
       def select_lock_sql(sql)
         super
 
-        if @opts[:skip_locked]
-          sql << " SKIP LOCKED"
+        if @opts[:lock]
+          if @opts[:skip_locked]
+            sql << " SKIP LOCKED"
+          elsif @opts[:nowait]
+            sql << " NOWAIT"
+          end
         end
       end
 

@@ -917,6 +917,8 @@ module Sequel
           ExclusionConstraintViolation
         elsif sqlstate == '40P01'
           SerializationFailure
+        elsif sqlstate == '55P03'
+          DatabaseLockTimeout
         else
           super
         end
@@ -1631,6 +1633,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports NOWAIT.
+      def supports_nowait?
+        true
+      end
+
       # Returning is always supported.
       def supports_returning?(type)
         true
@@ -1850,14 +1857,19 @@ module Sequel
       # Support FOR SHARE locking when using the :share lock style.
       # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
-        if @opts[:lock] == :share
+        lock = @opts[:lock]
+        if lock == :share
           sql << ' FOR SHARE'
         else
           super
         end
 
-        if @opts[:skip_locked]
-          sql << " SKIP LOCKED"
+        if lock
+          if @opts[:skip_locked]
+            sql << " SKIP LOCKED"
+          elsif @opts[:nowait]
+            sql << " NOWAIT"
+          end
         end
       end
 

@@ -342,6 +342,7 @@ module Sequel
         /conflicted with the CHECK constraint/ => CheckConstraintViolation,
         /column does not allow nulls/ => NotNullConstraintViolation,
         /was deadlocked on lock resources with another process and has been chosen as the deadlock victim/ => SerializationFailure,
+        /\ALock request time out period exceeded\./ => DatabaseLockTimeout,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
@@ -712,6 +713,11 @@ module Sequel
         false
       end
       
+      # MSSQL supports NOWAIT.
+      def supports_nowait?
+        true
+      end
+
       # MSSQL 2012+ supports offsets in correlated subqueries.
       def supports_offsets_in_correlated_subqueries?
         is_2012_or_later?
@@ -958,6 +964,7 @@ module Sequel
       def select_lock_sql(sql)
         lock = @opts[:lock]
         skip_locked = @opts[:skip_locked]
+        nowait = @opts[:nowait]
         for_update = lock == :update
         dirty = lock == :dirty
         lock_hint = for_update || dirty
@@ -966,19 +973,12 @@ module Sequel
           sql << " WITH ("
 
           if lock_hint
-            sql << if for_update
-              'UPDLOCK'
-            else
-              'NOLOCK'
-            end
+            sql << (for_update ? 'UPDLOCK' : 'NOLOCK')
           end
 
-          if lock_hint && skip_locked
-            sql << ', '
-          end
-
-          if skip_locked
-            sql << "READPAST"
+          if skip_locked || nowait
+            sql << ', ' if lock_hint
+            sql << (skip_locked ? "READPAST" : "NOWAIT")
           end
 
           sql << ')'

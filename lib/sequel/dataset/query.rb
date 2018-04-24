@@ -678,6 +678,18 @@ module Sequel
       cached_dataset(:_naked_ds){with_row_proc(nil)}
     end
 
+    # Returns a copy of the dataset that will raise a DatabaseLockTimeout instead
+    # of waiting for rows that are locked by another transaction
+    #
+    #   DB[:items].for_update.nowait
+    #   # SELECT * FROM items FOR UPDATE NOWAIT
+    def nowait
+      cached_dataset(:_nowait_ds) do
+        raise(Error, 'This dataset does not support raises errors instead of waiting for locked rows') unless supports_nowait?
+        clone(:nowait=>true)
+      end
+    end
+
     # Returns a copy of the dataset with a specified order. Can be safely combined with limit.
     # If you call limit with an offset, it will override override the offset if you've called
     # offset first.

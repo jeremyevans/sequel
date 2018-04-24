@@ -115,6 +115,11 @@ module Sequel
       true
     end
     
+    # Whether the dataset supports skipping raising an error instead of waiting for locked rows when returning data, false by default.
+    def supports_nowait?
+      false
+    end
+
     # Whether modifying joined datasets is supported, false by default.
     def supports_modifying_joins?
       false

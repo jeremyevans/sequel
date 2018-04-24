@@ -4784,6 +4784,27 @@ describe "Dataset#lock_style and for_update" do
   end
 end
 
+describe "Dataset#nowait" do
+  before do
+    @ds = Sequel.mock.dataset.from(:t).for_update
+  end
+  
+  it "should raise an error if not supported" do
+    proc{@ds.nowait}.must_raise Sequel::Error
+  end
+  
+  it "should use the nowait SYNTAX if supported" do
+    @ds = @ds.with_extend do
+      def supports_nowait?; true end
+      def select_lock_sql(sql) super; sql << " NOWAIT" if @opts[:nowait] end
+    end
+    @ds.sql.must_equal "SELECT * FROM t FOR UPDATE"
+    3.times do
+      @ds.nowait.sql.must_equal "SELECT * FROM t FOR UPDATE NOWAIT"
+    end
+  end
+end
+  
 describe "Dataset#skip_locked" do
   before do
     @ds = Sequel.mock.dataset.from(:t).for_update

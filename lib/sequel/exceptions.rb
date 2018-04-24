@@ -74,6 +74,13 @@ module Sequel
   ).name
 
   (
+  # Error raised when Sequel determines the database could not acquire a necessary lock
+  # before timing out. Use of Dataset#nowait can often cause this exception when
+  # retrieving rows.
+  DatabaseLockTimeout = Class.new(DatabaseError)
+  ).name
+
+  (
   # Error raised on an invalid operation, such as trying to update or delete
   # a joined or grouped dataset when the database does not support that.
   InvalidOperation = Class.new(Error)
