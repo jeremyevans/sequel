@@ -792,6 +792,11 @@ module Sequel
         true
       end
 
+      # MySQL 8+ supports SKIP LOCKED.
+      def supports_skip_locked?
+        !db.mariadb? && db.server_version >= 80000
+      end
+
       # Check the database setting for whether fractional timestamps
       # are suppported.
       def supports_timestamp_usecs?
@@ -962,8 +967,21 @@ module Sequel
       end
   
       # Support FOR SHARE locking when using the :share lock style.
+      # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
-        @opts[:lock] == :share ? (sql << ' LOCK IN SHARE MODE') : super
+        if @opts[:lock] == :share
+          if !db.mariadb? && db.server_version >= 80000
+            sql << ' FOR SHARE'
+          else
+            sql << ' LOCK IN SHARE MODE'
+          end
+        else
+          super
+        end
+
+        if @opts[:skip_locked]
+          sql << " SKIP LOCKED"
+        end
       end
 
       # MySQL specific SQL_CALC_FOUND_ROWS option

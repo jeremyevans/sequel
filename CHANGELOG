@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#skip_locked on MySQL 8+ (jeremyevans)
+
 * Make schema modification methods in the pg_enum extension work on a frozen Database object (jeremyevans)
 
 * Support common table expressions and window functions on MySQL 8+ (jeremyevans)
