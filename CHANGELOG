@@ -1,5 +1,7 @@
 === master
 
+* Work around REGEXP BINARY not working correctly on MySQL 8 by using REGEXP_LIKE with the 'c' match_type (jeremyevans)
+
 * Force correct column order in Database#foreign_key_list on MySQL (jeremyevans)
 
 * Add ConnectionPool#connection_expiration_random_delay to connection_expiration extension, to avoid thundering herd if preallocating connections (hex2a, jeremyevans) (#1503)

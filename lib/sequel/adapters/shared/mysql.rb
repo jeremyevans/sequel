@@ -580,6 +580,12 @@ module Sequel
             super
           end
         when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
+          if !db.mariadb? && db.server_version >= 80000 && [:~, :'!~'].include?(op)
+            func = Sequel.function(:REGEXP_LIKE, args[0], args[1], 'c')
+            func = ~func if op == :'!~'
+            return literal_append(sql, func)
+          end
+
           sql << '('
           literal_append(sql, args[0])
           sql << ' '
