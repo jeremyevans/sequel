@@ -37,13 +37,18 @@ module Sequel
     # connection creation before expiring a connection.
     # Defaults to 14400 seconds (4 hours).
     attr_accessor :connection_expiration_timeout
+    # The maximum number of seconds that will be added as a random delay to the expiration timeout
+    # Defaults to 0 seconds (no random delay)
+    attr_accessor :connection_expiration_random_delay
 
     # Initialize the data structures used by this extension.
     def self.extended(pool)
       pool.instance_exec do
         sync do
           @connection_expiration_timestamps ||= {}
+          @connection_expiration_random_delays ||= {}
           @connection_expiration_timeout ||= 14400
+          @connection_expiration_random_delay ||= 0
         end
       end
     end
@@ -53,6 +58,7 @@ module Sequel
     # Clean up expiration timestamps during disconnect.
     def disconnect_connection(conn)
       sync{@connection_expiration_timestamps.delete(conn)}
+      sync{@connection_expiration_random_delays.delete(conn)}
       super
     end
 
@@ -60,6 +66,7 @@ module Sequel
     def make_new(*)
       conn = super
       @connection_expiration_timestamps[conn] = Sequel.start_timer
+      @connection_expiration_random_delays[conn] = rand(@connection_expiration_random_delay)
       conn
     end
 
@@ -70,7 +77,7 @@ module Sequel
       begin
         if (conn = super) &&
            (timer = sync{@connection_expiration_timestamps[conn]}) &&
-           Sequel.elapsed_seconds_since(timer) > @connection_expiration_timeout
+           Sequel.elapsed_seconds_since(timer) > (@connection_expiration_timeout + @connection_expiration_random_delays[conn])
 
           if pool_type == :sharded_threaded
             sync{allocated(a.last).delete(Thread.current)}
