@@ -1,5 +1,7 @@
 === master
 
+* Support common table expressions and window functions on MySQL 8+ (jeremyevans)
+
 * Ignore Dataset#explain :extended option on MySQL 5.7+, since extended output is then the MySQL default (jeremyevans)
 
 * Work around REGEXP BINARY not working correctly on MySQL 8+ by using REGEXP_LIKE with the 'c' match_type (jeremyevans)

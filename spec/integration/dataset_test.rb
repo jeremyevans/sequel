@@ -749,8 +749,8 @@ if DB.dataset.supports_cte?
   end
 end
 
-if DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
-  describe "Common Table Expressions in INSERT/UPDATE/DELETE" do
+if DB.dataset.supports_cte?(:insert) || DB.dataset.supports_cte?(:update) || DB.dataset.supports_cte?(:delete)
+  describe "Common Table Expressions" do
     before do
       @db = DB
       @db.create_table!(:i1){Integer :id}
@@ -763,14 +763,20 @@ if DB.dataset.supports_cte?(:update) # Assume INSERT and DELETE support as well
       @db.drop_table?(:i1)
     end
     
-    it "should give correct results for WITH" do
+    it "should give correct results for WITH in insert" do
       @ds2.insert(@db[:t])
       @ds.select_order_map(:id).must_equal [1, 1, 2, 2]
+    end if DB.dataset.supports_cte?(:insert)
+
+    it "should give correct results for WITH in update" do
       @ds2.filter(:id=>@db[:t].select{max(id)}).update(:id=>Sequel.+(:id, 1))
-      @ds.select_order_map(:id).must_equal [1, 1, 3, 3]
+      @ds.select_order_map(:id).must_equal [1, 3]
+    end if DB.dataset.supports_cte?(:update)
+
+    it "should give correct results for WITH in delete" do
       @ds2.filter(:id=>@db[:t].select{max(id)}).delete
-      @ds.select_order_map(:id).must_equal [1, 1]
-    end
+      @ds.select_order_map(:id).must_equal [1]
+    end if DB.dataset.supports_cte?(:delete)
 
     it "should support a subselect in an subquery used for INSERT" do
       @db.transaction(:rollback=>:always) do

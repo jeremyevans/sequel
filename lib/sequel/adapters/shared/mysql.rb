@@ -562,10 +562,10 @@ module Sequel
       MATCH_AGAINST = ["MATCH ".freeze, " AGAINST (".freeze, ")".freeze].freeze
       MATCH_AGAINST_BOOLEAN = ["MATCH ".freeze, " AGAINST (".freeze, " IN BOOLEAN MODE)".freeze].freeze
 
-      Dataset.def_sql_method(self, :delete, %w'delete from where order limit')
+      Dataset.def_sql_method(self, :delete, %w'with delete from where order limit')
       Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
       Dataset.def_sql_method(self, :select, %w'with select distinct calc_found_rows columns from join where group having compounds order limit lock')
-      Dataset.def_sql_method(self, :update, %w'update ignore table set where order limit')
+      Dataset.def_sql_method(self, :update, %w'with update ignore table set where order limit')
 
       include Sequel::Dataset::Replace
       include UnmodifiedIdentifiers::DatasetMethods
@@ -738,8 +738,16 @@ module Sequel
         sql << '`' << c.to_s.gsub('`', '``') << '`'
       end
 
+      # MariaDB 10.2+ and MySQL 8+ support CTEs
       def supports_cte?(type=:select)
-        type == :select && db.mariadb? && db.server_version >= 100200
+        if db.mariadb?
+          type == :select && db.server_version >= 100200
+        else
+          case type
+          when :select, :update, :delete
+            db.server_version >= 80000
+          end
+        end
       end
 
       # MySQL does not support derived column lists
@@ -790,8 +798,9 @@ module Sequel
         db.supports_timestamp_usecs?
       end
 
+      # MariaDB 10.2+ and MySQL 8+ support window functions
       def supports_window_functions?
-        db.mariadb? && db.server_version >= 100200
+        db.server_version >= (db.mariadb? ? 100200 : 80000)
       end
 
       # Sets up the update methods to use UPDATE IGNORE.
