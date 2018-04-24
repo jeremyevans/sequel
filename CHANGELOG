@@ -1,5 +1,7 @@
 === master
 
+* Force correct column order in Database#foreign_key_list on MySQL (jeremyevans)
+
 * Add ConnectionPool#connection_expiration_random_delay to connection_expiration extension, to avoid thundering herd if preallocating connections (hex2a, jeremyevans) (#1503)
 
 * Emit deprecation warning in association_proxies plugin if using #filter on an association proxy, since behavior will change on ruby 2.6+ (utilum) (#1497)

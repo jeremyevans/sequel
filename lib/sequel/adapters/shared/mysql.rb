@@ -58,6 +58,7 @@ module Sequel
           where(:TABLE_NAME=>im.call(table), :TABLE_SCHEMA=>Sequel.function(:DATABASE)).
           exclude(:CONSTRAINT_NAME=>'PRIMARY').
           exclude(:REFERENCED_TABLE_NAME=>nil).
+          order(:CONSTRAINT_NAME, :POSITION_IN_UNIQUE_CONSTRAINT).
           select(Sequel[:CONSTRAINT_NAME].as(:name), Sequel[:COLUMN_NAME].as(:column), Sequel[:REFERENCED_TABLE_NAME].as(:table), Sequel[:REFERENCED_COLUMN_NAME].as(:key))
         
         h = {}
