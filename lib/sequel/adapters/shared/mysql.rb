@@ -658,7 +658,7 @@ module Sequel
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
 
-        ds = db.send(:metadata_dataset).with_sql((opts[:extended] ? 'EXPLAIN EXTENDED ' : 'EXPLAIN ') + select_sql).naked
+        ds = db.send(:metadata_dataset).with_sql(((opts[:extended] && (db.mariadb? || db.server_version < 50700)) ? 'EXPLAIN EXTENDED ' : 'EXPLAIN ') + select_sql).naked
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end

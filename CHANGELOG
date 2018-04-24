@@ -1,6 +1,8 @@
 === master
 
-* Work around REGEXP BINARY not working correctly on MySQL 8 by using REGEXP_LIKE with the 'c' match_type (jeremyevans)
+* Ignore Dataset#explain :extended option on MySQL 5.7+, since extended output is then the MySQL default (jeremyevans)
+
+* Work around REGEXP BINARY not working correctly on MySQL 8+ by using REGEXP_LIKE with the 'c' match_type (jeremyevans)
 
 * Force correct column order in Database#foreign_key_list on MySQL (jeremyevans)
 
