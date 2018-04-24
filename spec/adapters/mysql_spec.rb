@@ -185,7 +185,6 @@ describe "A MySQL dataset" do
   it "should have explain output" do
     @d.explain.must_be_kind_of(String)
     @d.explain(:extended=>true).must_be_kind_of(String)
-    @d.explain.wont_equal @d.explain(:extended=>true)
   end
 
   it "should correctly literalize strings with comment backslashes in them" do
