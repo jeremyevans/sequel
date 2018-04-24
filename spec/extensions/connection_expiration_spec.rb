@@ -69,9 +69,7 @@ connection_expiration_specs = shared_description do
       c2 = @db.synchronize{|c| c}
       c2.wont_be_same_as(c1)
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).must_include(c2)
-      @db.pool.instance_variable_get(:@connection_expiration_random_delays).must_include(c2)
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).wont_include(c1)
-      @db.pool.instance_variable_get(:@connection_expiration_random_delays).wont_include(c1)
     end
 
     it "should not leak connection references during disconnect" do
@@ -79,6 +77,17 @@ connection_expiration_specs = shared_description do
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).size.must_equal 2
       @db.disconnect
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).size.must_equal 0
+    end
+
+    it "should not vary expiration timestamps by default" do
+      c1 = @db.synchronize{|c| c}
+      @db.pool.instance_variable_get(:@connection_expiration_timestamps)[c1].last.must_equal 2
+    end
+
+    it "should support #connection_expiration_random_delay to vary expiration timestamps" do
+      @db.pool.connection_expiration_random_delay = 1
+      c1 = @db.synchronize{|c| c}
+      @db.pool.instance_variable_get(:@connection_expiration_timestamps)[c1].last.wont_equal 2
     end
 
     def multiple_connections
@@ -103,7 +112,8 @@ connection_expiration_specs = shared_description do
     # Set the timestamp back in time to simulate sleep / passage of time.
     def simulate_sleep(conn, sleep_time = 3)
       timestamps = @db.pool.instance_variable_get(:@connection_expiration_timestamps)
-      timestamps[conn] -= sleep_time
+      timer, max = timestamps[conn]
+      timestamps[conn] = [timer - sleep_time, max]
       @db.pool.instance_variable_set(:@connection_expiration_timestamps, timestamps)
     end
   end

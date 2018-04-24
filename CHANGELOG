@@ -1,5 +1,7 @@
 === master
 
+* Add ConnectionPool#connection_expiration_random_delay to connection_expiration extension, to avoid thundering herd if preallocating connections (hex2a, jeremyevans) (#1503)
+
 * Emit deprecation warning in association_proxies plugin if using #filter on an association proxy, since behavior will change on ruby 2.6+ (utilum) (#1497)
 
 * Handle multiple add_constraint calls and a set_column_null call in the same alter_table block on SQLite (jeremyevans) (#1498)
