@@ -220,7 +220,7 @@ module Sequel
           end
         end
 
-        connection_configuration_sqls.each{|sql| conn.execute(sql)}
+        connection_configuration_sqls(opts).each{|sql| conn.execute(sql)}
         conn
       end
       
@@ -504,7 +504,7 @@ module Sequel
       end
 
       # Set the DateStyle to ISO if configured, for faster date parsing.
-      def connection_configuration_sqls
+      def connection_configuration_sqls(opts=@opts)
         sqls = super
         sqls << "SET DateStyle = 'ISO'" if @use_iso_date_format
         sqls

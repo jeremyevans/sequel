@@ -211,7 +211,7 @@ module Sequel
             end
           end
         end
-        setup_connection(conn)
+        setup_connection_with_opts(conn, opts)
       end
 
       # Close given adapter connections, and delete any related prepared statements.
@@ -583,6 +583,11 @@ module Sequel
       # Return the connection.  Can be overridden in subadapters for database specific setup.
       def setup_connection(conn)
         conn
+      end
+
+      # Setup the connection using the given connection options. Return the connection.  Can be overridden in subadapters for database specific setup.
+      def setup_connection_with_opts(conn, opts)
+        setup_connection(conn)
       end
 
       def schema_column_set_db_type(schema)

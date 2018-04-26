@@ -187,10 +187,10 @@ module Sequel
         end
 
         # Execute the connection configuration SQL queries on the connection.
-        def setup_connection(conn)
-          conn = super(conn)
+        def setup_connection_with_opts(conn, opts)
+          conn = super
           statement(conn) do |stmt|
-            connection_configuration_sqls.each{|sql| log_connection_yield(sql, conn){stmt.execute(sql)}}
+            connection_configuration_sqls(opts).each{|sql| log_connection_yield(sql, conn){stmt.execute(sql)}}
           end
           conn
         end

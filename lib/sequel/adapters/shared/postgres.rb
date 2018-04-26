@@ -863,12 +863,12 @@ module Sequel
 
       VALID_CLIENT_MIN_MESSAGES = %w'DEBUG5 DEBUG4 DEBUG3 DEBUG2 DEBUG1 LOG NOTICE WARNING ERROR FATAL PANIC'.freeze.each(&:freeze)
       # The SQL queries to execute when starting a new connection.
-      def connection_configuration_sqls
+      def connection_configuration_sqls(opts=@opts)
         sqls = []
 
-        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(@opts.fetch(:force_standard_strings, true))
+        sqls << "SET standard_conforming_strings = ON" if typecast_value_boolean(opts.fetch(:force_standard_strings, true))
 
-        cmm = @opts.fetch(:client_min_messages, :warning)
+        cmm = opts.fetch(:client_min_messages, :warning)
         if cmm && !cmm.to_s.empty?
           cmm = cmm.to_s.upcase.strip
           unless VALID_CLIENT_MIN_MESSAGES.include?(cmm)
@@ -877,7 +877,7 @@ module Sequel
           sqls << "SET client_min_messages = '#{cmm.to_s.upcase}'"
         end
 
-        if search_path = @opts[:search_path]
+        if search_path = opts[:search_path]
           case search_path
           when String
             search_path = search_path.split(",").map(&:strip)
