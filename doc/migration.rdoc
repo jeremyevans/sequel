@@ -469,21 +469,16 @@ or equal to that version will be migrated up.
 
 == Running migrations from a Rake task
 
-You can also incorporate migrations into a Rakefile. Here's an example
-using integer migration versions.
+You can also incorporate migrations into a Rakefile:
 
   namespace :db do
     desc "Run migrations"
     task :migrate, [:version] do |t, args|
-      require "sequel"
+      require "sequel/core"
       Sequel.extension :migration
-      db = Sequel.connect(ENV.fetch("DATABASE_URL"))
-      if args[:version]
-        puts "Migrating to version #{args[:version]}"
-        Sequel::Migrator.run(db, "db/migrations", target: args[:version].to_i)
-      else
-        puts "Migrating to latest"
-        Sequel::Migrator.run(db, "db/migrations")
+      version = args[:version].to_i if args[:version]
+      Sequel.connect(ENV.fetch("DATABASE_URL")) do |db|
+        Sequel::Migrator.run(db, "db/migrations", target: version)
       end
     end
   end
@@ -505,6 +500,12 @@ being executed during a migration, as well as the amount of time that each
 migration takes, you can use the <tt>-E</tt> option to +sequel+ to set up a
 +Database+ logger that logs to +STDOUT+.  You can also log that same output to
 a file using the <tt>-l</tt> option with a log file name.
+
+If you want to include a logger in the rake task above, add a +:logger+ option
+when calling Sequel.connect:
+
+  require "logger"
+  Sequel.connect(ENV.fetch("DATABASE_URL"), logger: Logger.new($stderr))
 
 == Using models in your migrations
 
