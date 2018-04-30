@@ -232,7 +232,7 @@ module Sequel
     end
 
     module DatasetMethods
-      Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
+      Dataset.def_sql_method(self, :insert, %w'insert into columns values')
       Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having compounds order lock')
 
       # Whether to convert smallint to boolean arguments for this dataset.
@@ -247,7 +247,7 @@ module Sequel
       end
 
       def supports_cte?(type=:select)
-        type == :select || type == :insert
+        type == :select
       end
 
       # SQLAnywhere supports GROUPING SETS

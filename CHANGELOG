@@ -1,5 +1,7 @@
 === master
 
+* Don't mark SQLAnywhere as supporting WITH in INSERT statement (jeremyevans)
+
 * Support :search_path as a shard option on PostgreSQL (jeremyevans)
 
 * Add Dataset#nowait for raising a Sequel::DatabaseLockTimeout when a locked row is encountered, supported on PostgreSQL, MySQL 8+, MSSQL, and Oracle (jeremyevans)
