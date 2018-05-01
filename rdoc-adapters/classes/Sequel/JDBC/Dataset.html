@@ -121,7 +121,7 @@ end</td>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-fetch_rows-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 707</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span> <span class="ruby-identifier">process_result_set</span>(<span class="ruby-identifier">result</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 712</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span> <span class="ruby-identifier">process_result_set</span>(<span class="ruby-identifier">result</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_convert_types'>
@@ -141,7 +141,7 @@ the returned dataset.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_convert_types-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_convert_types-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 718</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_convert_types</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:convert_types</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_convert_types-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 723</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_convert_types</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:convert_types</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_fetch_size'>
@@ -161,7 +161,7 @@ from the returned dataset.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_fetch_size-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_fetch_size-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 713</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch_size</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">size</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_fetch_size-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 718</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch_size</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">size</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

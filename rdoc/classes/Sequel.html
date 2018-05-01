@@ -397,6 +397,19 @@ href="Sequel/SQL.html">SQL</a> syntax is used.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
+<td class='context-item-name'>DatabaseLockTimeout</td>
+<td>=</td>
+<td class='context-item-value'>Class.new(DatabaseError)</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p><a href="Sequel/Error.html">Error</a> raised when <a
+href="Sequel.html">Sequel</a> determines the database could not acquire a
+necessary lock before timing out. Use of <a
+href="Sequel/Dataset.html#method-i-nowait">Sequel::Dataset#nowait</a> can
+often cause this exception when retrieving rows.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
 <td class='context-item-name'>ForeignKeyConstraintViolation</td>
 <td>=</td>
 <td class='context-item-value'>Class.new(ConstraintViolation)</td>
@@ -441,7 +454,7 @@ major changes.</p>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MINOR</td>
 <td>=</td>
-<td class='context-item-value'>7</td>
+<td class='context-item-value'>8</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
 <p>The minor version of <a href="Sequel.html">Sequel</a>.  Bumped for every

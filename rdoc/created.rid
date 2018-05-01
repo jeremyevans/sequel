@@ -1,6 +1,6 @@
-Sun, 01 Apr 2018 20:02:21 -0700
+Tue, 01 May 2018 11:47:01 -0700
 README.rdoc	Mon, 29 Jan 2018 12:40:57 -0800
-CHANGELOG	Sun, 01 Apr 2018 19:38:21 -0700
+CHANGELOG	Tue, 01 May 2018 11:42:13 -0700
 doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
 MIT-LICENSE	Fri, 26 Jan 2018 06:42:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -10,11 +10,11 @@ lib/sequel/core.rb	Sun, 01 Apr 2018 19:38:21 -0700
 lib/sequel/database.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/deprecated.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/exceptions.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
-lib/sequel/version.rb	Sun, 01 Apr 2018 19:38:21 -0700
+lib/sequel/version.rb	Tue, 01 May 2018 11:42:13 -0700
 lib/sequel/connection_pool/sharded_single.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Sun, 01 Apr 2018 19:38:21 -0700
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -31,12 +31,12 @@ lib/sequel/database/schema_methods.rb	Mon, 18 Dec 2017 14:45:05 -0800
 lib/sequel/database/transactions.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/actions.rb	Sun, 01 Apr 2018 19:38:21 -0700
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
-lib/sequel/dataset/features.rb	Mon, 20 Nov 2017 16:04:32 -0800
+lib/sequel/dataset/features.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/dataset/graph.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/misc.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/placeholder_literalizer.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/dataset/prepared_statements.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/dataset/query.rb	Fri, 01 Dec 2017 10:11:33 -0800
+lib/sequel/dataset/query.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/dataset/sql.rb	Mon, 20 Nov 2017 16:04:32 -0800
 lib/sequel/model/associations.rb	Mon, 13 Nov 2017 11:41:23 -0800
 lib/sequel/model/base.rb	Sat, 20 Jan 2018 09:58:09 -0800
@@ -47,7 +47,7 @@ lib/sequel/model/exceptions.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/plugins.rb	Tue, 01 Aug 2017 08:12:01 -0700
 doc/advanced_associations.rdoc	Mon, 25 Sep 2017 08:08:07 -0700
-doc/association_basics.rdoc	Mon, 02 Oct 2017 08:20:49 -0700
+doc/association_basics.rdoc	Sat, 14 Apr 2018 00:29:13 -0700
 doc/bin_sequel.rdoc	Thu, 10 Aug 2017 09:06:47 -0700
 doc/cheat_sheet.rdoc	Thu, 21 Dec 2017 07:13:29 -0800
 doc/code_order.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -56,14 +56,14 @@ doc/dataset_basics.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/dataset_filtering.rdoc	Mon, 18 Dec 2017 09:44:38 -0800
 doc/extensions.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/mass_assignment.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/migration.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
+doc/migration.rdoc	Sun, 29 Apr 2018 16:09:34 -0700
 doc/model_dataset_method_design.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/model_hooks.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/model_plugins.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/opening_databases.rdoc	Sat, 24 Mar 2018 21:47:31 -0700
-doc/postgresql.rdoc	Wed, 07 Mar 2018 14:28:04 -0800
+doc/postgresql.rdoc	Mon, 09 Apr 2018 12:34:09 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Thu, 22 Mar 2018 21:49:57 -0700
 doc/reflection.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -201,4 +201,5 @@ doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
+doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 lib/sequel/extensions/migration.rb	Sun, 01 Apr 2018 19:38:21 -0700

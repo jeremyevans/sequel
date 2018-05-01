@@ -30,7 +30,7 @@ doc/association_basics.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-10-02 08:20:49 -0700</span>
+<span class='datetime'>2018-04-14 00:29:13 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -654,14 +654,13 @@ understanding, they are grouped here by section.</p>
 <code>Sequel::Model.default_association_options</code>.  To make
 associations read only by default:</p>
 
-<p><a href=":read_only">Sequel::Model.default_association_options</a> = true</p>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_options</span>[<span class="ruby-value">:read_only</span>] = <span class="ruby-keyword">true</span></pre>
 
 <p>Many of these options are specific to particular association types, and the
 defaults can be set on a per association type basis.  To make one_to_many
 associations read only by default:</p>
 
-<p><a href=":one_to_many">Sequel::Model.default_association_type_options</a> =
-{read_only: true}</p>
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_association_type_options</span>[<span class="ruby-value">:one_to_many</span>] = {<span class="ruby-value">read_only:</span> <span class="ruby-keyword">true</span>}</pre>
 
 <h3 id="label-Association+Dataset+Modification+Options">Association Dataset Modification Options<span><a href="#label-Association+Dataset+Modification+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
 

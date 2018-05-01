@@ -77,6 +77,7 @@ Sequel::MSSQL::DatabaseMethods
 /conflicted with the CHECK constraint/ => CheckConstraintViolation,
 /column does not allow nulls/ => NotNullConstraintViolation,
 /was deadlocked on lock resources with another process and has been chosen as the deadlock victim/ => SerializationFailure,
+/Lock request time out period exceeded\./ => DatabaseLockTimeout,
 }.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>

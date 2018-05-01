@@ -30,7 +30,7 @@ doc/migration.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2018-04-29 16:09:34 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -522,10 +522,9 @@ version will be migrated up.</p>
 
 <h2 id="label-Running+migrations+from+a+Rake+task">Running migrations from a Rake task<span><a href="#label-Running+migrations+from+a+Rake+task">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>You can also incorporate migrations into a Rakefile. Here&#39;s an example
-using integer migration versions.</p>
+<p>You can also incorporate migrations into a Rakefile:</p>
 
-<pre class="ruby"><span class="ruby-identifier">namespace</span> <span class="ruby-value">:db</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">desc</span> <span class="ruby-string">&quot;Run migrations&quot;</span>&#x000A;  <span class="ruby-identifier">task</span> <span class="ruby-value">:migrate</span>, [<span class="ruby-value">:version</span>] <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">t</span>, <span class="ruby-identifier">args</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">require</span> <span class="ruby-string">&quot;sequel&quot;</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:migration</span>&#x000A;    <span class="ruby-identifier">db</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;DATABASE_URL&quot;</span>))&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">:version</span>]&#x000A;      <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Migrating to version #{args[:version]}&quot;</span>&#x000A;      <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-string">&quot;db/migrations&quot;</span>, <span class="ruby-value">target:</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">:version</span>].<span class="ruby-identifier">to_i</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">puts</span> <span class="ruby-string">&quot;Migrating to latest&quot;</span>&#x000A;      <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-string">&quot;db/migrations&quot;</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">namespace</span> <span class="ruby-value">:db</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">desc</span> <span class="ruby-string">&quot;Run migrations&quot;</span>&#x000A;  <span class="ruby-identifier">task</span> <span class="ruby-value">:migrate</span>, [<span class="ruby-value">:version</span>] <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">t</span>, <span class="ruby-identifier">args</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">require</span> <span class="ruby-string">&quot;sequel/core&quot;</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:migration</span>&#x000A;    <span class="ruby-identifier">version</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">:version</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">:version</span>]&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;DATABASE_URL&quot;</span>)) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-string">&quot;db/migrations&quot;</span>, <span class="ruby-value">target:</span> <span class="ruby-identifier">version</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
 <p>To migrate to the latest version, run:</p>
 
@@ -545,6 +544,12 @@ time that each migration takes, you can use the <code>-E</code> option to
 <code>sequel</code> to set up a <code>Database</code> logger that logs to
 <code>STDOUT</code>.  You can also log that same output to a file using the
 <code>-l</code> option with a log file name.</p>
+
+<p>If you want to include a logger in the rake task above, add a
+<code>:logger</code> option when calling <a
+href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>:</p>
+
+<pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&quot;logger&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;DATABASE_URL&quot;</span>), <span class="ruby-value">logger:</span> <span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stderr</span>))</pre>
 
 <h2 id="label-Using+models+in+your+migrations">Using models in your migrations<span><a href="#label-Using+models+in+your+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 

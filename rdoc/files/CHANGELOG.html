@@ -30,12 +30,91 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-04-01 19:38:21 -0700</span>
+<span class='datetime'>2018-05-01 11:42:13 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.8.0+-282018-05-01-29">5.8.0 (2018-05-01)<span><a href="#label-5.8.0+-282018-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Don&#39;t mark SQLAnywhere as supporting WITH in INSERT statement
+(jeremyevans)</p>
+</li><li>
+<p>Support :search_path as a shard option on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#nowait for raising a Sequel::DatabaseLockTimeout when a locked
+row is encountered, supported on PostgreSQL, MySQL 8+, MSSQL, and Oracle
+(jeremyevans)</p>
+</li><li>
+<p>Support Dataset#skip_locked on MySQL 8+ (jeremyevans)</p>
+</li><li>
+<p>Make schema modification methods in the pg_enum extension work on a frozen
+Database object (jeremyevans)</p>
+</li><li>
+<p>Support common table expressions and window functions on MySQL 8+
+(jeremyevans)</p>
+</li><li>
+<p>Ignore Dataset#explain :extended option on MySQL 5.7+, since extended
+output is then the MySQL default (jeremyevans)</p>
+</li><li>
+<p>Work around REGEXP BINARY not working correctly on MySQL 8+ by using
+REGEXP_LIKE with the &#39;c&#39; match_type (jeremyevans)</p>
+</li><li>
+<p>Force correct column order in Database#foreign_key_list on MySQL
+(jeremyevans)</p>
+</li><li>
+<p>Add ConnectionPool#connection_expiration_random_delay to
+connection_expiration extension, to avoid thundering herd if preallocating
+connections (hex2a, jeremyevans) (#1503)</p>
+</li><li>
+<p>Emit deprecation warning in association_proxies plugin if using filter on
+an association proxy, since behavior will change on ruby 2.6+ (utilum)
+(#1497)</p>
+</li><li>
+<p>Handle multiple add_constraint calls and a set_column_null call in the same
+alter_table block on SQLite (jeremyevans) (#1498)</p>
+</li><li>
+<p>Add Database#rename_enum to the pg_enum extension (AlexWayfer) (#1495)</p>
+</li><li>
+<p>Make tactical_eager_loading plugin respect the :allow_eager association
+option (jeremyevans) (#1494)</p>
+</li><li>
+<p>Add pg_auto_constraint_validations plugin, for automatically converting
+constraint violations to validation failures on PostgreSQL (jeremyevans)</p>
+</li><li>
+<p>Don&#39;t make Model#_valid? public in the error_splitter plugin
+(jeremyevans)</p>
+</li><li>
+<p>Support Database#indexes :include_partial option on PostgreSQL for
+including partial indexes (jeremyevans)</p>
+</li><li>
+<p>Include more diagnostic information in Database#error_info on PostgreSQL
+(jeremyevans)</p>
+</li><li>
+<p>Support Database#foreign_key_list :reverse option on PostgreSQL for parsing
+foreign key constraints that reference a given table (jeremyevans)</p>
+</li><li>
+<p>Add Database#check_constraints on PostgreSQL for parsing CHECK constraints
+(jeremyevans)</p>
+</li><li>
+<p>Don&#39;t use identity columns if :serial=&gt;true or
+:type=&gt;:serial|:bigserial column options are used (#1490) (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#select_all datasets if no arguments are given (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#returning datasets if no arguments are given (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#qualify datasets if no argument is given (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#lateral datasets (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#from_self datasets if no options are given (jeremyevans)</p>
+</li><li>
+<p>Cache Dataset#distinct datasets if no arguments or block is given
+(jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.7.0+-282018-04-01-29">5.7.0 (2018-04-01)<span><a href="#label-5.7.0+-282018-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Add <a

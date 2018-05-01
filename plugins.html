@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v5.7.0</h2>
+    <h2>Sequel::Model Plugins for v5.8.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -132,6 +132,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence/not_null, max length, type, and unique validations based on the model's schema.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations</a>: Setup automatic validations for constraints added via the <a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter</a>: Splits multi-column errors entries into separate errors, one per column.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/PgAutoConstraintValidations.html">pg_auto_constraint_validations</a>: Automatically convert constraint violations during INSERT/UPDATE on PostgreSQL to validation failures.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationContexts.html">validation_contexts</a>: Allow specifying a context to use during validations.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>

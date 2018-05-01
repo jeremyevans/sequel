@@ -30,7 +30,7 @@ lib/sequel/extensions/pg_enum.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-02-25 09:05:54 -0800</span>
+<span class='datetime'>2018-04-24 15:32:28 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -50,6 +50,10 @@ your Database instance:</p>
 <p>You can also add values to existing enums via add_enum_value:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_enum_value</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-string">&#39;value4&#39;</span>)</pre>
+
+<p>If you want to rename an enum type, you can use rename_enum:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-value">:enum_type_another_name</span>)</pre>
 
 <p>If you want to drop an enum type, you can use drop_enum:</p>
 

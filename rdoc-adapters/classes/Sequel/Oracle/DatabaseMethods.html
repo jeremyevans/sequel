@@ -72,6 +72,7 @@ Sequel::Oracle::DatabaseMethods
 /check constraint .+ violated/ => CheckConstraintViolation,
 /cannot insert NULL into|cannot update .+ to NULL/ => NotNullConstraintViolation,
 /can't serialize access for this transaction/ => SerializationFailure,
+/resource busy and acquire with NOWAIT specified or timeout/ => DatabaseLockTimeout,
 }.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
