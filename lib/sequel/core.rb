@@ -384,7 +384,7 @@ module Sequel
   # Helper method that the database adapter class methods that are added to Sequel via
   # metaprogramming use to parse arguments.
   def self.adapter_method(adapter, *args, &block)
-    options = args.last.is_a?(Hash) ? args.pop : {}
+    options = args.last.is_a?(Hash) ? args.pop : OPTS
     opts = {:adapter => adapter.to_sym}
     opts[:database] = args.shift if args.first.is_a?(String)
     if args.any?

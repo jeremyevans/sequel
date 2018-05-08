@@ -121,7 +121,7 @@ module Sequel
           foreign_key(key, v)
         end
         primary_key(keys) unless options[:no_primary_key]
-        index(keys.reverse, options[:index_options] || {}) unless options[:no_index]
+        index(keys.reverse, options[:index_options] || OPTS) unless options[:no_index]
       end
       nil
     end
@@ -314,7 +314,7 @@ module Sequel
     #   DB.drop_table(:posts, :comments)
     #   DB.drop_table(:posts, :comments, cascade: true)
     def drop_table(*names)
-      options = names.last.is_a?(Hash) ? names.pop : {}
+      options = names.last.is_a?(Hash) ? names.pop : OPTS 
       names.each do |n|
         execute_ddl(drop_table_sql(n, options))
         remove_cached_schema(n)
@@ -329,7 +329,7 @@ module Sequel
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # DROP TABLE a -- if it already exists
     def drop_table?(*names)
-      options = names.last.is_a?(Hash) ? names.pop : {}
+      options = names.last.is_a?(Hash) ? names.pop : OPTS
       if supports_drop_table_if_exists?
         options = options.merge(:if_exists=>true)
         names.each do |name|
@@ -357,7 +357,7 @@ module Sequel
     # PostgreSQL specific options:
     # :materialized :: Drop a materialized view.
     def drop_view(*names)
-      options = names.last.is_a?(Hash) ? names.pop : {}
+      options = names.last.is_a?(Hash) ? names.pop : OPTS
       names.each do |n|
         execute_ddl(drop_view_sql(n, options))
         remove_cached_schema(n)

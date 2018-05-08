@@ -21,7 +21,7 @@ module Sequel
     module Sharding
       module ClassMethods
         # Create a new object on the given shard s.
-        def create_using_server(s, values={}, &block)
+        def create_using_server(s, values=OPTS, &block)
           new_using_server(s, values, &block).save
         end
 
@@ -45,7 +45,7 @@ module Sequel
         # Return a newly instantiated object that is tied to the given
         # shard s.  When the object is saved, a record will be inserted
         # on shard s.
-        def new_using_server(s, values={}, &block)
+        def new_using_server(s, values=OPTS, &block)
           new(values, &block).set_server(s)
         end
 

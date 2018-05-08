@@ -28,7 +28,7 @@ module Sequel
 
       case values.size
       when 0
-        return insert_sql({})
+        return insert_sql(OPTS)
       when 1
         case vals = values[0]
         when Hash

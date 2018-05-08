@@ -261,7 +261,7 @@ module Sequel
         raise Error, "convert_serial_to_identity is only supported on PostgreSQL 10.2+" unless server_version >= 100002
 
         server = opts[:server]
-        server_hash = server ? {:server=>server} : {}
+        server_hash = server ? {:server=>server} : OPTS
         ds = dataset
         ds = ds.server(server) if server
 
@@ -1718,7 +1718,7 @@ module Sequel
 
       # Format TRUNCATE statement with PostgreSQL specific options.
       def _truncate_sql(table)
-        to = @opts[:truncate_opts] || {}
+        to = @opts[:truncate_opts] || OPTS
         "TRUNCATE TABLE#{' ONLY' if to[:only]} #{table}#{' RESTART IDENTITY' if to[:restart]}#{' CASCADE' if to[:cascade]}"
       end
 

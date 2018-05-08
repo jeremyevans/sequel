@@ -1,5 +1,7 @@
 === master
 
+* Avoid unnecessary hash creation in many places (jeremyevans)
+
 * Fix duplicate objects in nested associations when eager_graphing cascaded many_to_one=>one_to_many associations (jeremyevans)
 
 === 5.8.0 (2018-05-01)

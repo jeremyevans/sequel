@@ -64,7 +64,7 @@ module Sequel
       def self.configure(model, opts=OPTS)
         model.instance_exec do
           setup_pg_auto_constraint_validations
-          @pg_auto_constraint_validations_messages = (@pg_auto_constraint_validations_messages || DEFAULT_ERROR_MESSAGES).merge(opts[:messages] || {}).freeze
+          @pg_auto_constraint_validations_messages = (@pg_auto_constraint_validations_messages || DEFAULT_ERROR_MESSAGES).merge(opts[:messages] || OPTS).freeze
         end
       end
 

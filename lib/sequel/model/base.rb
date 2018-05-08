@@ -250,7 +250,7 @@ module Sequel
       #   Artist.create do |a|
       #     a.name = 'Jim'
       #   end # INSERT INTO artists (name) VALUES ('Jim')
-      def create(values = {}, &block)
+      def create(values = OPTS, &block)
         new(values, &block).save
       end
   
@@ -1055,7 +1055,7 @@ module Sequel
       #   Artist.new do |a|
       #     a.name = 'Bob'
       #   end
-      def initialize(values = {})
+      def initialize(values = OPTS)
         @values = {}
         @new = true
         @modified = true

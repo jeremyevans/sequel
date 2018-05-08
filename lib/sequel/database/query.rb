@@ -32,7 +32,7 @@ module Sequel
     #
     #   DB[:items].where(id: 1).prepare(:first, :sa)
     #   DB.call(:sa) # SELECT * FROM items WHERE id = 1
-    def call(ps_name, hash={}, &block)
+    def call(ps_name, hash=OPTS, &block)
       prepared_statement(ps_name).call(hash, &block)
     end
     

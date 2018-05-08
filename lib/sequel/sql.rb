@@ -1703,7 +1703,7 @@ module Sequel
       #   StringExpression.like(:a, 'a%', /^a/i) # (("a" LIKE 'a%' ESCAPE '\') OR ("a" ~* '^a'))
       def self.like(l, *ces)
         l, lre, lci = like_element(l)
-        lci = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive] ? true : lci
+        lci = (ces.last.is_a?(Hash) ? ces.pop : OPTS)[:case_insensitive] ? true : lci
         ces.map! do |ce|
           r, rre, rci = like_element(ce)
           BooleanExpression.new(LIKE_MAP[[lre||rre, lci||rci]], l, r)

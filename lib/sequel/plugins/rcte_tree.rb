@@ -121,11 +121,11 @@ module Sequel
           extract_key_alias = lambda{|m| bd_conv[m.values.delete(ka)]}
         end
         
-        parent = opts.merge(opts.fetch(:parent, {})).fetch(:name, :parent)
-        childrena = opts.merge(opts.fetch(:children, {})).fetch(:name, :children)
+        parent = opts.merge(opts.fetch(:parent, OPTS)).fetch(:name, :parent)
+        childrena = opts.merge(opts.fetch(:children, OPTS)).fetch(:name, :children)
         
         opts[:reciprocal] = nil
-        a = opts.merge(opts.fetch(:ancestors, {}))
+        a = opts.merge(opts.fetch(:ancestors, OPTS))
         ancestors = a.fetch(:name, :ancestors)
         a[:read_only] = true unless a.has_key?(:read_only)
         a[:eager_loader_key] = key
@@ -220,7 +220,7 @@ module Sequel
         end
         model.one_to_many ancestors, a
         
-        d = opts.merge(opts.fetch(:descendants, {}))
+        d = opts.merge(opts.fetch(:descendants, OPTS))
         descendants = d.fetch(:name, :descendants)
         d[:read_only] = true unless d.has_key?(:read_only)
         la = d[:level_alias] ||= :x_level_x
@@ -296,7 +296,7 @@ module Sequel
               :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases))
           ds = r.apply_eager_dataset_changes(ds)
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
-          model.eager_load_results(r, eo.merge(:loader=>false, :initalize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>{})) do |obj|
+          model.eager_load_results(r, eo.merge(:loader=>false, :initalize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>OPTS)) do |obj|
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end

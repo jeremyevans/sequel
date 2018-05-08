@@ -3081,7 +3081,7 @@ module Sequel
             associations = eager_assoc[r[:name]]
             if associations.respond_to?(:call)
               eager_block = associations
-              associations = {}
+              associations = OPTS
             elsif associations.is_a?(Hash) && associations.length == 1 && (pr_assoc = associations.to_a.first) && pr_assoc.first.respond_to?(:call)
               eager_block, associations = pr_assoc
             end

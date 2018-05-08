@@ -38,10 +38,10 @@ module Sequel
           @tree_order = opts[:order]
         end
         
-        par = opts.merge(opts.fetch(:parent, {}))
+        par = opts.merge(opts.fetch(:parent, OPTS))
         parent = par.fetch(:name, :parent)
         
-        chi = opts.merge(opts.fetch(:children, {}))
+        chi = opts.merge(opts.fetch(:children, OPTS))
         children = chi.fetch(:name, :children)
 
         par[:reciprocal] = children

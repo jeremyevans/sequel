@@ -67,7 +67,7 @@ module Sequel
             method = type.to_s
           end
 
-          define_method(method){|name, opts={}| column(name, type, opts)}
+          define_method(method){|name, opts=OPTS| column(name, type, opts)}
         end
         nil
       end
@@ -133,7 +133,7 @@ module Sequel
       def column(name, type, opts = OPTS)
         columns << {:name => name, :type => type}.merge!(opts)
         if index_opts = opts[:index]
-          index(name, index_opts.is_a?(Hash) ? index_opts : {})
+          index(name, index_opts.is_a?(Hash) ? index_opts : OPTS)
         end
         nil
       end
@@ -311,7 +311,7 @@ module Sequel
 
       # Add a composite primary key constraint
       def composite_primary_key(columns, *args)
-        opts = args.pop || {}
+        opts = args.pop || OPTS
         constraints << {:type => :primary_key, :columns => columns}.merge!(opts)
         nil
       end

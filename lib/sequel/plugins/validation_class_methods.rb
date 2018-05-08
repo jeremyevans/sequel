@@ -419,7 +419,7 @@ module Sequel
         # an empty hash is returned This method is useful when writing methods that
         # take an options hash as the last parameter.
         def extract_options!(array)
-          array.last.is_a?(Hash) ? array.pop : {}
+          array.last.is_a?(Hash) ? array.pop : OPTS
         end
 
         # Add the validation reflection to the class's validations.

@@ -95,7 +95,7 @@ module Sequel
               end
             end
           end
-          @default_values = h.merge!(@default_values || {})
+          @default_values = h.merge!(@default_values || OPTS)
         end
 
         # Handle the CURRENT_DATE and CURRENT_TIMESTAMP values specially by returning an appropriate Date or

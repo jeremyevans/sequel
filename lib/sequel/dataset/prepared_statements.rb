@@ -52,7 +52,7 @@ module Sequel
       end
 
       # Set the bind arguments based on the hash and call super.
-      def call(bind_vars={}, &block)
+      def call(bind_vars=OPTS, &block)
         sql = prepared_sql
         prepared_args.freeze
         ps = bind(bind_vars)
@@ -106,7 +106,7 @@ module Sequel
 
       # Sets the prepared_args to the given hash and runs the
       # prepared statement.
-      def call(bind_vars={}, &block)
+      def call(bind_vars=OPTS, &block)
         bind(bind_vars).run(&block)
       end
 
@@ -272,7 +272,7 @@ module Sequel
     #   DB[:table].where(id: :$id).bind(id: 1).call(:first)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
-    def bind(bind_vars={})
+    def bind(bind_vars=OPTS)
       bind_vars = if bv = @opts[:bind_vars]
         Hash[bv].merge!(bind_vars).freeze
       else
@@ -293,7 +293,7 @@ module Sequel
     #   DB[:table].where(id: :$id).call(:first, id: 1)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
-    def call(type, bind_variables={}, *values, &block)
+    def call(type, bind_variables=OPTS, *values, &block)
       to_prepared_statement(type, values, :extend=>bound_variable_modules).call(bind_variables, &block)
     end
     

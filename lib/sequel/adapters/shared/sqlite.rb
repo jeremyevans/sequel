@@ -328,7 +328,7 @@ module Sequel
 
       # The array of column schema hashes for the current columns in the table
       def defined_columns_for(table)
-        cols = parse_pragma(table, {})
+        cols = parse_pragma(table, OPTS)
         cols.each do |c|
           c[:default] = LiteralString.new(c[:default]) if c[:default]
           c[:type] = c[:db_type]
