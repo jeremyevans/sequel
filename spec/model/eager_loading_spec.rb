@@ -2168,6 +2168,21 @@ describe Sequel::Model, "#eager_graph" do
     a.al_genre.must_equal GraphGenre.load(:id=>12)
   end
 
+  it "should not include duplicate objects when eager graphing many_to_one=>one_to_many" do
+    ds = GraphAlbum.eager_graph(:band=>:albums)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id, albums_0.id AS albums_0_id, albums_0.band_id AS albums_0_band_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.band_id = band.id)"
+    a = ds.with_fetch([
+      {:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>1, :albums_0_id=>1, :albums_0_band_id=>2},
+      {:id=>2, :band_id=>2, :band_id_0=>2, :vocalist_id=>1, :albums_0_id=>1, :albums_0_band_id=>2},
+      {:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>1, :albums_0_id=>2, :albums_0_band_id=>2},
+      {:id=>2, :band_id=>2, :band_id_0=>2, :vocalist_id=>1, :albums_0_id=>2, :albums_0_band_id=>2}
+    ]).all
+    albums = [GraphAlbum.load(:id => 1, :band_id => 2), GraphAlbum.load(:id => 2, :band_id => 2)]
+    a.must_equal albums
+    a.map(&:band).must_equal [GraphBand.load(:id=>2, :vocalist_id=>1), GraphBand.load(:id=>2, :vocalist_id=>1)]
+    a.map(&:band).map(&:albums).must_equal [albums, albums]
+  end
+
   it "should eagerly load a many_to_one association with a custom callback" do
     ds = GraphAlbum.eager_graph(:band => proc {|ds1| ds1.select(:id).columns(:id)})
     ds.sql.must_equal 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'

@@ -3353,6 +3353,15 @@ module Sequel
               key = hkey(ta_h)
             end
             rm, rp, assoc_name, tm, rcm = @ta_map[ta]
+
+            # Check type map for all dependencies, and use a unique
+            # object if any are dependencies for multiple objects,
+            # to prevent duplicate objects from showing up in the case
+            # the normal duplicate removal code is not being used.
+            if !@unique && !deps.empty? && deps.any?{|key,_| @ta_map[key][3]}
+              key = [current.object_id, key]
+            end
+
             unless rec = rm[key]
               rec = rm[key] = rp.call(hfor(ta, h))
             end

@@ -2059,6 +2059,18 @@ describe "Sequel::Model Simple Associations" do
     artist.albums.first.tags.must_equal [tag2]
   end
   
+  it "should not produce duplicates when eager graphing many_to_one=>one_to_many association" do
+    @pr.call
+    @album.update(:artist => @artist)
+    album2 = Album.last
+    album2.update(:artist => @artist)
+
+    a = Album.eager_graph(:artist=>:albums).order{[albums[:id], albums_0[:id]]}.all
+    a.must_equal [@album, album2]
+    a.map(&:artist).must_equal [@artist, @artist]
+    a.map(&:artist).map(&:albums).must_equal [[@album, album2], [@album, album2]]
+  end
+
   it "should have remove method raise an error for one_to_many records if the object isn't already associated" do
     proc{@artist.remove_album(@album.id)}.must_raise(Sequel::Error)
     proc{@artist.remove_album(@album)}.must_raise(Sequel::Error)
