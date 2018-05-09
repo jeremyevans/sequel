@@ -482,6 +482,10 @@ module Sequel
             nsp[:nspname].as(:schema)
           ]}
 
+        if reverse
+          ds = ds.order_append(Sequel[:nsp][:nspname], Sequel[:cl2][:relname])
+        end
+
         h = {}
         fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
 
