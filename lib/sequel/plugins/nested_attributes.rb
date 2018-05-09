@@ -114,10 +114,10 @@ module Sequel
         # If a block is provided, it is used to set the :reject_if option.
         def nested_attributes(*associations, &block)
           include(@nested_attributes_module ||= Module.new) unless @nested_attributes_module
-          opts = associations.last.is_a?(Hash) ? associations.pop : {}
+          opts = associations.last.is_a?(Hash) ? associations.pop : OPTS
           reflections = associations.map{|a| association_reflection(a) || raise(Error, "no association named #{a} for #{self}")}
           reflections.each do |r|
-            r[:nested_attributes] = opts
+            r[:nested_attributes] = opts.dup
             r[:nested_attributes][:unmatched_pk] ||= :raise
             r[:nested_attributes][:reject_if] ||= block
             def_nested_attribute_method(r)

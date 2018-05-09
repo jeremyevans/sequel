@@ -49,6 +49,12 @@ describe "NestedAttributes plugin" do
     @db.sqls
   end
   
+  it "should not modify options hash when loading plugin" do
+    h = {}
+    @Concert.nested_attributes :albums, h
+    h.must_equal({})
+  end
+  
   it "should support creating new many_to_one objects" do
     a = @Album.new({:name=>'Al', :artist_attributes=>{:name=>'Ar'}})
     @db.sqls.must_equal []

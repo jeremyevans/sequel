@@ -1,5 +1,7 @@
 === master
 
+* Don't modify hash argument passed in Model.nested_attributes in the nested_attributes plugin (jeremyevans)
+
 * Avoid unnecessary hash creation in many places (jeremyevans)
 
 * Fix duplicate objects in nested associations when eager_graphing cascaded many_to_one=>one_to_many associations (jeremyevans)
