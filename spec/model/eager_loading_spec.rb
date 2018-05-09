@@ -2244,6 +2244,16 @@ describe Sequel::Model, "#eager_graph" do
     a.album.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>6)
     a.album.tracks.must_equal [GraphTrack.load(:id => 3, :album_id => 1)]
   end
+
+  it "should have frozen internal data structures" do
+    ds = GraphAlbum.eager_graph(:band)
+    ds.opts[:eager_graph].must_be :frozen?
+    ds.opts[:eager_graph].each_value{|v| v.must_be :frozen? if v.is_a?(Hash)}
+
+    ds = ds.eager_graph(:tracks)
+    ds.opts[:eager_graph].must_be :frozen?
+    ds.opts[:eager_graph].each_value{|v| v.must_be :frozen? if v.is_a?(Hash)}
+  end
 end
 
 describe "Sequel::Models with double underscores in table names" do

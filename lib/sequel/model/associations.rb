@@ -2751,7 +2751,7 @@ module Sequel
           opts = @opts[:eager]
           association_opts = eager_options_for_associations(associations)
           opts = opts ? Hash[opts].merge!(association_opts) : association_opts
-          clone(:eager=>opts)
+          clone(:eager=>opts.freeze)
         end
 
         # The secondary eager loading method.  Loads all associations in a single query. This
@@ -2800,8 +2800,9 @@ module Sequel
         #                    significantly slower in some cases (perhaps even the majority of cases), so you should
         #                    only use this if you have benchmarked that it is faster for your use cases.
         def eager_graph_with_options(associations, opts=OPTS)
+          opts = opts.dup unless opts.frozen?
           associations = [associations] unless associations.is_a?(Array)
-          if eg = @opts[:eager_graph]
+          ds = if eg = @opts[:eager_graph]
             eg = eg.dup
             [:requirements, :reflections, :reciprocals, :limits].each{|k| eg[k] = eg[k].dup}
             eg[:local] = opts
@@ -2815,8 +2816,12 @@ module Sequel
             # :limits :: Any limit/offset array slicing that need to be handled in ruby land after loading
             opts = {:requirements=>{}, :master=>alias_symbol(first_source), :reflections=>{}, :reciprocals=>{}, :limits=>{}, :local=>opts, :cartesian_product_number=>0, :row_proc=>row_proc}
             ds = clone(:eager_graph=>opts)
-            ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).naked
+            ds = ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations).naked
           end
+
+          ds.opts[:eager_graph].freeze
+          ds.opts[:eager_graph].each_value{|v| v.freeze if v.is_a?(Hash)}
+          ds
         end
 
         # If the dataset is being eagerly loaded, default to calling all
