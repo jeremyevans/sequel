@@ -3799,6 +3799,17 @@ describe "Dataset#with_sql_*" do
     @ds.with_sql_single_value('SELECT * FROM foo')
     @ds.columns.must_equal [:x]
   end
+
+  it "#_with_sql_dataset (private) should return a clone that doesn't use separate dataset for columns" do
+    @ds = @ds.with_extend{def fetch_rows(sql) self.columns = [:id]; super end}
+    @ds.send(:cache_set, :_columns, [:foo])
+    ds = @ds.send(:_with_sql_dataset)
+    ds.must_be_same_as ds.send(:_with_sql_dataset)
+    ds.with_sql_first('SELECT * FROM foo').must_equal(:id=>1)
+    ds.columns.must_equal [:id]
+    @ds.with_sql_first('SELECT * FROM foo').must_equal(:id=>1)
+    @ds.columns.must_equal [:foo]
+  end
 end
 
 describe "Dataset prepared statements and bound variables " do
