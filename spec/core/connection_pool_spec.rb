@@ -549,6 +549,28 @@ ThreadedConnectionPoolSpecs = shared_description do
     @pool.size.must_equal 0
     d.must_equal [2, 1, 3, 4]
   end
+
+
+  it "should handle dead threads with checked out connections" do
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1))
+
+    skip = true
+    # Leave allocated connection to emulate dead thread with checked out connection
+    pool.define_singleton_method(:release){|*a| return if skip; super(*a)}
+    Thread.new{pool.hold{Thread.current.kill}}.join
+    skip = false
+
+    pool.allocated.wont_be :empty?
+    pool.available_connections.must_be :empty?
+
+    pool.hold{|c1| c1}
+    pool.allocated.must_be :empty?
+    pool.available_connections.wont_be :empty?
+
+    pool.disconnect
+    pool.allocated.must_be :empty?
+    pool.available_connections.must_be :empty?
+  end
 end
 
 describe "Threaded Unsharded Connection Pool" do

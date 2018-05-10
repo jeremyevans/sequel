@@ -3,11 +3,12 @@ require_relative "spec_helper"
 connection_expiration_specs = shared_description do
   describe "connection expiration" do
     before do
-      @db.extend(Module.new do
+      @m = Module.new do
         def disconnect_connection(conn)
           @sqls << 'disconnect'
         end
-      end)
+      end
+      @db.extend @m
       @db.extension(:connection_expiration)
       @db.pool.connection_expiration_timeout = 2
     end
@@ -19,6 +20,23 @@ connection_expiration_specs = shared_description do
     it "should not override connection_expiration_timeout when loading extension" do
       @db.extension(:connection_expiration)
       @db.pool.connection_expiration_timeout.must_equal 2
+    end
+
+    it "should handle Database#disconnect calls while the connection is checked out" do
+      @db.synchronize{|c| @db.disconnect}
+    end
+
+    it "should handle disconnected connections" do
+      proc{@db.synchronize{|c| raise Sequel::DatabaseDisconnectError}}.must_raise Sequel::DatabaseDisconnectError
+      @db.sqls.must_equal ['disconnect']
+    end
+
+    it "should handle :connection_handling => :disconnect setting" do
+      @db = Sequel.mock(@db.opts.merge(:connection_handling => :disconnect))
+      @db.extend @m
+      @db.extension(:connection_expiration)
+      @db.synchronize{}
+      @db.sqls.must_equal ['disconnect']
     end
 
     it "should only expire if older than timeout" do

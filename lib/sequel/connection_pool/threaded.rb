@@ -101,7 +101,12 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
       end
       raise
     ensure
-      sync{release(t)} if conn
+      if conn
+        sync{release(t)}
+        if @connection_handling == :disconnect
+          disconnect_connection(conn)
+        end
+      end
     end
   end
 
@@ -150,7 +155,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
 
       # :nocov:
       # It's difficult to get to this point, it can only happen if there is a race condition
-      # where a connection cannot be acquired even after the thread is signalled by the condition
+      # where a connection cannot be acquired even after the thread is signalled by the condition variable
       sync do
         @waiter.wait(@mutex, timeout - elapsed)
         if conn = next_available
@@ -167,21 +172,30 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # The caller should NOT have the mutex before calling this.
   def assign_connection(thread)
     allocated = @allocated
-
     do_make_new = false
+    to_disconnect = nil
+
     sync do
       if conn = next_available
         return(allocated[thread] = conn)
       end
 
       if (n = _size) >= (max = @max_size)
-        allocated.keys.each{|t| release(t) unless t.alive?}
+        allocated.keys.each do |t|
+          unless t.alive?
+            (to_disconnect ||= []) << @allocated.delete(t)
+          end
+        end
         n = nil
       end
 
       if (n || _size) < max
         do_make_new = allocated[thread] = true
       end
+    end
+
+    if to_disconnect
+      to_disconnect.each{|dconn| disconnect_connection(dconn)}
     end
 
     # Connect to the database outside of the connection pool mutex,
@@ -252,9 +266,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   def release(thread)
     conn = @allocated.delete(thread)
 
-    if @connection_handling == :disconnect
-      disconnect_connection(conn)
-    else
+    unless @connection_handling == :disconnect
       checkin_connection(conn)
     end
 

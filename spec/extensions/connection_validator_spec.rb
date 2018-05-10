@@ -3,7 +3,7 @@ require_relative "spec_helper"
 connection_validator_specs = shared_description do
   describe "connection validator" do
     before do
-      @db.extend(Module.new do
+      @m = Module.new do
         def disconnect_connection(conn)
           @sqls << 'disconnect'
         end
@@ -19,7 +19,8 @@ connection_validator_specs = shared_description do
           conn.valid = true
           conn
         end
-      end)
+      end
+      @db.extend @m
       @db.extension(:connection_validator)
     end
 
@@ -50,6 +51,23 @@ connection_validator_specs = shared_description do
       c2 = @db.synchronize{|c| c}
       @db.sqls.must_equal ['SELECT NULL', 'disconnect']
       c2.wont_be_same_as(c1)
+    end
+
+    it "should handle Database#disconnect calls while the connection is checked out" do
+      @db.synchronize{|c| @db.disconnect}
+    end
+
+    it "should handle disconnected connections" do
+      proc{@db.synchronize{|c| raise Sequel::DatabaseDisconnectError}}.must_raise Sequel::DatabaseDisconnectError
+      @db.sqls.must_equal ['disconnect']
+    end
+
+    it "should handle :connection_handling => :disconnect setting" do
+      @db = Sequel.mock(@db.opts.merge(:connection_handling => :disconnect))
+      @db.extend @m
+      @db.extension(:connection_validator)
+      @db.synchronize{}
+      @db.sqls.must_equal ['disconnect']
     end
 
     it "should disconnect multiple connections repeatedly if they are not valid" do
@@ -124,4 +142,3 @@ describe "Sequel::ConnectionValidator with sharded threaded pool" do
   end
   include connection_validator_specs
 end
-

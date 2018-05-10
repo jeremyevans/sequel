@@ -109,7 +109,8 @@ class Sequel::ConnectionPool
   
   private
 
-  # Remove the connection from the pool.
+  # Remove the connection from the pool.  For threaded connections, this should be
+  # called without the mutex, because the disconnection may block.
   def disconnect_connection(conn)
     db.disconnect_connection(conn)
   end

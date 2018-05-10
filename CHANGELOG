@@ -1,5 +1,11 @@
 === master
 
+* Disconnect connections left allocated by dead threads instead of returning the connections to the pool (jeremyevans)
+
+* Make both threaded connection pools avoid disconnecting connections while holding the connection pool mutex (jeremyevans)
+
+* Don't deadlock when disconnecting connections in the sharded_threaded connection pool when using connection_validator or connection_expiration extensions (jeremyevans)
+
 * Don't modify hash argument passed in Model.nested_attributes in the nested_attributes plugin (jeremyevans)
 
 * Avoid unnecessary hash creation in many places (jeremyevans)

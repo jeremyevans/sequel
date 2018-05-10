@@ -19,6 +19,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     super
     @available_connections = {}
     @connections_to_remove = []
+    @connections_to_disconnect = []
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
     remove_instance_variable(:@waiter)
     @waiters = {}
@@ -130,6 +131,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       raise
     ensure
       sync{release(t, conn, server)} if conn
+      while dconn = sync{@connections_to_disconnect.shift}
+        disconnect_connection(dconn)
+      end
     end
   end
 
@@ -201,7 +205,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
 
       # :nocov:
       # It's difficult to get to this point, it can only happen if there is a race condition
-      # where a connection cannot be acquired even after the thread is signalled by the condition
+      # where a connection cannot be acquired even after the thread is signalled by the condition variable
       sync do
         @waiters[server].wait(@mutex, timeout - elapsed)
         if conn = next_available(server)
@@ -227,7 +231,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       end
 
       if (n = _size(server)) >= (max = @max_size)
-        alloc.to_a.each{|t,c| release(t, c, server) unless t.alive?}
+        alloc.to_a.each do |t,c|
+          unless t.alive?
+            remove(t, c, server)
+          end
+        end
         n = nil
       end
 
@@ -339,7 +347,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       conn = allocated(server).delete(thread)
 
       if @connection_handling == :disconnect
-        disconnect_connection(conn)
+        @connections_to_disconnect << conn
       else
         checkin_connection(server, conn)
       end
@@ -355,6 +363,6 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def remove(thread, conn, server)
     @connections_to_remove.delete(conn)
     allocated(server).delete(thread) if @servers.include?(server)
-    disconnect_connection(conn)
+    @connections_to_disconnect << conn
   end
 end
