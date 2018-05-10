@@ -248,6 +248,12 @@ module Sequel
     end
     
     if RUBY_ENGINE == 'ruby' && RUBY_VERSION < '2.5'
+    # :nocov:
+      def synchronize(server=nil)
+        @pool.hold(server || :default){|conn| yield conn}
+      end
+    # :nocov:
+    else
       # Acquires a database connection, yielding it to the passed block. This is
       # useful if you want to make sure the same connection is used for all
       # database queries in the block.  It is also useful if you want to gain
@@ -260,15 +266,9 @@ module Sequel
       #   DB.synchronize do |conn|
       #     # ...
       #   end
-      def synchronize(server=nil)
-        @pool.hold(server || :default){|conn| yield conn}
-      end
-    else
-    # :nocov:
       def synchronize(server=nil, &block)
         @pool.hold(server || :default, &block)
       end
-    # :nocov:
     end
     
     # Attempts to acquire a database connection.  Returns true if successful.
