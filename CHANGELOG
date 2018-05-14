@@ -1,5 +1,7 @@
 === master
 
+* Support use of LIKE with ANY function on PostgreSQL by avoiding unnecessary use of ESCAPE syntax (jeremyevans)
+
 * Disconnect connections left allocated by dead threads instead of returning the connections to the pool (jeremyevans)
 
 * Make both threaded connection pools avoid disconnecting connections while holding the connection pool mutex (jeremyevans)

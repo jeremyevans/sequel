@@ -389,8 +389,10 @@ module Sequel
         literal_append(sql, args[0])
         sql << ' ' << op.to_s << ' '
         literal_append(sql, args[1])
-        sql << " ESCAPE "
-        literal_append(sql, "\\")
+        if requires_like_escape?
+          sql << " ESCAPE "
+          literal_append(sql, "\\")
+        end
         sql << ')'
       when :ILIKE, :'NOT ILIKE'
         complex_expression_sql_append(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|v| Sequel.function(:UPPER, v)})

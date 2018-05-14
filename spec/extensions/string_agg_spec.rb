@@ -79,7 +79,7 @@ describe "string_agg extension" do
   it "should handle operations on object" do
     ds = dbf.call(:postgres).dataset.with_quote_identifiers(false)
     ds.literal(@sa1 + 'b').must_equal "(string_agg(c, ',') || 'b')"
-    ds.literal(@sa1.like('b')).must_equal "(string_agg(c, ',') LIKE 'b' ESCAPE '\\')"
+    ds.literal(@sa1.like('b')).must_equal "(string_agg(c, ',') LIKE 'b')"
     ds.literal(@sa1 < 'b').must_equal "(string_agg(c, ',') < 'b')"
     ds.literal(@sa1.as(:b)).must_equal "string_agg(c, ',') AS b"
     ds.literal(@sa1.cast(:b)).must_equal "CAST(string_agg(c, ',') AS b)"

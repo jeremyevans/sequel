@@ -109,12 +109,6 @@ module Sequel
           complex_expression_sql_append(sql, :LIKE, args)
         when :'NOT ILIKE'
           complex_expression_sql_append(sql, :'NOT LIKE', args)
-        when :LIKE, :'NOT LIKE'
-          sql << '('
-          literal_append(sql, args[0])
-          sql << ' ' << op.to_s << ' '
-          literal_append(sql, args[1])
-          sql << ')'
         when :'!='
           sql << '('
           literal_append(sql, args[0])
@@ -238,6 +232,11 @@ module Sequel
         else
           super
         end
+      end
+
+      # Access doesn't support ESCAPE for LIKE.
+      def requires_like_escape?
+        false
       end
 
       # Access requires parentheses when joining more than one table

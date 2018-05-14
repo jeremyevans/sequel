@@ -197,6 +197,11 @@ module Sequel
       true
     end
 
+    # Whether the dataset needs ESCAPE for LIKE for correct behavior.
+    def requires_like_escape?
+      true
+    end
+
     # Whether common table expressions are supported in UNION/INTERSECT/EXCEPT clauses.
     def supports_cte_in_compounds?
       supports_cte_in_subqueries?

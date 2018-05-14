@@ -1859,6 +1859,12 @@ module Sequel
         sql << ')'
       end
 
+      # Backslash is supported by default as the escape character on PostgreSQL,
+      # and using ESCAPE can break LIKE ANY() usage.
+      def requires_like_escape?
+        false
+      end
+
       # Support FOR SHARE locking when using the :share lock style.
       # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
