@@ -740,7 +740,7 @@ module Sequel
         f = File.basename(path)
         fi = f.downcase
         if target
-          if migration_version_from_file(f) > target
+          if migration_version_from_file(f) > target.to_i
             if applied_migrations.include?(fi)
               down_mts << [load_migration_file(path), f, :down]
             end
