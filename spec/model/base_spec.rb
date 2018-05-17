@@ -100,6 +100,44 @@ describe Sequel::Model, "dataset" do
   end
 end
   
+describe Sequel::Model, "has_dataset?" do
+  before do
+    @a = Class.new(Sequel::Model(:items))
+    @b = Class.new(Sequel::Model)
+    @c = Class.new(@b)
+    class ::Elephant < Sequel::Model(:ele1); end
+    class ::Maggot < Sequel::Model; end
+    class ::ShoeSize < Sequel::Model; end
+    class ::BootSize < ShoeSize; end
+  end
+
+  after do
+    [:Elephant, :Maggot, :ShoeSize, :BootSize].each{|x| Object.send(:remove_const, x)}
+  end
+
+  it "should return true if dataset from the class name" do
+    Maggot.has_dataset?.must_equal true
+    ShoeSize.has_dataset?.must_equal true
+  end
+
+  it "should return true if dataset from the superclass" do
+    BootSize.has_dataset?.must_equal true
+  end
+
+  it "should return true if dataset set explicitly" do
+    Elephant.has_dataset?.must_equal true
+    @a.has_dataset?.must_equal true
+  end
+
+  it "should return false if no dataset is explicitly set and the class is anonymous" do
+    @b.has_dataset?.must_equal false
+  end
+
+  it "should return false if no dataset is explicitly set and the class and its parent are anonymous" do
+    @c.has_dataset?.must_equal false
+  end
+end
+
 describe Sequel::Model, "implicit table names" do
   after do
     Object.send(:remove_const, :BlahBlah)

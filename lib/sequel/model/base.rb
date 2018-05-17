@@ -264,6 +264,11 @@ module Sequel
         @dataset || raise(Error, "No dataset associated with #{self}")
       end
 
+      # Whether or not the dataset exists
+      def has_dataset?
+        !@dataset.nil?
+      end
+
       # Alias of set_dataset
       def dataset=(ds)
         set_dataset(ds)
