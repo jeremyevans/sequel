@@ -264,11 +264,6 @@ module Sequel
         @dataset || raise(Error, "No dataset associated with #{self}")
       end
 
-      # Whether or not the dataset exists
-      def has_dataset?
-        !@dataset.nil?
-      end
-
       # Alias of set_dataset
       def dataset=(ds)
         set_dataset(ds)
@@ -449,6 +444,13 @@ module Sequel
         @plugins.freeze
 
         super
+      end
+
+      # Whether the model has a dataset.  True for most model classes,
+      # but can be false if the model class is an abstract model class
+      # designed for subclassing, such as Sequel::Model itself.
+      def has_dataset?
+        !@dataset.nil?
       end
 
       # Clear the setter_methods cache when a module is included, as it

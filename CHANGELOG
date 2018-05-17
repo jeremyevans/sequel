@@ -1,5 +1,7 @@
 === master
 
+* Add Model.has_dataset? to determine if the model class has a dataset (AlexWayfer) (#1508)
+
 * Support use of LIKE with ANY function on PostgreSQL by avoiding unnecessary use of ESCAPE syntax (jeremyevans)
 
 * Disconnect connections left allocated by dead threads instead of returning the connections to the pool (jeremyevans)
