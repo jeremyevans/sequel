@@ -38,7 +38,7 @@ These run each test in its own transaction, the recommended way to test.
 
   RSpec.configure do |c|
     c.around(:each) do |example|
-      DB.transaction(:rollback=>:always, :auto_savepoint=>true){example.run}
+      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){example.run}
     end
   end
 
