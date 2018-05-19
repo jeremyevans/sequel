@@ -13,7 +13,7 @@ These run each test in its own transaction, the recommended way to test.
   require 'minitest/hooks/default'
   class Minitest::HooksSpec
     def around
-      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){super}
+      DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
     end
   end
 
@@ -21,7 +21,7 @@ These run each test in its own transaction, the recommended way to test.
 
   class Minitest::Spec
     def run(*args, &block)
-      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){super}
+      DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
     end
   end
 
@@ -30,7 +30,7 @@ These run each test in its own transaction, the recommended way to test.
   # Use this class as the base class for your tests
   class SequelTestCase < Minitest::Test
     def run(*args, &block)
-      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){super}
+      DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
     end
   end
 
@@ -46,7 +46,7 @@ These run each test in its own transaction, the recommended way to test.
 
 You can use the Sequel.transaction method to run a transaction on multiple databases, rolling all of them back.  Instead of:
 
-  Sequel::Model.db.transaction(:rollback=>:always)
+  DB.transaction(:rollback=>:always)
 
 Use Sequel.transaction with an array of databases:
 
@@ -66,11 +66,11 @@ Example:
   require 'minitest/hooks/default'
   class Minitest::HooksSpec
     def around
-      Sequel::Model.db.transaction(:rollback=>:always, :savepoint=>true, :auto_savepoint=>true){super}
+      DB.transaction(:rollback=>:always, :savepoint=>true, :auto_savepoint=>true){super}
     end
 
     def around_all
-      Sequel::Model.db.transaction(:rollback=>:always){super}
+      DB.transaction(:rollback=>:always){super}
     end
   end
 
@@ -90,9 +90,9 @@ The order in which you delete/truncate the tables is important if you are using 
 
   describe "some test suite" do
     after do
-      [:table1, :table2].each{|x| Sequel::Model.db.from(x).truncate}
+      [:table1, :table2].each{|x| DB.from(x).truncate}
       # or
-      [:table1, :table2].each{|x| Sequel::Model.db.from(x).delete}
+      [:table1, :table2].each{|x| DB.from(x).delete}
     end
   end
 
@@ -100,9 +100,9 @@ The order in which you delete/truncate the tables is important if you are using 
 
   class SomeTestClass < Minitest::Test
     def teardown
-      [:table1, :table2].each{|x| Sequel::Model.db.from(x).truncate}
+      [:table1, :table2].each{|x| DB.from(x).truncate}
       # or
-      [:table1, :table2].each{|x| Sequel::Model.db.from(x).delete}
+      [:table1, :table2].each{|x| DB.from(x).delete}
     end
   end
 
