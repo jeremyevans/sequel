@@ -11,6 +11,9 @@ module Sequel
     # level instead of info level.
     attr_accessor :log_warn_duration
 
+    # Whether to log errors or not
+    attr_accessor :log_errors
+
     # Array of SQL loggers to use for this database.
     attr_accessor :loggers
     
@@ -42,7 +45,7 @@ module Sequel
       begin
         yield
       rescue => e
-        log_exception(e, sql)
+        log_exception(e, sql) if log_errors
         raise
       ensure
         log_duration(Sequel.elapsed_seconds_since(timer), sql) unless e

@@ -135,6 +135,7 @@ module Sequel
       @schema_type_classes = SCHEMA_TYPE_CLASSES.dup
 
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
+      self.log_errors = @opts.fetch(:log_errors, true)
       self.log_warn_duration = @opts[:log_warn_duration]
       self.log_connection_info = typecast_value_boolean(@opts[:log_connection_info])
 
