@@ -257,6 +257,13 @@ describe "Database#log_connection_yield" do
     @o.logs.first.last.must_match(/\ASequel::Error: adsf: blah\z/)
   end
 
+  it "should not log message at error level if block raises and error and log_errors is false" do
+    @db.log_warn_duration = 0
+    @db.log_errors = false
+    proc{@db.log_connection_yield('blah', @conn){raise Sequel::Error, 'adsf'}}.must_raise Sequel::Error
+    @o.logs.length.must_equal 0
+  end
+
   it "should include args with message if args passed" do
     @db.log_connection_yield('blah', @conn, [1, 2]){}
     @o.logs.length.must_equal 1
