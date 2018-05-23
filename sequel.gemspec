@@ -3,7 +3,6 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.name = 'sequel'
   s.version = Sequel.version
   s.platform = Gem::Platform::RUBY
-  s.has_rdoc = true
   s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "MIT-LICENSE"] + Dir["doc/*.rdoc"] + Dir['doc/release_notes/{4,5}.*.txt']
   s.rdoc_options += ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby', '--main', 'README.rdoc']
   s.summary = "The Database Toolkit for Ruby"
