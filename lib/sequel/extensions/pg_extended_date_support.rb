@@ -83,12 +83,21 @@ module Sequel
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
+        ovalue = value
         if value.is_a?(String) && (m = value.match(/(?:(?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/)) && (m[1] || m[2])
           if m[2]
             value = value.sub(' BC', '').sub(' ', ' BC ')
+            conv = defined?(JRUBY_VERSION) && JRUBY_VERSION == '9.2.0.0'
           end
-          if m[1]
+          if m[1] || conv
             dt = DateTime.parse(value)
+            if conv
+              if Sequel.datetime_class == DateTime
+                dt >>= 12
+              else
+                dt >>= 24
+              end
+            end
             dt = dt.to_time unless Sequel.datetime_class == DateTime
             Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
           else
@@ -191,15 +200,6 @@ module Sequel
         if RUBY_ENGINE == 'jruby'
           # :nocov:
 
-          # Work around JRuby bug #4822 in Time#to_datetime for times before date of calendar reform
-          def literal_time(time)
-            if time < TIME_YEAR_1
-              literal_datetime(DateTime.parse(super))
-            else
-              super
-            end
-          end
-
           ExtendedDateSupport::CONVERT_TYPES = [Java::JavaSQL::Types::DATE, Java::JavaSQL::Types::TIMESTAMP]
 
           # Use non-JDBC parsing as JDBC parsing doesn't work for BC dates/timestamps.
@@ -207,6 +207,18 @@ module Sequel
             case type
             when *CONVERT_TYPES
               db.oid_convertor_proc(meta.getField(i).getOID)
+            else
+              super
+            end
+          end
+
+          # Work around JRuby bug #4822 in Time#to_datetime for times before date of calendar reform
+          def literal_time(time)
+            if time < TIME_YEAR_1
+              dt = DateTime.parse(super)
+              # Work around JRuby bug #5191
+              dt >>= 12 if JRUBY_VERSION == '9.2.0.0'
+              literal_datetime(dt)
             else
               super
             end

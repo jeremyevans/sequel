@@ -1,5 +1,7 @@
 === master
 
+* Work around broken BC date handling in JRuby 9.2.0.0 (jeremyevans)
+
 * Switch use of BigDecimal.new() to BigDecimal(), since the former is deprecated (jeremyevans)
 
 * Add Sequel::VERSION_NUMBER for easier version comparisons (jeremyevans)
