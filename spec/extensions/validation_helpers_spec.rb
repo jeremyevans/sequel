@@ -293,7 +293,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.must_be :valid?
     @m.value = 1.0
     @m.must_be :valid?
-    @m.value = BigDecimal.new('1.0')
+    @m.value = BigDecimal('1.0')
     @m.wont_be :valid?
     @m.errors.full_messages.must_equal ['value is not a valid integer or float']
   end

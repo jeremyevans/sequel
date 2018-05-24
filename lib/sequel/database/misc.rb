@@ -461,12 +461,12 @@ module Sequel
     if RUBY_VERSION >= '2.4'
       # Typecast a string to a BigDecimal
       def _typecast_value_string_to_decimal(value)
-        BigDecimal.new(value)
+        BigDecimal(value)
       end
     else
       # :nocov:
       def _typecast_value_string_to_decimal(value)
-        d = BigDecimal.new(value)
+        d = BigDecimal(value)
         if d.zero?
           # BigDecimal parsing is loose by default, returning a 0 value for
           # invalid input.  If a zero value is received, use Float to check
@@ -488,7 +488,7 @@ module Sequel
       when BigDecimal
         value
       when Numeric
-        BigDecimal.new(value.to_s)
+        BigDecimal(value.to_s)
       when String
         _typecast_value_string_to_decimal(value)
       else

@@ -92,30 +92,30 @@ describe "pg_array extension" do
   it "should parse single dimensional decimal arrays" do
     c = @converter[1231]
     c.call("{}").to_a.must_equal []
-    c.call("{1.5}").to_a.must_equal [BigDecimal.new('1.5')]
-    c.call('{2.5,3.5}').to_a.must_equal [BigDecimal.new('2.5'), BigDecimal.new('3.5')]
-    c.call('{3.5,4.5,5.5}').to_a.must_equal [BigDecimal.new('3.5'), BigDecimal.new('4.5'), BigDecimal.new('5.5')]
+    c.call("{1.5}").to_a.must_equal [BigDecimal('1.5')]
+    c.call('{2.5,3.5}').to_a.must_equal [BigDecimal('2.5'), BigDecimal('3.5')]
+    c.call('{3.5,4.5,5.5}').to_a.must_equal [BigDecimal('3.5'), BigDecimal('4.5'), BigDecimal('5.5')]
   end
 
   it "should parse multiple dimensional decimal arrays" do
     c = @converter[1231]
     c.call("{{}}").to_a.must_equal [[]]
-    c.call("{{1.5}}").to_a.must_equal [[BigDecimal.new('1.5')]]
-    c.call('{{2.5},{3.5}}').to_a.must_equal [[BigDecimal.new('2.5')], [BigDecimal.new('3.5')]]
-    c.call('{{{1.5,2.5},{3.5,4.5}},{{5.5,6.5},{7.5,8.5}}}').to_a.must_equal [[[BigDecimal.new('1.5'), BigDecimal.new('2.5')], [BigDecimal.new('3.5'), BigDecimal.new('4.5')]], [[BigDecimal.new('5.5'), BigDecimal.new('6.5')], [BigDecimal.new('7.5'), BigDecimal.new('8.5')]]]
+    c.call("{{1.5}}").to_a.must_equal [[BigDecimal('1.5')]]
+    c.call('{{2.5},{3.5}}').to_a.must_equal [[BigDecimal('2.5')], [BigDecimal('3.5')]]
+    c.call('{{{1.5,2.5},{3.5,4.5}},{{5.5,6.5},{7.5,8.5}}}').to_a.must_equal [[[BigDecimal('1.5'), BigDecimal('2.5')], [BigDecimal('3.5'), BigDecimal('4.5')]], [[BigDecimal('5.5'), BigDecimal('6.5')], [BigDecimal('7.5'), BigDecimal('8.5')]]]
   end
 
   it "should parse decimal values with arbitrary precision" do
     c = @converter[1231]
-    c.call("{1.000000000000000000005}").to_a.must_equal [BigDecimal.new('1.000000000000000000005')]
-    c.call("{{1.000000000000000000005,2.000000000000000000005},{3.000000000000000000005,4.000000000000000000005}}").to_a.must_equal [[BigDecimal.new('1.000000000000000000005'), BigDecimal.new('2.000000000000000000005')], [BigDecimal.new('3.000000000000000000005'), BigDecimal.new('4.000000000000000000005')]]
+    c.call("{1.000000000000000000005}").to_a.must_equal [BigDecimal('1.000000000000000000005')]
+    c.call("{{1.000000000000000000005,2.000000000000000000005},{3.000000000000000000005,4.000000000000000000005}}").to_a.must_equal [[BigDecimal('1.000000000000000000005'), BigDecimal('2.000000000000000000005')], [BigDecimal('3.000000000000000000005'), BigDecimal('4.000000000000000000005')]]
   end
 
   it "should parse integers in decimal arrays as BigDecimals" do
     c = @converter[1231]
     c.call("{1}").to_a.first.must_be_kind_of(BigDecimal)
-    c.call("{1}").to_a.must_equal [BigDecimal.new('1')]
-    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.must_equal [[[BigDecimal.new('1'), BigDecimal.new('2')], [BigDecimal.new('3'), BigDecimal.new('4')]], [[BigDecimal.new('5'), BigDecimal.new('6')], [BigDecimal.new('7'), BigDecimal.new('8')]]]
+    c.call("{1}").to_a.must_equal [BigDecimal('1')]
+    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.must_equal [[[BigDecimal('1'), BigDecimal('2')], [BigDecimal('3'), BigDecimal('4')]], [[BigDecimal('5'), BigDecimal('6')], [BigDecimal('7'), BigDecimal('8')]]]
   end
 
   it "should parse arrays with NULL values" do
@@ -149,7 +149,7 @@ describe "pg_array extension" do
     @db.literal(@m::PGArray.new([nil])).must_equal 'ARRAY[NULL]'
     @db.literal(@m::PGArray.new([nil, 1])).must_equal 'ARRAY[NULL,1]'
     @db.literal(@m::PGArray.new([1.0, 2.5])).must_equal 'ARRAY[1.0,2.5]'
-    @db.literal(@m::PGArray.new([BigDecimal.new('1'), BigDecimal.new('2.000000000000000000005')])).must_equal 'ARRAY[1.0,2.000000000000000000005]'
+    @db.literal(@m::PGArray.new([BigDecimal('1'), BigDecimal('2.000000000000000000005')])).must_equal 'ARRAY[1.0,2.000000000000000000005]'
     @db.literal(@m::PGArray.new([nil, "NULL"])).must_equal "ARRAY[NULL,'NULL']"
     @db.literal(@m::PGArray.new([nil, "{},[]'\""])).must_equal "ARRAY[NULL,'{},[]''\"']"
   end
@@ -169,7 +169,7 @@ describe "pg_array extension" do
     @db.literal(@m::PGArray.new([nil], :text)).must_equal 'ARRAY[NULL]::text[]'
     @db.literal(@m::PGArray.new([nil, 1], :int8)).must_equal 'ARRAY[NULL,1]::int8[]'
     @db.literal(@m::PGArray.new([1.0, 2.5], :real)).must_equal 'ARRAY[1.0,2.5]::real[]'
-    @db.literal(@m::PGArray.new([BigDecimal.new('1'), BigDecimal.new('2.000000000000000000005')], :decimal)).must_equal 'ARRAY[1.0,2.000000000000000000005]::decimal[]'
+    @db.literal(@m::PGArray.new([BigDecimal('1'), BigDecimal('2.000000000000000000005')], :decimal)).must_equal 'ARRAY[1.0,2.000000000000000000005]::decimal[]'
     @db.literal(@m::PGArray.new([nil, "NULL"], :varchar)).must_equal "ARRAY[NULL,'NULL']::varchar[]"
     @db.literal(@m::PGArray.new([nil, "{},[]'\""], :"varchar(255)")).must_equal "ARRAY[NULL,'{},[]''\"']::varchar(255)[]"
   end
@@ -224,7 +224,7 @@ describe "pg_array extension" do
     {
       :integer=>{:class=>Integer, :convert=>['1', 1, '1']},
       :float=>{:db_type=>'double precision',  :class=>Float, :convert=>['1.1', 1.1, '1.1']},
-      :decimal=>{:db_type=>'numeric', :class=>BigDecimal, :convert=>['1.00000000000000000000000001', BigDecimal.new('1.00000000000000000000000001'), '1.00000000000000000000000001']},
+      :decimal=>{:db_type=>'numeric', :class=>BigDecimal, :convert=>['1.00000000000000000000000001', BigDecimal('1.00000000000000000000000001'), '1.00000000000000000000000001']},
       :string=>{:db_type=>'text', :class=>String, :convert=>[1, '1', "'1'"]},
       :bigint=>{:class=>Integer, :convert=>['1', 1, '1']},
       :boolean=>{:class=>TrueClass, :convert=>['t', true, 'true']},

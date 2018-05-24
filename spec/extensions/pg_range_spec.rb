@@ -43,7 +43,7 @@ describe "pg_range extension" do
     @db.literal(DateTime.new(2011, 1, 2, 10, 20, 30)...DateTime.new(2011, 2, 3, 10, 20, 30)).must_equal "'[2011-01-02 10:20:30,2011-02-03 10:20:30)'"
     @db.literal(1..2).must_equal "'[1,2]'"
     @db.literal(1.0..2.0).must_equal "'[1.0,2.0]'"
-    @db.literal(BigDecimal.new('1.0')..BigDecimal.new('2.0')).must_equal "'[1.0,2.0]'"
+    @db.literal(BigDecimal('1.0')..BigDecimal('2.0')).must_equal "'[1.0,2.0]'"
     @db.literal(Sequel.lit('a')..Sequel.lit('z')).must_equal "'[a,z]'"
     @db.literal(''..'()[]",\\2').must_equal "'[\"\",\\(\\)\\[\\]\\\"\\,\\\\2]'"
   end

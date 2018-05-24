@@ -62,7 +62,7 @@ describe "eval_inspect extension" do
       Sequel::SQL::AliasedExpression.new(Time.local(2011, 9, 11, 10, 20, 30, 500000.125), :a),
       Sequel::SQL::AliasedExpression.new(Time.utc(2011, 9, 11, 10, 20, 30), :a),
       Sequel::SQL::AliasedExpression.new(Time.utc(2011, 9, 11, 10, 20, 30, 500000.125), :a),
-      Sequel::SQL::AliasedExpression.new(BigDecimal.new('1.000000000000000000000000000000000000000000000001'), :a),
+      Sequel::SQL::AliasedExpression.new(BigDecimal('1.000000000000000000000000000000000000000000000001'), :a),
       Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_DATE, :a),
       Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_TIMESTAMP, :a),
     ].each do |o|

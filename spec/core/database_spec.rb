@@ -2167,7 +2167,7 @@ describe "Database#typecast_value" do
     [1.0, 1, '1.0', BigDecimal('1.0')].each do |i|
       v = @db.typecast_value(:decimal, i)
       v.must_be_kind_of(BigDecimal)
-      v.must_equal BigDecimal.new('1.0')
+      v.must_equal BigDecimal('1.0')
     end
   end
 
@@ -2426,8 +2426,8 @@ describe "Database#column_schema_to_ruby_default" do
     p[1.0, :float].must_equal 1.0
     p['1.0', :float].must_equal 1.0
     p['-1.0', :float].must_equal(-1.0)
-    p['1.0', :decimal].must_equal BigDecimal.new('1.0')
-    p['-1.0', :decimal].must_equal BigDecimal.new('-1.0')
+    p['1.0', :decimal].must_equal BigDecimal('1.0')
+    p['-1.0', :decimal].must_equal BigDecimal('-1.0')
     p[true, :boolean].must_equal true
     p[false, :boolean].must_equal false
     p['1', :boolean].must_equal true
@@ -2463,7 +2463,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["'a'::bpchar", :string].must_equal "a"
     p["(-1)", :integer].must_equal(-1)
     p["(-1.0)", :float].must_equal(-1.0)
-    p['(-1.0)', :decimal].must_equal BigDecimal.new('-1.0')
+    p['(-1.0)', :decimal].must_equal BigDecimal('-1.0')
     p["'a'::bytea", :blob].must_equal Sequel.blob('a')
     p["'a'::bytea", :blob].must_be_kind_of(Sequel::SQL::Blob)
     p["'2009-10-29'::date", :date].must_equal Date.new(2009,10,29)
@@ -2475,7 +2475,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["a", :string].must_equal "a"
     p["NULL", :string].must_equal "NULL"
     p["-1", :float].must_equal(-1.0)
-    p['-1', :decimal].must_equal BigDecimal.new('-1.0')
+    p['-1', :decimal].must_equal BigDecimal('-1.0')
     p["2009-10-29", :date].must_equal Date.new(2009,10,29)
     p["2009-10-29 10:20:30", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30')
     p["10:20:30", :time].must_equal Time.parse('10:20:30')
@@ -2486,7 +2486,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["(N'a')", :string].must_equal "a"
     p["((-12))", :integer].must_equal(-12)
     p["((12.1))", :float].must_equal 12.1
-    p["((-12.1))", :decimal].must_equal BigDecimal.new('-12.1')
+    p["((-12.1))", :decimal].must_equal BigDecimal('-12.1')
   end
 end
 

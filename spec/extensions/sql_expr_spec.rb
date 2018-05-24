@@ -24,7 +24,7 @@ describe "Sequel sql_expr extension" do
   end
 
   it "Numeric#sql_expr should wrap the object in a NumericExpression" do
-    [1, 2.0, 2^70, BigDecimal.new('1.0')].each do |o|
+    [1, 2.0, 2^70, BigDecimal('1.0')].each do |o|
       @ds.literal(o.sql_expr).must_equal @ds.literal(o)
       @ds.literal(o.sql_expr + 1).must_equal "(#{@ds.literal(o)} + 1)"
     end

@@ -1,5 +1,7 @@
 === master
 
+* Switch use of BigDecimal.new() to BigDecimal(), since the former is deprecated (jeremyevans)
+
 * Add Sequel::VERSION_NUMBER for easier version comparisons (jeremyevans)
 
 * Add Model.has_dataset? to determine if the model class has a dataset (AlexWayfer) (#1508)

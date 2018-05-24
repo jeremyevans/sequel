@@ -623,7 +623,7 @@ describe "Dataset#where" do
   it "should raise an error if an numeric is used" do
     proc{@dataset.filter(1)}.must_raise(Sequel::Error)
     proc{@dataset.filter(1.0)}.must_raise(Sequel::Error)
-    proc{@dataset.filter(BigDecimal.new('1.0'))}.must_raise(Sequel::Error)
+    proc{@dataset.filter(BigDecimal('1.0'))}.must_raise(Sequel::Error)
   end
 
   it "should raise an error if a NumericExpression or StringExpression is used" do
@@ -1082,10 +1082,10 @@ describe "Dataset#literal" do
   end
 
   it "should literalize BigDecimal instances correctly" do
-    @dataset.literal(BigDecimal.new("80")).must_equal "80.0"
-    @dataset.literal(BigDecimal.new("NaN")).must_equal "'NaN'"
-    @dataset.literal(BigDecimal.new("Infinity")).must_equal "'Infinity'"
-    @dataset.literal(BigDecimal.new("-Infinity")).must_equal "'-Infinity'"
+    @dataset.literal(BigDecimal("80")).must_equal "80.0"
+    @dataset.literal(BigDecimal("NaN")).must_equal "'NaN'"
+    @dataset.literal(BigDecimal("Infinity")).must_equal "'Infinity'"
+    @dataset.literal(BigDecimal("-Infinity")).must_equal "'-Infinity'"
   end
 
   it "should literalize PlaceholderLiteralStrings correctly" do

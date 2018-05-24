@@ -30,7 +30,7 @@ module Sequel
       # Return numeric/decimal types as instances of BigDecimal
       # instead of Float
       def decimal(s)
-        BigDecimal.new(s)
+        BigDecimal(s)
       end
       
       # Return datetime types as instances of Sequel.datetime_class

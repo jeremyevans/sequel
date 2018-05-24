@@ -1835,7 +1835,7 @@ describe Sequel::Model, "typecasting" do
   it "should convert to BigDecimal for a decimal field" do
     @c.db_schema = {:x=>{:type=>:decimal}}
     m = @c.new
-    bd = BigDecimal.new('1.0')
+    bd = BigDecimal('1.0')
     m.x = '1.0'
     m.x.must_equal bd
     m.x = 1.0

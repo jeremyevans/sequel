@@ -21,7 +21,7 @@ module Sequel
       def blob(s) ::Sequel::SQL::Blob.new(s) end
       def boolean(s) s.to_i != 0 end
       def date(s) ::Date.strptime(s) end
-      def decimal(s) ::BigDecimal.new(s) end
+      def decimal(s) BigDecimal(s) end
       def time(s) ::Sequel.string_to_time(s) end
     end.new
 

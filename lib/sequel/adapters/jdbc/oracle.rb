@@ -23,7 +23,7 @@ module Sequel
           if v == JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i)
             i
           else
-            BigDecimal.new(v.to_string)
+            ::Kernel::BigDecimal(v.to_string)
           end
         end
       end 

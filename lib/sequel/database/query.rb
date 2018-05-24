@@ -240,7 +240,7 @@ module Sequel
       when :time
         Sequel.string_to_time(default)
       when :decimal
-        BigDecimal.new(default)
+        BigDecimal(default)
       end
     end
    

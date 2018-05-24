@@ -60,7 +60,7 @@ module Sequel
       [17] => tt.method(:bytea),
       [20, 21, 23, 26] => tt.method(:integer),
       [700, 701] => tt.method(:float),
-      [1700] => ::BigDecimal.method(:new),
+      [1700] => ::Kernel.method(:BigDecimal),
       [1083, 1266] => ::Sequel.method(:string_to_time),
       [1082] => ::Sequel.method(:string_to_date),
       [1184, 1114] => ::Sequel.method(:database_to_application_timestamp),

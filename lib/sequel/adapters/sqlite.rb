@@ -1,4 +1,4 @@
-# frozen-string-literal: true
+# frozen-string-literal: trueend
 
 require 'sqlite3'
 require_relative 'shared/sqlite'
@@ -40,7 +40,7 @@ module Sequel
 
       def numeric(s)
         s = s.to_s unless s.is_a?(String)
-        ::BigDecimal.new(s) rescue s
+        BigDecimal(s) rescue s
       end
 
       def time(s)

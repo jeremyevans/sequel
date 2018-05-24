@@ -77,12 +77,12 @@ describe "An SQLite database" do
   it "should handle and return BigDecimal values for numeric columns" do
     DB.create_table!(:fk){numeric :d}
     d = DB[:fk]
-    d.insert(:d=>BigDecimal.new('80.0'))
-    d.insert(:d=>BigDecimal.new('NaN'))
-    d.insert(:d=>BigDecimal.new('Infinity'))
-    d.insert(:d=>BigDecimal.new('-Infinity'))
+    d.insert(:d=>BigDecimal('80.0'))
+    d.insert(:d=>BigDecimal('NaN'))
+    d.insert(:d=>BigDecimal('Infinity'))
+    d.insert(:d=>BigDecimal('-Infinity'))
     ds = d.all
-    ds.shift.must_equal(:d=>BigDecimal.new('80.0'))
+    ds.shift.must_equal(:d=>BigDecimal('80.0'))
     ds.map{|x| x[:d].to_s}.must_equal %w'NaN Infinity -Infinity'
     DB
   end
@@ -153,19 +153,19 @@ describe "SQLite type conversion" do
   it "should handle integers/floats/strings/decimals in numeric/decimal columns" do
     @db.create_table(:items){Numeric :a}
     @db[:items].insert(100)
-    @db[:items].select_map(:a).must_equal [BigDecimal.new('100')]
+    @db[:items].select_map(:a).must_equal [BigDecimal('100')]
     @db[:items].get(:a).must_be_kind_of(BigDecimal)
 
     @db[:items].update(:a=>100.1)
-    @db[:items].select_map(:a).must_equal [BigDecimal.new('100.1')]
+    @db[:items].select_map(:a).must_equal [BigDecimal('100.1')]
     @db[:items].get(:a).must_be_kind_of(BigDecimal)
 
     @db[:items].update(:a=>'100.1')
-    @db[:items].select_map(:a).must_equal [BigDecimal.new('100.1')]
+    @db[:items].select_map(:a).must_equal [BigDecimal('100.1')]
     @db[:items].get(:a).must_be_kind_of(BigDecimal)
 
-    @db[:items].update(:a=>BigDecimal.new('100.1'))
-    @db[:items].select_map(:a).must_equal [BigDecimal.new('100.1')]
+    @db[:items].update(:a=>BigDecimal('100.1'))
+    @db[:items].select_map(:a).must_equal [BigDecimal('100.1')]
     @db[:items].get(:a).must_be_kind_of(BigDecimal)
   end
 

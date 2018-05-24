@@ -68,7 +68,7 @@ module Sequel
       end
       def RubyBigDecimal(r, i)
         if v = r.getBigDecimal(i)
-          BigDecimal.new(v.to_string)
+          ::Kernel::BigDecimal(v.to_string)
         end
       end
       def RubyBlob(r, i)

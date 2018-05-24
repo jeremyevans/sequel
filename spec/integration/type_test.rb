@@ -45,11 +45,11 @@ describe "Supported types" do
   
   cspecify "should support generic numeric type", [:odbc, :mssql] do
     ds = create_items_table_with_column(:number, Numeric, :size=>[15, 10])
-    ds.insert(:number => BigDecimal.new('2.123456789'))
-    ds.all.must_equal [{:number=>BigDecimal.new('2.123456789')}]
+    ds.insert(:number => BigDecimal('2.123456789'))
+    ds.all.must_equal [{:number=>BigDecimal('2.123456789')}]
     ds = create_items_table_with_column(:number, BigDecimal, :size=>[15, 10])
-    ds.insert(:number => BigDecimal.new('2.123456789'))
-    ds.all.must_equal [{:number=>BigDecimal.new('2.123456789')}]
+    ds.insert(:number => BigDecimal('2.123456789'))
+    ds.all.must_equal [{:number=>BigDecimal('2.123456789')}]
   end
 
   it "should support generic string type" do

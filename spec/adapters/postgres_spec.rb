@@ -2186,10 +2186,10 @@ describe 'PostgreSQL array handling' do
       column :n, 'numeric[]'
     end
     @tp.call.must_equal [:decimal_array]
-    @ds.insert(Sequel.pg_array([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')], :numeric))
+    @ds.insert(Sequel.pg_array([BigDecimal('1.000000000000000000001'), nil, BigDecimal('1')], :numeric))
     @ds.count.must_equal 1
     rs = @ds.all
-    rs.must_equal [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
+    rs.must_equal [{:n=>[BigDecimal('1.000000000000000000001'), nil, BigDecimal('1')]}]
     rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
     rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
     @ds.delete
@@ -2197,9 +2197,9 @@ describe 'PostgreSQL array handling' do
     @ds.all.must_equal rs
 
     @ds.delete
-    @ds.insert(Sequel.pg_array([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]], :numeric))
+    @ds.insert(Sequel.pg_array([[BigDecimal('1.0000000000000000000000000000001'), nil], [nil, BigDecimal('1')]], :numeric))
     rs = @ds.all
-    rs.must_equal [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
+    rs.must_equal [{:n=>[[BigDecimal('1.0000000000000000000000000000001'), nil], [nil, BigDecimal('1')]]}]
     rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
     rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
     @ds.delete
@@ -2469,11 +2469,11 @@ describe 'PostgreSQL array handling' do
       column :t, 'text[]'
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    h = {:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']]}
+    h = {:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']]}
     o = c.create(h)
     o.i.must_equal [1, 2, nil]
     o.f.must_equal [[1, 2.5], [3, 4.5]]
-    o.d.must_equal [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
+    o.d.must_equal [BigDecimal('1'), BigDecimal('1.000000000000000000001')]
     o.t.must_equal [%w'a b c', ['NULL', nil, '1']]
     c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.must_equal [o]
     o2 = c.new(h)
@@ -2487,10 +2487,10 @@ describe 'PostgreSQL array handling' do
       column :t, 'varchar[]'
     end
     c = Class.new(Sequel::Model(@db[:items]))
-    o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
+    o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
     o.i.must_equal [1, 2, nil]
     o.f.must_equal [[1, 2.5], [3, 4.5]]
-    o.d.must_equal [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
+    o.d.must_equal [BigDecimal('1'), BigDecimal('1.000000000000000000001')]
     o.t.must_equal [%w'a b c', ['NULL', nil, '1']]
     c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.must_equal [o]
     o2 = c.new(h)
@@ -3225,7 +3225,7 @@ describe 'PostgreSQL range types' do
     @db = DB
     @ds = @db[:items]
     @map = {:i4=>'int4range', :i8=>'int8range', :n=>'numrange', :d=>'daterange', :t=>'tsrange', :tz=>'tstzrange'}
-    @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal.new('1.0')..BigDecimal.new('2.0'), :d=>Date.today...(Date.today+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
+    @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal('1.0')..BigDecimal('2.0'), :d=>Date.today...(Date.today+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
     @ra = {}
     @pgr = {}
     @pgra = {}

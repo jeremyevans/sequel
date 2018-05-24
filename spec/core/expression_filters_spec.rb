@@ -186,7 +186,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(1 + Sequel.expr(:x)).must_equal '(1 + x)'
     @d.lit(2**65 - Sequel.+(:x, 1)).must_equal "(#{2**65} - (x + 1))"
     @d.lit(1.0 / Sequel.function(:x)).must_equal '(1.0 / x())'
-    @d.lit(BigDecimal.new('1.0') * Sequel[:a][:y]).must_equal '(1.0 * a.y)'
+    @d.lit(BigDecimal('1.0') * Sequel[:a][:y]).must_equal '(1.0 * a.y)'
     @d.lit(2 ** Sequel.cast(:x, Integer)).must_equal 'power(2, CAST(x AS integer))'
     @d.lit(1 + Sequel.lit('x')).must_equal '(1 + x)'
     @d.lit(1 + Sequel.lit('?', :x)).must_equal '(1 + x)'
