@@ -144,7 +144,7 @@ module Sequel
             table_alias = e[:table]
             if aliases.include?(table_alias)
               i = 0
-              table_alias = loop do
+              table_alias = while true
                 ta = :"#{table_alias}_#{i}"
                 break ta unless aliases.include?(ta)
                 i += 1

@@ -579,7 +579,7 @@ module Sequel
           sql << str
         else
           re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
-          loop do
+          while true
             previous, q, str = str.partition(re)
             sql << previous
             literal_append(sql, args[($1||q[1..-1].to_s).to_sym]) unless q.empty?
@@ -598,7 +598,7 @@ module Sequel
       else
         i = -1
         match_len = args.length - 1
-        loop do
+        while true
           previous, q, str = str.partition('?')
           sql << previous
           literal_append(sql, args.at(i+=1)) unless q.empty?

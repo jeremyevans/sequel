@@ -226,7 +226,7 @@ module Sequel
       used_aliases += opts[:join].map{|j| j.table_alias ? alias_alias_symbol(j.table_alias) : alias_symbol(j.table)} if opts[:join]
       if used_aliases.include?(table_alias)
         i = 0
-        loop do
+        while true
           ta = :"#{table_alias}_#{i}"
           return ta unless used_aliases.include?(ta)
           i += 1 

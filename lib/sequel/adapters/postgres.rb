@@ -449,7 +449,7 @@ module Sequel
                   raise Error, 'calling #listen with :loop requires a block' unless block
                   loop_call = l.respond_to?(:call)
                   catch(:stop) do
-                    loop do
+                    while true
                       t = timeout_block ? [timeout_block.call] : []
                       conn.wait_for_notify(*t, &block)
                       l.call(conn) if loop_call
@@ -712,7 +712,7 @@ module Sequel
               yield_hash_rows(res, cols){|h| yield h}
               return if res.ntuples < rows_per_fetch
             end
-            loop do
+            while true
               execute(fetch_sql) do |res|
                 yield_hash_rows(res, cols){|h| yield h}
                 return if res.ntuples < rows_per_fetch
