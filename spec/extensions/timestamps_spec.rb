@@ -63,9 +63,9 @@ describe "Sequel::Plugins::Timestamps" do
   it "should work with current_datetime_timestamp extension" do
     Sequel.datetime_class = Time
     @c.dataset = @c.dataset.extension(:current_datetime_timestamp)
-    o = @c.create
+    @c.create
     @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES (CURRENT_TIMESTAMP)"]
-    o = @c.load(:id=>1).save
+    @c.load(:id=>1).save
     @c.db.sqls.must_equal ["UPDATE t SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 

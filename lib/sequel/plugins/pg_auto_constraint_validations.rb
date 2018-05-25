@@ -195,7 +195,7 @@ module Sequel
                 end
               end
             end
-          rescue => e2
+          rescue
             # If there is an error trying to conver the constraint violation
             # into a validation failure, it's best to just raise the constraint
             # violation.  This can make debugging the above block of code more

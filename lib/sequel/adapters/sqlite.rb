@@ -1,4 +1,4 @@
-# frozen-string-literal: trueend
+# frozen-string-literal: true
 
 require 'sqlite3'
 require_relative 'shared/sqlite'

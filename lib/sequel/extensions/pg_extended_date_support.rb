@@ -83,7 +83,6 @@ module Sequel
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
-        ovalue = value
         if value.is_a?(String) && (m = value.match(/(?:(?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/)) && (m[1] || m[2])
           if m[2]
             value = value.sub(' BC', '').sub(' ', ' BC ')

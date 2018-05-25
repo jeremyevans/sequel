@@ -105,7 +105,6 @@ module Sequel
           key_present = lambda{|m| key_conv[m].all?}
           prkey_conv = lambda{|m| prkey_array.map{|k| m[k]}}
           key_aliases = (0...key_array.length).map{|i| :"#{ka}_#{i}"}
-          ka_conv = lambda{|m| key_aliases.map{|k| m[k]}}
           ancestor_base_case_columns = prkey_array.zip(key_aliases).map{|k, ka_| SQL::AliasedExpression.new(k, ka_)} + c_all
           descendant_base_case_columns = key_array.zip(key_aliases).map{|k, ka_| SQL::AliasedExpression.new(k, ka_)} + c_all
           recursive_case_columns = prkey_array.zip(key_aliases).map{|k, ka_| SQL::QualifiedIdentifier.new(t, ka_)} + c_all
@@ -114,7 +113,6 @@ module Sequel
           key_present = key_conv = lambda{|m| m[key]}
           prkey_conv = lambda{|m| m[prkey]}
           key_aliases = [ka]
-          ka_conv = lambda{|m| m[ka]}
           ancestor_base_case_columns = [SQL::AliasedExpression.new(prkey, ka)] + c_all
           descendant_base_case_columns = [SQL::AliasedExpression.new(key, ka)] + c_all
           recursive_case_columns = [SQL::QualifiedIdentifier.new(t, ka)] + c_all

@@ -12,7 +12,6 @@ describe "pg_auto_constraint_validations plugin" do
 
   before do
     info = @info = {:schema=>'public', :table=>'items'}
-    error = @error = []
     @db = Sequel.mock(:host=>'postgres')
     def @db.schema(*) [[:i, {}], [:id, {}]] end
     @set_error = lambda{|ec, ei| @db.fetch = @db.autoid = @db.numrows = ec; info.merge!(ei)}

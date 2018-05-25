@@ -271,7 +271,7 @@ module Sequel
         def error_info(e)
           e = e.wrapped_exception if e.is_a?(DatabaseError)
           r = e.result
-          h = {
+          {
             :schema => r.error_field(::PG::PG_DIAG_SCHEMA_NAME),
             :table => r.error_field(::PG::PG_DIAG_TABLE_NAME),
             :column => r.error_field(::PG::PG_DIAG_COLUMN_NAME),

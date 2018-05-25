@@ -3363,7 +3363,7 @@ module Sequel
             # object if any are dependencies for multiple objects,
             # to prevent duplicate objects from showing up in the case
             # the normal duplicate removal code is not being used.
-            if !@unique && !deps.empty? && deps.any?{|key,_| @ta_map[key][3]}
+            if !@unique && !deps.empty? && deps.any?{|dep_key,_| @ta_map[dep_key][3]}
               key = [current.object_id, key]
             end
 
