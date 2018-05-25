@@ -92,11 +92,13 @@ module Sequel
           if m[1] || conv
             dt = DateTime.parse(value)
             if conv
+              # :nocov:
               if Sequel.datetime_class == DateTime
                 dt >>= 12
               else
                 dt >>= 24
               end
+              # :nocov:
             end
             dt = dt.to_time unless Sequel.datetime_class == DateTime
             Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
