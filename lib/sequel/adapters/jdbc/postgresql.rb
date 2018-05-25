@@ -135,11 +135,6 @@ module Sequel
 
         private
         
-        DATABASE_ERROR_CLASSES = [NativeException].freeze
-        def database_error_classes
-          DATABASE_ERROR_CLASSES
-        end
-
         def disconnect_error?(exception, opts)
           super || exception.message =~ /\A(This connection has been closed\.|FATAL: terminating connection due to administrator command|An I\/O error occurred while sending to the backend\.)\z/
         end
