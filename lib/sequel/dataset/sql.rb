@@ -604,7 +604,7 @@ module Sequel
           literal_append(sql, args.at(i+=1)) unless q.empty?
           if str.empty?
             unless i == match_len
-              raise Error, "Mismatched number of placeholders (#{i+1}) and placeholder arguments (#{args.length}) when using placeholder array"
+              raise Error, "Mismatched number of placeholders (#{i+1}) and placeholder arguments (#{args.length}) when using placeholder string"
             end
             break
           end
