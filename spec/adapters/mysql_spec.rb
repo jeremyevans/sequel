@@ -219,13 +219,7 @@ describe "Dataset#distinct" do
   end
 
   it "#distinct with arguments should return results distinct on those arguments" do
-    sql_mode = @db.get(Sequel.lit '@@sql_mode')
-    only_full_group_by = if sql_mode.empty?
-      !@db.mariadb? && @db.server_version >= 50705
-    else
-      sql_mode.include?('ONLY_FULL_GROUP_BY')
-    end
-    skip("ONLY_FULL_GROUP_BY sql_mode set, skipping DISTINCT ON emulation test") if only_full_group_by
+    skip("ONLY_FULL_GROUP_BY sql_mode set, skipping DISTINCT ON emulation test") if @db.get(Sequel.lit '@@sql_mode').include?('ONLY_FULL_GROUP_BY')
 
     @ds.insert(20, 10)
     @ds.insert(30, 10)
