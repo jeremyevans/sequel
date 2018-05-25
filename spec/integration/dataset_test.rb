@@ -1698,6 +1698,27 @@ describe "Dataset string methods" do
     @ds.filter(Sequel.expr(:b).ilike(@ds.escape_like('[Bar%]'))).select_order_map(:b).must_equal ['[bar%]']
     @ds.filter(Sequel.expr(:b).ilike("#{@ds.escape_like('Bar%')}_")).select_order_map(:b).must_equal ['bar%.']
     @ds.filter(Sequel.expr(:b).ilike("#{@ds.escape_like('Bar%')}%")).select_order_map(:b).must_equal ['bar%', 'bar%.', 'bar%..']
+
+    Sequel.extension(:escaped_like)
+    @ds.filter(Sequel.expr(:a).escaped_like('?', 'Foo_')).select_order_map(:a).must_equal []
+    @ds.filter(Sequel.expr(:a).escaped_like('?', 'foo_')).select_order_map(:a).must_equal ['foo_']
+    @ds.filter(Sequel.expr(:b).escaped_like('?', ['bar%'])).select_order_map(:b).must_equal ['bar%']
+    @ds.filter(Sequel.expr(:a).escaped_like('??', ['fo', 'o\\_'])).select_order_map(:a).must_equal ['foo\\_']
+    @ds.filter(Sequel.expr(:b).escaped_like('?', 'bar\\%')).select_order_map(:b).must_equal ['bar\\%']
+    @ds.filter(Sequel.expr(:a).escaped_like('?', '[f#*?oo_]')).select_order_map(:a).must_equal ['[f#*?oo_]']
+    @ds.filter(Sequel.expr(:b).escaped_like('?', '[bar%]')).select_order_map(:b).must_equal ['[bar%]']
+    @ds.filter(Sequel.expr(:b).escaped_like('?_', 'bar%')).select_order_map(:b).must_equal ['bar%.']
+    @ds.filter(Sequel.expr(:b).escaped_like('?%', 'bar%')).select_order_map(:b).must_equal ['bar%', 'bar%.', 'bar%..']
+
+    @ds.filter(Sequel.expr(:a).escaped_ilike('?', 'Foo_')).select_order_map(:a).must_equal ['foo_']
+    @ds.filter(Sequel.expr(:a).escaped_ilike('?', 'Foo_')).select_order_map(:a).must_equal ['foo_']
+    @ds.filter(Sequel.expr(:b).escaped_ilike('?', ['Bar%'])).select_order_map(:b).must_equal ['bar%']
+    @ds.filter(Sequel.expr(:a).escaped_ilike('??', ['Fo', 'o\\_'])).select_order_map(:a).must_equal ['foo\\_']
+    @ds.filter(Sequel.expr(:b).escaped_ilike('?', 'Bar\\%')).select_order_map(:b).must_equal ['bar\\%']
+    @ds.filter(Sequel.expr(:a).escaped_ilike('?', '[F#*?oo_]')).select_order_map(:a).must_equal ['[f#*?oo_]']
+    @ds.filter(Sequel.expr(:b).escaped_ilike('?', '[Bar%]')).select_order_map(:b).must_equal ['[bar%]']
+    @ds.filter(Sequel.expr(:b).escaped_ilike('?_', 'Bar%')).select_order_map(:b).must_equal ['bar%.']
+    @ds.filter(Sequel.expr(:b).escaped_ilike('?%', 'Bar%')).select_order_map(:b).must_equal ['bar%', 'bar%.', 'bar%..']
   end
   
   if DB.dataset.supports_regexp?

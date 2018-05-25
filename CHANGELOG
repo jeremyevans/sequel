@@ -1,5 +1,7 @@
 === master
 
+* Add escaped_like extension for creation of LIKE expressions with placeholders in the pattern without access to a dataset (jeremyevans)
+
 * Modify jdbc adapter exception handling to work around ::NativeException deprecation in JRuby 9.2 (jeremyevans)
 
 * Work around broken BC date handling in JRuby 9.2.0.0 (jeremyevans)
