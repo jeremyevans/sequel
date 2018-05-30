@@ -19,7 +19,7 @@ module Sequel
       include Sequel::Database::SplitAlterTable
 
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}.freeze
-      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :generation, :unique, :primary_key, :auto_increment, :references].freeze
+      COLUMN_DEFINITION_ORDER = [:generated, :collate, :null, :default, :unique, :primary_key, :auto_increment, :references].freeze
       
       # Set the default charset used for CREATE TABLE.  You can pass the
       # :charset option to create_table to override this setting.
@@ -337,12 +337,21 @@ module Sequel
       end
 
       # Add generation clause SQL fragment to column creation SQL.
-      def column_definition_generation_sql(sql, column)
-        if (generation_expression = column[:generated_always_as]) && supports_generated_columns?
-          sql << " GENERATED ALWAYS AS (#{generation_expression})"
+      def column_definition_generated_sql(sql, column)
+        if (generated_expression = column[:generated_always_as])
+          sql << " GENERATED ALWAYS AS (#{literal(generated_expression)})"
+          case (type = column[:generated_type])
+          when nil
+            # none, database default
+          when :virtual
+            sql << " VIRTUAL"
+          when :stored
+            sql << (mariadb? ? " PERSISTENT" : " STORED")
+          else
+            raise Error, "unsupported :generated_type option: #{type.inspect}"
+          end
         end
       end
-
 
       def column_definition_order
         COLUMN_DEFINITION_ORDER
@@ -486,11 +495,11 @@ module Sequel
         metadata_dataset.with_sql("DESCRIBE ?", table).map do |row|
           extra = row.delete(:Extra)
           if row[:primary_key] = row.delete(:Key) == 'PRI'
-            row[:auto_increment] = !!(extra.to_s =~ /auto_increment/io)
+            row[:auto_increment] = !!(extra.to_s =~ /auto_increment/i)
           end
           if supports_generated_columns?
-            # Extra field contains VIRTUAL GENERATED or VIRTUAL STORED for generated columns.
-            row[:generated] = !!(extra.to_s =~ /VIRTUAL/io)
+            # Extra field contains VIRTUAL or PERSISTENT for generated columns
+            row[:generated] = !!(extra.to_s =~ /VIRTUAL|STORED|PERSISTENT/i)
           end
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)

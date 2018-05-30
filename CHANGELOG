@@ -1,5 +1,7 @@
 === master
 
+* Support generated columns on MySQL 5.7+ and MariaDB 5.2+ (wjordan, jeremyevans) (#1517)
+
 * Add escaped_like extension for creation of LIKE expressions with placeholders in the pattern without access to a dataset (jeremyevans)
 
 * Modify jdbc adapter exception handling to work around ::NativeException deprecation in JRuby 9.2 (jeremyevans)

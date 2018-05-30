@@ -71,8 +71,9 @@ describe "MySQL", '#create_table' do
   end
 
   it "should create generated column" do
-    @db.create_table(:dolls){String :a; String :b, generated_always_as: "CONCAT(a, 'plus')"}
-    @db.schema(:dolls).to_h[:b][:generated].must_equal true
+    skip("generated columns not supported, skipping test") unless @db.supports_generated_columns?
+    @db.create_table(:dolls){String :a; String :b, generated_always_as: Sequel.function(:CONCAT, :a, 'plus')}
+    @db.schema(:dolls)[1][1][:generated].must_equal true
   end
 end
 
@@ -211,7 +212,7 @@ describe "A MySQL dataset" do
 
   it "should support generated columns" do
     skip("generated columns not supported, skipping test") unless DB.supports_generated_columns?
-    DB.alter_table(:items) {add_column :b, String, generated_always_as: "CONCAT(name, 'plus')"}
+    DB.alter_table(:items) {add_column :b, String, :generated_always_as => Sequel.function(:CONCAT, :name, 'plus')}
     @d.insert(name: 'hello')
     @d.first[:b].must_equal 'helloplus'
   end
@@ -516,10 +517,13 @@ describe "A MySQL database" do
     @db[:items].first.must_be_nil
   end
 
-  it "should correctly handle add_column :generated_always_as option" do
+  it "should have schema handle generated columns" do
+    skip("generated columns not supported, skipping test") unless @db.supports_generated_columns?
     @db.create_table(:items) {String :a}
-    @db.alter_table(:items){add_column :b, String, generated_always_as: "CONCAT(a, 'plus')"}
-    @db.schema(:items).to_h[:b][:generated].must_equal true
+    @db.alter_table(:items){add_column :b, String, :generated_always_as=>Sequel.function(:CONCAT, :a, 'plus'), :generated_type=>:stored, :unique=>true}
+    @db.schema(:items)[1][1][:generated].must_equal true
+    @db.alter_table(:items){add_column :c, String, :generated_always_as=>Sequel.function(:CONCAT, :a, 'minus'), :generated_type=>:virtual}
+    @db.schema(:items)[2][1][:generated].must_equal true
   end
 end  
 

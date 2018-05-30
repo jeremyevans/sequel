@@ -109,8 +109,6 @@ module Sequel
       #                yet exist on referenced table (but will exist before the transaction commits).
       #                Basically it adds DEFERRABLE INITIALLY DEFERRED on key creation.
       #                If you use :immediate as the value, uses DEFERRABLE INITIALLY IMMEDIATE.
-      # :generated_always_as :: Specify a GENERATED ALWAYS AS column expression,
-      #                         if generated columns are supported (MySQL and MariaDB).
       # :index :: Create an index on this column.  If given a hash, use the hash as the
       #           options for the index.
       # :key :: For foreign key columns, the column in the associated table
@@ -132,6 +130,10 @@ module Sequel
       # :unique :: Mark the column as unique, generally has the same effect as
       #            creating a unique index on the column.
       # :unique_constraint_name :: The name to give the unique key constraint
+      #
+      # MySQL specific options:
+      # :generated_always_as :: Specify a GENERATED ALWAYS AS column expression,
+      #                         if generated columns are supported.
       def column(name, type, opts = OPTS)
         columns << {:name => name, :type => type}.merge!(opts)
         if index_opts = opts[:index]
