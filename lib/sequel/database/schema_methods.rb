@@ -93,6 +93,13 @@ module Sequel
     # key ensures that entries in the table are unique, which is the typical
     # desire for a join table.
     #
+    # The default table name this will create is the sorted version of the two
+    # hash values, joined by an underscore.  So the following two method calls
+    # create the same table:
+    #
+    #   create_join_table(cat_id: :cats, dog_id: :dogs) # cats_dogs
+    #   create_join_table(dog_id: :dogs, cat_id: :cats) # cats_dogs
+    #
     # You can provide column options by making the values in the hash
     # be option hashes, so long as the option hashes have a :table
     # entry giving the table referenced:
