@@ -80,7 +80,7 @@ module Sequel
     # Create a join table using a hash of foreign keys to referenced
     # table names.  Example:
     #
-    #   create_join_table:cat_id: :cats, dog_id: :dogs)
+    #   create_join_table(cat_id: :cats, dog_id: :dogs)
     #   # CREATE TABLE cats_dogs (
     #   #  cat_id integer NOT NULL REFERENCES cats,
     #   #  dog_id integer NOT NULL REFERENCES dogs,
