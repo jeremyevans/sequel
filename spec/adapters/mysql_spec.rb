@@ -69,6 +69,11 @@ describe "MySQL", '#create_table' do
     @db.set_column_type :dolls, :a, Integer, :auto_increment=>true
     @db.schema(:dolls).first.last[:auto_increment].must_equal true
   end
+
+  it "should create generated column" do
+    @db.create_table(:dolls){String :a; String :b, generated_always_as: "CONCAT(a, 'plus')"}
+    @db.schema(:dolls).to_h[:b][:generated].must_equal true
+  end
 end
 
 if [:mysql, :mysql2].include?(DB.adapter_scheme)
@@ -202,6 +207,13 @@ describe "A MySQL dataset" do
     ds.all.must_equal [{:value=>1, :name=>'a'}]
     ps.call(:v => 1, :n => 'b')
     ds.all.must_equal [{:value=>1, :name=>'b'}]
+  end
+
+  it "should support generated columns" do
+    skip("generated columns not supported, skipping test") unless DB.supports_generated_columns?
+    DB.alter_table(:items) {add_column :b, String, generated_always_as: "CONCAT(name, 'plus')"}
+    @d.insert(name: 'hello')
+    @d.first[:b].must_equal 'helloplus'
   end
 end
 
@@ -502,6 +514,12 @@ describe "A MySQL database" do
 
     @db << 'DELETE FROM items'
     @db[:items].first.must_be_nil
+  end
+
+  it "should correctly handle add_column :generated_always_as option" do
+    @db.create_table(:items) {String :a}
+    @db.alter_table(:items){add_column :b, String, generated_always_as: "CONCAT(a, 'plus')"}
+    @db.schema(:items).to_h[:b][:generated].must_equal true
   end
 end  
 

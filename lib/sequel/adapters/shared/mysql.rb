@@ -19,7 +19,7 @@ module Sequel
       include Sequel::Database::SplitAlterTable
 
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}.freeze
-      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :unique, :primary_key, :auto_increment, :references].freeze
+      COLUMN_DEFINITION_ORDER = [:collate, :null, :default, :generation, :unique, :primary_key, :auto_increment, :references].freeze
       
       # Set the default charset used for CREATE TABLE.  You can pass the
       # :charset option to create_table to override this setting.
@@ -137,6 +137,11 @@ module Sequel
         true
       end
       
+      # Generated columns are supported in MariaDB 5.2.0+ and MySQL 5.7.6+.
+      def supports_generated_columns?
+        server_version >= (mariadb? ? 50200 : 50706)
+      end
+
       # MySQL 5+ supports prepared transactions (two-phase commit) using XA
       def supports_prepared_transactions?
         server_version >= 50000
@@ -331,6 +336,14 @@ module Sequel
         end
       end
 
+      # Add generation clause SQL fragment to column creation SQL.
+      def column_definition_generation_sql(sql, column)
+        if (generation_expression = column[:generated_always_as]) && supports_generated_columns?
+          sql << " GENERATED ALWAYS AS (#{generation_expression})"
+        end
+      end
+
+
       def column_definition_order
         COLUMN_DEFINITION_ORDER
       end
@@ -474,6 +487,10 @@ module Sequel
           extra = row.delete(:Extra)
           if row[:primary_key] = row.delete(:Key) == 'PRI'
             row[:auto_increment] = !!(extra.to_s =~ /auto_increment/io)
+          end
+          if supports_generated_columns?
+            # Extra field contains VIRTUAL GENERATED or VIRTUAL STORED for generated columns.
+            row[:generated] = !!(extra.to_s =~ /VIRTUAL/io)
           end
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)

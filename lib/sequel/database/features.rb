@@ -44,6 +44,12 @@ module Sequel
       respond_to?(:foreign_key_list)
     end
 
+    # Whether the database supports generated columns, false by default.
+    # SQL-2003 feature T-175.
+    def supports_generated_columns?
+      false
+    end
+
     # Whether the database supports Database#indexes for parsing indexes.
     def supports_index_parsing?
       respond_to?(:indexes)
