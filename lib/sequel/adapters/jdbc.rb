@@ -23,7 +23,12 @@ module Sequel
     NativeException = java.lang.Exception
     
     # Default database error classes
-    DATABASE_ERROR_CLASSES = [NativeException].freeze
+    DATABASE_ERROR_CLASSES = [NativeException]
+    if JRUBY_VERSION < '9.2'
+      # On JRuby <9.2, still include ::NativeException, as it is still needed in some cases
+      DATABASE_ERROR_CLASSES << ::NativeException
+    end
+    DATABASE_ERROR_CLASSES.freeze
 
     # Allow loading the necessary JDBC support via a gem.
     def self.load_gem(name)
@@ -175,7 +180,7 @@ module Sequel
                 last_insert_id(conn, opts)
               end
             end
-          rescue NativeException => e
+          rescue *DATABASE_ERROR_CLASSES => e
             raise_error(e)
           ensure
             cps.close
@@ -196,7 +201,7 @@ module Sequel
             JavaSQL::DriverManager.setLoginTimeout(opts[:login_timeout]) if opts[:login_timeout]
             raise StandardError, "skipping regular connection" if opts[:jdbc_properties]
             JavaSQL::DriverManager.getConnection(*args)
-          rescue NativeException, StandardError => e
+          rescue StandardError, *DATABASE_ERROR_CLASSES => e
             raise e unless driver
             # If the DriverManager can't get the connection - use the connect
             # method of the driver. (This happens under Tomcat for instance)
@@ -210,7 +215,7 @@ module Sequel
               c = driver.new.connect(args[0], props)
               raise(Sequel::DatabaseError, 'driver.new.connect returned nil: probably bad JDBC connection string') unless c
               c
-            rescue NativeException, StandardError => e2
+            rescue StandardError, *DATABASE_ERROR_CLASSES => e2
               if e2.respond_to?(:message=) && e2.message != e.message
                 e2.message = "#{e2.message}\n#{e.class.name}: #{e.message}"
               end
@@ -443,7 +448,7 @@ module Sequel
                 log_connection_yield(msg, conn, args){cps.executeUpdate}
               end
             end
-          rescue NativeException => e
+          rescue *DATABASE_ERROR_CLASSES => e
             raise_error(e)
           ensure
             cps.close unless name
@@ -668,7 +673,7 @@ module Sequel
       def statement(conn)
         stmt = conn.createStatement
         yield stmt
-      rescue NativeException => e
+      rescue *DATABASE_ERROR_CLASSES => e
         raise_error(e)
       ensure
         stmt.close if stmt
