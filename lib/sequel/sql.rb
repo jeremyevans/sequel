@@ -1777,6 +1777,61 @@ module Sequel
       end
     end
 
+    # A +Window+ is part of a window function specifying the window over which a window function operates.
+    #
+    #   Sequel::SQL::Window.new(partition: :col1)
+    #   # (PARTITION BY col1)
+    #   Sequel::SQL::Window.new(partition: [:col2, :col3])
+    #   # (PARTITION BY col2, col3)
+    #
+    #   Sequel::SQL::Window.new(order: :col4)
+    #   # (ORDER BY col4)
+    #   Sequel::SQL::Window.new(order: [:col5, Sequel.desc(:col6)])
+    #   # (ORDER BY col5, col6 DESC)
+    #
+    #   Sequel::SQL::Window.new(partition: :col7, frame: :all)
+    #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: :rows)
+    #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: "RANGE CURRENT ROW")
+    #   # (PARTITION BY col7 RANGE CURRENT ROW)
+    #
+    #   Sequel::SQL::Window.new(window: :named_window) # you can create a named window with Dataset#window
+    #   # (named_window)
+    class Window < Expression
+      # The options for this window.  Options currently supported:
+      # :frame :: if specified, should be :all, :rows, or a String that is used literally. :all always operates over all rows in the
+      #           partition, while :rows excludes the current row's later peers.  The default is to include
+      #           all previous rows in the partition up to the current row's last peer.
+      # :order :: order on the column(s) given
+      # :partition :: partition/group on the column(s) given
+      # :window :: base results on a previously specified named window
+      attr_reader :opts
+
+      # Set the options to the options given
+      def initialize(opts=OPTS)
+        @opts = opts.frozen? ? opts : Hash[opts].freeze
+        freeze
+      end
+
+      to_s_method :window_sql, '@opts'
+    end
+
+    # A +Wrapper+ is a simple way to wrap an existing object so that it supports
+    # the Sequel DSL.
+    class Wrapper < GenericExpression
+      # The underlying value wrapped by this object.
+      attr_reader :value
+
+      # Set the value wrapped by the object.
+      def initialize(value)
+        @value = value
+        freeze
+      end
+
+      to_s_method :literal, '@value'
+    end
+
     # The purpose of the +VirtualRow+ class is to allow the easy creation of SQL identifiers and functions,
     # in a way that leads to more compact code.
     #
@@ -1865,61 +1920,6 @@ module Sequel
       end)
 
       Sequel::VIRTUAL_ROW = new
-    end
-
-    # A +Window+ is part of a window function specifying the window over which a window function operates.
-    #
-    #   Sequel::SQL::Window.new(partition: :col1)
-    #   # (PARTITION BY col1)
-    #   Sequel::SQL::Window.new(partition: [:col2, :col3])
-    #   # (PARTITION BY col2, col3)
-    #
-    #   Sequel::SQL::Window.new(order: :col4)
-    #   # (ORDER BY col4)
-    #   Sequel::SQL::Window.new(order: [:col5, Sequel.desc(:col6)])
-    #   # (ORDER BY col5, col6 DESC)
-    #
-    #   Sequel::SQL::Window.new(partition: :col7, frame: :all)
-    #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
-    #   Sequel::SQL::Window.new(partition: :col7, frame: :rows)
-    #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
-    #   Sequel::SQL::Window.new(partition: :col7, frame: "RANGE CURRENT ROW")
-    #   # (PARTITION BY col7 RANGE CURRENT ROW)
-    #
-    #   Sequel::SQL::Window.new(window: :named_window) # you can create a named window with Dataset#window
-    #   # (named_window)
-    class Window < Expression
-      # The options for this window.  Options currently supported:
-      # :frame :: if specified, should be :all, :rows, or a String that is used literally. :all always operates over all rows in the
-      #           partition, while :rows excludes the current row's later peers.  The default is to include
-      #           all previous rows in the partition up to the current row's last peer.
-      # :order :: order on the column(s) given
-      # :partition :: partition/group on the column(s) given
-      # :window :: base results on a previously specified named window
-      attr_reader :opts
-
-      # Set the options to the options given
-      def initialize(opts=OPTS)
-        @opts = opts.frozen? ? opts : Hash[opts].freeze
-        freeze
-      end
-
-      to_s_method :window_sql, '@opts'
-    end
-
-    # A +Wrapper+ is a simple way to wrap an existing object so that it supports
-    # the Sequel DSL.
-    class Wrapper < GenericExpression
-      # The underlying value wrapped by this object.
-      attr_reader :value
-
-      # Set the value wrapped by the object.
-      def initialize(value)
-        @value = value
-        freeze
-      end
-
-      to_s_method :literal, '@value'
     end
   end
 
