@@ -134,6 +134,8 @@ module Sequel
       # MySQL specific options:
       # :generated_always_as :: Specify a GENERATED ALWAYS AS column expression,
       #                         if generated columns are supported.
+      # :generated_type :: Set the type of column when using :generated_always_as,
+      #                    should be :virtual or :stored to force a type.
       def column(name, type, opts = OPTS)
         columns << {:name => name, :type => type}.merge!(opts)
         if index_opts = opts[:index]
