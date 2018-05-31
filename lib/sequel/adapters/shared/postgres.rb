@@ -269,7 +269,7 @@ module Sequel
 
         table_oid = regclass_oid(table)
         im = input_identifier_meth
-        unless column = im.call(opts[:column] || ((schema(table).find{|col, sch| sch[:primary_key] && sch[:auto_increment]}) && sch[0]))
+        unless column = im.call(opts[:column] || ((sch = schema(table).find{|_, sc| sc[:primary_key] && sc[:auto_increment]}) && sch[0]))
           raise Error, "could not determine column to convert from serial to identity automatically"
         end
 
