@@ -1846,7 +1846,7 @@ module Sequel
         freeze
       end
 
-      include(Module.new do
+      m = Module.new do
         # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
         # on arguments and whether a block is provided.  Does not currently call the block.
         # See the class level documentation.
@@ -1862,7 +1862,8 @@ module Sequel
             Function.new(m, *args)
           end
         end
-      end)
+      end
+      include m
 
       Sequel::VIRTUAL_ROW = new
     end
