@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>escaped_like.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>escaped_like.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/escaped_like.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2018-05-25 14:49:16 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The escaped_like extension adds <code>escaped_like</code> and
+<code>escaped_ilike</code> methods to <a
+href="../../../../classes/Sequel/SQL/StringMethods.html">Sequel::SQL::StringMethods</a>,
+which allow them to be easily used with most of Sequel&#39;s expression
+objects.  Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">string_column</span>.<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-identifier">user_input</span>)}&#x000A;<span class="ruby-comment"># user_input is &#39;foo&#39;:</span>&#x000A;<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;foo%&#39; ESCAPE &#39;\&#39;</span>&#x000A;<span class="ruby-comment"># user_input is &#39;%foo&#39;:</span>&#x000A;<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;\%foo%&#39; ESCAPE &#39;\&#39;</span></pre>
+
+<p>To load the extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:escaped_like</span></pre>
+
+<p>Related modules: <a
+href="../../../../classes/Sequel/SQL/StringMethods.html">Sequel::SQL::StringMethods</a>,
+<a
+href="../../../../classes/Sequel/SQL/EscapedLikeExpression.html">Sequel::SQL::EscapedLikeExpression</a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -454,7 +454,7 @@ major changes.</p>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MINOR</td>
 <td>=</td>
-<td class='context-item-value'>8</td>
+<td class='context-item-value'>9</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
 <p>The minor version of <a href="Sequel.html">Sequel</a>.  Bumped for every
@@ -591,6 +591,16 @@ been violated.</p>
 <td class='context-item-desc'>
 <p>The version of <a href="Sequel.html">Sequel</a> you are using, as a string
 (e.g. “2.11.0”)</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>VERSION_NUMBER</td>
+<td>=</td>
+<td class='context-item-value'>MAJOR*10000 + MINOR*10 + TINY</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'>
+<p>The version of <a href="Sequel.html">Sequel</a> you are using, as a number
+(2.11.0 -&gt; 20110)</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -1215,7 +1225,7 @@ href="Sequel.html">Sequel</a> supports on some databases).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-version-source'><span class="ruby-comment"># File lib/sequel/version.rb, line 16</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">version</span>&#x000A;  <span class="ruby-constant">VERSION</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-version-source'><span class="ruby-comment"># File lib/sequel/version.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">version</span>&#x000A;  <span class="ruby-constant">VERSION</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-virtual_row'>

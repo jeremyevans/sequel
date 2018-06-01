@@ -270,7 +270,8 @@ aggregate functions that are order dependent.</p>
 <div class='description'>
 
 <p>Return a new function with an OVER clause (making it a window function).
-See {SQL::Window} for the list of options <code>over</code> can receive.</p>
+See Sequel::SQL::Window for the list of options <code>over</code> can
+receive.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:row_number</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">partition:</span> <span class="ruby-value">:col</span>) <span class="ruby-comment"># row_number() OVER (PARTITION BY col)</span></pre>
 

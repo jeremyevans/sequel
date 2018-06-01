@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.9.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.9.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.9.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2018-06-01 07:49:41 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An escaped_like extension has been added, for the creation of LIKE/ILIKE
+expressions with placeholders in patterns without access to a dataset. 
+This adds escaped_like and escaped_ilike methods to the same <a
+href="../../../classes/Sequel.html">Sequel</a> expression objects that
+support like and ilike.  These methods take two arguments, the first being
+the pattern, with ? placeholders, and the second being the placeholder
+value (which can be an array for multiple placeholders):</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:escaped_like</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">string_column</span>.<span class="ruby-identifier">escaped_like</span>(<span class="ruby-string">&#39;?%&#39;</span>, <span class="ruby-identifier">user_input</span>)}&#x000A;<span class="ruby-comment"># user_input is &#39;foo&#39;:</span>&#x000A;<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;foo%&#39;</span>&#x000A;<span class="ruby-comment"># user_input is &#39;%foo&#39;:</span>&#x000A;<span class="ruby-comment">#  SELECT * FROM table WHERE string_column LIKE &#39;\%foo%&#39;</span></pre>
+</li><li>
+<p>Generated columns on MySQL 5.7+ and MariaDB 5.2+ are now supported using
+the :generated_always_as option when creating the column. The
+:generated_type option can also be used to specify the type of generated
+column (virtual or stored).  Examples:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-operator">+</span><span class="ruby-string">&#39;b&#39;</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>&#x000A;<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;))</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-operator">+</span><span class="ruby-string">&#39;b&#39;</span>,&#x000A;  <span class="ruby-value">generated_type:</span> <span class="ruby-value">:virtual</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>&#x000A;<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;)) VIRTUAL</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> <span class="ruby-value">:t</span>, <span class="ruby-value">:c</span>, <span class="ruby-constant">Integer</span>, <span class="ruby-value">generated_always_as:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>]<span class="ruby-operator">+</span><span class="ruby-string">&#39;b&#39;</span>,&#x000A;  <span class="ruby-value">generated_type:</span> <span class="ruby-value">:stored</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` varchar(255)</span>&#x000A;<span class="ruby-comment"># GENERATED ALWAYS AS (CONCAT(`a`, &#39;b&#39;)) STORED</span></pre>
+</li><li>
+<p>Sequel::Model.has_dataset? has been added for checking whether the model
+class has an associated dataset.  This will generally be true for most
+model classes, but will be false for abstract model classes (such as <a
+href="../../../classes/Sequel/Model.html">Sequel::Model</a> itself).</p>
+</li><li>
+<p>Sequel::VERSION_NUMBER has been added for easier future version
+comparisons.  The version number for 5.9.0 is 50090.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When disconnecting connections in the threaded connection pools, the
+disconnection is performed without holding the connection pool mutex, since
+disconnection may block.</p>
+</li><li>
+<p>The sharded threaded connection pool no longer deadlocks when disconnecting
+connections if the connection_validator or connection_expiration extension
+is used.</p>
+</li><li>
+<p>If a thread dies and does not check a connection back into the connection
+pool, <a href="../../../classes/Sequel.html">Sequel</a> now disconnects the
+connection when it detects the dead thread, instead of assuming the
+connection is safe to be reused.</p>
+</li><li>
+<p>When using eager_graph with cascaded associations, a unique object is now
+used instead of a shared object in cases where using a shared object may
+cause further cascaded associated objects to be duplicated.</p>
+</li><li>
+<p>On PostgreSQL, the ESCAPE modifier to the LIKE/ILIKE operators is no longer
+used, since the default ESCAPE value is the one <a
+href="../../../classes/Sequel.html">Sequel</a> uses.  This change was made
+in order to allow the LIKE/ILIKE operators to work with the ANY function,
+as PostgreSQL does not support the use of the ESCAPE modifier in such
+cases.</p>
+</li><li>
+<p>A hash argument passed to Model.nested_attributes in the nested_attributes
+plugin is now no longer modified.</p>
+</li><li>
+<p>Internal data structures for eager and eager_graph datasets are now frozen
+to avoid unintentional modification.</p>
+</li><li>
+<p>Nondeterministic behavior in Database#foreign_key_list with the :reverse
+option on PostgreSQL is now avoided by using an unambiguous order.</p>
+</li><li>
+<p>Performance has been improved slightly by avoiding unnecessary hash
+allocations.</p>
+</li><li>
+<p>Performance has been improved slightly by using while instead of
+Kernel#loop.</p>
+</li><li>
+<p>BigDecimal() is now used instead of BigDecimal.new(), as the latter has
+been deprecated.</p>
+</li><li>
+<p>The jdbc adapter now avoids referencing ::NativeException on JRuby 9.2+,
+since JRuby has deprecated it.  It is still used on older versions of
+JRuby, since some JRuby 1.7 code may still require it.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html">Sequel</a> now works around multiple
+Date/Time conversion bugs in JRuby 9.2.0.0 for BC dates in the
+pg_extended_date_support extension.  These bugs have already been fixed in
+JRuby, and the workarounds will be removed after the release of JRuby
+9.2.1.0.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

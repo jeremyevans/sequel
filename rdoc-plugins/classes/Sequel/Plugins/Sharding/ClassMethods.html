@@ -53,7 +53,7 @@ Sequel::Plugins::Sharding::ClassMethods
 <a name='method-i-create_using_server'></a>
 <div class='synopsis'>
 <span class='name'>create_using_server</span>
-<span class='arguments'>(s, values={}, &block)</span>
+<span class='arguments'>(s, values=OPTS, &block)</span>
 
 </div>
 <div class='description'>
@@ -65,7 +65,7 @@ Sequel::Plugins::Sharding::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_using_server-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>={}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-eager_load_results'>
@@ -91,7 +91,7 @@ Sequel::Plugins::Sharding::ClassMethods
 <a name='method-i-new_using_server'></a>
 <div class='synopsis'>
 <span class='name'>new_using_server</span>
-<span class='arguments'>(s, values={}, &block)</span>
+<span class='arguments'>(s, values=OPTS, &block)</span>
 
 </div>
 <div class='description'>
@@ -104,7 +104,7 @@ the object is saved, a record will be inserted on shard s.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-new_using_server-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-new_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>={}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-new_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

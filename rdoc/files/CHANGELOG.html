@@ -30,12 +30,55 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-05-01 11:42:13 -0700</span>
+<span class='datetime'>2018-06-01 07:49:41 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.9.0+-282018-06-01-29">5.9.0 (2018-06-01)<span><a href="#label-5.9.0+-282018-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support generated columns on MySQL 5.7+ and MariaDB 5.2+ (wjordan,
+jeremyevans) (#1517)</p>
+</li><li>
+<p>Add escaped_like extension for creation of LIKE expressions with
+placeholders in the pattern without access to a dataset (jeremyevans)</p>
+</li><li>
+<p>Modify jdbc adapter exception handling to work around ::NativeException
+deprecation in JRuby 9.2 (jeremyevans)</p>
+</li><li>
+<p>Work around broken BC date handling in JRuby 9.2.0.0 (jeremyevans)</p>
+</li><li>
+<p>Switch use of BigDecimal.new() to BigDecimal(), since the former is
+deprecated (jeremyevans)</p>
+</li><li>
+<p>Add Sequel::VERSION_NUMBER for easier version comparisons (jeremyevans)</p>
+</li><li>
+<p>Add Model.has_dataset? to determine if the model class has a dataset
+(AlexWayfer) (#1508)</p>
+</li><li>
+<p>Support use of LIKE with ANY function on PostgreSQL by avoiding unnecessary
+use of ESCAPE syntax (jeremyevans)</p>
+</li><li>
+<p>Disconnect connections left allocated by dead threads instead of returning
+the connections to the pool (jeremyevans)</p>
+</li><li>
+<p>Make both threaded connection pools avoid disconnecting connections while
+holding the connection pool mutex (jeremyevans)</p>
+</li><li>
+<p>Don&#39;t deadlock when disconnecting connections in the sharded_threaded
+connection pool when using connection_validator or connection_expiration
+extensions (jeremyevans)</p>
+</li><li>
+<p>Don&#39;t modify hash argument passed in Model.nested_attributes in the
+nested_attributes plugin (jeremyevans)</p>
+</li><li>
+<p>Avoid unnecessary hash creation in many places (jeremyevans)</p>
+</li><li>
+<p>Fix duplicate objects in nested associations when eager_graphing cascaded
+many_to_one=&gt;one_to_many associations (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.8.0+-282018-05-01-29">5.8.0 (2018-05-01)<span><a href="#label-5.8.0+-282018-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Don&#39;t mark SQLAnywhere as supporting WITH in INSERT statement

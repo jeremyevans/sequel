@@ -73,7 +73,7 @@ variables.</p>
 <a name='method-i-call'></a>
 <div class='synopsis'>
 <span class='name'>call</span>
-<span class='arguments'>(bind_vars={}, &block)</span>
+<span class='arguments'>(bind_vars=OPTS, &block)</span>
 
 </div>
 <div class='description'>
@@ -87,7 +87,7 @@ to the given hash and runs the prepared statement.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>={}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-columns'>
