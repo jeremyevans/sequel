@@ -1,4 +1,4 @@
-=== master
+=== 5.9.0 (2018-06-01)
 
 * Support generated columns on MySQL 5.7+ and MariaDB 5.2+ (wjordan, jeremyevans) (#1517)
 
