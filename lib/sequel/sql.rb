@@ -1366,7 +1366,7 @@ module Sequel
       end
 
       # Return a new function with an OVER clause (making it a window function).
-      # See {SQL::Window} for the list of options +over+ can receive.
+      # See Sequel::SQL::Window for the list of options +over+ can receive.
       #
       #   Sequel.function(:row_number).over(partition: :col) # row_number() OVER (PARTITION BY col)
       def over(window=OPTS)
