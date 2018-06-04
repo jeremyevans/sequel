@@ -1,3 +1,7 @@
+=== master
+
+* Support ruby 2.6+ endless ranges in filters, using just a >= operator for them (jeremyevans)
+
 === 5.9.0 (2018-06-01)
 
 * Support generated columns on MySQL 5.7+ and MariaDB 5.2+ (wjordan, jeremyevans) (#1517)

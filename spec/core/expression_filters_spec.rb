@@ -503,6 +503,12 @@ describe "Blockless Ruby Filters" do
     end
     dsc.new(@d.db).literal(Sequel.trim(:a)).must_equal 'trimFOO(lower(a))'
   end
+
+  it "should endless ranges" do
+    endless = eval('1..')
+    @d.l{x =~ endless}.must_equal '(x >= 1)'
+    @d.l(:x => endless).must_equal '(x >= 1)'
+  end if RUBY_VERSION >= '2.6'
 end
 
 describe Sequel::SQL::VirtualRow do

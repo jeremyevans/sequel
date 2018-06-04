@@ -1059,7 +1059,11 @@ module Sequel
       def self.from_value_pair(l, r)
         case r
         when Range
-          new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
+          expr = new(:>=, l, r.begin)
+          unless r.end.nil?
+            expr = new(:AND, expr, new(r.exclude_end? ? :< : :<=, l, r.end))
+          end
+          expr
         when ::Array, ::Sequel::Dataset
           new(:IN, l, r)
         when NegativeBooleanConstant
