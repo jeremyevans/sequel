@@ -2401,6 +2401,14 @@ module Sequel
         # cached associations.
         def change_column_value(column, value)
           if assocs = model.autoreloading_associations[column]
+            if new?
+              # Do deeper checking for new objects, so that associations are
+              # not deleted when values do not change.  This code is run at
+              # a higher level for existing objects.
+              vals = @values
+              return super unless !vals.include?(column) || value != (c = vals[column]) || value.class != c.class
+            end
+
             assocs.each{|a| associations.delete(a)}
           end
           super

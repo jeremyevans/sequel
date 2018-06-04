@@ -4435,6 +4435,22 @@ describe "association autoreloading" do
     DB.reset
   end
 
+  it "should not reload many_to_one association when foreign key is not modified" do
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>1)
+    album.artist
+    DB.sqls.must_equal ['SELECT * FROM artists WHERE id = 1']
+    album.artist_id = 1
+    album.artist
+    DB.sqls.must_equal []
+
+    album = @Album.new(:name=>'Al', :artist_id=>1)
+    album.artist
+    DB.sqls.must_equal ['SELECT * FROM artists WHERE id = 1']
+    album.artist_id = 1
+    album.artist
+    DB.sqls.must_equal []
+  end
+
   it "should reload many_to_one association when foreign key is modified" do
     album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
     album.artist
