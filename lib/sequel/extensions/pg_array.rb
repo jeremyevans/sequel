@@ -71,6 +71,7 @@
 
 require 'delegate'
 require 'strscan'
+require 'pg'
 
 module Sequel
   module Postgres
@@ -397,23 +398,55 @@ module Sequel
         # The database type to set on the PGArray instances returned.
         attr_reader :type
 
-        # Set the type and optional converter callable that will be used.
-        def initialize(type, converter=nil)
-          @type = type
-          @converter = converter
-        end
-
-        if Sequel::Postgres.respond_to?(:parse_pg_array)
+        # Use pg's C-based parser if it has already been defined.
+        if defined?(PG::TextDecoder::Array)
         # :nocov:
-          # Use sequel_pg's C-based parser if it has already been defined.
+          class Converter < PG::SimpleDecoder
+            def initialize(converter)
+              @converter = converter
+            end
+            def decode(value, tuple=nil, field=nil)
+              @converter.call(value)
+            end
+          end
+
+          NATIVE_DECODERS = {
+            "smallint" => PG::TextDecoder::Integer,
+            "integer" => PG::TextDecoder::Integer,
+            "bigint" => PG::TextDecoder::Integer,
+            "boolean" => PG::TextDecoder::Boolean,
+            "real" => PG::TextDecoder::Float,
+            "double precision" => PG::TextDecoder::Float,
+          }
+
+          # Set the type and optional converter callable that will be used.
+          def initialize(type, converter=nil)
+            @type = type
+            params = {}
+            if converter
+              scalar = NATIVE_DECODERS[type]
+              if scalar
+                params[:elements_type] = scalar.new
+              else
+                params[:elements_type] = Converter.new(converter)
+              end
+            end
+            @deco = PG::TextDecoder::Array.new(params)
+          end
+
           def call(string)
-            PGArray.new(Sequel::Postgres.parse_pg_array(string, @converter), @type)
+            PGArray.new(@deco.decode(string), @type)
           end
         # :nocov:
         else
           # Parse the string using Parser with the appropriate
           # converter, and return a PGArray with the appropriate database
           # type.
+          def initialize(type, converter=nil)
+            @type = type
+            @converter = converter
+          end
+
           def call(string)
             PGArray.new(Parser.new(string, @converter).parse, @type)
           end
