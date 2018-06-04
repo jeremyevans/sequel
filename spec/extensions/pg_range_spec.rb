@@ -16,6 +16,8 @@ describe "pg_range extension" do
     @db.extension(:pg_array, :pg_range)
   end
 
+  endless_range_support = RUBY_VERSION >= '2.6'
+
   it "should set up conversion procs correctly" do
     cp = @db.conversion_procs
     cp[3904].call("[1,2]").must_equal @R.new(1,2, :exclude_begin=>false, :exclude_end=>false, :db_type=>'int4range')
@@ -48,6 +50,10 @@ describe "pg_range extension" do
     @db.literal(''..'()[]",\\2').must_equal "'[\"\",\\(\\)\\[\\]\\\"\\,\\\\2]'"
   end
 
+  it "should literalize endless Range instances to strings correctly" do
+    @db.literal(eval('1..')).must_equal "'[1,]'"
+  end if endless_range_support
+
   it "should literalize PGRange instances to strings correctly" do
     @db.literal(@R.new(1, 2)).must_equal "'[1,2]'"
     @db.literal(@R.new(true, false)).must_equal "'[true,false]'"
@@ -71,6 +77,10 @@ describe "pg_range extension" do
     @db.bound_variable_arg(1..2, nil).must_equal "[1,2]"
   end
 
+  it "should support using endless Range instances as bound variables" do
+    @db.bound_variable_arg(eval('1..'), nil).must_equal "[1,]"
+  end if endless_range_support
+
   it "should support using PGRange instances as bound variables" do
     @db.bound_variable_arg(@R.new(1, 2), nil).must_equal "[1,2]"
   end
@@ -78,6 +88,10 @@ describe "pg_range extension" do
   it "should support using arrays of Range instances as bound variables" do
     @db.bound_variable_arg([1..2,2...3], nil).must_equal '{"[1,2]","[2,3)"}'
   end
+
+  it "should support using arrays of endless Range instances as bound variables" do
+    @db.bound_variable_arg([eval('1..'), eval('2..')], nil).must_equal '{"[1,]","[2,]"}'
+  end if endless_range_support
 
   it "should support using PGRange instances as bound variables" do
     @db.bound_variable_arg([@R.new(1, 2),@R.new(2, 3)], nil).must_equal '{"[1,2]","[2,3]"}'
@@ -415,6 +429,14 @@ describe "pg_range extension" do
       @R.new(nil, nil).wont_be :==, (1..2)
     end
 
+    it "should consider PGRanges equal with a endless Range they represent" do
+      @R.new(1, nil).must_be :==, eval('1..')
+    end if endless_range_support
+
+    it "should not consider a PGRange equal with a Range if it can't be expressed as a range" do
+      @R.new(1, nil).wont_be :==, eval('2..')
+    end if endless_range_support
+
     it "should not consider a PGRange equal to other objects" do
       @R.new(nil, nil).wont_equal 1
     end
@@ -450,7 +472,6 @@ describe "pg_range extension" do
 
     it "should have #to_range raise an exception if the PGRange cannot be represented by a Range" do
       proc{@R.new(nil, 1).to_range}.must_raise(Sequel::Error)
-      proc{@R.new(1, nil).to_range}.must_raise(Sequel::Error)
       proc{@R.new(0, 1, :exclude_begin=>true).to_range}.must_raise(Sequel::Error)
       proc{@R.empty.to_range}.must_raise(Sequel::Error)
     end
@@ -458,6 +479,14 @@ describe "pg_range extension" do
     it "should have #to_range return the represented range" do
       @r1.to_range.must_be :==, (1..2)
     end
+
+    it "should have #to_range return the represented range for endless ranges" do
+      @R.new(1, nil).to_range.must_be :==, eval('1..')
+    end if endless_range_support
+
+    it "should have #to_range raise an exception for endless ranges" do
+      proc{@R.new(1, nil).to_range}.must_raise(Sequel::Error)
+    end unless endless_range_support
 
     it "should have #to_range cache the returned value" do
       @r1.to_range.must_be_same_as(@r1.to_range)
@@ -479,9 +508,12 @@ describe "pg_range extension" do
 
     it "should have #valid_ruby_range? return false if the PGRange cannot be represented as a Range" do
       @R.new(nil, 1).valid_ruby_range?.must_equal false
-      @R.new(1, nil).valid_ruby_range?.must_equal false
       @R.new(0, 1, :exclude_begin=>true).valid_ruby_range?.must_equal false
       @R.empty.valid_ruby_range?.must_equal false
+    end
+
+   it "should have #valid_ruby_range return #{endless_range_support} for endless ranges" do
+      @R.new(1, nil).valid_ruby_range?.must_equal(endless_range_support)
     end
   end
 end

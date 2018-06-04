@@ -1,5 +1,7 @@
 === master
 
+* Support ruby 2.6+ endless ranges in the pg_range extension (jeremyevans)
+
 * Support ruby 2.6+ endless ranges in filters, using just a >= operator for them (jeremyevans)
 
 === 5.9.0 (2018-06-01)
