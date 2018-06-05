@@ -99,7 +99,7 @@ module Sequel
             register_array_type('bytea', :oid=>1001, :scalar_oid=>17, :type_symbol=>:blob)
             register_array_type('date', :oid=>1182, :scalar_oid=>1082)
             register_array_type('time without time zone', :oid=>1183, :scalar_oid=>1083, :type_symbol=>:time)
-            register_array_type('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone, :scalar_typecast=>:time)
+            register_array_type('time with time zone', :oid=>1270, :scalar_oid=>1266, :type_symbol=>:time_timezone, :scalar_typecast=>:time)
 
             register_array_type('smallint', :oid=>1005, :scalar_oid=>21, :scalar_typecast=>:integer)
             register_array_type('oid', :oid=>1028, :scalar_oid=>26, :scalar_typecast=>:integer)
