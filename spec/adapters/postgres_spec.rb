@@ -2398,7 +2398,7 @@ describe 'PostgreSQL array handling' do
     @ds.delete
     @ds.insert(rs.first)
     @ds.all.must_equal rs
-  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+  end
 
   it 'use arrays in bound variables' do
     @db.create_table!(:items) do
@@ -3039,7 +3039,7 @@ describe 'PostgreSQL json type' do
       j = Sequel.pg_json([{'a'=>1, 'b'=>'c'}, {'a'=>2, 'b'=>'d'}]).op
       @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).must_equal [1, 2]
       @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).must_equal %w'c d'
-    end if DB.server_version >= 90300 && (DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc)
+    end if DB.server_version >= 90300
   end
 end if DB.server_version >= 90200
 
@@ -3218,7 +3218,7 @@ describe 'PostgreSQL custom range types' do
     r = Sequel::SQLTime.create(10, 11, 12)..Sequel::SQLTime.create(11, 12, 13)
     @db.get(Sequel.pg_range(r, :timerange)).to_range.must_equal r
   end
-end if DB.server_version >= 90200 && DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+end if DB.server_version >= 90200
 
 describe 'PostgreSQL range types' do
   before(:all) do
@@ -3570,7 +3570,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @db.drop_table(:domain_check)
       @db << "DROP DOMAIN positive_integer"
     end
-  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+  end
 
   it 'insert and retrieve arrays of row types' do
     @ds = @db[:company]
@@ -3822,7 +3822,7 @@ describe 'PostgreSQL enum types' do
 
   it "should add array parsers for enum values" do
     @db.get(Sequel.pg_array(%w'a b', :test_enum)).must_equal %w'a b'
-  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+  end
 
   it "should set up model typecasting correctly" do
     c = Class.new(Sequel::Model(:test_enumt))
