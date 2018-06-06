@@ -65,12 +65,12 @@
 # If you want an easy way to call PostgreSQL array functions and
 # operators, look into the pg_array_ops extension.
 #
-# This extension requires the strscan and delegate libraries.
+# This extension requires the delegate library, and the strscan library
+# sequel_pg has not been loaded.
 #
 # Related module: Sequel::Postgres::PGArray
 
 require 'delegate'
-require 'strscan'
 
 module Sequel
   module Postgres
@@ -300,93 +300,97 @@ module Sequel
         end
       end
 
-      # PostgreSQL array parser that handles PostgreSQL array output format.
-      # Note that does not handle all forms out input that PostgreSQL will
-      # accept, and it will not raise an error for all forms of invalid input.
-      class Parser < StringScanner
-        # Set the source for the input, and any converter callable
-        # to call with objects to be created.  For nested parsers
-        # the source may contain text after the end current parse,
-        # which will be ignored.
-        def initialize(source, converter=nil)
-          super(source)
-          @converter = converter 
-          @stack = [[]]
-          @encoding = string.encoding
-          @recorded = String.new.force_encoding(@encoding)
-        end
+      unless Sequel::Postgres.respond_to?(:parse_pg_array)
+        require 'strscan'
 
-        # Take the buffer of recorded characters and add it to the array
-        # of entries, and use a new buffer for recorded characters.
-        def new_entry(include_empty=false)
-          if !@recorded.empty? || include_empty
-            entry = @recorded
-            if entry == 'NULL' && !include_empty
-              entry = nil
-            elsif @converter
-              entry = @converter.call(entry)
-            end
-            @stack.last.push(entry)
+        # PostgreSQL array parser that handles PostgreSQL array output format.
+        # Note that does not handle all forms out input that PostgreSQL will
+        # accept, and it will not raise an error for all forms of invalid input.
+        class Parser < StringScanner
+          # Set the source for the input, and any converter callable
+          # to call with objects to be created.  For nested parsers
+          # the source may contain text after the end current parse,
+          # which will be ignored.
+          def initialize(source, converter=nil)
+            super(source)
+            @converter = converter 
+            @stack = [[]]
+            @encoding = string.encoding
             @recorded = String.new.force_encoding(@encoding)
           end
-        end
 
-        # Parse the input character by character, returning an array
-        # of parsed (and potentially converted) objects.
-        def parse
-          raise Sequel::Error, "invalid array, empty string" if eos?
-          raise Sequel::Error, "invalid array, doesn't start with {" unless scan(/((\[\d+:\d+\])+=)?\{/)
-
-          while !eos?
-            char = scan(/[{}",]|[^{}",]+/)
-            if char == ','
-              # Comma outside quoted string indicates end of current entry
-              new_entry
-            elsif char == '"'
-              raise Sequel::Error, "invalid array, opening quote with existing recorded data" unless @recorded.empty?
-              while true
-                char = scan(/["\\]|[^"\\]+/)
-                if char == '\\'
-                  @recorded << getch
-                elsif char == '"'
-                  n = peek(1)
-                  raise Sequel::Error, "invalid array, closing quote not followed by comma or closing brace" unless n == ',' || n == '}'
-                  break
-                else
-                  @recorded << char
-                end
+          # Take the buffer of recorded characters and add it to the array
+          # of entries, and use a new buffer for recorded characters.
+          def new_entry(include_empty=false)
+            if !@recorded.empty? || include_empty
+              entry = @recorded
+              if entry == 'NULL' && !include_empty
+                entry = nil
+              elsif @converter
+                entry = @converter.call(entry)
               end
-              new_entry(true)
-            elsif char == '{'
-              raise Sequel::Error, "invalid array, opening brace with existing recorded data" unless @recorded.empty?
-
-              # Start of new array, add it to the stack
-              new = []
-              @stack.last << new
-              @stack << new
-            elsif char == '}'
-              # End of current array, add current entry to the current array
-              new_entry
-
-              if @stack.length == 1
-                raise Sequel::Error, "array parsing finished without parsing entire string" unless eos?
-
-                # Top level of array, parsing should be over.
-                # Pop current array off stack and return it as result
-                return @stack.pop
-              else
-                # Nested array, pop current array off stack
-                @stack.pop
-              end
-            else
-              # Add the character to the recorded character buffer.
-              @recorded << char
+              @stack.last.push(entry)
+              @recorded = String.new.force_encoding(@encoding)
             end
           end
 
-          raise Sequel::Error, "array parsing finished with array unclosed"
+          # Parse the input character by character, returning an array
+          # of parsed (and potentially converted) objects.
+          def parse
+            raise Sequel::Error, "invalid array, empty string" if eos?
+            raise Sequel::Error, "invalid array, doesn't start with {" unless scan(/((\[\d+:\d+\])+=)?\{/)
+
+            while !eos?
+              char = scan(/[{}",]|[^{}",]+/)
+              if char == ','
+                # Comma outside quoted string indicates end of current entry
+                new_entry
+              elsif char == '"'
+                raise Sequel::Error, "invalid array, opening quote with existing recorded data" unless @recorded.empty?
+                while true
+                  char = scan(/["\\]|[^"\\]+/)
+                  if char == '\\'
+                    @recorded << getch
+                  elsif char == '"'
+                    n = peek(1)
+                    raise Sequel::Error, "invalid array, closing quote not followed by comma or closing brace" unless n == ',' || n == '}'
+                    break
+                  else
+                    @recorded << char
+                  end
+                end
+                new_entry(true)
+              elsif char == '{'
+                raise Sequel::Error, "invalid array, opening brace with existing recorded data" unless @recorded.empty?
+
+                # Start of new array, add it to the stack
+                new = []
+                @stack.last << new
+                @stack << new
+              elsif char == '}'
+                # End of current array, add current entry to the current array
+                new_entry
+
+                if @stack.length == 1
+                  raise Sequel::Error, "array parsing finished without parsing entire string" unless eos?
+
+                  # Top level of array, parsing should be over.
+                  # Pop current array off stack and return it as result
+                  return @stack.pop
+                else
+                  # Nested array, pop current array off stack
+                  @stack.pop
+                end
+              else
+                # Add the character to the recorded character buffer.
+                @recorded << char
+              end
+            end
+
+            raise Sequel::Error, "array parsing finished with array unclosed"
+          end
         end
-      end unless Sequel::Postgres.respond_to?(:parse_pg_array)
+      end
 
       # Callable object that takes the input string and parses it using Parser.
       class Creator

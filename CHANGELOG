@@ -1,5 +1,7 @@
 === master
 
+* Only load strscan library in pg_array extension if it is needed (jeremyevans)
+
 * Don't remove related many_to_one associations from cache when setting column value to existing value for model instances that have not been persisted (jeremyevans) (#1521)
 
 * Support ruby 2.6+ endless ranges in the pg_range extension (jeremyevans)
