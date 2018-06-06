@@ -2343,13 +2343,13 @@ describe 'PostgreSQL array handling' do
   end
 
   it 'insert and retrieve custom array types' do
-    int2vector = Class.new do
+    point= Class.new do
       attr_reader :array
       def initialize(array)
         @array = array
       end
       def sql_literal_append(ds, sql)
-        sql << "'#{array.join(' ')}'"
+        sql << "'(#{array.join(',')})'"
       end
       def ==(other)
         if other.is_a?(self.class)
@@ -2359,16 +2359,16 @@ describe 'PostgreSQL array handling' do
         end
       end
     end
-    @db.register_array_type(:int2vector){|s| int2vector.new(s.split.map{|i| i.to_i})}
+    @db.register_array_type(:point){|s| point.new(s[1...-1].split(',').map{|i| i.to_i})}
     @db.create_table!(:items) do
-      column :b, 'int2vector[]'
+      column :b, 'point[]'
     end
-    @tp.call.must_equal [:int2vector_array]
-    int2v = int2vector.new([1, 2])
-    @ds.insert(Sequel.pg_array([int2v], :int2vector))
+    @tp.call.must_equal [:point_array]
+    pv = point.new([1, 2])
+    @ds.insert(Sequel.pg_array([pv], :point))
     @ds.count.must_equal 1
     rs = @ds.all
-    rs.must_equal [{:b=>[int2v]}]
+    rs.must_equal [{:b=>[pv]}]
     rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
     rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
     @ds.delete
