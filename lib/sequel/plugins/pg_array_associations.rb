@@ -160,7 +160,7 @@ module Sequel
 
         def filter_by_associations_add_conditions_dataset_filter(ds)
           key = qualify(associated_class.table_name, self[:key])
-          ds.select{unnest(key)}.exclude(key=>nil)
+          ds.cross_join(Sequel.function(:unnest, key).as(:_smtopgaa_, [:_smtopgaa_key_])).exclude(key=>nil).select(:_smtopgaa_key_)
         end
         
         def filter_by_associations_conditions_key
@@ -527,7 +527,7 @@ module Sequel
               Sequel[pk=>assoc_pks]
             end
           when Sequel::Dataset
-            Sequel[pk=>obj.select{Sequel.pg_array_op(ref.qualify(obj.model.table_name, ref[:key_column])).unnest}]
+            obj.select(ref.qualify(obj.model.table_name, ref[:key_column]).as(:key)).from_self.where{{pk=>any(:key)}}.select(1).exists
           end
           expr = Sequel::SQL::Constants::FALSE unless expr
           expr = add_association_filter_conditions(ref, obj, expr)

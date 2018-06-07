@@ -1,5 +1,7 @@
 === master
 
+* Make many_to_pg_array associations in the pg_array_associations plugin work on PostgreSQL 11 (jeremyevans)
+
 * Only load strscan library in pg_array extension if it is needed (jeremyevans)
 
 * Don't remove related many_to_one associations from cache when setting column value to existing value for model instances that have not been persisted (jeremyevans) (#1521)
