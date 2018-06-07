@@ -2689,8 +2689,8 @@ module Sequel
         # creates a subquery to the join table.
         def complex_expression_sql_append(sql, op, args)
           r = args[1]
-          if (((op == :'=' || op == :'!=') and r.is_a?(Sequel::Model)) ||
-              (multiple = ((op == :IN || op == :'NOT IN') and ((is_ds = r.is_a?(Sequel::Dataset)) or r.all?{|x| x.is_a?(Sequel::Model)}))))
+          if (((op == :'=' || op == :'!=') && r.is_a?(Sequel::Model)) ||
+              (multiple = ((op == :IN || op == :'NOT IN') && ((is_ds = r.is_a?(Sequel::Dataset)) || (r.respond_to?(:all?) && r.all?{|x| x.is_a?(Sequel::Model)})))))
             l = args[0]
             if ar = model.association_reflections[l]
               if multiple

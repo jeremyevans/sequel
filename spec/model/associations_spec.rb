@@ -4149,6 +4149,11 @@ describe "Sequel::Model Associations with clashing column names" do
     @db.sqls.must_equal ["SELECT foos.id, foos.object_id, mtmbars.id AS mtmbars_id, mtmbars.object_id AS mtmbars_object_id FROM foos LEFT OUTER JOIN bars_foos ON (bars_foos.foo_id = foos.object_id) LEFT OUTER JOIN bars AS mtmbars ON (mtmbars.object_id = bars_foos.object_id)"]
   end
 
+  it "should not have filter by associations code break if using IN/NOT in with a set-returning function" do
+    @Bar.where(Sequel::SQL::BooleanExpression.new(:IN, :foo, Sequel.function(:srf))).sql.must_equal 'SELECT * FROM bars WHERE (foo IN srf())'
+    @Bar.exclude(Sequel::SQL::BooleanExpression.new(:IN, :foo, Sequel.function(:srf))).sql.must_equal 'SELECT * FROM bars WHERE (foo NOT IN srf())'
+  end
+
   it "should have working filter by associations with model instances" do
     @Bar.first(:foo=>@foo).must_equal @bar
     @db.sqls.must_equal ["SELECT * FROM bars WHERE (bars.object_id = 2) LIMIT 1"]
