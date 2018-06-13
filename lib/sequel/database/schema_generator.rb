@@ -224,6 +224,7 @@ module Sequel
       # :opclass :: Use a specific operator class in the index.
       # :include :: Include additional column values in the index, without
       #             actually indexing on those values (PostgreSQL 11+).
+      # :tablespace :: Specify tablespace for index.
       #
       # Microsoft SQL Server specific options:
       #

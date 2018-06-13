@@ -181,6 +181,7 @@ module Sequel
     #             where keys are option names and values are option values.  Note
     #             that option names are unquoted, so you should not use untrusted
     #             keys.
+    # :tablespace :: The tablespace to use for the table.
     #
     # See <tt>Schema::CreateTableGenerator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)
@@ -281,6 +282,7 @@ module Sequel
     #               in a subquery, if you are providing a Dataset as the source
     #               argument, if should probably call the union method with the
     #               all: true and from_self: false options.
+    # :tablespace :: The tablespace to use for materialized views.
     def create_view(name, source, options = OPTS)
       execute_ddl(create_view_sql(name, source, options))
       remove_cached_schema(name)

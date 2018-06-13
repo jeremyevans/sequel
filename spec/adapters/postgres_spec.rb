@@ -271,6 +271,11 @@ describe "PostgreSQL views" do
     @db.refresh_view(:items_view, :concurrently=>true)
   end if DB.server_version >= 90400
 
+  it "should support specifying tablespaces for materialized views" do
+    @opts = {:materialized=>true}
+    @db.create_view(:items_view, @db[:items].where{number >= 10}, :materialized=>true, :tablespace=>:pg_default)
+  end if DB.server_version >= 90300
+
   it "should support :if_exists=>true for not raising an error if the view does not exist" do
     @db.drop_view(:items_view, :if_exists=>true)
   end
@@ -725,6 +730,15 @@ describe "A PostgreSQL dataset" do
     @db.add_index :atest, :a, :include=>[:b, :c]
     @db.add_index :atest, :b, :include=>:a
   end if DB.server_version >= 110000
+
+  it "should support specifying tablespaces for tables" do
+    @db.create_table(:atest, :tablespace=>:pg_default){Integer :a}
+  end
+
+  it "should support specifying tablespaces for indexes" do
+    @db.create_table(:atest){Integer :a}
+    @db.add_index :atest, :a, :tablespace=>:pg_default
+  end
 
   it "#lock should lock table if inside a transaction" do
     @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}

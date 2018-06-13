@@ -1,5 +1,7 @@
 === master
 
+* Support :tablespace option when adding tables, indexes, and materialized views on PostgreSQL (jeremyevans)
+
 * Support :include option for indexes on PostgreSQL 11+ (jeremyevans)
 
 * Allow the use of IN/NOT IN operators with set returning functions for Sequel::Model datasets (jeremyevans)

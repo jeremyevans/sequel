@@ -1042,6 +1042,10 @@ module Sequel
           sql += " ON COMMIT #{ON_COMMIT[on_commit]}"
         end
 
+        if tablespace = options[:tablespace]
+          sql += " TABLESPACE #{quote_identifier(tablespace)}"
+        end
+
         if server = options[:foreign]
           sql += " SERVER #{quote_identifier(server)}"
           if foreign_opts = options[:options]
@@ -1077,7 +1081,13 @@ module Sequel
 
       # DDL fragment for initial part of CREATE VIEW statement
       def create_view_prefix_sql(name, options)
-        create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}#{'RECURSIVE ' if options[:recursive]}#{'MATERIALIZED ' if options[:materialized]}VIEW #{quote_schema_table(name)}", options[:columns] || options[:recursive])
+        sql = create_view_sql_append_columns("CREATE #{'OR REPLACE 'if options[:replace]}#{'TEMPORARY 'if options[:temp]}#{'RECURSIVE ' if options[:recursive]}#{'MATERIALIZED ' if options[:materialized]}VIEW #{quote_schema_table(name)}", options[:columns] || options[:recursive])
+
+        if tablespace = options[:tablespace]
+          sql += " TABLESPACE #{quote_identifier(tablespace)}"
+        end
+
+        sql
       end
 
       # SQL for dropping a function from the database.
@@ -1147,7 +1157,7 @@ module Sequel
         when :spatial
           index_type = :gist
         end
-        "CREATE #{unique}INDEX#{' CONCURRENTLY' if index[:concurrently]}#{if_not_exists} #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{" INCLUDE #{literal(Array(index[:include]))}" if index[:include]}#{filter}"
+        "CREATE #{unique}INDEX#{' CONCURRENTLY' if index[:concurrently]}#{if_not_exists} #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{" INCLUDE #{literal(Array(index[:include]))}" if index[:include]}#{" TABLESPACE #{quote_identifier(index[:tablespace])}" if index[:tablespace]}#{filter}"
       end
 
       # Setup datastructures shared by all postgres adapters.
