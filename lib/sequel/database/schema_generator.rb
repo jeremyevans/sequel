@@ -222,6 +222,8 @@ module Sequel
       #                  operations on the table while the index is being
       #                  built.
       # :opclass :: Use a specific operator class in the index.
+      # :include :: Include additional column values in the index, without
+      #             actually indexing on those values (PostgreSQL 11+).
       #
       # Microsoft SQL Server specific options:
       #

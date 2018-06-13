@@ -720,6 +720,12 @@ describe "A PostgreSQL dataset" do
     @db.add_index :test, [:name, :value], :if_not_exists=>true, :name=>'tnv3'
   end if DB.server_version >= 90500
 
+  it "should support including columns in indexes" do
+    @db.create_table(:atest){Integer :a; Integer :b; Integer :c}
+    @db.add_index :atest, :a, :include=>[:b, :c]
+    @db.add_index :atest, :b, :include=>:a
+  end if DB.server_version >= 110000
+
   it "#lock should lock table if inside a transaction" do
     @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
