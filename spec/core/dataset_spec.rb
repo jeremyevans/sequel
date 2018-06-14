@@ -1729,7 +1729,7 @@ describe "Dataset#with_extend" do
     m2 = Module.new{def a; 3 end}
     d.with_extend(m1, m2){def a; 4**super end}.a.must_equal 65536
     d.respond_to?(:a).must_equal false
-    ds = d.freeze.with_extend(m1, m2){def a; 4**super end}
+    ds = d.with_extend(m1, m2){def a; 4**super end}
     ds.a.must_equal 65536
     ds.frozen?.must_equal true
   end
@@ -1865,7 +1865,7 @@ describe "Dataset#with_row_proc" do
     l = lambda{|r| r}
     d.with_row_proc(l).row_proc.must_equal l
     d.row_proc.must_be_nil
-    ds = d.freeze.with_row_proc(l)
+    ds = d.with_row_proc(l)
     ds.frozen?.must_equal true
     ds.row_proc.must_equal l
   end
@@ -2094,7 +2094,7 @@ end
 describe "Dataset#count" do
   before do
     @db = Sequel.mock(:fetch=>{:count=>1})
-    @dataset = @db.from(:test).columns(:count).freeze
+    @dataset = @db.from(:test).columns(:count)
   end
   
   it "should format SQL properly" do
@@ -2656,7 +2656,7 @@ end
 
 describe "Dataset aggregate methods" do
   before do
-    @d = Sequel.mock(:fetch=>proc{|s| {1=>s}})[:test].freeze
+    @d = Sequel.mock(:fetch=>proc{|s| {1=>s}})[:test]
   end
   
   it "should include min" do
@@ -2715,7 +2715,7 @@ describe "Dataset #first and #last" do
   end
   
   it "should return a single record if no argument is given" do
-    ds = @d.order(:a).freeze
+    ds = @d.order(:a)
     3.times do
       ds.first.must_equal(:s=>'SELECT * FROM test ORDER BY a LIMIT 1')
       ds.last.must_equal(:s=>'SELECT * FROM test ORDER BY a DESC LIMIT 1')
@@ -2723,7 +2723,7 @@ describe "Dataset #first and #last" do
   end
 
   it "should return the first/last matching record if argument is not an Integer" do
-    ds = @d.order(:a).freeze
+    ds = @d.order(:a)
     5.times do
       ds.first(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1')
       ds.first([[:z, 15]]).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a LIMIT 1')
@@ -2733,7 +2733,7 @@ describe "Dataset #first and #last" do
   end
   
   it "should set the limit and return an array of records if the given number is > 1" do
-    ds = @d.order(:a).freeze
+    ds = @d.order(:a)
     5.times do
       i = rand(10) + 10
       ds.first(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
@@ -2742,7 +2742,7 @@ describe "Dataset #first and #last" do
   end
   
   it "should return the first matching record if a block is given without an argument" do
-    ds = @d.order(:name).freeze
+    ds = @d.order(:name)
     5.times do
       @d.first{z > 26}.must_equal(:s=>'SELECT * FROM test WHERE (z > 26) LIMIT 1')
       ds.last{z > 26}.must_equal(:s=>'SELECT * FROM test WHERE (z > 26) ORDER BY name DESC LIMIT 1')
@@ -2750,7 +2750,7 @@ describe "Dataset #first and #last" do
   end
   
   it "should combine block and standard argument filters if argument is not an Integer" do
-    ds = @d.order(:name).freeze
+    ds = @d.order(:name)
     5.times do
       @d.first(:y=>25){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
       ds.last(:y=>16){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
@@ -2758,7 +2758,7 @@ describe "Dataset #first and #last" do
   end
   
   it "should combine block and standard argument filters if argument is a literal string" do
-    ds = @d.order(:name).freeze
+    ds = @d.order(:name)
     5.times do
       @d.first(Sequel.lit('y = 25')){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
       ds.last(Sequel.lit('y = 16')){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
@@ -2768,7 +2768,7 @@ describe "Dataset #first and #last" do
   end
 
   it "should filter and return an array of records if an Integer argument is provided and a block is given" do
-    ds = @d.order(:a).freeze
+    ds = @d.order(:a)
     5.times do
       i = rand(10) + 10
       ds.first(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
@@ -3038,7 +3038,7 @@ describe "Dataset#get" do
   end
   
   it "should select the specified column and fetch its value" do
-    @d.freeze
+    @d
     5.times do
       @d.get(:name).must_equal "SELECT name FROM test LIMIT 1"
       @d.get(:abc).must_equal "SELECT abc FROM test LIMIT 1"
@@ -3050,14 +3050,14 @@ describe "Dataset#get" do
   end
   
   it "should work with aliased fields" do
-    @d.freeze
+    @d
     5.times do
       @d.get(Sequel.expr(Sequel[:x][:b]).as(:name)).must_equal "SELECT x.b AS name FROM test LIMIT 1"
     end
   end
   
   it "should work with plain strings" do
-    @d.freeze
+    @d
     5.times do
       @d.get('a').must_equal "SELECT 'a' AS v FROM test LIMIT 1"
     end
@@ -5225,32 +5225,19 @@ end
 
 describe "Frozen Datasets" do
   before do
-    @ds = Sequel.mock[:test].freeze
+    @ds = Sequel.mock[:test]
   end
 
-  it "should be returned by Dataset#freeze" do
+  it "datasets should be frozen by default" do
     @ds.must_be :frozen?
   end
 
   it "should have Dataset#freeze return receiver" do
-    @ds = Sequel.mock[:test]
-    @ds.freeze.must_be_same_as(@ds)
-  end
-
-  it "should have Dataset#freeze be a no-op" do
     @ds.freeze.must_be_same_as(@ds)
   end
 
   it "should have clones be frozen" do
     @ds.clone.must_be :frozen?
-  end
-
-  it "should be equal to unfrozen ones" do
-    @ds.must_equal @ds.db[:test]
-  end
-
-  it "should not raise an error when calling query methods" do
-    @ds.select(:a).sql.must_equal 'SELECT a FROM test'
   end
 end
 
@@ -5379,7 +5366,7 @@ end
 
 describe "Dataset#where_all"  do
   before do
-    @ds = Sequel.mock(:fetch=>{:id=>1})[:items].freeze
+    @ds = Sequel.mock(:fetch=>{:id=>1})[:items]
   end
 
   it "should filter dataset with condition, and return related rows" do
@@ -5401,7 +5388,7 @@ end
 
 describe "Dataset#where_each"  do
   before do
-    @ds = Sequel.mock(:fetch=>{:id=>1})[:items].freeze
+    @ds = Sequel.mock(:fetch=>{:id=>1})[:items]
   end
 
   it "should yield each row to the given block" do
@@ -5418,7 +5405,7 @@ describe "Dataset#where_single_value"  do
   before do
     @ds = Sequel.mock(:fetch=>{:id=>1})[:items].with_extend do
       select :only_id, :id
-    end.freeze
+    end
   end
 
   it "should return single value" do
