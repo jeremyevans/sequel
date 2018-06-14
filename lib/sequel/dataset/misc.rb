@@ -309,6 +309,20 @@ module Sequel
       loader
     end
 
+    # Return a cached placeholder literalizer for the key, unless where_block is
+    # nil and where_args is an empty array or hash.  This is designed to guard
+    # against placeholder literalizer use when passing arguments to where
+    # in the uncached case and filter_expr if a cached placeholder literalizer
+    # is used.
+    def cached_where_placeholder_literalizer(where_args, where_block, key, &block)
+      where_args = where_args[0] if where_args.length == 1
+      unless where_block
+        return if where_args == OPTS || where_args == EMPTY_ARRAY
+      end
+
+      cached_placeholder_literalizer(key, &block)
+    end
+
     # Set the columns for the current dataset.
     def columns=(v)
       cache_set(:_columns, v)

@@ -231,10 +231,11 @@ module Sequel
 
           return res
         end
+        where_args = args
         args = arg
       end
 
-      if loader = cached_placeholder_literalizer(:_first_cond_loader) do |pl|
+      if loader = cached_where_placeholder_literalizer(where_args||args, block, :_first_cond_loader) do |pl|
           _single_record_ds.where(pl.arg)
         end
 
@@ -875,7 +876,7 @@ module Sequel
     #   DB[:table].where_all(id: [1,2,3])
     #   # SELECT * FROM table WHERE (id IN (1, 2, 3))
     def where_all(cond, &block)
-      if loader = _where_loader
+      if loader = _where_loader([cond], nil)
         loader.all(filter_expr(cond), &block)
       else
         where(cond).all(&block)
@@ -889,7 +890,7 @@ module Sequel
     #   DB[:table].where_each(id: [1,2,3]){|row| p row}
     #   # SELECT * FROM table WHERE (id IN (1, 2, 3))
     def where_each(cond, &block)
-      if loader = _where_loader
+      if loader = _where_loader([cond], nil)
         loader.each(filter_expr(cond), &block)
       else
         where(cond).each(&block)
@@ -904,7 +905,7 @@ module Sequel
     #   DB[:table].select(:name).where_single_value(id: 1)
     #   # SELECT name FROM table WHERE (id = 1) LIMIT 1
     def where_single_value(cond)
-      if loader = cached_placeholder_literalizer(:_where_single_value_loader) do |pl|
+      if loader = cached_where_placeholder_literalizer([cond], nil, :_where_single_value_loader) do |pl|
           single_value_ds.where(pl.arg)
         end
 
@@ -1039,8 +1040,8 @@ module Sequel
     end
 
     # Loader used for where_all and where_each.
-    def _where_loader
-      cached_placeholder_literalizer(:_where_loader) do |pl|
+    def _where_loader(where_args, where_block)
+      cached_where_placeholder_literalizer(where_args, where_block, :_where_loader) do |pl|
         where(pl.arg)
       end
     end

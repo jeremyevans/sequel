@@ -2722,6 +2722,16 @@ describe "Dataset #first and #last" do
     end
   end
 
+  it "should handle empty arrays and hashes" do
+    ds = @d.order(:a)
+    3.times do
+      ds.first({}).must_equal(:s=>'SELECT * FROM test ORDER BY a LIMIT 1')
+      ds.last({}).must_equal(:s=>'SELECT * FROM test ORDER BY a DESC LIMIT 1')
+      ds.first([]).must_equal(:s=>'SELECT * FROM test ORDER BY a LIMIT 1')
+      ds.last([]).must_equal(:s=>'SELECT * FROM test ORDER BY a DESC LIMIT 1')
+    end
+  end
+
   it "should return the first/last matching record if argument is not an Integer" do
     ds = @d.order(:a)
     5.times do
@@ -5376,6 +5386,15 @@ describe "Dataset#where_all"  do
     end
   end
 
+  it "should handle empty arrays and hashes" do
+    5.times do
+      @ds.where_all([]).must_equal [{:id=>1}]
+      @ds.db.sqls.must_equal ['SELECT * FROM items']
+      @ds.where_all({}).must_equal [{:id=>1}]
+      @ds.db.sqls.must_equal ['SELECT * FROM items']
+    end
+  end
+
   it "should yield each row to the given block" do
     5.times do
       a = []
@@ -5389,6 +5408,17 @@ end
 describe "Dataset#where_each"  do
   before do
     @ds = Sequel.mock(:fetch=>{:id=>1})[:items]
+  end
+
+  it "should handle empty arrays and hashes" do
+    [[], {}].each do |arg|
+      5.times do
+        a = []
+        @ds.where_each(arg){|r| a << r}
+        a.must_equal [{:id=>1}]
+        @ds.db.sqls.must_equal ['SELECT * FROM items']
+      end
+    end
   end
 
   it "should yield each row to the given block" do
@@ -5405,6 +5435,15 @@ describe "Dataset#where_single_value"  do
   before do
     @ds = Sequel.mock(:fetch=>{:id=>1})[:items].with_extend do
       select :only_id, :id
+    end
+  end
+
+  it "should handle empty arrays and hashes" do
+    [[], {}].each do |arg|
+      5.times do
+        @ds.only_id.where_single_value(arg).must_equal 1
+        @ds.db.sqls.must_equal ['SELECT id FROM items LIMIT 1']
+      end
     end
   end
 
