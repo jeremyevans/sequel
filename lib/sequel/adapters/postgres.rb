@@ -737,9 +737,9 @@ module Sequel
         cols = []
         procs = db.conversion_procs
         res.nfields.times do |fieldnum|
-          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
+          cols << [procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
         end
-        self.columns = cols.map{|c| c[2]}
+        self.columns = cols.map{|c| c[1]}
         cols
       end
       
@@ -756,13 +756,20 @@ module Sequel
       # For each row in the result set, yield a hash with column name symbol
       # keys and typecasted values.
       def yield_hash_rows(res, cols)
-        res.ntuples.times do |recnum|
+        ntuples = res.ntuples
+        recnum = 0
+        while recnum < ntuples
+          fieldnum = 0
+          nfields = cols.length
           converted_rec = {}
-          cols.each do |fieldnum, type_proc, fieldsym|
+          while fieldnum < nfields
+            type_proc, fieldsym = cols[fieldnum]
             value = res.getvalue(recnum, fieldnum)
             converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
+            fieldnum += 1 
           end
           yield converted_rec
+          recnum += 1
         end
       end
     end
