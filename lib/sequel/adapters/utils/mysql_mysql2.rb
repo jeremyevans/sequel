@@ -17,6 +17,7 @@ module Sequel
         MySQL client is not connected
         This connection is still waiting for a result, try again once you have the result
         closed MySQL connection
+        The MySQL server is running with the --read-only option so it cannot execute this statement
         END
         # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
         MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/
