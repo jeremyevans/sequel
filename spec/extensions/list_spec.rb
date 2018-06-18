@@ -50,7 +50,7 @@ describe "List plugin" do
   end
 
   it "should accept a :top option to set top of the list" do
-    klass(:top=>0).top_of_list.must_equal 0
+    @tc.top_of_list.must_equal 0
   end
 
   it "should modify the order when using the plugin" do

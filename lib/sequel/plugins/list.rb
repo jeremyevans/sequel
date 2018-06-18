@@ -62,7 +62,9 @@ module Sequel
       def self.configure(model, opts = OPTS)
         model.position_field = opts[:field] || :position
         model.dataset = model.dataset.order_prepend(model.position_field)
-        model.top_of_list = opts[:top] || 1
+        model.instance_exec do
+          @top_of_list = opts[:top] || 1
+        end
         
         model.scope_proc = case scope = opts[:scope]
         when Symbol
@@ -86,7 +88,7 @@ module Sequel
         attr_accessor :scope_proc
 
         # An Integer to use as the position of the top of the list. Defaults to 1.
-        attr_accessor :top_of_list
+        attr_reader :top_of_list
 
         Plugins.inherited_instance_variables(self, :@position_field=>nil, :@scope_proc=>nil, :@top_of_list=>nil)
       end

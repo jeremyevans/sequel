@@ -1,5 +1,7 @@
 === master
 
+* Add :top as an option in the list plugin (celsworth) (#1526)
+
 * Fix Model#{ancestors,descendants,self_and_siblings} in the tree plugin when custom parent/children association names are used (jeremyevans) (#1525)
 
 * Treat read-only mode error as disconnect error on mysql and mysql2 adapters, for better behavior on AWS Aurora cluster (jeremyevans)
