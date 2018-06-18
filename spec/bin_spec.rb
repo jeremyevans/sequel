@@ -23,6 +23,8 @@ File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
 DB = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB}", :test=>false)
 DB2 = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB2}", :test=>false)
 
+ENV['MT_NO_PLUGINS'] = '1' # Work around stupid autoloading of plugins
+gem 'minitest'
 require 'minitest/autorun'
 
 describe "bin/sequel" do

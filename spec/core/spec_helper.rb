@@ -8,6 +8,7 @@ end
 $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
 require_relative "../../lib/sequel/core"
 
+ENV['MT_NO_PLUGINS'] = '1' # Work around stupid autoloading of plugins
 gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'

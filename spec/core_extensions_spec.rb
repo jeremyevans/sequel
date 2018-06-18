@@ -14,6 +14,7 @@ Sequel.extension :core_extensions
 Sequel.extension :symbol_aref
 Sequel.extension :virtual_row_method_block
 
+ENV['MT_NO_PLUGINS'] = '1' # Work around stupid autoloading of plugins
 gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
