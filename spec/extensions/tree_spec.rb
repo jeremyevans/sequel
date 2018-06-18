@@ -115,6 +115,46 @@ describe Sequel::Model, "tree plugin" do
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
 
+  it "should have methods work correctly with custom association names" do
+    o = klass(:primary_key=>:i, :key=>:pi, :order=>:name, :children=>{:name=>:cs}, :parent=>{:name=>:p}).load(:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4)
+    
+    o.model.parent_association_name.must_equal :p
+    o.model.children_association_name.must_equal :cs
+    o.model.dataset = o.model.dataset.with_fetch(lambda do |sql|
+      case sql
+      when "SELECT * FROM nodes WHERE (nodes.i = 4) ORDER BY name LIMIT 1"
+        {:id=>7, :parent_id=>8, :name=>'r2', :i=>4, :pi=>5}
+      when "SELECT * FROM nodes WHERE (nodes.i = 5) ORDER BY name LIMIT 1"
+        {:id=>10, :parent_id=>11, :name=>'r3', :i=>5, :pi=>nil}
+      when 'SELECT * FROM nodes WHERE (nodes.pi = 3) ORDER BY name'
+        {:id=>12, :parent_id=>13, :name=>'r4', :i=>7, :pi=>3}
+      when 'SELECT * FROM nodes WHERE (nodes.pi = 7) ORDER BY name'
+        {:id=>14, :parent_id=>15, :name=>'r5', :i=>8, :pi=>7}
+      when 'SELECT * FROM nodes WHERE (nodes.pi = 8) ORDER BY name'
+        []
+      when 'SELECT * FROM nodes WHERE (nodes.pi = 4) ORDER BY name'
+        [{:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4}, {:id=>20, :parent_id=>21, :name=>'r6', :i=>9, :pi=>4}]
+      else
+        raise sql
+      end
+    end)
+    o.db.sqls.must_equal []
+
+    o.ancestors.must_equal [o.model.load(:id=>7, :parent_id=>8, :name=>'r2', :i=>4, :pi=>5),
+      o.model.load(:id=>10, :parent_id=>11, :name=>'r3', :i=>5, :pi=>nil)]
+    o.db.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.i = 4) ORDER BY name LIMIT 1",
+      "SELECT * FROM nodes WHERE (nodes.i = 5) ORDER BY name LIMIT 1"]
+
+    o.descendants.must_equal [o.model.load(:id=>12, :parent_id=>13, :name=>'r4', :i=>7, :pi=>3),
+      o.model.load(:id=>14, :parent_id=>15, :name=>'r5', :i=>8, :pi=>7)]
+    o.db.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.pi = 3) ORDER BY name",
+      "SELECT * FROM nodes WHERE (nodes.pi = 7) ORDER BY name",
+      "SELECT * FROM nodes WHERE (nodes.pi = 8) ORDER BY name"]
+
+    o.siblings.must_equal [o.model.load(:id=>20, :parent_id=>21, :name=>'r6', :i=>9, :pi=>4)] 
+    o.db.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.pi = 4) ORDER BY name"]
+  end
+
   describe ":single_root option" do
     before do
       @c = klass(:single_root => true)

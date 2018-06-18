@@ -1,5 +1,7 @@
 === master
 
+* Fix Model#{ancestors,descendants,self_and_siblings} in the tree plugin when custom parent/children association names are used (jeremyevans) (#1525)
+
 * Treat read-only mode error as disconnect error on mysql and mysql2 adapters, for better behavior on AWS Aurora cluster (jeremyevans)
 
 * Don't use cached placeholder literalizers for in Dataset#{first,where_all,where_each,where_single_value} if argument is empty array or hash (jeremyevans)
