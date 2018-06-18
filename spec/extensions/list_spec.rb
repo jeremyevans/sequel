@@ -17,6 +17,8 @@ describe "List plugin" do
     @o = @c.load(:id=>7, :position=>3)
     @sc = klass(:scope=>:scope_id)
     @so = @sc.load(:id=>7, :position=>3, :scope_id=>5)
+    @tc = klass(:top=>0)
+    @to = @tc.load(:id=>7, :position=>3)
     @db.reset
   end
 
@@ -41,6 +43,14 @@ describe "List plugin" do
 
   it "should accept a :scope option with a proc for a custom list scope" do
     klass(:scope=>proc{|o| o.model.dataset.filter(:active).filter(:scope_id=>o.scope_id)}).new(:scope_id=>4).list_dataset.sql.must_equal 'SELECT * FROM items WHERE (active AND (scope_id = 4)) ORDER BY position'
+  end
+
+  it "should default top of the list to 1" do
+    @c.top_of_list.must_equal 1
+  end
+
+  it "should accept a :top option to set top of the list" do
+    klass(:top=>0).top_of_list.must_equal 0
   end
 
   it "should modify the order when using the plugin" do
@@ -197,6 +207,12 @@ describe "List plugin" do
     @o.move_to_top
     @db.sqls.must_equal ["UPDATE items SET position = (position + 1) WHERE ((position >= 1) AND (position < 3))",
       "UPDATE items SET position = 1 WHERE (id = 7)"]
+  end
+
+  it "should have move_to_top use position 0 when :top_of_list is 0" do
+    @to.move_to_top
+    @db.sqls.must_equal ["UPDATE items SET position = (position + 1) WHERE ((position >= 0) AND (position < 3))",
+      "UPDATE items SET position = 0 WHERE (id = 7)"]
   end
 
   it "should have move_up without an argument move up a single position" do

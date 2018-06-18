@@ -45,19 +45,24 @@ module Sequel
     # race conditions, and is not safe when concurrent modifications are made
     # to the same list.
     #
-    # Additionally, note that unlike ruby arrays, the list plugin assumes that the
-    # first entry in the list has position 1, not position 0.
+    # Note that by default, unlike ruby arrays, the list plugin assumes the first
+    # entry in the list has position 1, not position 0.
+    #
+    # You can change this by providing an integer <tt>:top</tt> option:
+    #
+    #   Item.plugin :list, top: 0
     #
     # Copyright (c) 2007-2010 Sharon Rosner, Wayne E. Seguin, Aman Gupta, Adrian Madrid, Jeremy Evans
     module List
-      # Set the +position_field+ and +scope_proc+ attributes for the model,
-      # using the <tt>:field</tt> and <tt>:scope</tt> options, respectively.
+      # Set the +position_field+, +scope_proc+ and +top_of_list+ attributes for the model,
+      # using the <tt>:field</tt>, <tt>:scope</tt>, and <tt>:top</tt> options, respectively.
       # The <tt>:scope</tt> option can be a symbol, array of symbols, or a proc that
       # accepts a model instance and returns a dataset representing the list.
       # Also, modify the model dataset's order to order by the position and scope fields.
       def self.configure(model, opts = OPTS)
         model.position_field = opts[:field] || :position
         model.dataset = model.dataset.order_prepend(model.position_field)
+        model.top_of_list = opts[:top] || 1
         
         model.scope_proc = case scope = opts[:scope]
         when Symbol
@@ -80,7 +85,10 @@ module Sequel
         # proc should accept an instance and return a dataset representing the list.
         attr_accessor :scope_proc
 
-        Plugins.inherited_instance_variables(self, :@position_field=>nil, :@scope_proc=>nil)
+        # An Integer to use as the position of the top of the list. Defaults to 1.
+        attr_accessor :top_of_list
+
+        Plugins.inherited_instance_variables(self, :@position_field=>nil, :@scope_proc=>nil, :@top_of_list=>nil)
       end
 
       module InstanceMethods
@@ -122,7 +130,7 @@ module Sequel
             checked_transaction do
               ds = list_dataset
               op, ds = if target < current
-                target = 1 if target < 1
+                target = model.top_of_list if target < model.top_of_list
                 [:+, ds.where(position_field=>target...current)]
               else
                 lp ||= last_position
@@ -142,9 +150,9 @@ module Sequel
           move_to(lp, lp)
         end
 
-        # Move this instance to the top (first position, position 1) of the list.
+        # Move this instance to the top (first position, usually position 1) of the list.
         def move_to_top
-          move_to(1)
+          move_to(model.top_of_list)
         end
 
         # Move this instance the given number of places up in the list, or 1 place
