@@ -1,5 +1,7 @@
 === master
 
+* Assume local time if database timezone not specified when handling BC timestamps on JRuby 9.2.0.0 in the pg_extended_date_support extension (jeremyevans)
+
 * Fix parsing of timetz types in the jdbc/postgresql adapter (jeremyevans)
 
 * Make SQLTime.parse respect SQLTime.date and Sequel.application_timezone (jeremyevans)

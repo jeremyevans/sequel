@@ -83,12 +83,12 @@ module Sequel
       # If convert_infinite_timestamps is true and the value is infinite, return an appropriate
       # value based on the convert_infinite_timestamps setting.
       def to_application_timestamp(value)
-        if value.is_a?(String) && (m = value.match(/(?:(?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/)) && (m[1] || m[2])
-          if m[2]
+        if value.is_a?(String) && (m = value.match(/((?:[-+]\d\d:\d\d)(:\d\d)?)?( BC)?\z/)) && (m[2] || m[3])
+          if m[3]
             value = value.sub(' BC', '').sub(' ', ' BC ')
             conv = defined?(JRUBY_VERSION) && JRUBY_VERSION == '9.2.0.0'
           end
-          if m[1] || conv
+          if m[2] || conv
             dt = DateTime.parse(value)
             if conv
               # :nocov:
@@ -99,7 +99,14 @@ module Sequel
               end
               # :nocov:
             end
-            dt = dt.to_time unless Sequel.datetime_class == DateTime
+            unless Sequel.datetime_class == DateTime
+              dt = dt.to_time
+              if conv && (timezone == nil || timezone == :local) && !m[1]
+                # :nocov:
+                dt = Sequel.send(:convert_input_timestamp, dt.strftime("%F %T.%6N"), :local)
+                # :nocov:
+              end
+            end
             Sequel.convert_output_timestamp(dt, Sequel.application_timezone)
           else
             super(value)
