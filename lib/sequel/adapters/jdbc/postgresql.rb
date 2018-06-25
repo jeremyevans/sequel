@@ -214,7 +214,7 @@ module Sequel
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
         ARRAY_METHOD = Postgres.method(:RubyPGArray)
-        PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT].freeze
+        PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze
         HSTORE_METHOD = Postgres.method(:RubyPGHstore)
 
         def type_convertor(map, meta, type, i)

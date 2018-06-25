@@ -1,5 +1,7 @@
 === master
 
+* Fix parsing of timetz types in the jdbc/postgresql adapter (jeremyevans)
+
 * Make SQLTime.parse respect SQLTime.date and Sequel.application_timezone (jeremyevans)
 
 * Add :top as an option in the list plugin (celsworth) (#1526)
