@@ -40,7 +40,8 @@ module Sequel
         d = @date
         if d || utc
           meth = utc ? :utc : :local
-          t = public_send(meth, (d||t).year, (d||t).month, (d||t).day, t.hour, t.min, t.sec, t.usec)
+          d ||= t
+          t = public_send(meth, d.year, d.month, d.day, t.hour, t.min, t.sec, t.usec)
         end
 
         t
