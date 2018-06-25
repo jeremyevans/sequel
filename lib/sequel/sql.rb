@@ -26,10 +26,24 @@ module Sequel
       # Set the date used for SQLTime instances.
       attr_writer :date
 
-      # use the date explicitly set, or the current date if there is not a
+      # Use the date explicitly set, or the current date if there is not a
       # date set.
       def date
         @date || now
+      end
+
+      # Set the correct date and timezone when parsing times.
+      def parse(*)
+        t = super
+
+        utc = Sequel.application_timezone == :utc
+        d = @date
+        if d || utc
+          meth = utc ? :utc : :local
+          t = public_send(meth, (d||t).year, (d||t).month, (d||t).day, t.hour, t.min, t.sec, t.usec)
+        end
+
+        t
       end
 
       # Create a new SQLTime instance given an hour, minute, second, and usec.

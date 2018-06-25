@@ -1146,6 +1146,16 @@ describe "Sequel::SQLTime" do
     Sequel::SQLTime.create(1, 2, 3).strftime('%Y-%m-%d').must_equal Date.new(2000).strftime('%Y-%m-%d')
   end
 
+  it ".parse should respect SQLTime.date setting" do
+    Sequel::SQLTime.date = Date.new(2000, 2, 3)
+    Sequel::SQLTime.parse('10:11:12').strftime('%F').must_equal "2000-02-03"
+  end
+
+  it ".parse should respect application_timezone setting" do
+    Sequel::application_timezone = :utc
+    Sequel::SQLTime.parse('10:11:12').utc_offset.must_equal 0
+  end
+
   it "#inspect should show class and time by default" do
     Sequel::SQLTime.create(1, 2, 3).inspect.must_equal "#<Sequel::SQLTime 01:02:03>"
     Sequel::SQLTime.create(13, 24, 35).inspect.must_equal "#<Sequel::SQLTime 13:24:35>"

@@ -1,5 +1,7 @@
 === master
 
+* Make SQLTime.parse respect SQLTime.date and Sequel.application_timezone (jeremyevans)
+
 * Add :top as an option in the list plugin (celsworth) (#1526)
 
 * Fix Model#{ancestors,descendants,self_and_siblings} in the tree plugin when custom parent/children association names are used (jeremyevans) (#1525)
