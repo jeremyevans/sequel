@@ -892,6 +892,61 @@ describe "A PostgreSQL dataset with a timestamp field" do
     (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).must_equal t.strftime('%N').to_i/1000
   end
 
+  it "should respect SQLTime.date setting for time columns" do
+    begin
+      Sequel::SQLTime.date = Time.local(2000, 1, 2)
+      d = Sequel::SQLTime.create(10, 11, 12)
+      @db.get(Sequel.cast(d, :time)).must_equal d
+      @db.get(Sequel.cast(d, :timetz)).must_equal d
+    ensure
+      Sequel::SQLTime.date = nil
+    end
+  end
+
+  it "should respect Sequel.application_timezone for time columns" do
+    begin
+      d = Sequel::SQLTime.create(10, 11, 12)
+      Sequel.application_timezone = :local
+      @db.get(Sequel.cast(d, :time)).utc_offset.must_equal Time.now.utc_offset
+      @db.get(Sequel.cast(d, :timetz)).utc_offset.must_equal Time.now.utc_offset
+      Sequel.application_timezone = :utc
+      @db.get(Sequel.cast(d, :time)).utc_offset.must_equal 0
+      @db.get(Sequel.cast(d, :timetz)).utc_offset.must_equal 0
+    ensure
+      Sequel.application_timezone = nil
+    end
+  end
+
+  it "should handle parsing dates and timestamps in with 1, 2, and 3 digit years" do
+    [1, 10, 100, -2, -20, -200].each do |year|
+      d = Date.new(year, 2, 3)
+      @db.get(Sequel.cast(d, Date)).must_equal d
+      d = Time.local(year, 2, 3, 10, 11, 12)
+      @db.get(Sequel.cast(d, Time)).must_equal d
+      begin
+        Sequel.datetime_class = DateTime
+        d = DateTime.new(year, 2, 3, 10, 11, 12)
+        @db.get(Sequel.cast(d, Time)).must_equal d
+      ensure
+        Sequel.datetime_class = Time
+      end
+    end
+  end
+
+  it "should handle parsing dates and timestamps in the distant future" do
+    d = Date.new(5874896, 2, 3)
+    @db.get(Sequel.cast(d, Date)).must_equal d
+    d = Time.local(294275, 2, 3, 10, 11, 12)
+    @db.get(Sequel.cast(d, Time)).must_equal d
+    begin
+      Sequel.datetime_class = DateTime
+      d = DateTime.new(294275, 2, 3, 10, 11, 12)
+      @db.get(Sequel.cast(d, Time)).must_equal d
+    ensure
+      Sequel.datetime_class = Time
+    end
+  end
+
   it "should handle BC times and dates" do
     d = Date.new(-1234, 2, 3)
     @db.get(Sequel.cast(d, Date)).must_equal d
@@ -3209,6 +3264,11 @@ describe 'PostgreSQL inet/cidr types' do
 
     @db.get(Sequel.pg_inet_op('1.2.3.4/24').abbrev).must_equal '1.2.3.4/24'
     @db.get(Sequel.pg_inet_op('1.2.3.4/24').broadcast).must_equal IPAddr.new('1.2.3.255/24')
+    @db.get(Sequel.pg_inet_op('1234:3456:5678:789a:9abc:bced:edf0:f012/96').broadcast).must_equal IPAddr.new('1234:3456:5678:789a:9abc:bced::/96')
+    @db.get(Sequel.pg_inet_op('1234:3456:5678:789a:9abc:bced:edf0:f012/128').broadcast).must_equal IPAddr.new('1234:3456:5678:789a:9abc:bced:edf0:f012/128')
+    @db.get(Sequel.pg_inet_op('1234:3456:5678:789a:9abc:bced:edf0:f012/64').broadcast).must_equal IPAddr.new('1234:3456:5678:789a::/64')
+    @db.get(Sequel.pg_inet_op('1234:3456:5678:789a:9abc:bced:edf0:f012/32').broadcast).must_equal IPAddr.new('1234:3456::/32')
+    @db.get(Sequel.pg_inet_op('1234:3456:5678:789a:9abc:bced:edf0:f012/0').broadcast).must_equal IPAddr.new('::/0')
     @db.get(Sequel.pg_inet_op('1.2.3.4/24').family).must_equal 4
     @db.get(Sequel.pg_inet_op('1.2.3.4/24').host).must_equal '1.2.3.4'
     @db.get(Sequel.pg_inet_op('1.2.3.4/24').hostmask).must_equal IPAddr.new('0.0.0.255/32')
