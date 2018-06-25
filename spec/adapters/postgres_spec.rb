@@ -869,6 +869,9 @@ describe "A PostgreSQL dataset with a timestamp field" do
   end
   after do
     @db.convert_infinite_timestamps = false
+    Sequel.datetime_class = Time
+    Sequel::SQLTime.date = nil
+    Sequel.application_timezone = nil
   end
   after(:all) do
     @db.drop_table?(:test3)
@@ -893,28 +896,20 @@ describe "A PostgreSQL dataset with a timestamp field" do
   end
 
   it "should respect SQLTime.date setting for time columns" do
-    begin
-      Sequel::SQLTime.date = Time.local(2000, 1, 2)
-      d = Sequel::SQLTime.create(10, 11, 12)
-      @db.get(Sequel.cast(d, :time)).must_equal d
-      @db.get(Sequel.cast(d, :timetz)).must_equal d
-    ensure
-      Sequel::SQLTime.date = nil
-    end
+    Sequel::SQLTime.date = Time.local(2000, 1, 2)
+    d = Sequel::SQLTime.create(10, 11, 12)
+    @db.get(Sequel.cast(d, :time)).must_equal d
+    @db.get(Sequel.cast(d, :timetz)).must_equal d
   end
 
   it "should respect Sequel.application_timezone for time columns" do
-    begin
-      d = Sequel::SQLTime.create(10, 11, 12)
-      Sequel.application_timezone = :local
-      @db.get(Sequel.cast(d, :time)).utc_offset.must_equal Time.now.utc_offset
-      @db.get(Sequel.cast(d, :timetz)).utc_offset.must_equal Time.now.utc_offset
-      Sequel.application_timezone = :utc
-      @db.get(Sequel.cast(d, :time)).utc_offset.must_equal 0
-      @db.get(Sequel.cast(d, :timetz)).utc_offset.must_equal 0
-    ensure
-      Sequel.application_timezone = nil
-    end
+    d = Sequel::SQLTime.create(10, 11, 12)
+    Sequel.application_timezone = :local
+    @db.get(Sequel.cast(d, :time)).utc_offset.must_equal Time.now.utc_offset
+    @db.get(Sequel.cast(d, :timetz)).utc_offset.must_equal Time.now.utc_offset
+    Sequel.application_timezone = :utc
+    @db.get(Sequel.cast(d, :time)).utc_offset.must_equal 0
+    @db.get(Sequel.cast(d, :timetz)).utc_offset.must_equal 0
   end
 
   it "should handle parsing dates and timestamps in with 1, 2, and 3 digit years" do
@@ -938,31 +933,24 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.get(Sequel.cast(d, Date)).must_equal d
     d = Time.local(294275, 2, 3, 10, 11, 12)
     @db.get(Sequel.cast(d, Time)).must_equal d
-    begin
-      Sequel.datetime_class = DateTime
-      d = DateTime.new(294275, 2, 3, 10, 11, 12)
-      @db.get(Sequel.cast(d, Time)).must_equal d
-    ensure
-      Sequel.datetime_class = Time
-    end
+    Sequel.datetime_class = DateTime
+    d = DateTime.new(294275, 2, 3, 10, 11, 12)
+    @db.get(Sequel.cast(d, Time)).must_equal d
   end
 
   it "should handle BC times and dates" do
     d = Date.new(-1234, 2, 3)
     @db.get(Sequel.cast(d, Date)).must_equal d
-    begin
-      Sequel.default_timezone = :utc
-      t = Time.at(-100000000000).utc + 0.5
-      @db.get(Sequel.cast(t, Time)).must_equal t
-      @db.get(Sequel.cast(t, :timestamptz)).must_equal t
-      Sequel.datetime_class = DateTime
-      dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
-      @db.get(Sequel.cast(dt, DateTime)).must_equal dt
-      @db.get(Sequel.cast(dt, :timestamptz)).must_equal dt
-    ensure
-      Sequel.datetime_class = Time
-      Sequel.default_timezone = nil
-    end
+    Sequel.default_timezone = :utc
+    t = Time.at(-100000000000).utc + 0.5
+    @db.get(Sequel.cast(t, Time)).must_equal t
+    @db.get(Sequel.cast(t, :timestamptz)).must_equal t
+    Sequel.datetime_class = DateTime
+    dt = DateTime.new(-1234, 2, 3, 10, 20, Rational(30, 20))
+    @db.get(Sequel.cast(dt, DateTime)).must_equal dt
+    @db.get(Sequel.cast(dt, :timestamptz)).must_equal dt
+    Sequel.datetime_class = Time
+    Sequel.default_timezone = nil
   end
 
   it "should handle infinite timestamps if convert_infinite_timestamps is set" do
