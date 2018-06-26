@@ -211,6 +211,13 @@ module Sequel
         end
 
         conn.instance_variable_set(:@db, self)
+        if USES_PG && conn.respond_to?(:type_map_for_queries=)
+          type_map = PG::TypeMapByClass.new
+          type_map[Integer] = PG::TextEncoder::Integer.new
+          type_map[FalseClass] = type_map[TrueClass] = PG::TextEncoder::Boolean.new
+          type_map[Float] = PG::TextEncoder::Float.new
+          conn.type_map_for_queries = type_map
+        end
 
         if encoding = opts[:encoding] || opts[:charset]
           if conn.respond_to?(:set_client_encoding)
