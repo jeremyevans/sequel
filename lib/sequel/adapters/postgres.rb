@@ -15,6 +15,12 @@ begin
   end
 
   Sequel::Postgres::USES_PG = true
+  if defined?(PG::TypeMapByClass)
+    type_map = Sequel::Postgres::PG_QUERY_TYPE_MAP = PG::TypeMapByClass.new
+    type_map[Integer] = PG::TextEncoder::Integer.new
+    type_map[FalseClass] = type_map[TrueClass] = PG::TextEncoder::Boolean.new
+    type_map[Float] = PG::TextEncoder::Float.new
+  end
 rescue LoadError => e 
   begin
     require 'postgres-pr/postgres-compat'
@@ -211,12 +217,8 @@ module Sequel
         end
 
         conn.instance_variable_set(:@db, self)
-        if USES_PG && conn.respond_to?(:type_map_for_queries=)
-          type_map = PG::TypeMapByClass.new
-          type_map[Integer] = PG::TextEncoder::Integer.new
-          type_map[FalseClass] = type_map[TrueClass] = PG::TextEncoder::Boolean.new
-          type_map[Float] = PG::TextEncoder::Float.new
-          conn.type_map_for_queries = type_map
+        if USES_PG && conn.respond_to?(:type_map_for_queries=) && defined?(PG_QUERY_TYPE_MAP)
+          conn.type_map_for_queries = PG_QUERY_TYPE_MAP
         end
 
         if encoding = opts[:encoding] || opts[:charset]
