@@ -41,6 +41,7 @@ Sequel::Plugins::List::ClassMethods
 <ol>
 <li><a href="#attribute-i-position_field">position_field</a></li>
 <li><a href="#attribute-i-scope_proc">scope_proc</a></li>
+<li><a href="#attribute-i-top_of_list">top_of_list</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -68,6 +69,15 @@ Sequel::Plugins::List::ClassMethods
 <p>A proc that scopes the dataset, so that there can be multiple positions  in
 the list, but the positions are unique with the scoped dataset. This proc
 should accept an instance and return a dataset representing the list.</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-top_of_list'>top_of_list</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>An Integer to use as the position of the top of the list. Defaults to 1.</p>
 </td>
 </tr>
 </table>

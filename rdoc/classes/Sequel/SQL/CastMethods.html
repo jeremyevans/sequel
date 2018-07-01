@@ -73,7 +73,7 @@ schema methods.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 669</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 684</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cast_numeric'>
@@ -97,7 +97,7 @@ so you can use the bitwise operators on the result.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_numeric-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast_numeric-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 679</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast_numeric-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 694</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cast_string'>
@@ -122,7 +122,7 @@ string concatenation.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_string-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 689</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 704</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

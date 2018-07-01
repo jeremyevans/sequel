@@ -77,13 +77,16 @@ href="../../../files/doc/virtual_rows_rdoc.html">Virtual Rows guide</a>.</p>
 <ol>
 <li><a href="#method-c-new">new</a></li>
 </ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-method_missing">method_missing</a></li>
+</ol>
 </div>
 <div id='context'>
 <div id='includes'>
 <h2>Included modules</h2>
 <ol>
 <li><a href="OperatorBuilders.html">OperatorBuilders</a></li>
-<li>Module</li>
 </ol>
 </div>
 </div>
@@ -104,7 +107,30 @@ href="../../../files/doc/virtual_rows_rdoc.html">Virtual Rows guide</a>.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1844</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1863</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-method_missing'>
+<a name='method-i-method_missing'></a>
+<div class='synopsis'>
+<span class='name'>method_missing</span>
+<span class='arguments'>(m, *args)</span>
+
+</div>
+<div class='description'>
+
+<p>Return an <code>Identifier</code>, <code>QualifiedIdentifier</code>, or
+<code>Function</code>, depending on arguments and whether a block is
+provided.  Does not currently call the block. See the class level
+documentation.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-method_missing-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1871</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols?</span>&#x000A;      <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;__&#39;</span>, <span class="ruby-value">2</span>)&#x000A;      <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

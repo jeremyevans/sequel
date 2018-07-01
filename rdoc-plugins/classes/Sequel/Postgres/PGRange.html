@@ -91,6 +91,20 @@ Superclass:
 </ol>
 </div>
 <div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>ENDLESS_RANGE_NOT_SUPPORTED</td>
+<td>=</td>
+<td class='context-item-value'>RUBY_VERSION < '2.6'</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
 <div id='aliases-list'>
 <h2>Public Instance Aliases</h2>
 <div class='name-list'>
@@ -390,7 +404,7 @@ instance, if one can be created.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_range-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 455</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_range</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@range</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@range</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range for an empty PostgreSQL range&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range excludes beginning element&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">exclude_begin?</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded beginning&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded ending&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>&#x000A;  <span class="ruby-ivar">@range</span> = <span class="ruby-constant">Range</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>, <span class="ruby-identifier">exclude_end?</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 457</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_range</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@range</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@range</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range for an empty PostgreSQL range&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range excludes beginning element&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">exclude_begin?</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded beginning&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot create ruby range when PostgreSQL range has unbounded ending&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>&#x000A;  <span class="ruby-ivar">@range</span> = <span class="ruby-constant">Range</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>, <span class="ruby-identifier">exclude_end?</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unbounded_begin-3F'>
@@ -409,7 +423,7 @@ instance, if one can be created.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unbounded_begin-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unbounded_begin-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 472</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_begin?</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unbounded_begin-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 474</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_begin?</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unbounded_end-3F'>
@@ -428,7 +442,7 @@ instance, if one can be created.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unbounded_end-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unbounded_end-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 477</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_end?</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unbounded_end-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 479</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unbounded_end?</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unquoted_literal'>
@@ -448,7 +462,7 @@ out for use by the bound argument code.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unquoted_literal-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unquoted_literal-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 483</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unquoted_literal</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-string">&#39;empty&#39;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-node">&quot;#{exclude_begin? ? &quot;(&quot; : &quot;[&quot;}#{escape_value(self.begin, ds)},#{escape_value(self.end, ds)}#{exclude_end? ? &quot;)&quot; : &quot;]&quot;}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unquoted_literal-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 485</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unquoted_literal</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-string">&#39;empty&#39;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-node">&quot;#{exclude_begin? ? &quot;(&quot; : &quot;[&quot;}#{escape_value(self.begin, ds)},#{escape_value(self.end, ds)}#{exclude_end? ? &quot;)&quot; : &quot;]&quot;}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-valid_ruby_range-3F'>
@@ -469,7 +483,7 @@ ending (no unbounded ranges), and it cannot exclude the beginning element.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-valid_ruby_range-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-valid_ruby_range-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 467</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid_ruby_range?</span>&#x000A;  <span class="ruby-operator">!</span>(<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">exclude_begin?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-valid_ruby_range-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 469</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid_ruby_range?</span>&#x000A;  <span class="ruby-operator">!</span>(<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">exclude_begin?</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">begin</span> <span class="ruby-operator">||</span> (<span class="ruby-constant">ENDLESS_RANGE_NOT_SUPPORTED</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">end</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

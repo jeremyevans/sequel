@@ -111,7 +111,7 @@ possible arguments.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1742</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1761</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">sub</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -134,7 +134,7 @@ multidimensional array.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1762</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1781</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-7C'>
@@ -156,7 +156,7 @@ current array of subscripts.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-7C-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1753</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1772</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -38,10 +38,100 @@ Superclass:
 </div>
 <div id='content'>
 <div id='text'>
-<div id='description'></div>
+<div id='description'>
+<p><code>LiteralString</code> is used to represent literal <a
+href="SQL.html">SQL</a> expressions. A  <code>LiteralString</code> is
+copied verbatim into an <a href="SQL.html">SQL</a> statement. Instances of
+<code>LiteralString</code> can be created by calling
+<code>Sequel.lit</code>.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-inspect">inspect</a></li>
+<li><a href="#method-i-lit">lit</a></li>
+<li><a href="#method-i-to_sequel_blob">to_sequel_blob</a></li>
+</ol>
+</div>
 <div id='context'>
+<div id='includes'>
+<h2>Included modules</h2>
+<ol>
+<li><a href="SQL/OrderMethods.html">SQL::OrderMethods</a></li>
+<li><a href="SQL/ComplexExpressionMethods.html">SQL::ComplexExpressionMethods</a></li>
+<li><a href="SQL/BooleanMethods.html">SQL::BooleanMethods</a></li>
+<li><a href="SQL/NumericMethods.html">SQL::NumericMethods</a></li>
+<li><a href="SQL/StringMethods.html">SQL::StringMethods</a></li>
+<li><a href="SQL/InequalityMethods.html">SQL::InequalityMethods</a></li>
+<li><a href="SQL/AliasMethods.html">SQL::AliasMethods</a></li>
+<li><a href="SQL/CastMethods.html">SQL::CastMethods</a></li>
+</ol>
+</div>
 </div>
 <div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-inspect'>
+<a name='method-i-inspect'></a>
+<div class='synopsis'>
+<span class='name'>inspect</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Show that the current string is a literal string in addition to the output.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1959</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-lit'>
+<a name='method-i-lit'></a>
+<div class='synopsis'>
+<span class='name'>lit</span>
+<span class='arguments'>(*args)</span>
+
+</div>
+<div class='description'>
+
+<p>Return self if no args are given, otherwise return a <a
+href="SQL/PlaceholderLiteralString.html">SQL::PlaceholderLiteralString</a>
+with the current string and the given args.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lit-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1965</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-to_sequel_blob'>
+<a name='method-i-to_sequel_blob'></a>
+<div class='synopsis'>
+<span class='name'>to_sequel_blob</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Convert a literal string to a <a href="SQL/Blob.html">SQL::Blob</a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_sequel_blob-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1970</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
 </div>
 
 </div>

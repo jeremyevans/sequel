@@ -39,7 +39,9 @@ Sequel::Plugins::Tree::ClassMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#attribute-i-children_association_name">children_association_name</a></li>
 <li><a href="#method-i-freeze">freeze</a></li>
+<li><a href="#attribute-i-parent_association_name">parent_association_name</a></li>
 <li><a href="#attribute-i-parent_column">parent_column</a></li>
 <li><a href="#method-i-roots">roots</a></li>
 <li><a href="#method-i-roots_dataset">roots_dataset</a></li>
@@ -53,6 +55,24 @@ Sequel::Plugins::Tree::ClassMethods
 <h2 class='section-bar'>Attributes</h2>
 <div class='name-list'>
 <table>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-children_association_name'>children_association_name</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The association name for the children association</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-parent_association_name'>parent_association_name</a>
+</td>
+<td class='context-item-value'>[R]</td>
+<td class='context-item-desc'>
+<p>The association name for the parent association</p>
+</td>
+</tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>
 <a name='attribute-i-parent_column'>parent_column</a>
@@ -93,7 +113,7 @@ the leaf.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-roots'>
@@ -114,7 +134,7 @@ the leaf.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-roots-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-roots-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots</span>&#x000A;  <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-roots-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots</span>&#x000A;  <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-roots_dataset'>
@@ -135,7 +155,7 @@ the leaf.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-roots_dataset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 82</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel: The Database Toolkit for Ruby (v5.9.0)</h2>
+    <h2>Sequel: The Database Toolkit for Ruby (v5.10.0)</h2>
 
 <h3 id='features'>Features:</h3>
 
@@ -61,7 +61,7 @@
 <span class='comment'># create an items table</span>
 <span class='constant'>DB</span><span class='punct'>.</span><span class='ident'>create_table</span> <span class='symbol'>:items</span> <span class='keyword'>do</span>
   <span class='ident'>primary_key</span> <span class='symbol'>:id</span>
-  <span class='ident'>String</span> <span class='symbol'>:name</span><span class='punct'>,</span> <span class='symbol'>uniq:</span> <span class='keyword'>true</span><span class='punct'>,</span> <span class='symbol'>null:</span> <span class='keyword'>false</span>
+  <span class='ident'>String</span> <span class='symbol'>:name</span><span class='punct'>,</span> <span class='symbol'>unique:</span> <span class='keyword'>true</span><span class='punct'>,</span> <span class='symbol'>null:</span> <span class='keyword'>false</span>
   <span class='ident'>Float</span> <span class='symbol'>:price</span><span class='punct'>,</span> <span class='symbol'>null:</span> <span class='keyword'>false</span>
 <span class='keyword'>end</span>
 
