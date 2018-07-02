@@ -634,6 +634,26 @@ describe "Database schema modifiers" do
     @ds.all.must_equal [{:id=>10}, {:id=>20}]
   end
 
+  it "should set column defaults to nil correctly" do
+    @db.create_table!(:items){Integer :id}
+    @ds.insert(:id=>10)
+    @db.alter_table(:items){set_column_default :id, nil}
+    @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id]
+    @ds.columns!.must_equal [:id]
+    @ds.insert
+    @ds.all.must_equal [{:id=>10}, {:id=>nil}]
+  end
+
+  it "should set column defaults to nil for NOT NULL columns correctly" do
+    @db.create_table!(:items){Integer :id, :null=>false}
+    @ds.insert(:id=>10)
+    @db.alter_table(:items){set_column_default :id, nil}
+    @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id]
+    @ds.columns!.must_equal [:id]
+    @ds.insert(20)
+    @ds.all.must_equal [{:id=>10}, {:id=>20}]
+  end
+
   cspecify "should set column types correctly", [:jdbc, :db2], :oracle do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)

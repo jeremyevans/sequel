@@ -1,3 +1,7 @@
+=== master
+
+* Allow using set_column_default with a nil value to remove the default value for a column on MySQL when the column is NOT NULL (jeremyevans)
+
 === 5.10.0 (2018-07-01)
 
 * Use input type casts when using the postgres adapter with pg 0.18+ to reduce string allocations for some primitive types used as prepared statement arguments (jeremyevans)

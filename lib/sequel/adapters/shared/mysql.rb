@@ -232,7 +232,14 @@ module Sequel
       alias alter_table_rename_column_sql alter_table_change_column_sql
       alias alter_table_set_column_type_sql alter_table_change_column_sql
       alias alter_table_set_column_null_sql alter_table_change_column_sql
-      alias alter_table_set_column_default_sql alter_table_change_column_sql
+
+      def alter_table_set_column_default_sql(table, op)
+        if op[:default].nil?
+          "ALTER COLUMN #{quote_identifier(op[:name])} DROP DEFAULT"
+        else
+          super
+        end
+      end
 
       def alter_table_add_constraint_sql(table, op)
         if op[:type] == :foreign_key
