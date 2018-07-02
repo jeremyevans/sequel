@@ -234,7 +234,11 @@ module Sequel
       alias alter_table_set_column_null_sql alter_table_change_column_sql
 
       def alter_table_set_column_default_sql(table, op)
-        if op[:default].nil?
+        return super unless op[:default].nil?
+
+        opts = schema(table).find{|x| x[0] == op[:name]}
+
+        if opts && opts[1][:allow_null] == false
           "ALTER COLUMN #{quote_identifier(op[:name])} DROP DEFAULT"
         else
           super
