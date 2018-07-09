@@ -462,6 +462,12 @@ describe "A PostgreSQL database " do
     DB.drop_table?(:b, :a)
   end
 
+  it "should handle non-ASCII column aliases" do
+    s = "\u00E4".force_encoding(DB.get('a').encoding)
+    k, v = DB.select(Sequel.as(s, s)).first.shift
+    k.to_s.must_equal v
+  end
+
   it "should parse foreign keys referencing current table using :reverse option" do
     DB.create_table!(:a) do
       primary_key :id
