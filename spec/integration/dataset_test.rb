@@ -944,7 +944,7 @@ if DB.dataset.supports_window_functions?
           must_equal [{:sum=>110, :id=>1}, {:sum=>1100, :id=>2}, {:sum=>11000, :id=>3}, {:sum=>110000, :id=>4}, {:sum=>100000, :id=>5}, {:sum=>nil, :id=>6}]
       end
 
-      cspecify "should give correct results for aggregate window functions with offsets for RANGES", :mssql do
+      cspecify "should give correct results for aggregate window functions with offsets for RANGES", :mssql, [proc{DB.server_version < 110000}, :postgres] do
         @ds.select(:id){sum(:amount).over(:order=>:group_id, :frame=>{:type=>:range, :start=>1}).as(:sum)}.all.
           must_equal [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
         @ds.select(:id){sum(:amount).over(:order=>:group_id, :frame=>{:type=>:range, :start=>0, :end=>1}).as(:sum)}.all.
