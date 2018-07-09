@@ -1,5 +1,7 @@
 === master
 
+* Support using a hash as a window function :frame option value, with support for ROWS/RANGE/GROUPS, numeric offsets, and EXCLUDE (jeremyevans)
+
 * Allow using set_column_default with a nil value to remove the default value for a column on MySQL when the column is NOT NULL (jeremyevans)
 
 === 5.10.0 (2018-07-01)

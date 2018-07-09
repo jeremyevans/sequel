@@ -183,6 +183,18 @@ module Sequel
       false
     end
     
+    # Whether the dataset supports the given window function option.  True by default.
+    # This should only be called if supports_window_functions? is true. Possible options
+    # are :rows, :range, :groups, :offset, :exclude.
+    def supports_window_function_frame_option?(option)
+      case option
+      when :rows, :range, :offset
+        true
+      else
+        false
+      end
+    end
+    
     # Whether the dataset supports WHERE TRUE (or WHERE 1 for databases that
     # that use 1 for true), true by default.
     def supports_where_true?

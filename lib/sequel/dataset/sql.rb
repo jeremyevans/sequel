@@ -718,41 +718,86 @@ module Sequel
     # Append literalization of windows (for window functions) to SQL string.
     def window_sql_append(sql, opts)
       raise(Error, 'This dataset does not support window functions') unless supports_window_functions?
-      sql << '('
-      window, part, order, frame = opts.values_at(:window, :partition, :order, :frame)
       space = false
       space_s = ' '
-      if window
+
+      sql << '('
+
+      if window = opts[:window]
         literal_append(sql, window)
         space = true
       end
-      if part
+
+      if part = opts[:partition]
         sql << space_s if space
         sql << "PARTITION BY "
         expression_list_append(sql, Array(part))
         space = true
       end
-      if order
+
+      if order = opts[:order]
         sql << space_s if space
         sql << "ORDER BY "
         expression_list_append(sql, Array(order))
         space = true
       end
-      case frame
-        when nil
-          # nothing
-        when :all
-          sql << space_s if space
-          sql << "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
-        when :rows
-          sql << space_s if space
-          sql << "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW"
-        when String
-          sql << space_s if space
+
+      if frame = opts[:frame]
+        sql << space_s if space
+
+        if frame.is_a?(String)
           sql << frame
         else
-          raise Error, "invalid window frame clause, should be :all, :rows, a string, or nil"
+          case frame
+          when :all
+            frame_type = :rows
+            frame_start = :preceding
+            frame_end = :following
+          when :rows, :range, :groups
+            frame_type = frame
+            frame_start = :preceding
+            frame_end = :current
+          when Hash
+            frame_type = frame[:type]
+            unless frame_type == :rows || frame_type == :range || frame_type == :groups
+              raise Error, "invalid window :frame :type option: #{frame_type.inspect}"
+            end
+            unless frame_start = frame[:start]
+              raise Error, "invalid window :frame :start option: #{frame_start.inspect}"
+            end
+            frame_end = frame[:end]
+            frame_exclude = frame[:exclude]
+          else
+            raise Error, "invalid window :frame option: #{frame.inspect}"
+          end
+
+          sql << frame_type.to_s.upcase << " "
+          sql << 'BETWEEN ' if frame_end
+          window_frame_boundary_sql_append(sql, frame_start, :preceding)
+          if frame_end
+            sql << " AND "
+            window_frame_boundary_sql_append(sql, frame_end, :following)
+          end
+
+          if frame_exclude
+            sql << " EXCLUDE "
+
+            case frame_exclude
+            when :current
+              sql << "CURRENT ROW"
+            when :group
+              sql << "GROUP"
+            when :ties
+              sql << "TIES"
+            when :no_others
+              sql << "NO OTHERS"
+            else
+              raise Error, "invalid window :frame :exclude option: #{frame_exclude.inspect}"
+            end
+          end
+        end
       end
+
       sql << ')'
     end
 
@@ -1534,6 +1579,36 @@ module Sequel
 
     def update_update_sql(sql)
       sql << 'UPDATE'
+    end
+
+    def window_frame_boundary_sql_append(sql, boundary, direction)
+      case boundary
+      when :current
+       sql << "CURRENT ROW"
+      when :preceding
+        sql << "UNBOUNDED PRECEDING"
+      when :following
+        sql << "UNBOUNDED FOLLOWING"
+      else
+        if boundary.is_a?(Array)
+          offset, direction = boundary
+          unless boundary.length == 2 && (direction == :preceding || direction == :following)
+            raise Error, "invalid window :frame boundary (:start or :end) option: #{boundary.inspect}"
+          end
+        else
+          offset = boundary
+        end
+
+        case offset
+        when Numeric, String, SQL::Cast
+          # nothing
+        else
+          raise Error, "invalid window :frame boundary (:start or :end) option: #{boundary.inspect}"
+        end
+
+        literal_append(sql, offset)
+        sql << (direction == :preceding ? " PRECEDING" : " FOLLOWING")
+      end
     end
   end
 end

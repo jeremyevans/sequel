@@ -1678,6 +1678,19 @@ module Sequel
         server_version >= 80400
       end
 
+      # Base support added in 8.4, offset supported added in 9.0,
+      # GROUPS and EXCLUDE support added in 11.0.
+      def supports_window_function_frame_option?(option)
+        case option
+        when :rows, :range
+          true
+        when :offset
+          server_version >= 90000
+        when :groups, :exclude
+          server_version >= 110000
+        end
+      end
+    
       # Truncates the dataset.  Returns nil.
       #
       # Options:

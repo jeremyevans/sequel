@@ -173,6 +173,16 @@ user input for function names.
 
   DB[:table].select(Sequel.function(params[:id])) # SQL injection!
 
+==== SQL Window Frames
+
+For backwards compatibility, Sequel supports regular strings in the
+window function :frame option, which will be treated as a literal string:
+
+  DB[:table].select{fun(arg).over(:frame=>'SQL Here')}
+
+You should make sure the frame argument is not derived from user input,
+or switch to using a hash as the :frame option value.
+
 ==== auto_literal_strings extension
 
 If the auto_literal_strings extension is used for backwards compatibility,

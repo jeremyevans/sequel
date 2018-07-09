@@ -583,16 +583,73 @@ describe Sequel::SQL::VirtualRow do
     @d.l{count.function.*.over}.must_equal 'count(*) OVER ()'
   end
 
-  it "should handle method.function.over(:frame=>:all) as a window function call" do
+  it "should handle method.function.over(:frame=>:all) as a window function call with frame for all rows" do
     @d.l{rank.function.over(:frame=>:all)}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)'
   end
 
-  it "should handle method.function.over(:frame=>:rows) as a window function call" do
+  it "should handle method.function.over(:frame=>:rows) as a window function call with frame for all rows before current row" do
     @d.l{rank.function.over(:frame=>:rows)}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
   end
 
-  it "should handle method.function.over(:frame=>'some string') as a window function call" do
+  it "should handle method.function.over(:frame=>:groups) as a window function call with frame for all groups before current row" do
+    @d.l{rank.function.over(:frame=>:groups)}.must_equal 'rank() OVER (GROUPS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should handle method.function.over(:frame=>:range) as a window function call with frame for all groups before current row" do
+    @d.l{rank.function.over(:frame=>:range)}.must_equal 'rank() OVER (RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should handle window function with :frame hash argument with :type option" do
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding})}.must_equal 'rank() OVER (ROWS UNBOUNDED PRECEDING)'
+    @d.l{rank.function.over(:frame=>{:type=>:range, :start=>:preceding})}.must_equal 'rank() OVER (RANGE UNBOUNDED PRECEDING)'
+    @d.l{rank.function.over(:frame=>{:type=>:groups, :start=>:preceding})}.must_equal 'rank() OVER (GROUPS UNBOUNDED PRECEDING)'
+  end
+
+  it "should handle window function with :frame hash argument with :start option" do
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding})}.must_equal 'rank() OVER (ROWS UNBOUNDED PRECEDING)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:following})}.must_equal 'rank() OVER (ROWS UNBOUNDED FOLLOWING)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:current})}.must_equal 'rank() OVER (ROWS CURRENT ROW)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>1})}.must_equal 'rank() OVER (ROWS 1 PRECEDING)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>[1, :following]})}.must_equal 'rank() OVER (ROWS 1 FOLLOWING)'
+  end
+
+  it "should handle window function with :frame hash argument with :end option" do
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>:preceding})}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED PRECEDING)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>:following})}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>:current})}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>1})}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND 1 FOLLOWING)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>[1, :preceding]})}.must_equal 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING)'
+  end
+
+  it "should handle window function with :frame hash argument with :exclude option" do
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding,:exclude=>:current})}.must_equal 'rank() OVER (ROWS UNBOUNDED PRECEDING EXCLUDE CURRENT ROW)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :exclude=>:group})}.must_equal 'rank() OVER (ROWS UNBOUNDED PRECEDING EXCLUDE GROUP)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :exclude=>:ties})}.must_equal 'rank() OVER (ROWS UNBOUNDED PRECEDING EXCLUDE TIES)'
+    @d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :exclude=>:no_others})}.must_equal 'rank() OVER (ROWS UNBOUNDED PRECEDING EXCLUDE NO OTHERS)'
+  end
+
+  it "should handle window function with :frame hash argument with invalid options" do
+    proc{@d.l{rank.function.over(:frame=>{:type=>:blah, :start=>:preceding})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:blah})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>[1, :blah]})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>[1, :preceding, 3]})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>:blah})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>[1, :blah]})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :end=>[1, :following, 3]})}}.must_raise Sequel::Error
+    proc{@d.l{rank.function.over(:frame=>{:type=>:rows, :start=>:preceding, :exclude=>:blah})}}.must_raise Sequel::Error
+  end
+
+  it "should handle method.function.over(:frame=>'some string') as a window function call with explicit frame" do
     @d.l{rank.function.over(:frame=>'RANGE BETWEEN 3 PRECEDING AND CURRENT ROW')}.must_equal 'rank() OVER (RANGE BETWEEN 3 PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should support window functions options" do
+    @d.supports_window_function_frame_option?(:rows).must_equal true
+    @d.supports_window_function_frame_option?(:range).must_equal true
+    @d.supports_window_function_frame_option?(:groups).must_equal false
+    @d.supports_window_function_frame_option?(:offset).must_equal true
+    @d.supports_window_function_frame_option?(:exclude).must_equal false
   end
 
   it "should raise an error if an invalid :frame option is used" do

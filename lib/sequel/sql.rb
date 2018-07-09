@@ -1903,16 +1903,40 @@ module Sequel
     #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
     #   Sequel::SQL::Window.new(partition: :col7, frame: :rows)
     #   # (PARTITION BY col7 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
-    #   Sequel::SQL::Window.new(partition: :col7, frame: "RANGE CURRENT ROW")
+    #   Sequel::SQL::Window.new(partition: :col7, frame: {type: :range, start: current})
     #   # (PARTITION BY col7 RANGE CURRENT ROW)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: {type: :range, start: 1, end: 1})
+    #   # (PARTITION BY col7 RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: {type: :range, start: 2, end: [1, :preceding]})
+    #   # (PARTITION BY col7 RANGE BETWEEN 2 PRECEDING AND 1 PRECEDING)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: {type: :range, start: 1, end: [2, :following]})
+    #   # (PARTITION BY col7 RANGE BETWEEN 1 FOLLOWING AND 2 FOLLOWING)
+    #   Sequel::SQL::Window.new(partition: :col7, frame: {type: :range, start: :preceding, exclude: :current})
+    #   # (PARTITION BY col7 RANGE UNBOUNDED PRECEDING EXCLUDE CURRENT ROW)
     #
     #   Sequel::SQL::Window.new(window: :named_window) # you can create a named window with Dataset#window
     #   # (named_window)
     class Window < Expression
       # The options for this window.  Options currently supported:
-      # :frame :: if specified, should be :all, :rows, or a String that is used literally. :all always operates over all rows in the
-      #           partition, while :rows excludes the current row's later peers.  The default is to include
-      #           all previous rows in the partition up to the current row's last peer.
+      # :frame :: if specified, should be :all, :rows, :range, :groups, a String, or a Hash.
+      #           :all :: Always operates over all rows in the partition
+      #           :rows :: Includes rows in the partition up to and including the current row
+      #           :range, :groups :: Includes rows in the partition up to and including the current group
+      #           String :: Used as literal SQL code, try to avoid
+      #           Hash :: Hash of options for the frame:
+      #                   :type :: The type of frame, must be :rows, :range, or :groups (required)
+      #                   :start :: The start of the frame (required).  Possible values:
+      #                             :preceding :: UNBOUNDED PRECEDING
+      #                             :following :: UNBOUNDED FOLLOWING
+      #                             :current :: CURRENT ROW
+      #                             String, Numeric, or Cast :: Used as the offset of rows/values preceding
+      #                             Array :: Must have two elements, with first element being String, Numeric, or
+      #                                      Cast and second element being :preceding or :following
+      #                   :end :: The end of the frame.  Can be left out.  If present, takes the same values as
+      #                           :start, except that when a String, Numeric, or Hash, it is used as the offset
+      #                           for rows following
+      #                   :exclude :: Which rows to exclude.  Possible values are :current, :ties, :group
+      #                               :no_others.
       # :order :: order on the column(s) given
       # :partition :: partition/group on the column(s) given
       # :window :: base results on a previously specified named window

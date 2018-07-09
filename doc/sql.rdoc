@@ -229,6 +229,18 @@ If the database supports window functions, Sequel can handle them by calling the
   DB[:albums].select{function(c1, c2).over(:partition=>[c3, c4], :order=>[c5, c6.desc])}
   # SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6 DESC) FROM albums
 
+  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>:rows)}
+  # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) FROM albums
+
+  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>{:type=>:range, :start=>1, :end=>1})}
+  # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM albums
+
+  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>{:type=>:groups, :start=>[2, :preceding], :end=>[1, :preceding]})}
+  # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 GROUPS BETWEEN 2 PRECEDING AND 1 PRECEDING) FROM albums
+
+  DB[:albums].select{function(c1).over(:partition=>c2, :order=>:c3, :frame=>{:type=>:range, :start=>:preceding, :exclude=>:current})}
+  # SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3 RANGE UNBOUNDED PRECEDING EXCLUDE CURRENT ROW) FROM albums
+
 === Schema Qualified Functions
 
 If the database supports schema qualified functions, Sequel can handle them by calling the +function+ method on a qualified identifier:
