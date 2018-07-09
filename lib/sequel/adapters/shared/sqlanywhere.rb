@@ -275,6 +275,10 @@ module Sequel
         false
       end
 
+      def supports_window_functions?
+        true
+      end
+
       # Uses CROSS APPLY to join the given table into the current dataset.
       def cross_apply(table)
         join_table(:cross_apply, table)
