@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#window for WINDOW clause on MySQL 8 and SQLAnywhere (jeremyevans)
+
 * Enable window function support on SQLAnywhere (jeremyevans)
 
 * Support using a hash as a window function :frame option value, with support for ROWS/RANGE/GROUPS, numeric offsets, and EXCLUDE (jeremyevans)

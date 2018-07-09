@@ -971,6 +971,17 @@ if DB.dataset.supports_window_functions?
       @ds.select(:id){sum(:amount).over(:order=>:id, :frame=>{:type=>:rows, :start=>:preceding, :exclude=>:no_others}).as(:sum)}.all.
         must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
     end if DB.dataset.supports_window_function_frame_option?(:exclude)
+
+    it "should give correct results for window functions" do
+      @ds.window(:win, :partition=>:group_id, :order=>:id).select(:id){sum(:amount).over(:window=>win, :frame=>:rows).as(:sum)}.all.
+        must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.window(:win, :partition=>:group_id).select(:id){sum(:amount).over(:window=>win, :order=>id, :frame=>:rows).as(:sum)}.all.
+        must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.window(:win, {}).select(:id){sum(:amount).over(:window=>:win, :order=>id, :frame=>:rows).as(:sum)}.all.
+        must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
+      @ds.window(:win, :partition=>:group_id).select(:id){sum(:amount).over(:window=>:win, :order=>id, :frame=>:all).as(:sum)}.all.
+        must_equal [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
+    end if DB.dataset.supports_window_clause?
   end
 end
 

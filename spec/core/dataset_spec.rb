@@ -4189,7 +4189,7 @@ describe "Sequel::Dataset#qualify" do
   end
 end
 
-describe "Sequel::Dataset #with and #with_recursive" do
+describe "Dataset#with and #with_recursive" do
   before do
     @db = Sequel.mock
     @ds = @db[:t].with_extend{def supports_cte?(*) true end}
@@ -4248,6 +4248,27 @@ describe "Sequel::Dataset #with and #with_recursive" do
     end
     @ds.with(:t, @ds.from(:s).with(:s, @ds.from(:r))).sql.must_equal 'WITH s AS (SELECT * FROM r), t AS (SELECT * FROM s) SELECT * FROM t'
     @ds.with_recursive(:t, @ds.from(:s).with(:s, @ds.from(:r)), @ds.from(:q).with(:q, @ds.from(:p))).sql.must_equal 'WITH s AS (SELECT * FROM r), q AS (SELECT * FROM p), t AS (SELECT * FROM s UNION ALL SELECT * FROM q) SELECT * FROM t'
+  end
+end
+
+describe "Dataset#window" do
+  before do
+    @db = Sequel.mock
+    @ds = @db[:t].with_extend do
+      Sequel::Dataset.def_sql_method(self, :select, %w'select columns from window')
+      def supports_window_clause?; true end
+      def supports_window_functions?; true end
+    end
+  end
+  
+  it "should not support window clause by default" do
+    @db.dataset.supports_window_clause?.must_equal false
+  end
+
+  it "should take a name and hash of window options" do
+    ds = @ds.window(:w, :partition=>:a, :order=>:b)
+    ds.sql.must_equal 'SELECT * FROM t WINDOW w AS (PARTITION BY a ORDER BY b)'
+    ds.window(:w2, :partition=>:c, :order=>:d).sql.must_equal 'SELECT * FROM t WINDOW w AS (PARTITION BY a ORDER BY b), w2 AS (PARTITION BY c ORDER BY d)'
   end
 end
 

@@ -602,7 +602,7 @@ module Sequel
 
       Dataset.def_sql_method(self, :delete, %w'with delete from where order limit')
       Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
-      Dataset.def_sql_method(self, :select, %w'with select distinct calc_found_rows columns from join where group having compounds order limit lock')
+      Dataset.def_sql_method(self, :select, %w'with select distinct calc_found_rows columns from join where group having window compounds order limit lock')
       Dataset.def_sql_method(self, :update, %w'with update ignore table set where order limit')
 
       include Sequel::Dataset::Replace
@@ -844,6 +844,11 @@ module Sequel
       # are suppported.
       def supports_timestamp_usecs?
         db.supports_timestamp_usecs?
+      end
+
+      # MySQL 8+ supports WINDOW clause.
+      def supports_window_clause?
+        !db.mariadb? && db.server_version >= 80000
       end
 
       # MariaDB 10.2+ and MySQL 8+ support window functions

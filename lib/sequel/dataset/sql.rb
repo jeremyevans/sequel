@@ -1457,6 +1457,22 @@ module Sequel
     alias delete_where_sql select_where_sql
     alias update_where_sql select_where_sql
     
+    def select_window_sql(sql)
+      if ws = @opts[:window]
+        sql << " WINDOW "
+        c = false
+        co = ', '
+        as = ' AS '
+        ws.map do |name, window|
+          sql << co if c
+          literal_append(sql, name)
+          sql << as
+          literal_append(sql, window)
+          c ||= true
+        end
+      end
+    end
+
     def select_with_sql(sql)
       return unless supports_cte?
       ws = opts[:with]

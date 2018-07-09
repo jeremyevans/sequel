@@ -178,6 +178,12 @@ module Sequel
       true
     end
     
+    # Whether the dataset supports the WINDOW clause to define windows used by multiple
+    # window functions, false by default.
+    def supports_window_clause?
+      false
+    end
+
     # Whether the dataset supports window functions, false by default.
     def supports_window_functions?
       false

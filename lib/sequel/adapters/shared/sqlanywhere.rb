@@ -233,7 +233,7 @@ module Sequel
 
     module DatasetMethods
       Dataset.def_sql_method(self, :insert, %w'insert into columns values')
-      Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having compounds order lock')
+      Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having window compounds order lock')
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the IBMDB module setting.
@@ -273,6 +273,10 @@ module Sequel
 
       def supports_timestamp_usecs?
         false
+      end
+
+      def supports_window_clause?
+        true
       end
 
       def supports_window_functions?
