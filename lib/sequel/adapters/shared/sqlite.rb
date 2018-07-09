@@ -500,7 +500,7 @@ module Sequel
       EXTRACT_MAP.each_value(&:freeze)
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
-      Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])
+      Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values on_conflict'], ["else", %w'insert conflict into columns values']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
@@ -620,6 +620,14 @@ module Sequel
       # supports the following conflict resolution algoriths: ROLLBACK, ABORT,
       # FAIL, IGNORE and REPLACE.
       #
+      # On SQLite 3.24.0+, you can pass a hash to use an ON CONFLICT clause.
+      # With out :update option, uses ON CONFLICT DO NOTHING.  Options:
+      #
+      # :conflict_where :: The index filter, when using a partial index to determine uniqueness.
+      # :target :: The column name or expression to handle uniqueness violations on.
+      # :update :: A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.
+      # :update_where :: A WHERE condition to use for the update.
+      #
       # Examples:
       #
       #   DB[:table].insert_conflict.insert(a: 1, b: 2)
@@ -627,11 +635,39 @@ module Sequel
       #
       #   DB[:table].insert_conflict(:replace).insert(a: 1, b: 2)
       #   # INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)
-      def insert_conflict(resolution = :ignore)
-        unless INSERT_CONFLICT_RESOLUTIONS.include?(resolution.to_s.upcase)
-          raise Error, "Invalid value passed to Dataset#insert_conflict: #{resolution.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace"
+      #
+      #   DB[:table].insert_conflict.insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT DO NOTHING
+      #   
+      #   DB[:table].insert_conflict(target: :a).insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) DO NOTHING
+      #
+      #   DB[:table].insert_conflict(target: :a, conflict_where: {c: true}).insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING
+      #   
+      #   DB[:table].insert_conflict(target: :a, update: {b: Sequel[:excluded][:b]}).insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
+      #   
+      #   DB[:table].insert_conflict(target: :a,
+      #     update: {b: Sequel[:excluded][:b]}, update_where: {Sequel[:table][:status_id] => 1}).insert(a: 1, b: 2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT ON (a) DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
+      def insert_conflict(opts = :ignore)
+        case opts
+        when Symbol, String
+          unless INSERT_CONFLICT_RESOLUTIONS.include?(opts.to_s.upcase)
+            raise Error, "Invalid symbol or string passed to Dataset#insert_conflict: #{opts.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace"
+          end
+          clone(:insert_conflict => opts)
+        when Hash
+          clone(:insert_on_conflict => opts)
+        else
+          raise Error, "Invalid value passed to Dataset#insert_conflict: #{opts.inspect}, should use a symbol or a hash"
         end
-        clone(:insert_conflict => resolution)
       end
 
       # Ignore uniqueness/exclusion violations when inserting, using INSERT OR IGNORE.
@@ -726,6 +762,36 @@ module Sequel
       def insert_conflict_sql(sql)
         if resolution = @opts[:insert_conflict]
           sql << " OR " << resolution.to_s.upcase
+        end
+      end
+
+      # Add ON CONFLICT clause if it should be used
+      def insert_on_conflict_sql(sql)
+        if opts = @opts[:insert_on_conflict]
+          sql << " ON CONFLICT"
+
+          if target = opts[:constraint] 
+            sql << " ON CONSTRAINT "
+            identifier_append(sql, target)
+          elsif target = opts[:target]
+            sql << ' '
+            identifier_append(sql, Array(target))
+            if conflict_where = opts[:conflict_where]
+              sql << " WHERE "
+              literal_append(sql, conflict_where)
+            end
+          end
+
+          if values = opts[:update]
+            sql << " DO UPDATE SET "
+            update_sql_values_hash(sql, values)
+            if update_where = opts[:update_where]
+              sql << " WHERE "
+              literal_append(sql, update_where)
+            end
+          else
+            sql << " DO NOTHING"
+          end
         end
       end
 

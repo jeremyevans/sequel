@@ -1,5 +1,7 @@
 === master
 
+* Support ON CONFLICT clause for INSERT on SQLite 3.24+ (jeremyevans)
+
 * Support Dataset#window for WINDOW clause on MySQL 8 and SQLAnywhere (jeremyevans)
 
 * Enable window function support on SQLAnywhere (jeremyevans)

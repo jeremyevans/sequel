@@ -598,3 +598,55 @@ describe "A SQLite database" do
     @db.indexes(:test2).values.first[:columns].must_equal [:name]
   end if DB.sqlite_version >= 30808
 end
+
+describe "SQLite", 'INSERT ON CONFLICT' do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:ic_test){Integer :a; Integer :b; Integer :c; TrueClass :c_is_unique, :default=>false; unique :a, :name=>:ic_test_a_uidx; unique [:b, :c], :name=>:ic_test_b_c_uidx; index [:c], :where=>:c_is_unique, :unique=>true}
+    @ds = @db[:ic_test]
+  end
+  before do
+    @ds.delete
+  end
+  after(:all) do
+    @db.drop_table?(:ic_test)
+  end
+
+  it "Dataset#insert_ignore and insert_conflict should ignore uniqueness violations" do
+    @ds.insert(1, 2, 3, false)
+    @ds.insert(10, 11, 3, true)
+    proc{@ds.insert(1, 3, 4, false)}.must_raise Sequel::UniqueConstraintViolation
+    proc{@ds.insert(11, 12, 3, true)}.must_raise Sequel::UniqueConstraintViolation
+    @ds.insert_ignore.insert(1, 3, 4, false)
+    @ds.insert_conflict.insert(1, 3, 4, false)
+    @ds.insert_conflict.insert(11, 12, 3, true)
+    @ds.insert_conflict(:target=>:a).insert(1, 3, 4, false)
+    @ds.insert_conflict(:target=>:c, :conflict_where=>:c_is_unique).insert(11, 12, 3, true)
+    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}, {:a=>10, :b=>11, :c=>3, :c_is_unique=>true}]
+  end
+
+  it "Dataset#insert_ignore and insert_conflict should work with multi_insert/import" do
+    @ds.insert(1, 2, 3, false)
+    @ds.insert_ignore.multi_insert([{:a=>1, :b=>3, :c=>4}])
+    @ds.insert_ignore.import([:a, :b, :c], [[1, 3, 4]])
+    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).import([:a, :b, :c], [[1, 3, 4]])
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3, :c_is_unique=>false}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>4}).multi_insert([{:a=>1, :b=>5, :c=>6}])
+    @ds.all.must_equal [{:a=>1, :b=>4, :c=>3, :c_is_unique=>false}]
+    end
+
+  it "Dataset#insert_conflict should handle upserts" do
+    @ds.insert(1, 2, 3, false)
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).insert(1, 3, 4, false)
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3, :c_is_unique=>false}]
+    @ds.insert_conflict(:target=>[:b, :c], :update=>{:c=>5}).insert(5, 3, 3, false)
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>5, :c_is_unique=>false}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>4}).insert(1, 3, nil, false)
+    @ds.all.must_equal [{:a=>1, :b=>4, :c=>5, :c_is_unique=>false}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>5}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4, false)
+    @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>6}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4, false)
+    @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
+  end
+end if DB.sqlite_version >= 32400
