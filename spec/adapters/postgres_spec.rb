@@ -463,7 +463,7 @@ describe "A PostgreSQL database " do
   end
 
   it "should handle non-ASCII column aliases" do
-    s = "\u00E4".force_encoding(DB.get('a').encoding)
+    s = String.new("\u00E4").force_encoding(DB.get('a').encoding)
     k, v = DB.select(Sequel.as(s, s)).first.shift
     k.to_s.must_equal v
   end
