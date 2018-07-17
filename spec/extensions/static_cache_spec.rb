@@ -45,6 +45,41 @@ describe "Sequel::Plugins::StaticCache" do
       @db.sqls.must_equal []
     end
 
+    it "should have first just returns instances without sending a query" do
+      @c.first.must_equal @c1
+      @c.first(2).must_equal [@c1, @c2]
+      @c.first(0).must_equal []
+      @db.sqls.must_equal []
+    end
+
+    it "should have first just returns instances with sending a query" do
+      @db.fetch = lambda do |s|
+        case s
+        when /id = '?(\d+)'?/
+          id = Regexp.last_match(1).to_i
+          id <= 2 ? { id: id } : nil
+        when /id >= '?(\d+)'?/
+          id = Regexp.last_match(1).to_i
+          id <= 2 ? (id..2).map { |i| { id: i } } : []
+        end
+      end
+
+      @c.first(id: 2).must_equal @c2
+      @c.first(id: '2').must_equal @c2
+      @c.first(id: 3).must_be_nil
+      @c.first { id >= 2 }.must_equal @c2
+      @c.first(2) { id >= 1 }.must_equal [@c1, @c2]
+      @c.first(Sequel.lit('id = ?', 2)).must_equal @c2
+      @db.sqls.must_equal [
+        "SELECT * FROM t WHERE (id = 2) LIMIT 1",
+        "SELECT * FROM t WHERE (id = '2') LIMIT 1",
+        "SELECT * FROM t WHERE (id = 3) LIMIT 1",
+        "SELECT * FROM t WHERE (id >= 2) LIMIT 1",
+        "SELECT * FROM t WHERE (id >= 1) LIMIT 2",
+        "SELECT * FROM t WHERE (id = 2) LIMIT 1"
+      ]
+    end
+
     it "should have each just iterate over the hash's values without sending a query" do
       a = []
       @c.each{|o| a << o}

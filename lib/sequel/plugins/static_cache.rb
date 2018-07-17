@@ -24,6 +24,7 @@ module Sequel
     # * Primary key lookups (e.g. Model[1])
     # * Model.all
     # * Model.each
+    # * Model.first (only without arguments or with integer argument)
     # * Model.count (without an argument or block)
     # * Model.map
     # * Model.as_hash
@@ -78,6 +79,23 @@ module Sequel
           else
             map{|o| o}
           end
+        end
+
+        # Returns the first matching record if no arguments are given,
+        # or if a integer argument is given, it is interpreted as a limit,
+        # and then returns all matching records up to that limit,
+        # without issuing a database query.
+        #
+        # Calls super (with issuing a database query)
+        # if Hash argument is passed, or a block is given.
+        #
+        # If there are no records in the array of instances, returns nil
+        # (or an empty array if an integer argument is given).
+        def first(*args, &block)
+          return super if block || args.length > 1
+          return @all.first if args.length.zero?
+          return super unless (arg = args.first).is_a?(Integer)
+          @all[0...arg]
         end
 
         # Get the number of records in the cache, without issuing a database query.
