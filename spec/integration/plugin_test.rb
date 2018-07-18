@@ -1989,6 +1989,13 @@ describe "Caching plugins" do
     end
 
     include CachingPluginSpecs
+
+    it "should have first retrieve correct values" do 
+      @Artist.first.must_equal @Artist.load(:id=>1)
+      @Artist.first(1).must_equal [@Artist.load(:id=>1)]
+      @Artist.first(:id=>1).must_equal @Artist.load(:id=>1)
+      @Artist.first{id =~ 1}.must_equal @Artist.load(:id=>1)
+    end
   end
 end
 

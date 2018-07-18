@@ -56,10 +56,10 @@ describe "Sequel::Plugins::StaticCache" do
       @db.fetch = lambda do |s|
         case s
         when /id = '?(\d+)'?/
-          id = Regexp.last_match(1).to_i
+          id = $1.to_i
           id <= 2 ? { id: id } : nil
         when /id >= '?(\d+)'?/
-          id = Regexp.last_match(1).to_i
+          id = $1.to_i
           id <= 2 ? (id..2).map { |i| { id: i } } : []
         end
       end

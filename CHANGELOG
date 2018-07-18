@@ -1,5 +1,7 @@
 === master
 
+* Use cached model instances for Model.first calls without an argument or with a single integer argument in the static_cache plugin (AlexWayfer) (#1529)
+
 * Support ON CONFLICT clause for INSERT on SQLite 3.24+ (jeremyevans)
 
 * Support Dataset#window for WINDOW clause on MySQL 8 and SQLAnywhere (jeremyevans)
