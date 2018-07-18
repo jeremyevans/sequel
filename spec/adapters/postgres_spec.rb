@@ -3551,16 +3551,18 @@ describe 'PostgreSQL row-valued/composite types' do
     Sequel.extension :pg_array_ops, :pg_row_ops
     @ds = @db[:person]
 
-    @db.create_table!(:address) do
+    @db.drop_table?(:company, :person, :address)
+
+    @db.create_table(:address) do
       String :street
       String :city
       String :zip
     end
-    @db.create_table!(:person) do
+    @db.create_table(:person) do
       Integer :id
       address :address
     end
-    @db.create_table!(:company) do
+    @db.create_table(:company) do
       Integer :id
       column :employees, 'person[]'
     end
