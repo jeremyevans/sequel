@@ -108,6 +108,13 @@ describe Sequel::Model, "tree plugin" do
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
 
+  it "should have self_and_siblings return the roots if the current object is a root" do
+    h = {:id=>2, :parent_id=>nil, :name=>'AA'}
+    @c.dataset = @c.dataset.with_fetch(h)
+    @c.load(h).self_and_siblings.must_equal [@c.load(h)]
+    @db.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id IS NULL)"]
+  end
+
   it "should have siblings return the children of the current node's parent, except for the current node" do
     @c.dataset = @c.dataset.with_fetch([[{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup]])
     @o.siblings.must_equal [@c.load(:id=>7, :parent_id=>1, :name=>'r2')] 
