@@ -82,6 +82,8 @@ module Sequel
       # columns are deleted.  This method should generally not be called
       # directly by user code.
       def clone(opts = (return self; nil))
+        # return self used above because clone is called by almost all
+        # other query methods, and it is the fastest approach
         c = super(:freeze=>false)
         c.opts.merge!(opts)
         unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
