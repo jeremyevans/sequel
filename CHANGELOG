@@ -1,5 +1,7 @@
 === master
 
+* Fix dumping schema for numeric/decimal columns with default values, broken starting in 5.9.0 (jeremyevans)
+
 * Recognize additional check constraint violations on certain versions of SQLite (jeremyevans)
 
 * Use cached model instances for Model.first calls without an argument or with a single integer argument in the static_cache plugin (AlexWayfer) (#1529)

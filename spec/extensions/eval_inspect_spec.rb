@@ -69,6 +69,13 @@ describe "eval_inspect extension" do
       v = eval(o.inspect)
       v.must_equal o
       @ds.literal(v).must_equal @ds.literal(o)
+
+      ds = @ds
+      @ds.db.create_table(:test) do
+        v = eval(o.inspect)
+        v.must_equal o
+        ds.literal(v).must_equal ds.literal(o)
+      end
     end
   end
 end

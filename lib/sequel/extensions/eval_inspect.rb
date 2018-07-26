@@ -27,7 +27,7 @@ module Sequel
     def eval_inspect(obj)
       case obj
       when BigDecimal
-        "BigDecimal(#{obj.to_s.inspect})"
+        "Kernel::BigDecimal(#{obj.to_s.inspect})"
       when Sequel::SQL::Blob, Sequel::LiteralString
         "#{obj.class}.new(#{obj.to_s.inspect})"
       when Sequel::SQL::ValueList
