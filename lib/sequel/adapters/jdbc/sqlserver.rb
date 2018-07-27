@@ -75,7 +75,7 @@ module Sequel
         private
 
         def _metadata_dataset
-          super.extend(MetadataDatasetMethods)
+          super.with_extend(MetadataDatasetMethods)
         end
 
         def disconnect_error?(exception, opts)

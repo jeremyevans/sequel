@@ -1,5 +1,7 @@
 === master
 
+* Fix using the jdbc/sqlserver adapter on JRuby 9.2+ (jeremyevans)
+
 * Fix dumping schema for numeric/decimal columns with default values, broken starting in 5.9.0 (jeremyevans)
 
 * Recognize additional check constraint violations on certain versions of SQLite (jeremyevans)
