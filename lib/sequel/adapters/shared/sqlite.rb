@@ -636,7 +636,7 @@ module Sequel
       #   DB[:table].insert_conflict(:replace).insert(a: 1, b: 2)
       #   # INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)
       #
-      #   DB[:table].insert_conflict.insert(a: 1, b: 2)
+      #   DB[:table].insert_conflict({}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT DO NOTHING
       #   
@@ -655,7 +655,7 @@ module Sequel
       #   DB[:table].insert_conflict(target: :a,
       #     update: {b: Sequel[:excluded][:b]}, update_where: {Sequel[:table][:status_id] => 1}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
-      #   # ON CONFLICT ON (a) DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
+      #   # ON CONFLICT (a) DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
       def insert_conflict(opts = :ignore)
         case opts
         when Symbol, String
