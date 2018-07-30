@@ -3825,7 +3825,7 @@ end
 describe "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel.mock
-    @ds = @db[:items].with_extend{def insert_select_sql(*v) "#{insert_sql(*v)} RETURNING *" end}
+    @ds = @db[:items].with_extend{def insert_select_sql(*v) insert_sql(*v) << " RETURNING *" end}
   end
   
   it "#call should take a type and bind hash and interpolate it" do
@@ -3896,12 +3896,23 @@ describe "Dataset prepared statements and bound variables " do
       'INSERT INTO items (num) VALUES (1) RETURNING *']
   end
     
+  it "should give correct results for recursive WITH" do
+    ps = @ds.with_extend{def supports_cte?(type=nil) true end}.
+      select(Sequel[:i].as(:id), Sequel[:pi].as(:parent_id)).
+      with_recursive(:t, @ds.filter(:parent_id=>:$n), @ds.join(:t, :i=>:parent_id).filter(Sequel[:t][:i]=>:parent_id).
+      select(Sequel[:i1][:id], Sequel[:i1][:parent_id]), :args=>[:i, :pi]).
+      order(:id).
+      prepare(:select, :cte_sel)
+    ps.call(:n=>1).must_equal []
+    @db.sqls.must_equal ["WITH t(i, pi) AS (SELECT * FROM items WHERE (parent_id = 1) UNION ALL SELECT i1.id, i1.parent_id FROM items INNER JOIN t ON (t.i = items.parent_id) WHERE (t.i = parent_id)) SELECT i AS id, pi AS parent_id FROM items ORDER BY id"]
+  end
+
   it "#call and #prepare should handle returning" do
     @ds = @ds.with_extend do
       def supports_returning?(_) true end
-      def insert_sql(*v) "#{super(*v)} RETURNING *" end
-      def update_sql(*v) "#{super(*v)} RETURNING *" end
-      def delete_sql; "#{super()} RETURNING *" end
+      def insert_sql(*) super << " RETURNING *" end
+      def update_sql(*) super << " RETURNING *" end
+      def delete_sql; super << " RETURNING *" end
     end
     @ds = @ds.returning
     @ds.call(:insert, {:n=>1}, :num=>:$n)
@@ -4010,6 +4021,9 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
       def execute_insert(sql, opts={}, &block)
         super(sql, opts.merge({:arguments=>bind_arguments}), &block)
       end
+      def prepared_statement_modules
+        [Sequel::Dataset::UnnumberedArgumentMapper]
+      end
     end
     @ps = []
     @ps << @ds.prepare(:select, :s)
@@ -4018,9 +4032,6 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     @ps << @ds.prepare(:delete, :d)
     @ps << @ds.prepare(:insert, :i, :num=>:$n)
     @ps << @ds.prepare(:update, :u, :num=>:$n)
-    @ps.map! do |p|
-      p.with_extend(Sequel::Dataset::UnnumberedArgumentMapper)
-    end
   end
 
   it "#inspect should show the actual SQL submitted to the database" do

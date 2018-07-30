@@ -67,6 +67,14 @@ module Sequel
         end
         cache_set(:_prepared_sql, super)
       end
+
+      private
+
+      # Report that prepared statements are not emulated, since
+      # all adapters that use this use native prepared statements.
+      def emulate_prepared_statements?
+        false
+      end
     end
 
     # Backbone of the prepared statement support.  Grafts bind variable
@@ -228,9 +236,12 @@ module Sequel
       # support and using the same argument hash so that you can use
       # bind variables/prepared arguments in subselects.
       def subselect_sql_append(sql, ds)
-        ds.clone(:append_sql=>sql, :prepared_args=>prepared_args, :bind_vars=>@opts[:bind_vars]).
-          send(:to_prepared_statement, :select, nil, :extend=>prepared_statement_modules).
-          prepared_sql
+        subselect_sql_dataset(sql, ds).prepared_sql
+      end
+
+      def subselect_sql_dataset(sql, ds)
+        super.clone(:prepared_args=>prepared_args, :bind_vars=>@opts[:bind_vars]).
+          send(:to_prepared_statement, :select, nil, :extend=>prepared_statement_modules)
       end
     end
     
@@ -262,6 +273,63 @@ module Sequel
       # Always assume there is a prepared arg in the argument mapper.
       def prepared_arg?(k)
         true
+      end
+    end
+    
+    # Prepared statements emulation support for adapters that don't
+    # support native prepared statements.  Uses a placeholder
+    # literalizer to hold the prepared sql with the ability to
+    # interpolate arguments to prepare the final SQL string.
+    module EmulatePreparedStatementMethods
+      include UnnumberedArgumentMapper
+
+      def run(&block)
+        if @opts[:prepared_sql_frags]
+          sql = literal(Sequel::SQL::PlaceholderLiteralString.new(@opts[:prepared_sql_frags], @opts[:bind_arguments], false))
+          clone(:prepared_sql_frags=>nil, :sql=>sql, :prepared_sql=>sql).run(&block)
+        else
+          super
+        end
+      end
+
+      private
+      
+      # Turn emulation of prepared statements back on, since ArgumentMapper
+      # turns it off.
+      def emulate_prepared_statements?
+        true
+      end
+        
+      def emulated_prepared_statement(type, name, values)
+        prepared_sql, frags = Sequel::Dataset::PlaceholderLiteralizer::Recorder.new.send(:prepared_sql_and_frags, self, prepared_args) do |pl, ds|
+          ds = ds.clone(:recorder=>pl)
+
+          case type
+          when :first
+            ds.limit(1)
+          when :update, :insert, :insert_select, :delete
+            ds.with_sql(:"#{type}_sql", *values)
+          when :insert_pk
+            ds.with_sql(:insert_sql, *values)
+          else
+            ds
+          end
+        end
+
+        prepared_args.freeze
+        clone(:prepared_sql_frags=>frags, :prepared_sql=>prepared_sql, :sql=>prepared_sql)
+      end
+
+      # Associates the argument with name k with the next position in
+      # the output array.
+      def prepared_arg(k)
+        prepared_args << k
+        @opts[:recorder].arg
+      end
+
+      def subselect_sql_dataset(sql, ds)
+        super.clone(:recorder=>@opts[:recorder]).
+          with_extend(EmulatePreparedStatementMethods)
       end
     end
     
@@ -315,7 +383,16 @@ module Sequel
     #   DB.call(:select_by_name, name: 'Blah') # Same thing
     def prepare(type, name, *values)
       ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules, :no_delayed_evaluations=>true)
-      ps.prepared_sql
+
+      ps = if ps.send(:emulate_prepared_statements?)
+        ps = ps.with_extend(EmulatePreparedStatementMethods)
+        ps.send(:emulated_prepared_statement, type, name, values)
+      else
+        sql = ps.prepared_sql
+        ps.prepared_args.freeze
+        ps.clone(:prepared_sql=>sql, :sql=>sql)
+      end
+
       db.set_prepared_statement(name, ps)
       ps
     end
@@ -342,6 +419,12 @@ module Sequel
 
     def bound_variable_modules
       prepared_statement_modules
+    end
+
+    # Whether prepared statements should be emulated.  True by
+    # default so that adapters have to opt in.
+    def emulate_prepared_statements?
+      true
     end
 
     def prepared_statement_modules

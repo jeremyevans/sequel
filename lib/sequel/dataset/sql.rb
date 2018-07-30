@@ -1553,7 +1553,11 @@ module Sequel
 
     # Append literalization of the subselect to SQL string.
     def subselect_sql_append(sql, ds)
-      ds.clone(:append_sql=>sql).sql
+      subselect_sql_dataset(sql, ds).sql
+    end
+
+    def subselect_sql_dataset(sql, ds)
+      ds.clone(:append_sql=>sql)
     end
 
     # The number of decimal digits of precision to use in timestamps.

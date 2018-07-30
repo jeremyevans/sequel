@@ -77,23 +77,8 @@ module Sequel
         # Yields the receiver and the dataset to the block, which should
         # call #arg on the receiver for each placeholder argument, and
         # return the dataset that you want to load.
-        def loader(dataset)
-          @argn = -1
-          @args = []
-          ds = yield self, dataset
-          sql = ds.clone(:placeholder_literalizer=>self).sql
-
-          last_offset = 0
-          fragments = @args.map do |used_sql, offset, arg, t|
-            raise Error, "placeholder literalizer argument literalized into different string than dataset returned" unless used_sql.equal?(sql)
-            a = [sql[last_offset...offset], arg, t]
-            last_offset = offset
-            a
-          end
-          final_sql = sql[last_offset..-1]
-
-          arity = @argn+1
-          PlaceholderLiteralizer.new(ds, fragments, final_sql, arity)
+        def loader(dataset, &block)
+          PlaceholderLiteralizer.new(*process(dataset, &block))
         end
 
         # Return an Argument with the specified position, or the next position. In
@@ -110,6 +95,51 @@ module Sequel
         # transforming block.
         def use(sql, arg, transformer)
           @args << [sql, sql.length, arg, transformer]
+        end
+
+        private
+
+        # Return an array with two elements, the first being an
+        # SQL string with interpolated prepared argument placeholders
+        # (suitable for inspect), the the second being an array of
+        # SQL fragments suitable for using for creating a 
+        # Sequel::SQL::PlaceholderLiteralString. Designed for use with
+        # emulated prepared statements.
+        def prepared_sql_and_frags(dataset, prepared_args, &block)
+          _, frags, final_sql, _ = process(dataset, &block)
+
+          frags = frags.map(&:first)
+          prepared_sql = String.new
+          frags.each_with_index do |sql, i|
+            prepared_sql << sql
+            prepared_sql << "$#{prepared_args[i]}"
+          end
+          if final_sql
+            frags << final_sql
+            prepared_sql << final_sql
+          end
+
+          [prepared_sql, frags]
+        end
+
+        # Internals of #loader and #prepared_sql_and_frags.
+        def process(dataset)
+          @argn = -1
+          @args = []
+          ds = yield self, dataset
+          sql = ds.clone(:placeholder_literalizer=>self).sql
+
+          last_offset = 0
+          fragments = @args.map do |used_sql, offset, arg, t|
+            raise Error, "placeholder literalizer argument literalized into different string than dataset returned" unless used_sql.equal?(sql)
+            a = [sql[last_offset...offset], arg, t]
+            last_offset = offset
+            a
+          end
+          final_sql = sql[last_offset..-1]
+
+          arity = @argn+1
+          [ds, fragments, final_sql, arity]
         end
       end
 

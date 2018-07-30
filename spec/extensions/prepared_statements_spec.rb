@@ -61,7 +61,7 @@ describe "prepared_statements plugin" do
           server(:default).with_sql_first(insert_select_sql(h))
         end
         def insert_select_sql(*v)
-          "#{insert_sql(*v)} RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
+          insert_sql(*v) << " RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
         end
       end
       @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
@@ -107,7 +107,7 @@ describe "prepared_statements plugin" do
           server(:default).with_sql_first(insert_select_sql(h))
         end
         def insert_select_sql(*v)
-          "#{insert_sql(*v)} RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
+          insert_sql(*v) << " RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
         end
       end
       @c.new(:name=>'foo').set_server(:read_only).save.must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
@@ -130,8 +130,8 @@ describe "prepared_statements plugin" do
     it "should correctly handle with schema type when placeholder type specifiers are required" do
       @c.dataset = @ds.with_extend do
         def requires_placeholder_type_specifiers?; true end
-        def prepare(*)
-          super.with_extend do 
+        def prepared_statement_modules
+          [Module.new do
             def literal_symbol_append(sql, v)
               if @opts[:bind_vars] && (match = /\A\$(.*)\z/.match(v.to_s))
                 s = match[1].split('__')[0].to_sym
@@ -144,7 +144,7 @@ describe "prepared_statements plugin" do
                 super
               end
             end
-          end
+          end]
         end
       end
       @c.db_schema[:id][:type] = :integer

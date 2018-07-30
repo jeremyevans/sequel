@@ -118,7 +118,7 @@ describe Sequel::Model, ".prepared_finder" do
     @db.extend_datasets do
       def select_sql
         sql = super
-        sql << ' -- prepared' if is_a?(Sequel::Dataset::PreparedStatementMethods)
+        sql << ' -- prepared' if is_a?(Sequel::Dataset::PreparedStatementMethods) && !opts[:sql]
         sql
       end
     end

@@ -1,3 +1,9 @@
+=== master
+
+* Freeze prepared statement arguments before returning the prepared statement (jeremyevans)
+
+* Refactor emulated prepared statement internals to use a placeholder literalizer (jeremyevans)
+
 === 5.11.0 (2018-08-01)
 
 * Fix using the jdbc/sqlserver adapter on JRuby 9.2+ (jeremyevans)
