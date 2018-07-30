@@ -93,7 +93,7 @@ module Sequel
           final_sql = sql[last_offset..-1]
 
           arity = @argn+1
-          PlaceholderLiteralizer.new(ds.clone, fragments, final_sql, arity)
+          PlaceholderLiteralizer.new(ds, fragments, final_sql, arity)
         end
 
         # Return an Argument with the specified position, or the next position. In
