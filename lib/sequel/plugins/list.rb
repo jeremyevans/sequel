@@ -124,8 +124,10 @@ module Sequel
           move_to(position_value + n)
         end
 
-        # Move this instance to the given place in the list.  Raises an
-        # exception if target is less than 1 or greater than the last position in the list.
+        # Move this instance to the given place in the list.  If lp is not
+        # given or greater than the last list position, uses the last list
+        # position.  If lp is less than the top list position, uses the
+        # top list position.
         def move_to(target, lp = nil)
           current = position_value
           if target != current
