@@ -1,4 +1,4 @@
-Sun, 01 Jul 2018 09:42:12 -0700
+Wed, 01 Aug 2018 08:19:59 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -19,7 +19,7 @@ lib/sequel/extensions/duplicate_columns_handler.rb	Tue, 01 Aug 2017 08:12:00 -07
 lib/sequel/extensions/empty_array_consider_nulls.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/error_sql.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/extensions/escaped_like.rb	Fri, 25 May 2018 14:49:16 -0700
-lib/sequel/extensions/eval_inspect.rb	Thu, 24 May 2018 16:51:22 -0700
+lib/sequel/extensions/eval_inspect.rb	Thu, 26 Jul 2018 13:43:38 -0700
 lib/sequel/extensions/freeze_datasets.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/from_block.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/graph_each.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -112,7 +112,7 @@ lib/sequel/plugins/instance_hooks.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/inverted_subsets.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/json_serializer.rb	Mon, 11 Dec 2017 12:58:35 -0800
 lib/sequel/plugins/lazy_attributes.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/list.rb	Mon, 18 Jun 2018 10:30:49 -0700
+lib/sequel/plugins/list.rb	Mon, 30 Jul 2018 18:58:32 -0700
 lib/sequel/plugins/many_through_many.rb	Fri, 25 May 2018 14:49:16 -0700
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Sat, 20 Jan 2018 09:44:46 -0800
@@ -131,7 +131,7 @@ lib/sequel/plugins/single_table_inheritance.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/singular_table_names.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/split_values.rb	Fri, 16 Jun 2017 12:40:57 -0700
-lib/sequel/plugins/static_cache.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/static_cache.rb	Wed, 18 Jul 2018 11:48:46 -0700
 lib/sequel/plugins/string_stripper.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/subclasses.rb	Sun, 22 Apr 2018 10:50:04 -0700
 lib/sequel/plugins/subset_conditions.rb	Tue, 01 Aug 2017 08:12:01 -0700

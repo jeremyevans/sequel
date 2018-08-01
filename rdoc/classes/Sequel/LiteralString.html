@@ -88,7 +88,7 @@ copied verbatim into an <a href="SQL.html">SQL</a> statement. Instances of
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1959</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1983</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
@@ -109,7 +109,7 @@ with the current string and the given args.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lit-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1965</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1989</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -128,7 +128,7 @@ with the current string and the given args.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_sequel_blob-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1970</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1994</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

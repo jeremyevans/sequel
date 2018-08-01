@@ -30,7 +30,7 @@ doc/security.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-10-17 07:32:06 -0700</span>
+<span class='datetime'>2018-07-09 14:34:36 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -260,6 +260,17 @@ quote SQL function names.  You should not use user input for function
 names.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">params</span>[<span class="ruby-value">:id</span>])) <span class="ruby-comment"># SQL injection!</span></pre>
+
+<h4 id="label-SQL+Window+Frames">SQL Window Frames<span><a href="#label-SQL+Window+Frames">&para;</a> <a href="#top">&uarr;</a></span></h4>
+
+<p>For backwards compatibility, <a href="../../classes/Sequel.html">Sequel</a>
+supports regular strings in the window function :frame option, which will
+be treated as a literal string:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">fun</span>(<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:frame</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;SQL Here&#39;</span>)}</pre>
+
+<p>You should make sure the frame argument is not derived from user input, or
+switch to using a hash as the :frame option value.</p>
 
 <h4 id="label-auto_literal_strings+extension">auto_literal_strings extension<span><a href="#label-auto_literal_strings+extension">&para;</a> <a href="#top">&uarr;</a></span></h4>
 

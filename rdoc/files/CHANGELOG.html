@@ -30,12 +30,40 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-07-01 09:35:21 -0700</span>
+<span class='datetime'>2018-08-01 08:13:54 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.11.0+-282018-08-01-29">5.11.0 (2018-08-01)<span><a href="#label-5.11.0+-282018-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Fix using the jdbc/sqlserver adapter on JRuby 9.2+ (jeremyevans)</p>
+</li><li>
+<p>Fix dumping schema for numeric/decimal columns with default values, broken
+starting in 5.9.0 (jeremyevans)</p>
+</li><li>
+<p>Recognize additional check constraint violations on certain versions of
+SQLite (jeremyevans)</p>
+</li><li>
+<p>Use cached model instances for Model.first calls without an argument or
+with a single integer argument in the static_cache plugin (AlexWayfer)
+(#1529)</p>
+</li><li>
+<p>Support ON CONFLICT clause for INSERT on SQLite 3.24+ (jeremyevans)</p>
+</li><li>
+<p>Support Dataset#window for WINDOW clause on MySQL 8 and SQLAnywhere
+(jeremyevans)</p>
+</li><li>
+<p>Enable window function support on SQLAnywhere (jeremyevans)</p>
+</li><li>
+<p>Support using a hash as a window function :frame option value, with support
+for ROWS/RANGE/GROUPS, numeric offsets, and EXCLUDE (jeremyevans)</p>
+</li><li>
+<p>Allow using set_column_default with a nil value to remove the default value
+for a column on MySQL when the column is NOT NULL (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.10.0+-282018-07-01-29">5.10.0 (2018-07-01)<span><a href="#label-5.10.0+-282018-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Use input type casts when using the postgres adapter with pg 0.18+ to

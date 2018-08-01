@@ -226,7 +226,7 @@ options to be compatible with other adapters.</p>
 <a name='method-i-insert_conflict'></a>
 <div class='synopsis'>
 <span class='name'>insert_conflict</span>
-<span class='arguments'>(resolution = :ignore)</span>
+<span class='arguments'>(opts = :ignore)</span>
 
 </div>
 <div class='description'>
@@ -236,16 +236,29 @@ resolution algorithm. With no options, uses INSERT OR REPLACE. <a
 href="../SQLite.html">SQLite</a> supports the following conflict resolution
 algoriths: ROLLBACK, ABORT, FAIL, IGNORE and REPLACE.</p>
 
+<p>On <a href="../SQLite.html">SQLite</a> 3.24.0+, you can pass a hash to use
+an ON CONFLICT clause. With out :update option, uses ON CONFLICT DO
+NOTHING.  Options:</p>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:conflict_where </td><td>
+<p>The index filter, when using a partial index to determine uniqueness.</p>
+</td></tr><tr><td class='label'>:target </td><td>
+<p>The column name or expression to handle uniqueness violations on.</p>
+</td></tr><tr><td class='label'>:update </td><td>
+<p>A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.</p>
+</td></tr><tr><td class='label'>:update_where </td><td>
+<p>A WHERE condition to use for the update.</p>
+</td></tr></tbody></table>
+
 <p>Examples:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:replace</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)</span></pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:replace</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>({}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT DO NOTHING</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO NOTHING</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>, <span class="ruby-value">conflict_where:</span> {<span class="ruby-value">c:</span> <span class="ruby-keyword">true</span>}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>, <span class="ruby-value">update:</span> {<span class="ruby-value">b:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO UPDATE SET b = excluded.b</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>,&#x000A;  <span class="ruby-value">update:</span> {<span class="ruby-value">b:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}, <span class="ruby-value">update_where:</span> {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:status_id</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)</span></pre>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert_conflict-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert_conflict-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 629</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">resolution</span> = <span class="ruby-value">:ignore</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-constant">INSERT_CONFLICT_RESOLUTIONS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">resolution</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>)&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid value passed to Dataset#insert_conflict: #{resolution.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">resolution</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert_conflict-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 658</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-value">:ignore</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">opts</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-constant">INSERT_CONFLICT_RESOLUTIONS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>)&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid symbol or string passed to Dataset#insert_conflict: #{opts.inspect}.  The allowed values are: :rollback, :abort, :fail, :ignore, or :replace&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_on_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid value passed to Dataset#insert_conflict: #{opts.inspect}, should use a symbol or a hash&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_ignore'>
@@ -268,7 +281,7 @@ Example:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert_ignore-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert_ignore-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 641</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>&#x000A;  <span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:ignore</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert_ignore-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 677</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>&#x000A;  <span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:ignore</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-quoted_identifier_append'>
@@ -330,7 +343,7 @@ expressions.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_cte-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 646</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30803</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 682</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30803</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte_in_subqueries-3F'>
@@ -350,7 +363,7 @@ supports CTEs.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_cte_in_subqueries-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_cte_in_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 651</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>&#x000A;  <span class="ruby-identifier">supports_cte?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_cte_in_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 687</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>&#x000A;  <span class="ruby-identifier">supports_cte?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_derived_column_lists-3F'>
@@ -370,7 +383,7 @@ column aliases</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_derived_column_lists-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_derived_column_lists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 656</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_derived_column_lists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 692</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_intersect_except_all-3F'>
@@ -390,7 +403,7 @@ EXCEPT ALL</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_intersect_except_all-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_intersect_except_all-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 661</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except_all?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_intersect_except_all-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 697</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except_all?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -409,7 +422,7 @@ EXCEPT ALL</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_is_true-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 666</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 702</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -429,7 +442,7 @@ the IN/NOT IN operators</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_multiple_column_in-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 671</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 707</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -451,7 +464,7 @@ so we allow the user to override the default per database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_timestamp_timezones-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 678</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 714</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -470,7 +483,7 @@ so we allow the user to override the default per database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_where_true-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_where_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 683</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_where_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 719</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_where_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
