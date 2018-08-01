@@ -1,4 +1,4 @@
-=== master
+=== 5.11.0 (2018-08-01)
 
 * Fix using the jdbc/sqlserver adapter on JRuby 9.2+ (jeremyevans)
 
