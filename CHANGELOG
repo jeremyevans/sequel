@@ -1,5 +1,7 @@
 === master
 
+* Add eager_graph_eager plugin for chaining eager association loads after eager_graph association loads (jeremyevans)
+
 * Support using Dataset#eager_graph in eager load callback for associations using join tables (jeremyevans)
 
 * Make Dataset#graph handle existing selections without determinable aliases by forcing a subselect (jeremyevans)
