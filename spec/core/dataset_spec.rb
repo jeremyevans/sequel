@@ -3868,9 +3868,10 @@ describe "Dataset prepared statements and bound variables " do
     pss << @ds.filter(:num=>:$n).prepare(:delete, :dn)
     pss << @ds.filter(:num=>:$n).prepare(:update, :un, :num=>:$n2)
     pss << @ds.prepare(:insert, :in, :num=>:$n)
+    pss << @ds.prepare(:insert_pk, :inp, :num=>:$n)
     pss << @ds.prepare(:insert_select, :ins, :num=>:$n)
-    @db.prepared_statements.keys.sort_by{|k| k.to_s}.must_equal [:ah, :dn, :en, :fn, :in, :ins, :sh, :shg, :sm, :sn, :un]
-    [:en, :sn, :sm, :ah, :sh, :shg, :fn, :dn, :un, :in, :ins].each_with_index{|x, i| @db.prepared_statements[x].must_equal pss[i]}
+    @db.prepared_statements.keys.sort_by{|k| k.to_s}.must_equal [:ah, :dn, :en, :fn, :in, :inp, :ins, :sh, :shg, :sm, :sn, :un]
+    [:en, :sn, :sm, :ah, :sh, :shg, :fn, :dn, :un, :in, :inp, :ins].each_with_index{|x, i| @db.prepared_statements[x].must_equal pss[i]}
     @db.call(:en, :n=>1){}
     @db.call(:sn, :n=>1)
     @db.call(:sm, :n=>1)
@@ -3881,6 +3882,7 @@ describe "Dataset prepared statements and bound variables " do
     @db.call(:dn, :n=>1)
     @db.call(:un, :n=>1, :n2=>2)
     @db.call(:in, :n=>1)
+    @db.call(:inp, :n=>1)
     @db.call(:ins, :n=>1)
     @db.sqls.must_equal [
       'SELECT * FROM items WHERE (num = 1)',
@@ -3892,6 +3894,7 @@ describe "Dataset prepared statements and bound variables " do
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'DELETE FROM items WHERE (num = 1)',
       'UPDATE items SET num = 2 WHERE (num = 1)',
+      'INSERT INTO items (num) VALUES (1)',
       'INSERT INTO items (num) VALUES (1)',
       'INSERT INTO items (num) VALUES (1) RETURNING *']
   end
