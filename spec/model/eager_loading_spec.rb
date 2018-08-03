@@ -1225,6 +1225,96 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
 
+  it "should support eager load of many_to_one with eager_graph of many_to_one in custom callback" do
+    a = EagerTrack.eager(:album=>proc{|ds| ds.eager_graph(:band).with_fetch(:id=>1, :band_id=>2, :band_id_0=>2)}).all
+    a.must_equal [EagerTrack.load(:id => 3, :album_id => 1)]
+    DB.sqls.must_equal ["SELECT * FROM tracks",
+      "SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) WHERE (albums.id IN (1))"]
+    a = a.first
+    a.album.must_equal EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.must_equal EagerBand.load(:id => 2)
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager load of many_to_one with eager_graph of one_to_many in custom callback" do
+    a = EagerTrack.eager(:album=>proc{|ds| ds.eager_graph(:tracks).with_fetch(:id=>1, :band_id=>2, :tracks_id=>3)}).all
+    a.must_equal [EagerTrack.load(:id => 3, :album_id => 1)]
+    DB.sqls.must_equal ["SELECT * FROM tracks",
+      "SELECT albums.id, albums.band_id, tracks.id AS tracks_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) WHERE (albums.id IN (1))"]
+    a = a.first
+    a.album.must_equal EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.tracks.must_equal [EagerTrack.load(:id=>3)]
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager load of many_to_one with eager_graph of many_to_many in custom callback" do
+    a = EagerTrack.eager(:album=>proc{|ds| ds.eager_graph(:genres).with_fetch(:id=>1, :band_id=>2, :genres_id=>4)}).all
+    a.must_equal [EagerTrack.load(:id => 3, :album_id => 1)]
+    DB.sqls.must_equal ["SELECT * FROM tracks",
+      "SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) WHERE (albums.id IN (1))"]
+    a = a.first
+    a.album.must_equal EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.genres.must_equal [EagerGenre.load(:id=>4)]
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager load of many_to_many with eager_graph of many_to_one in custom callback" do
+    a = EagerGenre.eager(:albums=>proc{|ds| ds.columns(:id, :band_id, :x_foreign_key_x).eager_graph(:band).with_fetch(:id=>1, :band_id=>2, :x_foreign_key_x=>4, :band_id_0=>2)}).all
+    a.must_equal [EagerGenre.load(:id => 4)]
+    DB.sqls.must_equal ["SELECT * FROM genres",
+      "SELECT albums.id, albums.band_id, albums.x_foreign_key_x, band.id AS band_id_0 FROM (SELECT albums.*, ag.genre_id AS x_foreign_key_x FROM albums INNER JOIN ag ON (ag.album_id = albums.id) WHERE (ag.genre_id IN (4))) AS albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)"]
+    a = a.first
+    a.albums.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.albums.first.band.must_equal EagerBand.load(:id=>2)
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager load of many_to_many with eager_graph of one_to_many in custom callback" do
+    a = EagerGenre.eager(:albums=>proc{|ds| ds.columns(:id, :band_id, :x_foreign_key_x).eager_graph(:tracks).with_fetch(:id=>1, :band_id=>2, :x_foreign_key_x=>4, :tracks_id=>5)}).all
+    a.must_equal [EagerGenre.load(:id => 4)]
+    DB.sqls.must_equal ["SELECT * FROM genres",
+      "SELECT albums.id, albums.band_id, albums.x_foreign_key_x, tracks.id AS tracks_id FROM (SELECT albums.*, ag.genre_id AS x_foreign_key_x FROM albums INNER JOIN ag ON (ag.album_id = albums.id) WHERE (ag.genre_id IN (4))) AS albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)"]
+    a = a.first
+    a.albums.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.albums.first.tracks.must_equal [EagerTrack.load(:id=>5)]
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager load of many_to_many with eager_graph of many_to_many in custom callback" do
+    a = EagerGenre.eager(:albums=>proc{|ds| ds.columns(:id, :band_id, :x_foreign_key_x).eager_graph(:genres).with_fetch(:id=>1, :band_id=>2, :x_foreign_key_x=>4, :genres_id=>4)}).all
+    a.must_equal [EagerGenre.load(:id => 4)]
+    DB.sqls.must_equal ["SELECT * FROM genres",
+      "SELECT albums.id, albums.band_id, albums.x_foreign_key_x, genres.id AS genres_id FROM (SELECT albums.*, ag.genre_id AS x_foreign_key_x FROM albums INNER JOIN ag ON (ag.album_id = albums.id) WHERE (ag.genre_id IN (4))) AS albums LEFT OUTER JOIN ag AS ag_0 ON (ag_0.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag_0.genre_id)"]
+    a = a.first
+    a.albums.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.albums.first.genres.must_equal [EagerGenre.load(:id=>4)]
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager_graph usage with cascaded associations in custom callback" do
+    a = EagerTrack.eager(:album=>proc{|ds| ds.eager_graph(:band=>:members).with_fetch(:id=>1, :band_id=>2, :band_id_0=>2, :members_id=>5)}).all
+    a.must_equal [EagerTrack.load(:id => 3, :album_id => 1)]
+    DB.sqls.must_equal ["SELECT * FROM tracks",
+      "SELECT albums.id, albums.band_id, band.id AS band_id_0, members.id AS members_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) LEFT OUTER JOIN bm ON (bm.band_id = band.id) LEFT OUTER JOIN members ON (members.id = bm.member_id) WHERE (albums.id IN (1))"]
+    a = a.first
+    a.album.must_equal EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.must_equal EagerBand.load(:id => 2)
+    a.album.band.members.must_equal [EagerBandMember.load(:id => 5)]
+    DB.sqls.must_equal []
+  end
+
+  it "should support eager_graph usage in custom callback with dependencies" do
+    a = EagerTrack.eager(:album=>{proc{|ds| ds.eager_graph(:band).with_fetch(:id=>1, :band_id=>2, :band_id_0=>2)}=>:genre}).all
+    a.must_equal [EagerTrack.load(:id => 3, :album_id => 1)]
+    DB.sqls.must_equal ["SELECT * FROM tracks",
+      "SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id) WHERE (albums.id IN (1))",
+      "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) WHERE (ag.album_id IN (1))"]
+    a = a.first
+    a.album.must_equal EagerAlbum.load(:id => 1, :band_id => 2)
+    a.album.band.must_equal EagerBand.load(:id => 2)
+    a.album.genre.must_equal EagerGenre.load(:id => 4)
+    DB.sqls.must_equal []
+  end
 end
 
 describe Sequel::Model, "#eager_graph" do

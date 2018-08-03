@@ -1,5 +1,7 @@
 === master
 
+* Support using Dataset#eager_graph in eager load callback for associations using join tables (jeremyevans)
+
 * Make Dataset#graph handle existing selections without determinable aliases by forcing a subselect (jeremyevans)
 
 * Freeze prepared statement arguments before returning the prepared statement (jeremyevans)

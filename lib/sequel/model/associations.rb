@@ -633,10 +633,15 @@ module Sequel
             ds = ds.eager(associations)
           end
           if block = eo[:eager_block]
+            orig_ds = ds
             ds = block.call(ds)
           end
           if eager_loading_use_associated_key?
-            ds = ds.select_append(*associated_key_array)
+            ds = if ds.opts[:eager_graph] && !orig_ds.opts[:eager_graph]
+              block.call(orig_ds.select_append(*associated_key_array))
+            else
+              ds.select_append(*associated_key_array)
+            end
           end
           if self[:eager_graph]
             raise(Error, "cannot eagerly load a #{self[:type]} association that uses :eager_graph") if eager_loading_use_associated_key?

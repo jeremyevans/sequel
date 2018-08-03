@@ -1688,6 +1688,23 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     a.first.albums.must_equal [@album]
     a.first.albums.first.artist.must_equal @artist
   end
+
+  it "should be able to eager_graph dependent eager associations using eager callback" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    a = Artist.eager(:albums=>proc{|ds| ds.eager_graph(:tags, :alias_tags).unordered}).eager(:first_album).all
+    a.must_equal [@artist]
+    a.first.albums.must_equal [@album]
+    a.first.first_album.must_equal @album
+    a.first.albums.first.tags.must_equal [@tag]
+    a.first.albums.first.alias_tags.must_equal [@tag]
+    
+    a = Tag.eager(:albums=>proc{|ds| ds.eager_graph(:artist).unordered}).all
+    a.must_equal [@tag]
+    a.first.albums.must_equal [@album]
+    a.first.albums.first.artist.must_equal @artist
+  end
 end
 
 RegularAndCompositeKeyAssociations = shared_description do
@@ -1766,6 +1783,11 @@ RegularAndCompositeKeyAssociations = shared_description do
     a.first.artist.must_equal @artist
     a.first.artist.tags.must_equal [@tag]
     
+    a = Album.eager(:artist=>proc{|ds| ds.eager_graph(:tags)}).all
+    a.must_equal [@album]
+    a.first.artist.must_equal @artist
+    a.first.artist.tags.must_equal [@tag]
+    
     a = Album.eager_graph(:artist=>:tags).all
     a.must_equal [@album]
     a.first.artist.must_equal @artist
@@ -1791,6 +1813,11 @@ RegularAndCompositeKeyAssociations = shared_description do
     a.first.first_tag.must_equal @tag
     
     a = Album.eager(:artist=>:first_tag).all
+    a.must_equal [@album]
+    a.first.artist.must_equal @artist
+    a.first.artist.first_tag.must_equal @tag
+    
+    a = Album.eager(:artist=>proc{|ds| ds.eager_graph(:first_tag)}).all
     a.must_equal [@album]
     a.first.artist.must_equal @artist
     a.first.artist.first_tag.must_equal @tag
