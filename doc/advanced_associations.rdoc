@@ -1,29 +1,149 @@
 = Advanced Associations
 
-Sequel::Model's association support is very powerful and flexible, but using that power and flexibility
-often results in complexity.
+Sequel::Model's association support is powerful and flexible, but it can be difficult for
+new users to understand what the support enables.  This guide shows off some of the more
+advanced Sequel::Model association features.
 
 You should probably review the {Model Associations Basics and Options guide}[rdoc-ref:doc/association_basics.rdoc]
 before reviewing this guide.
 
-== Background: Sequel::Model association options
+== Sequel::Model Eager Loading
+
+Sequel::Model offers two different ways to perform eager loading, +eager+ and
++eager_graph+. +eager+ uses an SQL query per association, +eager_graph+ uses a single
+SQL query containing JOINs.
+
+Assuming the following associations:
+
+  Artist.one_to_many :albums
+  Album.one_to_many :tracks
+  Tracks.many_to_one :lyric
+
+Let's say you wanted to load all artists and eagerly load the related albums, tracks, and lyrics.
+
+  Artist.eager(albums: {tracks: :lyric})
+  # 4 Queries:
+  # SELECT * FROM artists;
+  # SELECT * FROM albums WHERE (artist_id IN (...));
+  # SELECT * FROM tracks WHERE (album_id IN (...));
+  # SELECT * FROM lyrics WHERE (id IN (...));
+
+  Artist.eager_graph(albums: {tracks: :lyric})
+  # 1 Query:
+  # SELECT artists.id, artists.name, ...
+  #        albums.id AS albums_id, albums.name AS albums_name, ...
+  #        tracks.id AS tracks_id, tracks.name AS tracks_name, ...
+  #        lyric.id AS lyric_id, ...
+  # FROM artists
+  # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
+  # LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)
+  # LEFT OUTER JOIN lyrics AS lyric ON (lyric.id = tracks.lyric_id);
+
+In general, the recommendation is to use +eager+ unless you have a reason to use +eager_graph+.
++eager_graph+ is needed when you want to reference columns in an associated table.  For example,
+if you want to order the loading of returned artists based on the names of the albums, you cannot
+do:
+
+  Artist.eager(albums: {tracks: :lyric}).order{albums[:name]}
+
+because the initial query Sequel will use would be:
+
+  # SELECT * FROM artists ORDER BY albums.name;
+
+and +albums+ is not a valid qualifier in such a query.  In this situation, you must use +eager_graph+:
+
+  Artist.eager_graph(albums: {tracks: :lyric}).order{albums[:name]}
+
+Whether +eager+ or +eager_graph+ performs better is association and database dependent. If
+you are concerned about performance, you should try benchmarking both cases with appropriate
+data to see which performs better.
+
+=== Mixing eager and eager_graph
+
+Sequel offers the ability to mix +eager+ and +eager_graph+ when loading results.  This can
+be done at the main level by calling both +eager+ and +eager_graph+ on the same dataset:
+
+  Album.eager(:artist).eager_graph(:tracks)
+  # 2 Queries:
+  # SELECT albums.id, albums.name, ...
+  #        artist.id AS artist_id, artist.name AS artist_name, ...
+  # FROM albums
+  # LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id);
+  # SELECT * FROM artists WHERE (id IN (...));
+
+You can also use +eager+ to load initial associations, and +eager_graph+ to load
+remaining associations, by using +eager_graph+ in an eager load callback:
+
+  Artist.eager(albums: {tracks: proc{|ds| ds.eager_graph(:lyric)}})
+  # 3 Queries:
+  # SELECT * FROM artists;
+  # SELECT * FROM albums WHERE (artist_id IN (...));
+  # SELECT tracks.id, tracks.name, ...
+  #        lyric.id AS lyric_id, ...
+  # FROM tracks
+  # LEFT OUTER JOIN lyrics AS lyric ON (lyric.id = tracks.lyric_id)
+  # WHERE (tracks.album_id IN (...));
+
+Using the +eager_graph_eager+ plugin, you can use +eager_graph+ to load the
+initial associations, and +eager+ to load the remaining associations.  When
+you call +eager_graph_eager+, you must specify the dependency chain at
+which to start the eager loading via +eager+:
+
+  Artist.plugin :eager_graph_eager
+  Artist.eager_graph(albums: :tracks).eager_graph_eager([:albums, :tracks], :lyric)
+  # 2 Queries:
+  # SELECT artists.id, artists.name, ...
+  #        albums.id AS albums_id, albums.name AS albums_name, ...
+  #        tracks.id AS tracks_id, tracks.name AS tracks_name, ...
+  # FROM artists
+  # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
+  # LEFT OUTER JOIN tracks ON (tracks.album_id= albums.id);
+  # SELECT * FROM lyrics WHERE (id IN (...));
+
+These two approaches can also be nested, with +eager+ -> +eager_graph+ -> +eager+:
+
+  Album.plugin :eager_graph_eager
+  Artist.eager(albums: proc{|ds| ds.eager_graph(:tracks).eager_graph_eager([:tracks], :lyric)})
+  # 3 Queries:
+  # SELECT * FROM artists;
+  # SELECT albums.id, albums.name, ...
+  #        tracks.id AS tracks_id, tracks.name AS tracks_name, ...
+  # FROM albums 
+  # LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)
+  # WHERE (albums.artist_id IN (...));
+  # SELECT * FROM lyrics WHERE (id IN (...));
+
+Or with 2 separate +eager_graph+ queries:
+
+  Artist.eager_graph(:albums).eager_graph_eager([:albums], :tracks=>proc{|ds| ds.eager_graph(:lyric)})
+  # 2 Queries:
+  # SELECT artists.id, artists.name, ...
+  #        albums.id AS albums_id, albums.name AS albums_name, ...
+  # FROM artists
+  # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);
+  # SELECT tracks.id, tracks.name, ...
+  #        lyric.id AS lyric_id, ...
+  # FROM tracks
+  # LEFT OUTER JOIN lyrics AS lyric ON (lyric.id = tracks.lyric_id)
+  # WHERE (tracks.album_id IN (...));
+
+== Sequel::Model Association Loading Options
 
 There are a bunch of advanced association options that are available to
 handle more complex cases.  First we'll go over some of the simpler ones:
 
 All associations take a block that can be used to further filter/modify the
-default dataset.  There's also an :eager_block option if you want to use
-a different block when eager loading via <tt>Dataset#eager</tt>. Association blocks are
-useful for things like:
+default dataset:
 
   Artist.one_to_many :gold_albums, class: :Album do |ds|
     ds.where{copies_sold > 500000}
   end
 
-There are a whole bunch of options for changing how the association is eagerly
-loaded via <tt>Dataset#eager_graph</tt>: <tt>:graph_block</tt>, <tt>:graph_conditions</tt>,
-<tt>:graph_only_conditions</tt>, <tt>:graph_join_type</tt> (and <tt>:graph_join_table_*</tt> ones for
-JOINing to the join table in a many_to_many association).
+There's also an :eager_block option if you want to use a different block when
+eager loading via <tt>Dataset#eager</tt>.
+
+There are many options for changing how the association is eagerly
+loaded via <tt>Dataset#eager_graph</tt>:
 
 :graph_join_type :: The type of join to do (<tt>:inner</tt>, <tt>:left</tt>, <tt>:right</tt>)
 :graph_conditions :: Additional conditions to put on join (needs to be a
@@ -62,10 +182,6 @@ These can be used like this:
   # Handles the case where both key columns have the name artist_name, and you want to use
   # a JOIN USING
   Artist.one_to_many :albums, key: :artist_name, graph_only_conditions: [:artist_name]
-  
-Remember, using +eager_graph+ is generally only necessary when you need to
-filter/order based on columns in an associated table, it is recommended to
-use +eager+ for eager loading if possible.
 
 One advantage of using +eager_graph+ is that you can easily filter/order
 on columns in an associated table on a per-query basis, using regular
@@ -82,6 +198,8 @@ ordered by the albums name, you can do:
 For lazy loading (e.g. Model[1].association), the <tt>:dataset</tt> option can be used
 to specify an arbitrary dataset (one that uses different keys, multiple keys,
 joins to other tables, etc.).
+
+== Custom Eager Loaders
 
 For eager loading via +eager+, the <tt>:eager_loader</tt> option can be used to specify
 how to eagerly load a complex association.  This is an extremely powerful
