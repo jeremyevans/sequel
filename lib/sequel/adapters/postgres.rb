@@ -672,11 +672,6 @@ module Sequel
             end
             LiteralString.new("#{prepared_arg_placeholder}#{i}")
           end
-
-          # Always assume a prepared argument.
-          def prepared_arg?(k)
-           true
-          end
         end
 
         BindArgumentMethods = prepared_statements_module(:bind, [ArgumentMapper], %w'execute execute_dui')

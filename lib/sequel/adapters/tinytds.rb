@@ -194,11 +194,6 @@ module Sequel
         def prepared_arg(k)
           LiteralString.new("@#{k.to_s.gsub('.', '__')}")
         end
-
-        # Always assume a prepared argument.
-        def prepared_arg?(k)
-          true
-        end
       end
       
       PreparedStatementMethods = prepared_statements_module("sql = prepared_sql; opts = Hash[opts]; opts[:arguments] = bind_arguments", ArgumentMapper)

@@ -133,13 +133,8 @@ describe "prepared_statements plugin" do
         def prepared_statement_modules
           [Module.new do
             def literal_symbol_append(sql, v)
-              if @opts[:bind_vars] && (match = /\A\$(.*)\z/.match(v.to_s))
-                s = match[1].split('__')[0].to_sym
-                if prepared_arg?(s)
-                  literal_append(sql, prepared_arg(s))
-                else
-                  sql << v.to_s
-                end
+              if @opts[:bind_vars] && /\A\$(.*)\z/ =~ v
+                literal_append(sql, prepared_arg($1.split('__')[0].to_sym))
               else
                 super
               end

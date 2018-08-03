@@ -347,11 +347,6 @@ module Sequel
           i = prepared_args.length
           LiteralString.new(":#{i}")
         end
-
-        # Always assume a prepared argument.
-        def prepared_arg?(k)
-          true
-        end
       end
       
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)

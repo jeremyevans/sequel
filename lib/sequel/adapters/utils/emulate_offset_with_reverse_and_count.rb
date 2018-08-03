@@ -32,14 +32,11 @@ module Sequel
       row_count = @opts[:offset_total_count] || ds.clone(:append_sql=>String.new, :placeholder_literal_null=>true).count
       dsa1 = dataset_alias(1)
 
-      if o.is_a?(Symbol) && @opts[:bind_vars] && (match = /\A\$(.*)\z/.match(o.to_s))
+      if o.is_a?(Symbol) && @opts[:bind_vars] && /\A\$(.*)\z/ =~ o
         # Handle use of bound variable offsets.  Unfortunately, prepared statement
         # bound variable offsets cannot be handled, since the bound variable value
         # isn't available until later.
-        s = match[1].to_sym
-        if prepared_arg?(s)
-          o = prepared_arg(s)
-        end
+        o = prepared_arg($1.to_sym)
       end
 
       reverse_offset = row_count - o

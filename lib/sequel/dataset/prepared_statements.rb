@@ -163,13 +163,8 @@ module Sequel
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
       def literal_symbol_append(sql, v)
-        if @opts[:bind_vars] and match = /\A\$(.*)\z/.match(v.to_s)
-          s = match[1].to_sym
-          if prepared_arg?(s)
-            literal_append(sql, prepared_arg(s))
-          else
-            sql << v.to_s
-          end
+        if @opts[:bind_vars] && /\A\$(.*)\z/ =~ v
+          literal_append(sql, prepared_arg($1.to_sym))
         else
           super
         end
@@ -222,11 +217,6 @@ module Sequel
         @opts[:bind_vars][k]
       end
 
-      # Whether there is a bound value for the given key.
-      def prepared_arg?(k)
-        @opts[:bind_vars].has_key?(k)
-      end
-
       # The symbol cache should always be skipped, since placeholders are symbols.
       def skip_symbol_cache?
         true
@@ -268,11 +258,6 @@ module Sequel
       def prepared_arg(k)
         prepared_args << k
         prepared_arg_placeholder
-      end
-      
-      # Always assume there is a prepared arg in the argument mapper.
-      def prepared_arg?(k)
-        true
       end
     end
     
