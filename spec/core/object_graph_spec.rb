@@ -67,8 +67,10 @@ describe Sequel::Dataset do
     ds.sql.must_equal 'SELECT points.id, points.lid, points.x, points.y, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM (SELECT points.id, lines.id AS lid, lines.x, lines.y FROM points CROSS JOIN lines) AS points LEFT OUTER JOIN graphs ON (graphs.x = points.id)'
   end
 
-  it "#graph should raise error if currently selected expressions cannot be handled" do
-    proc{@ds1.select(1).graph(@ds2, :x=>:id)}.must_raise(Sequel::Error)
+  it "#graph should handle selection expression without introspectable alias using a subselect" do
+    ds = @ds1.select(Sequel.lit('1 AS v'))
+    ds.columns :v
+    ds.graph(@ds2, :x=>:v).sql.must_equal "SELECT points.v, lines.id, lines.x, lines.y, lines.graph_id FROM (SELECT 1 AS v FROM points) AS points LEFT OUTER JOIN lines ON (lines.x = points.v)"
   end
 
   it "#graph should accept a complex dataset and pass it directly to join" do
@@ -235,6 +237,42 @@ describe Sequel::Dataset do
     @ds1.graph(@ds2, :x=>:id)
     proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, :x=>:id)}.must_raise(Sequel::Error)
     @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:x=>:id}, :table_alias=>:blah)
+  end
+
+  it "#graph should handle ColumnAll values in selections" do
+    @ds1.select_all(:points).graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"
+    @ds1.from{points}.select_all(:points).graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"
+    @ds1.select_all(:points).graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"
+    @ds1.from_self(:alias=>:p).select_all(:p).graph(:lines, :x=>:id).sql.must_equal "SELECT p.id, p.x, p.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM (SELECT * FROM points) AS p LEFT OUTER JOIN lines ON (lines.x = p.id)"
+    @ds1.from{points.as(p)}.select_all(:p).graph(:lines, :x=>:id).sql.must_equal "SELECT p.id, p.x, p.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points AS p LEFT OUTER JOIN lines ON (lines.x = p.id)"
+    @ds1.from(Sequel[:s][:points]).select_all(Sequel[:s][:points]).graph(:lines, :x=>:id).sql.must_equal "SELECT s.points.id, s.points.x, s.points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM s.points LEFT OUTER JOIN lines ON (lines.x = s.points.id)"
+    @ds1.from(Sequel[:s][:points].as(:p)).select_all(:p).graph(:lines, :x=>:id).sql.must_equal "SELECT p.id, p.x, p.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM s.points AS p LEFT OUTER JOIN lines ON (lines.x = p.id)"
+
+    @ds1.select_all('points').graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"
+    @ds1.from_self(:alias=>'p').select_all(:p).graph(:lines, :x=>:id).sql.must_equal "SELECT p.id, p.x, p.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM (SELECT * FROM points) AS p LEFT OUTER JOIN lines ON (lines.x = p.id)"
+
+    @ds1.select_all(Sequel.identifier('points')).graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"
+    @ds1.from_self(:alias=>Sequel.identifier(:p)).select_all(:p).graph(:lines, :x=>:id).sql.must_equal "SELECT p.id, p.x, p.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM (SELECT * FROM points) AS p LEFT OUTER JOIN lines ON (lines.x = p.id)"
+
+    ds = @ds1.select_all(:points).select_append{(points[:id]+lines[:id]).as(:id2)}.join(:lines, :x=>:id)
+    ds.columns :id, :x, :y, :id2
+    ds.graph(:graphs, :id=>:graph_id).sql.must_equal "SELECT points.id, points.x, points.y, points.id2, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM (SELECT points.*, (points.id + lines.id) AS id2 FROM points INNER JOIN lines ON (lines.x = points.id)) AS points LEFT OUTER JOIN graphs ON (graphs.id = points.graph_id)"
+
+    ds = @ds1.select_all(:lines).select_append{(points[:id]+lines[:id]).as(:id2)}.join(:lines, :x=>:id)
+    ds.columns :id, :x, :y, :graph_id, :id2
+    ds.graph(:graphs, :id=>:graph_id).sql.must_equal "SELECT points.id, points.x, points.y, points.graph_id, points.id2, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM (SELECT lines.*, (points.id + lines.id) AS id2 FROM points INNER JOIN lines ON (lines.x = points.id)) AS points LEFT OUTER JOIN graphs ON (graphs.id = points.graph_id)"
+
+    ds = @ds1.select_all(:l).select_append{(points[:id]+lines[:id]).as(:id2)}.join(Sequel[:lines].as(:l), :x=>:id)
+    ds.columns :id, :x, :y, :graph_id, :id2
+    ds.graph(:graphs, :id=>:graph_id).sql.must_equal "SELECT points.id, points.x, points.y, points.graph_id, points.id2, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM (SELECT l.*, (points.id + lines.id) AS id2 FROM points INNER JOIN lines AS l ON (l.x = points.id)) AS points LEFT OUTER JOIN graphs ON (graphs.id = points.graph_id)"
+
+    ds = @ds1.select_all(:l).select_append{(points[:id]+lines[:id]).as(:id2)}.join(Sequel.as(:lines, :l), :x=>:id)
+    ds.columns :id, :x, :y, :graph_id, :id2
+    ds.graph(:graphs, :id=>:graph_id).sql.must_equal "SELECT points.id, points.x, points.y, points.graph_id, points.id2, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM (SELECT l.*, (points.id + lines.id) AS id2 FROM points INNER JOIN lines AS l ON (l.x = points.id)) AS points LEFT OUTER JOIN graphs ON (graphs.id = points.graph_id)"
+
+    ds = @ds1.select_all(:l).select_append{(points[:id]+lines[:id]).as(:id2)}.join(@ds1.db[:graphs].as(:l), :id=>:y)
+    ds.columns :id, :name, :x, :y, :lines_x, :id2
+    ds.graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.name, points.x, points.y, points.lines_x, points.id2, lines.id AS lines_id, lines.x AS lines_x_0, lines.y AS lines_y, lines.graph_id FROM (SELECT l.*, (points.id + lines.id) AS id2 FROM points INNER JOIN (SELECT * FROM graphs) AS l ON (l.id = points.y)) AS points LEFT OUTER JOIN lines ON (lines.x = points.id)"
   end
 
   it "#set_graph_aliases should not modify the current dataset's opts" do

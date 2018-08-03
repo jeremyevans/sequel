@@ -96,10 +96,30 @@ module Sequel
       
       table_alias_qualifier = qualifier_from_alias_symbol(table_alias, table)
       implicit_qualifier = options[:implicit_qualifier]
+      joined_dataset = joined_dataset?
       ds = self
+      graph = opts[:graph]
+
+      if !graph && (select = @opts[:select]) && !select.empty?
+        select_columns = nil
+
+        unless !joined_dataset && select.length == 1 && (select[0].is_a?(SQL::ColumnAll))
+          force_from_self = false
+          select_columns = select.map do |sel|
+            unless col = _hash_key_symbol(sel)
+              force_from_self = true
+              break
+            end
+
+            [sel, col]
+          end
+
+          select_columns = nil if force_from_self
+        end
+      end
 
       # Use a from_self if this is already a joined table (or from_self specifically disabled for graphs)
-      if (@opts[:graph_from_self] != false && !@opts[:graph] && joined_dataset?)
+      if (@opts[:graph_from_self] != false && !graph && (joined_dataset || force_from_self))
         from_selfed = true
         implicit_qualifier = options[:from_self_alias] || first_source
         ds = ds.from_self(:alias=>implicit_qualifier)
@@ -115,7 +135,7 @@ module Sequel
       # Whether to include the table in the result set
       add_table = options[:select] == false ? false : true
 
-      if graph = opts[:graph]
+      if graph
         graph = graph.dup
         select = opts[:select].dup
         [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k] = graph[k].dup}
@@ -137,12 +157,8 @@ module Sequel
         # Keep track of the alias numbers used
         ca_num = graph[:column_alias_num] = Hash.new(0)
 
-        # All columns in the master table are never
-        # aliased, but are not included if set_graph_aliases
-        # has been used.
-        if (select = @opts[:select]) && !select.empty? && !(select.length == 1 && (select.first.is_a?(SQL::ColumnAll)))
-          select = select.map do |sel|
-            raise Error, "can't figure out alias to use for graphing for #{sel.inspect}" unless column = _hash_key_symbol(sel)
+        select = if select_columns
+          select_columns.map do |sel, column|
             column_aliases[column] = [master, column]
             if from_selfed
               # Initial dataset was wrapped in subselect, selected all
@@ -155,7 +171,7 @@ module Sequel
             end
           end
         else
-          select = columns.map do |column|
+          columns.map do |column|
             column_aliases[column] = [master, column]
             SQL::QualifiedIdentifier.new(qualifier, column)
           end
