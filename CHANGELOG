@@ -1,5 +1,7 @@
 === master
 
+* Add caller_logging database extension to log callers before queries, useful during development (jeremyevans)
+
 * Add Database#call_procedure in the postgres adapter for calling PostgreSQL 11+ procedures (jeremyevans)
 
 * Add eager_graph_eager plugin for chaining eager association loads after eager_graph association loads (jeremyevans)
