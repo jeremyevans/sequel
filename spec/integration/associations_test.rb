@@ -2126,6 +2126,12 @@ describe "Sequel::Model Simple Associations" do
     a.must_equal [@album, album2]
     a.map(&:artist).must_equal [@artist, @artist]
     a.map(&:artist).map(&:albums).must_equal [[@album, album2], [@album, album2]]
+
+    a = Album.eager_graph(:artist=>:albums).eager_graph_eager([:artist], :tags).order{[albums[:id], albums_0[:id]]}.all
+    a.must_equal [@album, album2]
+    a.map(&:artist).must_equal [@artist, @artist]
+    a.map(&:artist).map(&:albums).must_equal [[@album, album2], [@album, album2]]
+    a.map(&:artist).map{|a| a.associations[:tags]}.must_equal [[], []]
   end
 
   it "should have remove method raise an error for one_to_many records if the object isn't already associated" do
