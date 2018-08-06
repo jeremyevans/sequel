@@ -337,6 +337,20 @@ rows that are distinct on just those columns:
   DB[:table].distinct(:id).all
   # SELECT DISTINCT ON ("id") * FROM "table"
 
+=== Calling PostgreSQL 11+ Procedures <tt>postgres only</tt>
+
+PostgreSQL 11+ added support for procedures, which are different from the user defined
+functions that PostgreSQL has historically supported.  These procedures are
+called via a special +CALL+ syntax, and Sequel supports them via
+<tt>Database#call_procedure</tt>:
+
+  DB.call_procedure(:foo, 1, "bar")
+  # CALL foo(1, 'bar')
+
+<tt>Database#call_procedure</tt> will return a hash of return values if
+the procedure returns a result, or +nil+ if the procedure does not return
+a result.
+
 === Using a Cursor to Process Large Datasets <tt>postgres only</tt>
 
 The postgres adapter offers a <tt>Dataset#use_cursor</tt> method to process large result sets

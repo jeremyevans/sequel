@@ -173,6 +173,15 @@ module Sequel
         end
       end
 
+      # Call a procedure with the given name and arguments.  Returns a hash if the procedure
+      # returns a value, and nil otherwise.  Example:
+      #
+      #   DB.call_procedure(:foo, 1, 2)
+      #   # CALL foo(1, 2)
+      def call_procedure(name, *args)
+        dataset.send(:call_procedure, name, args)
+      end
+
       # Connects to the database.  In addition to the standard database
       # options, using the :encoding or :charset option changes the
       # client encoding for the connection, :connect_timeout is a
@@ -696,6 +705,15 @@ module Sequel
       
       private
       
+      # Generate and execute a procedure call.
+      def call_procedure(name, args)
+        sql = String.new
+        sql << "CALL "
+        identifier_append(sql, name)
+        literal_append(sql, args)
+        with_sql_first(sql)
+      end
+
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql)
         server_opts = {:server=>@opts[:server] || :read_only}

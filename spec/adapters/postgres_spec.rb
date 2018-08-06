@@ -1239,6 +1239,45 @@ describe "A PostgreSQL database" do
   end if DB.server_version >= 90600
 end
 
+describe "Sequel::Postgres::Database" do
+  before do
+    @db = DB
+    @db.create_table!(:posts){Integer :a}
+  end
+  after do
+    @db.run("DROP PROCEDURE test_procedure_posts(int, int)")
+    @db.drop_table?(:posts)
+  end
+
+  it "#call_procedure should call a procedure that returns a row" do
+    @db.run <<SQL
+CREATE OR REPLACE PROCEDURE test_procedure_posts(inout a int, inout b int)
+LANGUAGE SQL
+AS $$
+INSERT INTO posts VALUES (a) RETURNING *;
+INSERT INTO posts VALUES (a * 2) RETURNING *;
+SELECT max(posts.a), min(posts.a) FROM posts;
+$$;
+SQL
+    @db.call_procedure(:test_procedure_posts, 1, nil).must_equal(:a=>2, :b=>1)
+    @db.call_procedure(:test_procedure_posts, 3, nil).must_equal(:a=>6, :b=>1)
+  end
+
+
+  it "#call_procedure should call a procedure that doesn't return a row" do
+    @db.run <<SQL
+CREATE OR REPLACE PROCEDURE test_procedure_posts(int, int)
+LANGUAGE SQL
+AS $$
+INSERT INTO posts VALUES ($1) RETURNING *;
+INSERT INTO posts VALUES ($1 * 2) RETURNING *;
+$$;
+SQL
+    @db.call_procedure(:test_procedure_posts, 1, nil).must_be_nil
+    @db.call_procedure(:test_procedure_posts, 3, nil).must_be_nil
+  end
+end if DB.adapter_scheme == :postgres && DB.server_version >= 110000
+
 describe "Postgres::Dataset#import" do
   before do
     @db = DB

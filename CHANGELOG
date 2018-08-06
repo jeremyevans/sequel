@@ -1,5 +1,7 @@
 === master
 
+* Add Database#call_procedure in the postgres adapter for calling PostgreSQL 11+ procedures (jeremyevans)
+
 * Add eager_graph_eager plugin for chaining eager association loads after eager_graph association loads (jeremyevans)
 
 * Support using Dataset#eager_graph in eager load callback for associations using join tables (jeremyevans)
