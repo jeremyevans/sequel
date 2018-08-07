@@ -1415,9 +1415,9 @@ module Sequel
       # is valid and before hooks execute successfully. Fails if:
       #
       # * the record is not valid, or
-      # * before_save returns false, or
-      # * the record is new and before_create returns false, or
-      # * the record is not new and before_update returns false.
+      # * before_save calls cancel_action, or
+      # * the record is new and before_create calls cancel_action, or
+      # * the record is not new and before_update calls cancel_action.
       #
       # If +save+ fails and either raise_on_save_failure or the
       # :raise_on_failure option is true, it raises ValidationFailed
