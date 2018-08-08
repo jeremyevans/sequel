@@ -1,5 +1,7 @@
 === master
 
+* Cache eager_graph loader to speed up subsequent loads from the same dataset (jeremyevans)
+
 * Add caller_logging database extension to log callers before queries, useful during development (jeremyevans)
 
 * Add Database#call_procedure in the postgres adapter for calling PostgreSQL 11+ procedures (jeremyevans)

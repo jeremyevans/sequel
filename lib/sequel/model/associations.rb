@@ -2954,7 +2954,7 @@ module Sequel
         # Replace the array of plain hashes with an array of model objects will all eager_graphed
         # associations set in the associations cache for each object.
         def eager_graph_build_associations(hashes)
-          hashes.replace(EagerGraphLoader.new(self).load(hashes))
+          hashes.replace(_eager_graph_build_associations(hashes, eager_graph_loader))
         end
       
         private
@@ -2963,6 +2963,12 @@ module Sequel
         # conditions specified by the associations.
         def _association_join(type, associations)
           clone(:join=>clone(:graph_from_self=>false).eager_graph_with_options(associations, :join_type=>type, :join_only=>true).opts[:join])
+        end
+
+        # Process the array of hashes using the eager graph loader to return an array
+        # of model objects with the associations set.
+        def _eager_graph_build_associations(hashes, egl)
+          egl.load(hashes)
         end
 
         # If the association has conditions itself, then it requires additional filters be
@@ -3056,6 +3062,14 @@ module Sequel
           end
         end
       
+        # The EagerGraphLoader instance used for converting eager_graph results.
+        def eager_graph_loader
+          unless egl = cache_get(:_model_eager_graph_loader)
+            egl = cache_set(:_model_eager_graph_loader, EagerGraphLoader.new(self))
+          end
+          egl.dup
+        end
+
         # Eagerly load all specified associations 
         def eager_load(a, eager_assoc=@opts[:eager])
           return if a.empty?
@@ -3243,12 +3257,15 @@ module Sequel
               :offset
             end
           end
+          after_load_map.freeze
+          alias_map.freeze
+          type_map.freeze
 
           # Make dependency map hash out of requirements array for each association.
           # This builds a tree of dependencies that will be used for recursion
           # to ensure that all parts of the object graph are loaded into the
           # appropriate subordinate association.
-          @dependency_map = {}
+          dependency_map = @dependency_map = {}
           # Sort the associations by requirements length, so that
           # requirements are added to the dependency hash before their
           # dependencies.
@@ -3264,18 +3281,12 @@ module Sequel
               hash[ta] = {}
             end
           end
+          freezer = lambda do |h|
+            h.freeze
+            h.each_value(&freezer)
+          end
+          freezer.call(dependency_map)
       
-          # This mapping is used to make sure that duplicate entries in the
-          # result set are mapped to a single record.  For example, using a
-          # single one_to_many association with 10 associated records,
-          # the main object column values appear in the object graph 10 times.
-          # We map by primary key, if available, or by the object's entire values,
-          # if not. The mapping must be per table, so create sub maps for each table
-          # alias.
-          records_map = {@master=>{}}
-          alias_map.keys.each{|ta| records_map[ta] = {}}
-          @records_map = records_map
-
           datasets = opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
           column_aliases = opts[:graph][:column_aliases]
           primary_keys = {}
@@ -3301,9 +3312,9 @@ module Sequel
               h.select{|ca, c| primary_keys[ta] = ca if pk == c}
             end
           end
-          @column_maps = column_maps
-          @primary_keys = primary_keys
-          @row_procs = row_procs
+          @column_maps = column_maps.freeze
+          @primary_keys = primary_keys.freeze
+          @row_procs = row_procs.freeze
 
           # For performance, create two special maps for the master table,
           # so you can skip a hash lookup.
@@ -3315,21 +3326,34 @@ module Sequel
           # used for performance, to get all values in one hash lookup instead of
           # separate hash lookups for each data structure.
           ta_map = {}
-          alias_map.keys.each do |ta|
-            ta_map[ta] = [records_map[ta], row_procs[ta], alias_map[ta], type_map[ta], reciprocal_map[ta]]
+          alias_map.each_key do |ta|
+            ta_map[ta] = [row_procs[ta], alias_map[ta], type_map[ta], reciprocal_map[ta]].freeze
           end
-          @ta_map = ta_map
+          @ta_map = ta_map.freeze
+          freeze
         end
 
         # Return an array of primary model instances with the associations cache prepopulated
         # for all model objects (both primary and associated).
         def load(hashes)
+          # This mapping is used to make sure that duplicate entries in the
+          # result set are mapped to a single record.  For example, using a
+          # single one_to_many association with 10 associated records,
+          # the main object column values appear in the object graph 10 times.
+          # We map by primary key, if available, or by the object's entire values,
+          # if not. The mapping must be per table, so create sub maps for each table
+          # alias.
+          @records_map = records_map = {}
+          alias_map.keys.each{|ta| records_map[ta] = {}}
+
           master = master()
       
           # Assign to local variables for speed increase
           rp = row_procs[master]
-          rm = records_map[master]
+          rm = records_map[master] = {}
           dm = dependency_map
+
+          records_map.freeze
 
           # This will hold the final record set that we will be replacing the object graph with.
           records = []
@@ -3351,6 +3375,9 @@ module Sequel
           # Run after_load procs if there are any
           post_process(records, dm) if @unique || !after_load_map.empty? || !limit_map.empty?
 
+          records_map.each_value(&:freeze)
+          freeze
+
           records
         end
       
@@ -3370,13 +3397,14 @@ module Sequel
               end
               key = hkey(ta_h)
             end
-            rm, rp, assoc_name, tm, rcm = @ta_map[ta]
+            rp, assoc_name, tm, rcm = @ta_map[ta]
+            rm = records_map[ta]
 
             # Check type map for all dependencies, and use a unique
             # object if any are dependencies for multiple objects,
             # to prevent duplicate objects from showing up in the case
             # the normal duplicate removal code is not being used.
-            if !@unique && !deps.empty? && deps.any?{|dep_key,_| @ta_map[dep_key][3]}
+            if !@unique && !deps.empty? && deps.any?{|dep_key,_| @ta_map[dep_key][2]}
               key = [current.object_id, key]
             end
 
