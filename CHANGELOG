@@ -1,5 +1,7 @@
 === master
 
+* Make tactical_eager_loading plugin handle automatic eager loading for associated objects created by eager_graph (jeremyevans)
+
 * Cache eager_graph loader to speed up subsequent loads from the same dataset (jeremyevans)
 
 * Add caller_logging database extension to log callers before queries, useful during development (jeremyevans)

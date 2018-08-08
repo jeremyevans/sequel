@@ -60,6 +60,46 @@ module Sequel
     #   # SELECT * FROM artists WHERE name > 'N' AND id IN (...)
     #   albums.first.artists(eager: lambda{|ds| ds.where(Sequel[:name] > 'N')})
     #
+    # The tactical_eager_loading plugin also allows transparent eager
+    # loading when calling association methods on associated objects
+    # eagerly loaded via Dataset#eager_graph.  This can reduce N queries
+    # to a single query when iterating over all associated objects.
+    # Consider the following code:
+    #
+    #   artists = Artist.eager_graph(:albums).all
+    #   artists.each do |artist|
+    #     artist.albums.each do |album|
+    #       album.tracks
+    #     end
+    #   end
+    #
+    # By default this will issue a single query to load the artists and
+    # albums, and then one query for each album to load the tracks for
+    # the album:
+    #
+    #   # SELECT artists.id, ...
+    #            albums.id, ...
+    #   # FROM artists
+    #   # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);
+    #   # SELECT * FROM tracks WHERE album_id = 1;
+    #   # SELECT * FROM tracks WHERE album_id = 2;
+    #   # SELECT * FROM tracks WHERE album_id = 10;
+    #   # ...
+    #
+    # With the tactical_eager_loading plugin, this uses the same
+    # query to load the artists and albums, but then issues a single query
+    # to load the tracks for all albums.
+    #
+    #   # SELECT artists.id, ...
+    #            albums.id, ...
+    #   # FROM artists
+    #   # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);
+    #   # SELECT * FROM tracks WHERE (tracks.album_id IN (1, 2, 10, ...));
+    #
+    # Note that transparent eager loading for associated objects
+    # loaded by eager_graph will only take place if the associated classes
+    # also use the tactical_eager_loading plugin.
+    #
     # Usage:
     #
     #   # Make all model subclass instances use tactical eager loading (called before loading subclasses)
@@ -112,7 +152,29 @@ module Sequel
       module DatasetMethods
         private
 
-        # Set the retrieved_with and retrieved_by attributes for the object
+        # Set the retrieved_with and retrieved_by attributes for each of the associated objects
+        # created by the eager graph loader with the appropriate class dataset and array of objects.
+        def _eager_graph_build_associations(_, egl)
+          objects = super
+
+          master = egl.master
+          egl.records_map.each do |k, v|
+            next if k == master || v.empty?
+
+            by = opts[:graph][:table_aliases][k]
+            values = v.values
+
+            values.each do |o|
+              next unless o.is_a?(TacticalEagerLoading::InstanceMethods) && !o.retrieved_by
+              o.retrieved_by = by
+              o.retrieved_with = values
+            end
+          end
+
+          objects
+        end
+
+        # Set the retrieved_with and retrieved_by attributes for each object
         # with the current dataset and array of all objects.
         def post_load(objects)
           super
