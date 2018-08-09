@@ -441,7 +441,7 @@ module Sequel
         /cannot be null/ => NotNullConstraintViolation,
         /Deadlock found when trying to get lock; try restarting transaction/ => SerializationFailure,
         /CONSTRAINT .+ failed for/ => CheckConstraintViolation,
-        /\AStatement aborted because lock\(s\) could not be acquired immediately and NOWAIT is set\./ => DatabaseLockTimeout,
+        /\A(Statement aborted because lock\(s\) could not be acquired immediately and NOWAIT is set\.|Lock wait timeout exceeded; try restarting transaction)/ => DatabaseLockTimeout,
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
@@ -819,9 +819,9 @@ module Sequel
         true
       end
 
-      # MySQL 8+ supports NOWAIT.
+      # MySQL 8+ and MariaDB 10.3+ support NOWAIT.
       def supports_nowait?
-        !db.mariadb? && db.server_version >= 80000
+        db.server_version >= (db.mariadb? ? 100300 : 80000)
       end
 
       # MySQL's DISTINCT ON emulation using GROUP BY does not respect the
