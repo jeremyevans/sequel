@@ -928,11 +928,11 @@ if DB.dataset.supports_window_functions?
     it "should give correct results for aggregate window functions with groups" do
       @ds.select(:id){sum(:amount).over(:partition=>:group_id, :order=>:id, :frame=>:groups).as(:sum)}.all.
         must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:amount).over(:partition=>:group_id, :frame=>:groups).as(:sum)}.all.
-        must_equal [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.select(:id){sum(:amount).over(:order=>:group_id, :frame=>:groups).as(:sum)}.all.
+        must_equal [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
     end if DB.dataset.supports_window_function_frame_option?(:groups)
 
-   if DB.dataset.supports_window_function_frame_option?(:offset)
+    if DB.dataset.supports_window_function_frame_option?(:offset)
       it "should give correct results for aggregate window functions with offsets for ROWS" do
         @ds.select(:id){sum(:amount).over(:order=>:id, :frame=>{:type=>:rows, :start=>1}).as(:sum)}.all.
           must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>110, :id=>3}, {:sum=>1100, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>110000, :id=>6}]
