@@ -804,9 +804,9 @@ module Sequel
         true
       end
 
-      # MySQL does not support INTERSECT or EXCEPT
+      # MariaDB 10.3+ supports INTERSECT or EXCEPT
       def supports_intersect_except?
-        false
+        db.mariadb? && db.server_version >= 100300
       end
       
       # MySQL does not support limits in correlated subqueries (or any subqueries that use IN).

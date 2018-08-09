@@ -1,5 +1,7 @@
 === master
 
+* Enable support for INTERSECT and EXCEPT on MariaDB 10.3+ (jeremyevans)
+
 * Make tactical_eager_loading plugin handle automatic eager loading for associated objects created by eager_graph (jeremyevans)
 
 * Cache eager_graph loader to speed up subsequent loads from the same dataset (jeremyevans)
