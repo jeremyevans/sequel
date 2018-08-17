@@ -264,6 +264,20 @@ describe "Sequel::Plugins::StaticCache" do
       @c.as_hash[3].must_equal @c.all.first
       @db.sqls.must_equal ['SELECT * FROM t2']
     end
+
+    it "should have load_cache" do
+      a = @c.all.sort_by{|o| o.id}
+      a.first.must_equal @c1
+      a.last.must_equal @c2
+      @db.sqls.must_equal []
+
+      @c.load_cache
+
+      a = @c.all.sort_by{|o| o.id}
+      a.first.must_equal @c1
+      a.last.must_equal @c2
+      @db.sqls.must_equal ['SELECT * FROM t']
+    end
   end
 
   describe "without options" do

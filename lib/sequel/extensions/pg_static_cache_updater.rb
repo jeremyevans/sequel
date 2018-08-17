@@ -129,7 +129,7 @@ SQL
           begin
             listen(opts[:channel_name]||default_static_cache_update_name, {:loop=>true}.merge!(opts)) do |_, _, oid|
               if model = oid_map[oid.to_i]
-                model.send(:load_cache)
+                model.load_cache
               end
             end
           ensure

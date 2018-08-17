@@ -55,6 +55,7 @@ module Sequel
     # Now if you +#dup+ a Model object (the resulting object is not frozen), you
     # will be able to update and save the duplicate.
     # Note the caveats around your responsibility to update the cache still applies.
+    # You can update the cache via `.load_cache` method.
     module StaticCache
       # Populate the static caches when loading the plugin. Options:
       # :frozen :: Whether retrieved model objects are frozen.  The default is true,
@@ -209,14 +210,6 @@ module Sequel
           !@static_cache_frozen
         end
 
-        private
-
-        # Return the frozen object with the given pk, or nil if no such object exists
-        # in the cache, without issuing a database query.
-        def primary_key_lookup(pk)
-          static_cache_object(cache[pk])
-        end
-
         # Reload the cache for this model by retrieving all of the instances in the dataset
         # freezing them, and populating the cached array and hash.
         def load_cache
@@ -228,6 +221,14 @@ module Sequel
           end
           @all = a.freeze
           @cache = h.freeze
+        end
+
+        private
+
+        # Return the frozen object with the given pk, or nil if no such object exists
+        # in the cache, without issuing a database query.
+        def primary_key_lookup(pk)
+          static_cache_object(cache[pk])
         end
 
         # If frozen: false is not used, just return the argument. Otherwise,
