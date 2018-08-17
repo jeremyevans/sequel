@@ -121,7 +121,7 @@ SQL
 
         oid_map = {}
         models.each do |model|
-          raise Error, "#{model.inspect} does not use the static_cache plugin" unless model.respond_to?(:load_cache, true)
+          raise Error, "#{model.inspect} does not use the static_cache plugin" unless model.respond_to?(:load_cache)
           oid_map[get(regclass_oid(model.dataset.first_source_table))] = model
         end
 

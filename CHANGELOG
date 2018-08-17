@@ -1,5 +1,7 @@
 === master
 
+* Make Model.load_cache public in the static_cache plugin (AlexWayfer) (#1533)
+
 * Enable support for NOWAIT on MariaDB 10.3+ (jeremyevans)
 
 * Enable support for INTERSECT and EXCEPT on MariaDB 10.3+ (jeremyevans)
