@@ -115,7 +115,7 @@ module Sequel
 
       PS_TYPES = {'string'=>String, 'integer'=>Integer, 'float'=>Float,
         'decimal'=>Float, 'date'=>Time, 'datetime'=>Time,
-        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB}.freeze
+        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB, 'clob'=>OCI8::CLOB}.freeze
       def cursor_bind_params(conn, cursor, args)
         i = 0
         args.map do |arg, type|
