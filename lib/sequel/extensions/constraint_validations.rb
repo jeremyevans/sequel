@@ -431,7 +431,7 @@ module Sequel
         end
       end
 
-      ds = from(:sequel_constraint_validations)
+      ds = from(constraint_validations_table)
       unless drop_rows.empty?
         ds.where([:table, :constraint_name]=>drop_rows).delete
       end

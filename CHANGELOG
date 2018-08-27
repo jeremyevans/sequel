@@ -1,5 +1,7 @@
 === master
 
+* Make constraint_validations extension respect Database#constraint_validations_table setting (jeremyevans)
+
 * Make Sequel.extension load files from gems (jeremyevans)
 
 * Map clob prepared statement argument type to OCI8::CLOB in the oracle adapter (pipistrellka) (#1534)
