@@ -115,7 +115,7 @@ module Sequel
 
       PS_TYPES = {'string'=>String, 'integer'=>Integer, 'float'=>Float,
         'decimal'=>Float, 'date'=>Time, 'datetime'=>Time,
-        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB}.freeze
+        'time'=>Time, 'boolean'=>String, 'blob'=>OCI8::BLOB, 'clob'=>OCI8::CLOB}.freeze
       def cursor_bind_params(conn, cursor, args)
         i = 0
         args.map do |arg, type|
@@ -129,6 +129,10 @@ module Sequel
             arg = arg.to_f
           when ::Sequel::SQL::Blob
             arg = ::OCI8::BLOB.new(conn, arg)
+          when String
+            if type == 'clob'
+              arg = ::OCI8::CLOB.new(conn, arg)
+            end
           end
           cursor.bind_param(i, arg, PS_TYPES[type] || arg.class)
           arg
