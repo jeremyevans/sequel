@@ -325,3 +325,23 @@ describe "An Oracle database with xml types" do
     DB.from(Sequel.lit('xml_test x')).select(Sequel.lit("x.xml_col.getCLOBVal() v")).all.must_equal [{:v=>"<a href=\"b\">c</a>\n"}]
   end
 end
+
+describe "An Oracle database bind clob types params" do
+  before do
+    DB.run <<SQL
+CREATE OR REPLACE PROCEDURE testCLOB(outParam OUT CLOB)
+IS
+BEGIN
+  outParam := 'Hello World CLOB OUT parameter';
+END;
+SQL
+  end
+  after do
+    DB.run("DROP PROCEDURE testCLOB")
+  end
+
+  it "should work correctly with output clobs" do
+    res = DB.execute("begin testCLOB(:1); end;", {:arguments => [[nil, 'clob']]}) {|c| c[1].read }
+    res.must_equal 'Hello World CLOB OUT parameter'
+  end
+end
