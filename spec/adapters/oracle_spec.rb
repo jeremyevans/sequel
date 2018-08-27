@@ -325,3 +325,27 @@ describe "An Oracle database with xml types" do
     DB.from(Sequel.lit('xml_test x')).select(Sequel.lit("x.xml_col.getCLOBVal() v")).all.must_equal [{:v=>"<a href=\"b\">c</a>\n"}]
   end
 end
+
+describe "Clob Bound Argument Type" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:items) do
+      primary_key :id
+      clob :c
+    end
+    @ds = @db[:items]
+  end
+  before do
+    @ds.delete
+  end
+  after(:all) do
+    @db.drop_table?(:items)
+  end
+
+  it "should handle clob type in prepared statement arguments" do
+    @ds.delete
+    clob = "\"'[]`a0 "
+    @ds.prepare(:insert, :ps_clob, {:c=>@db.adapter_scheme == :oracle ? :$c__clob : :$c}).call(:c=>clob)
+    @ds.get(:c).must_equal clob
+  end
+end
