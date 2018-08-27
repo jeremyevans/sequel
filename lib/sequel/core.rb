@@ -58,6 +58,11 @@ module Sequel
     #
     #   Sequel.single_threaded = true
     attr_accessor :single_threaded
+
+    # Alias of original require method, as Sequel.require is does a relative
+    # require for backwards compatibility.
+    alias orig_require require
+    private :orig_require
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
@@ -142,7 +147,7 @@ module Sequel
   #   Sequel.extension(:blank)
   #   Sequel.extension(:core_extensions, :named_timezones)
   def self.extension(*extensions)
-    extensions.each{|e| Kernel.require "sequel/extensions/#{e}"}
+    extensions.each{|e| orig_require("sequel/extensions/#{e}")}
   end
   
   # The exception classed raised if there is an error parsing JSON.

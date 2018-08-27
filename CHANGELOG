@@ -1,5 +1,7 @@
 === master
 
+* Make Sequel.extension load files from gems (jeremyevans)
+
 * Map clob prepared statement argument type to OCI8::CLOB in the oracle adapter (pipistrellka) (#1534)
 
 * Make Model.load_cache public in the static_cache plugin (AlexWayfer) (#1533)
