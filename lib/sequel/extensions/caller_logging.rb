@@ -7,7 +7,7 @@
 #   DB.extension :caller_logging
 #   DB[:table].first
 #   # Logger:
-#   # (0.000041s) (source: /path/to/app/foo/bar.rb:12 in `get_baz`) SELECT * FROM bazes WHERE (id = 1)
+#   # (0.000041s) (source: /path/to/app/foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1
 #
 # You can further filter the caller lines by setting
 # <tt>Database#caller_logging_ignore</tt> to a regexp of additional
@@ -18,7 +18,15 @@
 #
 #   DB.caller_logging_ignore = %r{/path/to/app/lib/plugins}
 #
-# You can also format the caller before it is placed in the logger
+# You can also format the caller before it is placed in the logger,
+# using +caller_logging_formatter+:
+#
+#   DB.caller_logging_formatter = lambda do |caller|
+#     "(#{caller.sub(/\A\/path\/to\/app\//, '')})"
+#   end
+#   DB[:table].first
+#   # Logger:
+#   # (0.000041s) (foo/t.rb:12 in `get_first`) SELECT * FROM table LIMIT 1
 #
 # Related module: Sequel::CallerLogging
 
