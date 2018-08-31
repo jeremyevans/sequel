@@ -68,6 +68,28 @@ eager load:</p>
 
 <pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Eagerly load all artists whose name starts with A-M for these albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt; &#39;N&#39; AND id IN (...)</span>&#x000A;<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;N&#39;</span>)})</pre>
 
+<p>The tactical_eager_loading plugin also allows transparent eager loading
+when calling association methods on associated objects eagerly loaded via
+Dataset#eager_graph.  This can reduce N queries to a single query when
+iterating over all associated objects. Consider the following code:</p>
+
+<pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>By default this will issue a single query to load the artists and albums,
+and then one query for each album to load the tracks for the album:</p>
+
+<pre># SELECT artists.id, ...&#x000A;         albums.id, ...&#x000A;# FROM artists&#x000A;# LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);&#x000A;# SELECT * FROM tracks WHERE album_id = 1;&#x000A;# SELECT * FROM tracks WHERE album_id = 2;&#x000A;# SELECT * FROM tracks WHERE album_id = 10;&#x000A;# ...</pre>
+
+<p>With the tactical_eager_loading plugin, this uses the same query to load
+the artists and albums, but then issues a single query to load the tracks
+for all albums.</p>
+
+<pre># SELECT artists.id, ...&#x000A;         albums.id, ...&#x000A;# FROM artists&#x000A;# LEFT OUTER JOIN albums ON (albums.artist_id = artists.id);&#x000A;# SELECT * FROM tracks WHERE (tracks.album_id IN (1, 2, 10, ...));</pre>
+
+<p>Note that transparent eager loading for associated objects loaded by
+eager_graph will only take place if the associated classes also use the
+tactical_eager_loading plugin.</p>
+
 <p>Usage:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances use tactical eager loading (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use tactical eager loading</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span></pre>

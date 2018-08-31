@@ -89,7 +89,7 @@ to return true:</p>
 <p>Now if you <code>#dup</code> a <a href="../Model.html">Model</a> object
 (the resulting object is not frozen), you will be able to update and save
 the duplicate. Note the caveats around your responsibility to update the
-cache still applies.</p>
+cache still applies. You can update the cache via `.load_cache` method.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -131,7 +131,7 @@ set to false, new instances are created.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@static_cache_frozen</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:frozen</span>, <span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">load_cache</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@static_cache_frozen</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:frozen</span>, <span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">load_cache</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Dataset::EmulatePreparedStatementMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Dataset::EmulatePreparedStatementMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/dataset/prepared_statements_rb.html">lib/sequel/dataset/prepared_statements.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Prepared statements emulation support for adapters that don&#39;t support
+native prepared statements.  Uses a placeholder literalizer to hold the
+prepared sql with the ability to interpolate arguments to prepare the final
+<a href="../SQL.html">SQL</a> string.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-run">run</a></li>
+</ol>
+</div>
+<div id='context'>
+<div id='includes'>
+<h2>Included modules</h2>
+<ol>
+<li><a href="UnnumberedArgumentMapper.html">UnnumberedArgumentMapper</a></li>
+</ol>
+</div>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-run'>
+<a name='method-i-run'></a>
+<div class='synopsis'>
+<span class='name'>run</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-run-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-run-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 270</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql_frags</span>]&#x000A;    <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql_frags</span>], <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>], <span class="ruby-keyword">false</span>))&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:prepared_sql_frags</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

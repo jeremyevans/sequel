@@ -463,14 +463,14 @@ CUBE)</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> does not support INTERSECT or EXCEPT</p>
+<p>MariaDB 10.3+ supports INTERSECT or EXCEPT</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_intersect_except-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_intersect_except-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 807</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_intersect_except-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 807</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except?</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">mariadb?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">100300</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_limits_in_correlated_subqueries-3F'>
@@ -521,14 +521,14 @@ subqueries (or any subqueries that use IN).</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> 8+ supports NOWAIT.</p>
+<p><a href="../MySQL.html">MySQL</a> 8+ and MariaDB 10.3+ support NOWAIT.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_nowait-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_nowait-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 822</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">mariadb?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_nowait-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 822</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> (<span class="ruby-identifier">db</span>.<span class="ruby-identifier">mariadb?</span> <span class="ruby-operator">?</span> <span class="ruby-value">100300</span> <span class="ruby-operator">:</span> <span class="ruby-value">80000</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_ordered_distinct_on-3F'>

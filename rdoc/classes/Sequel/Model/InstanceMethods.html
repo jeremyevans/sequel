@@ -841,11 +841,13 @@ before hooks execute successfully. Fails if:</p>
 <ul><li>
 <p>the record is not valid, or</p>
 </li><li>
-<p>before_save returns false, or</p>
+<p>before_save calls <a
+href="InstanceMethods.html#method-i-cancel_action">#cancel_action</a>, or</p>
 </li><li>
-<p>the record is new and before_create returns false, or</p>
+<p>the record is new and before_create calls <a
+href="InstanceMethods.html#method-i-cancel_action">#cancel_action</a>, or</p>
 </li><li>
-<p>the record is not new and before_update returns false.</p>
+<p>the record is not new and before_update calls cancel_action.</p>
 </li></ul>
 
 <p>If <code>save</code> fails and either raise_on_save_failure or the

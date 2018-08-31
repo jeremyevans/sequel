@@ -30,7 +30,7 @@ doc/postgresql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-04-09 12:34:09 -0700</span>
+<span class='datetime'>2018-08-06 10:27:09 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -299,6 +299,20 @@ use this new syntax:</p>
 are distinct on just those columns:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">distinct</span>(<span class="ruby-value">:id</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT DISTINCT ON (&quot;id&quot;) * FROM &quot;table&quot;</span></pre>
+
+<h3 id="label-Calling+PostgreSQL+11-2B+Procedures+postgres+only">Calling PostgreSQL 11+ Procedures <code>postgres only</code><span><a href="#label-Calling+PostgreSQL+11-2B+Procedures+postgres+only">&para;</a> <a href="#top">&uarr;</a></span></h3>
+
+<p>PostgreSQL 11+ added support for procedures, which are different from the
+user defined functions that PostgreSQL has historically supported.  These
+procedures are called via a special <code>CALL</code> syntax, and <a
+href="../../classes/Sequel.html">Sequel</a> supports them via
+<code>Database#call_procedure</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_procedure</span>(<span class="ruby-value">:foo</span>, <span class="ruby-value">1</span>, <span class="ruby-string">&quot;bar&quot;</span>)&#x000A;<span class="ruby-comment"># CALL foo(1, &#39;bar&#39;)</span></pre>
+
+<p><code>Database#call_procedure</code> will return a hash of return values if
+the procedure returns a result, or <code>nil</code> if the procedure does
+not return a result.</p>
 
 <h3 id="label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">Using a Cursor to Process Large Datasets <code>postgres only</code><span><a href="#label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">&para;</a> <a href="#top">&uarr;</a></span></h3>
 

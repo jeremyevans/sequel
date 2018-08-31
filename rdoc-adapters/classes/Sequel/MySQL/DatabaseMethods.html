@@ -100,7 +100,7 @@ Sequel::MySQL::DatabaseMethods
 /cannot be null/ => NotNullConstraintViolation,
 /Deadlock found when trying to get lock; try restarting transaction/ => SerializationFailure,
 /CONSTRAINT .+ failed for/ => CheckConstraintViolation,
-/\AStatement aborted because lock\(s\) could not be acquired immediately and NOWAIT is set\./ => DatabaseLockTimeout,
+/\A(Statement aborted because lock\(s\) could not be acquired immediately and NOWAIT is set\.|Lock wait timeout exceeded; try restarting transaction)/ => DatabaseLockTimeout,
 }.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>

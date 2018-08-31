@@ -72,7 +72,7 @@ offset.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-assign_singular-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-assign_singular-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">assign_singular?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">eager_limit_strategy</span> <span class="ruby-operator">!=</span> <span class="ruby-value">:ruby</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">slice_range</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-assign_singular-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">assign_singular?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">eager_limit_strategy</span> <span class="ruby-operator">!=</span> <span class="ruby-value">:ruby</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">slice_range</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-filter_by_associations_add_conditions-3F'>
@@ -92,7 +92,7 @@ the underlying relationship is probably not one-to-one.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-filter_by_associations_add_conditions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-filter_by_associations_add_conditions-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1131</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">filter_by_associations_add_conditions?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:eager_limit_strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:filter_limit_strategy</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-filter_by_associations_add_conditions-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1136</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">filter_by_associations_add_conditions?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:eager_limit_strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:filter_limit_strategy</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-limit_and_offset'>
@@ -111,7 +111,7 @@ the underlying relationship is probably not one-to-one.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-limit_and_offset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-limit_and_offset-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1136</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">limit_and_offset</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    [<span class="ruby-value">1</span>, <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-limit_and_offset-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">limit_and_offset</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    [<span class="ruby-value">1</span>, <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-returns_array-3F'>
@@ -130,7 +130,7 @@ the underlying relationship is probably not one-to-one.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-returns_array-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-returns_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1146</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returns_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-returns_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1151</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returns_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
