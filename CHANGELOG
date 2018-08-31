@@ -1,4 +1,4 @@
-=== master
+=== 5.12.0 (2018-08-31)
 
 * Make constraint_validations extension respect Database#constraint_validations_table setting (jeremyevans)
 
