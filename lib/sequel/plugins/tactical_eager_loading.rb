@@ -60,6 +60,9 @@ module Sequel
     #   # SELECT * FROM artists WHERE name > 'N' AND id IN (...)
     #   albums.first.artists(eager: lambda{|ds| ds.where(Sequel[:name] > 'N')})
     #
+    # Note that the :eager option only takes effect if the association
+    # has not already been loaded for the model.
+    #
     # The tactical_eager_loading plugin also allows transparent eager
     # loading when calling association methods on associated objects
     # eagerly loaded via Dataset#eager_graph.  This can reduce N queries
@@ -99,6 +102,12 @@ module Sequel
     # Note that transparent eager loading for associated objects
     # loaded by eager_graph will only take place if the associated classes
     # also use the tactical_eager_loading plugin.
+    #
+    # When using this plugin, calling association methods on separate
+    # instances of the same result set is not thread-safe, because this
+    # plugin attempts to modify all instances of the same result set
+    # to eagerly set the associated objects, and having separate threads
+    # modify the same model instance is not thread-safe.
     #
     # Usage:
     #
