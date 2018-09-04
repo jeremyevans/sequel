@@ -1287,11 +1287,11 @@ module Sequel
       #     a.update(:name=>'A')
       #   end
       #
-      #  a = Artist[2]
-      #  Artist.db.transaction do
-      #    a.lock!('FOR NO KEY UPDATE')
-      #    a.update(:name=>'B')
-      #  end
+      #   a = Artist[2]
+      #   Artist.db.transaction do
+      #     a.lock!('FOR NO KEY UPDATE')
+      #     a.update(:name=>'B')
+      #   end
       def lock!(style=:update)
         _refresh(this.lock_style(style)) unless new?
         self
