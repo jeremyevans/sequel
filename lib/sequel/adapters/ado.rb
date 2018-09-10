@@ -253,8 +253,8 @@ module Sequel
           recordset.GetRows.transpose.each do |field_values|
             h = {}
 
-            cols.each do |name, cp, i|
-              h[name] = if (v = field_values[i]) && cp
+            cols.each do |name, cp, index|
+              h[name] = if (v = field_values[index]) && cp
                 cp[v]
               else
                 v
