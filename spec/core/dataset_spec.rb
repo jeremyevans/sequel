@@ -2330,6 +2330,11 @@ describe "Dataset#from_self" do
     @ds.from_self(:alias=>:some_name, :column_aliases=>[:c1, :c2]).sql.must_equal 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name(c1, c2)'
   end
   
+  it "should use the user-specified alias" do
+    @ds.from_self(:alias=>:some_name).sql.must_equal 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name'
+    @ds.from_self(:alias=>:some_name1).sql.must_equal 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name1'
+  end
+  
   it "should use the user-specified alias for joins" do
     @ds.from_self(:alias=>:some_name).inner_join(:posts, :alias=>:name).sql.must_equal \
       'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name INNER JOIN posts ON (posts.alias = some_name.name)'

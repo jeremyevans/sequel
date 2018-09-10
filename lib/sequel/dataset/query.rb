@@ -291,7 +291,7 @@ module Sequel
         c
       end
 
-      cache ? cached_dataset(:_from_self_ds, &pr) : pr.call
+      opts.empty? ? cached_dataset(:_from_self_ds, &pr) : pr.call
     end
 
     # Match any of the columns to any of the patterns. The terms can be
