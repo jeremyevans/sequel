@@ -3,7 +3,7 @@
 # The constant_sql_override extension allows you to change the SQL
 # generated for Sequel constants.
 #
-# The use-case for this was to have Sequel::CURRENT_TIMESTAMP use UTC time when
+# One possible use-case for this is to have Sequel::CURRENT_TIMESTAMP use UTC time when
 # you have Sequel.database_timezone = :utc, but the database uses localtime when
 # generating CURRENT_TIMESTAMP.
 #
@@ -20,6 +20,9 @@
 #
 #   DB.extension :constant_sql_override
 #
+# Related module: Sequel::ConstantSqlOverride
+
+#
 module Sequel
   module ConstantSqlOverride
     module DatabaseMethods
@@ -31,16 +34,15 @@ module Sequel
         end
       end
 
-      attr_reader :constant_sqls
+      # Hash mapping constant symbols to SQL.  For internal use only.
+      attr_reader :constant_sqls # :nodoc:
 
-      # Add a new constant sql override to our hash.
+      # Set the SQL to use for the given Sequel::SQL::Constant
       def set_constant_sql(constant, override)
-        constant = constant.constant
-
-        @constant_sqls[constant] = override
+        @constant_sqls[constant.constant] = override
       end
 
-      # Freeze the constant_sqls hash to prevent adding new ones.
+      # Freeze the constant_sqls hash to prevent adding new overrides.
       def freeze
         @constant_sqls.freeze
         super
@@ -48,8 +50,13 @@ module Sequel
     end
 
     module DatasetMethods
+      # Use overridden constant SQL
       def constant_sql_append(sql, constant)
-        super(sql, db.constant_sqls[constant] || constant)
+        if constant_sql = db.constant_sqls[constant]
+          sql << constant_sql
+        else
+          super
+        end
       end
     end
   end
