@@ -81,7 +81,8 @@ module Sequel
         constraint(nil, *args, &block)
       end
 
-      # Add a column with the given name, type, and opts      #
+      # Add a column with the given name, type, and opts:
+      #
       #   column :num, :integer
       #   # num INTEGER
       #
