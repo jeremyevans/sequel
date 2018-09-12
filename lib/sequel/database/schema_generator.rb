@@ -159,7 +159,7 @@ module Sequel
         nil
       end
       
-      # Add a foreign key in the table that references another table. See column
+      # Add a foreign key in the table that references another table. See #column
       # for available options.
       #
       #   foreign_key(:artist_id) # artist_id INTEGER
@@ -242,7 +242,7 @@ module Sequel
         nil
       end
       
-      # Add a column with the given type, name, and opts.  See +column+ for available
+      # Add a column with the given type, name, and opts.  See #column for available
       # options.
       def method_missing(type, name = nil, opts = OPTS)
         name ? column(name, type, opts) : super
