@@ -15,13 +15,13 @@ and you call a mass assignment method with a hash:
 
 the mass assignment method will go through each key in the hash, append <tt>=</tt> to it to determine the
 setter method, and if the setter method is defined and access to it is not restricted, Sequel will call the
-setter method with the hash value.  So if we assume that the posts table has subject and text columns, what
+setter method with the hash value.  So if we assume that the posts table has title and body columns, what
 the above mass assignment call actually does is:
- 
+
   post.title=('T')
   post.body=('B')
 
-By default, there are two types of setter methods that are restricted.  
+By default, there are two types of setter methods that are restricted.
 The first is methods like <tt>typecast_on_assignment=</tt> and <tt>==</tt>, which don't affect columns.
 These methods cannot be enabled for mass assignment.
 The second is primary key setters.
