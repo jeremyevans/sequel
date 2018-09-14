@@ -1,5 +1,7 @@
 === master
 
+* Make Model.all in static_cache plugin accept a block (AlexWayfer, jeremyevans) (#1543)
+
 * Add constant_sql_override extension for overriding SQL used for constants such as CURRENT_TIMESTAMP (celsworth) (#1538)
 
 * Do not cache from_self datasets if options are given (jeremyevans)

@@ -154,8 +154,9 @@ describe "Sequel::Plugins::StaticCache" do
 
     it "should have all receiving block" do
       a = []
-      @c.all { |o| a << o }
+      b = @c.all { |o| a << o }
       a.must_equal [@c1, @c2]
+      a.must_equal b
       @db.sqls.must_equal []
     end
 

@@ -73,16 +73,11 @@ module Sequel
         attr_reader :cache
 
         # An array of all of the model's instances, without issuing a database
-        # query. If a block is given, the array is iterated over after all
-        # items.
+        # query. If a block is given, yields each instance to the block.
         def all(&block)
-          if block
-            map(&block)
-          elsif @static_cache_frozen
-            @all.dup
-          else
-            map{|o| o}
-          end
+          array = @static_cache_frozen ? @all.dup : to_a
+          array.each(&block) if block
+          array
         end
 
         # If a block is given, multiple arguments are given, or a single
