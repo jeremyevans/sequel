@@ -116,7 +116,7 @@ module Sequel
   # terminates, or use the <tt>keep_reference: false</tt> Database option.
   #
   # For details, see the {"Connecting to a Database" guide}[rdoc-ref:doc/opening_databases.rdoc].
-  # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[rdoc-ref:doc/sharding.rdoc].
+  # To set up a primary/replica or sharded database connection, see the {"Primary/Replica Database Configurations and Sharding" guide}[rdoc-ref:doc/sharding.rdoc].
   def self.connect(*args, &block)
     Database.connect(*args, &block)
   end

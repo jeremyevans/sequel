@@ -28,8 +28,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     add_servers(opts[:servers].keys) if opts[:servers]
   end
   
-  # Adds new servers to the connection pool.  Allows for dynamic expansion of the potential slaves/shards
-  # at runtime. servers argument should be an array of symbols. 
+  # Adds new servers to the connection pool.  Allows for dynamic expansion of the potential replicas/shards
+  # at runtime. +servers+ argument should be an array of symbols. 
   def add_servers(servers)
     sync do
       servers.each do |server|

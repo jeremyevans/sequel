@@ -1,7 +1,7 @@
-= Read-Only Slaves/Writable Master and Database Sharding
+= Primary/Replica Configurations and Database Sharding
 
-Sequel has support for read only slave databases
-with a writable master database, as well as database sharding (where you can
+Sequel has support for primary/replica configurations (writable primary
+database with read only replicas databases), as well as database sharding (where you can
 pick a server to use for a given dataset).  Support for both
 features is database independent, and should work for all database adapters
 that ship with Sequel.
@@ -13,7 +13,7 @@ option.  Using the :servers database option makes Sequel use a connection pool
 class that supports sharding, and the minimum required to enable sharding
 support is to use the empty hash:
 
-  DB=Sequel.connect('postgres://master_server/database', servers: {})
+  DB=Sequel.connect('postgres://primary_server/database', servers: {})
 
 In most cases, you are probably not going to want to use an empty hash.  Keys in the server hash are
 not restricted to type, but the general recommendation is to use a symbol
@@ -28,69 +28,69 @@ a :host entry in each shard's hash.
 Note that all servers should have the same schema for all
 tables you are accessing, unless you really know what you are doing.
 
-== Master and Slave Database Configurations
+== Primary and Replica Database Configurations
 
-=== Single Read-Only Slave, Single Master
+=== Single Primary, Single Replica
 
-To use a single, read-only slave that handles SELECT queries, the following
+To use a single, read-only replica that handles SELECT queries, the following
 is the simplest configuration:
 
-  DB=Sequel.connect('postgres://master_server/database', 
-    servers: {read_only: {host: 'slave_server'}})
+  DB=Sequel.connect('postgres://primary_server/database', 
+    servers: {read_only: {host: 'replica_server'}})
 
-This will use the slave_server for SELECT queries and master_server for
+This will use the replica_server for SELECT queries and primary_server for
 other queries.
 
 If you want to ensure your queries are going to a specific database, you
 can force this for a given query by using the .server method and passing 
 the symbol name defined in the connect options. For example:
 
-  # Force the SELECT to run on the master
+  # Force the SELECT to run on the primary server
   DB[:users].server(:default).all
 
-  # Force the DELETE to run on the read-only slave
+  # Force the DELETE to run on the read-only replica
   DB[:users].server(:read_only).delete
 
-=== Multiple Read-Only Slaves, Single Master
+=== Single Primary, Multiple Replicas
 
-Let's say you have 4 slave database servers with names slave_server0,
-slave_server1, slave_server2, and slave_server3.
+Let's say you have 4 replica servers with names replica_server0,
+replica_server1, replica_server2, and replica_server3.
 
   num_read_only = 4
   read_only_host = rand(num_read_only)
   read_only_proc = proc do |db|
-    {host: "slave_server#{(read_only_host+=1) % num_read_only}"}
+    {host: "replica_server#{(read_only_host+=1) % num_read_only}"}
   end
-  DB=Sequel.connect('postgres://master_server/database',
+  DB=Sequel.connect('postgres://primary_server/database',
     servers: {read_only: read_only_proc})
 
-This will use one of the slave servers for SELECT queries and use the
-master server for other queries.  It's also possible to pick a random host
+This will use one of the replica servers for SELECT queries and use the
+primary server for other queries.  It's also possible to pick a random host
 instead of using the round robin approach presented above, but that can result
 in less optimal resource usage.
 
-=== Multiple Read-Only Slaves, Multiple Masters
+=== Multiple Primary, Multiple Replicas
 
-This involves the same basic idea as the multiple slaves, single master, but
-it shows that the master database is named :default.  So for 4 masters and
-4 slaves:
+This involves the same basic idea as the multiple replicas, single primary, but
+it shows that the primary database is named :default.  So for 4 primary servers and
+4 replica servers:
 
   num_read_only = 4
   read_only_host = rand(num_read_only)
   read_only_proc = proc do |db|
-    {host: "slave_server#{(read_only_host+=1) % num_read_only}"}
+    {host: "replica_server#{(read_only_host+=1) % num_read_only}"}
   end
   num_default = 4
   default_host = rand(num_default)
   default_proc = proc do |db|
-    {host: "master_server#{(default_host+=1) % num_default}"}
+    {host: "primary_server#{(default_host+=1) % num_default}"}
   end
-  DB=Sequel.connect('postgres://master_server/database',
+  DB=Sequel.connect('postgres://primary_server/database',
     servers: {default: default_proc, read_only: read_only_proc})
   
 == Sharding
 
-There is specific support in Sequel for handling master/slave database
+There is specific support in Sequel for handling primary/replica database
 combinations, with the only necessary setup being the database configuration.
 However, since sharding is always going to be implementation dependent, Sequel
 supplies the basic infrastructure, but you have to tell it which server to use
@@ -210,7 +210,7 @@ need to do that, call the server method explicitly on the dataset used to retrie
 model objects.
 
 The with_server method also supports a second argument for the default read_only server
-to use, which can be useful if you are mixing sharding and master/slave servers:
+to use, which can be useful if you are mixing sharding and primary/replica servers:
 
   DB.extension :server_block
   DB.with_server(:a, :a_read_only) do

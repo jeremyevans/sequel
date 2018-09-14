@@ -83,7 +83,7 @@ These options are shared by all adapters unless otherwise noted.
 :log_connection_info :: Whether to include connection information in log messages (false by default)
 :log_warn_duration :: The amount of seconds after which the queries are logged at :warn level
 :password :: The password for the user account
-:servers :: A hash with symbol keys and hash or proc values, used with master/slave/partitioned database configurations
+:servers :: A hash with symbol keys and hash or proc values, used with primary/replica and sharded database configurations
 :sql_log_level :: The level at which to issue queries to the loggers (:info by default)
 :test :: Whether to test that a valid database connection can be made (true by default)
 :user :: The user account name to use logging in

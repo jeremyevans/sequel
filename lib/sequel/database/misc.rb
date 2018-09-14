@@ -281,7 +281,7 @@ module Sequel
     end
 
     # Whether this database instance uses multiple servers, either for sharding
-    # or for master/slave.
+    # or for primary/replica configurations.
     def sharded?
       @sharded
     end

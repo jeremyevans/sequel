@@ -9,7 +9,7 @@ toolkit for Ruby.
   records to Ruby objects and handling associated records.
 * Sequel supports advanced database features such as prepared
   statements, bound variables, savepoints, two-phase commit,
-  transaction isolation, master/slave configurations, and
+  transaction isolation, primary/replica configurations, and
   database sharding.
 * Sequel currently has adapters for ADO, Amalgalite, 
   IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle,
