@@ -72,10 +72,13 @@ module Sequel
         # A frozen ruby hash holding all of the model's frozen instances, keyed by frozen primary key.
         attr_reader :cache
 
-        # An array of all of the model's frozen instances, without issuing a database
-        # query.
-        def all
-          if @static_cache_frozen
+        # An array of all of the model's instances, without issuing a database
+        # query. If a block is given, the array is iterated over after all
+        # items.
+        def all(&block)
+          if block
+            map(&block)
+          elsif @static_cache_frozen
             @all.dup
           else
             map{|o| o}

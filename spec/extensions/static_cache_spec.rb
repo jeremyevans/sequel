@@ -122,6 +122,10 @@ describe "Sequel::Plugins::StaticCache" do
       @c.map.frozen?.must_equal false
     end
 
+    it "should have map without a block return an Enumerator" do
+      @c.map.class.must_equal Enumerator
+    end
+
     it "should have map with a block and argument raise" do
       proc{@c.map(:id){}}.must_raise(Sequel::Error)
     end
@@ -146,6 +150,13 @@ describe "Sequel::Plugins::StaticCache" do
 
     it "should have all return things in dataset order" do
       @c.all.must_equal [@c1, @c2]
+    end
+
+    it "should have all receiving block" do
+      a = []
+      @c.all { |o| a << o }
+      a.must_equal [@c1, @c2]
+      @db.sqls.must_equal []
     end
 
     it "should have as_hash/to_hash without arguments run without a query" do
