@@ -3207,7 +3207,6 @@ module Sequel
         # Hash with table alias symbol keys and [limit, offset] values
         attr_reader :limit_map
         
-        # Hash with table alias symbol keys and callable values used to create model instances
         # The table alias symbol for the primary model
         attr_reader :master
         
