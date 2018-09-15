@@ -2641,7 +2641,7 @@ module Sequel
       #   Album.eager(:artist, :genre).all
       #   Album.eager_graph(:artist, :genre).all
       #   Album.eager(:artist).eager(:genre).all
-      #   Album.eager_graph(:artist).eager(:genre).all
+      #   Album.eager_graph(:artist).eager_graph(:genre).all
       #   Artist.eager(albums: :tracks).all
       #   Artist.eager_graph(albums: :tracks).all
       #   Artist.eager(albums: {tracks: :genre}).all
@@ -2681,6 +2681,15 @@ module Sequel
         # association_inner_join :: INNER JOIN
         # association_left_join :: LEFT JOIN
         # association_right_join :: RIGHT JOIN
+        #
+        # The arguments can be symbols or hashes with symbol keys (for cascaded
+        # joining).  Examples:
+        #
+        #   Album.association_join(:artist)
+        #   Album.association_join(:artist, :genre)
+        #   Album.association_join(:artist).association_join(:genre).all
+        #   Artist.association_join(albums: :tracks).all
+        #   Artist.association_join(albums: {tracks: :genre}).all
         def association_join(*associations)
           association_inner_join(*associations)
         end
@@ -2760,6 +2769,14 @@ module Sequel
         #
         # Each association's order, if defined, is respected.
         # If the association uses a block or has an :eager_block argument, it is used.
+        #
+        # Examples:
+        #
+        #   Album.eager(:artist).all
+        #   Album.eager(:artist, :genre).all
+        #   Album.eager(:artist).eager(:genre).all
+        #   Artist.eager(albums: :tracks).all
+        #   Artist.eager(albums: {tracks: :genre}).all
         def eager(*associations)
           opts = @opts[:eager]
           association_opts = eager_options_for_associations(associations)
@@ -2788,6 +2805,14 @@ module Sequel
         #
         # Like +eager+, you need to call +all+ on the dataset for the eager loading to work.  If you just
         # call +each+, it will yield plain hashes, each containing all columns from all the tables.
+        #
+        # Examples:
+        #
+        #   Album.eager_graph(:artist).all
+        #   Album.eager_graph(:artist, :genre).all
+        #   Album.eager_graph(:artist).eager_graph(:genre).all
+        #   Artist.eager_graph(albums: :tracks).all
+        #   Artist.eager_graph(albums: {tracks: :genre}).all
         def eager_graph(*associations)
           eager_graph_with_options(associations)
         end
