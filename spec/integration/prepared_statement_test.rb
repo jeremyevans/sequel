@@ -21,6 +21,7 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:all, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).call(:first, :n=>10).must_equal(:id=>1, :numb=>10)
+    @ds.select(:numb).filter(:numb=>:$n).call(:single_value, :n=>10).must_equal(10)
     @ds.filter(:numb=>:$n).call([:map, :numb], :n=>10).must_equal [10]
     @ds.filter(:numb=>:$n).call([:as_hash, :id, :numb], :n=>10).must_equal(1=>10)
     @ds.filter(:numb=>:$n).call([:to_hash, :id, :numb], :n=>10).must_equal(1=>10)
@@ -39,20 +40,24 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:numb=>:$n).bind(:n=>10).call(:select).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>10).call(:all).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>10).call(:first).must_equal(:id=>1, :numb=>10)
+    @ds.select(:numb).filter(:numb=>:$n).bind(:n=>10).call(:single_value).must_equal(10)
     
     @ds.bind(:n=>10).filter(:numb=>:$n).call(:select).must_equal [{:id=>1, :numb=>10}]
     @ds.bind(:n=>10).filter(:numb=>:$n).call(:all).must_equal [{:id=>1, :numb=>10}]
     @ds.bind(:n=>10).filter(:numb=>:$n).call(:first).must_equal(:id=>1, :numb=>10)
+    @ds.bind(:n=>10).select(:numb).filter(:numb=>:$n).call(:single_value).must_equal(10)
   end
   
   it "should allow overriding variables specified with #bind" do
     @ds.filter(:numb=>:$n).bind(:n=>1).call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).call(:all, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).call(:first, :n=>10).must_equal(:id=>1, :numb=>10)
+    @ds.select(:numb).filter(:numb=>:$n).bind(:n=>1).call(:single_value, :n=>10).must_equal(10)
     
     @ds.filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:select).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:all).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:first).must_equal(:id=>1, :numb=>10)
+    @ds.select(:numb).filter(:numb=>:$n).bind(:n=>1).bind(:n=>10).call(:single_value).must_equal(10)
   end
 
   it "should support placeholder literal strings with call" do
@@ -160,6 +165,8 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:select_n, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.filter(:numb=>:$n).prepare(:first, :select_n)
     @db.call(:select_n, :n=>10).must_equal(:id=>1, :numb=>10)
+    @ds.select(:numb).filter(:numb=>:$n).prepare(:single_value, :select_n)
+    @db.call(:select_n, :n=>10).must_equal(10)
     @ds.filter(:numb=>:$n).prepare([:map, :numb], :select_n)
     @db.call(:select_n, :n=>10).must_equal [10]
     @ds.filter(:numb=>:$n).prepare([:as_hash, :id, :numb], :select_n)
