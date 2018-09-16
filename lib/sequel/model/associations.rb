@@ -2686,10 +2686,25 @@ module Sequel
         # joining).  Examples:
         #
         #   Album.association_join(:artist)
+        #   # join artists
+        #
         #   Album.association_join(:artist, :genre)
-        #   Album.association_join(:artist).association_join(:genre).all
-        #   Artist.association_join(albums: :tracks).all
-        #   Artist.association_join(albums: {tracks: :genre}).all
+        #   # join artists and genres
+        #
+        #   Album.association_join(:artist).association_join(:genre)
+        #   # join artists and genres
+        #
+        #   Artist.association_join(albums: :tracks)
+        #   # join albums and albums' tracks
+        #
+        #   Artist.association_join(albums: {tracks: :genre})
+        #   # join albums, albums' tracks, and tracks' genres
+        #
+        #   Artist.association_join(albums: proc{|ds| ds.where{year > 1990}})
+        #   # join filtered albums
+        #
+        #   Artist.association_join(albums: {tracks: proc{|ds| ds.where(genre: 'Rock')}})
+        #   # join albums and filtered albums' tracks
         def association_join(*associations)
           association_inner_join(*associations)
         end
@@ -2773,10 +2788,25 @@ module Sequel
         # Examples:
         #
         #   Album.eager(:artist).all
+        #   # eager load artists
+        #
         #   Album.eager(:artist, :genre).all
+        #   # eager load artists and genres
+        #
         #   Album.eager(:artist).eager(:genre).all
+        #   # eager load artists and genres
+        #
         #   Artist.eager(albums: :tracks).all
+        #   # eager load albums and albums' tracks
+        #
         #   Artist.eager(albums: {tracks: :genre}).all
+        #   # eager load albums, albums' tracks, and tracks' genres
+        #
+        #   Artist.eager(albums: proc{|ds| ds.where{year > 1990}}).all
+        #   # eager load filtered albums
+        #
+        #   Artist.eager(albums: {tracks: proc{|ds| ds.where(genre: 'Rock')}}).all
+        #   # eager load albums and filtered albums' tracks
         def eager(*associations)
           opts = @opts[:eager]
           association_opts = eager_options_for_associations(associations)
@@ -2809,10 +2839,25 @@ module Sequel
         # Examples:
         #
         #   Album.eager_graph(:artist).all
+        #   # join and load artists
+        #
         #   Album.eager_graph(:artist, :genre).all
+        #   # join and load artists and genres
+        #
         #   Album.eager_graph(:artist).eager_graph(:genre).all
+        #   # join and load artists and genres
+        #
         #   Artist.eager_graph(albums: :tracks).all
+        #   # join and load albums and albums' tracks
+        #
         #   Artist.eager_graph(albums: {tracks: :genre}).all
+        #   # join and load albums, albums' tracks, and tracks' genres
+        #
+        #   Artist.eager_graph(albums: proc{|ds| ds.where{year > 1990}}).all
+        #   # join and load filtered albums
+        #
+        #   Artist.eager_graph(albums: {tracks: proc{|ds| ds.where(genre: 'Rock')}}).all
+        #   # join and load albums and filtered albums' tracks
         def eager_graph(*associations)
           eager_graph_with_options(associations)
         end
