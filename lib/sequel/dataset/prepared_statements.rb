@@ -91,7 +91,7 @@ module Sequel
       end
       
       # The type of prepared statement, should be one of :select, :first,
-      # :insert, :update, or :delete
+      # :insert, :update, :delete, or :single_value
       def prepared_type
         @opts[:prepared_type]
       end
@@ -144,7 +144,7 @@ module Sequel
         when :select, :all, :each
           # Most common scenario, so listed first.
           select_sql
-        when :first
+        when :first, :single_value
           clone(:limit=>1).select_sql
         when :insert_select
           insert_select_sql(*prepared_modify_values)
@@ -205,6 +205,8 @@ module Sequel
           when :map, :as_hash, :to_hash, :to_hash_groups
             public_send(*prepared_type, &block) 
           end
+        when :single_value
+          single_value
         else
           raise Error, "unsupported prepared statement type used: #{prepared_type.inspect}"
         end
@@ -290,7 +292,7 @@ module Sequel
           ds = ds.clone(:recorder=>pl)
 
           case type
-          when :first
+          when :first, :single_value
             ds.limit(1)
           when :update, :insert, :insert_select, :delete
             ds.with_sql(:"#{type}_sql", *values)
@@ -339,7 +341,7 @@ module Sequel
       clone(:bind_vars=>bind_vars)
     end
     
-    # For the given type (:select, :first, :insert, :insert_select, :update, or :delete),
+    # For the given type (:select, :first, :insert, :insert_select, :update, :delete, or :single_value),
     # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
     # insert or update (if one of those types is used), which may contain placeholders.
     #
