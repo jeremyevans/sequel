@@ -2687,66 +2687,66 @@ module Sequel
         #
         # Examples:
         #
-        #   # For each album, eager_graph load the artist
-        #   Album.eager_graph(:artist).all
+        #   # For each album, association_join load the artist
+        #   Album.association_join(:artist).all
         #   # SELECT *
         #   # FROM albums
-        #   # LEFT OUTER JOIN artists AS artist ON (artists.id = albums.artist_id)
+        #   # INNER JOIN artists AS artist ON (artists.id = albums.artist_id)
         #
-        #   # For each album, eager_graph load the artist, using a specified alias
-        #   Album.eager_graph(Sequel[:artist].as(:a)).all
+        #   # For each album, association_join load the artist, using a specified alias
+        #   Album.association_join(Sequel[:artist].as(:a)).all
         #   # SELECT *
         #   # FROM albums
-        #   # LEFT OUTER JOIN artists AS a ON (a.id = albums.artist_id)
+        #   # INNER JOIN artists AS a ON (a.id = albums.artist_id)
         #
-        #   # For each album, eager_graph load the artist and genre
-        #   Album.eager_graph(:artist, :genre).all
-        #   Album.eager_graph(:artist).eager_graph(:genre).all
+        #   # For each album, association_join load the artist and genre
+        #   Album.association_join(:artist, :genre).all
+        #   Album.association_join(:artist).association_join(:genre).all
         #   # SELECT *
         #   # FROM albums
-        #   # LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id)
-        #   # LEFT OUTER JOIN genres AS genre ON (genre.id = albums.genre_id)
+        #   # INNER JOIN artists AS artist ON (artist.id = albums.artist_id)
+        #   # INNER JOIN genres AS genre ON (genre.id = albums.genre_id)
         #
-        #   # For each artist, eager_graph load albums and tracks for each album
-        #   Artist.eager_graph(albums: :tracks).all
+        #   # For each artist, association_join load albums and tracks for each album
+        #   Artist.association_join(albums: :tracks).all
         #   # SELECT *
         #   # FROM artists 
-        #   # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
-        #   # LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)
+        #   # INNER JOIN albums ON (albums.artist_id = artists.id)
+        #   # INNER JOIN tracks ON (tracks.album_id = albums.id)
         #
-        #   # For each artist, eager_graph load albums, tracks for each album, and genre for each track
-        #   Artist.eager_graph(albums: {tracks: :genre}).all
+        #   # For each artist, association_join load albums, tracks for each album, and genre for each track
+        #   Artist.association_join(albums: {tracks: :genre}).all
         #   # SELECT *
         #   # FROM artists 
-        #   # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
-        #   # LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)
-        #   # LEFT OUTER JOIN genres AS genre ON (genre.id = tracks.genre_id)
+        #   # INNER JOIN albums ON (albums.artist_id = artists.id)
+        #   # INNER JOIN tracks ON (tracks.album_id = albums.id)
+        #   # INNER JOIN genres AS genre ON (genre.id = tracks.genre_id)
         #
-        #   # For each artist, eager_graph load albums with year > 1990
-        #   Artist.eager_graph(albums: proc{|ds| ds.where{year > 1990}}).all
+        #   # For each artist, association_join load albums with year > 1990
+        #   Artist.association_join(albums: proc{|ds| ds.where{year > 1990}}).all
         #   # SELECT *
         #   # FROM artists 
-        #   # LEFT OUTER JOIN (
+        #   # INNER JOIN (
         #   #   SELECT * FROM albums WHERE (year > 1990)
         #   # ) AS albums ON (albums.artist_id = artists.id)
         #
-        #   # For each artist, eager_graph load albums and tracks 1-10 for each album
-        #   Artist.eager_graph(albums: {tracks: proc{|ds| ds.where(number: 1..10)}}).all
+        #   # For each artist, association_join load albums and tracks 1-10 for each album
+        #   Artist.association_join(albums: {tracks: proc{|ds| ds.where(number: 1..10)}}).all
         #   # SELECT *
         #   # FROM artists 
-        #   # LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
-        #   # LEFT OUTER JOIN (
+        #   # INNER JOIN albums ON (albums.artist_id = artists.id)
+        #   # INNER JOIN (
         #   #   SELECT * FROM tracks WHERE ((number >= 1) AND (number <= 10))
         #   # ) AS tracks ON (tracks.albums_id = albums.id)
         #
-        #   # For each artist, eager_graph load albums with year > 1990, and tracks for those albums
-        #   Artist.eager_graph(albums: {proc{|ds| ds.where{year > 1990}}=>:tracks}).all
+        #   # For each artist, association_join load albums with year > 1990, and tracks for those albums
+        #   Artist.association_join(albums: {proc{|ds| ds.where{year > 1990}}=>:tracks}).all
         #   # SELECT *
         #   # FROM artists 
-        #   # LEFT OUTER JOIN (
+        #   # INNER JOIN (
         #   #   SELECT * FROM albums WHERE (year > 1990)
         #   # ) AS albums ON (albums.artist_id = artists.id)
-        #   # LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)
+        #   # INNER JOIN tracks ON (tracks.album_id = albums.id)
         def association_join(*associations)
           association_inner_join(*associations)
         end
