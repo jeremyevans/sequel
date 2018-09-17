@@ -3841,6 +3841,7 @@ describe "Dataset prepared statements and bound variables " do
     @ds.filter(:num=>:$n).call([:to_hash, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call([:to_hash_groups, :a, :b], :n=>1)
     @ds.filter(:num=>:$n).call(:first, :n=>1)
+    @ds.filter(:num=>:$n).call(:single_value, :n=>1)
     @ds.filter(:num=>:$n).call(:delete, :n=>1)
     @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
     @ds.call(:insert, {:n=>1}, :num=>:$n)
@@ -3853,6 +3854,7 @@ describe "Dataset prepared statements and bound variables " do
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'DELETE FROM items WHERE (num = 1)',
       'UPDATE items SET num = 2 WHERE (num = 1)',
@@ -3870,13 +3872,14 @@ describe "Dataset prepared statements and bound variables " do
     pss << @ds.filter(:num=>:$n).prepare([:to_hash, :a, :b], :sh)
     pss << @ds.filter(:num=>:$n).prepare([:to_hash_groups, :a, :b], :shg)
     pss << @ds.filter(:num=>:$n).prepare(:first, :fn)
+    pss << @ds.filter(:num=>:$n).prepare(:single_value, :svn)
     pss << @ds.filter(:num=>:$n).prepare(:delete, :dn)
     pss << @ds.filter(:num=>:$n).prepare(:update, :un, :num=>:$n2)
     pss << @ds.prepare(:insert, :in, :num=>:$n)
     pss << @ds.prepare(:insert_pk, :inp, :num=>:$n)
     pss << @ds.prepare(:insert_select, :ins, :num=>:$n)
-    @db.prepared_statements.keys.sort_by{|k| k.to_s}.must_equal [:ah, :dn, :en, :fn, :in, :inp, :ins, :sh, :shg, :sm, :sn, :un]
-    [:en, :sn, :sm, :ah, :sh, :shg, :fn, :dn, :un, :in, :inp, :ins].each_with_index{|x, i| @db.prepared_statements[x].must_equal pss[i]}
+    @db.prepared_statements.keys.sort_by{|k| k.to_s}.must_equal [:ah, :dn, :en, :fn, :in, :inp, :ins, :sh, :shg, :sm, :sn, :svn, :un]
+    [:en, :sn, :sm, :ah, :sh, :shg, :fn, :svn, :dn, :un, :in, :inp, :ins].each_with_index{|x, i| @db.prepared_statements[x].must_equal pss[i]}
     @db.call(:en, :n=>1){}
     @db.call(:sn, :n=>1)
     @db.call(:sm, :n=>1)
@@ -3884,6 +3887,7 @@ describe "Dataset prepared statements and bound variables " do
     @db.call(:sh, :n=>1)
     @db.call(:shg, :n=>1)
     @db.call(:fn, :n=>1)
+    @db.call(:svn, :n=>1)
     @db.call(:dn, :n=>1)
     @db.call(:un, :n=>1, :n2=>2)
     @db.call(:in, :n=>1)
@@ -3896,6 +3900,7 @@ describe "Dataset prepared statements and bound variables " do
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
       'SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'DELETE FROM items WHERE (num = 1)',
       'UPDATE items SET num = 2 WHERE (num = 1)',
@@ -4037,6 +4042,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     @ps << @ds.prepare(:select, :s)
     @ps << @ds.prepare(:all, :a)
     @ps << @ds.prepare(:first, :f)
+    @ps << @ds.prepare(:single_value, :sv)
     @ps << @ds.prepare(:delete, :d)
     @ps << @ds.prepare(:insert, :i, :num=>:$n)
     @ps << @ds.prepare(:update, :u, :num=>:$n)
@@ -4050,6 +4056,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     @ps.each{|p| p.prepared_sql; p.call(:n=>1)}
     @db.sqls.must_equal ["SELECT * FROM items WHERE (num = ?) -- args: [1]",
       "SELECT * FROM items WHERE (num = ?) -- args: [1]",
+      "SELECT * FROM items WHERE (num = ?) LIMIT 1 -- args: [1]",
       "SELECT * FROM items WHERE (num = ?) LIMIT 1 -- args: [1]",
       "DELETE FROM items WHERE (num = ?) -- args: [1]",
       "INSERT INTO items (num) VALUES (?) -- args: [1]",
