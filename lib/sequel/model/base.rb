@@ -1551,8 +1551,8 @@ module Sequel
         update_restricted(hash, :default)
       end
   
-      # Update the instances values by calling +set_fields+ with the arguments, then
-      # saves any changes to the record.  Returns self.
+      # Update the instance's values by calling set_fields with the arguments, then
+      # calls save_changes.
       #
       #   artist.update_fields({name: 'Jim'}, [:name])
       #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
