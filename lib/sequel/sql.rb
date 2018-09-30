@@ -1123,6 +1123,14 @@ module Sequel
         end
       end
 
+      # Invert the expression using a SQL NOT operator.
+      #
+      #   BooleanExpression.not(Sequel[a: :b]) # NOT ("a" = "b")
+      #
+      # Note that this can lead to scenarios where the logic is not the exact
+      # inverse of the original expression.
+      #
+      #   BooleanExpression.not(Sequel.&(:a, :b)) # NOT ("a" AND "b")
       def self.not(ce)
         BooleanExpression.new(:NOT, ce)
       end

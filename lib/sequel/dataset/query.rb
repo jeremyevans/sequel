@@ -454,6 +454,12 @@ module Sequel
     #   DB[:items].where(category: 'software', id: 3).invert
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     #
+    # The clauses can also be inverted through wrapping with a NOT clause by
+    # specifying the :not option.
+    #
+    #   DB[:items].where(category: 'software').invert(not: true)
+    #   # SELECT * FROM items WHERE NOT (category = 'software')
+    #
     # See documentation for exclude for how inversion is handled in regards
     # to SQL 3-valued boolean logic.
     def invert(opts=OPTS)
