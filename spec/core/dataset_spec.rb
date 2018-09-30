@@ -732,6 +732,10 @@ describe "Dataset#invert" do
   it "should invert both having and where if both are preset" do
     @d.filter(:x).group(:x).having(:x).invert.sql.must_equal 'SELECT * FROM test WHERE NOT x GROUP BY x HAVING NOT x'
   end
+
+  it "should allow inversion using NOT" do
+    @d.filter(:x => 2).invert(:not => true).sql.must_equal 'SELECT * FROM test WHERE NOT (x = 2)'
+  end
 end
 
 describe "Dataset#having" do

@@ -454,17 +454,28 @@ module Sequel
     #   DB[:items].where(category: 'software', id: 3).invert
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     #
+    # The clauses can also be inverted through wrapping with a NOT clause by
+    # specifying the :not option.
+    #
+    #   DB[:items].where(category: 'software').invert(not: true)
+    #   # SELECT * FROM items WHERE NOT (category = 'software')
+    #
     # See documentation for exclude for how inversion is handled in regards
     # to SQL 3-valued boolean logic.
-    def invert
+    def invert(opts=OPTS)
       cached_dataset(:_invert_ds) do
         having, where = @opts.values_at(:having, :where)
         if having.nil? && where.nil?
           where(false)
         else
           o = {}
-          o[:having] = SQL::BooleanExpression.invert(having) if having
-          o[:where] = SQL::BooleanExpression.invert(where) if where
+          if opts[:not]
+            o[:having] = SQL::BooleanExpression.not(having) if having
+            o[:where] = SQL::BooleanExpression.not(where) if where
+          else
+            o[:having] = SQL::BooleanExpression.invert(having) if having
+            o[:where] = SQL::BooleanExpression.invert(where) if where
+          end
           clone(o)
         end
       end
