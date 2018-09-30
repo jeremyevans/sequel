@@ -1123,6 +1123,10 @@ module Sequel
         end
       end
 
+      def self.not(ce)
+        BooleanExpression.new(:NOT, ce)
+      end
+
       # Always use an AND operator for & on BooleanExpressions
       def &(ce)
         BooleanExpression.new(:AND, self, ce)
