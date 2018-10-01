@@ -78,6 +78,12 @@ describe "Blockless Ruby Filters" do
     @d.l(~Sequel.expr(:x => false)).must_equal '(x IS NOT FALSE)'
     @d.l(~Sequel.expr(:x => nil)).must_equal '(x IS NOT NULL)'
   end
+
+  it "should use NOT for inverting boolean expressions where right hand side is function or literal strings" do
+    @d.l(~Sequel.expr(:x => Sequel.function(:any))).must_equal 'NOT (x = any())'
+    @d.l(~Sequel.expr(:x => Sequel.lit('any()'))).must_equal 'NOT (x = any())'
+    @d.l(~Sequel.expr(:x => Sequel.lit('any(?)', 1))).must_equal 'NOT (x = any(1))'
+  end
   
   it "should support = and similar operations via =~ method" do
     @d.l{x =~ 100}.must_equal '(x = 100)'

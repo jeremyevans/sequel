@@ -1,3 +1,7 @@
+=== master
+
+* Do not push down expression inversion in cases where it may result in incorrect behavior (e.g. ANY/SOME/ALL operators) (jeremyevans) (#1549)
+
 === 5.13.0 (2018-10-01)
 
 * Support :single_value type in prepared statements (rintaun) (#1547)
