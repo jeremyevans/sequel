@@ -1108,11 +1108,15 @@ module Sequel
       #
       #   Artist[1] === Artist[1] # true
       #   Artist.new === Artist.new # false
-      #   Artist[1].set(:name=>'Bob') == Artist[1] # => true
+      #   Artist[1].set(:name=>'Bob') === Artist[1] # => true
       def ===(obj)
         pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
       end
-  
+
+      # You can also use `#pk_equal?` instead of `#===`.
+      #   Artist[1].set(:name=>'Bob').pk_equal? Artist[1] # => true
+      alias pk_equal? ===
+
       # class is defined in Object, but it is also a keyword,
       # and since a lot of instance methods call class methods,
       # this alias makes it so you can use model instead of
