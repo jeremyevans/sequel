@@ -1445,35 +1445,37 @@ describe Sequel::Model, "#==" do
   end
 end
 
-describe Sequel::Model, "#===" do
-  it "should compare instances by class and pk if pk is not nil" do
-    z = Class.new(Sequel::Model)
-    z.columns :id, :x
-    y = Class.new(Sequel::Model)
-    y.columns :id, :x
-    a = z.load(:id => 1, :x => 3)
-    b = z.load(:id => 1, :x => 4)
-    c = z.load(:id => 2, :x => 3)
-    d = y.load(:id => 1, :x => 3)
-    
-    a.must_be :===, b
-    a.wont_be :===, c
-    a.wont_be :===, d
-  end
+%i[=== pk_equal?].each do |method_name|
+  describe Sequel::Model, "##{method_name}" do
+    it "should compare instances by class and pk if pk is not nil" do
+      z = Class.new(Sequel::Model)
+      z.columns :id, :x
+      y = Class.new(Sequel::Model)
+      y.columns :id, :x
+      a = z.load(:id => 1, :x => 3)
+      b = z.load(:id => 1, :x => 4)
+      c = z.load(:id => 2, :x => 3)
+      d = y.load(:id => 1, :x => 3)
 
-  it "should always be false if the primary key is nil" do
-    z = Class.new(Sequel::Model)
-    z.columns :id, :x
-    y = Class.new(Sequel::Model)
-    y.columns :id, :x
-    a = z.new(:x => 3)
-    b = z.new(:x => 4)
-    c = z.new(:x => 3)
-    d = y.new(:x => 3)
-    
-    a.wont_be :===, b
-    a.wont_be :===, c
-    a.wont_be :===, d
+      a.must_be method_name, b
+      a.wont_be method_name, c
+      a.wont_be method_name, d
+    end
+
+    it "should always be false if the primary key is nil" do
+      z = Class.new(Sequel::Model)
+      z.columns :id, :x
+      y = Class.new(Sequel::Model)
+      y.columns :id, :x
+      a = z.new(:x => 3)
+      b = z.new(:x => 4)
+      c = z.new(:x => 3)
+      d = y.new(:x => 3)
+
+      a.wont_be method_name, b
+      a.wont_be method_name, c
+      a.wont_be method_name, d
+    end
   end
 end
 
