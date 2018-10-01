@@ -1103,18 +1103,31 @@ module Sequel
         eql?(obj)
       end
   
-      # If pk is not nil, true only if the objects have the same class and pk.
-      # If pk is nil, false.
+      # Case equality.  By default, checks equality of the primary key value, see
+      # pk_equal?.
       #
-      #   Artist[1] === Artist[1] # true
-      #   Artist.new === Artist.new # false
+      #   Artist[1] === Artist[1] # => true
+      #   Artist.new === Artist.new # => false
       #   Artist[1].set(:name=>'Bob') === Artist[1] # => true
       def ===(obj)
-        pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
+        case pkv = pk
+        when nil
+          return false
+        when Array
+          return false if pk.any?(&:nil?)
+        end
+
+        (obj.class == model) && (obj.pk == pkv)
       end
 
-      # You can also use `#pk_equal?` instead of `#===`.
-      #   Artist[1].set(:name=>'Bob').pk_equal? Artist[1] # => true
+      # If the receiver has a primary key value, returns true if the objects have
+      # the same class and primary key value.
+      # If the receiver's primary key value is nil or is an array containing
+      # nil, returns false.
+      #
+      #   Artist[1].pk_equal?(Artist[1]) # => true
+      #   Artist.new.pk_equal?(Artist.new) # => false
+      #   Artist[1].set(:name=>'Bob').pk_equal?(Artist[1]) # => true
       alias pk_equal? ===
 
       # class is defined in Object, but it is also a keyword,

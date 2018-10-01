@@ -1445,7 +1445,7 @@ describe Sequel::Model, "#==" do
   end
 end
 
-%i[=== pk_equal?].each do |method_name|
+[:===, :pk_equal?].each do |method_name|
   describe Sequel::Model, "##{method_name}" do
     it "should compare instances by class and pk if pk is not nil" do
       z = Class.new(Sequel::Model)
@@ -1475,6 +1475,15 @@ end
       a.wont_be method_name, b
       a.wont_be method_name, c
       a.wont_be method_name, d
+    end
+
+    it "should always be false if the primary key is an array containing nil" do
+      z = Class.new(Sequel::Model)
+      z.columns :id, :x
+      z.set_primary_key [:id, :x]
+      z.load(:id => nil, :x => nil).wont_be method_name, z.load(:id => nil, :x => nil)
+      z.load(:id => 1, :x => nil).wont_be method_name, z.load(:id => 1, :x => nil)
+      z.load(:id => nil, :x => 2).wont_be method_name, z.load(:id => nil, :x => 2)
     end
   end
 end

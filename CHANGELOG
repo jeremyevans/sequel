@@ -1,5 +1,9 @@
 === master
 
+* Make Model#=== work correctly for models with composite primary keys (jeremyevans)
+
+* Add Model#pk_equal? as a more descriptive name for Model#=== (AlexWayfer) (#1550)
+
 * Do not push down expression inversion in cases where it may result in incorrect behavior (e.g. ANY/SOME/ALL operators) (jeremyevans) (#1549)
 
 === 5.13.0 (2018-10-01)
