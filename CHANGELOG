@@ -1,4 +1,4 @@
-=== master
+=== 5.13.0 (2018-10-01)
 
 * Support :single_value type in prepared statements (rintaun) (#1547)
 
