@@ -68,6 +68,9 @@ eager load:</p>
 
 <pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Eagerly load all artists whose name starts with A-M for these albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt; &#39;N&#39; AND id IN (...)</span>&#x000A;<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-value">eager:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:name</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;N&#39;</span>)})</pre>
 
+<p>Note that the :eager option only takes effect if the association has not
+already been loaded for the model.</p>
+
 <p>The tactical_eager_loading plugin also allows transparent eager loading
 when calling association methods on associated objects eagerly loaded via
 Dataset#eager_graph.  This can reduce N queries to a single query when
@@ -89,6 +92,12 @@ for all albums.</p>
 <p>Note that transparent eager loading for associated objects loaded by
 eager_graph will only take place if the associated classes also use the
 tactical_eager_loading plugin.</p>
+
+<p>When using this plugin, calling association methods on separate instances
+of the same result set is not thread-safe, because this plugin attempts to
+modify all instances of the same result set to eagerly set the associated
+objects, and having separate threads modify the same model instance is not
+thread-safe.</p>
 
 <p>Usage:</p>
 

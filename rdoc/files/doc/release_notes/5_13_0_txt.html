@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.13.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.13.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.13.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2018-10-01 07:21:49 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A constant_sql_override Database extension has been added, allowing for
+overriding the SQL used by constants such as Sequel::CURRENT_TIMESTAMP. 
+This can be used to force CURRENT_TIMESTAMP to be literalized at a
+particular time zone:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:constant_sql_override</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">set_constant_sql</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>,&#x000A;  <span class="ruby-string">&quot;CURRENT_TIMESTAMP AT TIME ZONE &#39;UTC&#39;&quot;</span>)</pre>
+</li><li>
+<p>Prepared statements now support the :single_value type, which returns the
+first column value in the dataset.</p>
+
+<pre class="ruby"><span class="ruby-identifier">prep_stmt</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column</span>).<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:single_value</span>, <span class="ruby-value">:ps</span>)&#x000A;<span class="ruby-identifier">prep_stmt</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="ruby-comment"># PREPARE ps AS SELECT column FROM table LIMIT 1;</span>&#x000A;<span class="ruby-comment"># EXECUTE ps;</span>&#x000A;<span class="ruby-comment"># =&gt; 42</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Dataset#from_self will no longer use a cached dataset if any options are
+given, as that can result in incorrect behavior.</p>
+</li><li>
+<p>Model.all in the static_cache plugin now accepts a block, mirroring the API
+when the static_cache plugin is not used.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

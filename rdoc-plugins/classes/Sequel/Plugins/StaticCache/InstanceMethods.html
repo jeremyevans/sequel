@@ -64,7 +64,7 @@ Sequel::Plugins::StaticCache::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 247</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>&#x000A;  <span class="ruby-identifier">cancel_action</span>(<span class="ruby-string">&quot;modifying model objects that use the static_cache plugin is not allowed&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">static_cache_allow_modifications?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 245</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>&#x000A;  <span class="ruby-identifier">cancel_action</span>(<span class="ruby-string">&quot;modifying model objects that use the static_cache plugin is not allowed&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">static_cache_allow_modifications?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_save'>
@@ -83,7 +83,7 @@ Sequel::Plugins::StaticCache::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 253</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-identifier">cancel_action</span>(<span class="ruby-string">&quot;modifying model objects that use the static_cache plugin is not allowed&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">static_cache_allow_modifications?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/static_cache.rb, line 251</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-identifier">cancel_action</span>(<span class="ruby-string">&quot;modifying model objects that use the static_cache plugin is not allowed&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">static_cache_allow_modifications?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

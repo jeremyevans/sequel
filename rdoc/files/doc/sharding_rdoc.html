@@ -30,19 +30,20 @@ doc/sharding.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2018-09-14 07:48:03 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Read-Only+Slaves-2FWritable+Master+and+Database+Sharding">Read-Only Slaves/Writable Master and Database Sharding<span><a href="#label-Read-Only+Slaves-2FWritable+Master+and+Database+Sharding">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Primary-2FReplica+Configurations+and+Database+Sharding">Primary/Replica Configurations and Database Sharding<span><a href="#label-Primary-2FReplica+Configurations+and+Database+Sharding">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p><a href="../../classes/Sequel.html">Sequel</a> has support for read only
-slave databases with a writable master database, as well as database
-sharding (where you can pick a server to use for a given dataset).  Support
-for both features is database independent, and should work for all database
-adapters that ship with <a href="../../classes/Sequel.html">Sequel</a>.</p>
+<p><a href="../../classes/Sequel.html">Sequel</a> has support for
+primary/replica configurations (writable primary database with read only
+replicas databases), as well as database sharding (where you can pick a
+server to use for a given dataset).  Support for both features is database
+independent, and should work for all database adapters that ship with <a
+href="../../classes/Sequel.html">Sequel</a>.</p>
 
 <h2 id="label-The+-3Aservers+Database+option">The :servers Database option<span><a href="#label-The+-3Aservers+Database+option">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -52,7 +53,7 @@ href="../../classes/Sequel.html">Sequel</a> use a connection pool class
 that supports sharding, and the minimum required to enable sharding support
 is to use the empty hash:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>, <span class="ruby-value">servers:</span> {})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>, <span class="ruby-value">servers:</span> {})</pre>
 
 <p>In most cases, you are probably not going to want to use an empty hash. 
 Keys in the server hash are not restricted to type, but the general
@@ -68,48 +69,48 @@ hash.</p>
 <p>Note that all servers should have the same schema for all tables you are
 accessing, unless you really know what you are doing.</p>
 
-<h2 id="label-Master+and+Slave+Database+Configurations">Master and Slave Database Configurations<span><a href="#label-Master+and+Slave+Database+Configurations">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Primary+and+Replica+Database+Configurations">Primary and Replica Database Configurations<span><a href="#label-Primary+and+Replica+Database+Configurations">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<h3 id="label-Single+Read-Only+Slave-2C+Single+Master">Single Read-Only Slave, Single Master<span><a href="#label-Single+Read-Only+Slave-2C+Single+Master">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Single+Primary-2C+Single+Replica">Single Primary, Single Replica<span><a href="#label-Single+Primary-2C+Single+Replica">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>To use a single, read-only slave that handles SELECT queries, the following
-is the simplest configuration:</p>
+<p>To use a single, read-only replica that handles SELECT queries, the
+following is the simplest configuration:</p>
 
-<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>, &#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;slave_server&#39;</span>}})</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>, &#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">host:</span> <span class="ruby-string">&#39;replica_server&#39;</span>}})</pre>
 
-<p>This will use the slave_server for SELECT queries and master_server for
+<p>This will use the replica_server for SELECT queries and primary_server for
 other queries.</p>
 
 <p>If you want to ensure your queries are going to a specific database, you
 can force this for a given query by using the .server method and passing 
 the symbol name defined in the connect options. For example:</p>
 
-<pre class="ruby"><span class="ruby-comment"># Force the SELECT to run on the master</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Force the DELETE to run on the read-only slave</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span></pre>
+<pre class="ruby"><span class="ruby-comment"># Force the SELECT to run on the primary server</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Force the DELETE to run on the read-only replica</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span></pre>
 
-<h3 id="label-Multiple+Read-Only+Slaves-2C+Single+Master">Multiple Read-Only Slaves, Single Master<span><a href="#label-Multiple+Read-Only+Slaves-2C+Single+Master">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Single+Primary-2C+Multiple+Replicas">Single Primary, Multiple Replicas<span><a href="#label-Single+Primary-2C+Multiple+Replicas">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>Let&#39;s say you have 4 slave database servers with names slave_server0,
-slave_server1, slave_server2, and slave_server3.</p>
+<p>Let&#39;s say you have 4 replica servers with names replica_server0,
+replica_server1, replica_server2, and replica_server3.</p>
 
-<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)&#x000A;<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;slave_server#{(read_only_host+=1) % num_read_only}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>,&#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})</pre>
+<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)&#x000A;<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;replica_server#{(read_only_host+=1) % num_read_only}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>,&#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})</pre>
 
-<p>This will use one of the slave servers for SELECT queries and use the
-master server for other queries.  It&#39;s also possible to pick a random
+<p>This will use one of the replica servers for SELECT queries and use the
+primary server for other queries.  It&#39;s also possible to pick a random
 host instead of using the round robin approach presented above, but that
 can result in less optimal resource usage.</p>
 
-<h3 id="label-Multiple+Read-Only+Slaves-2C+Multiple+Masters">Multiple Read-Only Slaves, Multiple Masters<span><a href="#label-Multiple+Read-Only+Slaves-2C+Multiple+Masters">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<h3 id="label-Multiple+Primary-2C+Multiple+Replicas">Multiple Primary, Multiple Replicas<span><a href="#label-Multiple+Primary-2C+Multiple+Replicas">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>This involves the same basic idea as the multiple slaves, single master,
-but it shows that the master database is named :default.  So for 4 masters
-and 4 slaves:</p>
+<p>This involves the same basic idea as the multiple replicas, single primary,
+but it shows that the primary database is named :default.  So for 4 primary
+servers and 4 replica servers:</p>
 
-<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)&#x000A;<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;slave_server#{(read_only_host+=1) % num_read_only}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">num_default</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">default_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_default</span>)&#x000A;<span class="ruby-identifier">default_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;master_server#{(default_host+=1) % num_default}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>,&#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">default:</span> <span class="ruby-identifier">default_proc</span>, <span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})</pre>
+<pre class="ruby"><span class="ruby-identifier">num_read_only</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">read_only_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_read_only</span>)&#x000A;<span class="ruby-identifier">read_only_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;replica_server#{(read_only_host+=1) % num_read_only}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">num_default</span> = <span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">default_host</span> = <span class="ruby-identifier">rand</span>(<span class="ruby-identifier">num_default</span>)&#x000A;<span class="ruby-identifier">default_proc</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  {<span class="ruby-value">host:</span> <span class="ruby-node">&quot;primary_server#{(default_host+=1) % num_default}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://primary_server/database&#39;</span>,&#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">default:</span> <span class="ruby-identifier">default_proc</span>, <span class="ruby-value">read_only:</span> <span class="ruby-identifier">read_only_proc</span>})</pre>
 
 <h2 id="label-Sharding">Sharding<span><a href="#label-Sharding">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>There is specific support in <a href="../../classes/Sequel.html">Sequel</a>
-for handling master/slave database combinations, with the only necessary
+for handling primary/replica database combinations, with the only necessary
 setup being the database configuration. However, since sharding is always
 going to be implementation dependent, <a
 href="../../classes/Sequel.html">Sequel</a> supplies the basic
@@ -208,7 +209,7 @@ used to retrieve the model objects.</p>
 
 <p>The with_server method also supports a second argument for the default
 read_only server to use, which can be useful if you are mixing sharding and
-master/slave servers:</p>
+primary/replica servers:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:a_read_only</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># this SELECT query uses the &quot;a_read_only&quot; shard</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">hash:</span> <span class="ruby-regexp">/31337/</span>)&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">count</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-comment"># this UPDATE query also uses the &quot;a&quot; shard</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">save</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 

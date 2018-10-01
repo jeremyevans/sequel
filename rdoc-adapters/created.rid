@@ -1,5 +1,5 @@
-Fri, 31 Aug 2018 08:45:44 -0700
-lib/sequel/adapters/ado.rb	Thu, 24 May 2018 16:51:22 -0700
+Mon, 01 Oct 2018 07:25:00 -0700
+lib/sequel/adapters/ado.rb	Tue, 11 Sep 2018 10:35:39 -0700
 lib/sequel/adapters/ado/access.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/ado/mssql.rb	Wed, 01 Aug 2018 12:28:33 -0700
 lib/sequel/adapters/amalgalite.rb	Thu, 24 May 2018 16:51:22 -0700

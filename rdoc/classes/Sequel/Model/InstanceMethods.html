@@ -605,7 +605,7 @@ string to this method that is derived from user input, as that can lead to
 <p>A symbol may be used for database independent locking behavior, but all
 supported symbols have separate methods (e.g. for_update).</p>
 
-<pre class="ruby"> <span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A; <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;   <span class="ruby-identifier">a</span>.<span class="ruby-identifier">lock!</span>&#x000A;   <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>)&#x000A; <span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">lock!</span>(<span class="ruby-string">&#39;FOR NO KEY UPDATE&#39;</span>)&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;B&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">lock!</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">lock!</span>(<span class="ruby-string">&#39;FOR NO KEY UPDATE&#39;</span>)&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;B&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 
 </div>
 <div class='source'>
@@ -1054,8 +1054,9 @@ hash and then runs save_changes.</p>
 </div>
 <div class='description'>
 
-<p>Update the instances values by calling <code>set_fields</code> with the
-arguments, then saves any changes to the record.  Returns self.</p>
+<p>Update the instance&#39;s values by calling <a
+href="InstanceMethods.html#method-i-set_fields">#set_fields</a> with the
+arguments, then calls save_changes.</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>({<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Jim&#39;</span>}, [<span class="ruby-value">:name</span>])&#x000A;<span class="ruby-comment"># UPDATE artists SET name = &#39;Jim&#39; WHERE (id = 1)</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>({<span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;LA&#39;</span>}, [<span class="ruby-value">:name</span>])&#x000A;<span class="ruby-comment"># UPDATE artists SET name = NULL WHERE (id = 1)</span></pre>
 
