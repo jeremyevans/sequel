@@ -1553,7 +1553,13 @@ module Sequel
 
     # Append literalization of the subselect to SQL string.
     def subselect_sql_append(sql, ds)
-      subselect_sql_dataset(sql, ds).sql
+      sds = subselect_sql_dataset(sql, ds)
+      sds.sql
+      unless sds.send(:cache_sql?)
+        # If subquery dataset does not allow caching SQL,
+        # then this dataset should not allow caching SQL.
+        disable_sql_caching!
+      end
     end
 
     def subselect_sql_dataset(sql, ds)

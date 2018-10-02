@@ -1,5 +1,7 @@
 === master
 
+* Do not cache dataset SQL if dataset uses subquery that cannot cache SQL (jeremyevans)
+
 * Make Model#=== work correctly for models with composite primary keys (jeremyevans)
 
 * Add Model#pk_equal? as a more descriptive name for Model#=== (AlexWayfer) (#1550)

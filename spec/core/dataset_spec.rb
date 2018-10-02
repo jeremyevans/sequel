@@ -2344,6 +2344,14 @@ describe "Dataset#from_self" do
     @ds.server(:blah).from_self(:alias=>:some_name).opts[:server].must_equal :blah
   end
 
+  it "should work correctly when a delayed evaluation is used " do
+    a = true
+    ds = @ds.where(Sequel.delay{a}).from_self
+    ds.sql.must_equal "SELECT * FROM (SELECT name FROM test WHERE 't' LIMIT 1) AS t1"
+    a = false
+    ds.sql.must_equal "SELECT * FROM (SELECT name FROM test WHERE 'f' LIMIT 1) AS t1"
+  end
+
   it "should hoist WITH clauses in current dataset if dataset doesn't support WITH in subselect" do
     ds = Sequel.mock.dataset
     ds = ds.with_extend do
