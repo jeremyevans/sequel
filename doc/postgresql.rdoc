@@ -63,6 +63,11 @@ into the Database instance:
   DB.extension :pg_array
   Sequel.extension :pg_array_ops
 
+With regard to common database types, please note that String columns will
+default to PostgreSQL's <tt>text</tt> type, with an unbounded size.  You must
+specify a <tt>:size</tt> option to get a <tt>varchar</tt> type and impose a
+size constraint on the column.
+
 == PostgreSQL-specific DDL Support
 
 === Exclusion Constraints
