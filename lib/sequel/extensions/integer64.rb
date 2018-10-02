@@ -20,7 +20,7 @@
 #
 module Sequel
   module Integer64
-    # Use timestamptz by default for generic timestamp value.
+    # Use same type as used for :Bignum by default for generic integer value.
     def type_literal_generic_integer(column)
       type_literal_generic_bignum_symbol(column)
     end
