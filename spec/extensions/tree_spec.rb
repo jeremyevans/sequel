@@ -61,12 +61,12 @@ describe Sequel::Model, "tree plugin" do
 
   it "should have roots return an array of the tree's roots" do
     @c.dataset = @c.dataset.with_fetch([{:id=>1, :parent_id=>nil, :name=>'r'}])
-    @c.roots.must_equal [@c.load(:id=>1, :parent_id=>nil, :name=>'r')]
-    @db.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id IS NULL)"]
+    @c.exclude(id: 2).roots.must_equal [@c.load(:id=>1, :parent_id=>nil, :name=>'r')]
+    @db.sqls.must_equal ["SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL))"]
   end
 
   it "should have roots_dataset be a dataset representing the tree's roots" do
-    @c.roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE (parent_id IS NULL)"
+    @c.exclude(id: 2).roots_dataset.sql.must_equal "SELECT * FROM nodes WHERE ((id != 2) AND (parent_id IS NULL))"
   end
 
   it "should have ancestors return the ancestors of the current node" do

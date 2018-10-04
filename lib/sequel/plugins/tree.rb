@@ -51,6 +51,7 @@ module Sequel
 
           many_to_one parent, par
           one_to_many children, chi
+          dataset_module DatasetMethods
           plugin SingleRoot if opts[:single_root]
         end
       end
@@ -76,22 +77,6 @@ module Sequel
           @tree_order.freeze if @tree_order.is_a?(Array)
         
           super
-        end
-
-        # Returns list of all root nodes (those with no parent nodes).
-        #
-        #   TreeClass.roots # => [root1, root2]
-        def roots
-          roots_dataset.all
-        end
-        
-        # Returns the dataset for retrieval of all root nodes
-        #
-        #   TreeClass.roots_dataset # => Sequel::Dataset instance
-        def roots_dataset
-          ds = where(Sequel.or(Array(parent_column).zip([])))
-          ds = ds.order(*tree_order) if tree_order
-          ds
         end
       end
       
@@ -151,6 +136,24 @@ module Sequel
         # True if if all parent columns values are not NULL.
         def possible_root?
           !Array(model.parent_column).map{|c| self[c]}.all?
+        end
+      end
+
+      module DatasetMethods
+        # Returns list of all root nodes (those with no parent nodes).
+        #
+        #   TreeClass.roots # => [root1, root2]
+        def roots
+          roots_dataset.all
+        end
+
+        # Returns the dataset for retrieval of all root nodes
+        #
+        #   TreeClass.roots_dataset # => Sequel::Dataset instance
+        def roots_dataset
+          ds = where(Sequel.or(Array(model.parent_column).zip([])))
+          ds = ds.order(*model.tree_order) if model.tree_order
+          ds
         end
       end
 
