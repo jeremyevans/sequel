@@ -54,6 +54,22 @@ describe "Blockless Ruby Filters" do
     @d.l(~~Sequel.|(:x, :y)).must_equal '(x OR y)'
   end
 
+  it "should not modifying boolean expression created from array if array is modified" do
+    a = [1]
+    expr = Sequel.expr(:b=>a)
+    @d.l(expr).must_equal '(b IN (1))'
+    a << 2
+    @d.l(expr).must_equal '(b IN (1))'
+  end
+
+  it "should not modifying boolean expression created from string if string is modified" do
+    a = '1'.dup
+    expr = Sequel.expr(:b=>a)
+    @d.l(expr).must_equal "(b = '1')"
+    a << '2'
+    @d.l(expr).must_equal "(b = '1')"
+  end
+
   it "should support = via Hash" do
     @d.l(:x => 100).must_equal '(x = 100)'
     @d.l(:x => 'a').must_equal '(x = \'a\')'

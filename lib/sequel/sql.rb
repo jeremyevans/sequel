@@ -1079,7 +1079,13 @@ module Sequel
             expr = new(:AND, expr, new(r.exclude_end? ? :< : :<=, l, r.end))
           end
           expr
-        when ::Array, ::Sequel::Dataset
+        when ::Array
+          r = r.dup.freeze unless r.frozen?
+          new(:IN, l, r)
+        when ::String
+          r = r.dup.freeze unless r.frozen?
+          new(:'=', l, r)
+        when ::Sequel::Dataset
           new(:IN, l, r)
         when NegativeBooleanConstant
           new(:"IS NOT", l, r.constant)
