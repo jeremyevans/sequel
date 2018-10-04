@@ -1709,7 +1709,9 @@ describe "Sequel::Plugins::Tree" do
 
     it "iterate top-level nodes in order" do
       @Node.roots_dataset.count.must_equal 5
-      @Node.roots.map{|p| p.name}.must_equal %w'one two three four five'
+      @Node.roots.map(&:name).must_equal %w'one two three four five'
+      @Node.where(:name=>%w'one two.one').roots_dataset.count.must_equal 1
+      @Node.where(:name=>%w'one two.one').roots.map(&:name).must_equal %w'one'
     end
   
     it "should have children" do

@@ -51,7 +51,6 @@ module Sequel
 
           many_to_one parent, par
           one_to_many children, chi
-          dataset_module DatasetMethods
           plugin SingleRoot if opts[:single_root]
         end
       end
@@ -71,6 +70,7 @@ module Sequel
         attr_reader :children_association_name
 
         Plugins.inherited_instance_variables(self, :@parent_column=>nil, :@tree_order=>nil, :@parent_association_name=>nil, :@children_association_name=>nil)
+        Plugins.def_dataset_methods(self, [:roots, :roots_dataset])
 
         # Should freeze tree order if it is an array when freezing the model class.
         def freeze

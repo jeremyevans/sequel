@@ -1,5 +1,7 @@
 === master
 
+* Make roots and roots_dataset dataset methods instead of class methods in the tree plugin (JelF) (#1554)
+
 * Do not cache dataset SQL if dataset uses subquery that cannot cache SQL (jeremyevans)
 
 * Make Model#=== work correctly for models with composite primary keys (jeremyevans)
