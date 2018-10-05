@@ -309,6 +309,18 @@ can pass an +:update+ option with a hash of values to update.  You must pass eit
   DB[:table].insert_conflict(target: :a, update: {b: Sequel[:excluded][:b]}).insert(a: 1, b: 2)
   # INSERT INTO TABLE (a, b) VALUES (1, 2)
   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
+
+If you want to update existing rows but using the current value of the column, you can build
+the desired calculation using <tt>Sequel[]</tt>
+
+  DB[:table]
+    .insert_conflict(
+      target: :a,
+      update: {b: Sequel[:excluded][:b] + Sequel[:table][:a]}
+    )
+    .import([:a, :b], [ [1, 2] ])
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT (a) DO UPDATE SET b = (excluded.b + table.a)
  
 Additionally, if you only want to do the update in certain cases, you can specify an
 +:update_where+ option, which will be used as a filter.  If the row doesn't match the
