@@ -11,6 +11,13 @@ SEQUEL_GEMSPEC = Gem::Specification.new do |s|
   s.email = "code@jeremyevans.net"
   s.homepage = "http://sequel.jeremyevans.net"
   s.license = 'MIT'
+  s.metadata = {
+    'bug_tracker_uri'   => 'https://github.com/jeremyevans/sequel/issues',
+    'changelog_uri'     => 'http://sequel.jeremyevans.net/rdoc/files/CHANGELOG.html',
+    'documentation_uri' => 'http://sequel.jeremyevans.net/documentation.html',
+    'mailing_list_uri'  => 'https://groups.google.com/forum/#!forum/sequel-talk',
+    'source_code_uri'   => 'https://github.com/jeremyevans/sequel',
+  }
   s.required_ruby_version = ">= 1.9.2"
   s.files = %w(MIT-LICENSE CHANGELOG README.rdoc Rakefile bin/sequel) + Dir["doc/*.rdoc"] + Dir["doc/release_notes/{4,5}.*.txt"] + Dir["{spec,lib}/**/*.{rb,RB}"]
   s.require_path = "lib"
