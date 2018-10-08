@@ -354,9 +354,15 @@ module Sequel
       end
 
       # Return an <tt>SQL::CaseExpression</tt> created with the given arguments.
+      # The first argument are the <tt>WHEN</tt>/<tt>THEN</tt> conditions,
+      # specified as an array or a hash.  The second argument is the
+      # <tt>ELSE</tt> default value.  The third optional argument is the
+      # <tt>CASE</tt> expression.
       #
-      #   Sequel.case([[{a: [2,3]}, 1]], 0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
+      #   Sequel.case({a: 1}, 0) # SQL: CASE WHEN a THEN 1 ELSE 0 END
       #   Sequel.case({a: 1}, 0, :b) # SQL: CASE b WHEN a THEN 1 ELSE 0 END
+      #   Sequel.case({{a: [2,3]} => 1}, 0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
+      #   Sequel.case([[{a: [2,3]}, 1]], 0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
       def case(*args)
         SQL::CaseExpression.new(*args)
       end
