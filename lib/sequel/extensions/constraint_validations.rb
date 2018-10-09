@@ -355,6 +355,18 @@ module Sequel
       super
     end
 
+    def constraint_validation_expression(cols, allow_nil)
+      exprs = cols.map do |c|
+        expr = yield c
+        if allow_nil
+          Sequel.|({c=>nil}, expr)
+        else
+          Sequel.&(Sequel.~(c=>nil), expr)
+        end
+      end
+      Sequel.&(*exprs)
+    end
+
     # For the given table, generator, and validations, add constraints
     # to the generator for each of the validations, as well as adding
     # validation metadata to the constraint validations table.
@@ -365,28 +377,44 @@ module Sequel
 
         case validation_type
         when :presence
-          string_check = columns.select{|c| generator_string_column?(generator, table, c)}.map{|c| [Sequel.trim(c), blank_string_value]}
-          generator_add_constraint_from_validation(generator, val, (Sequel.negate(string_check) unless string_check.empty?))
+          strings, non_strings = columns.partition{|c| generator_string_column?(generator, table, c)}
+          if !non_strings.empty? && !allow_nil
+            non_strings_expr = Sequel.&(*non_strings.map{|c| Sequel.~(c=>nil)})
+          end
+
+          unless strings.empty?
+            strings_expr = constraint_validation_expression(strings, allow_nil){|c| Sequel.~(Sequel.trim(c) => blank_string_value)}
+          end
+
+          expr = if non_strings_expr && strings_expr
+            Sequel.&(strings_expr, non_strings_expr)
+          else
+            strings_expr || non_strings_expr
+          end
+
+          if expr
+            generator.constraint(constraint, expr)
+          end
         when :exact_length
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| {Sequel.char_length(c) => arg}}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| {Sequel.char_length(c) => arg}})
         when :min_length
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.char_length(c) >= arg}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| Sequel.char_length(c) >= arg})
         when :max_length
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.char_length(c) <= arg}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| Sequel.char_length(c) <= arg})
         when *REVERSE_OPERATOR_MAP.keys
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.identifier(c).public_send(REVERSE_OPERATOR_MAP[validation_type], arg)}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| Sequel.identifier(c).public_send(REVERSE_OPERATOR_MAP[validation_type], arg)})
         when :length_range
           op = arg.exclude_end? ? :< : :<=
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| (Sequel.char_length(c) >= arg.begin) & Sequel.char_length(c).public_send(op, arg.end)}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| (Sequel.char_length(c) >= arg.begin) & Sequel.char_length(c).public_send(op, arg.end)})
           arg = "#{arg.begin}..#{'.' if arg.exclude_end?}#{arg.end}"
         when :format
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| {c => arg}}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| {c => arg}})
           if arg.casefold?
             validation_type = :iformat
           end
           arg = arg.source
         when :includes
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| {c => arg}}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| {c => arg}})
           if arg.is_a?(Range)
             if arg.begin.is_a?(Integer) && arg.end.is_a?(Integer)
               validation_type = :includes_int_range
@@ -407,7 +435,7 @@ module Sequel
             raise Error, "validates includes only supports arrays and ranges currently, cannot handle: #{arg.inspect}"
           end
         when :like, :ilike
-          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.public_send(validation_type, c, arg)}))
+          generator.constraint(constraint, constraint_validation_expression(columns, allow_nil){|c| Sequel.public_send(validation_type, c, arg)})
         when :unique
           generator.unique(columns, :name=>constraint)
           columns = [columns.join(',')]
@@ -437,23 +465,6 @@ module Sequel
       end
       ds.multi_insert(rows.flatten)
     end
-
-    # Add the constraint to the generator, including a NOT NULL constraint
-    # for all columns unless the :allow_nil option is given.
-    def generator_add_constraint_from_validation(generator, val, cons)
-      if val[:allow_nil]
-        nil_cons = Sequel[val[:columns].map{|c| [c, nil]}]
-        cons = Sequel.|(nil_cons, cons) if cons
-      else
-        nil_cons = Sequel.negate(val[:columns].map{|c| [c, nil]})
-        cons = cons ? Sequel.&(nil_cons, cons) : nil_cons
-      end
-
-      if cons
-        generator.constraint(val[:name], cons)
-      end
-    end
-
 
     # Introspect the generator to determine if column
     # created is a string or not.

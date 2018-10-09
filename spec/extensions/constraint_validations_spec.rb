@@ -107,12 +107,38 @@ describe "constraint_validations extension" do
     sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CONSTRAINT cons CHECK ((name IS NOT NULL) AND (trim(name) != '')))"]
   end
 
-  it "should handle multiple columns when adding validations" do
+  it "should handle multiple string columns when adding presence validations" do
     @db.create_table(:foo){String :name; String :bar; validate{presence [:name, :bar]}}
     sqls = @db.sqls
     parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
     parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo")
-    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), bar varchar(255), CHECK ((name IS NOT NULL) AND (bar IS NOT NULL) AND (trim(name) != '') AND (trim(bar) != '')))"]
+    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), bar varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '') AND (bar IS NOT NULL) AND (trim(bar) != '')))"]
+  end
+
+  it "should handle multiple string columns when adding presence validations with :allow_nil" do
+    @db.create_table(:foo){String :name; String :bar; validate{presence [:name, :bar], :allow_nil=>true}}
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t')
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo", :allow_nil=>'t')
+    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), bar varchar(255), CHECK (((name IS NULL) OR (trim(name) != '')) AND ((bar IS NULL) OR (trim(bar) != ''))))"]
+  end
+
+  it "should handle multiple string columns when adding presence validations" do
+    @db.create_table(:foo){String :name; Integer :x; String :bar; validate{presence [:name, :x, :bar]}}
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo")
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"x", :table=>"foo")
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo")
+    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), x integer, bar varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) != '') AND (bar IS NOT NULL) AND (trim(bar) != '') AND (x IS NOT NULL)))"]
+  end
+
+  it "should handle multiple string columns when adding presence validations with :allow_nil" do
+    @db.create_table(:foo){String :name; Integer :x; String :bar; validate{presence [:name, :x, :bar], :allow_nil=>true}}
+    sqls = @db.sqls
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"name", :table=>"foo", :allow_nil=>'t')
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"x", :table=>"foo", :allow_nil=>'t')
+    parse_insert(sqls.slice!(1)).must_equal(:validation_type=>"presence", :column=>"bar", :table=>"foo", :allow_nil=>'t')
+    sqls.must_equal ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), x integer, bar varchar(255), CHECK (((name IS NULL) OR (trim(name) != '')) AND ((bar IS NULL) OR (trim(bar) != ''))))"]
   end
 
   it "should handle presence validation on non-String columns" do
