@@ -559,13 +559,30 @@ module Sequel
 
     # Append literalization of ordered expression to SQL string.
     def ordered_expression_sql_append(sql, oe)
+      if emulate = requires_emulating_nulls_first?
+        case oe.nulls
+        when :first
+          null_order = 0
+        when :last
+          null_order = 2
+        end
+
+        if null_order
+          literal_append(sql, Sequel.case({{oe.expression=>nil}=>null_order}, 1))
+          sql << ", "
+        end
+      end
+
       literal_append(sql, oe.expression)
       sql << (oe.descending ? ' DESC' : ' ASC')
-      case oe.nulls
-      when :first
-        sql << " NULLS FIRST"
-      when :last
-        sql << " NULLS LAST"
+
+      unless emulate
+        case oe.nulls
+        when :first
+          sql << " NULLS FIRST"
+        when :last
+          sql << " NULLS LAST"
+        end
       end
     end
 

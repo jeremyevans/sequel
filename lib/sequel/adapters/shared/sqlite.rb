@@ -825,6 +825,11 @@ module Sequel
         end
       end
 
+      # SQLite does not natively support NULLS FIRST/LAST.
+      def requires_emulating_nulls_first?
+        true
+      end
+
       # SQLite does not support FOR UPDATE, but silently ignore it
       # instead of raising an error for compatibility with other
       # databases.

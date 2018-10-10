@@ -1411,6 +1411,10 @@ describe "Dataset#order" do
     @dataset.order(Sequel.asc(:name, :nulls=>:last), Sequel.desc(:price, :nulls=>:first)).sql.must_equal 'SELECT * FROM test ORDER BY name ASC NULLS LAST, price DESC NULLS FIRST'
   end
   
+  it "should emulate :nulls options for asc and desc if not natively supported" do
+    @dataset.with_extend{def requires_emulating_nulls_first?; true end}.order(Sequel.asc(:name, :nulls=>:last), Sequel.desc(:price, :nulls=>:first)).sql.must_equal 'SELECT * FROM test ORDER BY (CASE WHEN (name IS NULL) THEN 2 ELSE 1 END), name ASC, (CASE WHEN (price IS NULL) THEN 0 ELSE 1 END), price DESC'
+  end
+  
   it "should override a previous ordering" do
     @dataset.order(:name).order(:stamp).sql.must_equal 'SELECT * FROM test ORDER BY stamp'
   end

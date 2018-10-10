@@ -397,6 +397,11 @@ module Sequel
         :values
       end
 
+      # SQLAnywhere does not natively support NULLS FIRST/LAST.
+      def requires_emulating_nulls_first?
+        true
+      end
+
       def select_into_sql(sql)
         if i = @opts[:into]
           sql << " INTO "

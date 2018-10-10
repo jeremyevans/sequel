@@ -220,6 +220,11 @@ module Sequel
       true
     end
 
+    # Whether ORDER BY col NULLS FIRST/LAST must be emulated.
+    def requires_emulating_nulls_first?
+      false
+    end
+
     # Whether common table expressions are supported in UNION/INTERSECT/EXCEPT clauses.
     def supports_cte_in_compounds?
       supports_cte_in_subqueries?

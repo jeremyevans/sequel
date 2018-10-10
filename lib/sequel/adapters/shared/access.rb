@@ -234,6 +234,11 @@ module Sequel
         end
       end
 
+      # Access does not natively support NULLS FIRST/LAST.
+      def requires_emulating_nulls_first?
+        true
+      end
+
       # Access doesn't support ESCAPE for LIKE.
       def requires_like_escape?
         false

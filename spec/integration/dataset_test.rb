@@ -39,6 +39,15 @@ describe "Simple Dataset operations" do
     @ds.order(:id).all.must_equal [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
   end
 
+  it "should support ordering considering NULLS" do
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>nil)
+    @ds.order(Sequel[:number].asc(:nulls=>:first)).select_map(:number).must_equal [nil, 10, 20]
+    @ds.order(Sequel[:number].asc(:nulls=>:last)).select_map(:number).must_equal [10, 20, nil]
+    @ds.order(Sequel[:number].desc(:nulls=>:first)).select_map(:number).must_equal [nil, 20, 10]
+    @ds.order(Sequel[:number].desc(:nulls=>:last)).select_map(:number).must_equal [20, 10, nil]
+  end
+
   it "should have insert return primary key value" do
     @ds.insert(:number=>20).must_equal 2
     @ds.filter(:id=>2).first[:number].must_equal 20

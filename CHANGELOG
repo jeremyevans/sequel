@@ -1,5 +1,7 @@
 === master
 
+* Emulate NULLS FIRST/LAST ordering on databases that do not natively support it (jeremyevans)
+
 * Do not modify boolean expressions created from string or array if string or array is modified (jeremyevans)
 
 * Make roots and roots_dataset dataset methods instead of class methods in the tree plugin (JelF) (#1554)

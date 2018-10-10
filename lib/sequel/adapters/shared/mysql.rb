@@ -1008,6 +1008,11 @@ module Sequel
         super || key == :insert_ignore || key == :update_ignore || key == :on_duplicate_key_update
       end
 
+      # MySQL does not natively support NULLS FIRST/LAST.
+      def requires_emulating_nulls_first?
+        true
+      end
+
       def select_only_offset_sql(sql)
         sql << " LIMIT "
         literal_append(sql, @opts[:offset])

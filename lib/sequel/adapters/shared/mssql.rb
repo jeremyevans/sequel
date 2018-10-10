@@ -1046,6 +1046,11 @@ module Sequel
         end
       end
 
+      # MSSQL does not natively support NULLS FIRST/LAST.
+      def requires_emulating_nulls_first?
+        true
+      end
+
       # MSSQL supports 100-nsec precision for time columns, but ruby by
       # default only supports usec precision.
       def sqltime_precision
