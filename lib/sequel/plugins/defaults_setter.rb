@@ -116,7 +116,7 @@ module Sequel
         # Use default value for a new record if values doesn't already contain an entry for it.
         def [](k)
           if new? && !values.has_key?(k)
-            v = model.default_values[k]
+            v = model.default_values.fetch(k){return}
             v = v.call if v.respond_to?(:call)
             values[k] = v if model.cache_default_values?
             v

@@ -1,5 +1,7 @@
 === master
 
+* Do not cache values for columns without parseable defaults when using :cache option in defaults_setter plugin (jeremyevans)
+
 * Emulate NULLS FIRST/LAST ordering on databases that do not natively support it (jeremyevans)
 
 * Do not modify boolean expressions created from string or array if string or array is modified (jeremyevans)

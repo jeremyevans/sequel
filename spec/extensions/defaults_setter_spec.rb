@@ -78,6 +78,15 @@ describe "Sequel::Plugins::DefaultsSetter" do
     o.a.must_be_same_as(o.a)
   end
 
+  it "should not cache default values if :cache plugin option is used and there is no default values" do
+    @c.plugin :defaults_setter, :cache => true
+    o = @c.new
+    o.a.must_be_nil
+    o.values.must_be_empty
+    o.a.must_be_nil
+    o.a.must_be_same_as(o.a)
+  end
+
   it "should not override a given value" do
     @pr.call(2)
     @c.new('a'=>3).a.must_equal 3
