@@ -1,5 +1,7 @@
 === master
 
+* Drop defaulting the :port option to 5432 in the postgres adapter, so that setting the :service option in :driver_options works (jeremyevans) (#1558)
+
 * Do not cache values for columns without parseable defaults when using :cache option in defaults_setter plugin (jeremyevans)
 
 * Emulate NULLS FIRST/LAST ordering on databases that do not natively support it (jeremyevans)

@@ -194,7 +194,7 @@ module Sequel
         if USES_PG
           connection_params = {
             :host => opts[:host],
-            :port => opts[:port] || 5432,
+            :port => opts[:port],
             :dbname => opts[:database],
             :user => opts[:user],
             :password => opts[:password],
