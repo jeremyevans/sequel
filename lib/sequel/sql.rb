@@ -265,12 +265,12 @@ module Sequel
     # methods overlap with the standard +BooleanMethods methods+, and they only
     # make sense for integers, they are only included in +NumericExpression+.
     #
-    #   :a.sql_number & :b # "a" & "b"
-    #   :a.sql_number | :b # "a" | "b"
-    #   :a.sql_number ^ :b # "a" ^ "b"
-    #   :a.sql_number << :b # "a" << "b"
-    #   :a.sql_number >> :b # "a" >> "b"
-    #   ~:a.sql_number # ~"a"
+    #   Sequel[:a].sql_number & :b # "a" & "b"
+    #   Sequel[:a].sql_number | :b # "a" | "b"
+    #   Sequel[:a].sql_number ^ :b # "a" ^ "b"
+    #   Sequel[:a].sql_number << :b # "a" << "b"
+    #   Sequel[:a].sql_number >> :b # "a" >> "b"
+    #   ~Sequel[:a].sql_number # ~"a"
     module BitwiseMethods
       ComplexExpression::BITWISE_OPERATORS.each do |o|
         module_eval("def #{o}(o) NumericExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
@@ -751,10 +751,10 @@ module Sequel
     # This module includes the inequality methods (>, <, >=, <=) that are defined on objects that can be 
     # used in a numeric or string context in SQL.
     #
-    #   Sequel.lit('a') > :b # a > "b"
-    #   Sequel.lit('a') < :b # a > "b"
-    #   Sequel.lit('a') >= :b # a >= "b"
-    #   Sequel.lit('a') <= :b # a <= "b"
+    #   Sequel[:a] > :b # a > "b"
+    #   Sequel[:a] < :b # a > "b"
+    #   Sequel[:a] >= :b # a >= "b"
+    #   Sequel[:a] <= :b # a <= "b"
     module InequalityMethods
       ComplexExpression::INEQUALITY_OPERATORS.each do |o|
         module_eval("def #{o}(o) BooleanExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
@@ -765,10 +765,10 @@ module Sequel
     # that are defined on objects that can be used in a numeric context in SQL
     # (+Symbol+, +LiteralString+, and +SQL::GenericExpression+).
     #
-    #   :a + :b # "a" + "b"
-    #   :a - :b # "a" - "b"
-    #   :a * :b # "a" * "b"
-    #   :a / :b # "a" / "b"
+    #   Sequel[:a] + :b # "a" + "b"
+    #   Sequel[:a] - :b # "a" - "b"
+    #   Sequel[:a] * :b # "a" * "b"
+    #   Sequel[:a] / :b # "a" / "b"
     #
     # One exception to this is if + is called with a +String+ or +StringExpression+,
     # in which case the || operator is used instead of the + operator:
