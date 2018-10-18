@@ -1088,6 +1088,9 @@ module Sequel
         when ::Array
           r = r.dup.freeze unless r.frozen?
           new(:IN, l, r)
+        when ::Hash
+          r = r.dup.freeze unless r.frozen?
+          Sequel.deep_qualify(l, from_value_pairs(r))
         when ::String
           r = r.dup.freeze unless r.frozen?
           new(:'=', l, r)

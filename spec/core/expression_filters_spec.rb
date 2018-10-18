@@ -62,6 +62,14 @@ describe "Blockless Ruby Filters" do
     @d.l(expr).must_equal '(b IN (1))'
   end
 
+  it "should not modifying boolean expression created from hash if hash is modified" do
+    a = {:c=>'d'}
+    expr = Sequel.expr(:b=>a)
+    @d.l(expr).must_equal "(b.c = 'd')"
+    a[:e] = 'f'
+    @d.l(expr).must_equal "(b.c = 'd')"
+  end
+
   it "should not modifying boolean expression created from string if string is modified" do
     a = '1'.dup
     expr = Sequel.expr(:b=>a)
@@ -77,6 +85,7 @@ describe "Blockless Ruby Filters" do
     @d.l(:x => false).must_equal '(x IS FALSE)'
     @d.l(:x => nil).must_equal '(x IS NULL)'
     @d.l(:x => [1,2,3]).must_equal '(x IN (1, 2, 3))'
+    @d.l(:x => {:y => "z"}).must_equal '(x.y = \'z\')'
   end
 
   it "should use = 't' and != 't' OR IS NULL if IS TRUE is not supported" do
@@ -163,6 +172,10 @@ describe "Blockless Ruby Filters" do
   it "should support negating IN with Dataset or Array" do
     @d.l(~Sequel.expr(:x => @d.select(:i))).must_equal '(x NOT IN (SELECT i FROM items))'
     @d.l(~Sequel.expr(:x => [1,2,3])).must_equal '(x NOT IN (1, 2, 3))'
+  end
+
+  it "should support negating qualified filter" do
+    @d.l(~Sequel.expr(:x => {:y => 'z'})).must_equal '(x.y != \'z\')'
   end
 
   it "should not add ~ method to string expressions" do
@@ -277,6 +290,7 @@ describe "Blockless Ruby Filters" do
     @d.l(:x => 100, :y => 'a')[1...-1].split(' AND ').sort.must_equal ['(x = 100)', '(y = \'a\')']
     @d.l(:x => true, :y => false)[1...-1].split(' AND ').sort.must_equal ['(x IS TRUE)', '(y IS FALSE)']
     @d.l(:x => nil, :y => [1,2,3])[1...-1].split(' AND ').sort.must_equal ['(x IS NULL)', '(y IN (1, 2, 3))']
+    @d.l(:x => 1.5, :y => {:z=>'a'})[1...-1].split(' AND ').sort.must_equal ['(x = 1.5)', '(y.z = \'a\')']
   end
   
   it "should support arrays with all two pairs the same as hashes" do
