@@ -2094,14 +2094,17 @@ describe "Sequel::Plugins::ConstraintValidations" do
         proc{@ds.insert(try.merge(:m2=>nil, :m3=>nil))}.must_raise(Sequel::DatabaseError)
         proc{@ds.insert(try.merge(:m1=>nil, :m2=>nil, :m3=>nil))}.must_raise(Sequel::DatabaseError)
       end
-      [:m1,  :m3].each do |c|
-        proc{@ds.insert(try.merge(c=>''))}.must_raise(Sequel::DatabaseError)
+
+      unless @db.database_type == :oracle
+        [:m1,  :m3].each do |c|
+          proc{@ds.insert(try.merge(c=>''))}.must_raise(Sequel::DatabaseError)
+        end
+        proc{@ds.insert(try.merge(:m1=>'', :m3=>''))}.must_raise(Sequel::DatabaseError)
+        proc{@ds.insert(try.merge(:m1=>'', :m2=>nil))}.must_raise(Sequel::DatabaseError)
+        proc{@ds.insert(try.merge(:m1=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
+        proc{@ds.insert(try.merge(:m2=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
+        proc{@ds.insert(try.merge(:m1=>'', :m2=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
       end
-      proc{@ds.insert(try.merge(:m1=>'', :m3=>''))}.must_raise(Sequel::DatabaseError)
-      proc{@ds.insert(try.merge(:m1=>'', :m2=>nil))}.must_raise(Sequel::DatabaseError)
-      proc{@ds.insert(try.merge(:m1=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
-      proc{@ds.insert(try.merge(:m2=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
-      proc{@ds.insert(try.merge(:m1=>'', :m2=>nil, :m3=>''))}.must_raise(Sequel::DatabaseError)
 
       # Test for dropping of constraint
       @db.alter_table(:cv_test){validate{drop :maxl2}}
