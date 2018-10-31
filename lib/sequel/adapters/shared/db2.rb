@@ -418,6 +418,11 @@ module Sequel
         false
       end
 
+      # At least some versions of DB do not support NULLS FIRST/LAST.
+      def requires_emulating_nulls_first?
+        true
+      end
+
       # Modify the sql to limit the number of rows returned.
       # Uses :offset_strategy Database option to determine how to format the
       # limit and offset.
