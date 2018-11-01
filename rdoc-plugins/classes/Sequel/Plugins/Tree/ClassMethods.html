@@ -43,8 +43,6 @@ Sequel::Plugins::Tree::ClassMethods
 <li><a href="#method-i-freeze">freeze</a></li>
 <li><a href="#attribute-i-parent_association_name">parent_association_name</a></li>
 <li><a href="#attribute-i-parent_column">parent_column</a></li>
-<li><a href="#method-i-roots">roots</a></li>
-<li><a href="#method-i-roots_dataset">roots_dataset</a></li>
 <li><a href="#attribute-i-tree_order">tree_order</a></li>
 </ol>
 </div>
@@ -113,49 +111,7 @@ the leaf.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-roots'>
-<a name='method-i-roots'></a>
-<div class='synopsis'>
-<span class='name'>roots</span>
-<span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Returns list of all root nodes (those with no parent nodes).</p>
-
-<pre class="ruby"><span class="ruby-constant">TreeClass</span>.<span class="ruby-identifier">roots</span> <span class="ruby-comment"># =&gt; [root1, root2]</span></pre>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-roots-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-roots-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots</span>&#x000A;  <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-roots_dataset'>
-<a name='method-i-roots_dataset'></a>
-<div class='synopsis'>
-<span class='name'>roots_dataset</span>
-<span class='arguments'>()</span>
-
-</div>
-<div class='description'>
-
-<p>Returns the dataset for retrieval of all root nodes</p>
-
-<pre class="ruby"><span class="ruby-constant">TreeClass</span>.<span class="ruby-identifier">roots_dataset</span> <span class="ruby-comment"># =&gt; Sequel::Dataset instance</span></pre>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-roots_dataset-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -30,12 +30,42 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-10-01 07:21:49 -0700</span>
+<span class='datetime'>2018-11-01 07:32:49 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.14.0+-282018-11-01-29">5.14.0 (2018-11-01)<span><a href="#label-5.14.0+-282018-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Drop defaulting the :port option to 5432 in the postgres adapter, so that
+setting the :service option in :driver_options works (jeremyevans) (#1558)</p>
+</li><li>
+<p>Do not cache values for columns without parseable defaults when using
+:cache option in defaults_setter plugin (jeremyevans)</p>
+</li><li>
+<p>Emulate NULLS FIRST/LAST ordering on databases that do not natively support
+it (jeremyevans)</p>
+</li><li>
+<p>Do not modify boolean expressions created from string or array if string or
+array is modified (jeremyevans)</p>
+</li><li>
+<p>Make roots and roots_dataset dataset methods instead of class methods in
+the tree plugin (JelF) (#1554)</p>
+</li><li>
+<p>Do not cache dataset SQL if dataset uses subquery that cannot cache SQL
+(jeremyevans)</p>
+</li><li>
+<p>Make Model#=== work correctly for models with composite primary keys
+(jeremyevans)</p>
+</li><li>
+<p>Add Model#pk_equal? as a more descriptive name for Model#=== (AlexWayfer)
+(#1550)</p>
+</li><li>
+<p>Do not push down expression inversion in cases where it may result in
+incorrect behavior (e.g. ANY/SOME/ALL operators) (jeremyevans) (#1549)</p>
+</li></ul>
+
 <h3 id="label-5.13.0+-282018-10-01-29">5.13.0 (2018-10-01)<span><a href="#label-5.13.0+-282018-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support :single_value type in prepared statements (rintaun) (#1547)</p>

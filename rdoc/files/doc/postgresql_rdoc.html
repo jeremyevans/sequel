@@ -30,7 +30,7 @@ doc/postgresql.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-08-06 10:27:09 -0700</span>
+<span class='datetime'>2018-10-05 13:20:51 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -125,6 +125,15 @@ so you should load them via <code>Sequel.extension</code>, after loading
 support for the specific types into the Database instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array_ops</span></pre>
+
+<p>With regard to common database types, please note that the generic String
+type is <code>text</code> on PostgreSQL and not <code>varchar(255)</code>
+as it is on some other databases.  <code>text</code> is PostgreSQL&#39;s
+recommended type for storage of text data, and is more similar to
+Ruby&#39;s String type as it allows for unlimited length. If you want to
+set a maximum size for a text column, you must specify a <code>:size</code>
+option.  This will use a <code>varchar($size)</code> type and impose a
+maximum size for the column.</p>
 
 <h2 id="label-PostgreSQL-specific+DDL+Support">PostgreSQL-specific DDL Support<span><a href="#label-PostgreSQL-specific+DDL+Support">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -275,6 +284,11 @@ values to update.  You must pass either the <code>:target</code> or
 option:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>, <span class="ruby-value">update:</span> {<span class="ruby-value">b:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO UPDATE SET b = excluded.b</span></pre>
+
+<p>If you want to update existing rows but using the current value of the
+column, you can build the desired calculation using <code>Sequel[]</code></p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;  .<span class="ruby-identifier">insert_conflict</span>(&#x000A;    <span class="ruby-value">target:</span> <span class="ruby-value">:a</span>,&#x000A;    <span class="ruby-value">update:</span> {<span class="ruby-value">b:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>] <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:a</span>]}&#x000A;  )&#x000A;  .<span class="ruby-identifier">import</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>], [ [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] ])&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO UPDATE SET b = (excluded.b + table.a)</span></pre>
 
 <p>Additionally, if you only want to do the update in certain cases, you can
 specify an <code>:update_where</code> option, which will be used as a
