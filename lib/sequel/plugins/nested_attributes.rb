@@ -176,6 +176,7 @@ module Sequel
           delay_validate_associated_object(reflection, obj)
           if reflection.returns_array?
             public_send(reflection[:name]) << obj
+            obj.skip_validation_on_next_save!
             after_save_hook{public_send(reflection[:add_method], obj)}
           else
             associations[reflection[:name]] = obj
