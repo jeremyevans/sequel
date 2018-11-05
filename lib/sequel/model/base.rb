@@ -1456,7 +1456,7 @@ module Sequel
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
-        unless checked_save_failure(opts){_valid?(opts)}
+        unless _save_valid?(opts)
           raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
           return
         end
@@ -1551,6 +1551,15 @@ module Sequel
         super
       end
   
+      # Skip all validation of the object on the next call to #save,
+      # including the running of validation hooks. This is designed for
+      # and should only be used in cases where #valid? is called before
+      # saving and the <tt>validate: false</tt> option cannot be passed to
+      # #save.
+      def skip_validation_on_next_save!
+        @skip_validation_on_next_save = true
+      end
+
       # Returns (naked) dataset that should return only this instance.
       #
       #   Artist[1].this
@@ -1807,6 +1816,19 @@ module Sequel
         cc = changed_columns
         Array(primary_key).each{|x| v.delete(x) unless cc.include?(x)}
         v
+      end
+
+      # Validate the object if validating on save. Skips validation
+      # completely (including validation hooks) if
+      # skip_validation_on_save! has been called on the object,
+      # resetting the flag so that future saves will validate.
+      def _save_valid?(opts)
+        if @skip_validation_on_next_save
+          @skip_validation_on_next_save = false
+          return true
+        end
+
+        checked_save_failure(opts){_valid?(opts)}
       end
 
       # Call _update with the given columns, if any are present.

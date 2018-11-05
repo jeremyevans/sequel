@@ -1,3 +1,7 @@
+=== master
+
+* Add Model#skip_validation_on_next_save! for skipping validation on next save call (jeremyevans)
+
 === 5.14.0 (2018-11-01)
 
 * Drop defaulting the :port option to 5432 in the postgres adapter, so that setting the :service option in :driver_options works (jeremyevans) (#1558)

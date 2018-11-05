@@ -170,6 +170,33 @@ describe "Model#save" do
     DB.sqls.must_equal ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
 
+  it "should skip validations if the skip_validation_on_save! method is used" do
+    @m.raise_on_save_failure = false
+    @m.wont_be :valid?
+    @m.skip_validation_on_next_save!
+    @m.save
+    DB.sqls.must_equal ['UPDATE people SET x = 6 WHERE (id = 4)']
+  end
+
+  it "should not skip future validations if the skip_validation_on_save! method is used" do
+    @m.wont_be :valid?
+    @m.skip_validation_on_next_save!
+    @m.save
+    DB.sqls.must_equal ['UPDATE people SET x = 6 WHERE (id = 4)']
+    proc{@m.save}.must_raise Sequel::ValidationFailed
+
+    @m.skip_validation_on_next_save!
+    @m.save
+    DB.sqls.must_equal ['UPDATE people SET x = 6 WHERE (id = 4)']
+  end
+
+  it "should skip validations if the skip_validation_on_save! method is used and :validate=>true option is used" do
+    @m.wont_be :valid?
+    @m.skip_validation_on_next_save!
+    @m.save(:validate=>true)
+    DB.sqls.must_equal ['UPDATE people SET x = 6 WHERE (id = 4)']
+  end
+
   it "should raise error if validations fail and raise_on_save_failure is true" do
     begin
       @m.save
