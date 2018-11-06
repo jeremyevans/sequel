@@ -189,6 +189,68 @@ describe Sequel::Model, "associate" do
     o.associations.must_equal(:c=>1)
   end
 
+  it "should not autoreload associations when the current foreign key value is nil" do
+    c = Class.new(Sequel::Model(Sequel::Model.db[:c]))
+    c.many_to_one :c
+    o = c.new
+    o.associations[:c] = 1
+    o[:c_id] = 2
+    o.associations[:c].must_equal 1
+
+    o = c.load({})
+    o.associations[:c] = 1
+    o[:c_id] = 2
+    o.associations[:c].must_equal 1
+  end
+
+  it "should autoreload associations when the current foreign key is nil and the current associated value is nil" do
+    c = Class.new(Sequel::Model(Sequel::Model.db[:c]))
+    c.many_to_one :c
+    o = c.new
+    o.associations[:c] = nil
+    o[:c_id] = 2
+    o.associations.must_be_empty
+
+    o = c.load({})
+    o.associations[:c] = nil
+    o[:c_id] = 2
+    o.associations.must_be_empty
+  end
+
+  it "should handle autoreloading for multiple associations when the current foreign key is nil" do
+    c = Class.new(Sequel::Model(Sequel::Model.db[:c]))
+    c.many_to_one :c
+    c.many_to_one :d, :key=>:c_id
+    o = c.new
+    o.associations[:c] = nil
+    o.associations[:d] = 1
+    o[:c_id] = nil
+    o.associations.must_equal(:c=>nil, :d=>1)
+
+    o[:c_id] = 2
+    o.associations.must_equal(:d=>1)
+
+    o[:c_id] = 2
+    o.associations.must_equal(:d=>1)
+
+    o[:c_id] = nil
+    o.associations.must_be_empty
+
+    o = c.load({:c_id=>nil})
+    o.associations[:c] = nil
+    o.associations[:d] = 1
+    o[:c_id] = nil
+    o.associations.must_equal(:c=>nil, :d=>1)
+
+    o[:c_id] = 2
+    o.associations.must_equal(:d=>1)
+
+    o[:c_id] = 2
+    o.associations.must_equal(:d=>1)
+
+    o[:c_id] = nil
+    o.associations.must_be_empty
+  end
 end
 
 describe Sequel::Model, "many_to_one" do

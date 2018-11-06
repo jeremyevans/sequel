@@ -2406,15 +2406,32 @@ module Sequel
         # cached associations.
         def change_column_value(column, value)
           if assocs = model.autoreloading_associations[column]
+            vals = @values
             if new?
               # Do deeper checking for new objects, so that associations are
               # not deleted when values do not change.  This code is run at
               # a higher level for existing objects.
-              vals = @values
-              return super unless !vals.include?(column) || value != (c = vals[column]) || value.class != c.class
+              if value == (c = vals[column]) && value.class == c.class
+                # If the value is the same, there is no reason to delete
+                # the related associations, so exit early in that case.
+                return super
+              end
+
+              only_delete_nil = c.nil?
+            elsif vals[column].nil?
+              only_delete_nil = true
             end
 
-            assocs.each{|a| associations.delete(a)}
+            if only_delete_nil
+              # If the current foreign key value is nil, but the association
+              # is already present in the cache, it was probably added to the
+              # cache for a reason, and we do not want to delete it in that case.
+              # However, we still want to delete associations with nil values
+              # to remove the cached false negative.
+              assocs.each{|a| associations.delete(a) if associations[a].nil?}
+            else
+              assocs.each{|a| associations.delete(a)}
+            end
           end
           super
         end
