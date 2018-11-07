@@ -1,5 +1,7 @@
 === master
 
+* Support rename_column without emulation on SQLite 3.25+ (jeremyevans)
+
 * Do not remove currently cached many_to_one associated objects when changing the related foreign key value from nil to non-nil (jeremyevans)
 
 * Do not validate new *_to_many associated objects twice when saving in the nested_attributes plugin (jeremyevans)
