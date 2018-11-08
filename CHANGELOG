@@ -1,5 +1,7 @@
 === master
 
+* Automatically support datasets using qualified tables in the class_table_inheritance plugin without having to use the :alias option (benalavi) (#1565)
+
 * Support rename_column without emulation on SQLite 3.25+ (jeremyevans)
 
 * Do not remove currently cached many_to_one associated objects when changing the related foreign key value from nil to non-nil (jeremyevans)
