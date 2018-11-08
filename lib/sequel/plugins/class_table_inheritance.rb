@@ -207,7 +207,12 @@ module Sequel
           @cti_instance_dataset = @instance_dataset
           @cti_table_columns = columns
           @cti_table_map = opts[:table_map] || {}
-          @cti_alias = opts[:alias] || @dataset.first_source
+          @cti_alias = opts[:alias] || case source = @dataset.first_source
+          when SQL::QualifiedIdentifier
+            @dataset.unqualified_column_for(source)
+          else
+            source
+          end
           @cti_ignore_subclass_columns = opts[:ignore_subclass_columns] || []
         end
       end
