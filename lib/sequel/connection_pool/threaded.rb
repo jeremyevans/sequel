@@ -172,6 +172,8 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Assign a connection to the thread, or return nil if one cannot be assigned.
   # The caller should NOT have the mutex before calling this.
   def assign_connection(thread)
+    # Thread safe as instance variable is only assigned to local variable
+    # and not operated on outside mutex.
     allocated = @allocated
     do_make_new = false
     to_disconnect = nil
@@ -184,7 +186,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
       if (n = _size) >= (max = @max_size)
         allocated.keys.each do |t|
           unless t.alive?
-            (to_disconnect ||= []) << @allocated.delete(t)
+            (to_disconnect ||= []) << allocated.delete(t)
           end
         end
         n = nil

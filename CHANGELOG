@@ -1,5 +1,7 @@
 === master
 
+* Access already allocated connections in a thread safe manner when checking out connections in the sharded threaded connection pool (jeremyevans)
+
 * Automatically support datasets using qualified tables in the class_table_inheritance plugin without having to use the :alias option (benalavi) (#1565)
 
 * Support rename_column without emulation on SQLite 3.25+ (jeremyevans)

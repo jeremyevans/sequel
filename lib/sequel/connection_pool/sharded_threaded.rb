@@ -223,10 +223,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # Assign a connection to the thread, or return nil if one cannot be assigned.
   # The caller should NOT have the mutex before calling this.
   def assign_connection(thread, server)
-    alloc = allocated(server)
+    alloc = nil
 
     do_make_new = false
     sync do
+      alloc = allocated(server)
       if conn = next_available(server)
         alloc[thread] = conn
         return conn
