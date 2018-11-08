@@ -11,10 +11,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   attr_reader :max_size
   
   # An array of connections that are available for use by the pool.
+  # The calling code should already have the mutex before calling this.
   attr_reader :available_connections
   
-  # A hash with thread keys and connection values for currently allocated
-  # connections.
+  # A hash with thread keys and connection values for currently allocated connections.
+  # The calling code should already have the mutex before calling this.
   attr_reader :allocated
 
   # The following additional options are respected:
