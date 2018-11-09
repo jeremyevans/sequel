@@ -1181,12 +1181,13 @@ module Sequel
       # default value, and optional expression.  An expression can be provided to
       # test each condition against, instead of having
       # all conditions represent their own boolean expression.
-      def initialize(conditions, default, expression=(no_expression=true; nil))
+      def initialize(conditions, default=(no_default=true; nil), expression=(no_expression=true; nil))
         raise(Sequel::Error, 'CaseExpression conditions must be a hash or array of all two pairs') unless Sequel.condition_specifier?(conditions)
         @conditions = conditions.to_a.dup.freeze
         @default = default
         @expression = expression
         @no_expression = no_expression
+        @no_default = no_default
         freeze
       end
 
@@ -1195,12 +1196,17 @@ module Sequel
         !@no_expression
       end
 
+      # Whether to use the ELSE clause for this CASE expression.
+      def default?
+        !@no_default
+      end
+
       # Merge the CASE expression into the conditions, useful for databases that
       # don't support CASE expressions.
       def with_merged_expression
         if expression?
           e = expression
-          CaseExpression.new(conditions.map{|c, r| [::Sequel::SQL::BooleanExpression.new(:'=', e, c), r]}, default)
+          CaseExpression.new(conditions.map{|c, r| [::Sequel::SQL::BooleanExpression.new(:'=', e, c), r]}, *default)
         else
           self
         end

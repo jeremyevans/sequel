@@ -891,10 +891,13 @@ describe "Sequel core extension replacements" do
   end
 
   it "Sequel.case should use a CASE expression" do
+    l(Sequel.case({:a=>1}), "(CASE WHEN a THEN 1 END)")
     l(Sequel.case({:a=>1}, 2), "(CASE WHEN a THEN 1 ELSE 2 END)")
     l(Sequel.case({:a=>1}, 2, :b), "(CASE b WHEN a THEN 1 ELSE 2 END)")
+    l(Sequel.case([[:a, 1]]), "(CASE WHEN a THEN 1 END)")
     l(Sequel.case([[:a, 1]], 2), "(CASE WHEN a THEN 1 ELSE 2 END)")
     l(Sequel.case([[:a, 1]], 2, :b), "(CASE b WHEN a THEN 1 ELSE 2 END)")
+    l(Sequel.case([[:a, 1], [:c, 3]]), "(CASE WHEN a THEN 1 WHEN c THEN 3 END)")
     l(Sequel.case([[:a, 1], [:c, 3]], 2), "(CASE WHEN a THEN 1 WHEN c THEN 3 ELSE 2 END)")
     l(Sequel.case([[:a, 1], [:c, 3]], 2, :b), "(CASE b WHEN a THEN 1 WHEN c THEN 3 ELSE 2 END)")
   end

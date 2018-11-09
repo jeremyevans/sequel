@@ -307,8 +307,10 @@ module Sequel
         sql << t
         literal_append(sql, r)
       end
-      sql << " ELSE "
-      literal_append(sql, ce.default)
+      if ce.default?
+        sql << " ELSE "
+        literal_append(sql, ce.default)
+      end
       sql << " END)"
     end
 
