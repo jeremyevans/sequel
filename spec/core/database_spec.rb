@@ -1072,6 +1072,22 @@ DatabaseTransactionSpecs = shared_description do
     proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{@db.execute('foo')}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
   end
+
+  it "should have rollback_on_exit cause the transaction to rollback on exit" do
+    @db.transaction{@db.rollback_on_exit}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+    catch(:foo){@db.transaction{@db.rollback_on_exit; throw :foo}}
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+    lambda{@db.transaction{@db.rollback_on_exit; return true}}.call
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+  end
+
+  it "should have rollback_on_exit with :cancel option will cause the transaction to commit on exit" do
+    @db.transaction{@db.rollback_on_exit(:cancel=>true)}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+    @db.transaction{@db.rollback_on_exit; @db.rollback_on_exit(:cancel=>true)}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+  end
 end
 
 describe "Database#transaction with savepoint support" do
@@ -1153,6 +1169,87 @@ describe "Database#transaction with savepoint support" do
   it "should not create transaction if not inside a transaction when :savepoint=>:only is used" do
     @db.transaction(:savepoint=>:only){}
     @db.sqls.must_equal []
+  end
+
+  it "should have rollback_on_exit with :savepoint option inside transaction cause the transaction to rollback on exit" do
+    @db.transaction{@db.rollback_on_exit(:savepoint=>true)}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+    catch(:foo){@db.transaction{@db.rollback_on_exit(:savepoint=>true); throw :foo}}
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+    lambda{@db.transaction{@db.rollback_on_exit(:savepoint=>true); return true}}.call
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+  end
+
+  it "should have rollback_on_exit with :savepoint option inside savepoint cause the savepoint to rollback on exit" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true)}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+    catch(:foo){@db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); throw :foo}}}
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); return true}}}.call
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  it "should have rollback_on_exit with :savepoint option inside nested savepoint cause the current savepoint to rollback on exit" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+    catch(:foo){@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); throw :foo}}}}
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); return true}}}}.call
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  it "should have rollback_on_exit with :savepoint=>1 option inside nested savepoint cause the current savepoint to rollback on exit" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>1)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+    catch(:foo){@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>1); throw :foo}}}}
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>1); return true}}}}.call
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  it "should have rollback_on_exit with :savepoint=>2 option inside nested savepoint cause the current and next savepoint to rollback on exit" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>2)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+    catch(:foo){@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>2); throw :foo}}}}
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>2); return true}}}}.call
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  it "should have rollback_on_exit with :savepoint=>3 option inside nested savepoint cause the three enclosing savepoints/transaction to rollback on exit" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>3)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+    catch(:foo){@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>3); throw :foo}}}}
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>3); return true}}}}.call
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+  end
+
+  it "should have rollback_on_exit with :savepoint and :cancel option will cause the transaction to commit on exit" do
+    @db.transaction{@db.rollback_on_exit(:savepoint=>true, :cancel=>true)}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+    @db.transaction{@db.rollback_on_exit(:savepoint=>true); @db.rollback_on_exit(:savepoint=>true, :cancel=>true)}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+  end
+
+  it "should have rollback_on_exit with :savepoint option called at different levels work correctly" do
+    @db.transaction{@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true)}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+
+    @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2','ROLLBACK TO SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true, :cancel=>true)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2','RELEASE SAVEPOINT autopoint_2', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>2, :cancel=>true)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2','RELEASE SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>3, :cancel=>true)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2','RELEASE SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>4, :cancel=>true)}}}.must_be_nil
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2','RELEASE SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
   end
 end
   

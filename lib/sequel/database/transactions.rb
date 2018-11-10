@@ -52,7 +52,48 @@ module Sequel
         end
       end
     end
-    
+
+    # When exiting the transaction block through methods other than an exception
+    # (e.g. normal exit, non-local return, or throw), set the current transaction
+    # to rollback instead of committing.  This is designed for use in cases where
+    # you want to preform a non-local return but also want to rollback instead of
+    # committing.
+    # Options:
+    # :cancel :: Cancel the current rollback_on_exit setting, so exiting will commit instead
+    #            of rolling back.
+    # :savepoint :: Rollback only the current savepoint if inside a savepoint.
+    #               Can also be an positive integer value to rollback that number of enclosing savepoints,
+    #               up to and including the transaction itself.
+    #               If the database does not support savepoints, this option is ignored and the entire
+    #               transaction is affected.
+    # :server :: The server/shard the transaction is being executed on.
+    def rollback_on_exit(opts=OPTS)
+      synchronize(opts[:server]) do |conn|
+        raise Error, "Cannot call Sequel:: Database#rollback_on_exit! unless inside a transaction" unless h = _trans(conn)
+        rollback = !opts[:cancel]
+
+        if supports_savepoints?
+          savepoints = h[:savepoints]
+
+          if level = opts[:savepoint]
+            level = 1 if level == true
+            raise Error, "invalid :savepoint option to Database#rollback_on_exit: #{level.inspect}" unless level.is_a?(Integer)
+            raise Error, "cannot pass nonpositive integer (#{level.inspect}) as :savepoint option to Database#rollback_on_exit" if level < 1
+            level.times do |i|
+              break unless savepoint = savepoints[-1 - i]
+              savepoint[:rollback_on_exit] = rollback
+            end
+          else
+            savepoints[0][:rollback_on_exit] = rollback
+          end
+        else
+          h[:rollback_on_exit] = rollback
+        end
+      end
+
+      nil
+    end
+
     # Return true if already in a transaction given the options,
     # false otherwise.  Respects the :server option for selecting
     # a shard.
@@ -164,7 +205,7 @@ module Sequel
               end
             end
 
-            if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
+            if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last[:auto_savepoint]
               opts[:savepoint] = true
             end
 
@@ -242,10 +283,10 @@ module Sequel
 
       if supports_savepoints?
         if t = _trans(conn)
-          t[:savepoints].push(opts[:auto_savepoint])
+          t[:savepoints].push({:auto_savepoint=>opts[:auto_savepoint]})
           return
         else
-          hash[:savepoints] = [opts[:auto_savepoint]]
+          hash[:savepoints] = [{:auto_savepoint=>opts[:auto_savepoint]}]
           if (prep = opts[:prepare]) && supports_prepared_transactions?
             hash[:prepare] = prep
           end
@@ -318,7 +359,7 @@ module Sequel
       if exception
         false
       else
-        if Thread.current.status == 'aborting'
+        if rollback_on_transaction_exit?(conn, opts)
           rollback_transaction(conn, opts)
           false
         else
@@ -372,7 +413,7 @@ module Sequel
       callbacks = transaction_hooks(conn, committed)
 
       if transaction_finished?(conn)
-        h = @transactions[conn]
+        h = _trans(conn)
         rolled_back = !committed
         Sequel.synchronize{h[:rolled_back] = rolled_back}
         Sequel.synchronize{@transactions.delete(conn)}
@@ -384,6 +425,17 @@ module Sequel
     # SQL to rollback to a savepoint
     def rollback_savepoint_sql(depth)
       "ROLLBACK TO SAVEPOINT autopoint_#{depth}"
+    end
+
+    # Whether to rollback the transaction when exiting the transaction.
+    def rollback_on_transaction_exit?(conn, opts)
+      return true if Thread.current.status == 'aborting'
+      h = _trans(conn)
+      if supports_savepoints?
+        h[:savepoints].last[:rollback_on_exit]
+      else
+        h[:rollback_on_exit]
+      end
     end
 
     # Rollback the active transaction on the connection

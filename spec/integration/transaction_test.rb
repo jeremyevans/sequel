@@ -82,8 +82,207 @@ describe "Database transactions" do
     end}.must_raise(Interrupt)
     @d.count.must_equal 0
   end 
+
+  it "should support rollback_on_exit" do
+    @db.transaction do
+      @d.insert(:name => 'abc', :value => 1)
+      @db.rollback_on_exit
+    end
+    @d.must_be_empty
+
+    catch(:foo) do
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.rollback_on_exit
+        throw :foo
+      end
+    end
+    @d.must_be_empty
+
+    lambda do
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.rollback_on_exit
+        return true
+      end
+    end
+    @d.must_be_empty
+
+    @db.transaction do
+      @d.insert(:name => 'abc', :value => 1)
+      @db.rollback_on_exit
+      @db.rollback_on_exit(:cancel=>true)
+    end
+    @d.count.must_equal 1
+
+    @d.delete
+    @db.transaction do
+      @d.insert(:name => 'abc', :value => 1)
+      @db.rollback_on_exit(:cancel=>true)
+    end
+    @d.count.must_equal 1
+
+    @d.delete
+    @db.transaction do
+      @d.insert(:name => 'abc', :value => 1)
+      @db.rollback_on_exit
+      @db.rollback_on_exit(:cancel=>true)
+      @db.rollback_on_exit
+    end
+    @d.must_be_empty
+  end
   
   if DB.supports_savepoints?
+    it "should support rollback_on_exit inside savepoints" do
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.rollback_on_exit
+        end
+      end
+      @d.must_be_empty
+
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.rollback_on_exit
+          @db.transaction(:savepoint=>true) do
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.must_be_empty
+
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.must_be_empty
+    end
+
+    it "should support rollback_on_exit with :savepoint option" do
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.rollback_on_exit(:savepoint=>true)
+        end
+      end
+      @d.select_order_map(:value).must_equal [1]
+
+      @d.delete
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.rollback_on_exit(:savepoint=>true)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit(:savepoint=>true)
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.select_order_map(:value).must_equal [1]
+    end
+
+    it "should support rollback_on_exit with :savepoint=>Integer" do
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.rollback_on_exit(:savepoint=>2)
+        end
+      end
+      @d.must_be_empty
+
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.rollback_on_exit(:savepoint=>3)
+        end
+      end
+      @d.must_be_empty
+
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit(:savepoint=>2)
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.select_order_map(:value).must_equal [1]
+    end
+
+    it "should support rollback_on_exit with :savepoint=>Integer and :cancel" do
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @db.rollback_on_exit(:savepoint=>true)
+          @d.insert(:name => 'def', :value => 2)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit(:savepoint=>2, :cancel=>true)
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.select_order_map(:value).must_equal [1, 2, 3]
+
+      @d.delete
+      @db.transaction do
+        @db.rollback_on_exit(:savepoint=>true)
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @db.rollback_on_exit(:savepoint=>true)
+          @d.insert(:name => 'def', :value => 2)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit(:savepoint=>3, :cancel=>true)
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.select_order_map(:value).must_equal [1, 2, 3]
+
+      @d.delete
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.rollback_on_exit(:savepoint=>true)
+        @db.transaction(:savepoint=>true) do
+          @d.insert(:name => 'def', :value => 2)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit(:savepoint=>4, :cancel=>true)
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.select_order_map(:value).must_equal [1, 2, 3]
+
+      @d.delete
+      @db.transaction do
+        @d.insert(:name => 'abc', :value => 1)
+        @db.transaction(:savepoint=>true) do
+          @db.rollback_on_exit(:savepoint=>2)
+          @d.insert(:name => 'def', :value => 2)
+          @db.transaction(:savepoint=>true) do
+            @db.rollback_on_exit(:savepoint=>2, :cancel=>true)
+            @d.insert(:name => 'ghi', :value => 3)
+          end
+        end
+      end
+      @d.must_be_empty
+    end
+
     it "should handle table_exists? failures inside transactions" do
       @db.transaction do
         @d.insert(:name => '1')

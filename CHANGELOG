@@ -1,5 +1,7 @@
 === master
 
+* Add Database#rollback_on_exit to rollback transactions instead of committing them when exiting the transaction block (jeremyevans)
+
 * Enable window functions in SQLite 3.26.0+ (jeremyevans)
 
 * Do not override existing methods when creating Sequel::Model attribute getter/setter methods (jeremyevans) (#1578)
