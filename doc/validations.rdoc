@@ -535,7 +535,7 @@ Note that the column names used in the errors are used verbatim in the error mes
   errors.full_messages
   # => ["Album name is not valid"]
 
-Alternatively, feel free to override Sequel::Model::Errors#full_messages.  As long as it returns an array of strings, overridding it is completely safe.
+Alternatively, feel free to override Sequel::Model::Errors#full_messages.  As long as it returns an array of strings, overriding it is completely safe.
 
 === +count+
 
