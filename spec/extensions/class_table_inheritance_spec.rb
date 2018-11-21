@@ -586,38 +586,99 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
         }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
       end
     end
-    ::Employee = Class.new(Sequel::Model)
-    ::Employee.db = @db
-    ::Employee.set_dataset(Sequel[:hr][:employees])
-    class ::Employee
-      def _save_refresh; @values[:id] = 1 end
-      def self.columns
-        dataset.columns || dataset.opts[:from].first.expression.columns
-      end
-      plugin :class_table_inheritance, key: :type, :table_map=>{:Manager=>Sequel[:hr][:managers], :Staff=>Sequel[:hr][:staff]}
-    end
-    class ::Manager < Employee
-      one_to_many :staff_members, :class=>:Staff
-    end
-    class ::Staff < Employee
-      many_to_one :manager
-    end
-    @ds = Employee.dataset
-    @db.sqls
   end
   after do
-    [:Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
+    [:Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s) if Object.const_defined?(s)}
   end
 
-  it "should handle many_to_one relationships correctly" do
-    Manager.dataset = Manager.dataset.with_fetch(:id=>3, :name=>'E')
-    Staff.load(:manager_id=>3).manager.must_equal Manager.load(:id=>3, :name=>'E')
-    @db.sqls.must_equal ['SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind FROM hr.employees INNER JOIN hr.managers ON (hr.managers.id = hr.employees.id)) AS employees WHERE (id = 3) LIMIT 1']
+  describe "with table_map used to qualify subclasses" do
+    before do
+      ::Employee = Class.new(Sequel::Model)
+      ::Employee.db = @db
+      ::Employee.set_dataset(Sequel[:hr][:employees])
+      class ::Employee
+        def _save_refresh; @values[:id] = 1 end
+        def self.columns
+          dataset.columns || dataset.opts[:from].first.expression.columns
+        end
+        plugin :class_table_inheritance, :table_map=>{:Manager=>Sequel[:hr][:managers],:Staff=>Sequel[:hr][:staff]}
+      end
+      class ::Manager < Employee
+        one_to_many :staff_members, :class=>:Staff
+      end
+      class ::Staff < Employee
+        many_to_one :manager
+      end
+    end
+
+    it "should handle many_to_one relationships correctly" do
+      Manager.dataset = Manager.dataset.with_fetch(:id=>3, :name=>'E')
+      Staff.load(:manager_id=>3).manager.must_equal Manager.load(:id=>3, :name=>'E')
+      @db.sqls.must_equal ['SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind FROM hr.employees INNER JOIN hr.managers ON (hr.managers.id = hr.employees.id)) AS employees WHERE (id = 3) LIMIT 1']
+    end
+
+    it "should handle one_to_many relationships correctly" do
+      Staff.dataset = Staff.dataset.with_fetch(:id=>1, :name=>'S', :manager_id=>3)
+      Manager.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :manager_id=>3)]
+      @db.sqls.must_equal ['SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind, hr.staff.manager_id FROM hr.employees INNER JOIN hr.staff ON (hr.staff.id = hr.employees.id)) AS employees WHERE (employees.manager_id = 3)']
+    end
   end
 
-  it "should handle one_to_many relationships correctly" do
-    Staff.dataset = Staff.dataset.with_fetch(:id=>1, :name=>'S', :manager_id=>3)
-    Manager.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :manager_id=>3)]
-    @db.sqls.must_equal ['SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind, hr.staff.manager_id FROM hr.employees INNER JOIN hr.staff ON (hr.staff.id = hr.employees.id)) AS employees WHERE (employees.manager_id = 3)']
+  describe "without table_map or qualify_tables set" do
+    it "should use a non-qualified subquery in subclasses" do
+      def @db.schema(table, opts={})
+        {Sequel[:hr][:employees]=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
+         :managers=>[[:id, {:type=>:integer}]],
+        }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
+      end
+      @db.extend_datasets do
+        def columns
+          {[Sequel[:hr][:employees]]=>[:id, :name, :kind],
+           [:managers]=>[:id],
+           [Sequel[:hr][:employees], :managers]=>[:id, :name, :kind]
+          }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
+        end
+      end
+      ::Employee = Class.new(Sequel::Model)
+      ::Employee.db = @db
+      ::Employee.set_dataset(Sequel[:hr][:employees])
+      class ::Employee
+        def _save_refresh; @values[:id] = 1 end
+        def self.columns
+          dataset.columns || dataset.opts[:from].first.expression.columns
+        end
+        plugin :class_table_inheritance
+      end
+      class ::Manager < ::Employee
+      end
+
+      Employee.dataset.sql.must_equal 'SELECT * FROM hr.employees'
+      Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind FROM hr.employees INNER JOIN managers ON (managers.id = hr.employees.id)) AS employees'
+    end
+  end
+
+  describe "with qualify_tables option set" do
+    it "should use a subquery with the same qualifier in subclasses" do
+      ::Employee = Class.new(Sequel::Model)
+      ::Employee.db = @db
+      ::Employee.set_dataset(Sequel[:hr][:employees])
+      class ::Employee
+        def _save_refresh; @values[:id] = 1 end
+        def self.columns
+          dataset.columns || dataset.opts[:from].first.expression.columns
+        end
+        plugin :class_table_inheritance, :table_map=>{:Staff=>Sequel[:hr][:staff]}, qualify_tables: true
+      end
+      class ::Manager < ::Employee
+        one_to_many :staff_members, :class=>:Staff
+      end
+      class ::Staff < ::Employee
+        many_to_one :manager
+      end
+
+      Employee.dataset.sql.must_equal 'SELECT * FROM hr.employees'
+      Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind FROM hr.employees INNER JOIN hr.managers ON (hr.managers.id = hr.employees.id)) AS employees'
+      Staff.dataset.sql.must_equal 'SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind, hr.staff.manager_id FROM hr.employees INNER JOIN hr.staff ON (hr.staff.id = hr.employees.id)) AS employees'
+    end
   end
 end

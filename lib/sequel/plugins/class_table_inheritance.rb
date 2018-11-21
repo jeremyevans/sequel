@@ -198,6 +198,9 @@ module Sequel
       #               Overrides implicit table names.
       # :ignore_subclass_columns :: Array with column names as symbols that are ignored
       #                             on all sub-classes.
+      # :qualify_tables :: Boolean true to qualify automatically determined
+      #                    subclass tables with the same qualifier as their
+      #                    superclass.
       def self.configure(model, opts = OPTS)
         SingleTableInheritance.configure model, opts[:key], opts
 
@@ -214,6 +217,7 @@ module Sequel
             source
           end
           @cti_ignore_subclass_columns = opts[:ignore_subclass_columns] || []
+          @cti_qualify_tables = !!opts[:qualify_tables]
         end
       end
 
@@ -244,6 +248,13 @@ module Sequel
         # primary key column is always allowed to be duplicated
         attr_reader :cti_ignore_subclass_columns
 
+        # A boolean indicating whether or not to automatically qualify tables
+        # backing subclasses with the same qualifier as their superclass, if
+        # the superclass is qualified. Specified with the :qualify_tables
+        # option to the plugin and only applied to automatically determined
+        # table names (not to the :table_map option).
+        attr_reader :cti_qualify_tables
+
         # Freeze CTI information when freezing model class.
         def freeze
           @cti_models.freeze
@@ -255,7 +266,7 @@ module Sequel
           super
         end
 
-        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil, :@cti_alias=>nil, :@cti_ignore_subclass_columns=>nil)
+        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil, :@cti_alias=>nil, :@cti_ignore_subclass_columns=>nil, :@cti_qualify_tables=>nil)
 
         def inherited(subclass)
           ds = sti_dataset
@@ -272,7 +283,11 @@ module Sequel
             if table = cti_table_map[n.to_sym]
               columns = db.from(table).columns
             else
-              table = subclass.implicit_table_name
+              table = if table_name.is_a?(SQL::QualifiedIdentifier) && cti_qualify_tables && schema = dataset.schema_and_table(table_name).first
+                SQL::QualifiedIdentifier.new schema, subclass.implicit_table_name
+              else
+                subclass.implicit_table_name
+              end
               columns = check_non_connection_error(false){db.from(table).columns}
               table = nil if !columns || columns.empty?
             end
