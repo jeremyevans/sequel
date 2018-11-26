@@ -203,7 +203,7 @@ module Sequel
             :sslrootcert => opts[:sslrootcert]
           }.delete_if { |key, value| blank_object?(value) }
           connection_params.merge!(opts[:driver_options]) if opts[:driver_options]
-          conn = Adapter.connect(connection_params)
+          conn = Adapter.connect(opts[:conn_str] || connection_params)
 
           conn.instance_variable_set(:@prepared_statements, {})
 
