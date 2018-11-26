@@ -1,5 +1,9 @@
 === master
 
+* Add :conn_str option in the postgres adapter for PostgreSQL connection strings, if the pg driver is used (graywolf) (#1572)
+
+* Add :qualify_tables option to class_table_inheritance plugin to automatically qualify subclass tables with superclass qualifier (benalavi) (#1571)
+
 * Access already allocated connections in a thread safe manner when checking out connections in the sharded threaded connection pool (jeremyevans)
 
 * Automatically support datasets using qualified tables in the class_table_inheritance plugin without having to use the :alias option (benalavi) (#1565)
