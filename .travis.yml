@@ -12,12 +12,10 @@ rvm:
   - jruby-9.1.17.0
   - jruby-9.2.0.0
   - jruby-head
-  - truffleruby
   - ruby-head
 matrix:
   allow_failures:
     - rvm: jruby-head
-    - rvm: truffleruby
     - rvm: ruby-head
     - rvm: jruby-19mode
     - rvm: jruby-9.0.5.0
