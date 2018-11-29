@@ -1,5 +1,7 @@
 === master
 
+* Enable window functions in SQLite 3.26.0+ (jeremyevans)
+
 * Do not override existing methods when creating Sequel::Model attribute getter/setter methods (jeremyevans) (#1578)
 
 * Use parentheses for expressions being subscripted (e.g. (array_agg(column))[1]) (jeremyevans)

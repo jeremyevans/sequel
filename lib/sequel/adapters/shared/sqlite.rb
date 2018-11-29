@@ -725,6 +725,14 @@ module Sequel
         false
       end
       
+      # SQLite 3.25+ supports window functions.  However, support is only enabled
+      # on SQLite 3.26.0+ because internal Sequel usage of window functions
+      # to implement eager loading of limited associations triggers
+      # an SQLite crash bug in versions 3.25.0-3.25.3.
+      def supports_window_functions?
+        db.sqlite_version >= 32600
+      end
+    
       private
       
       # SQLite uses string literals instead of identifiers in AS clauses.
