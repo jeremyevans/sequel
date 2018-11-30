@@ -1,4 +1,4 @@
-=== master
+=== 5.15.0 (2018-12-01)
 
 * Add :conn_str option in the postgres adapter for PostgreSQL connection strings, if the pg driver is used (graywolf) (#1572)
 
