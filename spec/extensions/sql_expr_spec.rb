@@ -15,7 +15,7 @@ describe "Sequel sql_expr extension" do
     @ds.literal(s+1).must_equal "(foo + 1)"
     @ds.literal(s & true).must_equal "(foo AND 't')"
     @ds.literal(s < 1).must_equal "(foo < 1)"
-    @ds.literal(s.sql_subscript(1)).must_equal "foo[1]"
+    @ds.literal(s.sql_subscript(1)).must_equal "(foo)[1]"
     @ds.literal(s.like('a')).must_equal "(foo LIKE 'a' ESCAPE '\\')"
     @ds.literal(s.as(:a)).must_equal "foo AS a"
     @ds.literal(s.cast(Integer)).must_equal "CAST(foo AS integer)"

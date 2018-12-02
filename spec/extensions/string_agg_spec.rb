@@ -85,6 +85,6 @@ describe "string_agg extension" do
     ds.literal(@sa1.cast(:b)).must_equal "CAST(string_agg(c, ',') AS b)"
     ds.literal(@sa1.desc).must_equal "string_agg(c, ',') DESC"
     ds.literal(@sa1 =~ /a/).must_equal "(string_agg(c, ',') ~ 'a')"
-    ds.literal(@sa1.sql_subscript(1)).must_equal "string_agg(c, ',')[1]"
+    ds.literal(@sa1.sql_subscript(1)).must_equal "(string_agg(c, ','))[1]"
   end
 end

@@ -18,11 +18,11 @@ describe "Sequel::Postgres::PGRowOp" do
   end
 
   it "#[] should support array access if not given an identifier" do
-    @db.literal(@a[:b][1]).must_equal "(a).b[1]"
+    @db.literal(@a[:b][1]).must_equal "((a).b)[1]"
   end
 
   it "#[] should be chainable with array access" do
-    @db.literal(@a[1][:b]).must_equal "(a[1]).b"
+    @db.literal(@a[1][:b]).must_equal "((a)[1]).b"
   end
 
   it "#splat should return a splatted argument inside parentheses" do

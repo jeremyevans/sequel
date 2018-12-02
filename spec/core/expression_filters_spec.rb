@@ -1271,7 +1271,7 @@ describe "Sequel::SQL::Wrapper" do
     @ds.literal(s**1).must_equal "power(foo, 1)"
     @ds.literal(s & true).must_equal "(foo AND 't')"
     @ds.literal(s < 1).must_equal "(foo < 1)"
-    @ds.literal(s.sql_subscript(1)).must_equal "foo[1]"
+    @ds.literal(s.sql_subscript(1)).must_equal "(foo)[1]"
     @ds.literal(s.like('a')).must_equal "(foo LIKE 'a' ESCAPE '\\')"
     @ds.literal(s.as(:a)).must_equal "foo AS a"
     @ds.literal(s.cast(Integer)).must_equal "CAST(foo AS integer)"
@@ -1301,6 +1301,18 @@ describe Sequel::SQL::Subscript do
   it "should have [] return a new nested subscript" do
     s = @s[2]
     @ds.literal(s).must_equal 'a[1][2]'
+  end
+
+  it "should not wrap identifiers in parentheses" do
+    @ds.literal(Sequel::SQL::Subscript.new(:a, [1])).must_equal 'a[1]'
+    @ds.literal(Sequel::SQL::Subscript.new(Sequel[:a], [1])).must_equal 'a[1]'
+    @ds.literal(Sequel::SQL::Subscript.new(Sequel[:a][:b], [1])).must_equal 'a.b[1]'
+  end
+
+  it "should wrap other expression types in parentheses" do
+    @ds.literal(Sequel::SQL::Subscript.new(Sequel.function('a'), [1])).must_equal '(a())[1]'
+    @ds.literal(Sequel::SQL::Subscript.new(Sequel.lit('a'), [1])).must_equal '(a)[1]'
+    @ds.literal(Sequel::SQL::Subscript.new(Sequel.lit('a(?)', 2), [1])).must_equal '(a(2))[1]'
   end
 end
 

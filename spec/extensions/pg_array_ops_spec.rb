@@ -17,12 +17,12 @@ describe "Sequel::Postgres::ArrayOp" do
   end
 
   it "#[] should support subscript access" do
-    @db.literal(@a[1]).must_equal "a[1]"
-    @db.literal(@a[1][2]).must_equal "a[1][2]"
+    @db.literal(@a[1]).must_equal "(a)[1]"
+    @db.literal(@a[1][2]).must_equal "(a)[1][2]"
   end
 
   it "#[] with a range should return an ArrayOp" do
-    @db.literal(@a[1..2].any).must_equal "ANY(a[1:2])"
+    @db.literal(@a[1..2].any).must_equal "ANY((a)[1:2])"
   end
 
   it "#any should use the ANY method" do
@@ -52,12 +52,12 @@ describe "Sequel::Postgres::ArrayOp" do
 
   it "#remove should remove the element from the array" do
     @db.literal(@a.remove(1)).must_equal "array_remove(a, 1)"
-    @db.literal(@a.remove(1)[2]).must_equal "array_remove(a, 1)[2]"
+    @db.literal(@a.remove(1)[2]).must_equal "(array_remove(a, 1))[2]"
   end
 
   it "#remove should replace the element in the array with another" do
     @db.literal(@a.replace(1, 2)).must_equal "array_replace(a, 1, 2)"
-    @db.literal(@a.replace(1, 2)[3]).must_equal "array_replace(a, 1, 2)[3]"
+    @db.literal(@a.replace(1, 2)[3]).must_equal "(array_replace(a, 1, 2))[3]"
   end
 
   it "#unshift should use the || operator in prepend mode" do

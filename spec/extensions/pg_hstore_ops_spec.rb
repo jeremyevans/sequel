@@ -43,7 +43,7 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#[] should return a PGArrayOp if given an array" do
-    @ds.literal(@h[%w'a'][0]).must_equal "(h -> ARRAY['a'])[0]"
+    @ds.literal(@h[%w'a'][0]).must_equal "((h -> ARRAY['a']))[0]"
   end
 
   it "#[] should not return a PGArrayOp if given an array but pg_array_op is not supported" do
@@ -58,11 +58,11 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#[] should return a PGArrayOp if given a PGArray" do
-    @ds.literal(@h[Sequel.pg_array(%w'a')][0]).must_equal "(h -> ARRAY['a'])[0]"
+    @ds.literal(@h[Sequel.pg_array(%w'a')][0]).must_equal "((h -> ARRAY['a']))[0]"
   end
 
   it "#[] should return a PGArrayOp if given a PGArrayOp" do
-    @ds.literal(@h[Sequel.pg_array_op(:a)][0]).must_equal "(h -> a)[0]"
+    @ds.literal(@h[Sequel.pg_array_op(:a)][0]).must_equal "((h -> a))[0]"
   end
 
   it "#[] should return a string expression" do
@@ -157,8 +157,8 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#keys and #akeys should return PGArrayOps" do
-    @ds.literal(@h.keys[0]).must_equal "akeys(h)[0]"
-    @ds.literal(@h.akeys[0]).must_equal "akeys(h)[0]"
+    @ds.literal(@h.keys[0]).must_equal "(akeys(h))[0]"
+    @ds.literal(@h.akeys[0]).must_equal "(akeys(h))[0]"
   end
 
   it "#populate should use the populate_record function" do
@@ -194,7 +194,7 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#to_array should return a PGArrayOp" do
-    @ds.literal(@h.to_array[0]).must_equal "hstore_to_array(h)[0]"
+    @ds.literal(@h.to_array[0]).must_equal "(hstore_to_array(h))[0]"
   end
 
   it "#to_matrix should use the hstore_to_matrix function" do
@@ -202,7 +202,7 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#to_matrix should return a PGArrayOp" do
-    @ds.literal(@h.to_matrix[0]).must_equal "hstore_to_matrix(h)[0]"
+    @ds.literal(@h.to_matrix[0]).must_equal "(hstore_to_matrix(h))[0]"
   end
 
   it "#values and #avals should use the avals function" do
@@ -211,8 +211,8 @@ describe "Sequel::Postgres::HStoreOp" do
   end
 
   it "#values and #avals should return PGArrayOps" do
-    @ds.literal(@h.values[0]).must_equal "avals(h)[0]"
-    @ds.literal(@h.avals[0]).must_equal "avals(h)[0]"
+    @ds.literal(@h.values[0]).must_equal "(avals(h))[0]"
+    @ds.literal(@h.avals[0]).must_equal "(avals(h))[0]"
   end
 
   it "should have Sequel.hstore_op return HStoreOp instances as-is" do

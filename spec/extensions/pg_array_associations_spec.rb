@@ -143,10 +143,10 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
     @c2.many_to_pg_array :artists, :clone=>:artists, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
 
-    @c1.filter(:tags=>@o2).sql.must_equal "SELECT * FROM artists WHERE (artists.tag_ids[1:2] @> ARRAY[6]::integer[])"
+    @c1.filter(:tags=>@o2).sql.must_equal "SELECT * FROM artists WHERE ((artists.tag_ids)[1:2] @> ARRAY[6]::integer[])"
     @c2.filter(:artists=>@o1).sql.must_equal "SELECT * FROM tags WHERE ((tags.id * 3) IN (3, 6, 9))"
-    @c1.filter(:tags=>@c2.where(:id=>1)).sql.must_equal "SELECT * FROM artists WHERE coalesce((artists.tag_ids[1:2] && (SELECT array_agg((tags.id * 3)) FROM tags WHERE (id = 1))), false)"
-    @c2.filter(:artists=>@c1.where(:id=>1)).sql.must_equal "SELECT * FROM tags WHERE (EXISTS (SELECT 1 FROM (SELECT artists.tag_ids[1:2] AS key FROM artists WHERE (id = 1)) AS t1 WHERE ((tags.id * 3) = any(key))))"
+    @c1.filter(:tags=>@c2.where(:id=>1)).sql.must_equal "SELECT * FROM artists WHERE coalesce(((artists.tag_ids)[1:2] && (SELECT array_agg((tags.id * 3)) FROM tags WHERE (id = 1))), false)"
+    @c2.filter(:artists=>@c1.where(:id=>1)).sql.must_equal "SELECT * FROM tags WHERE (EXISTS (SELECT 1 FROM (SELECT (artists.tag_ids)[1:2] AS key FROM artists WHERE (id = 1)) AS t1 WHERE ((tags.id * 3) = any(key))))"
   end
   
   it "should raise an error if associated model does not have a primary key, and :primary_key is not specified" do
@@ -168,7 +168,7 @@ describe Sequel::Model, "pg_array_associations" do
   
   it "should support a :key_column option" do
     @c2.many_to_pg_array :artists, :clone=>:artists, :key_column=>Sequel.pg_array(:tag_ids)[1..2], :key=>:tag2_ids
-    @o2.artists_dataset.sql.must_equal "SELECT * FROM artists WHERE (artists.tag_ids[1:2] @> ARRAY[2]::integer[])"
+    @o2.artists_dataset.sql.must_equal "SELECT * FROM artists WHERE ((artists.tag_ids)[1:2] @> ARRAY[2]::integer[])"
   end
   
   it "should support a :primary_key option" do
@@ -211,7 +211,7 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :dataset=>proc{Tag.where(:id=>tag_ids.map{|x| x*2})}
     @c2.many_to_pg_array :artists, :clone=>:artists, :dataset=>proc{Artist.where(Sequel.pg_array(Sequel.pg_array(:tag_ids)[1..2]).contains([id]))}
     @o1.tags_dataset.sql.must_equal "SELECT * FROM tags WHERE (id IN (2, 4, 6))"
-    @o2.artists_dataset.sql.must_equal "SELECT * FROM artists WHERE (tag_ids[1:2] @> ARRAY[2])"
+    @o2.artists_dataset.sql.must_equal "SELECT * FROM artists WHERE ((tag_ids)[1:2] @> ARRAY[2])"
   end
 
   it "should support a :limit option" do
@@ -274,7 +274,7 @@ describe Sequel::Model, "pg_array_associations" do
 
     a = @c2.eager(:artists).all
     a.must_equal [@o2]
-    @db.sqls.must_equal ["SELECT * FROM tags", "SELECT * FROM artists WHERE (artists.tag_ids[1:2] && ARRAY[6]::integer[])"]
+    @db.sqls.must_equal ["SELECT * FROM tags", "SELECT * FROM artists WHERE ((artists.tag_ids)[1:2] && ARRAY[6]::integer[])"]
     a.first.artists.must_equal [@o1]
     @db.sqls.must_equal []
   end
@@ -461,13 +461,13 @@ describe Sequel::Model, "pg_array_associations" do
 
     a = @c1.eager_graph(:tags).all
     a.must_equal [@o1]
-    @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids[1:2] @> ARRAY[(tags.id * 3)])"]
+    @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON ((artists.tag_ids)[1:2] @> ARRAY[(tags.id * 3)])"]
     a.first.tags.must_equal [@o2]
     @db.sqls.must_equal []
 
     a = @c2.eager_graph(:artists).all
     a.must_equal [@o2]
-    @db.sqls.must_equal ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON (artists.tag_ids[1:2] @> ARRAY[tags.id3])"]
+    @db.sqls.must_equal ["SELECT tags.id, artists.id AS artists_id, artists.tag_ids FROM tags LEFT OUTER JOIN artists ON ((artists.tag_ids)[1:2] @> ARRAY[tags.id3])"]
     a.first.artists.must_equal [@o1]
     @db.sqls.must_equal []
   end
