@@ -1,4 +1,4 @@
-Thu, 01 Nov 2018 07:47:16 -0700
+Sat, 01 Dec 2018 17:19:03 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -90,7 +90,7 @@ lib/sequel/plugins/blacklist_security.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_readers.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_subsets.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/caching.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/plugins/class_table_inheritance.rb	Thu, 14 Dec 2017 13:33:39 -0800
+lib/sequel/plugins/class_table_inheritance.rb	Mon, 26 Nov 2018 07:59:05 -0800
 lib/sequel/plugins/column_conflicts.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/column_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/columns_updated.rb	Tue, 28 Mar 2017 16:44:29 -0700
@@ -119,7 +119,7 @@ lib/sequel/plugins/list.rb	Mon, 30 Jul 2018 18:58:32 -0700
 lib/sequel/plugins/many_through_many.rb	Fri, 25 May 2018 14:49:16 -0700
 lib/sequel/plugins/modification_detection.rb	Sat, 20 Jan 2018 09:45:21 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Sat, 20 Jan 2018 09:44:46 -0800
-lib/sequel/plugins/nested_attributes.rb	Wed, 09 May 2018 10:56:52 -0700
+lib/sequel/plugins/nested_attributes.rb	Mon, 05 Nov 2018 14:47:02 -0800
 lib/sequel/plugins/optimistic_locking.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/pg_array_associations.rb	Thu, 07 Jun 2018 12:50:38 -0700
 lib/sequel/plugins/pg_auto_constraint_validations.rb	Fri, 25 May 2018 15:59:03 -0700

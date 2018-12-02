@@ -30,12 +30,40 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-11-01 07:32:49 -0700</span>
+<span class='datetime'>2018-11-30 09:22:15 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.15.0+-282018-12-01-29">5.15.0 (2018-12-01)<span><a href="#label-5.15.0+-282018-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Add :conn_str option in the postgres adapter for PostgreSQL connection
+strings, if the pg driver is used (graywolf) (#1572)</p>
+</li><li>
+<p>Add :qualify_tables option to class_table_inheritance plugin to
+automatically qualify subclass tables with superclass qualifier (benalavi)
+(#1571)</p>
+</li><li>
+<p>Access already allocated connections in a thread safe manner when checking
+out connections in the sharded threaded connection pool (jeremyevans)</p>
+</li><li>
+<p>Automatically support datasets using qualified tables in the
+class_table_inheritance plugin without having to use the :alias option
+(benalavi) (#1565)</p>
+</li><li>
+<p>Support rename_column without emulation on SQLite 3.25+ (jeremyevans)</p>
+</li><li>
+<p>Do not remove currently cached many_to_one associated objects when changing
+the related foreign key value from nil to non-nil (jeremyevans)</p>
+</li><li>
+<p>Do not validate new *_to_many associated objects twice when saving in the
+nested_attributes plugin (jeremyevans)</p>
+</li><li>
+<p>Add Model#skip_validation_on_next_save! for skipping validation on next
+save call (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.14.0+-282018-11-01-29">5.14.0 (2018-11-01)<span><a href="#label-5.14.0+-282018-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Drop defaulting the :port option to 5432 in the postgres adapter, so that

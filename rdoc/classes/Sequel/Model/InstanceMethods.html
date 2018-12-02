@@ -99,6 +99,7 @@ try the class setting if no instance setting has been set.</p>
 <li><a href="#method-i-set_fields">set_fields</a></li>
 <li><a href="#method-i-set_server">set_server</a></li>
 <li><a href="#method-i-singleton_method_added">singleton_method_added</a></li>
+<li><a href="#method-i-skip_validation_on_next_save-21">skip_validation_on_next_save!</a></li>
 <li><a href="#method-i-this">this</a></li>
 <li><a href="#method-i-update">update</a></li>
 <li><a href="#method-i-update_fields">update_fields</a></li>
@@ -902,7 +903,7 @@ setting</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-save-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1455</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t save frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] &#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_valid?</span>(<span class="ruby-identifier">opts</span>)}&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ValidationFailed</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">raise_on_failure?</span>(<span class="ruby-identifier">opts</span>)&#x000A;    <span class="ruby-keyword">return</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_save</span>(<span class="ruby-identifier">opts</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-save-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1455</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t save frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] &#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">_save_valid?</span>(<span class="ruby-identifier">opts</span>)&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ValidationFailed</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)) <span class="ruby-keyword">if</span> <span class="ruby-identifier">raise_on_failure?</span>(<span class="ruby-identifier">opts</span>)&#x000A;    <span class="ruby-keyword">return</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">checked_save_failure</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">_save</span>(<span class="ruby-identifier">opts</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-save_changes'>
@@ -1024,6 +1025,30 @@ check for the string version of the argument in the hash if given a symbol.</p>
 <pre id='method-i-singleton_method_added-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1548</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">singleton_method_added</span>(<span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-ivar">@singleton_setter_added</span> = <span class="ruby-keyword">true</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">end_with?</span>(<span class="ruby-string">&#39;=&#39;</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-skip_validation_on_next_save-21'>
+<a name='method-i-skip_validation_on_next_save-21'></a>
+<div class='synopsis'>
+<span class='name'>skip_validation_on_next_save!</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Skip all validation of the object on the next call to <a
+href="InstanceMethods.html#method-i-save">save</a>, including the running
+of validation hooks. This is designed for and should only be used in cases
+where <a href="InstanceMethods.html#method-i-valid-3F">valid?</a> is called
+before saving and the <code>validate: false</code> option cannot be passed
+to <a href="InstanceMethods.html#method-i-save">save</a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-skip_validation_on_next_save-21-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-skip_validation_on_next_save-21-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1558</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_validation_on_next_save!</span>&#x000A;  <span class="ruby-ivar">@skip_validation_on_next_save</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-this'>
 <a name='method-i-this'></a>
 <div class='synopsis'>
@@ -1042,7 +1067,7 @@ check for the string version of the argument in the hash if given a symbol.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-this-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-this-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1557</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">this</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@this</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@this</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;No dataset for model #{model}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_dataset</span>&#x000A;  <span class="ruby-ivar">@this</span> = <span class="ruby-identifier">use_server</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk_hash</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-this-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1566</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">this</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@this</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@this</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;No dataset for model #{model}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_dataset</span>&#x000A;  <span class="ruby-ivar">@this</span> = <span class="ruby-identifier">use_server</span>(<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">pk_hash</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update'>
@@ -1064,7 +1089,7 @@ hash and then runs save_changes.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1566</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:default</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1575</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-value">:default</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_fields'>
@@ -1087,7 +1112,7 @@ arguments, then calls save_changes.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_fields-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update_fields-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1578</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update_fields-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1587</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">fields</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-valid-3F'>
@@ -1108,7 +1133,7 @@ arguments, then calls save_changes.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-valid-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-valid-3F-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1597</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid?</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">_valid?</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">HookFailed</span>&#x000A;    <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-valid-3F-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1606</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid?</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">_valid?</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">HookFailed</span>&#x000A;    <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-validate'>
@@ -1132,7 +1157,7 @@ object is valid.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-validate-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1589</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-validate-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1598</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

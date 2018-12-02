@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-09-14 07:48:03 -0700</span>
+<span class='datetime'>2018-11-26 07:59:05 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -432,6 +432,13 @@ default, no conversion is done, so an error is raised if you attempt to
 retrieve an infinite timestamp/date.  You can set this to :nil to convert
 to nil, :string to leave as a string, or :float to convert to an infinite
 float.</p>
+</td></tr><tr><td class='label'>:conn_str </td><td>
+<p>Use connection string (in form of `host=x port=y …`). Ignores all other
+options, only supported with pg library. See <a
+href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING</a>
+and  <a
+href="https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS">www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-PARAMKEYWORDS</a>
+for format and list of supported options.</p>
 </td></tr><tr><td class='label'>:connect_timeout </td><td>
 <p>Set the number of seconds to wait for a connection (default 20, only
 respected if using the pg library).</p>

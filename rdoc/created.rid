@@ -1,6 +1,6 @@
-Thu, 01 Nov 2018 07:45:24 -0700
+Sat, 01 Dec 2018 17:17:12 -0800
 README.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
-CHANGELOG	Thu, 01 Nov 2018 07:32:49 -0700
+CHANGELOG	Fri, 30 Nov 2018 09:22:15 -0800
 doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
 MIT-LICENSE	Fri, 26 Jan 2018 06:42:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -12,13 +12,13 @@ lib/sequel/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/deprecated.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/sql.rb	Wed, 17 Oct 2018 17:59:32 -0700
+lib/sequel/sql.rb	Sat, 01 Dec 2018 17:11:32 -0800
 lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
-lib/sequel/version.rb	Thu, 01 Nov 2018 07:32:49 -0700
+lib/sequel/version.rb	Fri, 30 Nov 2018 09:22:15 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
-lib/sequel/connection_pool/sharded_threaded.rb	Fri, 14 Sep 2018 07:48:03 -0700
+lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/connection_pool/threaded.rb	Thu, 10 May 2018 14:41:34 -0700
+lib/sequel/connection_pool/threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/database/connecting.rb	Thu, 10 May 2018 14:41:34 -0700
 lib/sequel/database/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -37,9 +37,9 @@ lib/sequel/dataset/misc.rb	Thu, 14 Jun 2018 08:10:55 -0700
 lib/sequel/dataset/placeholder_literalizer.rb	Wed, 01 Aug 2018 12:28:33 -0700
 lib/sequel/dataset/prepared_statements.rb	Mon, 17 Sep 2018 07:14:53 -0700
 lib/sequel/dataset/query.rb	Mon, 10 Sep 2018 12:59:06 -0700
-lib/sequel/dataset/sql.rb	Wed, 10 Oct 2018 08:22:55 -0700
-lib/sequel/model/associations.rb	Mon, 17 Sep 2018 07:14:53 -0700
-lib/sequel/model/base.rb	Mon, 01 Oct 2018 10:26:14 -0700
+lib/sequel/dataset/sql.rb	Sat, 01 Dec 2018 17:11:35 -0800
+lib/sequel/model/associations.rb	Tue, 06 Nov 2018 08:50:29 -0800
+lib/sequel/model/base.rb	Mon, 05 Nov 2018 14:47:02 -0800
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -62,7 +62,7 @@ doc/model_hooks.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/model_plugins.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
-doc/opening_databases.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
+doc/opening_databases.rdoc	Mon, 26 Nov 2018 07:59:05 -0800
 doc/postgresql.rdoc	Fri, 05 Oct 2018 13:20:51 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Thu, 22 Mar 2018 21:49:57 -0700
@@ -74,7 +74,7 @@ doc/sql.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
 doc/testing.rdoc	Sat, 19 May 2018 07:18:43 -0700
 doc/thread_safety.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/transactions.rdoc	Tue, 29 Aug 2017 17:21:01 -0700
-doc/validations.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
+doc/validations.rdoc	Thu, 15 Nov 2018 08:53:33 -0800
 doc/virtual_rows.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/release_notes/1.0.txt	Sat, 16 Jul 2011 11:31:03 -0700
 doc/release_notes/1.1.txt	Sat, 16 Jul 2011 11:31:03 -0700
@@ -200,6 +200,7 @@ doc/release_notes/5.11.0.txt	Wed, 01 Aug 2018 08:13:54 -0700
 doc/release_notes/5.12.0.txt	Fri, 31 Aug 2018 08:39:42 -0700
 doc/release_notes/5.13.0.txt	Mon, 01 Oct 2018 07:21:49 -0700
 doc/release_notes/5.14.0.txt	Thu, 01 Nov 2018 07:32:49 -0700
+doc/release_notes/5.15.0.txt	Fri, 30 Nov 2018 09:22:15 -0800
 doc/release_notes/5.2.0.txt	Fri, 27 Oct 2017 08:36:52 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
