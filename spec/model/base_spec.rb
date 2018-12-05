@@ -41,6 +41,55 @@ describe "Model attribute setters" do
   end
 end
 
+describe "Model attribute getters/setters" do
+  before do
+    a = @a = []
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :id, :x, :"x y", :require_modification
+
+      [:x, :"x y"].each do |c|
+        define_method(c) do
+          a << c
+          super()
+        end
+        define_method(:"#{c}=") do |v|
+          a << :"#{c}=" << v
+          super(v)
+        end
+      end
+    end
+    DB.reset
+  end
+
+  it "should not override existing methods" do
+    @o = @c.new
+    @o.values.merge!(:x=>4, :"x y"=>5, :require_modification=>6)
+    @o.x.must_equal 4
+    @o.x = 1
+    @o.send(:"x y").must_equal 5
+    @o.send(:"x y=", 2)
+    @o.require_modification.must_equal true
+    @o.require_modification = 3
+    @o.values.must_equal(:x=>1, :"x y"=>2, :require_modification=>6)
+    @a.must_equal [:x, :x=, 1, :"x y", :"x y=", 2]
+  end
+
+  it "should not override existing methods in subclasses" do
+    @c = Class.new(@c)
+    @c.columns(:id, :x, :y, :"x y", :require_modification)
+    @o = @c.new
+    @o.values.merge!(:x=>4, :"x y"=>5, :require_modification=>6)
+    @o.x.must_equal 4
+    @o.x = 1
+    @o.send(:"x y").must_equal 5
+    @o.send(:"x y=", 2)
+    @o.require_modification.must_equal true
+    @o.require_modification = 3
+    @o.values.must_equal(:x=>1, :"x y"=>2, :require_modification=>6)
+    @a.must_equal [:x, :x=, 1, :"x y", :"x y=", 2]
+  end
+end
+
 describe "Model.def_column_alias" do
   before do
     @o = Class.new(Sequel::Model(:items)) do

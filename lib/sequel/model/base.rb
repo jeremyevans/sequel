@@ -765,9 +765,11 @@ module Sequel
 
       # Create a column accessor for a column with a method name that is hard to use in ruby code.
       def def_bad_column_accessor(column)
+        im = instance_methods
         overridable_methods_module.module_eval do
-          define_method(column){self[column]}
-          define_method("#{column}="){|v| self[column] = v}
+          meth = :"#{column}="
+          define_method(column){self[column]} unless im.include?(column)
+          define_method(meth){|v| self[column] = v} unless im.include?(meth)
         end
       end
   
@@ -779,7 +781,7 @@ module Sequel
         bad_columns.each{|x| def_bad_column_accessor(x)}
         im = instance_methods
         columns.each do |column|
-          meth = "#{column}="
+          meth = :"#{column}="
           overridable_methods_module.module_eval("def #{column}; self[:#{column}] end", __FILE__, __LINE__) unless im.include?(column)
           overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end", __FILE__, __LINE__) unless im.include?(meth)
         end

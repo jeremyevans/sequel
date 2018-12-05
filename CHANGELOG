@@ -1,5 +1,7 @@
 === master
 
+* Do not override existing methods when creating Sequel::Model attribute getter/setter methods (jeremyevans) (#1578)
+
 * Use parentheses for expressions being subscripted (e.g. (array_agg(column))[1]) (jeremyevans)
 
 === 5.15.0 (2018-12-01)
