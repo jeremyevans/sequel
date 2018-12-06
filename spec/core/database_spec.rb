@@ -1264,7 +1264,7 @@ describe "Database#transaction without savepoint support" do
     @db.sqls.must_equal ['BEGIN', 'COMMIT']
   end
 
-  it "should automatically use a savepoint if :rollback=>:always given inside a transaction" do
+  it "should not automatically use a savepoint if :rollback=>:always given inside a transaction" do
     proc do
       @db.transaction do
         @db.transaction(:rollback=>:always) do
