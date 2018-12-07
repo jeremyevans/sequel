@@ -1,10 +1,6 @@
 # frozen-string-literal: true
 
-begin
-  require "mysqlplus"
-rescue LoadError
-  require 'mysql'
-end
+require 'mysql'
 raise(LoadError, "require 'mysql' did not define Mysql::CLIENT_MULTI_RESULTS!\n  You are probably using the pure ruby mysql.rb driver,\n  which Sequel does not support. You need to install\n  the C based adapter, and make sure that the mysql.so\n  file is loaded instead of the mysql.rb file.\n") unless defined?(Mysql::CLIENT_MULTI_RESULTS)
 
 require_relative 'utils/mysql_mysql2'

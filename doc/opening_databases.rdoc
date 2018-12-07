@@ -233,7 +233,7 @@ jdbc-h2 :: jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not w
 
 === mysql 
 
-Requires: mysqlplus (or mysql if mysqlplus is not available)
+Requires: mysql
 
 The MySQL adapter does not support the pure-ruby mysql.rb driver, it requires the C-extension driver.
 
