@@ -334,12 +334,8 @@ module Sequel
 
     # Start a new database transaction or a new savepoint on the given connection.
     def begin_transaction(conn, opts=OPTS)
-      if supports_savepoints?
-        if savepoint_level(conn) > 1
-          begin_savepoint(conn, opts)
-        else
-          begin_new_transaction(conn, opts)
-        end
+      if in_savepoint?(conn)
+        begin_savepoint(conn, opts)
       else
         begin_new_transaction(conn, opts)
       end
@@ -400,10 +396,15 @@ module Sequel
       []
     end
 
+    # Whether the connection is currently inside a savepoint.
+    def in_savepoint?(conn)
+      supports_savepoints? && savepoint_level(conn) > 1
+    end
+
     # Retrieve the transaction hooks that should be run for the given
     # connection and commit status.
     def transaction_hooks(conn, committed)
-      if !supports_savepoints? || savepoint_level(conn) == 1
+      unless in_savepoint?(conn)
         _trans(conn)[committed ? :after_commit : :after_rollback]
       end
     end
