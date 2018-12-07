@@ -682,3 +682,40 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
     end
   end
 end
+
+describe "class_table_inheritance plugin with schema_caching extension" do
+  before do
+    @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    def @db.supports_schema_parsing?() true end
+    def @db.schema(table, opts={})
+      {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
+       :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}] ],
+       :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
+       }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
+    end
+  end
+  after do
+    [:Executive, :Manager, :Employee, :Staff].each{|s| Object.send(:remove_const, s) if Object.const_defined?(s)}
+  end
+  it "should not query for columns if the schema cache is present and a table_map is given" do
+    class ::Employee < Sequel::Model(@db)
+      plugin :class_table_inheritance, :table_map=>{:Staff=>:employees, :Manager=>:managers, :Executive=>:executives}
+    end
+    class ::Staff < Employee; end
+    class ::Manager < Employee; end
+    class ::Executive < Manager; end
+    Employee.columns.must_equal [:id, :name, :kind]
+    Staff.columns.must_equal [:id, :name, :kind]
+    Manager.columns.must_equal [:id, :name, :kind, :num_staff]
+    Executive.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
+    @db.sqls.must_equal []
+  end
+  it "should not query for columns if the schema cache is present and no table_map is given" do
+    class ::Employee < Sequel::Model(@db)
+      plugin :class_table_inheritance
+    end
+    class ::Manager < Employee; end
+    class ::Executive < Manager; end
+    @db.sqls.must_equal []
+  end
+end

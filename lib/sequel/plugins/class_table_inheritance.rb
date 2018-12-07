@@ -98,7 +98,7 @@ module Sequel
     #
     #   a = Executive.first
     #   a.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
-    #   
+    #
     # Note that when loading from a subclass, because the subclass dataset uses a subquery
     # that by default uses the same alias at the primary table, any qualified identifiers
     # should reference the subquery alias (and qualified identifiers should not be needed
@@ -281,14 +281,14 @@ module Sequel
           columns = nil
           if (n = subclass.name) && !n.empty?
             if table = cti_table_map[n.to_sym]
-              columns = db.from(table).columns
+              columns = db.schema(table).map(&:first)
             else
               table = if cti_qualify_tables && (schema = dataset.schema_and_table(table_name).first)
                 SQL::QualifiedIdentifier.new(schema, subclass.implicit_table_name)
               else
                 subclass.implicit_table_name
               end
-              columns = check_non_connection_error(false){db.from(table).columns}
+              columns = check_non_connection_error(false){db.schema(table) && db.schema(table).map(&:first)}
               table = nil if !columns || columns.empty?
             end
           end
@@ -301,6 +301,7 @@ module Sequel
             if cti_tables.length == 1
               ds = ds.select(*self.columns.map{|cc| Sequel.qualify(cti_table_name, Sequel.identifier(cc))})
             end
+            ds.send(:columns=, self.columns)
             cols = (columns - [pk]) - cti_ignore_subclass_columns
             dup_cols = cols & ds.columns
             unless dup_cols.empty?
@@ -310,6 +311,7 @@ module Sequel
             @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)
 
             ds = ds.from_self(:alias=>@cti_alias)
+            ds.send(:columns=, self.columns + cols)
 
             set_dataset(ds)
             set_columns(self.columns)
