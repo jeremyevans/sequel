@@ -1,5 +1,7 @@
 === master
 
+* Make mysql adapter work correctly on ruby 2.6+ (jeremyevans)
+
 * Add Database#rollback_on_exit to rollback transactions instead of committing them when exiting the transaction block (jeremyevans)
 
 * Enable window functions in SQLite 3.26.0+ (jeremyevans)

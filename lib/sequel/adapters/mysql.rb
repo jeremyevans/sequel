@@ -21,7 +21,7 @@ module Sequel
     # Hash with integer keys and callable values for converting MySQL types.
     MYSQL_TYPES = {}
     {
-      [0, 246] => ::BigDecimal.method(:new),
+      [0, 246] => ::Kernel.method(:BigDecimal),
       [2, 3, 8, 9, 13, 247, 248] => tt.method(:integer),
       [4, 5] => tt.method(:float),
       [249, 250, 251, 252] => ::Sequel::SQL::Blob.method(:new)
