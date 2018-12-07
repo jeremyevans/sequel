@@ -697,6 +697,7 @@ describe "class_table_inheritance plugin with schema_caching extension" do
   after do
     [:Executive, :Manager, :Employee, :Staff].each{|s| Object.send(:remove_const, s) if Object.const_defined?(s)}
   end
+
   it "should not query for columns if the schema cache is present and a table_map is given" do
     class ::Employee < Sequel::Model(@db)
       plugin :class_table_inheritance, :table_map=>{:Staff=>:employees, :Manager=>:managers, :Executive=>:executives}
@@ -710,6 +711,7 @@ describe "class_table_inheritance plugin with schema_caching extension" do
     Executive.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
     @db.sqls.must_equal []
   end
+
   it "should not query for columns if the schema cache is present and no table_map is given" do
     class ::Employee < Sequel::Model(@db)
       plugin :class_table_inheritance
