@@ -574,6 +574,7 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
       {Sequel[:hr][:employees]=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
        Sequel[:hr][:managers]=>[[:id, {:type=>:integer}]],
        Sequel[:hr][:staff]=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
+       Sequel[:hr][:executives]=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
       }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
     end
     @db.extend_datasets do
@@ -583,12 +584,13 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
          [Sequel[:hr][:staff]]=>[:id, :manager_id],
          [Sequel[:hr][:employees], Sequel[:hr][:managers]]=>[:id, :name, :kind],
          [Sequel[:hr][:employees], Sequel[:hr][:staff]]=>[:id, :name, :kind, :manager_id],
+         [Sequel[:hr][:employees], Sequel[:hr][:managers], Sequel[:hr][:executives]]=>[:id, :name, :kind, :manager_id, :num_managers],
         }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
       end
     end
   end
   after do
-    [:Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s) if Object.const_defined?(s)}
+    [:Manager, :Staff, :Employee, :Executive].each{|s| Object.send(:remove_const, s) if Object.const_defined?(s)}
   end
 
   describe "with table_map used to qualify subclasses" do
@@ -675,10 +677,13 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
       class ::Staff < ::Employee
         many_to_one :manager
       end
+      class ::Executive < ::Manager
+      end
 
       Employee.dataset.sql.must_equal 'SELECT * FROM hr.employees'
       Manager.dataset.sql.must_equal 'SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind FROM hr.employees INNER JOIN hr.managers ON (hr.managers.id = hr.employees.id)) AS employees'
       Staff.dataset.sql.must_equal 'SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind, hr.staff.manager_id FROM hr.employees INNER JOIN hr.staff ON (hr.staff.id = hr.employees.id)) AS employees'
+      Executive.dataset.sql.must_equal 'SELECT * FROM (SELECT hr.employees.id, hr.employees.name, hr.employees.kind, hr.executives.num_managers FROM hr.employees INNER JOIN hr.managers ON (hr.managers.id = hr.employees.id) INNER JOIN hr.executives ON (hr.executives.id = hr.managers.id)) AS employees'
     end
   end
 end

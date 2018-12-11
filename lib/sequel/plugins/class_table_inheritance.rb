@@ -283,7 +283,7 @@ module Sequel
             if table = cti_table_map[n.to_sym]
               columns = db.schema(table).map(&:first)
             else
-              table = if cti_qualify_tables && (schema = dataset.schema_and_table(table_name).first)
+              table = if cti_qualify_tables && (schema = dataset.schema_and_table(cti_table_name).first)
                 SQL::QualifiedIdentifier.new(schema, subclass.implicit_table_name)
               else
                 subclass.implicit_table_name
