@@ -529,6 +529,27 @@ describe "NestedAttributes plugin" do
       "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)")
   end
   
+  it "should not clear reciprocal association before saving new one_to_one associated object" do
+    @Artist.one_to_one :first_album, :clone=>:first_album, :reciprocal=>:artist
+    @Artist.nested_attributes :first_album
+    assoc = []
+    @Album.class_eval do
+      define_method(:after_save) do
+        super()
+        assoc << associations[:artist]
+      end
+    end
+    a = @Artist.new(:name=>'Ar', :first_album_attributes=>{:name=>'Al'})
+    @db.sqls.must_equal []
+    assoc.must_be_empty
+    a.save
+    assoc.length.must_equal 1
+    assoc.first.must_be_kind_of(@Artist)
+    check_sql_array("INSERT INTO artists (name) VALUES ('Ar')",
+      "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)",
+      "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)")
+  end
+  
   it "should not save if nested attribute is not valid and should include nested attribute validation errors in the main object's validation errors" do
     @Artist.class_eval do
       def validate

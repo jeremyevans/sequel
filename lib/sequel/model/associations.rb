@@ -2597,9 +2597,10 @@ module Sequel
         # Set the given object as the associated object for the given *_to_one association reflection
         def _set_associated_object(opts, o)
           a = associations[opts[:name]]
-          return if a && a == o && !set_associated_object_if_same?
+          no_set_assoc = !set_associated_object_if_same?
+          return if a && a == o && no_set_assoc
           run_association_callbacks(opts, :before_set, o)
-          remove_reciprocal_object(opts, a) if a
+          remove_reciprocal_object(opts, a) if a && no_set_assoc
           # Allow calling private _setter method
           send(opts[:_setter_method], o)
           associations[opts[:name]] = o
