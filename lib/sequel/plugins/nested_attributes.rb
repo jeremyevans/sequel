@@ -191,7 +191,10 @@ module Sequel
             if reflection[:type] == :many_to_one 
               before_save_hook{public_send(reflection[:setter_method], obj.save(:validate=>false))}
             else
-              after_save_hook{public_send(reflection[:setter_method], obj)}
+              after_save_hook do
+                obj.skip_validation_on_next_save!
+                public_send(reflection[:setter_method], obj)
+              end
             end
           end
           add_reciprocal_object(reflection, obj)

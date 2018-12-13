@@ -1,5 +1,7 @@
 === master
 
+* Do not validate *_to_one associated objects twice when saving in the nested_attributes plugin (jeremyevans)
+
 * Fix :qualify_tables option to class_table_inheritance plugin to work correctly with subclasses of subclasses (benalavi) (#1581)
 
 * Make class_table_inheritance plugin use the schema cache instead of sending a query to get columns for tables (kenaniah) (#1580)
