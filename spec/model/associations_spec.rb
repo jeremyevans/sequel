@@ -1084,6 +1084,37 @@ describe Sequel::Model, "one_to_one" do
     DB.sqls.must_equal []
   end
 
+  it "should have setter not unset reciprocal during save if reciprocal is the same as current" do
+    @c2.many_to_one :parent, :class => @c2, :key=>:parent_id
+    @c2.one_to_one :child, :class => @c2, :key=>:parent_id, :reciprocal=>:parent
+
+    d = @c2.new(:id => 1)
+    e = @c2.new(:id => 2)
+    e2 = @c2.new(:id => 3)
+    e3 = @c2.new(:id => 4)
+    d.associations[:parent] = e
+    e.associations[:child] = d
+    e2.associations[:child] = d
+    e3.associations[:child] = e
+    assoc = nil
+    d.define_singleton_method(:after_save) do
+      super()
+      assoc = associations
+    end
+
+    def e.set_associated_object_if_same?; true; end
+    e.child = d
+    assoc.must_equal(:parent=>e)
+
+    def e2.set_associated_object_if_same?; true; end
+    e2.child = e
+    assoc.must_equal(:parent=>nil)
+
+    d.associations.clear
+    e3.child = d
+    assoc.must_equal({})
+  end
+
   it "should not add associations methods directly to class" do
     @c2.one_to_one :parent, :class => @c2
     @c2.instance_methods.must_include(:parent)
