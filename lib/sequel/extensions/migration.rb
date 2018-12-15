@@ -389,7 +389,8 @@ module Sequel
     #             using the :table and :column options.
     # :relative :: Run the given number of migrations, with a positive number being migrations to migrate
     #              up, and a negative number being migrations to migrate down (IntegerMigrator only).
-    # :table :: The table containing the schema version (default: :schema_info).
+    # :table :: The table containing the schema version (default: :schema_info for integer migrations and
+    #           :schema_migrations for timestamped migrations).
     # :target :: The target version to which to migrate.  If not given, migrates to the maximum version.
     #
     # Examples: 
