@@ -177,7 +177,10 @@ module Sequel
       # needed for drop column.
       def apply_alter_table(table, ops)
         fks = fetch("PRAGMA foreign_keys")
-        run "PRAGMA foreign_keys = 0" if fks
+        if fks
+          run "PRAGMA foreign_keys = 0"
+          run "PRAGMA legacy_alter_table = 1" if sqlite_version >= 32600
+        end
         transaction do 
           if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint || op[:op] == :set_column_null}
             null_ops, ops = ops.partition{|op| op[:op] == :set_column_null}
@@ -196,7 +199,10 @@ module Sequel
         end
         remove_cached_schema(table)
       ensure
-        run "PRAGMA foreign_keys = 1" if fks
+        if fks
+          run "PRAGMA foreign_keys = 1"
+          run "PRAGMA legacy_alter_table = 0" if sqlite_version >= 32600
+        end
       end
 
       # SQLite supports limited table modification.  You can add a column
