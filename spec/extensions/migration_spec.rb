@@ -284,18 +284,18 @@ describe "Sequel::IntegerMigrator" do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
   end
   
-  it "should raise and error if there is a missing integer migration version" do
+  it "should raise an error if there is a missing integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
   
-  it "should not raise and error if there is a missing integer migration version and allow_missing_migration_files is true" do
+  it "should not raise an error if there is a missing integer migration version and allow_missing_migration_files is true" do
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true)
     @db.sqls.last.must_equal "UPDATE schema_info SET version = 3"
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true, :target=>0)
     @db.sqls.last.must_equal "UPDATE schema_info SET version = 0"
   end
 
-  it "should raise and error if there is a duplicate integer migration version" do
+  it "should raise an error if there is a duplicate integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/duplicate_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
 
