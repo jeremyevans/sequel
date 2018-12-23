@@ -237,6 +237,11 @@ describe "Sequel::Migrator.migrator_class" do
     Sequel::IntegerMigrator.migrator_class("spec/files/timestamped_migrations").must_equal Sequel::IntegerMigrator
     Sequel::TimestampMigrator.migrator_class("spec/files/integer_migrations").must_equal Sequel::TimestampMigrator
   end
+
+  it "should raise an error if the migration folder does not exist" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/nonexistant_migration_path")}.must_raise(Sequel::Migrator::Error)
+  end
+  
 end
 
 describe "Sequel::IntegerMigrator" do
@@ -283,7 +288,7 @@ describe "Sequel::IntegerMigrator" do
   after do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
   end
-  
+
   it "should raise an error if there is a missing integer migration version" do
     proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
@@ -305,6 +310,12 @@ describe "Sequel::IntegerMigrator" do
 
   it "should raise an error if there is a migration file with multiple migrations" do
     proc{Sequel::Migrator.apply(@db, "spec/files/double_migration")}.must_raise(Sequel::Migrator::Error)
+  end
+
+  it "should raise an error if the most recent migration can't be detected" do
+    # Have to specify a target version, otherwise an earlier check (inability
+    # to detect the target) would raise an error, falsely matching the check.
+    proc{Sequel::Migrator.apply(@db, "spec/files/empty_migration_folder", 2)}.must_raise(Sequel::Migrator::Error)
   end
 
   it "should add a column name if it doesn't already exist in the schema_info table" do
