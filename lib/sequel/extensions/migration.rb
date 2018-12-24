@@ -1,5 +1,7 @@
 # frozen-string-literal: true
-#
+
+require 'set'
+
 # Adds the Sequel::Migration and Sequel::Migrator classes, which allow
 # the user to easily group schema changes and migrate the database
 # to a newer version or revert to a previous version.
@@ -289,8 +291,8 @@ module Sequel
     MigrationDSL.create(&block)
   end
 
-  # The +Migrator+ class performs migrations based on migration files in a 
-  # specified directory. The migration files should be named using the
+  # The +Migrator+ class performs migrations based on migration files in
+  # specified directories. The migration files should be named using the
   # following pattern:
   # 
   #   <version>_<title>.rb
@@ -317,20 +319,23 @@ module Sequel
   #
   # Migrations are generally run via the sequel command line tool,
   # using the -m and -M switches.  The -m switch specifies the migration
-  # directory, and the -M switch specifies the version to which to migrate.
+  # directories, and the -M switch specifies the version to which to migrate.
+  #
+  # You can specify multiple directories in which to search for migrations by
+  # separating them with a comma (`,`).
   # 
   # You can apply migrations using the Migrator API, as well (this is necessary
   # if you want to specify the version from which to migrate in addition to the version
   # to which to migrate).
   # To apply a migrator, the +apply+ method must be invoked with the database
-  # instance, the directory of migration files and the target version. If
+  # instance, the directories of migration files and the target version. If
   # no current version is supplied, it is read from the database. The migrator
   # automatically creates a table (schema_info for integer migrations and
   # schema_migrations for timestamped migrations). in the database to keep track
   # of the current migration version. If no migration version is stored in the
   # database, the version is considered to be 0. If no target version is 
   # specified, the database is migrated to the latest version available in the
-  # migration directory.
+  # migration directories.
   #
   # For example, to migrate the database to the latest version:
   #
@@ -366,8 +371,8 @@ module Sequel
     end
 
     # Wrapper for +run+, maintaining backwards API compatibility
-    def self.apply(db, directory, target = nil, current = nil)
-      run(db, directory, :target => target, :current => current)
+    def self.apply(db, directories, target = nil, current = nil)
+      run(db, directories, :target => target, :current => current)
     end
 
     # Raise a NotCurrentError unless the migrator is current, takes the same
@@ -378,11 +383,11 @@ module Sequel
 
     # Return whether the migrator is current (i.e. it does not need to make
     # any changes).  Takes the same arguments as #run.
-    def self.is_current?(db, directory, opts=OPTS)
-      migrator_class(directory).new(db, directory, opts).is_current?
+    def self.is_current?(db, directories, opts=OPTS)
+      migrator_class(directories).new(db, directories, opts).is_current?
     end
 
-    # Migrates the supplied database using the migration files in the specified directory. Options:
+    # Migrates the supplied database using the migration files in the specified directories. Options:
     # :allow_missing_migration_files :: Don't raise an error if there are missing migration files.
     # :column :: The column in the :table argument storing the migration version (default: :version).
     # :current :: The current version of the database.  If not given, it is retrieved from the database
@@ -395,21 +400,27 @@ module Sequel
     #
     # Examples: 
     #   Sequel::Migrator.run(DB, "migrations")
+    #   Sequel::Migrator.run(DB, ["migrations", "migrations_old"])
     #   Sequel::Migrator.run(DB, "migrations", target: 15, current: 10)
     #   Sequel::Migrator.run(DB, "app1/migrations", column: :app2_version)
     #   Sequel::Migrator.run(DB, "app2/migrations", column: :app2_version, table: :schema_info2)
-    def self.run(db, directory, opts=OPTS)
-      migrator_class(directory).new(db, directory, opts).run
+    def self.run(db, directories, opts=OPTS)
+      migrator_class(directories).new(db, directories, opts).run
     end
 
     # Choose the Migrator subclass to use.  Uses the TimestampMigrator
     # if the version number is greater than 20000101, otherwise uses the IntegerMigrator.
-    def self.migrator_class(directory)
+    def self.migrator_class(directories)
       if self.equal?(Migrator)
-        raise(Error, "Must supply a valid migration path") unless File.directory?(directory)
-        Dir.new(directory).each do |file|
-          next unless MIGRATION_FILE_PATTERN.match(file)
-          return TimestampMigrator if file.split('_', 2).first.to_i > 20000101
+        # Ensure backwards-compatability with single-directory method signature.
+        directories = [directories] unless directories.respond_to? :each
+        raise(Error, "Must supply a valid migration path") unless directories.all? { |dir| File.directory?(dir) }
+
+        Set.new(directories).each do |dir|
+          Dir.new(dir).each do |file|
+            next unless MIGRATION_FILE_PATTERN.match(file)
+            return TimestampMigrator if file.split('_', 2).first.to_i > 20000101
+          end
         end
         IntegerMigrator
       else
@@ -425,14 +436,14 @@ module Sequel
     # The database related to this migrator
     attr_reader :db
 
-    # The directory for this migrator's files
-    attr_reader :directory
+    # The directories for this migrator's files
+    attr_reader :directories
 
     # The dataset for this migrator, representing the +schema_info+ table for integer
     # migrations and the +schema_migrations+ table for timestamp migrations
     attr_reader :ds
 
-    # All migration files in this migrator's directory
+    # All migration files in this migrator's directories
     attr_reader :files
 
     # The table to use to hold the applied migration data (defaults to :schema_info for
@@ -443,10 +454,13 @@ module Sequel
     attr_reader :target
 
     # Setup the state for the migrator
-    def initialize(db, directory, opts=OPTS)
-      raise(Error, "Must supply a valid migration path") unless File.directory?(directory)
+    def initialize(db, directories, opts=OPTS)
+      # Ensure backwards-compatability with single-directory method signature.
+      directories = [directories] unless directories.respond_to? :each
+
+      raise(Error, "Must supply a valid migration path") unless directories.all? { |dir| File.directory?(dir) }
       @db = db
-      @directory = directory
+      @directories = Set.new(directories)
       @allow_missing_migration_files = opts[:allow_missing_migration_files]
       @files = get_migration_files
       schema, table = @db.send(:schema_and_table, opts[:table] || default_schema_table)
@@ -515,12 +529,13 @@ module Sequel
     attr_reader :migrations
 
     # Set up all state for the migrator instance
-    def initialize(db, directory, opts=OPTS)
+    def initialize(db, directories, opts=OPTS)
       super
       @current = opts[:current] || current_migration_version
       raise(Error, "No current version available") unless current
 
       latest_version = latest_migration_version
+
       @target = if opts[:target]
         opts[:target]
       elsif opts[:relative]
@@ -579,17 +594,19 @@ module Sequel
       :schema_info
     end
 
-    # Returns any found migration files in the supplied directory.
+    # Returns any found migration files in the supplied directories.
     def get_migration_files
       files = []
-      Dir.new(directory).each do |file|
-        next unless MIGRATION_FILE_PATTERN.match(file)
-        version = migration_version_from_file(file)
-        if version >= 20000101
-          raise Migrator::Error, "Migration number too large, must use TimestampMigrator: #{file}"
+      directories.each do |dir|
+        Dir.new(dir).each do |file|
+          next unless MIGRATION_FILE_PATTERN.match(file)
+          version = migration_version_from_file(file)
+          if version >= 20000101
+            raise Migrator::Error, "Migration number too large, must use TimestampMigrator: #{file}"
+          end
+          raise(Error, "Duplicate migration version: #{version}") if files[version]
+          files[version] = File.join(dir, file)
         end
-        raise(Error, "Duplicate migration version: #{version}") if files[version]
-        files[version] = File.join(directory, file)
       end
       1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i]} unless @allow_missing_migration_files
       files
@@ -601,7 +618,7 @@ module Sequel
       version_numbers.map{|n| load_migration_file(files[n])}
     end
     
-    # Returns the latest version available in the specified directory.
+    # Returns the latest version available in the specified directories.
     def latest_migration_version
       l = files.last
       l ? migration_version_from_file(File.basename(l)) : nil
@@ -662,7 +679,7 @@ module Sequel
     attr_reader :migration_tuples
 
     # Set up all state for the migrator instance
-    def initialize(db, directory, opts=OPTS)
+    def initialize(db, directories, opts=OPTS)
       super
       @target = opts[:target]
       @applied_migrations = get_applied_migrations
@@ -723,12 +740,14 @@ module Sequel
       am
     end
     
-    # Returns any migration files found in the migrator's directory.
+    # Returns any migration files found in the migrator's directories.
     def get_migration_files
       files = []
-      Dir.new(directory).each do |file|
-        next unless MIGRATION_FILE_PATTERN.match(file)
-        files << File.join(directory, file)
+      directories.each do |dir|
+        Dir.new(dir).each do |file|
+          next unless MIGRATION_FILE_PATTERN.match(file)
+          files << File.join(dir, file)
+        end
       end
       files.sort_by{|f| MIGRATION_FILE_PATTERN.match(File.basename(f))[1].to_i}
     end

@@ -227,6 +227,11 @@ For example:
 will look in the <tt>db/migrations</tt> folder relative to the current directory,
 and run unapplied migrations on the PostgreSQL database sequel_test running on localhost.
 
+If your migrations are spread across multiple folders, then you can supply
+those by separating them with a comma:
+
+  sequel -m db/migrations,db/migrations_old postgres://localhost/sequel_test
+
 == Two separate migrators
 
 Sequel actually ships with two separate migrators.  One is the +IntegerMigrator+, the other is

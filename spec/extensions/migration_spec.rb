@@ -390,7 +390,16 @@ describe "Sequel::IntegerMigrator" do
     @db.version.must_equal 3
     @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2, 3]
   end
-  
+
+  it "should support migrations spread across multiple directories" do
+    migration_dirs = ["spec/files/multi_directory_migrations_1", "spec/files/multi_directory_migrations_2"]
+    Sequel::Migrator.apply(@db, migration_dirs)
+
+    @db.creates.must_equal [1111, 2222, 3333]
+    @db.version.must_equal 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2, 3]
+  end
+
   it "should be able to tell whether there are outstanding migrations" do
     Sequel::Migrator.is_current?(@db, @dirname).must_equal false
     Sequel::Migrator.apply(@db, @dirname)

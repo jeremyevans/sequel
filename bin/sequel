@@ -9,7 +9,7 @@ dump_migration = nil
 dump_schema = nil
 dump_indexes = nil
 env = nil
-migrate_dir = nil
+migrate_dirs = []
 migrate_ver = nil
 backtrace = nil
 show_version = false
@@ -78,8 +78,8 @@ options = OptionParser.new do |opts|
     load_dirs << v
   end
   
-  opts.on("-m", "--migrate-directory DIR", "run the migrations in directory") do |v|
-    migrate_dir = v
+  opts.on("-m", "--migrate-directory DIR", Array, "run the migrations in given directories, separated by comma (`,`)") do |v|
+    migrate_dirs = v
     exclusive_options << :m
   end
   
@@ -126,7 +126,7 @@ extra_proc = lambda do
   $stderr.puts("Warning: last #{ARGV.length} arguments ignored") unless ARGV.empty?
 end
 
-error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
+error_proc["Error: Must specify -m if using -M"] if migrate_ver && migrate_dirs.empty?
 error_proc["Error: Cannot specify #{exclusive_options.map{|v| "-#{v}"}.join(' and ')} together"] if exclusive_options.length > 1
 
 connect_proc = lambda do |database|
@@ -157,10 +157,10 @@ begin
 
   DB = connect_proc[db]
   load_dirs.each{|d| d.is_a?(Array) ? require(d.first) : Dir["#{d}/**/*.rb"].each{|f| load(f)}}
-  if migrate_dir
+  unless migrate_dirs.empty?
     extra_proc.call
     Sequel.extension :migration, :core_extensions
-    Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
+    Sequel::Migrator.apply(DB, migrate_dirs, migrate_ver)
     exit
   end
   if dump_migration
