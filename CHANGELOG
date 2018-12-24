@@ -1,5 +1,7 @@
 === master
 
+* Use nicer error messages for missing or empty migration directories (Lavode) (#1585)
+
 * Make alter table emulation work correctly in SQLite 3.26.0+ (jeremyevans) (#1582)
 
 * Do not unset new one_to_one associated objects' reciprocal associations before saving associated objects in the nested_attributes plugin (jeremyevans)
