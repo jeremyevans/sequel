@@ -99,6 +99,13 @@ END
     DB2.foreign_key_list(:b).must_equal [{:columns=>[:a], :table=>:a, :key=>nil, :on_update=>:no_action, :on_delete=>:no_action}]
   end
 
+  it "-C should convert integer to bigint when copying from SQLite to other databases" do
+    DB.create_table(:a) do
+      Integer :id
+    end
+    bin(:args=>'-EC', :post=>"mock://postgres").must_include 'CREATE TABLE "a" ("id" bigint)'
+  end
+
   it "-d and -D should dump generic and specific migrations" do
     DB.create_table(:a) do
       primary_key :a

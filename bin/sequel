@@ -195,6 +195,10 @@ begin
     same_db = DB.database_type==TO_DB.database_type
     index_opts = {:same_db=>same_db}
     index_opts[:index_names] = :namespace if !DB.global_index_namespace? && TO_DB.global_index_namespace?
+    if DB.database_type == :sqlite && !same_db
+      # SQLite integer types allows 64-bit integers
+      TO_DB.extension :integer64
+    end
 
     puts "Databases connections successful"
     schema_migration = eval(DB.dump_schema_migration(:indexes=>false, :same_db=>same_db))

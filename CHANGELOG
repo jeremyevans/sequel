@@ -1,5 +1,7 @@
 === master
 
+* Convert integer columns to bigint columns when copying SQLite databases to other databases using bin/sequel -C (jeremyevans) (#1584)
+
 * Use nicer error messages for missing or empty migration directories (Lavode) (#1585)
 
 * Make alter table emulation work correctly in SQLite 3.26.0+ (jeremyevans) (#1582)
