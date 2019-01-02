@@ -1,4 +1,4 @@
-=== master
+=== 5.16.0 (2019-01-02)
 
 * Convert integer columns to bigint columns when copying SQLite databases to other databases using bin/sequel -C (jeremyevans) (#1584)
 
