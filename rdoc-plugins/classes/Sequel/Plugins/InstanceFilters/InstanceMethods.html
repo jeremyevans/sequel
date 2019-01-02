@@ -66,7 +66,7 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">clear_instance_filters</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">57</span>   <span class="ruby-identifier">clear_instance_filters</span>&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-after_update'>
@@ -85,7 +85,7 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">clear_instance_filters</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">63</span>   <span class="ruby-identifier">clear_instance_filters</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -104,7 +104,7 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">68</span>   <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">69</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-instance_filter'>
@@ -116,15 +116,14 @@ Sequel::Plugins::InstanceFilters::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Add an instance filter to the array of instance filters Both the arguments
-given and the block are passed to the dataset&#39;s filter method.</p>
+<p>Add an instance filter to the array of instance filters Both the arguments given and the block are passed to the dataset&#39;s filter method.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-instance_filter-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-instance_filter-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-instance_filter-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">76</span>   <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

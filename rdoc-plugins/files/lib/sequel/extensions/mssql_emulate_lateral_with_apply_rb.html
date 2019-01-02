@@ -36,18 +36,11 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The mssql_emulate_lateral_with_apply extension converts queries that use
-LATERAL into queries that use CROSS/OUTER APPLY, allowing code that works
-on databases that support LATERAL via Dataset#lateral to run on Microsoft
-SQL Server and Sybase SQLAnywhere.</p>
+<p>The mssql_emulate_lateral_with_apply extension converts queries that use LATERAL into queries that use CROSS/OUTER APPLY, allowing code that works on databases that support LATERAL via Dataset#lateral to run on Microsoft SQL Server and Sybase SQLAnywhere.</p>
 
-<p>This is available as a separate extension instead of integrated into the
-Microsoft SQL Server and Sybase SQLAnywhere support because few people need
-it and there is a performance hit to code that doesn&#39;t use it.</p>
+<p>This is available as a separate extension instead of integrated into the Microsoft SQL Server and Sybase SQLAnywhere support because few people need it and there is a performance hit to code that doesn&#39;t use it.</p>
 
-<p>It is possible there are cases where this emulation does not work.  Users
-should probably verify that correct results are returned when using this
-extension.</p>
+<p>It is possible there are cases where this emulation does not work.  Users should probably verify that correct results are returned when using this extension.</p>
 
 <p>You can load this extension into specific datasets:</p>
 
@@ -57,8 +50,7 @@ extension.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:mssql_emulate_lateral_with_apply</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/MSSQL/EmulateLateralWithApply.html">Sequel::MSSQL::EmulateLateralWithApply</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/MSSQL/EmulateLateralWithApply.html"><code>Sequel::MSSQL::EmulateLateralWithApply</code></a></p>
 </div>
 <div id='context'>
 </div>

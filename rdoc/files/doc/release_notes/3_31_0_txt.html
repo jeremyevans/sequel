@@ -38,134 +38,73 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The serialization plugin can now support custom serialization formats, by
-supplying a serializer/deserializer pair of callable objects.  You can also
-register custom deserializers via
-Sequel::Plugins::Serialization.register_format, so that they can be
-referenced by name.  Example:</p>
+<p>The serialization plugin can now support custom serialization formats, by supplying a serializer/deserializer pair of callable objects.  You can also register custom deserializers via Sequel::Plugins::Serialization.register_format, so that they can be referenced by name.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Serialization</span>.<span class="ruby-identifier">register_format</span>(<span class="ruby-value">:reverse</span>,&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>},&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>})&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> <span class="ruby-value">:reverse</span>, <span class="ruby-value">:password</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>Dataset#import and multi_insert now support a :return=&gt;:primary_key
-option.  When this option is used, the methods return an array of primary
-key values, one for each inserted row.  Usage of this option on MySQL
-requires that a separate query be issued per row (instead of the single
-query for all rows that MySQL would usually use).</p>
+<p>Dataset#import and multi_insert now support a :return=&gt;:primary_key option.  When this option is used, the methods return an array of primary key values, one for each inserted row.  Usage of this option on MySQL requires that a separate query be issued per row (instead of the single query for all rows that MySQL would usually use).</p>
 </li><li>
-<p>PostgreSQL can now use Dataset#returning in conjunction with
-import/multi_insert to set a custom column to return.</p>
+<p>PostgreSQL can now use Dataset#returning in conjunction with import/multi_insert to set a custom column to return.</p>
 </li><li>
-<p>Microsoft SQL Server can now use Dataset#output in conjection with
-import/multi_insert to set a custom column to return.</p>
+<p>Microsoft SQL Server can now use Dataset#output in conjection with import/multi_insert to set a custom column to return.</p>
 </li><li>
-<p>Dataset#import and multi_insert now respect a :server option to set the
-server/shard on which to execute the queries. Additionally, options given
-to this method are also passed to Dataset#transaction.</p>
+<p>Dataset#import and multi_insert now respect a :server option to set the server/shard on which to execute the queries. Additionally, options given to this method are also passed to Dataset#transaction.</p>
 </li><li>
 <p>Dataset#insert_multiple now returns an array of inserted primary keys.</p>
 </li><li>
-<p>Model.def_column_alias has been added to make it easy to create alias
-methods for columns.  This is useful if you have a legacy database and want
-to create friendly method names for the underlying columns.  Note that this
-alias only affects the setter and getter methods.  This does not affect the
-dataset level, so you still need to use the actual column names in dataset
-filters.</p>
+<p>Model.def_column_alias has been added to make it easy to create alias methods for columns.  This is useful if you have a legacy database and want to create friendly method names for the underlying columns.  Note that this alias only affects the setter and getter methods.  This does not affect the dataset level, so you still need to use the actual column names in dataset filters.</p>
 </li><li>
-<p>many_to_one associations can now have the same name as the related foreign
-key column, using the :key_column option.  Use of this feature is not
-recommended, as it is much better to either rename the column or rename the
-association.  Here&#39;s an example of usage:</p>
+<p>many_to_one associations can now have the same name as the related foreign key column, using the :key_column option.  Use of this feature is not recommended, as it is much better to either rename the column or rename the association.  Here&#39;s an example of usage:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Example schema:</span>&#x000A;<span class="ruby-comment">#  albums           artists</span>&#x000A;<span class="ruby-comment">#   :id        /--&gt;  :id</span>&#x000A;<span class="ruby-comment">#   :artist --/      :name</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">def_column_alias</span>(<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:artist</span>)&#x000A;  <span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">:key_column</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>The mock adapter can now mock out database types, by providing a shared
-adapter name as the host (e.g. mock://postgres).  This emulation is not
-perfect, but in most cases it allows you to see what SQL <a
-href="../../../classes/Sequel.html">Sequel</a> would generate on a given
-database without needing to install the required database driver.</p>
+<p>The mock adapter can now mock out database types, by providing a shared adapter name as the host (e.g. mock://postgres).  This emulation is not perfect, but in most cases it allows you to see what SQL <a href="../../../classes/Sequel.html"><code>Sequel</code></a> would generate on a given database without needing to install the required database driver.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now supports creating
-full text indexes on Microsoft SQL Server.  Before using it, you must have
-previously setup a default full text search catalog, and you need to
-provide a :key_index option with an index name symbol.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports creating full text indexes on Microsoft SQL Server.  Before using it, you must have previously setup a default full text search catalog, and you need to provide a :key_index option with an index name symbol.</p>
 </li><li>
-<p>Dataset#group_rollup and group_cube methods have been added for GROUP BY
-ROLLUP and GROUP BY CUBE support.  These features are in a recent SQL
-standard, and they are supported to various degrees on Microsoft SQL
-Server, DB2, Oracle, MySQL, and Derby.</p>
+<p>Dataset#group_rollup and group_cube methods have been added for GROUP BY ROLLUP and GROUP BY CUBE support.  These features are in a recent SQL standard, and they are supported to various degrees on Microsoft SQL Server, DB2, Oracle, MySQL, and Derby.</p>
 </li><li>
-<p>Dataset#full_text_search on Microsoft SQL Server now supports multiple
-search terms.</p>
+<p>Dataset#full_text_search on Microsoft SQL Server now supports multiple search terms.</p>
 </li><li>
-<p>The jdbc adapter now supports a :login_timeout option, giving the timeout
-in seconds.</p>
+<p>The jdbc adapter now supports a :login_timeout option, giving the timeout in seconds.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p>Dataset#exists can now be used with prepared statement placeholders.</p>
 </li><li>
-<p>Dataset#full_text_search can now be used with prepared statement
-placeholders on PostgreSQL, MySQL, and Microsoft SQL Server.</p>
+<p>Dataset#full_text_search can now be used with prepared statement placeholders on PostgreSQL, MySQL, and Microsoft SQL Server.</p>
 </li><li>
-<p>If tables from two separate schema are detected when parsing the schema for
-a table on PostgreSQL, an error is now raised. Previously, no error was
-raised, which led to weird errors later, such as duplicate columns in a
-model&#39;s primary_key.</p>
+<p>If tables from two separate schema are detected when parsing the schema for a table on PostgreSQL, an error is now raised. Previously, no error was raised, which led to weird errors later, such as duplicate columns in a model&#39;s primary_key.</p>
 </li><li>
-<p>RETURNING is now supported with UPDATE/DELETE on PostgreSQL 8.2+.
-Previously, <a href="../../../classes/Sequel.html">Sequel</a> only
-supported it on 9.1+, but PostgreSQL introduced support for it in 8.2.</p>
+<p>RETURNING is now supported with UPDATE/DELETE on PostgreSQL 8.2+. Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> only supported it on 9.1+, but PostgreSQL introduced support for it in 8.2.</p>
 </li><li>
-<p>The shared postgres adapter now correctly handles the return value for
-Dataset#insert if you provide a separate column array and value array on
-PostgreSQL &lt; 8.2.</p>
+<p>The shared postgres adapter now correctly handles the return value for Dataset#insert if you provide a separate column array and value array on PostgreSQL &lt; 8.2.</p>
 </li><li>
-<p>Handle case in the PostgreSQL adapter where the server version cannot be
-determined via a query.</p>
+<p>Handle case in the PostgreSQL adapter where the server version cannot be determined via a query.</p>
 </li><li>
-<p>H2 clob types are now treated as string instead of as blob. Treating clob
-as blob breaks on H2, as it doesn&#39;t automatically hex-unescape the
-input for clobs as it does for blobs.</p>
+<p>H2 clob types are now treated as string instead of as blob. Treating clob as blob breaks on H2, as it doesn&#39;t automatically hex-unescape the input for clobs as it does for blobs.</p>
 </li><li>
-<p>Dataset#empty? now works correctly when the dataset has an offset and
-offset support is being emulated.</p>
+<p>Dataset#empty? now works correctly when the dataset has an offset and offset support is being emulated.</p>
 </li><li>
 <p>The mock adapter no longer defaults to downcasing identifiers on output.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset#exists now returns a PlaceholderLiteralString instead of a
-LiteralString, which could potentially break some code.  If you would like
-a String returned, you can pass the returned object to Dataset#literal:</p>
+<p>Dataset#exists now returns a PlaceholderLiteralString instead of a LiteralString, which could potentially break some code.  If you would like a String returned, you can pass the returned object to Dataset#literal:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exists</span>)</pre>
 </li><li>
-<p>Dataset#from no longer handles :a__b__c___d as “a.b.c AS d”.  This was not
-the intended behavior, and nowhere else in <a
-href="../../../classes/Sequel.html">Sequel</a> is a symbol treated that
-way.  Now, Dataset#from is consistent with the rest of <a
-href="../../../classes/Sequel.html">Sequel</a>, using “a.b__c AS d”.  This
-should only affect people in very rare cases, as most databases don&#39;t
-use three level qualified tables.  One exception is Microsoft SQL Server,
-which can use three level qualified tables for cross-database access.</p>
+<p>Dataset#from no longer handles :a__b__c___d as “a.b.c AS d”.  This was not the intended behavior, and nowhere else in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is a symbol treated that way.  Now, Dataset#from is consistent with the rest of <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, using “a.b__c AS d”.  This should only affect people in very rare cases, as most databases don&#39;t use three level qualified tables.  One exception is Microsoft SQL Server, which can use three level qualified tables for cross-database access.</p>
 </li><li>
-<p>Previously, Dataset#insert_multiple returned an array of hashes, now it
-returns an array of primary key values.</p>
+<p>Previously, Dataset#insert_multiple returned an array of hashes, now it returns an array of primary key values.</p>
 </li><li>
-<p>Dataset#EXRACT_CLOSE in the shared sqlite adapter has been renamed to
-Dataset#EXTRACT_CLOSE.</p>
+<p>Dataset#EXRACT_CLOSE in the shared sqlite adapter has been renamed to Dataset#EXTRACT_CLOSE.</p>
 </li><li>
-<p>Dataset::StoredProcedureMethods::SQL_QUERY_TYPE and
-Dataset::ArgumentMapper::SQL_QUERY_TYPE constants have been removed, as
-have related sql_query_type private methods.</p>
+<p>Dataset::StoredProcedureMethods::SQL_QUERY_TYPE and Dataset::ArgumentMapper::SQL_QUERY_TYPE constants have been removed, as have related sql_query_type private methods.</p>
 </li><li>
-<p>The serialization plugin was significantly refactored.
-Model.serialization_map now contains a callable object instead of a Symbol,
-and Model.serialization_format has been removed.
-Model.define_serialized_attribute_accessors private method now takes two
-callable objects before the columns, instead of a single symbol.</p>
+<p>The serialization plugin was significantly refactored. Model.serialization_map now contains a callable object instead of a Symbol, and Model.serialization_format has been removed. Model.define_serialized_attribute_accessors private method now takes two callable objects before the columns, instead of a single symbol.</p>
 </li></ul>
 </div>
 <div id='context'>

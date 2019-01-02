@@ -36,45 +36,33 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The sql_comments extension adds Dataset#comment to the datasets, allowing
-you to set SQL comments in the resulting query.  These comments are
-appended to the end of the SQL query:</p>
+<p>The sql_comments extension adds Dataset#comment to the datasets, allowing you to set SQL comments in the resulting query.  These comments are appended to the end of the SQL query:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment</span>&#x000A;<span class="ruby-comment">#</span></pre>
 
-<p>As you can see, this uses single line SQL comments (–) suffixed by a
-newline.  This # plugin transforms all consecutive whitespace in the
-comment to # a single string:</p>
+<p>As you can see, this uses single line SQL comments (–) suffixed by a newline.  This # plugin transforms all consecutive whitespace in the comment to # a single string:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
 
-<p>The reason for the prefixing and suffixing by newlines is to work correctly
-when used in subqueries:</p>
+<p>The reason for the prefixing and suffixing by newlines is to work correctly when used in subqueries:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">ds</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (id IN (SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment"># )) -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
 
-<p>In addition to working on SELECT queries, it also works when inserting,
-updating, and deleting.</p>
+<p>In addition to working on SELECT queries, it also works when inserting, updating, and deleting.</p>
 
-<p>Due to the use of single line SQL comments and converting all whitespace to
-spaces, this should correctly handle even malicious input.  However, it
-would be unwise to rely on that, you should ensure that the argument given
-to Dataset#comment is not derived from user input.</p>
+<p>Due to the use of single line SQL comments and converting all whitespace to spaces, this should correctly handle even malicious input.  However, it would be unwise to rely on that, you should ensure that the argument given to Dataset#comment is not derived from user input.</p>
 
 <p>You can load this extension into specific datasets:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:sql_comments</span>)</pre>
 
-<p>Note that Microsoft Access does not support inline comments, and attempting
-to use comments on it will result in SQL syntax errors.</p>
+<p>Note that Microsoft Access does not support inline comments, and attempting to use comments on it will result in SQL syntax errors.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/SQLComments.html">Sequel::SQLComments</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/SQLComments.html"><code>Sequel::SQLComments</code></a></p>
 </div>
 <div id='context'>
 </div>

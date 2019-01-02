@@ -129,7 +129,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1651</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span> = <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-ivar">@descending</span> = <span class="ruby-identifier">descending</span>&#x000A;  <span class="ruby-ivar">@nulls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:nulls</span>]&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1652</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span> = <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1653</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;<span class="line-num">1654</span>   <span class="ruby-ivar">@descending</span> = <span class="ruby-identifier">descending</span>&#x000A;<span class="line-num">1655</span>   <span class="ruby-ivar">@nulls</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:nulls</span>]&#x000A;<span class="line-num">1656</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">1657</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -149,7 +149,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-asc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-asc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1659</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">asc</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-asc-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1660</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">asc</span>&#x000A;<span class="line-num">1661</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="line-num">1662</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-desc'>
@@ -168,7 +168,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-desc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-desc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1664</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">desc</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-desc-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1665</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">desc</span>&#x000A;<span class="line-num">1666</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="line-num">1667</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-invert'>
@@ -180,15 +180,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Return an inverted expression, changing ASC to DESC and NULLS FIRST to
-NULLS LAST.</p>
+<p>Return an inverted expression, changing ASC to DESC and NULLS FIRST to NULLS LAST.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-invert-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-invert-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1669</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">invert</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-operator">!</span><span class="ruby-ivar">@descending</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">INVERT_NULLS</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@nulls</span>, <span class="ruby-ivar">@nulls</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-invert-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1670</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">invert</span>&#x000A;<span class="line-num">1671</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-operator">!</span><span class="ruby-ivar">@descending</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">INVERT_NULLS</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@nulls</span>, <span class="ruby-ivar">@nulls</span>))&#x000A;<span class="line-num">1672</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

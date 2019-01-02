@@ -35,8 +35,7 @@ Sequel::SQL::SubscriptMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes the <code>sql_subscript</code> method, representing <a
-href="../SQL.html">SQL</a> array accesses.</p>
+<p>This module includes the <code>sql_subscript</code> method, representing <a href="../SQL.html"><code>SQL</code></a> array accesses.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -59,8 +58,7 @@ href="../SQL.html">SQL</a> array accesses.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Subscript</code> with the given arguments, representing an
-<a href="../SQL.html">SQL</a> array access.</p>
+<p>Return a <code>Subscript</code> with the given arguments, representing an <a href="../SQL.html"><code>SQL</code></a> array access.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># array[1]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array[1, 2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]) <span class="ruby-comment"># array[1, 2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># array[1:2]</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:array</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">...</span><span class="ruby-value">3</span>) <span class="ruby-comment"># array[1:2]</span></pre>
 
@@ -69,7 +67,7 @@ href="../SQL.html">SQL</a> array accesses.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_subscript-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_subscript-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 986</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_subscript</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_subscript-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">987</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_subscript</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">sub</span>)&#x000A;<span class="line-num">988</span>   <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="line-num">989</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

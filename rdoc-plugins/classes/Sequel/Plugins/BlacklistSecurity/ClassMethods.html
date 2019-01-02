@@ -57,10 +57,7 @@ Sequel::Plugins::BlacklistSecurity::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>Which columns are specifically restricted in a call to set/update/new/etc.
-(default: not set).  Some columns are restricted regardless of this
-setting, such as the primary key column and columns in
-Model::RESTRICTED_SETTER_METHODS.</p>
+<p>Which columns are specifically restricted in a call to set/update/new/etc. (default: not set).  Some columns are restricted regardless of this setting, such as the primary key column and columns in Model::RESTRICTED_SETTER_METHODS.</p>
 </td>
 </tr>
 </table>
@@ -84,7 +81,7 @@ Model::RESTRICTED_SETTER_METHODS.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@restricted_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">32</span>   <span class="ruby-ivar">@restricted_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">33</span> &#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_restricted_columns'>
@@ -96,18 +93,9 @@ Model::RESTRICTED_SETTER_METHODS.</p>
 </div>
 <div class='description'>
 
-<p>Set the columns to restrict when using mass assignment (e.g.
-<code>set</code>).  Using this means that attempts to call setter methods
-for the columns listed here will cause an exception or be silently skipped
-(based on the <code>strict_param_setting</code> setting). If you have any
-virtual setter methods (methods that end in =) that you want not to be used
-during mass assignment, they need to be listed here as well (without the
-=).</p>
+<p>Set the columns to restrict when using mass assignment (e.g. <code>set</code>).  Using this means that attempts to call setter methods for the columns listed here will cause an exception or be silently skipped (based on the <code>strict_param_setting</code> setting). If you have any virtual setter methods (methods that end in =) that you want not to be used during mass assignment, they need to be listed here as well (without the =).</p>
 
-<p>It&#39;s generally a bad idea to rely on a blacklist approach for security.
-Using a whitelist approach such as the whitelist_security plugin or the
-set_fields methods is usually a better choice.  So use of this method is
-generally a bad idea.</p>
+<p>It&#39;s generally a bad idea to rely on a blacklist approach for security.  Using a whitelist approach such as the whitelist_security plugin or the set_fields methods is usually a better choice.  So use of this method is generally a bad idea.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_restricted_columns</span>(<span class="ruby-value">:records_sold</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">hometown:</span> <span class="ruby-string">&#39;Sactown&#39;</span>) <span class="ruby-comment"># No Error</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Bob&#39;</span>, <span class="ruby-value">records_sold:</span> <span class="ruby-value">30000</span>) <span class="ruby-comment"># Error</span></pre>
 
@@ -116,7 +104,7 @@ generally a bad idea.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_restricted_columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_restricted_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_restricted_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">clear_setter_methods_cache</span>&#x000A;  <span class="ruby-ivar">@restricted_columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_restricted_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_restricted_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-identifier">clear_setter_methods_cache</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-ivar">@restricted_columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

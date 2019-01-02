@@ -35,11 +35,7 @@ Sequel::Plugins::Timestamps
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The timestamps plugin creates hooks that automatically set create and
-update timestamp fields.  Both field names used are configurable, and you 
-can also set whether to overwrite existing create timestamps (false by
-default), or whether to set the update timestamp when creating (also false
-by default).</p>
+<p>The timestamps plugin creates hooks that automatically set create and update timestamp fields.  Both field names used are configurable, and you  can also set whether to overwrite existing create timestamps (false by default), or whether to set the update timestamp when creating (also false by default).</p>
 
 <p>Usage:</p>
 
@@ -73,12 +69,9 @@ by default).</p>
 </div>
 <div class='description'>
 
-<p>Configure the plugin by setting the available options.  Note that if this
-method is run more than once, previous settings are ignored, and it will
-just use the settings given or the default settings.  Options:</p>
+<p>Configure the plugin by setting the available options.  Note that if this method is run more than once, previous settings are ignored, and it will just use the settings given or the default settings.  Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_manual_update </td><td>
-<p>Whether to skip setting the update timestamp if it has been modified
-manually (default: false)</p>
+<p>Whether to skip setting the update timestamp if it has been modified manually (default: false)</p>
 </td></tr><tr><td class='label'>:create </td><td>
 <p>The field to hold the create timestamp (default: :created_at)</p>
 </td></tr><tr><td class='label'>:force </td><td>
@@ -86,8 +79,7 @@ manually (default: false)</p>
 </td></tr><tr><td class='label'>:update </td><td>
 <p>The field to hold the update timestamp (default: :updated_at)</p>
 </td></tr><tr><td class='label'>:update_on_create </td><td>
-<p>Whether to set the update timestamp to the create timestamp when creating
-(default: false)</p>
+<p>Whether to set the update timestamp to the create timestamp when creating (default: false)</p>
 </td></tr></tbody></table>
 
 </div>
@@ -95,7 +87,7 @@ manually (default: false)</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@allow_manual_timestamp_update</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_manual_update</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>&#x000A;    <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-ivar">@allow_manual_timestamp_update</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_manual_update</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">35</span>     <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>&#x000A;<span class="line-num">36</span>     <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>&#x000A;<span class="line-num">37</span>     <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">38</span>     <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">39</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

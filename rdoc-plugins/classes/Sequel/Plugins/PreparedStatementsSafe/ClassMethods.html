@@ -56,11 +56,7 @@ Sequel::Plugins::PreparedStatementsSafe::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>A hash with column symbol keys and default values.  Instance values are
-merged into this hash before creating to reduce the number of free columns
-(columns that may or may not be present in the INSERT statement), as the
-number of prepared statements that can be created is 2^N (where N is the
-number of free columns).</p>
+<p>A hash with column symbol keys and default values.  Instance values are merged into this hash before creating to reduce the number of free columns (columns that may or may not be present in the INSERT statement), as the number of prepared statements that can be created is 2^N (where N is the number of free columns).</p>
 </td>
 </tr>
 </table>
@@ -77,15 +73,14 @@ number of free columns).</p>
 </div>
 <div class='description'>
 
-<p>Freeze the prepared statements column defaults when freezing the model
-class.</p>
+<p>Freeze the prepared statements column defaults when freezing the model class.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@prepared_statements_column_defaults</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@prepared_statements_column_defaults</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">43</span>   <span class="ruby-ivar">@prepared_statements_column_defaults</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@prepared_statements_column_defaults</span>&#x000A;<span class="line-num">44</span> &#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

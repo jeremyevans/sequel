@@ -80,7 +80,7 @@ Sequel::JDBC::Transactions
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 5</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>  <span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb</span>&#x000A;<span class="line-num">6</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">7</span>   <span class="ruby-identifier">supports_savepoints?</span>&#x000A;<span class="line-num">8</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
@@ -92,15 +92,14 @@ Sequel::JDBC::Transactions
 </div>
 <div class='description'>
 
-<p>Check the <a href="../JDBC.html">JDBC</a> DatabaseMetaData for savepoint
-support</p>
+<p>Check the <a href="../JDBC.html"><code>JDBC</code></a> DatabaseMetaData for savepoint support</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_savepoints-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints?</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_savepoints</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_savepoints</span>)&#x000A;  <span class="ruby-ivar">@supports_savepoints</span> = <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supports_savepoints</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_savepoints-3F-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb</span>&#x000A;<span class="line-num">12</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints?</span>&#x000A;<span class="line-num">13</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_savepoints</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_savepoints</span>)&#x000A;<span class="line-num">14</span>   <span class="ruby-ivar">@supports_savepoints</span> = <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supports_savepoints</span>}&#x000A;<span class="line-num">15</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_transaction_isolation_levels-3F'>
@@ -112,15 +111,14 @@ support</p>
 </div>
 <div class='description'>
 
-<p>Check the <a href="../JDBC.html">JDBC</a> DatabaseMetaData for support for
-serializable isolation, since that&#39;s the value most people will use.</p>
+<p>Check the <a href="../JDBC.html"><code>JDBC</code></a> DatabaseMetaData for support for serializable isolation, since that&#39;s the value most people will use.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_transaction_isolation_levels-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supportsTransactionIsolationLevel</span>(<span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">TRANSACTION_SERIALIZABLE</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_transaction_isolation_levels-3F-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/transactions.rb</span>&#x000A;<span class="line-num">19</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transaction_isolation_levels?</span>&#x000A;<span class="line-num">20</span>   <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">getMetaData</span>.<span class="ruby-identifier">supportsTransactionIsolationLevel</span>(<span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">TRANSACTION_SERIALIZABLE</span>)}&#x000A;<span class="line-num">21</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -92,7 +92,7 @@ Sequel::Plugins::Subclasses::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-descendents-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-descendents-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">descendents</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="line-num">56</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze_descendents'>
@@ -104,15 +104,14 @@ Sequel::Plugins::Subclasses::ClassMethods
 </div>
 <div class='description'>
 
-<p>Freeze all descendent classes.  This also finalizes the associations for
-those classes before freezing.</p>
+<p>Freeze all descendent classes.  This also finalizes the associations for those classes before freezing.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze_descendents-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze_descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze_descendents</span>&#x000A;  <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze_descendents-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze_descendents</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inherited'>
@@ -124,15 +123,14 @@ those classes before freezing.</p>
 </div>
 <div class='description'>
 
-<p>Add the subclass to this model&#39;s current subclasses, and initialize a
-new subclasses instance variable in the subclass.</p>
+<p>Add the subclass to this model&#39;s current subclasses, and initialize a new subclasses instance variable in the subclass.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inherited-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;  <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inherited-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;<span class="line-num">70</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;<span class="line-num">72</span>   <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

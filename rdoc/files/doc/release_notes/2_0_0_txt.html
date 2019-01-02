@@ -39,21 +39,13 @@ Last Update:
 <p>Blockless Filter Expressions</p>
 <hr>
 
-<p>Before 2.0.0, in order to specify complex SQL expressions, you either had
-to resort to writing the SQL yourself in a string or using an expression
-inside a block that was parsed by ParseTree. Because ParseTree was
-required, only ruby 1.8.* was supported, and supporting other ruby versions
-(ruby 1.9, JRuby, Rubinius) would never be possible.</p>
+<p>Before 2.0.0, in order to specify complex SQL expressions, you either had to resort to writing the SQL yourself in a string or using an expression inside a block that was parsed by ParseTree. Because ParseTree was required, only ruby 1.8.* was supported, and supporting other ruby versions (ruby 1.9, JRuby, Rubinius) would never be possible.</p>
 
-<p>With 2.0.0, you no longer need to use a block to write complex SQL
-expressions. The basics of the blockless filters are the usual arithmetic,
-inequality, and binary operators:</p>
+<p>With 2.0.0, you no longer need to use a block to write complex SQL expressions. The basics of the blockless filters are the usual arithmetic, inequality, and binary operators:</p>
 
 <pre>+ = addition&#x000A;- = subtraction&#x000A;* = multiplication&#x000A;/ = division&#x000A;&gt; = greater than&#x000A;&lt; = less than&#x000A;&gt;= = greater than or equal to&#x000A;&lt;= = less than or equal to&#x000A;~ = negation&#x000A;&amp; = AND&#x000A;| = OR</pre>
 
-<p>You can use these operators on Symbols, LiteralStrings, and other
-Sequel::SQL::Expressions.  Note that there is no equal operator or not
-equal operator, to specify those, you use a Hash.</p>
+<p>You can use these operators on Symbols, LiteralStrings, and other Sequel::SQL::Expressions.  Note that there is no equal operator or not equal operator, to specify those, you use a Hash.</p>
 
 <p>Here are some examples:</p>
 
@@ -74,26 +66,20 @@ equal operator, to specify those, you use a Hash.</p>
 <p>SQL String Concatenation</p>
 <hr>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
-expressing SQL string concatenation in an easy way:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has support for expressing SQL string concatenation in an easy way:</p>
 
 <pre class="ruby">[<span class="ruby-value">:name</span>, <span class="ruby-value">:title</span>].<span class="ruby-identifier">sql_string_join</span>(<span class="ruby-string">&quot; - &quot;</span>)&#x000A;<span class="ruby-comment"># SQL:  name || &#39; - &#39; || title</span></pre>
 
-<p>You can use this in selecting columns, creating filters, ordering datasets,
-and possibly elsewhere.</p>
+<p>You can use this in selecting columns, creating filters, ordering datasets, and possibly elsewhere.</p>
 
 <p>Schema Reflection Support/Typecasting on Assignment</p>
 <hr>
 
-<p>When used with PostgreSQL, MySQL, or SQLite, <a
-href="../../../classes/Sequel.html">Sequel</a> now has the ability to get
-information from the database&#39;s schema in regards to column types:</p>
+<p>When used with PostgreSQL, MySQL, or SQLite, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has the ability to get information from the database&#39;s schema in regards to column types:</p>
 
 <pre>DB.schema(:artist)&#x000A;=&gt; [[:id, {:type=&gt;:integer, :db_type=&gt;&quot;integer&quot;, :max_chars=&gt;0&#x000A;   :numeric_precision=&gt;32, :allow_null=&gt;false,&#x000A;   :default=&gt;&quot;nextval(&#39;artist_id_seq&#39;::regclass)&quot;}], [:name,&#x000A;   {:type=&gt;:string, :default=&gt;nil, :db_type=&gt;&quot;text&quot;,&#x000A;   :numeric_precision=&gt;0, :allow_null=&gt;true, :max_chars=&gt;0}]]</pre>
 
-<p>Models now use this information to typecast values on attribute assignment.
-For example, if you have an integer column named number and a text (e.g.
-varchar) column named title:</p>
+<p>Models now use this information to typecast values on attribute assignment. For example, if you have an integer column named number and a text (e.g. varchar) column named title:</p>
 
 <pre>1.5.1:&#x000A;  model.number = &#39;1&#39;&#x000A;  model.number # =&gt; &#39;1&#39;&#x000A;  model.title = 1&#x000A;  model.title # =&gt; 1&#x000A;2.0.0:&#x000A;  model.number = &#39;1&#39;&#x000A;  model.number # =&gt; 1&#x000A;  model.title = 1&#x000A;  model.title # =&gt; &#39;1&#39;</pre>
 
@@ -101,8 +87,7 @@ varchar) column named title:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">typecast_on_assignment</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">typecast_on_assignment</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Per Class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">typecast_on_assignment</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># Per Object</span></pre>
 
-<p>Typecasting is somewhat strict, it does not allow obviously bogus data to
-be used:</p>
+<p>Typecasting is somewhat strict, it does not allow obviously bogus data to be used:</p>
 
 <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> = <span class="ruby-string">&#39;a&#39;</span> <span class="ruby-comment"># Raises error</span></pre>
 
@@ -110,148 +95,90 @@ be used:</p>
 
 <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> = <span class="ruby-string">&#39;a&#39;</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">number</span> <span class="ruby-comment"># =&gt; 0</span></pre>
 
-<p>If <a href="../../../classes/Sequel.html">Sequel</a> is being used with a
-web framework and you want to display friendly error messages to the user,
-you should probably turn typecasting off and set up the necessary
-validations in your models.</p>
+<p>If <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is being used with a web framework and you want to display friendly error messages to the user, you should probably turn typecasting off and set up the necessary validations in your models.</p>
 
 <p>Model Association Improvements</p>
 <hr>
 
-<p>Associations can now be eagerly loaded even if they have a block, though
-the block should not rely on being evaluated in the context of an instance.
-This allows you filter on associations when eagerly loading:</p>
+<p>Associations can now be eagerly loaded even if they have a block, though the block should not rely on being evaluated in the context of an instance. This allows you filter on associations when eagerly loading:</p>
 
 <pre>Artist.one_to_many :albums_with_10_tracks, :class=&gt;:Album do |ds|&#x000A;  ds.filter(:num_tracks =&gt; 10)&#x000A;end&#x000A;Artist.filter(:name.like(&#39;A%)).eager(:albums_with_10_tracks).all&#x000A;# SELECT * FROM artists WHERE (name LIKE &#39;A%&#39;)&#x000A;# SELECT albums.* FROM albums WHERE ((artist_id IN (...)) AND&#x000A;#   (num_tracks = 10))</pre>
 
-<p>Associations now have a remove_all_ method for removing all associated
-objects in a single query:</p>
+<p>Associations now have a remove_all_ method for removing all associated objects in a single query:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">remove_all_albums</span>&#x000A;<span class="ruby-comment"># DELETE FROM albums_artists WHERE artist_id = 1</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">remove_all_albums</span>&#x000A;<span class="ruby-comment"># UPDATE albums SET artist_id = NULL WHERE artist_id = 1</span></pre>
 
-<p>All associations can specify a :select option to change which columns are
-selected.  Previously only many to many associations suppported this.</p>
+<p>All associations can specify a :select option to change which columns are selected.  Previously only many to many associations suppported this.</p>
 
-<p>The SQL used when eagerly loading through eager_graph can be modified via
-the :graph_join_type, :graph_conditions, and :graph_join_conditions
-options.</p>
+<p>The SQL used when eagerly loading through eager_graph can be modified via the :graph_join_type, :graph_conditions, and :graph_join_conditions options.</p>
 
-<p>:graph_join_type changes the join type from the default of :left_outer. 
-This can be useful if you do not want any albums that don&#39;t have an
-artist in the result set:</p>
+<p>:graph_join_type changes the join type from the default of :left_outer.  This can be useful if you do not want any albums that don&#39;t have an artist in the result set:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">:graph_join_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:inner</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:artist</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT ... FROM albums INNER JOIN artists ...</span></pre>
 
-<p>:graph_conditions adds conditions on the join to the table you are joining,
-the eager_graph equivalent of an association block argument in eager. It
-takes either a hash or an array where all elements are arrays of length
-two, similar to join_table, where key symbols specify columns in the joined
-table and value symbols specify columns in the last joined or primary
-table:</p>
+<p>:graph_conditions adds conditions on the join to the table you are joining, the eager_graph equivalent of an association block argument in eager. It takes either a hash or an array where all elements are arrays of length two, similar to join_table, where key symbols specify columns in the joined table and value symbols specify columns in the last joined or primary table:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>, <span class="ruby-value">:graph_conditions</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:active</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:artist</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT ... FROM albums LEFT OUTER JOIN artists ON ((artists.id =</span>&#x000A;<span class="ruby-comment">#   albums.artist_id) AND (artists.active = &#39;t&#39;))</span></pre>
 
-<p>:graph_join_table_conditions exists for many to many associations only, and
-operates the same as :graph_conditions, except it specifies a condition on
-the many to many join table instead of the associated model&#39;s table.
-This is necessary if the join table is also model table with other columns
-on which you may want to filter:</p>
+<p>:graph_join_table_conditions exists for many to many associations only, and operates the same as :graph_conditions, except it specifies a condition on the many to many join table instead of the associated model&#39;s table. This is necessary if the join table is also model table with other columns on which you may want to filter:</p>
 
 <pre>Album.many_to_many :genres, :join_table=&gt;:ag, \&#x000A;  :graph_join_table_conditions=&gt;{:active=&gt;true}&#x000A;Album.eager_graph(:genres).sql&#x000A;# SELECT ... FROM albums LEFT OUTER JOIN ag ON ((ag.album_id =&#x000A;    albums.id) AND (ag.active = &#39;t&#39;)) LEFT OUTER JOIN genres ON&#x000A;    (genres.id = ag.genre_id)</pre>
 
 <p>Other Small Improvements</p>
 <hr>
 <ul><li>
-<p>Dataset#invert returns a dataset that matches all records not matching the
-current filter.</p>
+<p>Dataset#invert returns a dataset that matches all records not matching the current filter.</p>
 </li><li>
 <p>Dataset#unfiltered returns a dataset that has any filters removed.</p>
 </li><li>
 <p>Dataset#last_page? and Dataset#first_page? for paginated datasets.</p>
 </li><li>
-<p>The sequel command line tool now support an -E or –echo argument that logs
-all SQL to the standard output.  It also can take a path to a yaml file
-with database connection options, in addition to a database URL.</p>
+<p>The sequel command line tool now support an -E or –echo argument that logs all SQL to the standard output.  It also can take a path to a yaml file with database connection options, in addition to a database URL.</p>
 </li><li>
-<p>Databases can now have multiple SQL loggers, so you can log to the standard
-output as well as a file.</p>
+<p>Databases can now have multiple SQL loggers, so you can log to the standard output as well as a file.</p>
 </li><li>
-<p>SQL identifiers (columns and tables) are now quoted by default (you can
-turn this off via Sequel.quote_identifiers = false if need be).</p>
+<p>SQL identifiers (columns and tables) are now quoted by default (you can turn this off via Sequel.quote_identifiers = false if need be).</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
-now takes an optional block that will disconnect the database when the
-block finishes.</p>
+<p><a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> now takes an optional block that will disconnect the database when the block finishes.</p>
 </li><li>
 <p>AlterTableGenerator now has add_primary_key and add_foreign_key methods.</p>
 </li><li>
-<p>Running the specs without ParseTree installed skips the specs that require
-ParseTree.</p>
+<p>Running the specs without ParseTree installed skips the specs that require ParseTree.</p>
 </li><li>
-<p>You can use an array of arrays instead of a hash when specifying
-conditions, which may be necessary in certain situations where you would be
-using the same hash key more than once.</p>
+<p>You can use an array of arrays instead of a hash when specifying conditions, which may be necessary in certain situations where you would be using the same hash key more than once.</p>
 </li><li>
-<p>Almost all documentation for <a
-href="../../../classes/Sequel.html">Sequel</a> was updated for 2.0.0, so if
-you found <a href="../../../classes/Sequel.html">Sequel</a> documentation
-lacking before, check out the new RDoc pages.</p>
+<p>Almost all documentation for <a href="../../../classes/Sequel.html"><code>Sequel</code></a> was updated for 2.0.0, so if you found <a href="../../../classes/Sequel.html"><code>Sequel</code></a> documentation lacking before, check out the new RDoc pages.</p>
 </li><li>
-<p>There have been many minor refactoring improvements, the code should now be
-easier to read and follow.</p>
+<p>There have been many minor refactoring improvements, the code should now be easier to read and follow.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now has no external
-dependencies.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has no external dependencies.</p>
 </li><li>
 <p>Sequel::Models now have before_validation and after_validation hooks.</p>
 </li><li>
-<p><a href="../../../classes/Sequel/Model.html">Sequel::Model</a> hooks that
-return false cause the methods that call them (such as save) to return
-false.</p>
+<p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> hooks that return false cause the methods that call them (such as save) to return false.</p>
 </li><li>
-<p>Sequel::Models can now load their schema on first instantiation, instead of
-when they are created, via Sequel::Model.lazy_load_schema=.  This is
-helpful for certain web frameworks that reload all models on every request.</p>
+<p>Sequel::Models can now load their schema on first instantiation, instead of when they are created, via Sequel::Model.lazy_load_schema=.  This is helpful for certain web frameworks that reload all models on every request.</p>
 </li><li>
-<p>Hook methods that use blocks can now include an optional tag, which allows
-them to work well with web frameworks that load source files every time
-they are modified.</p>
+<p>Hook methods that use blocks can now include an optional tag, which allows them to work well with web frameworks that load source files every time they are modified.</p>
 </li></ul>
 
-<p>The PostgreSQL adapter has been rewritten and now supports ruby-pg. There
-have also been improvements in the following adapters: DBI, MySQL, SQLite,
-Oracle, and MSSQL.</p>
+<p>The PostgreSQL adapter has been rewritten and now supports ruby-pg. There have also been improvements in the following adapters: DBI, MySQL, SQLite, Oracle, and MSSQL.</p>
 
-<p>All of the methods that have been deprecated in 1.5.0 have now been
-removed.  If you are want to upgrade to <a
-href="../../../classes/Sequel.html">Sequel</a> 2.0.0 from version 1.4.0 or
-previous, upgrade to 1.5.1 first, fix all of the deprecation warnings that
-show up, and then upgrade to 2.0.0.</p>
+<p>All of the methods that have been deprecated in 1.5.0 have now been removed.  If you are want to upgrade to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.0.0 from version 1.4.0 or previous, upgrade to 1.5.1 first, fix all of the deprecation warnings that show up, and then upgrade to 2.0.0.</p>
 
-<p>There were some backwards incompatible changes made in 2.0.0 beyond the
-removal of deprecated methods.  These are:</p>
+<p>There were some backwards incompatible changes made in 2.0.0 beyond the removal of deprecated methods.  These are:</p>
 <ul><li>
-<p>Inflector is no longer used, the inflection methods were moved directly
-into String (where they belong because inflections only make sense for
-strings).  So to override singularization or pluralization rules, use
-String.inflections instead of Inflector.inflections.</p>
+<p>Inflector is no longer used, the inflection methods were moved directly into String (where they belong because inflections only make sense for strings).  So to override singularization or pluralization rules, use String.inflections instead of Inflector.inflections.</p>
 </li><li>
-<p>MySQL tinyints are now returned as boolean values instead of integers. 
-MySQL doesn&#39;t have a boolean type, and usually it is recommended to use
-tinyint for a boolean column.</p>
+<p>MySQL tinyints are now returned as boolean values instead of integers.  MySQL doesn&#39;t have a boolean type, and usually it is recommended to use tinyint for a boolean column.</p>
 </li><li>
-<p>You can no longer pass an array to Dataset#order or Dataset#select, you
-need to pass each argument separately (the * operator is your friend).</p>
+<p>You can no longer pass an array to Dataset#order or Dataset#select, you need to pass each argument separately (the * operator is your friend).</p>
 </li><li>
-<p>You must use &#39;?&#39; instead of &#39;(?)&#39; when interpolating an
-array argument into a string (e.g. filter(&#39;x IN ?&#39;, [1,2,3]))</p>
+<p>You must use &#39;?&#39; instead of &#39;(?)&#39; when interpolating an array argument into a string (e.g. filter(&#39;x IN ?&#39;, [1,2,3]))</p>
 </li><li>
-<p>You must pass an explicit table alias argument to join_table and related
-methods, you can no longer include the table alias inside the table
-argument.</p>
+<p>You must pass an explicit table alias argument to join_table and related methods, you can no longer include the table alias inside the table argument.</p>
 </li><li>
-<p>sqlite:// URLs now operate the same as file:// URLs (2 slashes for a
-relative path, 3 for an absolute path).</p>
+<p>sqlite:// URLs now operate the same as file:// URLs (2 slashes for a relative path, 3 for an absolute path).</p>
 </li></ul>
 </div>
 <div id='context'>

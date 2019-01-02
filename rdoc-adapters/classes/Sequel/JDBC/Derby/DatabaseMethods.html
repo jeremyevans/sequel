@@ -87,17 +87,14 @@ Sequel::JDBC::Derby::DatabaseMethods
 </div>
 <div class='description'>
 
-<p><a href="../Derby.html">Derby</a> doesn&#39;t support casting integer to
-varchar, only integer to char, and char(254) appears to have the widest
-support (with char(255) failing). This does add a bunch of extra spaces at
-the end, but those will be trimmed elsewhere.</p>
+<p><a href="../Derby.html"><code>Derby</code></a> doesn&#39;t support casting integer to varchar, only integer to char, and char(254) appears to have the widest support (with char(255) failing). This does add a bunch of extra spaces at the end, but those will be trimmed elsewhere.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_type_literal-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast_type_literal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_type_literal</span>(<span class="ruby-identifier">type</span>)&#x000A;  (<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>) <span class="ruby-operator">?</span> <span class="ruby-string">&#39;CHAR(254)&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast_type_literal-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_type_literal</span>(<span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">25</span>   (<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>) <span class="ruby-operator">?</span> <span class="ruby-string">&#39;CHAR(254)&#39;</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-database_type'>
@@ -114,7 +111,7 @@ the end, but those will be trimmed elsewhere.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-database_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>&#x000A;  <span class="ruby-value">:derby</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-database_type-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb</span>&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>&#x000A;<span class="line-num">29</span>   <span class="ruby-value">:derby</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -131,7 +128,7 @@ the end, but those will be trimmed elsewhere.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">svn_version</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">svn_version</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -143,15 +140,14 @@ the end, but those will be trimmed elsewhere.</p>
 </div>
 <div class='description'>
 
-<p><a href="../Derby.html">Derby</a> uses an IDENTITY sequence for
-autoincrementing columns.</p>
+<p><a href="../Derby.html"><code>Derby</code></a> uses an IDENTITY sequence for autoincrementing columns.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-serial_primary_key_options-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-serial_primary_key_options-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>&#x000A;  {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Integer</span>, <span class="ruby-value">:identity</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:start_with</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-serial_primary_key_options-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>&#x000A;<span class="line-num">39</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Integer</span>, <span class="ruby-value">:identity</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:start_with</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_transactional_ddl-3F'>
@@ -163,14 +159,14 @@ autoincrementing columns.</p>
 </div>
 <div class='description'>
 
-<p><a href="../Derby.html">Derby</a> supports transactional DDL statements.</p>
+<p><a href="../Derby.html"><code>Derby</code></a> supports transactional DDL statements.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_transactional_ddl-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_transactional_ddl-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transactional_ddl?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_transactional_ddl-3F-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb</span>&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transactional_ddl?</span>&#x000A;<span class="line-num">53</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-svn_version'>
@@ -189,7 +185,7 @@ autoincrementing columns.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-svn_version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-svn_version-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">svn_version</span>&#x000A;  <span class="ruby-ivar">@svn_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">get_meta_data</span>.<span class="ruby-identifier">get_database_product_version</span>}&#x000A;    <span class="ruby-identifier">v</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\((\d+)\)\z/</span>&#x000A;    <span class="ruby-node">$1</span>.<span class="ruby-identifier">to_i</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-svn_version-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">svn_version</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-ivar">@svn_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">45</span>     <span class="ruby-identifier">v</span> = <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">get_meta_data</span>.<span class="ruby-identifier">get_database_product_version</span>}&#x000A;<span class="line-num">46</span>     <span class="ruby-identifier">v</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/\((\d+)\)\z/</span>&#x000A;<span class="line-num">47</span>     <span class="ruby-node">$1</span>.<span class="ruby-identifier">to_i</span>&#x000A;<span class="line-num">48</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -36,9 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The graph_each extension adds Dataset#graph_each and makes Dataset#each
-call graph_each if the dataset has been graphed. Dataset#graph_each splits
-result hashes into subhashes per table:</p>
+<p>The graph_each extension adds Dataset#graph_each and makes Dataset#each call graph_each if the dataset has been graphed. Dataset#graph_each splits result hashes into subhashes per table:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">graph</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">id:</span> <span class="ruby-value">:b_id</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;{:id=&gt;1, :b_id=&gt;2}, :b=&gt;{:id=&gt;2}}</span></pre>
 
@@ -46,13 +44,11 @@ result hashes into subhashes per table:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:graph_each</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:graph_each</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/GraphEach.html">Sequel::GraphEach</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/GraphEach.html"><code>Sequel::GraphEach</code></a></p>
 </div>
 <div id='context'>
 </div>

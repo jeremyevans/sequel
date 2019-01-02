@@ -38,92 +38,53 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#schema now includes :max_length entries for string columns,
-specifying the size of the string field.  The auto_validations plugin now
-uses this information to automatically set up max_length validations on
-those fields.</p>
+<p>Database#schema now includes :max_length entries for string columns, specifying the size of the string field.  The auto_validations plugin now uses this information to automatically set up max_length validations on those fields.</p>
 </li><li>
-<p>The Dataset join methods now support a :reset_implicit_qualifier option. 
-If set to false, this makes the join not reset the implicit qualifier, so
-that the next join will not consider this table as the last table joined. 
-Example:</p>
+<p>The Dataset join methods now support a :reset_implicit_qualifier option.  If set to false, this makes the join not reset the implicit qualifier, so that the next join will not consider this table as the last table joined.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:d</span>).&#x000A;  <span class="ruby-identifier">join</span>(<span class="ruby-value">:e</span>, <span class="ruby-value">:f</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:g</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a</span>&#x000A;<span class="ruby-comment"># INNER JOIN b ON (b.c = a.d)</span>&#x000A;<span class="ruby-comment"># INNER JOIN e ON (e.f = b.g)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, {<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:d</span>}, <span class="ruby-value">:reset_implicit_qualifier</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>).&#x000A;  <span class="ruby-identifier">join</span>(<span class="ruby-value">:e</span>, <span class="ruby-value">:f</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:g</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a</span>&#x000A;<span class="ruby-comment"># INNER JOIN b ON (b.c = a.d)</span>&#x000A;<span class="ruby-comment"># INNER JOIN e ON (e.f = a.g)</span></pre>
 </li><li>
-<p>The Dataset cross and natural join methods now accept an options hash.
-Example:</p>
+<p>The Dataset cross and natural join methods now accept an options hash. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">cross_join</span>(<span class="ruby-value">:b</span>, <span class="ruby-value">:table_alias</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:c</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a CROSS JOIN b AS c</span></pre>
 </li><li>
-<p>Model#set_nested_attributes has been added to the nested_attributes plugin,
-which allows you to to set the nested_attributes options to use per-call. 
-This is very helpful if you have multiple forms that handle associated
-objects, but with different input fields used for the associated objects
-depending on the form.  Example:</p>
+<p>Model#set_nested_attributes has been added to the nested_attributes plugin, which allows you to to set the nested_attributes options to use per-call.  This is very helpful if you have multiple forms that handle associated objects, but with different input fields used for the associated objects depending on the form.  Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_nested_attributes</span>(<span class="ruby-value">:tracks</span>,&#x000A;  <span class="ruby-identifier">params</span>[<span class="ruby-value">:track_attributes</span>],&#x000A;  <span class="ruby-value">:fields</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>, <span class="ruby-value">:c</span>])</pre>
 </li><li>
-<p>Database#values has been added on PostgreSQL, which creates a dataset that
-uses VALUES instead of SELECT.  Just as PostgreSQL allows, you can also use
-orders, limits, and offsets with this dataset.</p>
+<p>Database#values has been added on PostgreSQL, which creates a dataset that uses VALUES instead of SELECT.  Just as PostgreSQL allows, you can also use orders, limits, and offsets with this dataset.</p>
 </li><li>
-<p>A :notice_receiver option is now supported in the postgres adapter if the
-pg driver is used.  This should be a proc, which will be passed to the pg
-connection&#39;s set_notice_receiver method.</p>
+<p>A :notice_receiver option is now supported in the postgres adapter if the pg driver is used.  This should be a proc, which will be passed to the pg connection&#39;s set_notice_receiver method.</p>
 </li><li>
-<p>A Database :readonly option is now supported in the sqlite adapter, which
-opens the database in a read-only mode, causing an error if a query is
-issued that would modify the database.</p>
+<p>A Database :readonly option is now supported in the sqlite adapter, which opens the database in a read-only mode, causing an error if a query is issued that would modify the database.</p>
 </li><li>
-<p>A :before_thread_exit option has been added to
-Database#listen_for_static_cache_updates in the pg_static_cache_updater
-extension, allowing you to run code before the created thread exits.</p>
+<p>A :before_thread_exit option has been added to Database#listen_for_static_cache_updates in the pg_static_cache_updater extension, allowing you to run code before the created thread exits.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Eager loading limited associations using a UNION now works correctly when
-an association block is used.  This fixes a regression that first occurred
-in 4.10.0, when the union eager loader became the default eager loader.</p>
+<p>Eager loading limited associations using a UNION now works correctly when an association block is used.  This fixes a regression that first occurred in 4.10.0, when the union eager loader became the default eager loader.</p>
 </li><li>
-<p>When creating a new associated object in the nested_attributes plugin,
-where the reciprocal association is a many_to_one association, set the
-cached reciprocal object in the new associated object before saving it.</p>
+<p>When creating a new associated object in the nested_attributes plugin, where the reciprocal association is a many_to_one association, set the cached reciprocal object in the new associated object before saving it.</p>
 
-<p>This fixes issues when validations in the associated object require access
-to the current object, which may not yet be saved in the database.</p>
+<p>This fixes issues when validations in the associated object require access to the current object, which may not yet be saved in the database.</p>
 </li><li>
-<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> and
-prepared_statements_associations plugins now automatically use explicit
-column references when preparing statements.  This fixes issues on
-PostgreSQL when a column is added to a table while a prepared statement
-exists that selects * from the table.  Previously, all further attempts to
-use the prepared statement will fail.</p>
+<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> and prepared_statements_associations plugins now automatically use explicit column references when preparing statements.  This fixes issues on PostgreSQL when a column is added to a table while a prepared statement exists that selects * from the table.  Previously, all further attempts to use the prepared statement will fail.</p>
 
-<p>This allows you to run migrations that add columns to tables while
-concurrently running an application that uses the prepared statements
-plugins.  Note that many other schema modifications can cause issues when
-running migrations while concurrently running an application, but most of
-those are not specific to usage of prepared statements.</p>
+<p>This allows you to run migrations that add columns to tables while concurrently running an application that uses the prepared statements plugins.  Note that many other schema modifications can cause issues when running migrations while concurrently running an application, but most of those are not specific to usage of prepared statements.</p>
 </li><li>
-<p>Dataset#insert_select on PostgreSQL now respects an existing RETURNING
-clause, and won&#39;t override it to use RETURNING *.</p>
+<p>Dataset#insert_select on PostgreSQL now respects an existing RETURNING clause, and won&#39;t override it to use RETURNING *.</p>
 
-<p>A similar fix was applied to the generalized prepared statements support as
-well.</p>
+<p>A similar fix was applied to the generalized prepared statements support as well.</p>
 </li><li>
-<p>The interval parser in the pg_interval extension now supports intervals
-with 2-10 digits for hours.  Previously, it only supported using 2 digits
-for hours.</p>
+<p>The interval parser in the pg_interval extension now supports intervals with 2-10 digits for hours.  Previously, it only supported using 2 digits for hours.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
 <p>The methods and classes deprecated in 4.11.0 have been removed.</p>
 </li><li>
-<p>The nested_attributes internal API has changed significantly. If you were
-calling any private nested_attributes methods, you&#39;ll probably need to
-update your code.</p>
+<p>The nested_attributes internal API has changed significantly. If you were calling any private nested_attributes methods, you&#39;ll probably need to update your code.</p>
 </li></ul>
 </div>
 <div id='context'>

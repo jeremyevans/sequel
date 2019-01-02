@@ -57,15 +57,14 @@ Sequel::Plugins::AssociationPks::InstanceMethods
 </div>
 <div class='description'>
 
-<p>After creating an object, if there are any saved association pks, call the
-related association pks setters.</p>
+<p>After creating an object, if there are any saved association pks, call the related association pks setters.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb, line 180</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">assoc_pks</span> = <span class="ruby-ivar">@_association_pks</span>&#x000A;    <span class="ruby-identifier">assoc_pks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">pks</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">instance_exec</span>(<span class="ruby-identifier">pks</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)[<span class="ruby-value">:pks_setter</span>])&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_save-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb</span>&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;<span class="line-num">182</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">assoc_pks</span> = <span class="ruby-ivar">@_association_pks</span>&#x000A;<span class="line-num">183</span>     <span class="ruby-identifier">assoc_pks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">pks</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">184</span>       <span class="ruby-identifier">instance_exec</span>(<span class="ruby-identifier">pks</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)[<span class="ruby-value">:pks_setter</span>])&#x000A;<span class="line-num">185</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">186</span>     <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">187</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">188</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-refresh'>
@@ -84,7 +83,7 @@ related association pks setters.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-refresh-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-refresh-source'><span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb, line 191</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh</span>&#x000A;  <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-refresh-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb</span>&#x000A;<span class="line-num">192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh</span>&#x000A;<span class="line-num">193</span>   <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">194</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">195</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

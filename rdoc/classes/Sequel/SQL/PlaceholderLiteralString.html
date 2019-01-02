@@ -39,9 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Represents a literal string with placeholders and arguments. This is
-necessary to ensure delayed literalization of the arguments required for
-the prepared statement support and for database-specific literalization.</p>
+<p>Represents a literal string with placeholders and arguments. This is necessary to ensure delayed literalization of the arguments required for the prepared statement support and for database-specific literalization.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -70,10 +68,7 @@ the prepared statement support and for database-specific literalization.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The arguments that will be subsituted into the placeholders. Either an
-array of unnamed placeholders (which will be substituted in order for ?
-characters), or a hash of named placeholders (which will be substituted for
-:key phrases).</p>
+<p>The arguments that will be subsituted into the placeholders. Either an array of unnamed placeholders (which will be substituted in order for ? characters), or a hash of named placeholders (which will be substituted for :key phrases).</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -91,8 +86,7 @@ characters), or a hash of named placeholders (which will be substituted for
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The literal string containing placeholders.  This can also be an array of
-strings, where each arg in args goes between the string elements.</p>
+<p>The literal string containing placeholders.  This can also be an array of strings, where each arg in args goes between the string elements.</p>
 </td>
 </tr>
 </table>
@@ -109,15 +103,14 @@ strings, where each arg in args goes between the string elements.</p>
 </div>
 <div class='description'>
 
-<p>Create an object with the given string, placeholder arguments, and parens
-flag.</p>
+<p>Create an object with the given string, placeholder arguments, and parens flag.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1601</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">str</span>, <span class="ruby-identifier">args</span>, <span class="ruby-identifier">parens</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-ivar">@str</span> = <span class="ruby-identifier">str</span>&#x000A;  <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-ivar">@parens</span> = <span class="ruby-identifier">parens</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1602</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">str</span>, <span class="ruby-identifier">args</span>, <span class="ruby-identifier">parens</span>=<span class="ruby-keyword">false</span>)&#x000A;<span class="line-num">1603</span>   <span class="ruby-ivar">@str</span> = <span class="ruby-identifier">str</span>&#x000A;<span class="line-num">1604</span>   <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>&#x000A;<span class="line-num">1605</span>   <span class="ruby-ivar">@parens</span> = <span class="ruby-identifier">parens</span>&#x000A;<span class="line-num">1606</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">1607</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -137,7 +130,7 @@ flag.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_parens-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_parens-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1609</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_parens</span>&#x000A;  <span class="ruby-ivar">@parens</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@str</span>, <span class="ruby-ivar">@args</span>, <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_parens-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1610</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_parens</span>&#x000A;<span class="line-num">1611</span>   <span class="ruby-ivar">@parens</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@str</span>, <span class="ruby-ivar">@args</span>, <span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">1612</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

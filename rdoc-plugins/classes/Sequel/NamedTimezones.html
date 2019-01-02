@@ -61,9 +61,7 @@ Sequel::NamedTimezones
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>Handles TZInfo::AmbiguousTime exceptions automatically by providing a proc
-called with both the datetime value being converted as well as the array of
-TZInfo::TimezonePeriod results. Example:</p>
+<p>Handles TZInfo::AmbiguousTime exceptions automatically by providing a proc called with both the datetime value being converted as well as the array of TZInfo::TimezonePeriod results. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">tzinfo_disambiguator</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">datetime</span>, <span class="ruby-identifier">periods</span><span class="ruby-operator">|</span> <span class="ruby-identifier">periods</span>.<span class="ruby-identifier">first</span>}</pre>
 </td>

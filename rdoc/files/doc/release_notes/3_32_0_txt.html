@@ -38,170 +38,97 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Prepared statements now support :map and :to_hash prepared statement types.
-The main reason for this is that certain extensions (e.g. sequel_pg)
-optimize map/to_hash calls, and there previously was not a way to use
-prepared statements with the map/to_hash optimizations.</p>
+<p>Prepared statements now support :map and :to_hash prepared statement types.  The main reason for this is that certain extensions (e.g. sequel_pg) optimize map/to_hash calls, and there previously was not a way to use prepared statements with the map/to_hash optimizations.</p>
 </li><li>
-<p>Sequel.empty_array_handle_nulls has been added to change how IN/NOT IN
-operations with an empty array are handled.  See the Backwards
-Compatibility section for details.</p>
+<p>Sequel.empty_array_handle_nulls has been added to change how IN/NOT IN operations with an empty array are handled.  See the Backwards Compatibility section for details.</p>
 </li><li>
-<p>5 new association options have been added that allow you to define
-associations where the underlying columns clash with standard ruby method
-names:</p>
+<p>5 new association options have been added that allow you to define associations where the underlying columns clash with standard ruby method names:</p>
 
 <pre class="ruby"><span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:primary_key_method</span>&#x000A;<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:key_method</span>&#x000A;<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:primary_key_column</span>&#x000A;<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:left_primary_key_column</span>&#x000A;<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:right_primary_key_method</span></pre>
 
-<p>Using these new options, you can now define associations that work
-correctly when the underlying primary/foreign key columns clash with
-existing ruby method names.  See the RDoc for details.</p>
+<p>Using these new options, you can now define associations that work correctly when the underlying primary/foreign key columns clash with existing ruby method names.  See the RDoc for details.</p>
 </li><li>
-<p>A use_after_commit_rollback setting has been added to models. This defaults
-to true, but can be set to false for performance or to allow models to be
-used in prepared transactions (which don&#39;t support
-after_commit/after_rollback).</p>
+<p>A use_after_commit_rollback setting has been added to models. This defaults to true, but can be set to false for performance or to allow models to be used in prepared transactions (which don&#39;t support after_commit/after_rollback).</p>
 </li><li>
-<p>Dataset#update_ignore has been added when connecting to MySQL, enabling use
-of the UPDATE IGNORE syntax to skip updating a row if the update would
-cause a unique constraint to be violated.</p>
+<p>Dataset#update_ignore has been added when connecting to MySQL, enabling use of the UPDATE IGNORE syntax to skip updating a row if the update would cause a unique constraint to be violated.</p>
 </li><li>
 <p>Database#indexes is now supported when connecting to Microsoft SQL Server.</p>
 </li><li>
-<p>On Microsoft SQL Server, the :include option is now supported when creating
-indexes, for storing column values in the index, which can be used by the
-query optimizer.</p>
+<p>On Microsoft SQL Server, the :include option is now supported when creating indexes, for storing column values in the index, which can be used by the query optimizer.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The filtering/excluding by associations code now uses qualified identifiers
-instead of unqualified identifiers, which allows it to avoid ambiguous
-column names if you are doing your own joins.</p>
+<p>The filtering/excluding by associations code now uses qualified identifiers instead of unqualified identifiers, which allows it to avoid ambiguous column names if you are doing your own joins.</p>
 </li><li>
-<p>Virtual row blocks that return arrays are now handled correctly in
-Dataset#select_map/select_order_map.</p>
+<p>Virtual row blocks that return arrays are now handled correctly in Dataset#select_map/select_order_map.</p>
 </li><li>
-<p>Dataset#select_map/select_order_map can now take both a block argument as
-well as a regular argument.</p>
+<p>Dataset#select_map/select_order_map can now take both a block argument as well as a regular argument.</p>
 </li><li>
-<p>Dataset#select_order_map now handles virtual row blocks that return ordered
-expressions.</p>
+<p>Dataset#select_order_map now handles virtual row blocks that return ordered expressions.</p>
 </li><li>
-<p>Database#table_exists? should no longer generate false negatives if you
-only have permission to retrieve some column values but not all.  Note that
-if you lack permission to SELECT from the table itself, table_exists? can
-still generate false negatives.</p>
+<p>Database#table_exists? should no longer generate false negatives if you only have permission to retrieve some column values but not all.  Note that if you lack permission to SELECT from the table itself, table_exists? can still generate false negatives.</p>
 </li><li>
-<p>The active_model plugin now supports ActiveModel 3.2, by adding support for
-to_partial_path.</p>
+<p>The active_model plugin now supports ActiveModel 3.2, by adding support for to_partial_path.</p>
 </li><li>
-<p>The serialization_modification_detection plugin now handles changed_columns
-correctly both for new objects and after saving objects.</p>
+<p>The serialization_modification_detection plugin now handles changed_columns correctly both for new objects and after saving objects.</p>
 </li><li>
-<p>The serialization plugin now clears the deserialized values when it does
-the automatic refresh after saving a new object, mostly for consistency. 
-You can use the skip_create_refresh plugin to skip refreshing when creating
-a new model object.</p>
+<p>The serialization plugin now clears the deserialized values when it does the automatic refresh after saving a new object, mostly for consistency.  You can use the skip_create_refresh plugin to skip refreshing when creating a new model object.</p>
 </li><li>
-<p>Column default values are now wrapped in parentheses on SQLite, which fixes
-some cases such as when the default is an SQL function call.</p>
+<p>Column default values are now wrapped in parentheses on SQLite, which fixes some cases such as when the default is an SQL function call.</p>
 </li><li>
-<p>Alter table emulation now works correctly on SQLite when foreign keys
-reference the table being altered.  The emulation requires a
-renaming/deleting the existing table and creating a new table, which can
-break foreign key references.  <a
-href="../../../classes/Sequel.html">Sequel</a> now disables the foreign key
-PRAGMA when altering tables, so SQLite won&#39;t track the table renames
-and break the foreign key relationships.</p>
+<p>Alter table emulation now works correctly on SQLite when foreign keys reference the table being altered.  The emulation requires a renaming/deleting the existing table and creating a new table, which can break foreign key references.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now disables the foreign key PRAGMA when altering tables, so SQLite won&#39;t track the table renames and break the foreign key relationships.</p>
 </li><li>
-<p>The set_column_type table alteration method no longer modifies default
-values and NULL/NOT NULL settings on Microsoft SQL Server, H2, and SQLite.</p>
+<p>The set_column_type table alteration method no longer modifies default values and NULL/NOT NULL settings on Microsoft SQL Server, H2, and SQLite.</p>
 </li><li>
-<p>On MySQL, Time/DateTime columns now use the timestamp type if the default
-value is Sequel::CURRENT_TIMESTAMP, since it is currently impossible for
-MySQL to have a non-constant default for a datetime column (without using a
-workaround like a trigger).</p>
+<p>On MySQL, Time/DateTime columns now use the timestamp type if the default value is Sequel::CURRENT_TIMESTAMP, since it is currently impossible for MySQL to have a non-constant default for a datetime column (without using a workaround like a trigger).</p>
 </li><li>
-<p>Metadata methods such as tables, views, and view_exists? are now handled
-correctly on Oracle if custom identifier input methods are used.</p>
+<p>Metadata methods such as tables, views, and view_exists? are now handled correctly on Oracle if custom identifier input methods are used.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now ignores errors that
-occur when attempting to get information on column defaults in Oracle
-(which can happen if you lack permission to the appropriate table). 
-Previously, such errors would cause the schema parser to raise an error,
-now, the schema information is just returned without default information.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now ignores errors that occur when attempting to get information on column defaults in Oracle (which can happen if you lack permission to the appropriate table).  Previously, such errors would cause the schema parser to raise an error, now, the schema information is just returned without default information.</p>
 </li><li>
-<p>Database#indexes now skips the primary key index when connecting to DB2,
-Derby, HSQLDB, and Oracle via the jdbc adapter.</p>
+<p>Database#indexes now skips the primary key index when connecting to DB2, Derby, HSQLDB, and Oracle via the jdbc adapter.</p>
 </li><li>
 <p>Database#indexes now works correctly on DB2.</p>
 </li><li>
-<p>The progress adapter has been fixed, it had been broken since the dataset
-literalization refactoring.</p>
+<p>The progress adapter has been fixed, it had been broken since the dataset literalization refactoring.</p>
 </li><li>
-<p>Dataset#naked! now works correctly.  Previously, it just returned the
-receiver unmodified.</p>
+<p>Dataset#naked! now works correctly.  Previously, it just returned the receiver unmodified.</p>
 </li><li>
 <p>Dataset#paginate! has been removed, as it was broken.</p>
 </li><li>
-<p>The query extension no longer breaks Dataset#clone if an argument is not
-given.</p>
+<p>The query extension no longer breaks Dataset#clone if an argument is not given.</p>
 </li><li>
 <p>Transaction related queries are no longer logged twice in the mock adapter.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Sequel&#39;s default handling of NOT IN operators with an empty array of
-values has changed, which can change which rows are returned for such
-queries.</p>
+<p>Sequel&#39;s default handling of NOT IN operators with an empty array of values has changed, which can change which rows are returned for such queries.</p>
 
-<p>Previously, <a href="../../../classes/Sequel.html">Sequel</a> was
-inconsistent in that it tried to handle NULL values correctly in the IN
-case, but not in the NOT IN case.  Now, it defaults to handling NULL values
-correctly in both cases:</p>
+<p>Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> was inconsistent in that it tried to handle NULL values correctly in the IN case, but not in the NOT IN case.  Now, it defaults to handling NULL values correctly in both cases:</p>
 
 <pre class="ruby"><span class="ruby-comment"># 3.31.0</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (b != b)</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (1 = 1)</span>&#x000A;&#x000A;<span class="ruby-comment"># 3.32.0</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (b != b)</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (b = b)</span></pre>
 
-<p>The important change in behavior is that in the NOT IN case, if the left
-hand argument is NULL, the filter returns NULL instead of true.  This has
-the potential to change query results.</p>
+<p>The important change in behavior is that in the NOT IN case, if the left hand argument is NULL, the filter returns NULL instead of true.  This has the potential to change query results.</p>
 
-<p>“Correct” here is really an opinion and not a fact, as there are valid
-arguments for the alternative behavior:</p>
+<p>“Correct” here is really an opinion and not a fact, as there are valid arguments for the alternative behavior:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (1 = 0)</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (1 = 1)</span></pre>
 
-<p>The difference is that the “correct” NULL behavior is more consistent with
-the non-empty array cases.  For example, if b is NULL:</p>
+<p>The difference is that the “correct” NULL behavior is more consistent with the non-empty array cases.  For example, if b is NULL:</p>
 
 <pre># &quot;Correct&quot; NULL handling&#x000A;#  Empty array: where(:b=&gt;[])&#x000A;WHERE (b != b) # NULL&#x000A;WHERE (b = b) # NULL&#x000A;#  Non-empty array: where(:b=&gt;[1, 2])&#x000A;WHERE (b IN (1, 2)) # NULL&#x000A;WHERE (b NOT IN (1, 2)) # NULL&#x000A;# Static boolean handling&#x000A;#  Empty array: where(:b=&gt;[])&#x000A;WHERE (1 = 0) # false&#x000A;WHERE (1 = 1) # true&#x000A;#  Non-empty array: where(:b=&gt;[1, 2])&#x000A;WHERE (b IN (1, 2)) # NULL&#x000A;WHERE (b NOT IN (1, 2)) # NULL</pre>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> chooses to default to
-behavior consistent with the non-empty array cases (similar to SQLAlchemy).
-However, there are two downsides to this handling.  The first is that some
-databases with poor optimizers (e.g. MySQL) might do a full table scan with
-the default syntax.  The second is that the static boolean handling may be
-generally perferable, if you believe that IN/NOT IN with an empty array
-should always be true or false and never NULL even if the left hand
-argument is NULL.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> chooses to default to behavior consistent with the non-empty array cases (similar to SQLAlchemy).  However, there are two downsides to this handling.  The first is that some databases with poor optimizers (e.g. MySQL) might do a full table scan with the default syntax.  The second is that the static boolean handling may be generally perferable, if you believe that IN/NOT IN with an empty array should always be true or false and never NULL even if the left hand argument is NULL.</p>
 
-<p>As there really isn&#39;t a truly correct answer in this case, <a
-href="../../../classes/Sequel.html">Sequel</a> defaults to the “correct”
-NULL handling, and allows you to switch to the static boolean handling via:</p>
+<p>As there really isn&#39;t a truly correct answer in this case, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> defaults to the “correct” NULL handling, and allows you to switch to the static boolean handling via:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">empty_array_handle_nulls</span> = <span class="ruby-keyword">false</span></pre>
 
-<p>This is currently a global setting, it may be made Database or Dataset
-specific later if requested.  Also, it is possible the default will switch
-in the future, so if you care about a specific handling, you should set
-your own default.</p>
+<p>This is currently a global setting, it may be made Database or Dataset specific later if requested.  Also, it is possible the default will switch in the future, so if you care about a specific handling, you should set your own default.</p>
 </li><li>
-<p>Database#table_exists? now only rescues Sequel::DatabaseErrors instead of
-StandardErrors, so it&#39;s possible it will raise errors instead of
-returning false on custom adapters that don&#39;t wrap their errors
-correctly.</p>
+<p>Database#table_exists? now only rescues Sequel::DatabaseErrors instead of StandardErrors, so it&#39;s possible it will raise errors instead of returning false on custom adapters that don&#39;t wrap their errors correctly.</p>
 </li></ul>
 </div>
 <div id='context'>

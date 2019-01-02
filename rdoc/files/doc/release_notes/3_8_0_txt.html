@@ -39,46 +39,25 @@ Last Update:
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>Dataset#each_server was added, allowing you to run the same query (most
-likely insert/update/delete) on all shards.  This is useful if you have a
-sharded database but have lookup tables that should be identical on all
-shards.  It works by yielding copies of the current dataset that are tied
-to each server/shard:</p>
+<p>Dataset#each_server was added, allowing you to run the same query (most likely insert/update/delete) on all shards.  This is useful if you have a sharded database but have lookup tables that should be identical on all shards.  It works by yielding copies of the current dataset that are tied to each server/shard:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each_server</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>Database#each_server was added, allowing you to run schema modification
-methods on all shards.  It works by yielding a new <a
-href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
-for each shard, that will connect to only that shard:</p>
+<p>Database#each_server was added, allowing you to run schema modification methods on all shards.  It works by yielding a new <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object for each shard, that will connect to only that shard:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">each_server</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:t</span>){<span class="ruby-constant">Integer</span> <span class="ruby-value">:num</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>You can now add and remove servers/shards from the connection pool while <a
-href="../../../classes/Sequel.html">Sequel</a> is running:</p>
+<p>You can now add and remove servers/shards from the connection pool while <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is running:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_servers</span>(<span class="ruby-value">:shard1</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;s1&#39;</span>}, <span class="ruby-value">:shard2</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;s2&#39;</span>})&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">remove_servers</span>(<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>)</pre>
 </li><li>
-<p>When you attempt to disconnect from a server that has connections currently
-in use, <a href="../../../classes/Sequel.html">Sequel</a> will now schedule
-those connections to be disconnected when they are returned to the pool. 
-Previously, <a href="../../../classes/Sequel.html">Sequel</a> disconnected
-available connections, but ignored connections currently in use, so it
-wasn&#39;t possible to guarantee complete disconnection from the server. 
-Even with this new feature, you can only guarantee eventual disconnection,
-since disconnection of connections in use happens asynchronously.</p>
+<p>When you attempt to disconnect from a server that has connections currently in use, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now schedule those connections to be disconnected when they are returned to the pool.  Previously, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> disconnected available connections, but ignored connections currently in use, so it wasn&#39;t possible to guarantee complete disconnection from the server.  Even with this new feature, you can only guarantee eventual disconnection, since disconnection of connections in use happens asynchronously.</p>
 </li><li>
-<p>Database#disconnect now accepts a :servers option specifying the server(s)
-from which to disconnect.  This should be a symbol or array of symbols
-representing servers/shards.  Only those specified will be disconnected:</p>
+<p>Database#disconnect now accepts a :servers option specifying the server(s) from which to disconnect.  This should be a symbol or array of symbols representing servers/shards.  Only those specified will be disconnected:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span>(<span class="ruby-value">:servers</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>])</pre>
 </li><li>
-<p>A validates_type validation was added to the validation_helpers plugin.  It
-allows you to check that a given column contains the correct type.  I can
-be helpful if you are also using the serialization plugin to store
-serialized ruby objects, by making sure that the objects are of the correct
-type (e.g. Hash):</p>
+<p>A validates_type validation was added to the validation_helpers plugin.  It allows you to check that a given column contains the correct type.  I can be helpful if you are also using the serialization plugin to store serialized ruby objects, by making sure that the objects are of the correct type (e.g. Hash):</p>
 
 <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">validates_type</span>(<span class="ruby-constant">Hash</span>, <span class="ruby-value">:options</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
@@ -86,89 +65,57 @@ type (e.g. Hash):</p>
 
 <pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>) <span class="ruby-operator">==</span> \&#x000A;  <span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>)&#x000A;<span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-value">:column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>) <span class="ruby-operator">==</span> \&#x000A;  <span class="ruby-value">:other_column</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:type</span>)&#x000A;<span class="ruby-comment"># =&gt; false</span></pre>
 </li><li>
-<p>When using the generic File type to create blob columns on MySQL, you can
-specify the specific database type by using the :size option (with :tiny,
-:medium, and :long values recognized):</p>
+<p>When using the generic File type to create blob columns on MySQL, you can specify the specific database type by using the :size option (with :tiny, :medium, and :long values recognized):</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:docs</span>){<span class="ruby-constant">File</span> <span class="ruby-value">:body</span>, <span class="ruby-value">:size</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:long</span>} <span class="ruby-comment"># longblob</span></pre>
 </li><li>
-<p>The mysql adapter will now default to using mysqlplus, falling back to use
-mysql.  mysqlplus is significantly better for threaded code because queries
-do not block the entire interpreter.</p>
+<p>The mysql adapter will now default to using mysqlplus, falling back to use mysql.  mysqlplus is significantly better for threaded code because queries do not block the entire interpreter.</p>
 </li><li>
 <p>The JDBC adapter is now able to detect certain types of disconnect errors.</p>
 </li><li>
-<p>ConnectionPool.servers and Database.servers were added, which return an
-array of symbols specifying the servers/shards in use.</p>
+<p>ConnectionPool.servers and Database.servers were added, which return an array of symbols specifying the servers/shards in use.</p>
 </li></ul>
 
 <p>Other Improvements</p>
 <hr>
 <ul><li>
-<p>The single-threaded connection pool now raises DatabaseConnectionErrors if
-unable to connect, so it now operates more similarly to the default
-connection pool.</p>
+<p>The single-threaded connection pool now raises DatabaseConnectionErrors if unable to connect, so it now operates more similarly to the default connection pool.</p>
 </li><li>
-<p>The single-threaded connection pool now operates more similar to the
-default connection pool when given a nonexistent server.</p>
+<p>The single-threaded connection pool now operates more similar to the default connection pool when given a nonexistent server.</p>
 </li><li>
-<p>PGErrors are now correctly converted to DatabaseErrors in the postgres
-adapter when preparing statements or executing prepared statements.</p>
+<p>PGErrors are now correctly converted to DatabaseErrors in the postgres adapter when preparing statements or executing prepared statements.</p>
 </li><li>
-<p>DatabaseDisconnectErrors are now raised correctly in the postgres adapter
-if the connection status is not OK after a query raises an error.</p>
+<p>DatabaseDisconnectErrors are now raised correctly in the postgres adapter if the connection status is not OK after a query raises an error.</p>
 </li><li>
-<p>In the mysql adapter, multiple statements in a single query should now be
-handled correctly in the all cases, not just when using Dataset#each.  So
-you can now submit multiple queries in a single string to Database#run.</p>
+<p>In the mysql adapter, multiple statements in a single query should now be handled correctly in the all cases, not just when using Dataset#each.  So you can now submit multiple queries in a single string to Database#run.</p>
 </li><li>
-<p>Model object creation on Microsoft SQL Server 2000 once again works
-correctly.  Previously, an optimization was used that was only supported on
-2005+.</p>
+<p>Model object creation on Microsoft SQL Server 2000 once again works correctly.  Previously, an optimization was used that was only supported on 2005+.</p>
 </li><li>
-<p>Backslashes are no longer doubled inside string literals when connecting to
-Microsoft SQL Server.</p>
+<p>Backslashes are no longer doubled inside string literals when connecting to Microsoft SQL Server.</p>
 </li><li>
-<p>The ORDER clause now correctly comes after the HAVING clause on Microsoft
-SQL Server.</p>
+<p>The ORDER clause now correctly comes after the HAVING clause on Microsoft SQL Server.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now checks that there is
-an active transaction before rolling back transactions on Microsoft SQL
-Server, since there are cases where Microsoft SQL Server will roll back
-transactions implicitly.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now checks that there is an active transaction before rolling back transactions on Microsoft SQL Server, since there are cases where Microsoft SQL Server will roll back transactions implicitly.</p>
 </li><li>
 <p>Blobs are now handled correctly when connecting to H2.</p>
 </li><li>
 <p>64-bit integers are now handled correctly in JDBC prepared statements.</p>
 </li><li>
-<p>In the boolean_readers plugin, correctly handle columns not in the
-db_schema, and don&#39;t raise an error if the model&#39;s columns
-can&#39;t be determined.</p>
+<p>In the boolean_readers plugin, correctly handle columns not in the db_schema, and don&#39;t raise an error if the model&#39;s columns can&#39;t be determined.</p>
 </li><li>
-<p>In the identity_map plugin, remove instances from the cache if they are
-deleted or destroyed.</p>
+<p>In the identity_map plugin, remove instances from the cache if they are deleted or destroyed.</p>
 </li></ul>
 
 <p>Backwards Compatibility</p>
 <hr>
 <ul><li>
-<p>Dataset::FROM_SELF_KEEP_OPTS was merged into Dataset::NON_SQL_OPTIONS. 
-While used in different places, they were used for the same purpose, and
-entries missing from one should have been included in the other.</p>
+<p>Dataset::FROM_SELF_KEEP_OPTS was merged into Dataset::NON_SQL_OPTIONS.  While used in different places, they were used for the same purpose, and entries missing from one should have been included in the other.</p>
 </li><li>
-<p>The connection pool internals changed substantially.  Now, ConnectionPool
-allocated and available_connections will return nil instead of an array or
-hash if they are called with a nonexistent server.  These are generally
-only used internally, though they are part of the public API. 
-created_count and size still return the size of the :default server when
-called with a nonexistent server, though.</p>
+<p>The connection pool internals changed substantially.  Now, ConnectionPool allocated and available_connections will return nil instead of an array or hash if they are called with a nonexistent server.  These are generally only used internally, though they are part of the public API.  created_count and size still return the size of the :default server when called with a nonexistent server, though.</p>
 </li><li>
-<p>The meta_eval and metaclass private methods were removed from
-Sequel::MetaProgramming (only the meta_def public method remains). If you
-want these methods, use the metaid gem.</p>
+<p>The meta_eval and metaclass private methods were removed from Sequel::MetaProgramming (only the meta_def public method remains). If you want these methods, use the metaid gem.</p>
 </li><li>
-<p>The irregular ox-&gt;oxen pluralization rule was removed from the default
-inflections, as it screws up the more common box-&gt;boxes.</p>
+<p>The irregular ox-&gt;oxen pluralization rule was removed from the default inflections, as it screws up the more common box-&gt;boxes.</p>
 </li></ul>
 </div>
 <div id='context'>

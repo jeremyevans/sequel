@@ -39,7 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Base class for all <a href="../SQL.html">SQL</a> expression objects.</p>
+<p>Base class for all <a href="../SQL.html"><code>SQL</code></a> expression objects.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -100,18 +100,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p><a href="Expression.html">Expression</a> objects are assumed to be value
-objects, where their attribute values can&#39;t change after assignment. 
-In order to make it easy to define equality and hash methods, subclass
-instances assume that the only values that affect the results of such
-methods are the values of the object&#39;s attributes.</p>
+<p><a href="Expression.html"><code>Expression</code></a> objects are assumed to be value objects, where their attribute values can&#39;t change after assignment.  In order to make it easy to define equality and hash methods, subclass instances assume that the only values that affect the results of such methods are the values of the object&#39;s attributes.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-attr_reader-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-attr_reader-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">attr_reader</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-attr_reader-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">91</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">attr_reader</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">92</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">93</span>   <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">94</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-inherited'>
@@ -123,16 +119,14 @@ methods are the values of the object&#39;s attributes.</p>
 </div>
 <div class='description'>
 
-<p>Copy the <a
-href="Expression.html#attribute-c-comparison_attrs">::comparison_attrs</a>
-into the subclass.</p>
+<p>Copy the <a href="Expression.html#attribute-c-comparison_attrs"><code>comparison_attrs</code></a> into the subclass.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-inherited-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-inherited-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comparison_attrs</span>, <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-inherited-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num"> 97</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;<span class="line-num"> 98</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num"> 99</span>   <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comparison_attrs</span>, <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="line-num">100</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -152,7 +146,7 @@ into the subclass.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-3D-3D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-3D-3D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">==</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-3D-3D-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">==</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">125</span>   <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-clone'>
@@ -164,15 +158,14 @@ into the subclass.</p>
 </div>
 <div class='description'>
 
-<p>Make clone/dup return self, since <a href="Expression.html">Expression</a>
-objects are supposed to be frozen value objects</p>
+<p>Make clone/dup return self, since <a href="Expression.html"><code>Expression</code></a> objects are supposed to be frozen value objects</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-clone-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-clone-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 117</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">clone</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-clone-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">clone</span>&#x000A;<span class="line-num">119</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-eql-3F'>
@@ -184,15 +177,14 @@ objects are supposed to be frozen value objects</p>
 </div>
 <div class='description'>
 
-<p>Returns true if the receiver is the same expression as the the
-<code>other</code> expression.</p>
+<p>Returns true if the receiver is the same expression as the the <code>other</code> expression.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-eql-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-eql-3F-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">a</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-eql-3F-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">130</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">131</span>   <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">a</span>)}&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hash'>
@@ -211,7 +203,7 @@ objects are supposed to be frozen value objects</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hash-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hash-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash</span>&#x000A;  ([<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>] <span class="ruby-operator">+</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">x</span>)}).<span class="ruby-identifier">hash</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hash-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">135</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash</span>&#x000A;<span class="line-num">136</span>   ([<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>] <span class="ruby-operator">+</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">x</span>)}).<span class="ruby-identifier">hash</span>&#x000A;<span class="line-num">137</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inspect'>
@@ -230,7 +222,7 @@ objects are supposed to be frozen value objects</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 139</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class} #{instance_variables.map{|iv| &quot;#{iv}=&gt;#{instance_variable_get(iv).inspect}&quot;}.join(&#39;, &#39;)}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">140</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">141</span>   <span class="ruby-node">&quot;#&lt;#{self.class} #{instance_variables.map{|iv| &quot;#{iv}=&gt;#{instance_variable_get(iv).inspect}&quot;}.join(&#39;, &#39;)}&gt;&quot;</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

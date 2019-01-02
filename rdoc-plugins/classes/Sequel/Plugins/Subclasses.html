@@ -35,21 +35,15 @@ Sequel::Plugins::Subclasses
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The subclasses plugin keeps track of all subclasses of the current model
-class.  Direct subclasses are available via the subclasses method, and all
-descendent classes are available via the descendents method:</p>
+<p>The subclasses plugin keeps track of all subclasses of the current model class.  Direct subclasses are available via the subclasses method, and all descendent classes are available via the descendents method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="ruby-identifier">sc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">sc2</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ssc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sc1</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">subclasses</span>    <span class="ruby-comment"># [sc1, sc2]</span>&#x000A;<span class="ruby-identifier">sc1</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># [ssc1]</span>&#x000A;<span class="ruby-identifier">sc2</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">ssc1</span>.<span class="ruby-identifier">subclasses</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">descendents</span>   <span class="ruby-comment"># [sc1, ssc1, sc2]</span></pre>
 
-<p>You can also finalize the associations and then freeze the classes in all
-descendent classes.  Doing so is a recommended practice after all models
-have been defined in production and testing, and this makes it easier than
-keeping track of the classes to finalize and freeze manually:</p>
+<p>You can also finalize the associations and then freeze the classes in all descendent classes.  Doing so is a recommended practice after all models have been defined in production and testing, and this makes it easier than keeping track of the classes to finalize and freeze manually:</p>
 
 <pre class="ruby"><span class="ruby-identifier">c</span>.<span class="ruby-identifier">freeze_descendants</span></pre>
 
-<p>You can provide a block when loading the plugin, and it will be called with
-each subclass created:</p>
+<p>You can provide a block when loading the plugin, and it will be called with each subclass created:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = []&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:subclasses</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">sc</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sc</span>}&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">A</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">B</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; [A, B]</span></pre>
 </div>
@@ -87,7 +81,7 @@ each subclass created:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@subclasses</span>, [])&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@on_subclass</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@subclasses</span>, [])&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@on_subclass</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

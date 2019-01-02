@@ -35,21 +35,13 @@ Sequel::Plugins::ColumnConflicts
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The column_conflicts plugin overrides Model#get_column_value and
-set_column_value to automatically handle column names that conflict with
-Ruby/Sequel method names.</p>
+<p>The column_conflicts plugin overrides Model#get_column_value and set_column_value to automatically handle column names that conflict with Ruby/Sequel method names.</p>
 
-<p>By default, Model#get_column_value and set_column_value just call send,
-this plugin overrides the methods and gets/sets the value directly in the
-values hash if the column name conflicts with an existing <a
-href="../Model.html">Sequel::Model</a> instance method name.</p>
+<p>By default, Model#get_column_value and set_column_value just call send, this plugin overrides the methods and gets/sets the value directly in the values hash if the column name conflicts with an existing <a href="../Model.html"><code>Sequel::Model</code></a> instance method name.</p>
 
-<p>Checking for column conflicts causes a performance hit, which is why <a
-href="../../Sequel.html">Sequel</a> does not enable such checks by default.</p>
+<p>Checking for column conflicts causes a performance hit, which is why <a href="../../Sequel.html"><code>Sequel</code></a> does not enable such checks by default.</p>
 
-<p>When using this plugin, you can manually update the columns used.  This may
-be useful if the columns conflict with one of your custom methods, instead
-of a method defined in Sequel::Model:</p>
+<p>When using this plugin, you can manually update the columns used.  This may be useful if the columns conflict with one of your custom methods, instead of a method defined in Sequel::Model:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:column_conflicts</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">get_column_conflict!</span>(<span class="ruby-value">:column</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_column_conflict!</span>(<span class="ruby-value">:other_column</span>)</pre>
 
@@ -91,7 +83,7 @@ of a method defined in Sequel::Model:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@get_column_conflicts</span> = {}&#x000A;    <span class="ruby-ivar">@set_column_conflicts</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-ivar">@get_column_conflicts</span> = {}&#x000A;<span class="line-num">35</span>     <span class="ruby-ivar">@set_column_conflicts</span> = {}&#x000A;<span class="line-num">36</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">37</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -110,7 +102,7 @@ of a method defined in Sequel::Model:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">check_column_conflicts</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">42</span>     <span class="ruby-identifier">check_column_conflicts</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">43</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

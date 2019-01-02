@@ -35,54 +35,31 @@ Sequel::Plugins::ValidationHelpers
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The validation_helpers plugin contains validate_* methods designed to be
-called inside Model#validate to perform validations:</p>
+<p>The validation_helpers plugin contains validate_* methods designed to be called inside Model#validate to perform validations:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">1</span>, <span class="ruby-value">:num_tracks</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>The validates_unique method has a unique API, but the other validations
-have the API explained here:</p>
+<p>The validates_unique method has a unique API, but the other validations have the API explained here:</p>
 
 <p>Arguments:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>atts </td><td>
-<p>Single attribute symbol or an array of attribute symbols specifying the
-attribute(s) to validate.</p>
+<p>Single attribute symbol or an array of attribute symbols specifying the attribute(s) to validate.</p>
 </td></tr></tbody></table>
 
 <p>Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_blank </td><td>
 <p>Whether to skip the validation if the value is blank.</p>
 </td></tr><tr><td class='label'>:allow_missing </td><td>
-<p>Whether to skip the validation if the attribute isn&#39;t a key in the
-values hash.  This is different from allow_nil, because <a
-href="../../Sequel.html">Sequel</a> only sends the attributes in the values
-when doing an insert or update.  If the attribute is not present, <a
-href="../../Sequel.html">Sequel</a> doesn&#39;t specify it, so the database
-will use the table&#39;s default value.  This is different from having an
-attribute in values with a value of nil, which <a
-href="../../Sequel.html">Sequel</a> will send as NULL. If your database
-table has a non NULL default, this may be a good option to use.  You
-don&#39;t want to use allow_nil, because if the attribute is in values but
-has a value nil, <a href="../../Sequel.html">Sequel</a> will attempt to
-insert a NULL value into the database, instead of using the database&#39;s
-default.</p>
+<p>Whether to skip the validation if the attribute isn&#39;t a key in the values hash.  This is different from allow_nil, because <a href="../../Sequel.html"><code>Sequel</code></a> only sends the attributes in the values when doing an insert or update.  If the attribute is not present, <a href="../../Sequel.html"><code>Sequel</code></a> doesn&#39;t specify it, so the database will use the table&#39;s default value.  This is different from having an attribute in values with a value of nil, which <a href="../../Sequel.html"><code>Sequel</code></a> will send as NULL. If your database table has a non NULL default, this may be a good option to use.  You don&#39;t want to use allow_nil, because if the attribute is in values but has a value nil, <a href="../../Sequel.html"><code>Sequel</code></a> will attempt to insert a NULL value into the database, instead of using the database&#39;s default.</p>
 </td></tr><tr><td class='label'>:allow_nil </td><td>
 <p>Whether to skip the validation if the value is nil.</p>
 </td></tr><tr><td class='label'>:from </td><td>
-<p>Set to :values to pull column values from the values hash instead of
-calling the related method. Allows for setting up methods on the underlying
-column values, in the cases where the model transforms the underlying value
-before returning it, such as when using serialization.</p>
+<p>Set to :values to pull column values from the values hash instead of calling the related method. Allows for setting up methods on the underlying column values, in the cases where the model transforms the underlying value before returning it, such as when using serialization.</p>
 </td></tr><tr><td class='label'>:message </td><td>
-<p>The message to use.  Can be a string which is used directly, or a proc
-which is called.  If the validation method takes a argument before the
-array of attributes, that argument is passed as an argument to the proc.</p>
+<p>The message to use.  Can be a string which is used directly, or a proc which is called.  If the validation method takes a argument before the array of attributes, that argument is passed as an argument to the proc.</p>
 </td></tr></tbody></table>
 
-<p>The default validation options for all models can be modified by
-overridding the Model#default_validation_helpers_options private method. By
-changing the default options, you can setup internationalization of the
-error messages.  For example, you would modify the default options:</p>
+<p>The default validation options for all models can be modified by overridding the Model#default_validation_helpers_options private method. By changing the default options, you can setup internationalization of the error messages.  For example, you would modify the default options:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_validation_helpers_options</span>(<span class="ruby-identifier">type</span>)&#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:exact_length</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">exact</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.exact_length&quot;</span>, <span class="ruby-value">exact:</span> <span class="ruby-identifier">exact</span>)}}&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:integer</span>&#x000A;      {<span class="ruby-value">message:</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.integer&quot;</span>)}}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -90,9 +67,7 @@ error messages.  For example, you would modify the default options:</p>
 
 <pre>en:&#x000A;  errors:&#x000A;    exact_length: &quot;is not %{exact} characters&quot;&#x000A;    integer: &quot;is not a number&quot;</pre>
 
-<p>Note that if you want to support internationalization of
-Errors#full_messages, you need to override the method.  Here&#39;s an
-example:</p>
+<p>Note that if you want to support internationalization of Errors#full_messages, you need to override the method.  Here&#39;s an example:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">Errors</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_messages</span>&#x000A;    <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = <span class="ruby-operator">*</span><span class="ruby-identifier">kv</span>&#x000A;      <span class="ruby-identifier">att</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">att</span>).<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-node">&quot;attributes.#{v}&quot;</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">att</span> = <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-node">&quot;attributes.#{att}&quot;</span>)&#x000A;      <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(I18n.t(&#39;errors.joiner&#39;))} #{e}&quot;</span>)}&#x000A;      <span class="ruby-identifier">m</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </div>

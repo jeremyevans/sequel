@@ -65,8 +65,7 @@ Sequel::Plugins::SingleTableInheritance::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The base dataset for STI, to which filters are added to get only the models
-for the specific STI subclass.</p>
+<p>The base dataset for STI, to which filters are added to get only the models for the specific STI subclass.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -84,9 +83,7 @@ for the specific STI subclass.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p><a href="../../../Array.html">Array</a> holding keys for all subclasses of
-this class, used for the dataset filter in subclasses. Nil in the main
-class.</p>
+<p><a href="../../../Array.html"><code>Array</code></a> holding keys for all subclasses of this class, used for the dataset filter in subclasses. Nil in the main class.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -95,8 +92,7 @@ class.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>A proc which returns the value to use for new instances. This defaults to a
-lookup in the key map.</p>
+<p>A proc which returns the value to use for new instances. This defaults to a lookup in the key map.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -105,11 +101,7 @@ lookup in the key map.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>A hash/proc with class keys and column value values, mapping the class to a
-particular value given to the <a
-href="ClassMethods.html#attribute-i-sti_key">#sti_key</a> column. Used to
-set the column value when creating objects, and for the filter when
-retrieving objects in subclasses.</p>
+<p>A hash/proc with class keys and column value values, mapping the class to a particular value given to the <a href="ClassMethods.html#attribute-i-sti_key"><code>sti_key</code></a> column. Used to set the column value when creating objects, and for the filter when retrieving objects in subclasses.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -118,9 +110,7 @@ retrieving objects in subclasses.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>A hash/proc with column value keys and class values, mapping the value of
-the <a href="ClassMethods.html#attribute-i-sti_key">#sti_key</a> column to
-the appropriate class to use.</p>
+<p>A hash/proc with column value keys and class values, mapping the value of the <a href="ClassMethods.html#attribute-i-sti_key"><code>sti_key</code></a> column to the appropriate class to use.</p>
 </td>
 </tr>
 </table>
@@ -137,16 +127,14 @@ the appropriate class to use.</p>
 </div>
 <div class='description'>
 
-<p>Freeze STI information when freezing model class.  Note that because of how
-STI works, you should not freeze an STI subclass until after all subclasses
-of it have been created.</p>
+<p>Freeze STI information when freezing model class.  Note that because of how STI works, you should not freeze an STI subclass until after all subclasses of it have been created.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 157</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@sti_key_array</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_array</span>&#x000A;  <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;  <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">159</span>   <span class="ruby-ivar">@sti_key_array</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_array</span>&#x000A;<span class="line-num">160</span>   <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_key_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;<span class="line-num">161</span>   <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@sti_model_map</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;<span class="line-num">162</span> &#x000A;<span class="line-num">163</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">164</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-inherited'>
@@ -158,15 +146,14 @@ of it have been created.</p>
 </div>
 <div class='description'>
 
-<p>Copy the necessary attributes to the subclasses, and filter the
-subclass&#39;s dataset based on the sti_kep_map entry for the class.</p>
+<p>Copy the necessary attributes to the subclasses, and filter the subclass&#39;s dataset based on the sti_kep_map entry for the class.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inherited-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 167</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">key</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sti_key_map</span>[<span class="ruby-identifier">subclass</span>]).<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">row_proc</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">set_dataset</span>(<span class="ruby-identifier">sti_subclass_dataset</span>(<span class="ruby-identifier">key</span>), <span class="ruby-value">:inherited</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@dataset</span> = <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_row_proc</span>(<span class="ruby-identifier">rp</span>)&#x000A;    <span class="ruby-ivar">@sti_key_array</span> = <span class="ruby-identifier">key</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">simple_table</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inherited-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;<span class="line-num">169</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">170</span>   <span class="ruby-identifier">key</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sti_key_map</span>[<span class="ruby-identifier">subclass</span>]).<span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">171</span>   <span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">172</span>   <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">row_proc</span>&#x000A;<span class="line-num">173</span>   <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">set_dataset</span>(<span class="ruby-identifier">sti_subclass_dataset</span>(<span class="ruby-identifier">key</span>), <span class="ruby-value">:inherited</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">174</span>   <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">175</span>     <span class="ruby-ivar">@dataset</span> = <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_row_proc</span>(<span class="ruby-identifier">rp</span>)&#x000A;<span class="line-num">176</span>     <span class="ruby-ivar">@sti_key_array</span> = <span class="ruby-identifier">key</span>&#x000A;<span class="line-num">177</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">simple_table</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">178</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">179</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_class_from_sti_key'>
@@ -185,7 +172,7 @@ subclass&#39;s dataset based on the sti_kep_map entry for the class.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sti_class_from_sti_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sti_class_from_sti_key-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 187</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_class_from_sti_key</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">sti_class</span>(<span class="ruby-identifier">sti_model_map</span>[<span class="ruby-identifier">key</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sti_class_from_sti_key-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_class_from_sti_key</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">189</span>   <span class="ruby-identifier">sti_class</span>(<span class="ruby-identifier">sti_model_map</span>[<span class="ruby-identifier">key</span>])&#x000A;<span class="line-num">190</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_load'>
@@ -197,16 +184,14 @@ subclass&#39;s dataset based on the sti_kep_map entry for the class.</p>
 </div>
 <div class='description'>
 
-<p>Return an instance of the class specified by <a
-href="ClassMethods.html#attribute-i-sti_key">#sti_key</a>, used by the
-row_proc.</p>
+<p>Return an instance of the class specified by <a href="ClassMethods.html#attribute-i-sti_key"><code>sti_key</code></a>, used by the row_proc.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sti_load-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sti_load-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_load</span>(<span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-identifier">sti_class_from_sti_key</span>(<span class="ruby-identifier">r</span>[<span class="ruby-identifier">sti_key</span>]).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sti_load-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_load</span>(<span class="ruby-identifier">r</span>)&#x000A;<span class="line-num">184</span>   <span class="ruby-identifier">sti_class_from_sti_key</span>(<span class="ruby-identifier">r</span>[<span class="ruby-identifier">sti_key</span>]).<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>)&#x000A;<span class="line-num">185</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sti_subclass_added'>
@@ -218,15 +203,14 @@ row_proc.</p>
 </div>
 <div class='description'>
 
-<p>Make sure that all subclasses of the parent class correctly include  keys
-for all of their descendant classes.</p>
+<p>Make sure that all subclasses of the parent class correctly include  keys for all of their descendant classes.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sti_subclass_added-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sti_subclass_added-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 193</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sti_key_array</span>&#x000A;    <span class="ruby-identifier">key_array</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">key</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">sti_key_array</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_array</span>)}&#x000A;    <span class="ruby-identifier">superclass</span>.<span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sti_subclass_added-source'>    <span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb</span>&#x000A;<span class="line-num">194</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">195</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sti_key_array</span>&#x000A;<span class="line-num">196</span>     <span class="ruby-identifier">key_array</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">197</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">sti_key_array</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_array</span>)}&#x000A;<span class="line-num">198</span>     <span class="ruby-identifier">superclass</span>.<span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;<span class="line-num">199</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

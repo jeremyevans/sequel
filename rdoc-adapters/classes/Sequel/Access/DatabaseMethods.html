@@ -88,7 +88,7 @@ Sequel::Access::DatabaseMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-database_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 12</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>&#x000A;  <span class="ruby-value">:access</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-database_type-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">13</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>&#x000A;<span class="line-num">14</span>   <span class="ruby-value">:access</span>&#x000A;<span class="line-num">15</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rename_table'>
@@ -100,16 +100,14 @@ Sequel::Access::DatabaseMethods
 </div>
 <div class='description'>
 
-<p><a href="../Access.html">Access</a> doesn&#39;t support renaming tables
-from an <a href="../SQL.html">SQL</a> query, so create a copy of the table
-and then drop the from table.</p>
+<p><a href="../Access.html"><code>Access</code></a> doesn&#39;t support renaming tables from an SQL query, so create a copy of the table and then drop the from table.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-rename_table-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-rename_table-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_table</span>(<span class="ruby-identifier">from_table</span>, <span class="ruby-identifier">to_table</span>)&#x000A;  <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">to_table</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">from</span>(<span class="ruby-identifier">from_table</span>))&#x000A;  <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">from_table</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-rename_table-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rename_table</span>(<span class="ruby-identifier">from_table</span>, <span class="ruby-identifier">to_table</span>)&#x000A;<span class="line-num">25</span>   <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">to_table</span>, <span class="ruby-value">:as</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">from</span>(<span class="ruby-identifier">from_table</span>))&#x000A;<span class="line-num">26</span>   <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">from_table</span>)&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -121,15 +119,14 @@ and then drop the from table.</p>
 </div>
 <div class='description'>
 
-<p><a href="../Access.html">Access</a> uses type Counter for an
-autoincrementing keys</p>
+<p><a href="../Access.html"><code>Access</code></a> uses type Counter for an autoincrementing keys</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-serial_primary_key_options-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-serial_primary_key_options-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>&#x000A;  {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Counter</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-serial_primary_key_options-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">serial_primary_key_options</span>&#x000A;<span class="line-num">31</span>   {<span class="ruby-value">:primary_key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Counter</span>}&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -36,44 +36,27 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Allows the use of named timezones via TZInfo (requires tzinfo). Forces the
-use of DateTime as Sequel&#39;s datetime_class, since ruby&#39;s Time class
-doesn&#39;t support timezones other than local and UTC.</p>
+<p>Allows the use of named timezones via TZInfo (requires tzinfo). Forces the use of DateTime as Sequel&#39;s datetime_class, since ruby&#39;s Time class doesn&#39;t support timezones other than local and UTC.</p>
 
-<p>This allows you to either pass strings or TZInfo::Timezone instance to
-Sequel.database_timezone=, application_timezone=, and typecast_timezone=. 
-If a string is passed, it is converted to a TZInfo::Timezone using
-TZInfo::Timezone.get.</p>
+<p>This allows you to either pass strings or TZInfo::Timezone instance to Sequel.database_timezone=, application_timezone=, and typecast_timezone=.  If a string is passed, it is converted to a TZInfo::Timezone using TZInfo::Timezone.get.</p>
 
 <p>To load the extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span></pre>
 
-<p>Let&#39;s say you have the database server in New York and the application
-server in Los Angeles.  For historical reasons, data is stored in local New
-York time, but the application server only services clients in Los Angeles,
-so you want to use New York time in the database and Los Angeles time in
-the application.  This is easily done via:</p>
+<p>Let&#39;s say you have the database server in New York and the application server in Los Angeles.  For historical reasons, data is stored in local New York time, but the application server only services clients in Los Angeles, so you want to use New York time in the database and Los Angeles time in the application.  This is easily done via:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
 
-<p>Then, before data is stored in the database, it is converted to New York
-time.  When data is retrieved from the database, it is converted to Los
-Angeles time.</p>
+<p>Then, before data is stored in the database, it is converted to New York time.  When data is retrieved from the database, it is converted to Los Angeles time.</p>
 
-<p>If you are using database specific timezones, you may want to load this
-extension into the database in order to support similar API:</p>
+<p>If you are using database specific timezones, you may want to load this extension into the database in order to support similar API:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span></pre>
 
-<p>Note that typecasting from the database timezone to the application
-timezone when fetching rows is dependent on the database adapter, and only
-works on adapters where <a
-href="../../../../classes/Sequel.html">Sequel</a> itself does the
-conversion. It should work on mysql, postgres, sqlite, ibmdb, and jdbc.</p>
+<p>Note that typecasting from the database timezone to the application timezone when fetching rows is dependent on the database adapter, and only works on adapters where <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> itself does the conversion. It should work on mysql, postgres, sqlite, ibmdb, and jdbc.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/NamedTimezones.html">Sequel::NamedTimezones</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/NamedTimezones.html"><code>Sequel::NamedTimezones</code></a></p>
 </div>
 <div id='context'>
 <div id='requires'>

@@ -39,9 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>A <a
-href="ShardedSingleConnectionPool.html">ShardedSingleConnectionPool</a> is
-a single threaded connection pool that works with multiple shards/servers.</p>
+<p>A <a href="ShardedSingleConnectionPool.html"><code>ShardedSingleConnectionPool</code></a> is a single threaded connection pool that works with multiple shards/servers.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -80,13 +78,9 @@ a single threaded connection pool that works with multiple shards/servers.</p>
 
 <p>The single threaded pool takes the following options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:servers </td><td>
-<p>A hash of servers to use.  Keys should be symbols.  If not present, will
-use a single :default server.</p>
+<p>A hash of servers to use.  Keys should be symbols.  If not present, will use a single :default server.</p>
 </td></tr><tr><td class='label'>:servers_hash </td><td>
-<p>The base hash to use for the servers.  By default, <a
-href="../Sequel.html">Sequel</a> uses Hash.new(:default).  You can use a
-hash with a default proc that raises an error if you want to catch all
-cases where a nonexistent server is used.</p>
+<p>The base hash to use for the servers.  By default, <a href="../Sequel.html"><code>Sequel</code></a> uses Hash.new(:default).  You can use a hash with a default proc that raises an error if you want to catch all cases where a nonexistent server is used.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -94,7 +88,7 @@ cases where a nonexistent server is used.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@conns</span> = {}&#x000A;  <span class="ruby-ivar">@servers</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:servers_hash</span>, <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:default</span>))&#x000A;  <span class="ruby-identifier">add_servers</span>([<span class="ruby-value">:default</span>])&#x000A;  <span class="ruby-identifier">add_servers</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>].<span class="ruby-identifier">keys</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">15</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">16</span>   <span class="ruby-ivar">@conns</span> = {}&#x000A;<span class="line-num">17</span>   <span class="ruby-ivar">@servers</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:servers_hash</span>, <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:default</span>))&#x000A;<span class="line-num">18</span>   <span class="ruby-identifier">add_servers</span>([<span class="ruby-value">:default</span>])&#x000A;<span class="line-num">19</span>   <span class="ruby-identifier">add_servers</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>].<span class="ruby-identifier">keys</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:servers</span>]&#x000A;<span class="line-num">20</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -107,17 +101,14 @@ cases where a nonexistent server is used.</p>
 </div>
 <div class='description'>
 
-<p>Adds new servers to the connection pool. Primarily used in conjunction with
-primary/replica or sharded configurations. Allows for dynamic expansion of
-the potential replicas/shards at runtime. <code>servers</code> argument
-should be an array of symbols.</p>
+<p>Adds new servers to the connection pool. Primarily used in conjunction with primary/replica or sharded configurations. Allows for dynamic expansion of the potential replicas/shards at runtime. <code>servers</code> argument should be an array of symbols.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-add_servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_servers</span>(<span class="ruby-identifier">servers</span>)&#x000A;  <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@servers</span>[<span class="ruby-identifier">s</span>] = <span class="ruby-identifier">s</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-add_servers-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">25</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_servers</span>(<span class="ruby-identifier">servers</span>)&#x000A;<span class="line-num">26</span>   <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@servers</span>[<span class="ruby-identifier">s</span>] = <span class="ruby-identifier">s</span>}&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-all_connections'>
@@ -136,7 +127,7 @@ should be an array of symbols.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-all_connections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-all_connections-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>&#x000A;  <span class="ruby-ivar">@conns</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-all_connections-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all_connections</span>&#x000A;<span class="line-num">31</span>   <span class="ruby-ivar">@conns</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">c</span>}&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-conn'>
@@ -155,7 +146,7 @@ should be an array of symbols.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-conn-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-conn-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">conn</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;  <span class="ruby-ivar">@conns</span>[<span class="ruby-ivar">@servers</span>[<span class="ruby-identifier">server</span>]]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-conn-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">conn</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">36</span>   <span class="ruby-ivar">@conns</span>[<span class="ruby-ivar">@servers</span>[<span class="ruby-identifier">server</span>]]&#x000A;<span class="line-num">37</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disconnect'>
@@ -167,12 +158,9 @@ should be an array of symbols.</p>
 </div>
 <div class='description'>
 
-<p>Disconnects from the database. Once a connection is requested using <a
-href="ShardedSingleConnectionPool.html#method-i-hold">hold</a>, the
-connection is reestablished. Options:</p>
+<p>Disconnects from the database. Once a connection is requested using <a href="ShardedSingleConnectionPool.html#method-i-hold"><code>hold</code></a>, the connection is reestablished. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>
-<p>Should be a symbol specifing the server to disconnect from, or an array of
-symbols to specify multiple servers.</p>
+<p>Should be a symbol specifing the server to disconnect from, or an array of symbols to specify multiple servers.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -180,7 +168,7 @@ symbols to specify multiple servers.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-disconnect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">servers</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">disconnect_server</span>(<span class="ruby-identifier">s</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-disconnect-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">44</span>   (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-operator">?</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">servers</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">disconnect_server</span>(<span class="ruby-identifier">s</span>)}&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -197,7 +185,7 @@ symbols to specify multiple servers.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">48</span>   <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">49</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hold'>
@@ -209,15 +197,14 @@ symbols to specify multiple servers.</p>
 </div>
 <div class='description'>
 
-<p>Yields the connection to the supplied block for the given server. This
-method simulates the ConnectionPool#hold API.</p>
+<p>Yields the connection to the supplied block for the given server. This method simulates the ConnectionPool#hold API.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hold-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hold-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">server</span> = <span class="ruby-identifier">pick_server</span>(<span class="ruby-identifier">server</span>)&#x000A;    <span class="ruby-keyword">yield</span>(<span class="ruby-ivar">@conns</span>[<span class="ruby-identifier">server</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">make_new</span>(<span class="ruby-identifier">server</span>))&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect_server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;    <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hold-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hold</span>(<span class="ruby-identifier">server</span>=<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">55</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">56</span>     <span class="ruby-identifier">server</span> = <span class="ruby-identifier">pick_server</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">57</span>     <span class="ruby-keyword">yield</span>(<span class="ruby-ivar">@conns</span>[<span class="ruby-identifier">server</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">make_new</span>(<span class="ruby-identifier">server</span>))&#x000A;<span class="line-num">58</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>, <span class="ruby-operator">*</span><span class="ruby-ivar">@error_classes</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">59</span>     <span class="ruby-identifier">disconnect_server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">disconnect_error?</span>(<span class="ruby-identifier">e</span>)&#x000A;<span class="line-num">60</span>     <span class="ruby-identifier">raise</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-max_size'>
@@ -229,16 +216,14 @@ method simulates the ConnectionPool#hold API.</p>
 </div>
 <div class='description'>
 
-<p>The <a
-href="ShardedSingleConnectionPool.html">ShardedSingleConnectionPool</a>
-always has a maximum size of 1.</p>
+<p>The <a href="ShardedSingleConnectionPool.html"><code>ShardedSingleConnectionPool</code></a> always has a maximum size of 1.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-max_size-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-max_size-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">max_size</span>&#x000A;  <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-max_size-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">max_size</span>&#x000A;<span class="line-num">66</span>   <span class="ruby-value">1</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pool_type'>
@@ -255,7 +240,7 @@ always has a maximum size of 1.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pool_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pool_type-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>&#x000A;  <span class="ruby-value">:sharded_single</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pool_type-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pool_type</span>&#x000A;<span class="line-num">91</span>   <span class="ruby-value">:sharded_single</span>&#x000A;<span class="line-num">92</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-remove_servers'>
@@ -267,16 +252,14 @@ always has a maximum size of 1.</p>
 </div>
 <div class='description'>
 
-<p>Remove servers from the connection pool. Similar to disconnecting from all
-given servers, except that after it is used, future requests for the server
-will use the :default server instead.</p>
+<p>Remove servers from the connection pool. Similar to disconnecting from all given servers, except that after it is used, future requests for the server will use the :default server instead.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-remove_servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-remove_servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove_servers</span>(<span class="ruby-identifier">servers</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot remove default server&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:default</span>)&#x000A;  <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">server</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">disconnect_server</span>(<span class="ruby-identifier">server</span>)&#x000A;    <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-remove_servers-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remove_servers</span>(<span class="ruby-identifier">servers</span>)&#x000A;<span class="line-num">73</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;cannot remove default server&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:default</span>)&#x000A;<span class="line-num">74</span>   <span class="ruby-identifier">servers</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">server</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">75</span>     <span class="ruby-identifier">disconnect_server</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">76</span>     <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">server</span>)&#x000A;<span class="line-num">77</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-servers'>
@@ -295,7 +278,7 @@ will use the :default server instead.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-servers-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>&#x000A;  <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">keys</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-servers-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">servers</span>&#x000A;<span class="line-num">82</span>   <span class="ruby-ivar">@servers</span>.<span class="ruby-identifier">keys</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-size'>
@@ -314,7 +297,7 @@ will use the :default server instead.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-size-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-size-source'><span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>&#x000A;  <span class="ruby-ivar">@conns</span>.<span class="ruby-identifier">length</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-size-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool/sharded_single.rb</span>&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">size</span>&#x000A;<span class="line-num">87</span>   <span class="ruby-ivar">@conns</span>.<span class="ruby-identifier">length</span>&#x000A;<span class="line-num">88</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

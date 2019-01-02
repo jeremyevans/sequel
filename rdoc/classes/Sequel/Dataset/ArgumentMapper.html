@@ -35,9 +35,7 @@ Sequel::Dataset::ArgumentMapper
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Default implementation of the argument mapper to allow native database
-support for bind variables and prepared statements (as opposed to the
-emulated ones used by default).</p>
+<p>Default implementation of the argument mapper to allow native database support for bind variables and prepared statements (as opposed to the emulated ones used by default).</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -70,7 +68,7 @@ emulated ones used by default).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-bind_arguments-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-bind_arguments-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bind_arguments</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-bind_arguments-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bind_arguments</span>&#x000A;<span class="line-num">51</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_arguments</span>]&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-call'>
@@ -89,7 +87,7 @@ emulated ones used by default).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">prepared_sql</span>&#x000A;  <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:bind_arguments</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ps</span>.<span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:bind_vars</span>]), <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">prepared_sql</span>&#x000A;<span class="line-num">57</span>   <span class="ruby-identifier">prepared_args</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">58</span>   <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">bind</span>(<span class="ruby-identifier">bind_vars</span>)&#x000A;<span class="line-num">59</span>   <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:bind_arguments</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">ps</span>.<span class="ruby-identifier">map_to_prepared_args</span>(<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:bind_vars</span>]), <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>, <span class="ruby-value">:prepared_sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">sql</span>).<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_sql'>
@@ -101,15 +99,14 @@ emulated ones used by default).</p>
 </div>
 <div class='description'>
 
-<p>Override the given *_sql method based on the type, and cache the result of
-the sql.</p>
+<p>Override the given *_sql method based on the type, and cache the result of the sql.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-prepared_sql-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-prepared_sql-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_sql</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_prepared_sql</span>)&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">sql</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_prepared_sql</span>, <span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-prepared_sql-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_sql</span>&#x000A;<span class="line-num">65</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_sql</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_prepared_sql</span>)&#x000A;<span class="line-num">66</span>     <span class="ruby-keyword">return</span> <span class="ruby-identifier">sql</span>&#x000A;<span class="line-num">67</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">68</span>   <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_prepared_sql</span>, <span class="ruby-keyword">super</span>)&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepared_statement_name'>
@@ -128,7 +125,7 @@ the sql.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-prepared_statement_name-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-prepared_statement_name-source'><span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement_name</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_statement_name</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-prepared_statement_name-source'>   <span class="ruby-comment"># File lib/sequel/dataset/prepared_statements.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepared_statement_name</span>&#x000A;<span class="line-num">46</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:prepared_statement_name</span>]&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -61,15 +61,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Adds an exclusion constraint to an existing table, see <a
-href="CreateTableGenerator.html#method-i-exclude">Sequel::Postgres::CreateTableGenerator#exclude</a>.</p>
+<p>Adds an exclusion constraint to an existing table, see <a href="CreateTableGenerator.html#method-i-exclude"><code>CreateTableGenerator#exclude</code></a>.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_exclusion_constraint-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-add_exclusion_constraint-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 117</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_exclusion_constraint</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-add_exclusion_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_exclusion_constraint</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">119</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:add_constraint</span>, <span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-validate_constraint'>
@@ -81,15 +80,14 @@ href="CreateTableGenerator.html#method-i-exclude">Sequel::Postgres::CreateTableG
 </div>
 <div class='description'>
 
-<p>Validate the constraint with the given name, which should have been added
-previously with NOT VALID.</p>
+<p>Validate the constraint with the given name, which should have been added previously with NOT VALID.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validate_constraint-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-validate_constraint-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-validate_constraint-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate_constraint</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">125</span>   <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:validate_constraint</span>, <span class="ruby-value">:name</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">name</span>}&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -38,41 +38,28 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Support COLLATE in column definitions.  At least MySQL and Microsoft SQL
-Server support them, and PostgreSQL 9.1 should as well.</p>
+<p>Support COLLATE in column definitions.  At least MySQL and Microsoft SQL Server support them, and PostgreSQL 9.1 should as well.</p>
 </li><li>
-<p>When connecting to Microsoft SQL Server, you can use the
-mssql_unicode_strings accessor to turn of the default usage of unicode
-strings (N&#39;&#39;) and use regular strings (&#39;&#39;). This can
-improve performance, but changes the behavior.  It&#39;s set to true by
-default for backwards compatibility.  You can change it at both the dataset
-and database level:</p>
+<p>When connecting to Microsoft SQL Server, you can use the mssql_unicode_strings accessor to turn of the default usage of unicode strings (N&#39;&#39;) and use regular strings (&#39;&#39;). This can improve performance, but changes the behavior.  It&#39;s set to true by default for backwards compatibility.  You can change it at both the dataset and database level:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># default for datasets</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># just this dataset</span></pre>
 </li><li>
-<p>In the oracle adapter, if Sequel.application_timezone is :utc, set the
-timezone for the connection to use the 00:00 timezone.</p>
+<p>In the oracle adapter, if Sequel.application_timezone is :utc, set the timezone for the connection to use the 00:00 timezone.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>In the single_table_inheritance plugin, correctly handle a multi-level
-class hierarchy so that loading instances from a middle level of the
-hierarchy can return instances of subclasses.</p>
+<p>In the single_table_inheritance plugin, correctly handle a multi-level class hierarchy so that loading instances from a middle level of the hierarchy can return instances of subclasses.</p>
 </li><li>
-<p>Don&#39;t use a schema when creating a temporary table, even if
-default_schema is set.</p>
+<p>Don&#39;t use a schema when creating a temporary table, even if default_schema is set.</p>
 </li><li>
 <p>Fix the migrator when a default_schema is used.</p>
 </li><li>
-<p>In the ado adapter, assume a connection to SQL Server if the :conn_string
-is given and doesn&#39;t indicate Access/Jet.</p>
+<p>In the ado adapter, assume a connection to SQL Server if the :conn_string is given and doesn&#39;t indicate Access/Jet.</p>
 </li><li>
-<p>Fix fetching rows in the tinytds adapter when the identifier_output_method
-is nil.</p>
+<p>Fix fetching rows in the tinytds adapter when the identifier_output_method is nil.</p>
 </li><li>
-<p>The tinytds adapter now checks for disconnect errors, but it might not be
-reliable until the next release of tiny_tds.</p>
+<p>The tinytds adapter now checks for disconnect errors, but it might not be reliable until the next release of tiny_tds.</p>
 </li><li>
 <p>The odbc adapter now handles ODBC::Time instances correctly.</p>
 </li></ul>

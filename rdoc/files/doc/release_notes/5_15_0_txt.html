@@ -38,43 +38,24 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A :qualify_tables option has been added to the class_table_inheritance
-plugin, which will automatically qualify subclass tables with the same
-qualifier as the superclass table if the superclass table is qualified.</p>
+<p>A :qualify_tables option has been added to the class_table_inheritance plugin, which will automatically qualify subclass tables with the same qualifier as the superclass table if the superclass table is qualified.</p>
 </li><li>
-<p>Model#save_validation_on_next_save! has been added, which skips all
-validation on the next save to the object, including the running of
-validation related hooks.  This method is designed for use only when
-Model#valid? is called on the object before saving, to avoid running
-validations on the object twice.  This method takes precedence even over an
-explicit validate: true option passed to Model#save, and as such should be
-used with care.</p>
+<p>Model#save_validation_on_next_save! has been added, which skips all validation on the next save to the object, including the running of validation related hooks.  This method is designed for use only when Model#valid? is called on the object before saving, to avoid running validations on the object twice.  This method takes precedence even over an explicit validate: true option passed to Model#save, and as such should be used with care.</p>
 </li><li>
-<p>The postgres adapter now supports a :conn_str Database option to use a
-PostgreSQL connection string (e.g. “host=foo port=2442”) when connecting. 
-This option has preference over other connection related options if it is
-present.</p>
+<p>The postgres adapter now supports a :conn_str Database option to use a PostgreSQL connection string (e.g. “host=foo port=2442”) when connecting.  This option has preference over other connection related options if it is present.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>If a foreign key for a model object is changed from a nil value to a
-non-nil value, any cached associated objects related to the foreign key are
-no longer removed.  Such associated objects could only be set manually, and
-if they have been set manually, it is probably not a good idea to remove
-them automatically.</p>
+<p>If a foreign key for a model object is changed from a nil value to a non-nil value, any cached associated objects related to the foreign key are no longer removed.  Such associated objects could only be set manually, and if they have been set manually, it is probably not a good idea to remove them automatically.</p>
 </li><li>
-<p>When using the nested_attributes plugin, new *_to_many associated objects
-are not validated twice when saving.</p>
+<p>When using the nested_attributes plugin, new *_to_many associated objects are not validated twice when saving.</p>
 </li><li>
-<p>The default table alias when using the class_table_inheritance plugin now
-correctly handles qualified tables.</p>
+<p>The default table alias when using the class_table_inheritance plugin now correctly handles qualified tables.</p>
 </li><li>
-<p>A theoretical thread safety issue when assigning connections in the
-threaded connection pools has been fixed.</p>
+<p>A theoretical thread safety issue when assigning connections in the threaded connection pools has been fixed.</p>
 </li><li>
-<p>Renaming columns is now supported without emulation when using SQLite
-3.25+.</p>
+<p>Renaming columns is now supported without emulation when using SQLite 3.25+.</p>
 </li></ul>
 </div>
 <div id='context'>

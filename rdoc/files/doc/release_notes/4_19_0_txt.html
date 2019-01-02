@@ -38,48 +38,22 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Model#get_column_value and set_column_value have been added for
-getting/setting column values.  Historically, to get column values, you
-would just send the column name, and to set column values you would send
-the column name suffixed by =.  However, this doesn&#39;t work when such
-methods are already defined by ruby or <a
-href="../../../classes/Sequel.html">Sequel</a> itself (e.g. class, model,
-object_id).</p>
+<p>Model#get_column_value and set_column_value have been added for getting/setting column values.  Historically, to get column values, you would just send the column name, and to set column values you would send the column name suffixed by =.  However, this doesn&#39;t work when such methods are already defined by ruby or <a href="../../../classes/Sequel.html"><code>Sequel</code></a> itself (e.g. class, model, object_id).</p>
 
-<p>Both get_column_value and set_column_value are just aliases to send, but
-you can safely override the methods to handle column names that conflict
-with existing method names.  Both the core model code and all of the
-plugins that ship with <a href="../../../classes/Sequel.html">Sequel</a>
-have been updated to use these new methods.  External plugins are strongly
-encouraged to switch to these new methods.</p>
+<p>Both get_column_value and set_column_value are just aliases to send, but you can safely override the methods to handle column names that conflict with existing method names.  Both the core model code and all of the plugins that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> have been updated to use these new methods.  External plugins are strongly encouraged to switch to these new methods.</p>
 </li><li>
-<p>A column_conflicts plugin has been added to automatically handle columns
-that conflict with existing method names.  So if you have a column named
-“model” in your table, you can just load the column_conflicts plugin and <a
-href="../../../classes/Sequel.html">Sequel</a> will handle things
-correctly.</p>
+<p>A column_conflicts plugin has been added to automatically handle columns that conflict with existing method names.  So if you have a column named “model” in your table, you can just load the column_conflicts plugin and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will handle things correctly.</p>
 </li><li>
-<p>A accessed_columns plugin has been added, which records which columns have
-been accessed for a model instance.  This is useful in development when you
-are planning on restricted the columns selected by the dataset that
-retrieved the instance.  SELECTing only the columns you need can result in
-significant performance increases, and the accessed_columns plugin makes
-that easier.</p>
+<p>A accessed_columns plugin has been added, which records which columns have been accessed for a model instance.  This is useful in development when you are planning on restricted the columns selected by the dataset that retrieved the instance.  SELECTing only the columns you need can result in significant performance increases, and the accessed_columns plugin makes that easier.</p>
 </li><li>
-<p>Model#cancel_action has been added for canceling actions in before hooks,
-instead of having the before hook methods return false (which is still
-supported).  In addition to being easier to use, this also makes it
-possible to use custom exception messages for hook failures, if you are
-using the default behavior of raising exceptions on save failures.</p>
+<p>Model#cancel_action has been added for canceling actions in before hooks, instead of having the before hook methods return false (which is still supported).  In addition to being easier to use, this also makes it possible to use custom exception messages for hook failures, if you are using the default behavior of raising exceptions on save failures.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset#union, intersect, and except now automatically handle datasets with
-raw SQL, by wrapping such datasets in subqueries.</p>
+<p>Dataset#union, intersect, and except now automatically handle datasets with raw SQL, by wrapping such datasets in subqueries.</p>
 </li><li>
-<p>The integer migrator now stores the correct migration number when migrating
-with allow_missing_migration_files set.</p>
+<p>The integer migrator now stores the correct migration number when migrating with allow_missing_migration_files set.</p>
 </li><li>
 <p>A :timeout=&gt;nil Database option on MySQL no longer sets a wait_timeout.</p>
 </li></ul>

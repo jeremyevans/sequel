@@ -68,15 +68,14 @@ Sequel::Plugins::List::InstanceMethods
 </div>
 <div class='description'>
 
-<p>When destroying an instance, move all entries after the instance down one
-position, so that there aren&#39;t any gaps</p>
+<p>When destroying an instance, move all entries after the instance down one position, so that there aren&#39;t any gaps</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 103</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;&#x000A;  <span class="ruby-identifier">f</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">position_field</span>]&#x000A;  <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">f</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">position_value</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">f</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_destroy-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">104</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;<span class="line-num">105</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">106</span> &#x000A;<span class="line-num">107</span>   <span class="ruby-identifier">f</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">position_field</span>]&#x000A;<span class="line-num">108</span>   <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">f</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">position_value</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">f</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">f</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)&#x000A;<span class="line-num">109</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-at_position'>
@@ -88,15 +87,14 @@ position, so that there aren&#39;t any gaps</p>
 </div>
 <div class='description'>
 
-<p>The model object at the given position in the list containing this
-instance.</p>
+<p>The model object at the given position in the list containing this instance.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-at_position-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-at_position-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 97</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">at_position</span>(<span class="ruby-identifier">p</span>)&#x000A;  <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">position_field</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">p</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-at_position-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num"> 98</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">at_position</span>(<span class="ruby-identifier">p</span>)&#x000A;<span class="line-num"> 99</span>   <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">first</span>(<span class="ruby-identifier">position_field</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">p</span>)&#x000A;<span class="line-num">100</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_validation'>
@@ -108,15 +106,14 @@ instance.</p>
 </div>
 <div class='description'>
 
-<p>Set the value of the position_field to the maximum value plus 1 unless the
-position field already has a value.</p>
+<p>Set the value of the position_field to the maximum value plus 1 unless the position field already has a value.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_validation-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 186</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;    <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span><span class="ruby-value">+1</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;<span class="line-num">188</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;<span class="line-num">189</span>     <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span><span class="ruby-value">+1</span>)&#x000A;<span class="line-num">190</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">191</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">192</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-last_position'>
@@ -135,7 +132,7 @@ position field already has a value.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-last_position-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-last_position-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 111</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last_position</span>&#x000A;  <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-last_position-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">112</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last_position</span>&#x000A;<span class="line-num">113</span>   <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span>&#x000A;<span class="line-num">114</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-list_dataset'>
@@ -154,7 +151,7 @@ position field already has a value.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-list_dataset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-list_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">list_dataset</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-list_dataset-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">list_dataset</span>&#x000A;<span class="line-num">118</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">scope_proc</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">dataset</span>&#x000A;<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-move_down'>
@@ -166,15 +163,14 @@ position field already has a value.</p>
 </div>
 <div class='description'>
 
-<p>Move this instance down the given number of places in the list, or 1 place
-if no argument is specified.</p>
+<p>Move this instance down the given number of places in the list, or 1 place if no argument is specified.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-move_down-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-move_down-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 122</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_down</span>(<span class="ruby-identifier">n</span> = <span class="ruby-value">1</span>)&#x000A;  <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">position_value</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">n</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-move_down-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_down</span>(<span class="ruby-identifier">n</span> = <span class="ruby-value">1</span>)&#x000A;<span class="line-num">124</span>   <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">position_value</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">n</span>)&#x000A;<span class="line-num">125</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-move_to'>
@@ -186,16 +182,14 @@ if no argument is specified.</p>
 </div>
 <div class='description'>
 
-<p>Move this instance to the given place in the list.  If lp is not given or
-greater than the last list position, uses the last list position.  If lp is
-less than the top list position, uses the top list position.</p>
+<p>Move this instance to the given place in the list.  If lp is not given or greater than the last list position, uses the last list position.  If lp is less than the top list position, uses the top list position.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-move_to-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-move_to-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_to</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">lp</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">current</span> = <span class="ruby-identifier">position_value</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">current</span>&#x000A;    <span class="ruby-identifier">checked_transaction</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">list_dataset</span>&#x000A;      <span class="ruby-identifier">op</span>, <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">current</span>&#x000A;        <span class="ruby-identifier">target</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span>&#x000A;        [<span class="ruby-value">:+</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">position_field</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">target</span><span class="ruby-operator">...</span><span class="ruby-identifier">current</span>)]&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">lp</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">last_position</span>&#x000A;        <span class="ruby-identifier">target</span> = <span class="ruby-identifier">lp</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">lp</span>&#x000A;        [<span class="ruby-value">:-</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">position_field</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">current</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)<span class="ruby-operator">..</span><span class="ruby-identifier">target</span>)]&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">position_field</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">position_field</span>, <span class="ruby-value">1</span>))&#x000A;      <span class="ruby-identifier">update</span>(<span class="ruby-identifier">position_field</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">target</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-move_to-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_to</span>(<span class="ruby-identifier">target</span>, <span class="ruby-identifier">lp</span> = <span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">132</span>   <span class="ruby-identifier">current</span> = <span class="ruby-identifier">position_value</span>&#x000A;<span class="line-num">133</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">current</span>&#x000A;<span class="line-num">134</span>     <span class="ruby-identifier">checked_transaction</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">135</span>       <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">list_dataset</span>&#x000A;<span class="line-num">136</span>       <span class="ruby-identifier">op</span>, <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">current</span>&#x000A;<span class="line-num">137</span>         <span class="ruby-identifier">target</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span>&#x000A;<span class="line-num">138</span>         [<span class="ruby-value">:+</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">position_field</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">target</span><span class="ruby-operator">...</span><span class="ruby-identifier">current</span>)]&#x000A;<span class="line-num">139</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">140</span>         <span class="ruby-identifier">lp</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">last_position</span>&#x000A;<span class="line-num">141</span>         <span class="ruby-identifier">target</span> = <span class="ruby-identifier">lp</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">target</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">lp</span>&#x000A;<span class="line-num">142</span>         [<span class="ruby-value">:-</span>, <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">position_field</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">current</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)<span class="ruby-operator">..</span><span class="ruby-identifier">target</span>)]&#x000A;<span class="line-num">143</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">144</span>       <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">position_field</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">position_field</span>, <span class="ruby-value">1</span>))&#x000A;<span class="line-num">145</span>       <span class="ruby-identifier">update</span>(<span class="ruby-identifier">position_field</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">target</span>)&#x000A;<span class="line-num">146</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">147</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">148</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">149</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-move_to_bottom'>
@@ -214,7 +208,7 @@ less than the top list position, uses the top list position.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-move_to_bottom-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-move_to_bottom-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 151</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_to_bottom</span>&#x000A;  <span class="ruby-identifier">lp</span> = <span class="ruby-identifier">last_position</span> &#x000A;  <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">lp</span>, <span class="ruby-identifier">lp</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-move_to_bottom-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">152</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_to_bottom</span>&#x000A;<span class="line-num">153</span>   <span class="ruby-identifier">lp</span> = <span class="ruby-identifier">last_position</span> &#x000A;<span class="line-num">154</span>   <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">lp</span>, <span class="ruby-identifier">lp</span>)&#x000A;<span class="line-num">155</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-move_to_top'>
@@ -226,15 +220,14 @@ less than the top list position, uses the top list position.</p>
 </div>
 <div class='description'>
 
-<p>Move this instance to the top (first position, usually position 1) of the
-list.</p>
+<p>Move this instance to the top (first position, usually position 1) of the list.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-move_to_top-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-move_to_top-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 157</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_to_top</span>&#x000A;  <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-move_to_top-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_to_top</span>&#x000A;<span class="line-num">159</span>   <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">top_of_list</span>)&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-move_up'>
@@ -246,15 +239,14 @@ list.</p>
 </div>
 <div class='description'>
 
-<p>Move this instance the given number of places up in the list, or 1 place if
-no argument is specified.</p>
+<p>Move this instance the given number of places up in the list, or 1 place if no argument is specified.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-move_up-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-move_up-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 163</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_up</span>(<span class="ruby-identifier">n</span> = <span class="ruby-value">1</span>)&#x000A;  <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">position_value</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">n</span>) &#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-move_up-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">move_up</span>(<span class="ruby-identifier">n</span> = <span class="ruby-value">1</span>)&#x000A;<span class="line-num">165</span>   <span class="ruby-identifier">move_to</span>(<span class="ruby-identifier">position_value</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">n</span>) &#x000A;<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-next'>
@@ -266,15 +258,14 @@ no argument is specified.</p>
 </div>
 <div class='description'>
 
-<p>The model instance the given number of places below this model instance in
-the list, or 1 place below if no argument is given.</p>
+<p>The model instance the given number of places below this model instance in the list, or 1 place below if no argument is given.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-next-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-next-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 169</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">next</span>(<span class="ruby-identifier ruby-title">n</span> = <span class="ruby-value">1</span>)&#x000A;  <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">at_position</span>(<span class="ruby-identifier">position_value</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">n</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-next-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">next</span>(<span class="ruby-identifier ruby-title">n</span> = <span class="ruby-value">1</span>)&#x000A;<span class="line-num">171</span>   <span class="ruby-identifier">n</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">at_position</span>(<span class="ruby-identifier">position_value</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">n</span>)&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-position_value'>
@@ -293,7 +284,7 @@ the list, or 1 place below if no argument is given.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-position_value-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-position_value-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 174</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">position_value</span>&#x000A;  <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-position_value-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">175</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">position_value</span>&#x000A;<span class="line-num">176</span>   <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;<span class="line-num">177</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prev'>
@@ -305,15 +296,14 @@ the list, or 1 place below if no argument is given.</p>
 </div>
 <div class='description'>
 
-<p>The model instance the given number of places below this model instance in
-the list, or 1 place below if no argument is given.</p>
+<p>The model instance the given number of places below this model instance in the list, or 1 place below if no argument is given.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-prev-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-prev-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 180</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prev</span>(<span class="ruby-identifier">n</span> = <span class="ruby-value">1</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">next</span>(<span class="ruby-identifier">n</span> <span class="ruby-operator">*</span> <span class="ruby-value">-1</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-prev-source'>    <span class="ruby-comment"># File lib/sequel/plugins/list.rb</span>&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prev</span>(<span class="ruby-identifier">n</span> = <span class="ruby-value">1</span>)&#x000A;<span class="line-num">182</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">next</span>(<span class="ruby-identifier">n</span> <span class="ruby-operator">*</span> <span class="ruby-value">-1</span>)&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

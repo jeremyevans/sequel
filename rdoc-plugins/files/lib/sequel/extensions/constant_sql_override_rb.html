@@ -36,12 +36,9 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The constant_sql_override extension allows you to change the SQL generated
-for <a href="../../../../classes/Sequel.html">Sequel</a> constants.</p>
+<p>The constant_sql_override extension allows you to change the SQL generated for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> constants.</p>
 
-<p>One possible use-case for this is to have Sequel::CURRENT_TIMESTAMP use UTC
-time when you have Sequel.database_timezone = :utc, but the database uses
-localtime when generating CURRENT_TIMESTAMP.</p>
+<p>One possible use-case for this is to have Sequel::CURRENT_TIMESTAMP use UTC time when you have Sequel.database_timezone = :utc, but the database uses localtime when generating CURRENT_TIMESTAMP.</p>
 
 <p>You can set SQL overrides with Database#set_constant_sql:</p>
 
@@ -55,8 +52,7 @@ localtime when generating CURRENT_TIMESTAMP.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:constant_sql_override</span></pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/ConstantSqlOverride.html">Sequel::ConstantSqlOverride</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/ConstantSqlOverride.html"><code>Sequel::ConstantSqlOverride</code></a></p>
 </div>
 <div id='context'>
 </div>

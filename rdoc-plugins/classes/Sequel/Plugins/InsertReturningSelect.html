@@ -35,13 +35,7 @@ Sequel::Plugins::InsertReturningSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>If the model&#39;s dataset selects explicit columns and the database
-supports it, the insert_returning_select plugin will automatically set the
-RETURNING clause on the dataset used to insert rows to the columns
-selected, which allows the default model support to run the insert and
-refresh of the data in a single query, instead of two separate queries. 
-This is Sequel&#39;s default behavior when the model does not select
-explicit columns.</p>
+<p>If the model&#39;s dataset selects explicit columns and the database supports it, the insert_returning_select plugin will automatically set the RETURNING clause on the dataset used to insert rows to the columns selected, which allows the default model support to run the insert and refresh of the data in a single query, instead of two separate queries.  This is Sequel&#39;s default behavior when the model does not select explicit columns.</p>
 
 <p>Usage:</p>
 
@@ -75,15 +69,14 @@ explicit columns.</p>
 </div>
 <div class='description'>
 
-<p>Modify the current model&#39;s dataset selection, if the model has a
-dataset.</p>
+<p>Modify the current model&#39;s dataset selection, if the model has a dataset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/insert_returning_select.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/insert_returning_select.rb</span>&#x000A;<span class="line-num">23</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">24</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">25</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>]&#x000A;<span class="line-num">26</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

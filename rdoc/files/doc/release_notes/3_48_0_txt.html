@@ -38,73 +38,48 @@ Last Update:
 <div id='description'>
 <h1 id="label-Deprecation+Warnings">Deprecation Warnings<span><a href="#label-Deprecation+Warnings">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p>The main change in <a href="../../../classes/Sequel.html">Sequel</a> 3.48.0
-is the deprecation of <a href="../../../classes/Sequel.html">Sequel</a>
-features that will be modified, moved, or removed in <a
-href="../../../classes/Sequel.html">Sequel</a> 4. For the reasoning behind
-these changes, please review the commits logs at <a
-href="https://github.com/jeremyevans/sequel-4-plans/commits/master">github.com/jeremyevans/sequel-4-plans/commits/master</a></p>
+<p>The main change in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.48.0 is the deprecation of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> features that will be modified, moved, or removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4. For the reasoning behind these changes, please review the commits logs at <a href="https://github.com/jeremyevans/sequel-4-plans/commits/master">github.com/jeremyevans/sequel-4-plans/commits/master</a></p>
 
 <h2 id="label-Deprecation+Logging">Deprecation Logging<span><a href="#label-Deprecation+Logging">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>If you use a deprecated method or feature, <a
-href="../../../classes/Sequel.html">Sequel</a> will by default print a
-deprecation message and 10 lines of backtrace to stderr to easily allow you
-to figure out which code needs to be updated.  You can change where the
-deprecation messages go and how many lines of backtrace are given using the
-following:</p>
+<p>If you use a deprecated method or feature, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will by default print a deprecation message and 10 lines of backtrace to stderr to easily allow you to figure out which code needs to be updated.  You can change where the deprecation messages go and how many lines of backtrace are given using the following:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Turn off all deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span>&#x000A;&#x000A;<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-comment"># Select which backtrace lines to output</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = \&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line_no</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">3</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/my_app/</span>}</pre>
 
 <h2 id="label-Major+Change">Major Change<span><a href="#label-Major+Change">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>The core extensions will no longer be loaded by default. You will have to
-use `Sequel.extension :core_extensions` to load the core extensions.</p>
+<p>The core extensions will no longer be loaded by default. You will have to use `Sequel.extension :core_extensions` to load the core extensions.</p>
 </li><li>
-<p>The Symbol#[] and Symbol#{&lt;,&gt;,&lt;=,&gt;=} methods will no longer be
-provided by the core extensions on ruby 1.8. You will have to use
-`Sequel.extension :ruby18_symbol_extensions` to use them.</p>
+<p>The Symbol#[] and Symbol#{&lt;,&gt;,&lt;=,&gt;=} methods will no longer be provided by the core extensions on ruby 1.8. You will have to use `Sequel.extension :ruby18_symbol_extensions` to use them.</p>
 </li></ul>
 
 <h2 id="label-Core+Behavior+Changes">Core Behavior Changes<span><a href="#label-Core+Behavior+Changes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>Dataset#filter becomes an alias for where, and exclude becomes an alias for
-exclude_where. You will have to use `DB.extension :filter_having` to get
-the previous behavior. Dataset#and and or will also only affect the WHERE
-clause.</p>
+<p>Dataset#filter becomes an alias for where, and exclude becomes an alias for exclude_where. You will have to use `DB.extension :filter_having` to get the previous behavior. Dataset#and and or will also only affect the WHERE clause.</p>
 </li><li>
 <p>Dataset#and, or, and invert will not raise errors for no existing filter.</p>
 </li><li>
 <p>Dataset#select_more becomes an alias for select_append.</p>
 </li><li>
-<p>Dataset#select and from will not longer consider a hash argument as an
-alias specification. You will have to use `DB.extension :hash_aliases` to
-get the previous behavior.</p>
+<p>Dataset#select and from will not longer consider a hash argument as an alias specification. You will have to use `DB.extension :hash_aliases` to get the previous behavior.</p>
 </li><li>
 <p>Database#dataset and Dataset.new will not take an options hash.</p>
 </li><li>
 <p>Database#transaction :disconnect=&gt;:retry option will be removed.</p>
 </li><li>
-<p>Calling Dataset#add_graph_aliases before graph or set_graph_aliases will
-raise an Error.</p>
+<p>Calling Dataset#add_graph_aliases before graph or set_graph_aliases will raise an Error.</p>
 </li><li>
 <p>Datasets will have a frozen options hash by default.</p>
 </li><li>
-<p>Dataset#set_overrides and set_defaults will move to the set_overrides
-extension.</p>
+<p>Dataset#set_overrides and set_defaults will move to the set_overrides extension.</p>
 </li><li>
-<p>Sequel.empty_array_handle_nulls will be removed.  To get the
-empty_array_handle_nulls = false behavior, you will have to use
-`DB.extension :empty_array_ignore_nulls`.</p>
+<p>Sequel.empty_array_handle_nulls will be removed.  To get the empty_array_handle_nulls = false behavior, you will have to use `DB.extension :empty_array_ignore_nulls`.</p>
 </li><li>
-<p>The second argument to Dataset union, intersect, and except must be an
-options hash if it is given.</p>
+<p>The second argument to Dataset union, intersect, and except must be an options hash if it is given.</p>
 </li><li>
-<p>The fourth argument to Dataset join_table must be an options hash if it is
-given.</p>
+<p>The fourth argument to Dataset join_table must be an options hash if it is given.</p>
 </li><li>
-<p>Using a mismatched number of placeholders and arguments in a placeholder
-literal string will raise an error.</p>
+<p>Using a mismatched number of placeholders and arguments in a placeholder literal string will raise an error.</p>
 </li><li>
 <p>Dataset#graph_each will move to the graph_each extension.</p>
 </li><li>
@@ -112,32 +87,25 @@ literal string will raise an error.</p>
 </li><li>
 <p>Dataset#[]= will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
-<p>Dataset#insert_multiple will be moved to the sequel_3_dataset_methods
-extension.</p>
+<p>Dataset#insert_multiple will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
 <p>Dataset#set will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
 <p>Dataset#to_csv will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
-<p>Dataset#db= and opts= setters will be moved to the sequel_3_dataset_methods
-extension.</p>
+<p>Dataset#db= and opts= setters will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
-<p>Dataset#qualify_to and qualify_to_first_source will be moved to the
-sequel_3_dataset_methods extension.</p>
+<p>Dataset#qualify_to and qualify_to_first_source will be moved to the sequel_3_dataset_methods extension.</p>
 </li><li>
-<p>Remove default methods that raise Sequel::NotImplemented: 
-Database#connect, execute, foreign_key_list, indexes, tables, and views,
-and Dataset#fetch_rows.</p>
+<p>Remove default methods that raise Sequel::NotImplemented:  Database#connect, execute, foreign_key_list, indexes, tables, and views, and Dataset#fetch_rows.</p>
 </li><li>
 <p>Sequel::SQL::Expression#to_s will be removed.</p>
 </li><li>
-<p>All Dataset methods in Dataset::PUBLIC_APPEND_METHODS except for literal,
-quote_identifier, and quote_schema_table will be removed.</p>
+<p>All Dataset methods in Dataset::PUBLIC_APPEND_METHODS except for literal, quote_identifier, and quote_schema_table will be removed.</p>
 </li><li>
 <p>All Dataset methods in Dataset::PRIVATE_APPEND_METHODS will be removed.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> k_require, ts_require,
-tsk_require, and check_requiring_thread will be removed.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> k_require, ts_require, tsk_require, and check_requiring_thread will be removed.</p>
 </li><li>
 <p>Dataset.def_append_methods will be removed.</p>
 </li><li>
@@ -150,37 +118,28 @@ tsk_require, and check_requiring_thread will be removed.</p>
 
 <h2 id="label-Adapter+Behavior+Changes">Adapter Behavior Changes<span><a href="#label-Adapter+Behavior+Changes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>The Database#do method will be removed from the ado, db2, dbi, informix,
-odbc, openbase, and oracle adapters.</p>
+<p>The Database#do method will be removed from the ado, db2, dbi, informix, odbc, openbase, and oracle adapters.</p>
 </li><li>
-<p>The jdbc adapter will raise an error when parsing the schema for a table if
-it detects results for the same table name in multiple schemas.</p>
+<p>The jdbc adapter will raise an error when parsing the schema for a table if it detects results for the same table name in multiple schemas.</p>
 </li><li>
 <p>The Database#query method will be removed from the informix adapter.</p>
 </li><li>
 <p>Dataset#lock on PostgreSQL will check the given lock mode.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> will check the
-client_min_messages setting before use on PostgreSQL.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will check the client_min_messages setting before use on PostgreSQL.</p>
 </li><li>
-<p>Prepared statement placeholders on PostgreSQL will no longer support
-implicit casting via :$x__type.</p>
+<p>Prepared statement placeholders on PostgreSQL will no longer support implicit casting via :$x__type.</p>
 </li></ul>
 
 <h2 id="label-Extension+Behavior+Changes">Extension Behavior Changes<span><a href="#label-Extension+Behavior+Changes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>The following extensions will no longer make global changes to the Database
-and Dataset classes: null_dataset, pagination, pretty_table, query,
-schema_caching, schema_dumper, select_remove, and to_dot.  These will be
-changed to Database/Dataset specific extensions.</p>
+<p>The following extensions will no longer make global changes to the Database and Dataset classes: null_dataset, pagination, pretty_table, query, schema_caching, schema_dumper, select_remove, and to_dot.  These will be changed to Database/Dataset specific extensions.</p>
 </li><li>
 <p>The pg_auto_parameterize and pg_statement_cache extensions will be removed.</p>
 </li><li>
-<p>Sequel::Dataset.introspect_all_columns will be removed from the
-columns_introspection extension.</p>
+<p>Sequel::Dataset.introspect_all_columns will be removed from the columns_introspection extension.</p>
 </li><li>
-<p>PGRangeOp#starts_before and ends_after will be removed from the
-pg_range_ops extension.</p>
+<p>PGRangeOp#starts_before and ends_after will be removed from the pg_range_ops extension.</p>
 </li></ul>
 
 <h2 id="label-Model+Behavior+Changes">Model Behavior Changes<span><a href="#label-Model+Behavior+Changes">&para;</a> <a href="#top">&uarr;</a></span></h2>
@@ -189,83 +148,58 @@ pg_range_ops extension.</p>
 </li><li>
 <p>The after_initialize hook will be moved to a plugin.</p>
 </li><li>
-<p>Move blacklist-based security methods (#set_except, update_except,
-.set_restricted_columns) to a plugin.</p>
+<p>Move blacklist-based security methods (#set_except, update_except, .set_restricted_columns) to a plugin.</p>
 </li><li>
-<p>The :eager_loader and :eager_grapher association option procs will always
-be passed a hash.</p>
+<p>The :eager_loader and :eager_grapher association option procs will always be passed a hash.</p>
 </li><li>
-<p>Model string column setters will consider array and hash input to be
-invalid.</p>
+<p>Model string column setters will consider array and hash input to be invalid.</p>
 </li><li>
-<p>Remove save taking multiple arguments for the columns to save. Add
-Model#save :columns option for saving specific columns.</p>
+<p>Remove save taking multiple arguments for the columns to save. Add Model#save :columns option for saving specific columns. </p>
 </li><li>
-<p>Don&#39;t automatically choose a reciprocal association with a condition or
-block.</p>
+<p>Don&#39;t automatically choose a reciprocal association with a condition or block.</p>
 </li><li>
-<p>Don&#39;t automatically set up reciprocal associations if multiple ones
-match.</p>
+<p>Don&#39;t automatically set up reciprocal associations if multiple ones match.</p>
 </li><li>
-<p>Model::Errors#[] will no longer modify the receiver.  If you want
-autovivification, use the active_model plugin.</p>
+<p>Model::Errors#[] will no longer modify the receiver.  If you want autovivification, use the active_model plugin. </p>
 </li><li>
-<p>Model.set_primary_key will not longer accept composite keys as multiple
-arguments.</p>
+<p>Model.set_primary_key will not longer accept composite keys as multiple arguments.</p>
 </li><li>
 <p>The correlated_subquery eager limit strategy will be removed.</p>
 </li><li>
-<p>The following Model class dataset methods will be removed: print,
-each_page, paginate, set, add_graph_aliases, insert_multiple, query,
-set_overrides, set_defaults, to_csv.</p>
+<p>The following Model class dataset methods will be removed: print, each_page, paginate, set, add_graph_aliases, insert_multiple, query, set_overrides, set_defaults, to_csv.</p>
 </li><li>
-<p>The Model.{destroy,delete,update} class dataset methods will be moved to
-the scissors plugin.</p>
+<p>The Model.{destroy,delete,update} class dataset methods will be moved to the scissors plugin.</p>
 </li><li>
 <p>Model#pk_or_nil will be removed.</p>
 </li><li>
-<p>Model#set_values will no longer be called directly by any <a
-href="../../../classes/Sequel.html">Sequel</a> code, and overriding it is
-deprecated. It will be removed in <a
-href="../../../classes/Sequel.html">Sequel</a> 4.1.</p>
+<p>Model#set_values will no longer be called directly by any <a href="../../../classes/Sequel.html"><code>Sequel</code></a> code, and overriding it is deprecated. It will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.1.</p>
 </li><li>
-<p>Model.cache_anonymous_models accessor will move to <a
-href="../../../classes/Sequel.html">Sequel</a> module.</p>
+<p>Model.cache_anonymous_models accessor will move to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module.</p>
 </li><li>
-<p>Model::InstanceMethods.class_attr_overridable and .class_attr_reader will
-be removed.</p>
+<p>Model::InstanceMethods.class_attr_overridable and .class_attr_reader will be removed.</p>
 </li><li>
 <p>The :one_to_one option check for one_to_many associations will be removed.</p>
 </li></ul>
 
 <h2 id="label-Plugin+Behavior+Changes">Plugin Behavior Changes<span><a href="#label-Plugin+Behavior+Changes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 <ul><li>
-<p>Public dataset methods will no longer have class methods automatically
-added.</p>
+<p>Public dataset methods will no longer have class methods automatically added.</p>
 </li><li>
-<p>The validates_not_string validation will be removed from the
-validation_class_methods and validation_helpers plugin.</p>
+<p>The validates_not_string validation will be removed from the validation_class_methods and validation_helpers plugin.</p>
 </li><li>
-<p>In the json_serializer plugin, the to_json :root=&gt;true option means
-:root=&gt;:collection instead of :root=&gt;:both.</p>
+<p>In the json_serializer plugin, the to_json :root=&gt;true option means :root=&gt;:collection instead of :root=&gt;:both.</p>
 </li><li>
-<p>In the json_serializer plugin, the to_json :naked option will default to
-true, and there will not be way to add the JSON.create_id automatically.</p>
+<p>In the json_serializer plugin, the to_json :naked option will default to true, and there will not be way to add the JSON.create_id automatically.</p>
 </li><li>
-<p>In the json_serializer plugin, from_json will no longer automatically
-delete the JSON.create_id key from the input hash.</p>
+<p>In the json_serializer plugin, from_json will no longer automatically delete the JSON.create_id key from the input hash.</p>
 </li><li>
-<p>The to_json and to_xml :all_columns and :all_associations options in the
-json_serializer and xml_serializer plugins will be removed.</p>
+<p>The to_json and to_xml :all_columns and :all_associations options in the json_serializer and xml_serializer plugins will be removed.</p>
 </li><li>
-<p>The Model.json_create method will be removed from the json_serializer
-plugin.</p>
+<p>The Model.json_create method will be removed from the json_serializer plugin.</p>
 </li><li>
-<p>The validates_type validation will raise validation errors for nil if
-:allow_nil=&gt;true is not used.</p>
+<p>The validates_type validation will raise validation errors for nil if :allow_nil=&gt;true is not used.</p>
 </li><li>
-<p>auto_validate_presence_columns will be removed from the auto_validations
-plugin</p>
+<p>auto_validate_presence_columns will be removed from the auto_validations plugin </p>
 </li><li>
 <p>The identity_map plugin will be removed.</p>
 </li></ul>
@@ -274,65 +208,40 @@ plugin</p>
 <ul><li>
 <p>The sequel_core.rb and sequel_model.rb files will be removed.</p>
 </li><li>
-<p>Dataset#{quote_identifiers,identifier_output_method,
-identifier_input_method} will assume Database implements the methods.</p>
+<p>Dataset#{quote_identifiers,identifier_output_method, identifier_input_method} will assume Database implements the methods.</p>
 </li></ul>
 
 <h1 id="label-Forwards+Compatibility">Forwards Compatibility<span><a href="#label-Forwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p>Not all changes planned in <a
-href="../../../classes/Sequel.html">Sequel</a> 4 have deprecation warnings.
-The following changes will be made in <a
-href="../../../classes/Sequel.html">Sequel</a> 4 but do not have
-deprecation warnings in 3.48.0:</p>
+<p>Not all changes planned in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 have deprecation warnings. The following changes will be made in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 but do not have deprecation warnings in 3.48.0:</p>
 <ul><li>
-<p>The threaded connection pools will default to
-:connection_handling=&gt;:queue.  You can manually set
-:connection_handling=&gt;:stack to get the current behavior.</p>
+<p>The threaded connection pools will default to :connection_handling=&gt;:queue.  You can manually set :connection_handling=&gt;:stack to get the current behavior.</p>
 </li><li>
-<p>Dataset#join_table will default to :qualify=&gt;:deep.  You can manually
-set :qualify=&gt;:symbol to get the current behavior.  This can be set at a
-global level by overriding Dataset#default_join_table_qualification.</p>
+<p>Dataset#join_table will default to :qualify=&gt;:deep.  You can manually set :qualify=&gt;:symbol to get the current behavior.  This can be set at a global level by overriding Dataset#default_join_table_qualification.</p>
 </li><li>
-<p>Model.raise_on_typecast_failure will default to false.  Set this to true to
-get the current behavior of raising typecast errors in the setter methods.</p>
+<p>Model.raise_on_typecast_failure will default to false.  Set this to true to get the current behavior of raising typecast errors in the setter methods.</p>
 </li><li>
-<p>Model#save will no longer call Model#_refresh or Model#set_values
-internally after an insert.  Manually refreshes will be treated differently
-than after creation refreshes in <a
-href="../../../classes/Sequel.html">Sequel</a> 4.</p>
+<p>Model#save will no longer call Model#_refresh or Model#set_values internally after an insert.  Manually refreshes will be treated differently than after creation refreshes in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
-<p>On SQLite, integer_booleans will be true by default.  Set this to false to
-get the current behavior of &#39;t&#39; for true and &#39;f&#39; for false.</p>
+<p>On SQLite, integer_booleans will be true by default.  Set this to false to get the current behavior of &#39;t&#39; for true and &#39;f&#39; for false.</p>
 </li><li>
-<p>On SQLite, use_timestamp_timezones will be false by default.  Set this to
-true to get the current behavior with timezone information in timestamps.</p>
+<p>On SQLite, use_timestamp_timezones will be false by default.  Set this to true to get the current behavior with timezone information in timestamps.</p>
 </li><li>
-<p>The default value for most option hash arguments will be an empty frozen
-hash.  If you are overriding methods and modifying option hashes, fix your
-code.</p>
+<p>The default value for most option hash arguments will be an empty frozen hash.  If you are overriding methods and modifying option hashes, fix your code.</p>
 </li><li>
-<p>The defaults_setter plugin will work in a lazy manner instead of an eager
-manner.  If you must have the values hash contain defaults for new objects
-(instead of just getting defaults from getter methods), you&#39;ll need to
-fork the current plugin.</p>
+<p>The defaults_setter plugin will work in a lazy manner instead of an eager manner.  If you must have the values hash contain defaults for new objects (instead of just getting defaults from getter methods), you&#39;ll need to fork the current plugin.</p>
 </li><li>
 <p>Model#set_all will allow setting the primary key columns.</p>
 </li><li>
-<p>The many_to_one_pk_lookup plugin will be integrated into the default
-associations support.</p>
+<p>The many_to_one_pk_lookup plugin will be integrated into the default associations support.</p>
 </li><li>
-<p>The association_autoreloading plugin will be integrated into the default
-associations support.</p>
+<p>The association_autoreloading plugin will be integrated into the default associations support.</p>
 </li><li>
-<p>Plugins will extend the class with ClassMethods before including
-InstanceMethods in the class.</p>
+<p>Plugins will extend the class with ClassMethods before including InstanceMethods in the class.</p>
 </li><li>
-<p>Dataset#get, select_map, and select_order_map will automatically add
-aliases for unaliased expressions if given a single expression.</p>
+<p>Dataset#get, select_map, and select_order_map will automatically add aliases for unaliased expressions if given a single expression.</p>
 </li><li>
-<p>Database#tables and views on PostgreSQL will check against the current
-schemas in the search path.</p>
+<p>Database#tables and views on PostgreSQL will check against the current schemas in the search path.</p>
 </li><li>
 <p>Sequel::SQL::SQLArray alias for ValueList will be removed.</p>
 </li><li>
@@ -342,75 +251,42 @@ schemas in the search path.</p>
 </li><li>
 <p>Sequel::Model::EMPTY_INSTANCE_VARIABLES will be removed.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> will no longer provide a
-default database for the adapter or integration specs.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer provide a default database for the adapter or integration specs.</p>
 </li></ul>
 
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>You can now choose which Errors class to use on a per model basis by
-overriding Model#errors_class.</p>
+<p>You can now choose which Errors class to use on a per model basis by overriding Model#errors_class.</p>
 </li><li>
-<p>The following Database methods have been added to check for support:
-supports_index_parsing?, supports_foreign_key_parsing?,
-support_table_listing?, supports_view_listing?.</p>
+<p>The following Database methods have been added to check for support: supports_index_parsing?, supports_foreign_key_parsing?, support_table_listing?, supports_view_listing?.</p>
 </li><li>
-<p>The pg_hstore_ops extension now integrates with the pg_array, pg_hstore,
-and pg_array_ops extensions, allowing you to pass in arrays and hashes to
-be treated as PGArrays and HStores, and returning ArrayOps for PostgreSQL
-functions/operators that return arrays.</p>
+<p>The pg_hstore_ops extension now integrates with the pg_array, pg_hstore, and pg_array_ops extensions, allowing you to pass in arrays and hashes to be treated as PGArrays and HStores, and returning ArrayOps for PostgreSQL functions/operators that return arrays.</p>
 </li><li>
-<p><a
-href="../../../classes/Sequel.html#method-c-object_to_json">Sequel.object_to_json</a>
-and <a
-href="../../../classes/Sequel.html#method-c-json_parser_error_class">Sequel.json_parser_error_class</a>
-have been added and all internal json usage uses them, so you can now
-override these methods if you want to use an alternative json library with
-<a href="../../../classes/Sequel.html">Sequel</a>.</p>
+<p><a href="../../../classes/Sequel.html#method-c-object_to_json"><code>Sequel.object_to_json</code></a> and <a href="../../../classes/Sequel.html#method-c-json_parser_error_class"><code>Sequel.json_parser_error_class</code></a> have been added and all internal json usage uses them, so you can now override these methods if you want to use an alternative json library with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li><li>
-<p>The association_proxies plugin now accepts a block allowing the user
-control over which methods are proxied to the dataset or the cached array
-of instances.  You can base the decision on where to send the method using
-a variety of factors including the method name, the method arguments, the
-state of the current instance, or the related association.  Here&#39;s an
-example of a simple case just depending on the name of the method;</p>
+<p>The association_proxies plugin now accepts a block allowing the user control over which methods are proxied to the dataset or the cached array of instances.  You can base the decision on where to send the method using a variety of factors including the method name, the method arguments, the state of the current instance, or the related association.  Here&#39;s an example of a simple case just depending on the name of the method; </p>
 
 <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_proxies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opts</span><span class="ruby-operator">|</span>&#x000A; [<span class="ruby-value">:find</span>, <span class="ruby-value">:where</span>, <span class="ruby-value">:create</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:method</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>If the block returns true, the method is sent to the dataset, otherwise it
-is sent to the array of associated objects.</p>
+<p>If the block returns true, the method is sent to the dataset, otherwise it is sent to the array of associated objects.</p>
 </li><li>
-<p>The auto_validations plugin now accepts a :not_null=&gt;:presence option,
-for doing a presence validation instead of a not_null validation.  This is
-useful for databases with NOT NULL constraints where you also want to
-disallow empty strings.</p>
+<p>The auto_validations plugin now accepts a :not_null=&gt;:presence option, for doing a presence validation instead of a not_null validation.  This is useful for databases with NOT NULL constraints where you also want to disallow empty strings.</p>
 </li><li>
-<p>The auto_validations plugin now validates against explicit nil values in
-NOT NULL columns that have defaults.</p>
+<p>The auto_validations plugin now validates against explicit nil values in NOT NULL columns that have defaults.</p>
 </li><li>
-<p>The constraint_validations plugin now reflects validations, using
-Model.constraint_validation_reflections.</p>
+<p>The constraint_validations plugin now reflects validations, using Model.constraint_validation_reflections.</p>
 
 <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">constraint_validation_reflections</span>[<span class="ruby-value">:column</span>]&#x000A;<span class="ruby-comment"># =&gt; [[:presence, {}],</span>&#x000A;<span class="ruby-comment">#     [:max_length, {:argument=&gt;255, :message=&gt;&#39;just too long&#39;}]]</span></pre>
 </li><li>
-<p>The constraint_validations plugin can now be set to pass specific
-validations options to the validation_helpers plugin.  This can be useful
-if using the auto_validations plugin with this plugin to avoid duplicate
-error messages for nil values:</p>
+<p>The constraint_validations plugin can now be set to pass specific validations options to the validation_helpers plugin.  This can be useful if using the auto_validations plugin with this plugin to avoid duplicate error messages for nil values:</p>
 
 <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:constraint_validations</span>,&#x000A;  <span class="ruby-value">:validates_options</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:presence</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:allow_nil</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}}</pre>
 </li><li>
-<p>The named_timezones extension can now be loaded as a database extension,
-which allows for automatic conversions of string timezones:</p>
+<p>The named_timezones extension can now be loaded as a database extension, which allows for automatic conversions of string timezones:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:named_timezones</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
 </li><li>
-<p>Offsets are now emulated by Microsoft Access using a combination of reverse
-orders and total counts.  This is slow, especially on large datasets, but
-probably better than having no support at all. It is also possible to use
-the same code to support Microsoft SQL Server 2000, but as <a
-href="../../../classes/Sequel.html">Sequel</a> does not support that
-(minimum supported version is 2005), you have to do it manually:</p>
+<p>Offsets are now emulated by Microsoft Access using a combination of reverse orders and total counts.  This is slow, especially on large datasets, but probably better than having no support at all. It is also possible to use the same code to support Microsoft SQL Server 2000, but as <a href="../../../classes/Sequel.html"><code>Sequel</code></a> does not support that (minimum supported version is 2005), you have to do it manually:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;adapters/utils/emulate_offset_with_reverse_and_count&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">EmulateOffsetWithReverseAndCount</span></pre>
 </li></ul>
@@ -419,75 +295,48 @@ href="../../../classes/Sequel.html">Sequel</a> does not support that
 <ul><li>
 <p>Dataset#clone is now faster.</p>
 </li><li>
-<p>Database methods that create datasets (fetch, from, select, get) are now
-faster.</p>
+<p>Database methods that create datasets (fetch, from, select, get) are now faster.</p>
 </li><li>
 <p>Model.with_pk and .with_pk! are now faster.</p>
 </li><li>
-<p>Dataset#or now just clones if given an empty argument, similar to
-Dataset#where.</p>
+<p>Dataset#or now just clones if given an empty argument, similar to Dataset#where.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now correctly frees
-statements after using them in the ibmdb adapter.  Previously, they
-weren&#39;t freed until GC, which could result in errors if all available
-handles are in use.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now correctly frees statements after using them in the ibmdb adapter.  Previously, they weren&#39;t freed until GC, which could result in errors if all available handles are in use.</p>
 </li><li>
 <p>Dataset creation is now faster on Microsoft SQL Server.</p>
 </li><li>
 <p>The mediumint and mediumtext types are now recognized on MySQL.</p>
 </li><li>
-<p>The ado adapter now handles disconnecting an already disconnected
-connection.</p>
+<p>The ado adapter now handles disconnecting an already disconnected connection.</p>
 </li><li>
-<p>The auto_validations plugin now works on databases that don&#39;t support
-index parsing.  However, it will not set up automatic uniqueness
-validations on such databases.</p>
+<p>The auto_validations plugin now works on databases that don&#39;t support index parsing.  However, it will not set up automatic uniqueness validations on such databases.</p>
 </li><li>
-<p>The validation_helpers is more strict in some cases when checking for nil
-values, using a specific nil check instead of general falsely check.</p>
+<p>The validation_helpers is more strict in some cases when checking for nil values, using a specific nil check instead of general falsely check.</p>
 </li><li>
-<p>The table inheritance plugins now correctly handle usage of set_dataset in
-a subclass.</p>
+<p>The table inheritance plugins now correctly handle usage of set_dataset in a subclass.</p>
 </li><li>
 <p>The bin/sequel command line tool now has specs.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now uses aliases for many
-internal Dataset#get calls, such as those used by table_exists? and max.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses aliases for many internal Dataset#get calls, such as those used by table_exists? and max. </p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now no longer uses class
-variables internally.  Instead, instance variables of the <a
-href="../../../classes/Sequel/Database.html">Sequel::Database</a> class are
-used.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now no longer uses class variables internally.  Instead, instance variables of the <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> class are used.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now sets up the
-identifier mangling methods on Database initialization instead of on first
-use.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now sets up the identifier mangling methods on Database initialization instead of on first use.</p>
 </li><li>
-<p>The private Database#adapter_initialize method has been added for per
-adapter configuration.  All internal adapters have been switched to use
-this method instead of overridding initialize, and all external adapters
-should as well.  This makes sure that Database instances are not added to
-Sequel::DATABASES until they have been completely initialized.</p>
+<p>The private Database#adapter_initialize method has been added for per adapter configuration.  All internal adapters have been switched to use this method instead of overridding initialize, and all external adapters should as well.  This makes sure that Database instances are not added to Sequel::DATABASES until they have been completely initialized.</p>
 </li><li>
-<p>Virtual row blocks no longer convert their return values to an array. Among
-other things, this means that having a virtual row block return a hash
-works as expected.</p>
+<p>Virtual row blocks no longer convert their return values to an array. Among other things, this means that having a virtual row block return a hash works as expected.</p>
 </li><li>
-<p>The private Dataset#hash_key_symbol method now only takes a single
-argument.</p>
+<p>The private Dataset#hash_key_symbol method now only takes a single argument.</p>
 </li><li>
-<p>Database#constraint_validations in the constraint_validations plugin now
-returns raw hash rows, instead of arrays of validation method call
-arguments.</p>
+<p>Database#constraint_validations in the constraint_validations plugin now returns raw hash rows, instead of arrays of validation method call arguments.</p>
 </li><li>
 <p>Dataset#count now uses a lowercase count function in the SQL.</p>
 </li><li>
-<p>Passing a non-String or Hash as the first argument to an adapter method
-(e.g. Sequel.postgres(1)) now raises an error.  Before, this used to work
-on some adapters that implicitly converted the database name to a string.</p>
+<p>Passing a non-String or Hash as the first argument to an adapter method (e.g. Sequel.postgres(1)) now raises an error.  Before, this used to work on some adapters that implicitly converted the database name to a string.</p>
 </li><li>
 <p>The stats and dcov rake tasks were removed.</p>
 </li></ul>

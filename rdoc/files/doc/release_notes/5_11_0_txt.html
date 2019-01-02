@@ -38,52 +38,30 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now supports more window
-frame specification types when using window functions.  You can now provide
-the window frame specification as a hash, and <a
-href="../../../classes/Sequel.html">Sequel</a> will format the correct SQL.
-Specifically, this adds support for RANGE and GROUPS, numeric offsets, and
-EXCLUDE on a database that supports it (e.g. PostgreSQL 11+).  Examples:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports more window frame specification types when using window functions.  You can now provide the window frame specification as a hash, and <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will format the correct SQL.  Specifically, this adds support for RANGE and GROUPS, numeric offsets, and EXCLUDE on a database that supports it (e.g. PostgreSQL 11+).  Examples:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">c1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">c2</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:c3</span>,&#x000A;  <span class="ruby-value">:frame</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:range</span>, <span class="ruby-value">:start</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:end</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>})}&#x000A;<span class="ruby-comment"># SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3</span>&#x000A;<span class="ruby-comment"># RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">c1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">c2</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:c3</span>,&#x000A;  <span class="ruby-value">:frame</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:groups</span>, <span class="ruby-value">:start</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">:preceding</span>], <span class="ruby-value">:end</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">:preceding</span>]})}&#x000A;<span class="ruby-comment"># SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3</span>&#x000A;<span class="ruby-comment"># GROUPS BETWEEN 2 PRECEDING AND 1 PRECEDING) FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">c1</span>).<span class="ruby-identifier">over</span>(<span class="ruby-value">:partition</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">c2</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:c3</span>,&#x000A;  <span class="ruby-value">:frame</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:range</span>, <span class="ruby-value">:start</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:preceding</span>, <span class="ruby-value">:exclude</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:current</span>})}&#x000A;<span class="ruby-comment"># SELECT function(c1) OVER (PARTITION BY c2 ORDER BY c3</span>&#x000A;<span class="ruby-comment"># RANGE UNBOUNDED PRECEDING EXCLUDE CURRENT ROW) FROM albums</span></pre>
 </li><li>
-<p>The SQLite 3.24+ ON CONFLICT clause to INSERT is now supported. This
-support is very similar to the PostgreSQL support for the same feature,
-also known as  UPSERT (UPDATE if the row already exists, INSERT if it does
-not).  This support is different than the previous support for INSERT ON
-CONFLICT REPLACE (also known as INSERT OR REPLACE), but it uses the same
-method name in order to be compatible with the PostgreSQL support.  The new
-syntax requires passing a hash to Dataset#insert_conflict.  Examples:</p>
+<p>The SQLite 3.24+ ON CONFLICT clause to INSERT is now supported. This support is very similar to the PostgreSQL support for the same feature, also known as  UPSERT (UPDATE if the row already exists, INSERT if it does not).  This support is different than the previous support for INSERT ON CONFLICT REPLACE (also known as INSERT OR REPLACE), but it uses the same method name in order to be compatible with the PostgreSQL support.  The new syntax requires passing a hash to Dataset#insert_conflict.  Examples:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>({}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT DO NOTHING</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO NOTHING</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>,&#x000A;  <span class="ruby-value">conflict_where:</span> {<span class="ruby-value">c:</span> <span class="ruby-keyword">true</span>}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>,&#x000A;  <span class="ruby-value">update:</span> {<span class="ruby-value">b:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO UPDATE SET b = excluded.b</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">target:</span> <span class="ruby-value">:a</span>,&#x000A;  <span class="ruby-value">update:</span> {<span class="ruby-value">b:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]},&#x000A;  <span class="ruby-value">update_where:</span> {<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:status_id</span>] <span class="ruby-operator">=&gt;</span> <span class="ruby-value">1</span>}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2) ON CONFLICT (a)</span>&#x000A;<span class="ruby-comment"># DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)</span></pre>
 </li><li>
-<p>Dataset#window for the WINDOW clause has been moved from the
-PostgreSQL-specific support to core, and has been enabled on MySQL 8+ and
-SQLAnywhere.  This allows you to specify a shared window specification in a
-query, which can be used by multiple window functions.</p>
+<p>Dataset#window for the WINDOW clause has been moved from the PostgreSQL-specific support to core, and has been enabled on MySQL 8+ and SQLAnywhere.  This allows you to specify a shared window specification in a query, which can be used by multiple window functions.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>When using the static_cache plugin, Model.first when called without a block
-and without arguments or with a single Integer argument now uses the cached
-values instead of issuing a query.</p>
+<p>When using the static_cache plugin, Model.first when called without a block and without arguments or with a single Integer argument now uses the cached values instead of issuing a query.</p>
 </li><li>
-<p>Using set_column_default with a nil value now correctly removes an existing
-default value on MySQL when the column is NOT NULL.</p>
+<p>Using set_column_default with a nil value now correctly removes an existing default value on MySQL when the column is NOT NULL.</p>
 </li><li>
-<p>Window function support has been enabled on SQLAnywhere, since it works
-correctly.</p>
+<p>Window function support has been enabled on SQLAnywhere, since it works correctly.</p>
 </li><li>
-<p>Dumping schema for numeric/decimal columns with default values now works
-correctly.  This was broken starting in <a
-href="../../../classes/Sequel.html">Sequel</a> 5.9.0 due to changes to use
-BigDecimal() instead of BigDecimal.new().</p>
+<p>Dumping schema for numeric/decimal columns with default values now works correctly.  This was broken starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.9.0 due to changes to use BigDecimal() instead of BigDecimal.new().</p>
 </li><li>
 <p>The jdbc/sqlserver adapter now works correctly on JRuby 9.2+.</p>
 </li><li>
-<p>An additional check constraint violation failure message is now recognized
-on SQLite.</p>
+<p>An additional check constraint violation failure message is now recognized on SQLite.</p>
 </li></ul>
 </div>
 <div id='context'>

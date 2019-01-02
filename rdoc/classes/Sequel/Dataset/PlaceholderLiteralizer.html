@@ -51,17 +51,9 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="PlaceholderLiteralizer.html">PlaceholderLiteralizer</a> allows you
-to record the application of arbitrary changes to a dataset with
-placeholder arguments, recording where those placeholder arguments are used
-in the query.  When running the query, the literalization process is much
-faster as <a href="../../Sequel.html">Sequel</a> can skip most of the work
-it normally has to do when literalizing a dataset.</p>
+<p><a href="PlaceholderLiteralizer.html"><code>PlaceholderLiteralizer</code></a> allows you to record the application of arbitrary changes to a dataset with placeholder arguments, recording where those placeholder arguments are used in the query.  When running the query, the literalization process is much faster as <a href="../../Sequel.html"><code>Sequel</code></a> can skip most of the work it normally has to do when literalizing a dataset.</p>
 
-<p>Basically, this enables optimizations that allow <a
-href="../../Sequel.html">Sequel</a> to cache the <a
-href="../SQL.html">SQL</a> produced for a given dataset, so that it
-doesn&#39;t need to recompute that information every time.</p>
+<p>Basically, this enables optimizations that allow <a href="../../Sequel.html"><code>Sequel</code></a> to cache the <a href="../SQL.html"><code>SQL</code></a> produced for a given dataset, so that it doesn&#39;t need to recompute that information every time.</p>
 
 <p>Example:</p>
 
@@ -73,15 +65,11 @@ doesn&#39;t need to recompute that information every time.</p>
 
 <pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.<span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>, <span class="ruby-value">item_id:</span> <span class="ruby-value">:id</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">all</span>(<span class="ruby-value">:cart_items</span>)</pre>
 
-<p>Will not qualify the item_id column with cart_items.  In this type of
-situation it&#39;s best to add a table alias when joining:</p>
+<p>Will not qualify the item_id column with cart_items.  In this type of situation it&#39;s best to add a table alias when joining:</p>
 
 <pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.<span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>, <span class="ruby-value">:t</span>), <span class="ruby-value">item_id:</span> <span class="ruby-value">:id</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">all</span>(<span class="ruby-value">:cart_items</span>)</pre>
 
-<p>There are other similar cases that are not handled, mainly when <a
-href="../../Sequel.html">Sequel</a> changes the <a
-href="../SQL.html">SQL</a> produced depending on the types of the
-arguments.</p>
+<p>There are other similar cases that are not handled, mainly when <a href="../../Sequel.html"><code>Sequel</code></a> changes the <a href="../SQL.html"><code>SQL</code></a> produced depending on the types of the arguments.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -122,17 +110,14 @@ arguments.</p>
 </div>
 <div class='description'>
 
-<p>Create a <a href="PlaceholderLiteralizer.html">PlaceholderLiteralizer</a>
-by yielding a <a href="PlaceholderLiteralizer/Recorder.html">Recorder</a>
-and dataset to the given block, recording the offsets at which the
-recorders arguments are used in the query.</p>
+<p>Create a <a href="PlaceholderLiteralizer.html"><code>PlaceholderLiteralizer</code></a> by yielding a <a href="PlaceholderLiteralizer/Recorder.html"><code>Recorder</code></a> and dataset to the given block, recording the offsets at which the recorders arguments are used in the query.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-loader-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-loader-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 148</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">Recorder</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-loader-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">149</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">150</span>   <span class="ruby-constant">Recorder</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-new'>
@@ -144,15 +129,14 @@ recorders arguments are used in the query.</p>
 </div>
 <div class='description'>
 
-<p>Save the dataset, array of <a href="../SQL.html">SQL</a> fragments, and
-ending <a href="../SQL.html">SQL</a> string.</p>
+<p>Save the dataset, array of <a href="../SQL.html"><code>SQL</code></a> fragments, and ending <a href="../SQL.html"><code>SQL</code></a> string.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">fragments</span>, <span class="ruby-identifier">final_sql</span>, <span class="ruby-identifier">arity</span>)&#x000A;  <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">dataset</span>&#x000A;  <span class="ruby-ivar">@fragments</span> = <span class="ruby-identifier">fragments</span>&#x000A;  <span class="ruby-ivar">@final_sql</span> = <span class="ruby-identifier">final_sql</span>&#x000A;  <span class="ruby-ivar">@arity</span> = <span class="ruby-identifier">arity</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">fragments</span>, <span class="ruby-identifier">final_sql</span>, <span class="ruby-identifier">arity</span>)&#x000A;<span class="line-num">155</span>   <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">dataset</span>&#x000A;<span class="line-num">156</span>   <span class="ruby-ivar">@fragments</span> = <span class="ruby-identifier">fragments</span>&#x000A;<span class="line-num">157</span>   <span class="ruby-ivar">@final_sql</span> = <span class="ruby-identifier">final_sql</span>&#x000A;<span class="line-num">158</span>   <span class="ruby-ivar">@arity</span> = <span class="ruby-identifier">arity</span>&#x000A;<span class="line-num">159</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -165,16 +149,14 @@ ending <a href="../SQL.html">SQL</a> string.</p>
 </div>
 <div class='description'>
 
-<p>Return an array of all objects by running the <a href="../SQL.html">SQL</a>
-query for the given arguments. If a block is given, yields all objects to
-the block after loading them.</p>
+<p>Return an array of all objects by running the <a href="../SQL.html"><code>SQL</code></a> query for the given arguments. If a block is given, yields all objects to the block after loading them.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-all-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-all-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_all</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-all-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">all</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">179</span>   <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_all</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-each'>
@@ -186,15 +168,14 @@ the block after loading them.</p>
 </div>
 <div class='description'>
 
-<p>Run the <a href="../SQL.html">SQL</a> query for the given arguments,
-yielding each returned row to the block.</p>
+<p>Run the <a href="../SQL.html"><code>SQL</code></a> query for the given arguments, yielding each returned row to the block.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-each-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">184</span>   <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">185</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-first'>
@@ -206,15 +187,14 @@ yielding each returned row to the block.</p>
 </div>
 <div class='description'>
 
-<p>Run the <a href="../SQL.html">SQL</a> query for the given arguments,
-returning the first row.</p>
+<p>Run the <a href="../SQL.html"><code>SQL</code></a> query for the given arguments, returning the first row.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-first-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-first-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 187</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-first-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">189</span>   <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))&#x000A;<span class="line-num">190</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -226,15 +206,14 @@ returning the first row.</p>
 </div>
 <div class='description'>
 
-<p>Freeze the fragments and final <a href="../SQL.html">SQL</a> when freezing
-the literalizer.</p>
+<p>Freeze the fragments and final <a href="../SQL.html"><code>SQL</code></a> when freezing the literalizer.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 162</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@fragments</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@final_sql</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">164</span>   <span class="ruby-ivar">@fragments</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">165</span>   <span class="ruby-ivar">@final_sql</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">166</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">167</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-get'>
@@ -246,16 +225,14 @@ the literalizer.</p>
 </div>
 <div class='description'>
 
-<p>Run the <a href="../SQL.html">SQL</a> query for the given arguments,
-returning the first value.  For this to make sense, the dataset should
-return a single row with a single value (or no rows).</p>
+<p>Run the <a href="../SQL.html"><code>SQL</code></a> query for the given arguments, returning the first value.  For this to make sense, the dataset should return a single row with a single value (or no rows).</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-get-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 193</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-get-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">194</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">195</span>   <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">with_sql_single_value</span>(<span class="ruby-identifier">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))&#x000A;<span class="line-num">196</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql'>
@@ -267,15 +244,14 @@ return a single row with a single value (or no rows).</p>
 </div>
 <div class='description'>
 
-<p>Return the <a href="../SQL.html">SQL</a> query to use for the given
-arguments.</p>
+<p>Return the <a href="../SQL.html"><code>SQL</code></a> query to use for the given arguments.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 198</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;wrong number of arguments (#{args.length} for #{@arity})&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-ivar">@arity</span>&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-ivar">@fragments</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sql</span>, <span class="ruby-identifier">i</span>, <span class="ruby-identifier">transformer</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)&#x000A;      <span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">i</span>)&#x000A;      <span class="ruby-identifier">v</span> = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">transformer</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">v</span> = <span class="ruby-identifier">i</span>.<span class="ruby-identifier">call</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@final_sql</span>&#x000A;    <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">199</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">200</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;wrong number of arguments (#{args.length} for #{@arity})&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-ivar">@arity</span>&#x000A;<span class="line-num">201</span>   <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">203</span>   <span class="ruby-ivar">@fragments</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sql</span>, <span class="ruby-identifier">i</span>, <span class="ruby-identifier">transformer</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">204</span>     <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>&#x000A;<span class="line-num">205</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)&#x000A;<span class="line-num">206</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">207</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">transformer</span>&#x000A;<span class="line-num">208</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">209</span>       <span class="ruby-identifier">v</span> = <span class="ruby-identifier">i</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">210</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">211</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">212</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">213</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span> = <span class="ruby-ivar">@final_sql</span>&#x000A;<span class="line-num">214</span>     <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>&#x000A;<span class="line-num">215</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">216</span>   <span class="ruby-identifier">s</span>&#x000A;<span class="line-num">217</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_dataset'>
@@ -287,17 +263,14 @@ arguments.</p>
 </div>
 <div class='description'>
 
-<p>Return a new <a
-href="PlaceholderLiteralizer.html">PlaceholderLiteralizer</a> with a
-modified dataset.  This yields the receiver&#39;s dataset to the block, and
-the block should return the new dataset to use.</p>
+<p>Return a new <a href="PlaceholderLiteralizer.html"><code>PlaceholderLiteralizer</code></a> with a modified dataset.  This yields the receiver&#39;s dataset to the block, and the block should return the new dataset to use.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_dataset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_dataset-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_dataset</span>&#x000A;  <span class="ruby-identifier">dup</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-ivar">@dataset</span> = <span class="ruby-keyword">yield</span> <span class="ruby-ivar">@dataset</span>; <span class="ruby-keyword">self</span>}.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_dataset-source'>    <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_dataset</span>&#x000A;<span class="line-num">173</span>   <span class="ruby-identifier">dup</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-ivar">@dataset</span> = <span class="ruby-keyword">yield</span> <span class="ruby-ivar">@dataset</span>; <span class="ruby-keyword">self</span>}.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

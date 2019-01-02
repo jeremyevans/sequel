@@ -35,8 +35,7 @@ Sequel::ConnectionPool::ClassMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Class methods used to return an appropriate pool subclass, separated into a
-module for easier overridding by extensions.</p>
+<p>Class methods used to return an appropriate pool subclass, separated into a module for easier overridding by extensions.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -59,17 +58,14 @@ module for easier overridding by extensions.</p>
 </div>
 <div class='description'>
 
-<p>Return a pool subclass instance based on the given options.  If a
-<code>:pool_class</code> option is provided is provided, use that pool
-class, otherwise use a new instance of an appropriate pool subclass based
-on the <code>:single_threaded</code> and <code>:servers</code> options.</p>
+<p>Return a pool subclass instance based on the given options.  If a <code>:pool_class</code> option is provided is provided, use that pool class, otherwise use a new instance of an appropriate pool subclass based on the <code>:single_threaded</code> and <code>:servers</code> options.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_pool-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-get_pool-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_pool</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">connection_pool_class</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-get_pool-source'>   <span class="ruby-comment"># File lib/sequel/connection_pool.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_pool</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">connection_pool_class</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

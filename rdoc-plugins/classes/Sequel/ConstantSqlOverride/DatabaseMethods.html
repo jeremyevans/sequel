@@ -68,7 +68,7 @@ Sequel::ConstantSqlOverride::DatabaseMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-extended-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/constant_sql_override.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@constant_sqls</span> <span class="ruby-operator">||=</span> {}&#x000A;    <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-extended-source'>   <span class="ruby-comment"># File lib/sequel/extensions/constant_sql_override.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">32</span>     <span class="ruby-ivar">@constant_sqls</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">33</span>     <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">DatasetMethods</span>)&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -88,7 +88,7 @@ Sequel::ConstantSqlOverride::DatabaseMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/extensions/constant_sql_override.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@constant_sqls</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/extensions/constant_sql_override.rb</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">47</span>   <span class="ruby-ivar">@constant_sqls</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">48</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_constant_sql'>
@@ -100,15 +100,14 @@ Sequel::ConstantSqlOverride::DatabaseMethods
 </div>
 <div class='description'>
 
-<p>Set the <a href="../SQL.html">SQL</a> to use for the given <a
-href="../SQL/Constant.html">Sequel::SQL::Constant</a></p>
+<p>Set the <a href="../SQL.html"><code>SQL</code></a> to use for the given <a href="../SQL/Constant.html"><code>Sequel::SQL::Constant</code></a></p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_constant_sql-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_constant_sql-source'><span class="ruby-comment"># File lib/sequel/extensions/constant_sql_override.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_constant_sql</span>(<span class="ruby-identifier">constant</span>, <span class="ruby-identifier">override</span>)&#x000A;  <span class="ruby-ivar">@constant_sqls</span>[<span class="ruby-identifier">constant</span>.<span class="ruby-identifier">constant</span>] = <span class="ruby-identifier">override</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_constant_sql-source'>   <span class="ruby-comment"># File lib/sequel/extensions/constant_sql_override.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_constant_sql</span>(<span class="ruby-identifier">constant</span>, <span class="ruby-identifier">override</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-ivar">@constant_sqls</span>[<span class="ruby-identifier">constant</span>.<span class="ruby-identifier">constant</span>] = <span class="ruby-identifier">override</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

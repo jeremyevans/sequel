@@ -38,40 +38,19 @@ Last Update:
 <div id='description'>
 <h1 id="label-Thread+Safety">Thread Safety<span><a href="#label-Thread+Safety">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p>Most <a href="../../classes/Sequel.html">Sequel</a> usage (and all common
-<a href="../../classes/Sequel.html">Sequel</a> usage) is thread safe by
-default.  Specifically, multiple threads can operate on Database instances,
-Dataset instances, and Model classes concurrently without problems.  In
-general, Database instance and Model classes are not modified after
-application startup, and Dataset instances are always frozen.</p>
+<p>Most <a href="../../classes/Sequel.html"><code>Sequel</code></a> usage (and all common <a href="../../classes/Sequel.html"><code>Sequel</code></a> usage) is thread safe by default.  Specifically, multiple threads can operate on Database instances, Dataset instances, and Model classes concurrently without problems.  In general, Database instance and Model classes are not modified after application startup, and Dataset instances are always frozen.</p>
 
 <h2 id="label-Connection+Pool">Connection Pool<span><a href="#label-Connection+Pool">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>In order to allow multiple threads to operate on the same database at the
-same time, <a href="../../classes/Sequel.html">Sequel</a> uses a connection
-pool.  The connection pool is designed so that a thread uses a connection
-for the minimum amount of time, returning the connection to the pool as
-soon as it is done using the connection.  If a thread requests a connection
-and the pool does not have an available connection, a new connection will
-be created.  If the maximum number of connections in the pool has already
-been reached, the thread will block until a connection is available or the
-connection pool timeout has elapsed (in which case a Sequel::PoolTimeout
-error will be raised).</p>
+<p>In order to allow multiple threads to operate on the same database at the same time, <a href="../../classes/Sequel.html"><code>Sequel</code></a> uses a connection pool.  The connection pool is designed so that a thread uses a connection for the minimum amount of time, returning the connection to the pool as soon as it is done using the connection.  If a thread requests a connection and the pool does not have an available connection, a new connection will be created.  If the maximum number of connections in the pool has already been reached, the thread will block until a connection is available or the connection pool timeout has elapsed (in which case a Sequel::PoolTimeout error will be raised).</p>
 
 <h2 id="label-Exceptions">Exceptions<span><a href="#label-Exceptions">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>This is a small list of things that are specifically non thread-safe.  This
-is not an exhaustive list, there may be cases not mentioned here.</p>
+<p>This is a small list of things that are specifically non thread-safe.  This is not an exhaustive list, there may be cases not mentioned here.</p>
 
-<p>1) Model instances: Model instances are not thread-safe unless they are
-frozen first.  Multiple threads should not operate on an unfrozen model
-instance concurrently.</p>
+<p>1) Model instances: Model instances are not thread-safe unless they are frozen first.  Multiple threads should not operate on an unfrozen model instance concurrently.</p>
 
-<p>2) Model class modifications: Model class modifications, such as adding
-associations and loading plugins, are not designed to be thread safe.  You
-should not modify a class in one thread if any other thread can
-concurrently access it.  Model subclassing is designed to be thread-safe,
-so you create a model subclass in a thread and modify it safely.</p>
+<p>2) Model class modifications: Model class modifications, such as adding associations and loading plugins, are not designed to be thread safe.  You should not modify a class in one thread if any other thread can concurrently access it.  Model subclassing is designed to be thread-safe, so you create a model subclass in a thread and modify it safely.</p>
 </div>
 <div id='context'>
 </div>

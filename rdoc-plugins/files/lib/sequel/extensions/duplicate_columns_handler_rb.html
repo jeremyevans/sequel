@@ -36,12 +36,9 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The duplicate_columns_handler extension allows you to customize handling of
-duplicate column names in your queries on a per-database or per-dataset
-level.</p>
+<p>The duplicate_columns_handler extension allows you to customize handling of duplicate column names in your queries on a per-database or per-dataset level.</p>
 
-<p>For example, you may want to raise an exception if you join 2 tables
-together which contains a column that will override another columns.</p>
+<p>For example, you may want to raise an exception if you join 2 tables together which contains a column that will override another columns.</p>
 
 <p>To use the extension, you need to load the extension into the database:</p>
 
@@ -51,9 +48,7 @@ together which contains a column that will override another columns.</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)</pre>
 
-<p>A database option is introduced: :on_duplicate_columns. It accepts a <a
-href="../../../../classes/Symbol.html">Symbol</a> or any object that
-responds to :call.</p>
+<p>A database option is introduced: :on_duplicate_columns. It accepts a <a href="../../../../classes/Symbol.html"><code>Symbol</code></a> or any object that responds to :call.</p>
 
 <pre>on_duplicate_columns: :raise&#x000A;on_duplicate_columns: :warn&#x000A;on_duplicate_columns: :ignore&#x000A;on_duplicate_columns: lambda{|columns| arbitrary_condition? ? :raise : :warn}</pre>
 
@@ -61,14 +56,9 @@ responds to :call.</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:warn</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:raise</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:ignore</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:warn</span>})</pre>
 
-<p>If :raise is specified, a <a
-href="../../../../classes/Sequel/DuplicateColumnError.html">Sequel::DuplicateColumnError</a>
-is raised. If :warn is specified, you will receive a warning via
-<code>warn</code>. If a callable is specified, it will be called. If no
-on_duplicate_columns is specified, the default is :warn.</p>
+<p>If :raise is specified, a <a href="../../../../classes/Sequel/DuplicateColumnError.html"><code>Sequel::DuplicateColumnError</code></a> is raised. If :warn is specified, you will receive a warning via <code>warn</code>. If a callable is specified, it will be called. If no on_duplicate_columns is specified, the default is :warn.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/DuplicateColumnsHandler.html">Sequel::DuplicateColumnsHandler</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/DuplicateColumnsHandler.html"><code>Sequel::DuplicateColumnsHandler</code></a></p>
 </div>
 <div id='context'>
 </div>

@@ -39,13 +39,9 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The <a href="InetOp.html">InetOp</a> class is a simple container for a
-single object that defines methods that yield <a
-href="../../Sequel.html">Sequel</a> expression objects representing
-PostgreSQL inet operators and functions.</p>
+<p>The <a href="InetOp.html"><code>InetOp</code></a> class is a simple container for a single object that defines methods that yield <a href="../../Sequel.html"><code>Sequel</code></a> expression objects representing PostgreSQL inet operators and functions.</p>
 
-<p>Most methods in this class are defined via metaprogramming, see the
-pg_inet_ops extension documentation for details on the API.</p>
+<p>Most methods in this class are defined via metaprogramming, see the pg_inet_ops extension documentation for details on the API.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -99,15 +95,14 @@ pg_inet_ops extension documentation for details on the API.</p>
 </div>
 <div class='description'>
 
-<p>For <a href="../../String.html">String</a> and IPAddr instances, wrap them
-in a cast to inet, to avoid ambiguity issues when calling operator methods.</p>
+<p>For <a href="../../String.html"><code>String</code></a> and IPAddr instances, wrap them in a cast to inet, to avoid ambiguity issues when calling operator methods.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>&#x000A;    <span class="ruby-comment"># nothing</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>, <span class="ruby-constant">IPAddr</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">v</span>, <span class="ruby-value">:inet</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">78</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">79</span>   <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>&#x000A;<span class="line-num">80</span>     <span class="ruby-comment"># nothing</span>&#x000A;<span class="line-num">81</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>, <span class="ruby-constant">IPAddr</span>&#x000A;<span class="line-num">82</span>     <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">v</span>, <span class="ruby-value">:inet</span>)&#x000A;<span class="line-num">83</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">84</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -127,7 +122,7 @@ in a cast to inet, to avoid ambiguity issues when calling operator methods.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-2D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 127</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">-</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">super</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-2D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">-</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">129</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">130</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;<span class="line-num">131</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="line-num">132</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">133</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">super</span>)&#x000A;<span class="line-num">134</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">135</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_inet'>
@@ -146,7 +141,7 @@ in a cast to inet, to avoid ambiguity issues when calling operator methods.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_inet-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_inet-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 117</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_inet</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_inet-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>&#x000A;<span class="line-num">118</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_inet</span>&#x000A;<span class="line-num">119</span>   <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">120</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_masklen'>
@@ -158,16 +153,14 @@ in a cast to inet, to avoid ambiguity issues when calling operator methods.</p>
 </div>
 <div class='description'>
 
-<p>Return an expression for the calling of the <a
-href="InetOp.html#method-i-set_masklen">#set_masklen</a> function with the
-receiver and the given argument</p>
+<p>Return an expression for the calling of the <a href="InetOp.html#method-i-set_masklen"><code>set_masklen</code></a> function with the receiver and the given argument</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_masklen-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_masklen-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 137</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_masklen</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:set_masklen</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_masklen-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_masklen</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">139</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:set_masklen</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>))&#x000A;<span class="line-num">140</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-~'>
@@ -186,7 +179,7 @@ receiver and the given argument</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-~-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 122</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>&#x000A;<span class="line-num">123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>&#x000A;<span class="line-num">124</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="line-num">125</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -57,15 +57,14 @@ Sequel::Dataset::StoredProcedures
 </div>
 <div class='description'>
 
-<p>For the given type (:select, :first, :insert, :update, or :delete), run the
-database stored procedure with the given name with the given arguments.</p>
+<p>For the given type (:select, :first, :insert, :update, or :delete), run the database stored procedure with the given name with the given arguments.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call_sproc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call_sproc-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>).<span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call_sproc-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>).<span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-prepare_sproc'>
@@ -77,15 +76,14 @@ database stored procedure with the given name with the given arguments.</p>
 </div>
 <div class='description'>
 
-<p>Transform this dataset into a stored procedure that you can call multiple
-times with new arguments.</p>
+<p>Transform this dataset into a stored procedure that you can call multiple times with new arguments.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-prepare_sproc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-prepare_sproc-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepare_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">prepare_extend_sproc</span>(<span class="ruby-keyword">self</span>).<span class="ruby-identifier">clone</span>(<span class="ruby-value">:sproc_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>, <span class="ruby-value">:sproc_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-prepare_sproc-source'>   <span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb</span>&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">prepare_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">50</span>   <span class="ruby-identifier">prepare_extend_sproc</span>(<span class="ruby-keyword">self</span>).<span class="ruby-identifier">clone</span>(<span class="ruby-value">:sproc_type</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">type</span>, <span class="ruby-value">:sproc_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">name</span>, <span class="ruby-value">:sql</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;&#39;</span>)&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

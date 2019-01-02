@@ -39,31 +39,19 @@ Last Update:
 <p>Optimizations</p>
 <hr>
 <ul><li>
-<p>Model.[] was optimized to use static SQL in cases where doing so should
-result in the same output.  This should result in a 30-40% performance
-increase.  Since this can be the most significant or only method call in a
-web application action, this has potential to significantly enhance the
-performance of web application code.</p>
+<p>Model.[] was optimized to use static SQL in cases where doing so should result in the same output.  This should result in a 30-40% performance increase.  Since this can be the most significant or only method call in a web application action, this has potential to significantly enhance the performance of web application code.</p>
 
-<p>In order for this optimization to have an effect, you need to make sure
-that you are calling set_dataset with a Symbol and not a Dataset object:</p>
+<p>In order for this optimization to have an effect, you need to make sure that you are calling set_dataset with a Symbol and not a Dataset object:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Optimized:</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:foos</span>); <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> <span class="ruby-value">:foos</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Not Optimized, but otherwise equivalent:</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>[<span class="ruby-value">:foos</span>]); <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:foos</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>Dataset#literal was refactored for performance reasons to make overriding
-it in subclasses unnecessary.  The changes made result in a 20-25%
-performance increase.  <a href="../../../classes/Sequel.html">Sequel</a>
-can spend about 10% of it&#39;s time in Dataset#literal, so this may be
-only a 2% overall performance improvement.</p>
+<p>Dataset#literal was refactored for performance reasons to make overriding it in subclasses unnecessary.  The changes made result in a 20-25% performance increase.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> can spend about 10% of it&#39;s time in Dataset#literal, so this may be only a 2% overall performance improvement.</p>
 </li></ul>
 
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>Association datasets now know about the model objects that created them, as
-well as the related association reflection.  This makes association
-extensions much more powerful.  For example, you can now create generic
-association extensions such as:</p>
+<p>Association datasets now know about the model objects that created them, as well as the related association reflection.  This makes association extensions much more powerful.  For example, you can now create generic association extensions such as:</p>
 
 <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">FindOrCreate</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_create</span>(<span class="ruby-identifier">vals</span>)&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">association_reflection</span>.<span class="ruby-identifier">associated_class</span>. \&#x000A;     <span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">association_reflection</span>[<span class="ruby-value">:key</span>]<span class="ruby-operator">=&gt;</span> \&#x000A;       <span class="ruby-identifier">model_object</span>.<span class="ruby-identifier">id</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -71,52 +59,31 @@ association extensions such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">:extend</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">FindOrCreate</span>&#x000A;<span class="ruby-comment"># Create an album named Foo related to this artist,</span>&#x000A;<span class="ruby-comment"># unless such an album already exists</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">find_or_create</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)</pre>
 
-<p>Before, the only way to do the above was to use a closure inside the
-:dataset option proc, which couldn&#39;t be done generically for multiple
-associations.</p>
+<p>Before, the only way to do the above was to use a closure inside the :dataset option proc, which couldn&#39;t be done generically for multiple associations.</p>
 </li><li>
-<p>A :conditions association option was added, which allows simple filters to
-be set up without defining :graph_conditions and an association block:</p>
+<p>A :conditions association option was added, which allows simple filters to be set up without defining :graph_conditions and an association block:</p>
 
 <pre class="ruby"><span class="ruby-comment"># 2.10.0</span>&#x000A;<span class="ruby-identifier">one_to_many</span>(<span class="ruby-value">:japanese_verses</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Verse</span>, \&#x000A; <span class="ruby-value">:graph_conditions</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:languageid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>})<span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:languageid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># 2.11.0</span>&#x000A;<span class="ruby-identifier">one_to_many</span>(<span class="ruby-value">:japanese_verses</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Verse</span>, \&#x000A;   <span class="ruby-value">:conditions</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:languageid</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>})</pre>
 </li><li>
-<p>A :clone association option was added, which allows you to clone an
-existing association.  This is most useful when you are dealing with a
-legacy schema and had to define the same options redundantly for each type
-of association. You can now do:</p>
+<p>A :clone association option was added, which allows you to clone an existing association.  This is most useful when you are dealing with a legacy schema and had to define the same options redundantly for each type of association. You can now do:</p>
 
 <pre class="ruby"><span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:deputies</span>, <span class="ruby-value">:class</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:Employee</span>, \&#x000A; <span class="ruby-value">:join_table</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:employeecurrentaudits</span>, <span class="ruby-value">:left_key</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:currentauditid</span>, \&#x000A; <span class="ruby-value">:right_key</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:employeeid</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">:firstname</span>, <span class="ruby-value">:lastname</span>] <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:capacity</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:project_managers</span>, <span class="ruby-value">:clone</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:deputies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:capacity</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">many_to_many</span> <span class="ruby-value">:team_leaders</span>, <span class="ruby-value">:clone</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:deputies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:capacity</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>All of the above would use the same :class, :join_table, :left_key,
-:right_key, and :order options.  If you don&#39;t provide an association
-block, but you are cloning an association that has one, the cloned
-association&#39;s block is used.  You can use the :block=&gt;nil option to
-not use a block even if the cloned association has a block.</p>
+<p>All of the above would use the same :class, :join_table, :left_key, :right_key, and :order options.  If you don&#39;t provide an association block, but you are cloning an association that has one, the cloned association&#39;s block is used.  You can use the :block=&gt;nil option to not use a block even if the cloned association has a block.</p>
 </li><li>
-<p>Dataset#select, select_more, order, order_more, and get all take a block
-that yields a <a
-href="../../../classes/Sequel/SQL/VirtualRow.html">Sequel::SQL::VirtualRow</a>
-instance, similar to the behavior of filter. This allows for the easier use
-of SQL functions on Ruby 1.9:</p>
+<p>Dataset#select, select_more, order, order_more, and get all take a block that yields a <a href="../../../classes/Sequel/SQL/VirtualRow.html"><code>Sequel::SQL::VirtualRow</code></a> instance, similar to the behavior of filter. This allows for the easier use of SQL functions on Ruby 1.9:</p>
 
 <pre class="ruby"><span class="ruby-comment"># 2.10.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:prettify</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:name</span>))&#x000A;<span class="ruby-comment"># 2.11.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">prettify</span>(<span class="ruby-value">:name</span>)}</pre>
 </li><li>
-<p>String#lit can now accept arguments and return an SQL literal string.  This
-allows you to do things that were previously hard or at least unnecessarily
-verbose.  For example, you can now easily use the SQL standard SUBSTRING
-function:</p>
+<p>String#lit can now accept arguments and return an SQL literal string.  This allows you to do things that were previously hard or at least unnecessarily verbose.  For example, you can now easily use the SQL standard SUBSTRING function:</p>
 
 <pre class="ruby"><span class="ruby-identifier">column</span> = <span class="ruby-value">:user</span>&#x000A;<span class="ruby-identifier">pattern</span> = <span class="ruby-identifier">params</span>[<span class="ruby-value">:pattern</span>]&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">substring</span>(<span class="ruby-string">&#39;? from ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">pattern</span>))}</pre>
 </li><li>
-<p>A validates_inclusion_of validation method was added to Model. You can
-provide a Range or an Array in the :in option to specify the allowed
-values:</p>
+<p>A validates_inclusion_of validation method was added to Model. You can provide a Range or an Array in the :in option to specify the allowed values:</p>
 
 <pre class="ruby"><span class="ruby-identifier">validates_inclusion_of</span> <span class="ruby-value">:value</span>, <span class="ruby-value">:in</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>&#x000A;<span class="ruby-identifier">validates_inclusion_of</span> <span class="ruby-value">:weekday</span>, <span class="ruby-value">:in</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">%w&#39;Monday Tuesday ...&#39;</span></pre>
 </li><li>
-<p>Dataset#with_sql was added, which returns a copy of the dataset with static
-SQL.  This is useful if you want to keep the same
-row_proc/graph/transform/etc., but want to use your own custom SQL.</p>
+<p>Dataset#with_sql was added, which returns a copy of the dataset with static SQL.  This is useful if you want to keep the same row_proc/graph/transform/etc., but want to use your own custom SQL.</p>
 </li></ul>
 
 <p>Other Improvements</p>
@@ -126,27 +93,15 @@ row_proc/graph/transform/etc., but want to use your own custom SQL.</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">:number</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">String</span>))</pre>
 
-<p>Among other things, the default cast types for cast_string and cast_numeric
-now work in the MySQL adapter.</p>
+<p>Among other things, the default cast types for cast_string and cast_numeric now work in the MySQL adapter.</p>
 </li><li>
-<p>Model#set_associated_object was added.  The many_to_one association setter
-method calls it.  This allows you to easily override the association
-setters for all many_to_one associations of a class by modifying a single
-method.</p>
+<p>Model#set_associated_object was added.  The many_to_one association setter method calls it.  This allows you to easily override the association setters for all many_to_one associations of a class by modifying a single method. </p>
 </li><li>
-<p>Typecasting invalid date strings now raises a Sequel::Error::InvalidValue
-instead of an argument error, which means that you can use
-raise_on_typecast_failure = false and not have an error raised when an
-invalid date format is used.</p>
+<p>Typecasting invalid date strings now raises a Sequel::Error::InvalidValue instead of an argument error, which means that you can use raise_on_typecast_failure = false and not have an error raised when an invalid date format is used.</p>
 </li><li>
-<p>String#to_sequel_blob was added and should now be used instead of
-String#to_blob.  sqlite3-ruby defines String#to_blob differently, which
-could cause problems.</p>
+<p>String#to_sequel_blob was added and should now be used instead of String#to_blob.  sqlite3-ruby defines String#to_blob differently, which could cause problems.</p>
 </li><li>
-<p>Blob columns are now fully supported in the SQLite adapter, with the hex
-escape syntax being used for input, and returning columns of type <a
-href="../../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a> on
-output.</p>
+<p>Blob columns are now fully supported in the SQLite adapter, with the hex escape syntax being used for input, and returning columns of type <a href="../../../classes/Sequel/SQL/Blob.html"><code>Sequel::SQL::Blob</code></a> on output.</p>
 </li><li>
 <p>The SQLite adapter drop_column support is now significantly more robust.</p>
 </li><li>
@@ -154,63 +109,39 @@ output.</p>
 </li><li>
 <p>The MySQL adapter now supports stored procedures with multiple arguments.</p>
 </li><li>
-<p>The MySQL adapter can now not use a compressed connection to the server via
-the :compress=&gt;false option.</p>
+<p>The MySQL adapter can now not use a compressed connection to the server via the :compress=&gt;false option.</p>
 </li><li>
-<p>The MySQL adapter now sets a default timeout of 30 days to the database
-connection, you can change it via the :timeout option, which accepts a
-number of seconds.</p>
+<p>The MySQL adapter now sets a default timeout of 30 days to the database connection, you can change it via the :timeout option, which accepts a number of seconds.</p>
 </li><li>
-<p>The MySQL adapter now sets SQL_AUTO_IS_NULL to false by default, you can
-use the :auto_is_null=&gt;true option to not do this.</p>
+<p>The MySQL adapter now sets SQL_AUTO_IS_NULL to false by default, you can use the :auto_is_null=&gt;true option to not do this.</p>
 </li><li>
-<p>The MySQL adapter now sets the encoding option on the database connection
-itself, so it works across reconnects.</p>
+<p>The MySQL adapter now sets the encoding option on the database connection itself, so it works across reconnects.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> itself no longer uses
-String#lit or Symbol#* internally, so it shouldn&#39;t break if another
-library defines them.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> itself no longer uses String#lit or Symbol#* internally, so it shouldn&#39;t break if another library defines them.</p>
 </li><li>
-<p>The default index name is now generated correctly if a non-String or Symbol
-column is used.</p>
+<p>The default index name is now generated correctly if a non-String or Symbol column is used.</p>
 </li><li>
 <p>Some ruby -w warnings have been fixed.</p>
 </li><li>
-<p>INSERTs are now sent to the master database instead of the slave
-database(s) if using a master/slave database configuration and PostgreSQL
-8.2+ or Firebird.</p>
+<p>INSERTs are now sent to the master database instead of the slave database(s) if using a master/slave database configuration and PostgreSQL 8.2+ or Firebird.</p>
 </li><li>
 <p>DateTime literalization has been fixed in the Firebird adapter.</p>
 </li><li>
 <p>Date literalization has been fixed in the H2 JDBC subadapter.</p>
 </li><li>
-<p>Release notes for versions from 1.0 to the present are now included in the
-<a href="../../../classes/Sequel.html">Sequel</a> repository and the RDoc
-documentation, see <a
-href="http://sequel.rubyforge.org/rdoc/files/doc/release_notes">sequel.rubyforge.org/rdoc/files/doc/release_notes</a>/</p>
+<p>Release notes for versions from 1.0 to the present are now included in the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> repository and the RDoc documentation, see <a target="_top" href="http://sequel.rubyforge.org/rdoc/files/doc/release_notes">sequel.rubyforge.org/rdoc/files/doc/release_notes</a>/</p>
 </li></ul>
 
 <p>Backwards Compatibilty</p>
 <hr>
 <ul><li>
-<p>The optimization of Model.[] may break if you modify the model&#39;s
-dataset behind its back.  Always use Model.set_dataset if you want to
-change a Model&#39;s dataset.</p>
+<p>The optimization of Model.[] may break if you modify the model&#39;s dataset behind its back.  Always use Model.set_dataset if you want to change a Model&#39;s dataset.</p>
 </li><li>
-<p>Sequel::Dataset::UnsupportedExceptIntersect and
-Sequel::Dataset::UnsupportedExceptIntersectAll will now only be defined if
-you are using an adapter that requires them.</p>
+<p>Sequel::Dataset::UnsupportedExceptIntersect and Sequel::Dataset::UnsupportedExceptIntersectAll will now only be defined if you are using an adapter that requires them.</p>
 </li><li>
 <p>The private Model#cache_delete_unless_new method has been removed.</p>
 </li><li>
-<p>Sequel::SQL::IrregularFunction was removed, as it was a bad hack that is
-not used by <a href="../../../classes/Sequel.html">Sequel</a> anymore. 
-Unless you were instantiating it directly or using a plugin/extension that
-did, this shouldn&#39;t affect you.  Using a <a
-href="../../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a>
-with a  <a
-href="../../../classes/Sequel/SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a>
-is recommended instead, see the substring example above.</p>
+<p>Sequel::SQL::IrregularFunction was removed, as it was a bad hack that is not used by <a href="../../../classes/Sequel.html"><code>Sequel</code></a> anymore.  Unless you were instantiating it directly or using a plugin/extension that did, this shouldn&#39;t affect you.  Using a <a href="../../../classes/Sequel/SQL/Function.html"><code>Sequel::SQL::Function</code></a> with a  <a href="../../../classes/Sequel/SQL/PlaceholderLiteralString.html"><code>Sequel::SQL::PlaceholderLiteralString</code></a> is recommended instead, see the substring example above.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="Error.html">Error</a> raised when the user requests a record via
-the first! or similar method, and the dataset does not yield any rows.</p>
+<p><a href="Error.html"><code>Error</code></a> raised when the user requests a record via the first! or similar method, and the dataset does not yield any rows.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -66,8 +65,7 @@ the first! or similar method, and the dataset does not yield any rows.</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>The dataset that raised this <a href="NoMatchingRow.html">NoMatchingRow</a>
-exception.</p>
+<p>The dataset that raised this <a href="NoMatchingRow.html"><code>NoMatchingRow</code></a> exception.</p>
 </td>
 </tr>
 </table>
@@ -84,16 +82,14 @@ exception.</p>
 </div>
 <div class='description'>
 
-<p>If the first argument is a <a href="Dataset.html">Sequel::Dataset</a>, set
-the dataset related to the exception to that argument, instead of assuming
-it is the exception message.</p>
+<p>If the first argument is a <a href="Dataset.html"><code>Sequel::Dataset</code></a>, set the dataset related to the exception to that argument, instead of assuming it is the exception message.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/exceptions.rb, line 101</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">msg</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">msg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>)&#x000A;    <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">msg</span>&#x000A;    <span class="ruby-identifier">msg</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/exceptions.rb</span>&#x000A;<span class="line-num">102</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">msg</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">103</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">msg</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>)&#x000A;<span class="line-num">104</span>     <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">msg</span>&#x000A;<span class="line-num">105</span>     <span class="ruby-identifier">msg</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">106</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">107</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">108</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

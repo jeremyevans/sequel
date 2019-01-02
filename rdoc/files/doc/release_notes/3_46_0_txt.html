@@ -38,112 +38,74 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset#first! has been added.  This is identical to first, except where
-first would return nil due to no row matching, first! raises a <a
-href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
-exception.  The main benefit here is that a standard exception class is now
-used, so external libraries can deal with these exceptions appropriately
-(such as web applications returning a 404 error).</p>
+<p>Dataset#first! has been added.  This is identical to first, except where first would return nil due to no row matching, first! raises a <a href="../../../classes/Sequel/NoMatchingRow.html"><code>Sequel::NoMatchingRow</code></a> exception.  The main benefit here is that a standard exception class is now used, so external libraries can deal with these exceptions appropriately (such as web applications returning a 404 error).</p>
 </li><li>
-<p>Dataset#with_pk! has been added to model datasets.  Similar to first!, this
-raises a <a
-href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
-exception instead of returning nil if there is no matching row.</p>
+<p>Dataset#with_pk! has been added to model datasets.  Similar to first!, this raises a <a href="../../../classes/Sequel/NoMatchingRow.html"><code>Sequel::NoMatchingRow</code></a> exception instead of returning nil if there is no matching row.</p>
 </li><li>
 <p>A drop_foreign_key method has been added to the alter_table generator:</p>
 
 <pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:tab</span>){<span class="ruby-identifier">drop_foreign_key</span> <span class="ruby-value">:col</span>}</pre>
 
-<p>This relies on foreign_key_list working and including the name of the
-foreign key.  Previously, you&#39;d have to drop the foreign key constraint
-before dropping the column in some cases.</p>
+<p>This relies on foreign_key_list working and including the name of the foreign key.  Previously, you&#39;d have to drop the foreign key constraint before dropping the column in some cases.</p>
 </li><li>
 <p>Column constraints can now be named using :*_constraint_name options:</p>
 
 <pre class="ruby"><span class="ruby-identifier">create_table</span>(<span class="ruby-value">:tab</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>, <span class="ruby-value">:primary_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:pk_name</span>&#x000A;  <span class="ruby-identifier">foriegn_key</span> <span class="ruby-value">:t_id</span>, <span class="ruby-value">:t</span>, <span class="ruby-value">:foreign_key_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:fk_name</span>,&#x000A;    <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:unique_constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:uk_name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>This makes it easier to name constraints, which has always been recommended
-as it makes it easier to drop such constraints in the future.</p>
+<p>This makes it easier to name constraints, which has always been recommended as it makes it easier to drop such constraints in the future.</p>
 </li><li>
-<p>On Microsoft SQL Server, Dataset#cross_apply and outer_apply have been
-added to use CROSS/OUTER APPLY.  These are useful if you want to join a
-table to the output of a function that takes the table as an argument.</p>
+<p>On Microsoft SQL Server, Dataset#cross_apply and outer_apply have been added to use CROSS/OUTER APPLY.  These are useful if you want to join a table to the output of a function that takes the table as an argument.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The connection pools are now faster when using the
-:connection_handling=&gt;:queue option.</p>
+<p>The connection pools are now faster when using the :connection_handling=&gt;:queue option.</p>
 </li><li>
-<p>External connection pool classes can now be loaded automatically by the
-:pool_class option.</p>
+<p>External connection pool classes can now be loaded automatically by the :pool_class option.</p>
 </li><li>
-<p>Database#each_server now raises if not given a block.  Previously, it just
-leaked Database references.</p>
+<p>Database#each_server now raises if not given a block.  Previously, it just leaked Database references.</p>
 </li><li>
-<p>On Microsoft SQL Server, ] characters are now escaped correctly in
-identifiers.</p>
+<p>On Microsoft SQL Server, ] characters are now escaped correctly in identifiers.</p>
 </li><li>
-<p>On PostgreSQL, infinite dates are also handled when using
-Database#convert_infinite_timestamps.  Previously, infinite dates were
-incorrectly converted to 0000-01-01.</p>
+<p>On PostgreSQL, infinite dates are also handled when using Database#convert_infinite_timestamps.  Previously, infinite dates were incorrectly converted to 0000-01-01.</p>
 </li><li>
-<p>The associations, composition, serialization, and dirty plugins now clear
-caches stored in the instance in some additional cases, such as when saving
-model instances when the dataset supports insert_select.</p>
+<p>The associations, composition, serialization, and dirty plugins now clear caches stored in the instance in some additional cases, such as when saving model instances when the dataset supports insert_select.</p>
 </li><li>
-<p>Model#validates_type in the validation_helpers plugin now handles false
-values correctly.</p>
+<p>Model#validates_type in the validation_helpers plugin now handles false values correctly.</p>
 </li><li>
-<p>The string_stripper plugin has been fixed to not change the result of
-Model.set_dataset.</p>
+<p>The string_stripper plugin has been fixed to not change the result of Model.set_dataset.</p>
 </li><li>
 <p>You can now drop primary key constraints on H2, using:</p>
 
 <pre class="ruby"><span class="ruby-identifier">alter_table</span>(<span class="ruby-value">:tab</span>){<span class="ruby-identifier">drop_constraint</span> <span class="ruby-value">:foo</span>, <span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:primary_key</span>}</pre>
 </li><li>
-<p>The jdbc/as400 adapter has been fixed, it was broken starting in <a
-href="../../../classes/Sequel.html">Sequel</a> 3.44.0.</p>
+<p>The jdbc/as400 adapter has been fixed, it was broken starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.44.0.</p>
 </li><li>
-<p>A Security guide has been added explaining various security issues to think
-about when using <a href="../../../classes/Sequel.html">Sequel</a>.</p>
+<p>A Security guide has been added explaining various security issues to think about when using <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The change to make associations, composition, serialization, and dirty now
-clear caches after saving when the dataset supports insert_select can break
-code that expected the previous behavior. For example:</p>
+<p>The change to make associations, composition, serialization, and dirty now clear caches after saving when the dataset supports insert_select can break code that expected the previous behavior. For example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">has_albums</span> <span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:artist</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">artist</span>)&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">album</span>.<span class="ruby-identifier">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:has_albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">has_albums</span> <span class="ruby-comment"># =&gt; false</span></pre>
 
-<p>Such code should either refresh the artist after saving the album, or use
-album.artist.has_albums.  You already had to do that if the dataset did not
-support insert_select; the impetus for this change was to make the behavior
-consistent.</p>
+<p>Such code should either refresh the artist after saving the album, or use album.artist.has_albums.  You already had to do that if the dataset did not support insert_select; the impetus for this change was to make the behavior consistent.</p>
 </li><li>
-<p>Decimal/numeric columns are now strictly typecast by default, similar to
-integer and real/double precision columns.  If you want the previous loose
-typecasting to for decimal/numeric columns, use the looser_typecasting
-extension.</p>
+<p>Decimal/numeric columns are now strictly typecast by default, similar to integer and real/double precision columns.  If you want the previous loose typecasting to for decimal/numeric columns, use the looser_typecasting extension.</p>
 </li><li>
-<p>External adapters that called Database.set_adapter_scheme with a string
-should change to using a symbol.</p>
+<p>External adapters that called Database.set_adapter_scheme with a string should change to using a symbol.</p>
 </li><li>
-<p>Dataset#select_map, select_order_map, and get now raise an exception if
-they are passed a plain string inside an array.</p>
+<p>Dataset#select_map, select_order_map, and get now raise an exception if they are passed a plain string inside an array.</p>
 
 <p>If you do want to use a plain string, you now need to alias it:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">get</span>([<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-string">&#39;string&#39;</span>, <span class="ruby-value">:some_alias</span>)])</pre>
 </li></ul>
 
-<h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html">Sequel</a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> 4 implementation planning
-has begun.  If you want to view and/or provide feedback on the
-implementation plan, see <a
-href="https://github.com/jeremyevans/sequel-4-plans">github.com/jeremyevans/sequel-4-plans</a></p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 implementation planning has begun.  If you want to view and/or provide feedback on the implementation plan, see <a href="https://github.com/jeremyevans/sequel-4-plans">github.com/jeremyevans/sequel-4-plans</a></p>
 </li></ul>
 </div>
 <div id='context'>

@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Callable object that takes the input string and parses it using <a
-href="Parser.html">Parser</a>.</p>
+<p>Callable object that takes the input string and parses it using <a href="Parser.html"><code>Parser</code></a>.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -68,8 +67,7 @@ href="Parser.html">Parser</a>.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The converter callable that is called on each member of the array to
-convert it to the correct type.</p>
+<p>The converter callable that is called on each member of the array to convert it to the correct type.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -78,8 +76,7 @@ convert it to the correct type.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The database type to set on the <a href="../PGArray.html">PGArray</a>
-instances returned.</p>
+<p>The database type to set on the <a href="../PGArray.html"><code>PGArray</code></a> instances returned.</p>
 </td>
 </tr>
 </table>
@@ -103,7 +100,7 @@ instances returned.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 404</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">405</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">406</span>   <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">407</span>   <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="line-num">408</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -123,7 +120,7 @@ instances returned.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 412</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">parse_pg_array</span>(<span class="ruby-identifier">string</span>, <span class="ruby-ivar">@converter</span>), <span class="ruby-ivar">@type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">413</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">414</span>   <span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">parse_pg_array</span>(<span class="ruby-identifier">string</span>, <span class="ruby-ivar">@converter</span>), <span class="ruby-ivar">@type</span>)&#x000A;<span class="line-num">415</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

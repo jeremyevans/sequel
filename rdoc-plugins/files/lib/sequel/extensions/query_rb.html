@@ -36,8 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The query extension adds a query method which allows a different way to
-construct queries instead of the usual method chaining:</p>
+<p>The query extension adds a query method which allows a different way to construct queries instead of the usual method chaining:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">select</span> <span class="ruby-value">:x</span>, <span class="ruby-value">:y</span>, <span class="ruby-value">:z</span>&#x000A;  <span class="ruby-identifier">where</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}&#x000A;  <span class="ruby-identifier">reverse</span> <span class="ruby-value">:z</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -45,17 +44,11 @@ construct queries instead of the usual method chaining:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:query</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:query</span>)</pre>
 
-<p>Related modules: <a
-href="../../../../classes/Sequel/DatabaseQuery.html">Sequel::DatabaseQuery</a>,
-<a
-href="../../../../classes/Sequel/DatasetQuery.html">Sequel::DatasetQuery</a>,
-<a
-href="../../../../classes/Sequel/Dataset/Query.html">Sequel::Dataset::Query</a></p>
+<p>Related modules: <a href="../../../../classes/Sequel/DatabaseQuery.html"><code>Sequel::DatabaseQuery</code></a>, <a href="../../../../classes/Sequel/DatasetQuery.html"><code>Sequel::DatasetQuery</code></a>, <a href="../../../../classes/Sequel/Dataset/Query.html"><code>Sequel::Dataset::Query</code></a></p>
 </div>
 <div id='context'>
 </div>

@@ -41,12 +41,7 @@ Sequel::Plugins::ConstraintValidations
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The constraint_validations plugin is designed to be used with databases
-that used the constraint_validations extension when creating their tables. 
-The extension adds validation metadata for constraints created, and this
-plugin reads that metadata and automatically creates validations for all of
-the constraints.  For example, if you used the extension and created your
-albums table like this:</p>
+<p>The constraint_validations plugin is designed to be used with databases that used the constraint_validations extension when creating their tables.  The extension adds validation metadata for constraints created, and this plugin reads that metadata and automatically creates validations for all of the constraints.  For example, if you used the extension and created your albums table like this:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -114,15 +109,14 @@ albums table like this:</p>
 </div>
 <div class='description'>
 
-<p>Automatically load the validation_helpers plugin to run the actual
-validations.</p>
+<p>Automatically load the validation_helpers plugin to run the actual validations.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;    <span class="ruby-ivar">@constraint_validations_table</span> = <span class="ruby-constant">DEFAULT_CONSTRAINT_VALIDATIONS_TABLE</span>&#x000A;    <span class="ruby-ivar">@constraint_validation_options</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">43</span>     <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;<span class="line-num">44</span>     <span class="ruby-ivar">@constraint_validations_table</span> = <span class="ruby-constant">DEFAULT_CONSTRAINT_VALIDATIONS_TABLE</span>&#x000A;<span class="line-num">45</span>     <span class="ruby-ivar">@constraint_validation_options</span> = {}&#x000A;<span class="line-num">46</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -136,13 +130,9 @@ validations.</p>
 
 <p>Parse the constraint validations metadata from the database. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:constraint_validations_table </td><td>
-<p>Override the name of the constraint validations metadata table.  Should
-only be used if the table name was overridden when creating the constraint
-validations.</p>
+<p>Override the name of the constraint validations metadata table.  Should only be used if the table name was overridden when creating the constraint validations.</p>
 </td></tr><tr><td class='label'>:validation_options </td><td>
-<p>Override/augment the options stored in the database with the given options.
-Keys should be validation type symbols (e.g. :presence) and values should
-be hashes of options specific to that validation type.</p>
+<p>Override/augment the options stored in the database with the given options.  Keys should be validation type symbols (e.g. :presence) and values should be hashes of options specific to that validation type.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -150,7 +140,7 @@ be hashes of options specific to that validation type.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:constraint_validations_table</span>]&#x000A;      <span class="ruby-ivar">@constraint_validations_table</span> = <span class="ruby-identifier">table</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">vos</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:validation_options</span>]&#x000A;      <span class="ruby-identifier">vos</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">existing_options</span> = <span class="ruby-ivar">@constraint_validation_options</span>[<span class="ruby-identifier">k</span>]       &#x000A;          <span class="ruby-identifier">v</span> = <span class="ruby-identifier">existing_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">v</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-ivar">@constraint_validation_options</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">parse_constraint_validations</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb</span>&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">59</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">60</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:constraint_validations_table</span>]&#x000A;<span class="line-num">61</span>       <span class="ruby-ivar">@constraint_validations_table</span> = <span class="ruby-identifier">table</span>&#x000A;<span class="line-num">62</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">63</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">vos</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:validation_options</span>]&#x000A;<span class="line-num">64</span>       <span class="ruby-identifier">vos</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">65</span>         <span class="ruby-keyword">if</span> <span class="ruby-identifier">existing_options</span> = <span class="ruby-ivar">@constraint_validation_options</span>[<span class="ruby-identifier">k</span>]       &#x000A;<span class="line-num">66</span>           <span class="ruby-identifier">v</span> = <span class="ruby-identifier">existing_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">67</span>         <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">68</span>         <span class="ruby-ivar">@constraint_validation_options</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">69</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">70</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">71</span>     <span class="ruby-identifier">parse_constraint_validations</span>&#x000A;<span class="line-num">72</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -66,8 +66,7 @@ Superclass:
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p><a href="Database.html">Sequel::Mock::Database</a> object that created this
-connection</p>
+<p><a href="Database.html"><code>Sequel::Mock::Database</code></a> object that created this connection</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -85,8 +84,7 @@ connection</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>Shard this connection operates on, when using Sequel&#39;s sharding support
-(always :default for databases not using sharding).</p>
+<p>Shard this connection operates on, when using Sequel&#39;s sharding support (always :default for databases not using sharding).</p>
 </td>
 </tr>
 </table>
@@ -110,7 +108,7 @@ connection</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@server</span> = <span class="ruby-identifier">server</span>&#x000A;  <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mock.rb</span>&#x000A;<span class="line-num">20</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">21</span>   <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="line-num">22</span>   <span class="ruby-ivar">@server</span> = <span class="ruby-identifier">server</span>&#x000A;<span class="line-num">23</span>   <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -130,7 +128,7 @@ connection</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-execute-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_execute</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-value">:log</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>) &#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-execute-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mock.rb</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">execute</span>(<span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">28</span>   <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_execute</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-value">:log</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>) &#x000A;<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

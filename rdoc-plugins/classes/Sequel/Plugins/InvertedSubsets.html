@@ -35,12 +35,9 @@ Sequel::Plugins::InvertedSubsets
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The inverted_subsets plugin adds another method for each defined subset,
-which inverts the condition supplied. By default, inverted subset method
-names are prefixed with not_.</p>
+<p>The inverted_subsets plugin adds another method for each defined subset, which inverts the condition supplied. By default, inverted subset method names are prefixed with not_.</p>
 
-<p>You can change the prefix, or indeed entirely customise the inverted names,
-by passing a block to the plugin configuration:</p>
+<p>You can change the prefix, or indeed entirely customise the inverted names, by passing a block to the plugin configuration:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Use an exclude_ prefix for inverted subsets instead of not_</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:inverted_subsets</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;exclude_#{name}&quot;</span>}</pre>
 
@@ -86,7 +83,7 @@ by passing a block to the plugin configuration:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;        <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:inverted_subset_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;        <span class="ruby-identifier">private</span> <span class="ruby-value">:inverted_subset_name</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">34</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">35</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;<span class="line-num">36</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">37</span>         <span class="ruby-identifier">define_method</span>(<span class="ruby-value">:inverted_subset_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">38</span>         <span class="ruby-identifier">private</span> <span class="ruby-value">:inverted_subset_name</span>&#x000A;<span class="line-num">39</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">41</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

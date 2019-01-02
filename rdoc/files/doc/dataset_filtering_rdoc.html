@@ -38,11 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-Dataset+Filtering">Dataset Filtering<span><a href="#label-Dataset+Filtering">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p><a href="../../classes/Sequel.html">Sequel</a> is very flexible when it
-comes to filtering records. You can specify your conditions as a hash of
-values to compare against, or as ruby code that <a
-href="../../classes/Sequel.html">Sequel</a> translates into SQL
-expressions, or as an SQL code fragment (with optional parameters), .</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> is very flexible when it comes to filtering records. You can specify your conditions as a hash of values to compare against, or as ruby code that <a href="../../classes/Sequel.html"><code>Sequel</code></a> translates into SQL expressions, or as an SQL code fragment (with optional parameters), .</p>
 
 <h2 id="label-Filtering+using+a+hash">Filtering using a hash<span><a href="#label-Filtering+using+a+hash">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -50,7 +46,7 @@ expressions, or as an SQL code fragment (with optional parameters), .</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (category = &#39;ruby&#39;)&quot;</span></pre>
 
-<p><a href="../../classes/Sequel.html">Sequel</a> can check for null values:</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> can check for null values:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-keyword">nil</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (category IS NULL)&quot;</span></pre>
 
@@ -68,15 +64,13 @@ expressions, or as an SQL code fragment (with optional parameters), .</p>
 
 <h2 id="label-Filtering+using+an+array">Filtering using an array<span><a href="#label-Filtering+using+an+array">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>If you need to select multiple items from a dataset, you can supply an
-array:</p>
+<p>If you need to select multiple items from a dataset, you can supply an array:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> [<span class="ruby-value">1</span>, <span class="ruby-value">38</span>, <span class="ruby-value">47</span>, <span class="ruby-value">99</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (id IN (1, 38, 47, 99))&quot;</span></pre>
 
 <h2 id="label-Filtering+using+expressions">Filtering using expressions<span><a href="#label-Filtering+using+expressions">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>You can pass a block to where (referred to as a virtual row block), which
-is evaluated in a special context:</p>
+<p>You can pass a block to where (referred to as a virtual row block), which is evaluated in a special context:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">*</span> <span class="ruby-value">2</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">50</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price * 2) &lt; 50)</span></pre>
 
@@ -84,15 +78,11 @@ is evaluated in a special context:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price + 100) &lt; 200)</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price - 100) &gt; 200)</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">200</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price * 100) &lt;= 200)</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">/</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">200</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price / 100) &gt;= 200)</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">**</span> <span class="ruby-value">2</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">200</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (power(price, 2) &gt;= 200)</span></pre>
 
-<p>You use the overloaded bitwise and (&amp;) and or (|) operators to combine
-expressions:</p>
+<p>You use the overloaded bitwise and (&amp;) and or (|) operators to combine expressions:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">price</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">200</span>)}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (((price + 100) &lt; 200) AND ((price * 100) &lt;= 200))</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">|</span> (<span class="ruby-identifier">price</span> <span class="ruby-operator">/</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">200</span>)}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (((price - 100) &gt; 200) OR ((price / 100) &gt;= 200))</span></pre>
 
-<p>To filter by equality, you use the standard hash, which can be combined
-with other expressions using <a
-href="../../classes/Sequel.html">Sequel</a>.&amp; and <a
-href="../../classes/Sequel.html">Sequel</a>.|:</p>
+<p>To filter by equality, you use the standard hash, which can be combined with other expressions using <a href="../../classes/Sequel.html"><code>Sequel</code></a>.&amp; and <a href="../../classes/Sequel.html"><code>Sequel</code></a>.|:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>({<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>}, (<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>))}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category = &#39;ruby&#39;) AND ((price + 100) &lt; 200))&quot;</span></pre>
 
@@ -106,32 +96,25 @@ href="../../classes/Sequel.html">Sequel</a>.|:</p>
 
 <h2 id="label-Filtering+using+a+custom+filter+string">Filtering using a custom filter string<span><a href="#label-Filtering+using+a+custom+filter+string">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>If you wish to include an SQL fragment as part of a filter, you need to
-wrap it with <code>Sequel.lit</code> to mark that it is literal SQL code,
-and pass it to the where method:</p>
+<p>If you wish to include an SQL fragment as part of a filter, you need to wrap it with <code>Sequel.lit</code> to mark that it is literal SQL code, and pass it to the where method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;x &lt; 10&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE x &lt; 10&quot;</span></pre>
 
-<p>In order to prevent SQL injection, you can replace literal values with
-question marks and supply the values as additional arguments to
-<code>Sequel.lit</code>:</p>
+<p>In order to prevent SQL injection, you can replace literal values with question marks and supply the values as additional arguments to <code>Sequel.lit</code>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;category = ?&#39;</span>, <span class="ruby-string">&#39;ruby&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE category = &#39;ruby&#39;&quot;</span></pre>
 
-<p>You can also use placeholders with :placeholder and a hash of placeholder
-values:</p>
+<p>You can also use placeholders with :placeholder and a hash of placeholder values:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;category = :category&#39;</span>, <span class="ruby-value">category:</span> <span class="ruby-string">&quot;ruby&quot;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE category = &#39;ruby&#39;&quot;</span></pre>
 
 <h3 id="label-Specifying+SQL+functions">Specifying SQL functions<span><a href="#label-Specifying+SQL+functions">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p><a href="../../classes/Sequel.html">Sequel</a> also allows you to specify
-functions by using the Sequel.function method:</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> also allows you to specify functions by using the Sequel.function method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:avg</span>, <span class="ruby-value">:price</span>)) <span class="ruby-comment"># &quot;avg(price)&quot;</span></pre>
 
-<p>If you are specifying a filter/selection/order, you can use a virtual row
-block:</p>
+<p>If you are specifying a filter/selection/order, you can use a virtual row block:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">avg</span>(<span class="ruby-identifier">price</span>)}</pre>
 
@@ -141,9 +124,7 @@ block:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (category != &#39;ruby&#39;)&quot;</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:active</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE NOT active&quot;</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">exclude</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">/</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">200</span>}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((price / 100) &lt; 200)</span></pre>
 
-<p>To exclude only parts of conditions, you can use when in combination with
-<a href="../../classes/Sequel.html">Sequel</a>.~ or the ~ method on <a
-href="../../classes/Sequel.html">Sequel</a> expressions:</p>
+<p>To exclude only parts of conditions, you can use when in combination with <a href="../../classes/Sequel.html"><code>Sequel</code></a>.~ or the ~ method on <a href="../../classes/Sequel.html"><code>Sequel</code></a> expressions:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">&amp;</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>), (<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>))}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category != &#39;ruby&#39;) AND ((price + 100) &lt; 200))&quot;</span>&#x000A;&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">~</span>(<span class="ruby-identifier">category</span> <span class="ruby-operator">=~</span> <span class="ruby-string">&#39;ruby&#39;</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">price</span> <span class="ruby-operator">+</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>)}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((category != &#39;ruby&#39;) AND ((price + 100) &lt; 200))&quot;</span></pre>
 
@@ -163,18 +144,15 @@ href="../../classes/Sequel.html">Sequel</a> expressions:</p>
 
 <h2 id="label-String+search+functions">String search functions<span><a href="#label-String+search+functions">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>You can search SQL strings in a case sensitive manner using the Sequel.like
-method:</p>
+<p>You can search SQL strings in a case sensitive manner using the Sequel.like method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (name LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;)&quot;</span></pre>
 
-<p>You can search SQL strings in a case insensitive manner using the
-Sequel.ilike method:</p>
+<p>You can search SQL strings in a case insensitive manner using the Sequel.ilike method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-value">:name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (name ILIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;)&quot;</span></pre>
 
-<p>You can specify a Regexp as a hash value (or like argument), but this will
-probably only work on PostgreSQL and MySQL:</p>
+<p>You can specify a Regexp as a hash value (or like argument), but this will probably only work on PostgreSQL and MySQL:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-regexp">/Acme.*/</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (name ~ &#39;Acme.*&#39;)&quot;</span></pre>
 
@@ -194,20 +172,15 @@ probably only work on PostgreSQL and MySQL:</p>
 
 <h2 id="label-Filtering+using+sub-queries">Filtering using sub-queries<span><a href="#label-Filtering+using+sub-queries">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Datasets can be used as subqueries. Subqueries can be very useful for
-filtering records, and many times provide a simpler alternative to table
-joins. Subqueries can be used in all forms of filters:</p>
+<p>Datasets can be used as subqueries. Subqueries can be very useful for filtering records, and many times provide a simpler alternative to table joins. Subqueries can be used in all forms of filters:</p>
 
 <pre class="ruby"><span class="ruby-identifier">refs</span> = <span class="ruby-identifier">consumer_refs</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:logged_in</span>).<span class="ruby-identifier">select</span>(<span class="ruby-value">:consumer_id</span>)&#x000A;<span class="ruby-identifier">consumers</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">id:</span> <span class="ruby-identifier">refs</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM consumers WHERE (id IN (SELECT consumer_id FROM consumer_refs WHERE logged_in))&quot;</span></pre>
 
-<p>Note that if you are checking for the inclusion of a single column in a
-subselect, the subselect should only select a single column.</p>
+<p>Note that if you are checking for the inclusion of a single column in a subselect, the subselect should only select a single column.</p>
 
 <h2 id="label-Using+OR+instead+of+AND">Using OR instead of AND<span><a href="#label-Using+OR+instead+of+AND">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>By default, if you chain calls to <code>where</code>, the conditions get
-ANDed together.  If you want to use an OR for a condition, you can use the
-<code>or</code> method:</p>
+<p>By default, if you chain calls to <code>where</code>, the conditions get ANDed together.  If you want to use an OR for a condition, you can use the <code>or</code> method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Food&#39;</span>).<span class="ruby-identifier">or</span>(<span class="ruby-value">vendor:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE ((name = &#39;Food&#39;) OR (vendor = 1))&quot;</span></pre>
 </div>

@@ -35,17 +35,9 @@ Sequel::Plugins::SerializationModificationDetection
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This plugin extends the serialization plugin and enables it to detect
-changes in serialized values by checking whether the current deserialized
-value is the same as the original deserialized value. The serialization
-plugin does not do such checks by default, as they often aren&#39;t needed
-and can hurt performance.</p>
+<p>This plugin extends the serialization plugin and enables it to detect changes in serialized values by checking whether the current deserialized value is the same as the original deserialized value. The serialization plugin does not do such checks by default, as they often aren&#39;t needed and can hurt performance.</p>
 
-<p>Note that for this plugin to work correctly, the values you are serializing
-must roundtrip correctly (i.e. deserialize(serialize(value)) should equal
-value).  This is true in most cases, but not in all.  For example, ruby
-symbols round trip through yaml, but not json (as they get turned into
-strings in json).</p>
+<p>Note that for this plugin to work correctly, the values you are serializing must roundtrip correctly (i.e. deserialize(serialize(value)) should equal value).  This is true in most cases, but not in all.  For example, ruby symbols round trip through yaml, but not json (as they get turned into strings in json).</p>
 
 <h2 id="module-Sequel::Plugins::SerializationModificationDetection-label-Example">Example<span><a href="#module-Sequel::Plugins::SerializationModificationDetection-label-Example">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -85,7 +77,7 @@ strings in json).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

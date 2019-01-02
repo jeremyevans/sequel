@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Represents an <a href="../SQL.html">SQL</a> JOIN clause with USING
-conditions.</p>
+<p>Represents an <a href="../SQL.html"><code>SQL</code></a> JOIN clause with USING conditions.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -66,8 +65,7 @@ conditions.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The columns that appear in both tables that should be equal  for the
-conditions to match.</p>
+<p>The columns that appear in both tables that should be equal  for the conditions to match.</p>
 </td>
 </tr>
 </table>
@@ -84,15 +82,14 @@ conditions to match.</p>
 </div>
 <div class='description'>
 
-<p>Create an object with the given USING conditions and call super with the
-remaining args.</p>
+<p>Create an object with the given USING conditions and call super with the remaining args.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1574</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@using</span> = <span class="ruby-identifier">cols</span> &#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1575</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1576</span>   <span class="ruby-ivar">@using</span> = <span class="ruby-identifier">cols</span> &#x000A;<span class="line-num">1577</span>   <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1578</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

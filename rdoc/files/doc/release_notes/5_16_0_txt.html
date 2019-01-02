@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.16.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.16.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.16.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-01-02 10:09:14 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#rollback_on_exit has been added, which allows you to rollback transactions instead of committing them when exiting the transaction block.  Previously, the only way to rollback a transaction from inside a transaction block was to raise an exception.  This allows you to tell <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to roll the transaction back on exit, and then use return or throw to exit the transaction block.</p>
+
+<p>Database#rollback_on_exit supports savepoints, including multiple savepoint levels, as well as canceling rollbacks:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;      <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-value">3</span>)&#x000A;    <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_on_exit</span>(<span class="ruby-value">cancel:</span> <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports window functions on SQLite 3.26.0+. SQLite technically supports window functions on 3.25.0+, but enabling window function support in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> opens up a code path that generates queries that cause older versions of SQLite to produce a segmentation fault.  This bug in SQLite has been fixed in 3.26.0.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> no longer overrides existing methods when defining getters and setters.  Historically, it only checked for existing method definitions for methods that could be directly expressed (e.g. not requiring send).  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 broke the check for setter methods that could be directly expressed.  This fixes cases where model inheritance is used and the setter methods are overridden in a parent class.</p>
+</li><li>
+<p>Alter table emulation now works correctly on SQLite 3.26.0+.</p>
+</li><li>
+<p>The one_to_one association setter does not modify reciprocal associations in cases where doing so is not necessary.  This can fix some cases where the nested_attributes plugin is used.</p>
+</li><li>
+<p>The class_table_inheritance plugin can now take advantage of the schema_caching extension to prevent database queries to determine column information when the class is created.</p>
+</li><li>
+<p>The nested_attributes plugin no longer validates one_to_one associations twice when saving.</p>
+</li><li>
+<p>The class_table_inheritance plugin :qualify_tables option now correctly qualifies subclasses of subclasses.</p>
+</li><li>
+<p>SQL expressions that are subscripted are now wrapped in parentheses. This fixes at least subscripting a function expression on PostgreSQL:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">array_agg</span>(<span class="ruby-identifier">column</span>).<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>)}&#x000A;<span class="ruby-comment"># SELECT (array_agg(column))[1] FROM t</span></pre>
+</li><li>
+<p><a href="../../../classes/Sequel/Migrator.html"><code>Sequel::Migrator</code></a> now uses more descriptive error messages if a missing or empty migration directory is given.</p>
+</li><li>
+<p>bin/sequel -C when converting from SQLite to another database type will now use 64-bit integer columns in the other database when the SQLite column type is integer, as SQLite supports storing 64-bit values in integer columns, and most other databases only support 32-bit values in integer columns.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The mysql adapter no longer attempts to load the mysqlplus driver, it now only attempts to load the mysql driver.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

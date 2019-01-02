@@ -35,17 +35,9 @@ Sequel::Plugins::DelayAddAssociation
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The delay_add_association plugin delays the adding of associated objects to
-a new (unsaved) object until after the new object is saved.  By default, if
-you attempt to add associated objects to a new object, <a
-href="../../Sequel.html">Sequel</a> will raise an error, because you need
-to have a primary key before saving the objects.</p>
+<p>The delay_add_association plugin delays the adding of associated objects to a new (unsaved) object until after the new object is saved.  By default, if you attempt to add associated objects to a new object, <a href="../../Sequel.html"><code>Sequel</code></a> will raise an error, because you need to have a primary key before saving the objects.</p>
 
-<p>When delaying the add of an associated object, the object will be
-immediately added to the cached association array. When saving the current
-object, it will also attempt to validate any associated objects, and if the
-associated objects are not valid, the current object will also be
-considered not valid.</p>
+<p>When delaying the add of an associated object, the object will be immediately added to the cached association array. When saving the current object, it will also attempt to validate any associated objects, and if the associated objects are not valid, the current object will also be considered not valid.</p>
 
 <p>Usage:</p>
 
@@ -85,7 +77,7 @@ considered not valid.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/delay_add_association.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/delay_add_association.rb</span>&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;<span class="line-num">29</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

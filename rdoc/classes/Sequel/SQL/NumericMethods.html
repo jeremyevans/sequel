@@ -35,16 +35,11 @@ Sequel::SQL::NumericMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes the standard mathematical methods (+, -, *, and /)
-that are defined on objects that can be used in a numeric context in <a
-href="../SQL.html">SQL</a> (<code>Symbol</code>,
-<code>LiteralString</code>, and <code>SQL::GenericExpression</code>).</p>
+<p>This module includes the standard mathematical methods (+, -, *, and /) that are defined on objects that can be used in a numeric context in <a href="../SQL.html"><code>SQL</code></a> (<code>Symbol</code>, <code>LiteralString</code>, and <code>SQL::GenericExpression</code>).</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; + &quot;b&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">-</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; - &quot;b&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">*</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; * &quot;b&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">/</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># &quot;a&quot; / &quot;b&quot;</span></pre>
 
-<p>One exception to this is if + is called with a <code>String</code> or
-<code>StringExpression</code>, in which case the || operator is used
-instead of the + operator:</p>
+<p>One exception to this is if + is called with a <code>String</code> or <code>StringExpression</code>, in which case the || operator is used instead of the + operator:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">+</span> <span class="ruby-string">&#39;b&#39;</span> <span class="ruby-comment"># &quot;a&quot; || &#39;b&#39;</span></pre>
 </div>
@@ -70,16 +65,14 @@ instead of the + operator:</p>
 </div>
 <div class='description'>
 
-<p>Use || as the operator when called with <a
-href="StringExpression.html">StringExpression</a> and String instances, and
-the + operator for LiteralStrings and all other types.</p>
+<p>Use || as the operator when called with <a href="StringExpression.html"><code>StringExpression</code></a> and String instances, and the + operator for LiteralStrings and all other types.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2B-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-2B-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 796</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">+</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">ce</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">LiteralString</span>&#x000A;    <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">StringExpression</span>, <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;||&#39;</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-2B-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">797</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">+</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">798</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">ce</span>&#x000A;<span class="line-num">799</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">LiteralString</span>&#x000A;<span class="line-num">800</span>     <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">801</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">StringExpression</span>, <span class="ruby-constant">String</span>&#x000A;<span class="line-num">802</span>     <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;||&#39;</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">803</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">804</span>     <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:+</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">805</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">806</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-coerce'>
@@ -91,8 +84,7 @@ the + operator for LiteralStrings and all other types.</p>
 </div>
 <div class='description'>
 
-<p>If the argument given is Numeric, treat it as a <a
-href="NumericExpression.html">NumericExpression</a>, allowing code such as:</p>
+<p>If the argument given is Numeric, treat it as a <a href="NumericExpression.html"><code>NumericExpression</code></a>, allowing code such as:</p>
 
 <pre class="ruby"><span class="ruby-value">1</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:x</span>] <span class="ruby-comment"># SQL: (1 + x)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">x</span>(<span class="ruby-identifier">y</span>)} <span class="ruby-comment"># SQL: (1 - x(y))</span></pre>
 
@@ -101,7 +93,7 @@ href="NumericExpression.html">NumericExpression</a>, allowing code such as:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-coerce-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-coerce-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 786</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">coerce</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Numeric</span>)&#x000A;    [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">other</span>), <span class="ruby-keyword">self</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span> &#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-coerce-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">787</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">coerce</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">788</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Numeric</span>)&#x000A;<span class="line-num">789</span>     [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">other</span>), <span class="ruby-keyword">self</span>]&#x000A;<span class="line-num">790</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">791</span>     <span class="ruby-keyword">super</span> &#x000A;<span class="line-num">792</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">793</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

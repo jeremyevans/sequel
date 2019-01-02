@@ -57,15 +57,14 @@ Sequel::Postgres::JSONOpMethods
 </div>
 <div class='description'>
 
-<p>Wrap the receiver in an <a href="JSONOp.html">JSONOp</a> so you can easily
-use the PostgreSQL json functions and operators with it.</p>
+<p>Wrap the receiver in an <a href="JSONOp.html"><code>JSONOp</code></a> so you can easily use the PostgreSQL json functions and operators with it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_json-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 421</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json</span>&#x000A;  <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">422</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json</span>&#x000A;<span class="line-num">423</span>   <span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">424</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_jsonb'>
@@ -77,15 +76,14 @@ use the PostgreSQL json functions and operators with it.</p>
 </div>
 <div class='description'>
 
-<p>Wrap the receiver in an <a href="JSONBOp.html">JSONBOp</a> so you can
-easily use the PostgreSQL jsonb functions and operators with it.</p>
+<p>Wrap the receiver in an <a href="JSONBOp.html"><code>JSONBOp</code></a> so you can easily use the PostgreSQL jsonb functions and operators with it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_jsonb-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 427</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;  <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_jsonb-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">428</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;<span class="line-num">429</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">430</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

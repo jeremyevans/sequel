@@ -36,29 +36,19 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The base connection pool class, which all other connection pools are based
-on.  This class is not instantiated directly, but subclasses should at the
-very least implement the following API:</p>
+<p>The base connection pool class, which all other connection pools are based on.  This class is not instantiated directly, but subclasses should at the very least implement the following API:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>initialize(Database, Hash) </td><td>
-<p>Initialize using the passed <a
-href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
-and options hash.</p>
+<p>Initialize using the passed <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object and options hash.</p>
 </td></tr><tr><td class='label'>hold(Symbol, &amp;block) </td><td>
-<p>Yield a connection object (obtained from calling the block passed to
-<code>initialize</code>) to the current block. For sharded connection
-pools, the Symbol passed is the shard/server to use.</p>
+<p>Yield a connection object (obtained from calling the block passed to <code>initialize</code>) to the current block. For sharded connection pools, the Symbol passed is the shard/server to use.</p>
 </td></tr><tr><td class='label'>disconnect(Symbol) </td><td>
-<p>Disconnect the connection object.  For sharded connection pools, the Symbol
-passed is the shard/server to use.</p>
+<p>Disconnect the connection object.  For sharded connection pools, the Symbol passed is the shard/server to use.</p>
 </td></tr><tr><td class='label'>servers </td><td>
-<p>An array of shard/server symbols for all shards/servers that this
-connection pool recognizes.</p>
+<p>An array of shard/server symbols for all shards/servers that this connection pool recognizes.</p>
 </td></tr><tr><td class='label'>size </td><td>
-<p>an integer representing the total number of connections in the pool, or for
-the given shard/server if sharding is supported.</p>
+<p>an integer representing the total number of connections in the pool, or for the given shard/server if sharding is supported.</p>
 </td></tr><tr><td class='label'>max_size </td><td>
-<p>an integer representing the maximum size of the connection pool, or the
-maximum size per shard/server if sharding is supported.</p>
+<p>an integer representing the maximum size of the connection pool, or the maximum size per shard/server if sharding is supported.</p>
 </td></tr></tbody></table>
 
 <p>For sharded connection pools, the sharded API adds the following methods:</p>

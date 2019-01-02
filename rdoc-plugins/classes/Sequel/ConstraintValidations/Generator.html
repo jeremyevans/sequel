@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This is the DSL class used for the validate block inside create_table and
-alter_table.</p>
+<p>This is the DSL class used for the validate block inside create_table and alter_table.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +75,7 @@ alter_table.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">generator</span>)&#x000A;  <span class="ruby-ivar">@generator</span> = <span class="ruby-identifier">generator</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">generator</span>)&#x000A;<span class="line-num">155</span>   <span class="ruby-ivar">@generator</span> = <span class="ruby-identifier">generator</span>&#x000A;<span class="line-num">156</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -89,15 +88,14 @@ alter_table.</p>
 </div>
 <div class='description'>
 
-<p>Given the name of a constraint, drop that constraint from the database, and
-remove the related validation metadata.</p>
+<p>Given the name of a constraint, drop that constraint from the database, and remove the related validation metadata.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 194</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop</span>(<span class="ruby-identifier">constraint</span>)&#x000A;  <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:drop</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint</span>})&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop</span>(<span class="ruby-identifier">constraint</span>)&#x000A;<span class="line-num">196</span>   <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:drop</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint</span>})&#x000A;<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-operator'>
@@ -109,16 +107,14 @@ remove the related validation metadata.</p>
 </div>
 <div class='description'>
 
-<p>Create operator validation.  The op should be either <code>:&gt;</code>,
-+:&gt;=+, <code>:&lt;</code>, or +:&lt;=+, and the arg should be either a
-string or an integer.</p>
+<p>Create operator validation.  The op should be either <code>:&gt;</code>, +:&gt;=+, <code>:&lt;</code>, or +:&lt;=+, and the arg should be either a string or an integer.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-operator-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-operator-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">operator</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid operator (#{op}) used when creating operator validation&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">suffix</span> = <span class="ruby-constant">OPERATORS</span>[<span class="ruby-identifier">op</span>]&#x000A;&#x000A;  <span class="ruby-identifier">prefix</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-string">&quot;str&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-string">&quot;int&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid argument (#{arg.inspect}) used when creating operator validation&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:&quot;#{prefix}_#{suffix}&quot;</span>, <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-value">:arg</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">arg</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-operator-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">operator</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">179</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid operator (#{op}) used when creating operator validation&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">suffix</span> = <span class="ruby-constant">OPERATORS</span>[<span class="ruby-identifier">op</span>]&#x000A;<span class="line-num">180</span> &#x000A;<span class="line-num">181</span>   <span class="ruby-identifier">prefix</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;<span class="line-num">182</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;<span class="line-num">183</span>     <span class="ruby-string">&quot;str&quot;</span>&#x000A;<span class="line-num">184</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;<span class="line-num">185</span>     <span class="ruby-string">&quot;int&quot;</span>&#x000A;<span class="line-num">186</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">187</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid argument (#{arg.inspect}) used when creating operator validation&quot;</span>&#x000A;<span class="line-num">188</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">189</span> &#x000A;<span class="line-num">190</span>   <span class="ruby-ivar">@generator</span>.<span class="ruby-identifier">validation</span>({<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:&quot;#{prefix}_#{suffix}&quot;</span>, <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-value">:arg</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">arg</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-process'>
@@ -137,7 +133,7 @@ string or an integer.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-process-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-process-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">process</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-process-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">process</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">201</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">202</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

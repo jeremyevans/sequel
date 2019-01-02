@@ -67,16 +67,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Wrap the <a href="JSONBArray.html">JSONBArray</a> instance in an <a
-href="JSONBOp.html">JSONBOp</a>, allowing you to easily use the PostgreSQL
-jsonb functions and operators with literal jsonbs.</p>
+<p>Wrap the <a href="JSONBArray.html"><code>JSONBArray</code></a> instance in an <a href="JSONBOp.html"><code>JSONBOp</code></a>, allowing you to easily use the PostgreSQL jsonb functions and operators with literal jsonbs.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-op-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 452</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;  <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">453</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;<span class="line-num">454</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">455</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -95,7 +93,7 @@ jsonb functions and operators with literal jsonbs.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::jsonb&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_literal_append-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">91</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">92</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::jsonb&#39;</span>&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

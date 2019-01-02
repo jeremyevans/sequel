@@ -56,15 +56,14 @@ Sequel::Plugins::ModificationDetection::ClassMethods
 </div>
 <div class='description'>
 
-<p>Calculate the hashes for all of the column values, so that they can be
-compared later to determine if the column value has changed.</p>
+<p>Calculate the hashes for all of the column values, so that they can be compared later to determine if the column value has changed.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">_</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">v</span>.<span class="ruby-identifier">calculate_values_hashes</span>&#x000A;  <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">_</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">v</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">v</span>.<span class="ruby-identifier">calculate_values_hashes</span>&#x000A;<span class="line-num">42</span>   <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

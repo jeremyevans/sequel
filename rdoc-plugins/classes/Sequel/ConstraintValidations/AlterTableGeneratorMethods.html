@@ -35,9 +35,7 @@ Sequel::ConstraintValidations::AlterTableGeneratorMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Additional methods for the alter_table generator to support constraint
-validations, used to give it a more similar API to the create_table
-generator.</p>
+<p>Additional methods for the alter_table generator to support constraint validations, used to give it a more similar API to the create_table generator.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -74,7 +72,7 @@ generator.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-constraint-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-constraint-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constraint</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">add_constraint</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-constraint-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">228</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">constraint</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">229</span>   <span class="ruby-identifier">add_constraint</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">230</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-unique'>
@@ -93,7 +91,7 @@ generator.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-unique-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-unique-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 232</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unique</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">add_unique_constraint</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-unique-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">233</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">unique</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">234</span>   <span class="ruby-identifier">add_unique_constraint</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">235</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

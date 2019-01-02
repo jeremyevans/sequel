@@ -39,9 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The default exception class for exceptions raised by <a
-href="../Sequel.html">Sequel</a>. All exception classes defined by <a
-href="../Sequel.html">Sequel</a> are descendants of this class.</p>
+<p>The default exception class for exceptions raised by <a href="../Sequel.html"><code>Sequel</code></a>. All exception classes defined by <a href="../Sequel.html"><code>Sequel</code></a> are descendants of this class.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -64,8 +62,7 @@ href="../Sequel.html">Sequel</a> are descendants of this class.</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>If this exception wraps an underlying exception, the underlying exception
-is held here.</p>
+<p>If this exception wraps an underlying exception, the underlying exception is held here.</p>
 </td>
 </tr>
 </table>
@@ -82,15 +79,14 @@ is held here.</p>
 </div>
 <div class='description'>
 
-<p>Returned the wrapped exception if one exists, otherwise use ruby&#39;s
-default behavior.</p>
+<p>Returned the wrapped exception if one exists, otherwise use ruby&#39;s default behavior.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cause-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cause-source'><span class="ruby-comment"># File lib/sequel/exceptions.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cause</span>&#x000A;  <span class="ruby-identifier">wrapped_exception</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cause-source'>   <span class="ruby-comment"># File lib/sequel/exceptions.rb</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cause</span>&#x000A;<span class="line-num">15</span>   <span class="ruby-identifier">wrapped_exception</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">16</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

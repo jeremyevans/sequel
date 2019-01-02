@@ -36,51 +36,33 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The constraint_validations extension is designed to easily create database
-constraints inside create_table and alter_table blocks.  It also adds
-relevant metadata about the constraints to a separate table, which the
-constraint_validations model plugin uses to setup automatic validations.</p>
+<p>The constraint_validations extension is designed to easily create database constraints inside create_table and alter_table blocks.  It also adds relevant metadata about the constraints to a separate table, which the constraint_validations model plugin uses to setup automatic validations.</p>
 
 <p>To use this extension, you first need to load it into the database:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:constraint_validations</span>)</pre>
 
-<p>Note that you should only need to do this when modifying the constraint
-validations (i.e. when migrating).  You should probably not load this
-extension in general application code.</p>
+<p>Note that you should only need to do this when modifying the constraint validations (i.e. when migrating).  You should probably not load this extension in general application code. </p>
 
-<p>You also need to make sure to add the metadata table for the automatic
-validations.  By default, this table is called
-sequel_constraint_validations.</p>
+<p>You also need to make sure to add the metadata table for the automatic validations.  By default, this table is called sequel_constraint_validations.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_constraint_validations_table</span></pre>
 
-<p>This table should only be created once.  For new applications, you
-generally want to create it first, before creating any other application
-tables.</p>
+<p>This table should only be created once.  For new applications, you generally want to create it first, before creating any other application tables.</p>
 
-<p>Because migrations instance_exec the up and down blocks on a database,
-using this extension in a migration can be done via:</p>
+<p>Because migrations instance_exec the up and down blocks on a database, using this extension in a migration can be done via:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span>(<span class="ruby-value">:constraint_validations</span>)&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span>(<span class="ruby-value">:constraint_validations</span>)&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>However, note that you cannot use change migrations with this extension,
-you need to use separate up/down migrations.</p>
+<p>However, note that you cannot use change migrations with this extension, you need to use separate up/down migrations.</p>
 
-<p>The API for creating the constraints with automatic validations is similar
-to the validation_helpers model plugin API.  However, instead of having
-separate validates_* methods, it just adds a validate method that accepts a
-block to the schema generators.  Like the create_table and alter_table
-blocks, this block is instance_execed and offers its own DSL. Example:</p>
+<p>The API for creating the constraints with automatic validations is similar to the validation_helpers model plugin API.  However, instead of having separate validates_* methods, it just adds a validate method that accepts a block to the schema generators.  Like the create_table and alter_table blocks, this block is instance_execed and offers its own DSL. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">presence</span> <span class="ruby-value">:id</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>instance_exec is used in this case because create_table and alter_table
-already use instance_exec, so losing access to the surrounding receiver is
-not an issue.</p>
+<p>instance_exec is used in this case because create_table and alter_table already use instance_exec, so losing access to the surrounding receiver is not an issue.</p>
 
-<p>Here&#39;s a breakdown of the constraints created for each constraint
-validation method:</p>
+<p>Here&#39;s a breakdown of the constraints created for each constraint validation method:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>All constraints except unique unless :allow_nil is true </td><td>
 <p>CHECK column IS NOT NULL</p>
 </td></tr><tr><td class='label'>presence (String column) </td><td>
@@ -125,63 +107,33 @@ validation method:</p>
 
 <p>There are some additional API differences:</p>
 <ul><li>
-<p>Only the :message and :allow_nil options are respected.  The :allow_blank
-and :allow_missing options are not respected.</p>
+<p>Only the :message and :allow_nil options are respected.  The :allow_blank and :allow_missing options are not respected.</p>
 </li><li>
-<p>A new option, :name, is respected, for providing the name of the
-constraint.  It is highly recommended that you provide a name for all
-constraint validations, as otherwise, it is difficult to drop the
-constraints later.</p>
+<p>A new option, :name, is respected, for providing the name of the constraint.  It is highly recommended that you provide a name for all constraint validations, as otherwise, it is difficult to drop the constraints later.</p>
 </li><li>
-<p>The includes validation only supports an array of strings, and array of
-integers, and a range of integers.</p>
+<p>The includes validation only supports an array of strings, and array of integers, and a range of integers.</p>
 </li><li>
-<p>There are like and ilike validations, which are similar to the format
-validation but use a case sensitive or case insensitive LIKE pattern. LIKE
-patters are very simple, so many regexp patterns cannot be expressed by
-them, but only a couple databases (PostgreSQL and MySQL) support regexp
-patterns.</p>
+<p>There are like and ilike validations, which are similar to the format validation but use a case sensitive or case insensitive LIKE pattern. LIKE patters are very simple, so many regexp patterns cannot be expressed by them, but only a couple databases (PostgreSQL and MySQL) support regexp patterns.</p>
 </li><li>
-<p>The operator validation only supports &gt;, &gt;=, &lt;, and &lt;=
-operators, and the argument must be a string or an integer.</p>
+<p>The operator validation only supports &gt;, &gt;=, &lt;, and &lt;= operators, and the argument must be a string or an integer.</p>
 </li><li>
-<p>When using the unique validation, column names cannot have embedded commas.
-For similar reasons, when using an includes validation with an array of
-strings, none of the strings in the array can have embedded commas.</p>
+<p>When using the unique validation, column names cannot have embedded commas. For similar reasons, when using an includes validation with an array of strings, none of the strings in the array can have embedded commas.</p>
 </li><li>
-<p>The unique validation does not support an arbitrary number of columns. For
-a single column, just the symbol should be used, and for an array of
-columns, an array of symbols should be used.  There is no support for
-creating two separate unique validations for separate columns in a single
-call.</p>
+<p>The unique validation does not support an arbitrary number of columns. For a single column, just the symbol should be used, and for an array of columns, an array of symbols should be used.  There is no support for creating two separate unique validations for separate columns in a single call.</p>
 </li><li>
-<p>A drop method can be called with a constraint name in a alter_table
-validate block to drop an existing constraint and the related validation
-metadata.</p>
+<p>A drop method can be called with a constraint name in a alter_table validate block to drop an existing constraint and the related validation metadata.</p>
 </li><li>
-<p>While it is allowed to create a presence constraint with :allow_nil set to
-true, doing so does not create a constraint unless the column has <a
-href="../../../../classes/String.html">String</a> type.</p>
+<p>While it is allowed to create a presence constraint with :allow_nil set to true, doing so does not create a constraint unless the column has <a href="../../../../classes/String.html"><code>String</code></a> type.</p>
 </li></ul>
 
 <p>Note that this extension has the following issues on certain databases:</p>
 <ul><li>
-<p>MySQL does not support check constraints (they are parsed but ignored), so
-using this extension does not actually set up constraints on MySQL, except
-for the unique constraint.  It can still be used on MySQL to add the
-validation metadata so that the plugin can setup automatic validations.</p>
+<p>MySQL does not support check constraints (they are parsed but ignored), so using this extension does not actually set up constraints on MySQL, except for the unique constraint.  It can still be used on MySQL to add the validation metadata so that the plugin can setup automatic validations.</p>
 </li><li>
-<p>On SQLite, adding constraints to a table is not supported, so it must be
-emulated by dropping the table and recreating it with the constraints. If
-you want to use this plugin on SQLite with an alter_table block, you should
-drop all constraint validation metadata using
-<code>drop_constraint_validations_for(:table=&gt;&#39;table&#39;)</code>,
-and then readd all constraints you want to use inside the alter table
-block, making no other changes inside the alter_table block.</p>
+<p>On SQLite, adding constraints to a table is not supported, so it must be emulated by dropping the table and recreating it with the constraints. If you want to use this plugin on SQLite with an alter_table block, you should drop all constraint validation metadata using <code>drop_constraint_validations_for(:table=&gt;&#39;table&#39;)</code>, and then readd all constraints you want to use inside the alter table block, making no other changes inside the alter_table block.</p>
 </li></ul>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/ConstraintValidations.html">Sequel::ConstraintValidations</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/ConstraintValidations.html"><code>Sequel::ConstraintValidations</code></a></p>
 </div>
 <div id='context'>
 </div>

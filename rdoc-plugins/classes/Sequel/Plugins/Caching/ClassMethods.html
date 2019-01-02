@@ -62,8 +62,7 @@ Sequel::Plugins::Caching::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>If true, ignores exceptions when gettings cached records (the memcached
-API).</p>
+<p>If true, ignores exceptions when gettings cached records (the memcached API).</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -72,8 +71,7 @@ API).</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The cache store object for the model, which should implement the
-Ruby-Memcache (or memcached) API</p>
+<p>The cache store object for the model, which should implement the Ruby-Memcache (or memcached) API</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -106,7 +104,7 @@ Ruby-Memcache (or memcached) API</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_delete_pk-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_delete_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_delete_pk-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">65</span>   <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_get_pk'>
@@ -118,15 +116,14 @@ Ruby-Memcache (or memcached) API</p>
 </div>
 <div class='description'>
 
-<p>Return the cached object with the given primary key, or nil if no such
-object is in the cache.</p>
+<p>Return the cached object with the given primary key, or nil if no such object is in the cache.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_get_pk-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_get_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_get_pk-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">71</span>   <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_key'>
@@ -145,7 +142,7 @@ object is in the cache.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_key-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_key-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">81</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;<span class="line-num">82</span>   <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_key_prefix'>
@@ -164,7 +161,7 @@ object is in the cache.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_key_prefix-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_key_prefix-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key_prefix</span>&#x000A;  <span class="ruby-identifier">to_s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_key_prefix-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key_prefix</span>&#x000A;<span class="line-num">76</span>   <span class="ruby-identifier">to_s</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_cache_ttl'>
@@ -176,15 +173,14 @@ object is in the cache.</p>
 </div>
 <div class='description'>
 
-<p>Set the time to live for the cache store, in seconds (default is 3600, # so
-1 hour).</p>
+<p>Set the time to live for the cache store, in seconds (default is 3600, # so 1 hour).</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_cache_ttl-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_cache_ttl-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;  <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_cache_ttl-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">88</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;<span class="line-num">89</span>   <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

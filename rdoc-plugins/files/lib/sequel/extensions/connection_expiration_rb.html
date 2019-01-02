@@ -36,12 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The connection_expiration extension modifies a database&#39;s connection
-pool to validate that connections checked out from the pool are not
-expired, before yielding them for use.  If it detects an expired
-connection, it removes it from the pool and tries the next available
-connection, creating a new connection if no available connection is
-unexpired.  Example of use:</p>
+<p>The connection_expiration extension modifies a database&#39;s connection pool to validate that connections checked out from the pool are not expired, before yielding them for use.  If it detects an expired connection, it removes it from the pool and tries the next available connection, creating a new connection if no available connection is unexpired.  Example of use:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:connection_expiration</span>)</pre>
 
@@ -49,17 +44,9 @@ unexpired.  Example of use:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_expiration_timeout</span> = <span class="ruby-value">3600</span> <span class="ruby-comment"># 1 hour</span></pre>
 
-<p>Note that this extension only affects the default threaded and the sharded
-threaded connection pool.  The single threaded and sharded single threaded
-connection pools are not affected.  As the only reason to use the single
-threaded pools is for speed, and this extension makes the connection pool
-slower, there&#39;s not much point in modifying this extension to work with
-the single threaded pools.  The threaded pools work fine even in single
-threaded code, so if you are currently using a single threaded pool and
-want to use this extension, switch to using a threaded pool.</p>
+<p>Note that this extension only affects the default threaded and the sharded threaded connection pool.  The single threaded and sharded single threaded connection pools are not affected.  As the only reason to use the single threaded pools is for speed, and this extension makes the connection pool slower, there&#39;s not much point in modifying this extension to work with the single threaded pools.  The threaded pools work fine even in single threaded code, so if you are currently using a single threaded pool and want to use this extension, switch to using a threaded pool.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/ConnectionExpiration.html">Sequel::ConnectionExpiration</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/ConnectionExpiration.html"><code>Sequel::ConnectionExpiration</code></a></p>
 </div>
 <div id='context'>
 </div>

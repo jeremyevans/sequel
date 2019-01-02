@@ -60,10 +60,7 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Add an exclusion constraint when creating the table. Elements should be an
-array of 2 element arrays, with the first element being the column or
-expression the exclusion constraint is applied to, and the second element
-being the operator to use for the column/expression to check for exclusion.</p>
+<p>Add an exclusion constraint when creating the table. Elements should be an array of 2 element arrays, with the first element being the column or expression the exclusion constraint is applied to, and the second element being the operator to use for the column/expression to check for exclusion.</p>
 
 <p>Example:</p>
 
@@ -71,13 +68,11 @@ being the operator to use for the column/expression to check for exclusion.</p>
 
 <p>Options supported:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
-<p>Name the constraint with the given name (useful if you may need to drop the
-constraint later)</p>
+<p>Name the constraint with the given name (useful if you may need to drop the constraint later)</p>
 </td></tr><tr><td class='label'>:using </td><td>
 <p>Override the index_method for the exclusion constraint (defaults to gist).</p>
 </td></tr><tr><td class='label'>:where </td><td>
-<p>Create a partial exclusion constraint, which only affects a subset of table
-rows, value should be a filter expression.</p>
+<p>Create a partial exclusion constraint, which only affects a subset of table rows, value should be a filter expression.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -85,7 +80,7 @@ rows, value should be a filter expression.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-exclude-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-exclude-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-exclude-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">exclude</span>(<span class="ruby-identifier">elements</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">111</span>   <span class="ruby-identifier">constraints</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:type</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:exclude</span>, <span class="ruby-value">:elements</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">elements</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

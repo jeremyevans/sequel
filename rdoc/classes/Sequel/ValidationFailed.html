@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Exception class raised when <code>raise_on_save_failure</code> is set and
-validation fails</p>
+<p>Exception class raised when <code>raise_on_save_failure</code> is set and validation fails</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -67,8 +66,7 @@ validation fails</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The <a href="Model/Errors.html">Sequel::Model::Errors</a> object related to
-this exception.</p>
+<p>The <a href="Model/Errors.html"><code>Sequel::Model::Errors</code></a> object related to this exception.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -77,8 +75,7 @@ this exception.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The <a href="Model.html">Sequel::Model</a> object related to this
-exception.</p>
+<p>The <a href="Model.html"><code>Sequel::Model</code></a> object related to this exception.</p>
 </td>
 </tr>
 </table>
@@ -100,7 +97,7 @@ exception.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/model/exceptions.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">errors</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;    <span class="ruby-ivar">@model</span> = <span class="ruby-identifier">errors</span>&#x000A;    <span class="ruby-identifier">errors</span> = <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">errors</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:full_messages</span>)&#x000A;    <span class="ruby-ivar">@errors</span> = <span class="ruby-identifier">errors</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/model/exceptions.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">errors</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="line-num">43</span>     <span class="ruby-ivar">@model</span> = <span class="ruby-identifier">errors</span>&#x000A;<span class="line-num">44</span>     <span class="ruby-identifier">errors</span> = <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">errors</span>&#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">46</span> &#x000A;<span class="line-num">47</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:full_messages</span>)&#x000A;<span class="line-num">48</span>     <span class="ruby-ivar">@errors</span> = <span class="ruby-identifier">errors</span>&#x000A;<span class="line-num">49</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;, &#39;</span>))&#x000A;<span class="line-num">50</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">51</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

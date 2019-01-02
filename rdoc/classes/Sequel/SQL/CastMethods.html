@@ -35,8 +35,7 @@ Sequel::SQL::CastMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Holds methods that are used to cast objects to different <a
-href="../SQL.html">SQL</a> types.</p>
+<p>Holds methods that are used to cast objects to different <a href="../SQL.html"><code>SQL</code></a> types.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -61,10 +60,7 @@ href="../SQL.html">SQL</a> types.</p>
 </div>
 <div class='description'>
 
-<p><a href="Cast.html">Cast</a> the reciever to the given <a
-href="../SQL.html">SQL</a> type.  You can specify a ruby class as a type,
-and it is handled similarly to using a database independent type in the
-schema methods.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type.  You can specify a ruby class as a type, and it is handled similarly to using a database independent type in the schema methods.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-value">:integer</span>) <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">String</span>) <span class="ruby-comment"># CAST(func() AS varchar(255))</span></pre>
 
@@ -73,7 +69,7 @@ schema methods.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 690</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">691</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast</span>(<span class="ruby-identifier">sql_type</span>)&#x000A;<span class="line-num">692</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span>)&#x000A;<span class="line-num">693</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cast_numeric'>
@@ -85,10 +81,7 @@ schema methods.</p>
 </div>
 <div class='description'>
 
-<p><a href="Cast.html">Cast</a> the reciever to the given <a
-href="../SQL.html">SQL</a> type (or the database&#39;s default Integer type
-if none given), and return the result as a <code>NumericExpression</code>,
-so you can use the bitwise operators on the result.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database&#39;s default Integer type if none given), and return the result as a <code>NumericExpression</code>, so you can use the bitwise operators on the result. </p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_numeric</span> <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(func() AS double precision)</span></pre>
 
@@ -97,7 +90,7 @@ so you can use the bitwise operators on the result.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_numeric-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast_numeric-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 700</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast_numeric-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">701</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_numeric</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">702</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Integer</span>).<span class="ruby-identifier">sql_number</span>&#x000A;<span class="line-num">703</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cast_string'>
@@ -109,11 +102,7 @@ so you can use the bitwise operators on the result.</p>
 </div>
 <div class='description'>
 
-<p><a href="Cast.html">Cast</a> the reciever to the given <a
-href="../SQL.html">SQL</a> type (or the database&#39;s default String type
-if none given), and return the result as a <code>StringExpression</code>,
-so you can use + directly on the result for <a href="../SQL.html">SQL</a>
-string concatenation.</p>
+<p><a href="Cast.html"><code>Cast</code></a> the reciever to the given <a href="../SQL.html"><code>SQL</code></a> type (or the database&#39;s default String type if none given), and return the result as a <code>StringExpression</code>, so you can use + directly on the result for <a href="../SQL.html"><code>SQL</code></a> string concatenation.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_string</span> <span class="ruby-comment"># CAST(func() AS varchar(255))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">cast_string</span>(<span class="ruby-value">:text</span>) <span class="ruby-comment"># CAST(func() AS text)</span></pre>
 
@@ -122,7 +111,7 @@ string concatenation.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_string-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 710</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast_string-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">711</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_string</span>(<span class="ruby-identifier">sql_type</span> = <span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">712</span>   <span class="ruby-constant">Cast</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql_type</span> <span class="ruby-operator">||</span> <span class="ruby-constant">String</span>).<span class="ruby-identifier">sql_string</span>&#x000A;<span class="line-num">713</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

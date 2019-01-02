@@ -57,15 +57,14 @@ Sequel::Plugins::ColumnConflicts::InstanceMethods
 </div>
 <div class='description'>
 
-<p>If the given column has a getter method conflict, lookup the value directly
-in the values hash.</p>
+<p>If the given column has a getter method conflict, lookup the value directly in the values hash.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_column_value-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-get_column_value-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_column_value</span>(<span class="ruby-identifier">c</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">col</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">get_column_conflicts</span>[<span class="ruby-identifier">c</span>]&#x000A;    <span class="ruby-keyword">self</span>[<span class="ruby-identifier">col</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-get_column_value-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">89</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_column_value</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="line-num">90</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">col</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">get_column_conflicts</span>[<span class="ruby-identifier">c</span>]&#x000A;<span class="line-num">91</span>     <span class="ruby-keyword">self</span>[<span class="ruby-identifier">col</span>]&#x000A;<span class="line-num">92</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">93</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">94</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">95</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_column_value'>
@@ -77,15 +76,14 @@ in the values hash.</p>
 </div>
 <div class='description'>
 
-<p>If the given column has a setter method conflict, set the value directly in
-the values hash.</p>
+<p>If the given column has a setter method conflict, set the value directly in the values hash.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_column_value-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_column_value-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 97</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_value</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">col</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">set_column_conflicts</span>[<span class="ruby-identifier">c</span>]&#x000A;    <span class="ruby-keyword">self</span>[<span class="ruby-identifier">col</span>] = <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_column_value-source'>    <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num"> 98</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_value</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num"> 99</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">col</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">set_column_conflicts</span>[<span class="ruby-identifier">c</span>]&#x000A;<span class="line-num">100</span>     <span class="ruby-keyword">self</span>[<span class="ruby-identifier">col</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">101</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">102</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">103</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">104</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

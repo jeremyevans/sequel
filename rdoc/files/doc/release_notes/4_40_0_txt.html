@@ -38,37 +38,21 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A Sequel.split_symbols setting has been added.  This setting is true by
-default, so there is no change to backwards compatibility by default. 
-However, users can now do:</p>
+<p>A Sequel.split_symbols setting has been added.  This setting is true by default, so there is no change to backwards compatibility by default.  However, users can now do:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">false</span></pre>
 
-<p>to disable the splitting of symbols.  This will make <a
-href="../../../classes/Sequel.html">Sequel</a> no longer treat symbols with
-double or triple underscores as qualified or aliased identifiers, instead
-treating them as plain identifiers. It will also make <a
-href="../../../classes/Sequel.html">Sequel</a> no longer treat virtual row
-methods with double underscores as qualified identifiers.  Examples:</p>
+<p>to disable the splitting of symbols.  This will make <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer treat symbols with double or triple underscores as qualified or aliased identifiers, instead treating them as plain identifiers. It will also make <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer treat virtual row methods with double underscores as qualified identifiers.  Examples:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Sequel.split_symbols = true</span>&#x000A;<span class="ruby-value">:column</span>                    <span class="ruby-comment"># &quot;column&quot;</span>&#x000A;<span class="ruby-value">:table__column</span>             <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-value">:column___alias</span>            <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-value">:table__column___alias</span>     <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table__column</span>} <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;&#x000A;<span class="ruby-comment"># Sequel.split_symbols = false</span>&#x000A;<span class="ruby-value">:column</span>                    <span class="ruby-comment"># &quot;column&quot;</span>&#x000A;<span class="ruby-value">:table__column</span>             <span class="ruby-comment"># &quot;table__column&quot;</span>&#x000A;<span class="ruby-value">:column___alias</span>            <span class="ruby-comment"># &quot;column___alias&quot;</span>&#x000A;<span class="ruby-value">:table__column___alias</span>     <span class="ruby-comment"># &quot;table__column___alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table__column</span>} <span class="ruby-comment"># &quot;table__column&quot;</span></pre>
 
-<p>Disabling symbol splitting can make things much easier if leading trailing,
-double, or triple underscores are used in identifiers in your database.</p>
+<p>Disabling symbol splitting can make things much easier if leading trailing, double, or triple underscores are used in identifiers in your database.</p>
 
-<p>Disabling symbol splitting makes <a
-href="../../../classes/Sequel.html">Sequel</a> simpler, even if it does
-make it slightly less easy to create qualified and aliased identifiers.  It
-is possible that the symbol splitting will be disabled by default starting
-in <a href="../../../classes/Sequel.html">Sequel</a> 5.</p>
+<p>Disabling symbol splitting makes <a href="../../../classes/Sequel.html"><code>Sequel</code></a> simpler, even if it does make it slightly less easy to create qualified and aliased identifiers.  It is possible that the symbol splitting will be disabled by default starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.</p>
 
-<p>Note that due to Database symbol literal caching, you should not change the
-Sequel.split_symbols setting after creating a Database instance.</p>
+<p>Note that due to Database symbol literal caching, you should not change the Sequel.split_symbols setting after creating a Database instance.</p>
 </li><li>
-<p>SQL::Identifier#[] and SQL::QualifiedIdentifier#[] have been added for
-creating qualified identifiers.  This makes it easier and more natural to
-create qualified identifiers from existing identifiers. Previously, you
-could do:</p>
+<p>SQL::Identifier#[] and SQL::QualifiedIdentifier#[] have been added for creating qualified identifiers.  This makes it easier and more natural to create qualified identifiers from existing identifiers. Previously, you could do:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">qualify</span>(<span class="ruby-value">:table</span>)</pre>
 
@@ -80,121 +64,79 @@ could do:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]}</pre>
 
-<p>This offers a easy way to create qualified identifers when symbol splitting
-has been disabled.</p>
+<p>This offers a easy way to create qualified identifers when symbol splitting has been disabled.</p>
 </li><li>
-<p>A symbol_aref extension has been added, allowing the use of Symbol#[] to
-create qualified identifiers if passed a Symbol, SQL::Identifier, or
-SQL::QualifiedIdentifier.  This doesn&#39;t break any existing ruby
-behavior, as ruby currrently raises an exception in such cases.  Example:</p>
+<p>A symbol_aref extension has been added, allowing the use of Symbol#[] to create qualified identifiers if passed a Symbol, SQL::Identifier, or SQL::QualifiedIdentifier.  This doesn&#39;t break any existing ruby behavior, as ruby currrently raises an exception in such cases.  Example:</p>
 
 <pre class="ruby"><span class="ruby-value">:table</span>[<span class="ruby-value">:column</span>] <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
 
-<p>This extension can make it easier to create qualified identifiers if symbol
-splitting is disabled.</p>
+<p>This extension can make it easier to create qualified identifiers if symbol splitting is disabled.</p>
 
-<p>A symbol_aref_refinement extension has also been added, which adds a
-refinement version of the extension that can be enabled via:</p>
+<p>A symbol_aref_refinement extension has also been added, which adds a refinement version of the extension that can be enabled via:</p>
 
 <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SymbolAref</span></pre>
 </li><li>
-<p>A symbol_as extension has been added, which adds the Symbol#as method to
-create aliased identifiers.  This was previously part of the core
-extensions, but has been separated so it can be included by itself.
-Example:</p>
+<p>A symbol_as extension has been added, which adds the Symbol#as method to create aliased identifiers.  This was previously part of the core extensions, but has been separated so it can be included by itself. Example:</p>
 
 <pre class="ruby"><span class="ruby-value">:column</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>) <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span></pre>
 
-<p>This extension can make it easier to create aliased identifiers if symbol
-splitting is disabled.</p>
+<p>This extension can make it easier to create aliased identifiers if symbol splitting is disabled.</p>
 
-<p>A symbol_as_refinement extension has also been added, which adds a
-refinement version of the extension that can be enabled via:</p>
+<p>A symbol_as_refinement extension has also been added, which adds a refinement version of the extension that can be enabled via:</p>
 
 <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SymbolAs</span></pre>
 </li><li>
-<p>An s extension has been added, which adds the Sequel::S module, containing
-a private #S method that calls Sequel.expr.  You can include this module in
-any module or class where you would like the S method to be available:</p>
+<p>An s extension has been added, which adds the Sequel::S module, containing a private #S method that calls Sequel.expr.  You can include this module in any module or class where you would like the S method to be available:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>, <span class="ruby-value">:order</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">S</span>(<span class="ruby-value">:number</span>).<span class="ruby-identifier">desc</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>You can include this in Object if you want the S method to be available
-globally:</p>
+<p>You can include this in Object if you want the S method to be available globally:</p>
 
 <pre class="ruby"><span class="ruby-constant">Object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>)</pre>
 
-<p>Sequel::S also works if it is used as a refinement, adding the S method to
-Object while the refinement is active:</p>
+<p>Sequel::S also works if it is used as a refinement, adding the S method to Object while the refinement is active:</p>
 
 <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span></pre>
 
-<p>This extension can make it easier to create qualified and aliased
-identifiers if symbol splitting is disabled:</p>
+<p>This extension can make it easier to create qualified and aliased identifiers if symbol splitting is disabled:</p>
 
 <pre class="ruby"><span class="ruby-constant">S</span>(<span class="ruby-value">:table</span>)[<span class="ruby-value">:column</span>]&#x000A;<span class="ruby-constant">S</span>(<span class="ruby-value">:column</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)</pre>
 </li><li>
-<p>Dataset#insert_conflict on PostgreSQL now supports a :conflict_where
-option, allowing for the handling of insert conflicts when using a partial
-unique index:</p>
+<p>Dataset#insert_conflict on PostgreSQL now supports a :conflict_where option, allowing for the handling of insert conflicts when using a partial unique index:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:target</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>,&#x000A;  <span class="ruby-value">:conflict_where</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}).<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING</span></pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> no longer attempts to
-combine arguments for non-associative operators, as doing so leads to
-invalid code in cases such as:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer attempts to combine arguments for non-associative operators, as doing so leads to invalid code in cases such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">column1</span> <span class="ruby-operator">-</span> (<span class="ruby-identifier">column2</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>)}</pre>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now automatically adds
-NOT NULL constraints on columns when adding a primary key constraint on the
-columns, if the database doesn&#39;t handle that situation correctly.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now automatically adds NOT NULL constraints on columns when adding a primary key constraint on the columns, if the database doesn&#39;t handle that situation correctly.</p>
 </li><li>
 <p>Database#rollback_checker now returns a thread-safe object.</p>
 </li><li>
-<p>SQL::QualifiedIdentifier#initialize now converts SQL::Identifier arguments
-to strings, fixing usage of such objects in the schema methods.</p>
+<p>SQL::QualifiedIdentifier#initialize now converts SQL::Identifier arguments to strings, fixing usage of such objects in the schema methods.</p>
 </li><li>
-<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
-plugin now correctly handles lookup by primary key on models with joined
-datasets.</p>
+<p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin now correctly handles lookup by primary key on models with joined datasets.</p>
 </li><li>
-<p>The dataset_associations plugin now handles many_through_many and
-one_through_many associations that use a single join table.  Note there is
-no reason to create such associations, as many_to_many and one_through_one
-associations will work for such cases.</p>
+<p>The dataset_associations plugin now handles many_through_many and one_through_many associations that use a single join table.  Note there is no reason to create such associations, as many_to_many and one_through_one associations will work for such cases.</p>
 </li><li>
-<p>The insert_returning_select plugin now handles cases where the model
-doesn&#39;t have a valid dataset, fixing usage with the lazy_attributes and
-dataset_associations plugins, and potentially other plugins.</p>
+<p>The insert_returning_select plugin now handles cases where the model doesn&#39;t have a valid dataset, fixing usage with the lazy_attributes and dataset_associations plugins, and potentially other plugins.</p>
 </li><li>
-<p>The column_select plugin no longer raises an exception if the model&#39;s
-table does not exist.</p>
+<p>The column_select plugin no longer raises an exception if the model&#39;s table does not exist.</p>
 </li><li>
-<p>The class_table_inheritance plugin now works when the <a
-href="../prepared_statements_rdoc.html">prepared_statements</a> plugin is
-also used.</p>
+<p>The class_table_inheritance plugin now works when the <a href="../prepared_statements_rdoc.html">prepared_statements</a> plugin is also used.</p>
 </li><li>
-<p>Some adapters now avoid thread-safety issues during loading on ruby
-implementations without a GVL by avoiding the modification of shared
-datastructures.</p>
+<p>Some adapters now avoid thread-safety issues during loading on ruby implementations without a GVL by avoiding the modification of shared datastructures.</p>
 </li><li>
-<p>When using Database#tables with the :qualify=&gt;true option on PostgreSQL,
-table names with double or triple underscores are now handled correctly.</p>
+<p>When using Database#tables with the :qualify=&gt;true option on PostgreSQL, table names with double or triple underscores are now handled correctly.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The following Dataset constants are now frozen: NON_SQL_OPTIONS,
-ACTION_METHODS, QUERY_METHODS, CONDITIONED_JOIN_TYPES,
-UNCONDITIONED_JOIN_TYPES, and JOIN_METHODS.  Of these, NON_SQL_OPTIONS was
-previously modified in a non-thread-safe manner by some adapters.  External
-adapters should switch to having the adapter&#39;s dataset non_sql_options
-method return an array of options that do not affect the SELECT SQL for the
-adapter&#39;s datasets, rather than modifying NON_SQL_OPTIONS.</p>
+<p>The following Dataset constants are now frozen: NON_SQL_OPTIONS, ACTION_METHODS, QUERY_METHODS, CONDITIONED_JOIN_TYPES, UNCONDITIONED_JOIN_TYPES, and JOIN_METHODS.  Of these, NON_SQL_OPTIONS was previously modified in a non-thread-safe manner by some adapters.  External adapters should switch to having the adapter&#39;s dataset non_sql_options method return an array of options that do not affect the SELECT SQL for the adapter&#39;s datasets, rather than modifying NON_SQL_OPTIONS.</p>
 </li></ul>
 </div>
 <div id='context'>

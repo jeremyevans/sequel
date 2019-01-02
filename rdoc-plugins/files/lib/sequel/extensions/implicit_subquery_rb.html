@@ -36,14 +36,11 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The implicit_subquery extension changes most dataset methods that return
-modified datasets to implicitly call from_self if the database currently
-uses raw SQL.  Sequel&#39;s by default does not do this:</p>
+<p>The implicit_subquery extension changes most dataset methods that return modified datasets to implicitly call from_self if the database currently uses raw SQL.  Sequel&#39;s by default does not do this:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM table&quot;</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># =&gt; &quot;SELECT * FROM table&quot;</span></pre>
 
-<p>With this extension, datasets that use raw SQL are implicitly wrapped in a
-subquery:</p>
+<p>With this extension, datasets that use raw SQL are implicitly wrapped in a subquery:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM table&quot;</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:column</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># =&gt; &quot;SELECT column FROM (SELECT * FROM table) AS t1&quot;</span></pre>
 
@@ -55,8 +52,7 @@ subquery:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:implicit_subquery</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Dataset/ImplicitSubquery.html">Sequel::Dataset::ImplicitSubquery</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Dataset/ImplicitSubquery.html"><code>Sequel::Dataset::ImplicitSubquery</code></a></p>
 </div>
 <div id='context'>
 </div>

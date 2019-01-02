@@ -36,14 +36,9 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The columns_introspection extension attempts to introspect the selected
-columns for a dataset before issuing a query.  If it thinks it can guess
-correctly at the columns the query will use, it will return the columns
-without issuing a database query.</p>
+<p>The columns_introspection extension attempts to introspect the selected columns for a dataset before issuing a query.  If it thinks it can guess correctly at the columns the query will use, it will return the columns without issuing a database query.</p>
 
-<p>This method is not fool-proof, it&#39;s possible that some databases will
-use column names that <a href="../../../../classes/Sequel.html">Sequel</a>
-does not expect.  Also, it may not correctly handle all cases.</p>
+<p>This method is not fool-proof, it&#39;s possible that some databases will use column names that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does not expect.  Also, it may not correctly handle all cases. </p>
 
 <p>To attempt to introspect columns for a single dataset:</p>
 
@@ -53,8 +48,7 @@ does not expect.  Also, it may not correctly handle all cases.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/ColumnsIntrospection.html">Sequel::ColumnsIntrospection</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/ColumnsIntrospection.html"><code>Sequel::ColumnsIntrospection</code></a></p>
 </div>
 <div id='context'>
 </div>

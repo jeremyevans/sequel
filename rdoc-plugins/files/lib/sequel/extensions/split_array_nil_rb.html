@@ -36,8 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The split_array_nil extension overrides Sequel&#39;s default handling of
-IN/NOT IN with arrays of values to do specific nil checking.  For example,</p>
+<p>The split_array_nil extension overrides Sequel&#39;s default handling of IN/NOT IN with arrays of values to do specific nil checking.  For example,</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">column:</span> [<span class="ruby-value">1</span>, <span class="ruby-keyword">nil</span>])</pre>
 
@@ -45,10 +44,7 @@ IN/NOT IN with arrays of values to do specific nil checking.  For example,</p>
 
 <pre>SELECT * FROM table WHERE (column IN (1, NULL))</pre>
 
-<p>However, because NULL = NULL is not true in SQL (it is NULL), this will not
-return rows in the table where the column is NULL.  This extension allows
-for an alternative behavior more similar to ruby, which will return rows in
-the table where the column is NULL, using a query like:</p>
+<p>However, because NULL = NULL is not true in SQL (it is NULL), this will not return rows in the table where the column is NULL.  This extension allows for an alternative behavior more similar to ruby, which will return rows in the table where the column is NULL, using a query like:</p>
 
 <pre>SELECT * FROM table WHERE ((column IN (1)) OR (column IS NULL)))</pre>
 
@@ -64,8 +60,7 @@ the table where the column is NULL, using a query like:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:split_array_nil</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Dataset/SplitArrayNil.html">Sequel::Dataset::SplitArrayNil</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Dataset/SplitArrayNil.html"><code>Sequel::Dataset::SplitArrayNil</code></a></p>
 </div>
 <div id='context'>
 </div>

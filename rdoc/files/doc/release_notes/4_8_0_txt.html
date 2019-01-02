@@ -38,116 +38,62 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A one_through_one association type has been added.  This is similar to the
-many_to_many association type in that it uses a join table, but it returns
-a single record instead of an array of records. This is designed for cases
-where the foreign key in the join table that references the current table
-has a unique constraint, or where you want to use an order to just pick the
-first matching record.</p>
+<p>A one_through_one association type has been added.  This is similar to the many_to_many association type in that it uses a join table, but it returns a single record instead of an array of records. This is designed for cases where the foreign key in the join table that references the current table has a unique constraint, or where you want to use an order to just pick the first matching record.</p>
 
-<p>Similarly, the many_through_many plugin now also offers a one_through_many
-association.</p>
+<p>Similarly, the many_through_many plugin now also offers a one_through_many association.</p>
 </li><li>
-<p>An association_join method has been added to model datasets, for setting up
-joins based on associations.  This basically does the same join that
-eager_graph would do, but does not make the other changes that eager_graph
-makes.</p>
+<p>An association_join method has been added to model datasets, for setting up joins based on associations.  This basically does the same join that eager_graph would do, but does not make the other changes that eager_graph makes.</p>
 
-<p>Unlike eager_graph (which uses LEFT OUTER JOINs by default),
-association_join uses INNER JOINs, but there are also association_*_join
-methods (e.g. association_left_join) for using different join types.</p>
+<p>Unlike eager_graph (which uses LEFT OUTER JOINs by default), association_join uses INNER JOINs, but there are also association_*_join methods (e.g. association_left_join) for using different join types.</p>
 
-<p>Similar to eager_graph, you can use cascading of associations or multiple
-associations.</p>
+<p>Similar to eager_graph, you can use cascading of associations or multiple associations.</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">association_join</span>(<span class="ruby-value">:artist</span>, <span class="ruby-value">:tracks</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">association_left_join</span>(<span class="ruby-value">:albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:tracks</span>)</pre>
 </li><li>
-<p>Dataset#eager_graph_with_options has been added for model datasets.  It
-currently supports a :join_type option, for overriding the type of join to
-use on a per-call basis, as well as a :limit_strategy option.  The API is
-similar to eager_graph, except that the associations to eagerly load are
-passed in as a single argument, and it takes an options hash.</p>
+<p>Dataset#eager_graph_with_options has been added for model datasets.  It currently supports a :join_type option, for overriding the type of join to use on a per-call basis, as well as a :limit_strategy option.  The API is similar to eager_graph, except that the associations to eagerly load are passed in as a single argument, and it takes an options hash.</p>
 
-<p>The :limit_strategy option works similarly to the :eager_limit_strategy
-option when eagerly loading.  If set to true and the database supports
-window functions, it will join the current dataset to a subquery that uses
-a window function to correctly restrict the join to only those objects that
-fall within the association&#39;s limit/offset.</p>
+<p>The :limit_strategy option works similarly to the :eager_limit_strategy option when eagerly loading.  If set to true and the database supports window functions, it will join the current dataset to a subquery that uses a window function to correctly restrict the join to only those objects that fall within the association&#39;s limit/offset.</p>
 
-<p>The :limit_strategy option is not on by default.  It is possible for it to
-perform significantly worse than the default strategy (which uses array
-slicing in ruby).  The :limit_strategy significantly changes the SQL used,
-and can change the results of the query if any filters/orders related to
-the association are used.</p>
+<p>The :limit_strategy option is not on by default.  It is possible for it to perform significantly worse than the default strategy (which uses array slicing in ruby).  The :limit_strategy significantly changes the SQL used, and can change the results of the query if any filters/orders related to the association are used.</p>
 
-<p>It&#39;s recommended you only use the :limit_strategy option if you are
-experiencing a bottleneck and you have benchmarked that it is faster and
-still produces the desired results.</p>
+<p>It&#39;s recommended you only use the :limit_strategy option if you are experiencing a bottleneck and you have benchmarked that it is faster and still produces the desired results.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph_with_options</span>(<span class="ruby-value">:first_10_albums</span>,&#x000A;  <span class="ruby-value">:limit_strategy</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># SELECT artists.id, artists.name,</span>&#x000A;<span class="ruby-comment">#   first_10_albums.id AS first_10_albums_id,</span>&#x000A;<span class="ruby-comment">#   first_10_albums.name AS first_10_albums_name,</span>&#x000A;<span class="ruby-comment">#   first_10_albums.artist_id,</span>&#x000A;<span class="ruby-comment">#   first_10_albums.release_date</span>&#x000A;<span class="ruby-comment"># FROM artists</span>&#x000A;<span class="ruby-comment"># LEFT OUTER JOIN (</span>&#x000A;<span class="ruby-comment">#   SELECT id, name, artist_id, release_date</span>&#x000A;<span class="ruby-comment">#   FROM (</span>&#x000A;<span class="ruby-comment">#     SELECT *, row_number() OVER (PARTITION BY tracks.album_id)</span>&#x000A;<span class="ruby-comment">#       AS x_sequel_row_number_x</span>&#x000A;<span class="ruby-comment">#     FROM albums</span>&#x000A;<span class="ruby-comment">#   ) AS t1 WHERE (x_sequel_row_number_x &lt;= 10)</span>&#x000A;<span class="ruby-comment"># ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)</span></pre>
 </li><li>
-<p>Dataset#full_text_search on PostgreSQL now supports :plain and :phrase
-options.  :plain takes the search terms as a single string, and searches
-for rows where all terms are used. :phrase is similar to :plain, but also
-adds a substring search to ensure that the string given appears verbatim in
-the text.</p>
+<p>Dataset#full_text_search on PostgreSQL now supports :plain and :phrase options.  :plain takes the search terms as a single string, and searches for rows where all terms are used. :phrase is similar to :plain, but also adds a substring search to ensure that the string given appears verbatim in the text.</p>
 </li><li>
-<p>A :graph_order association option has been added, for using a different
-order when using eager_graph.  This is mostly designed for cases where
-:order should be qualified in other cases, but using a qualification breaks
-eager_graph because the correct qualifier is not known until runtime.</p>
+<p>A :graph_order association option has been added, for using a different order when using eager_graph.  This is mostly designed for cases where :order should be qualified in other cases, but using a qualification breaks eager_graph because the correct qualifier is not known until runtime.</p>
 </li><li>
 <p>SQL::AliasedExpression#alias has been added as an alias for aliaz.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> will now automatically
-use an eager limit strategy for *_one associations that use an :order
-option.  For associations that are truly one-to-one, an :order option is
-not needed, so it only makes sense to have an :order option if the
-association could theoretically return multiple results (in which case an
-eager limit strategy is helpful).</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will now automatically use an eager limit strategy for *_one associations that use an :order option.  For associations that are truly one-to-one, an :order option is not needed, so it only makes sense to have an :order option if the association could theoretically return multiple results (in which case an eager limit strategy is helpful).</p>
 </li><li>
-<p>The queries that <a href="../../../classes/Sequel.html">Sequel</a> uses to
-filter by associations when those associations have conditions are now
-simpler and easier for the database to execute.</p>
+<p>The queries that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses to filter by associations when those associations have conditions are now simpler and easier for the database to execute.</p>
 </li><li>
-<p>The queries that <a href="../../../classes/Sequel.html">Sequel</a> uses for
-dataset associations now handle cases where unqualified identifiers were
-used in the receiving dataset that would be made ambiguous by a join.</p>
+<p>The queries that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses for dataset associations now handle cases where unqualified identifiers were used in the receiving dataset that would be made ambiguous by a join.</p>
 </li><li>
-<p>A limit strategy is now used when filtering by associations if the
-association has a limit and the database supports window functions.  This
-allows <a href="../../../classes/Sequel.html">Sequel</a> to setup a correct
-filter in such cases.</p>
+<p>A limit strategy is now used when filtering by associations if the association has a limit and the database supports window functions.  This allows <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to setup a correct filter in such cases.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:first_10_albums</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT *</span>&#x000A;<span class="ruby-comment"># FROM artists</span>&#x000A;<span class="ruby-comment"># WHERE (artists.id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT albums.artist_id</span>&#x000A;<span class="ruby-comment">#   FROM albums</span>&#x000A;<span class="ruby-comment">#   WHERE ((albums.artist_id IS NOT NULL) AND (albums.id IN (</span>&#x000A;<span class="ruby-comment">#     SELECT id FROM (</span>&#x000A;<span class="ruby-comment">#       SELECT albums.id, row_number() OVER</span>&#x000A;<span class="ruby-comment">#         (PARTITION BY albums.artist_id ORDER BY release_date)</span>&#x000A;<span class="ruby-comment">#         AS x_sequel_row_number_x</span>&#x000A;<span class="ruby-comment">#       FROM albums</span>&#x000A;<span class="ruby-comment">#     ) AS t1</span>&#x000A;<span class="ruby-comment">#     WHERE (x_sequel_row_number_x &lt;= 10)</span>&#x000A;<span class="ruby-comment">#   )) AND (albums.id = 1))))</span></pre>
 </li><li>
-<p>A limit strategy is now used in the dataset_associations plugin if the
-association has a limit and the database supports window functions.  This
-makes the resulting datasets return correct results.</p>
+<p>A limit strategy is now used in the dataset_associations plugin if the association has a limit and the database supports window functions.  This makes the resulting datasets return correct results.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_10_albums</span>&#x000A;<span class="ruby-comment"># SELECT *</span>&#x000A;<span class="ruby-comment"># FROM albums</span>&#x000A;<span class="ruby-comment"># WHERE ((albums.artist_id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT artists.id FROM artists)</span>&#x000A;<span class="ruby-comment"># ) AND (albums.id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT id FROM (</span>&#x000A;<span class="ruby-comment">#     SELECT albums.id, row_number() OVER</span>&#x000A;<span class="ruby-comment">#       (PARTITION BY albums.artist_id ORDER BY release_date)</span>&#x000A;<span class="ruby-comment">#       AS x_sequel_row_number_x</span>&#x000A;<span class="ruby-comment">#     FROM albums</span>&#x000A;<span class="ruby-comment">#   ) AS t1</span>&#x000A;<span class="ruby-comment">#   WHERE (x_sequel_row_number_x &lt;= 10)</span>&#x000A;<span class="ruby-comment"># )))</span>&#x000A;<span class="ruby-comment"># ORDER BY release_date</span></pre>
 </li><li>
-<p>You can now pass symbols with embedded qualifiers or aliases, as well as
-SQL::Identifier, SQL::QualifiedIdentifier, and SQL::AliasedExpression
-objects as the first argument to Dataset#graph.</p>
+<p>You can now pass symbols with embedded qualifiers or aliases, as well as SQL::Identifier, SQL::QualifiedIdentifier, and SQL::AliasedExpression objects as the first argument to Dataset#graph.</p>
 </li><li>
-<p>The nested_attributes plugin now automatically handles presence validations
-on foreign keys when creating associated objects. It now sets the foreign
-key value (or a placeholder value) before validating such objects.</p>
+<p>The nested_attributes plugin now automatically handles presence validations on foreign keys when creating associated objects. It now sets the foreign key value (or a placeholder value) before validating such objects.</p>
 </li><li>
 <p>Offsets on *_one associations are now respected when using eager_graph.</p>
 </li><li>
-<p>eager graphing *_many associations with offsets no longer breaks if there
-are no associated results.</p>
+<p>eager graphing *_many associations with offsets no longer breaks if there are no associated results.</p>
 </li><li>
-<p>Database#register_array_type in the pg_array extension now works correctly
-if there is no existing scalar conversion proc for the type.</p>
+<p>Database#register_array_type in the pg_array extension now works correctly if there is no existing scalar conversion proc for the type.</p>
 </li><li>
-<p>Unique, foreign key, and not null constraint violations are now recognized
-correctly on SQLite 3.8.2+.</p>
+<p>Unique, foreign key, and not null constraint violations are now recognized correctly on SQLite 3.8.2+.</p>
 </li><li>
 <p>The odbc adapter now returns fractional seconds in timestamps.</p>
 </li><li>
@@ -156,8 +102,7 @@ correctly on SQLite 3.8.2+.</p>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The private Model.apply_window_function_eager_limit_strategy method has
-been removed.</p>
+<p>The private Model.apply_window_function_eager_limit_strategy method has been removed.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -56,15 +56,14 @@ Sequel::CurrentDateTimeTimestamp::DatasetMethods
 </div>
 <div class='description'>
 
-<p>Return an instance of Sequel.datetime_class that will be literalized as
-CURRENT_TIMESTAMP.</p>
+<p>Return an instance of Sequel.datetime_class that will be literalized as CURRENT_TIMESTAMP.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-current_datetime-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-current_datetime-source'><span class="ruby-comment"># File lib/sequel/extensions/current_datetime_timestamp.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">current_datetime</span>&#x000A;  (<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-operator">::</span><span class="ruby-constant">Time</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Time</span> <span class="ruby-operator">:</span> <span class="ruby-constant">DateTime</span>).<span class="ruby-identifier">now</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-current_datetime-source'>   <span class="ruby-comment"># File lib/sequel/extensions/current_datetime_timestamp.rb</span>&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">current_datetime</span>&#x000A;<span class="line-num">35</span>   (<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-operator">::</span><span class="ruby-constant">Time</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Time</span> <span class="ruby-operator">:</span> <span class="ruby-constant">DateTime</span>).<span class="ruby-identifier">now</span>&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

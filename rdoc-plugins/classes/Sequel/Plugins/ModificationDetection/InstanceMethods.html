@@ -65,7 +65,7 @@ Sequel::Plugins::ModificationDetection::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">recalculate_values_hashes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;<span class="line-num">49</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">50</span>   <span class="ruby-identifier">recalculate_values_hashes</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-calculate_values_hashes'>
@@ -77,15 +77,14 @@ Sequel::Plugins::ModificationDetection::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Calculate the column hash values if they haven&#39;t been already
-calculated.</p>
+<p>Calculate the column hash values if they haven&#39;t been already calculated.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-calculate_values_hashes-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-calculate_values_hashes-source'><span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">calculate_values_hashes</span>&#x000A;  <span class="ruby-ivar">@values_hashes</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">recalculate_values_hashes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-calculate_values_hashes-source'>   <span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">calculate_values_hashes</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-ivar">@values_hashes</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">recalculate_values_hashes</span>&#x000A;<span class="line-num">56</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-changed_columns'>
@@ -97,15 +96,14 @@ calculated.</p>
 </div>
 <div class='description'>
 
-<p>Detect which columns have been modified by comparing the cached hash value
-to the hash of the current value.</p>
+<p>Detect which columns have been modified by comparing the cached hash value to the hash of the current value.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-changed_columns-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-changed_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">changed_columns</span>&#x000A;  <span class="ruby-identifier">changed</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">vh</span> = <span class="ruby-ivar">@values_hashes</span>&#x000A;    <span class="ruby-identifier">values</span> = <span class="ruby-ivar">@values</span>&#x000A;    <span class="ruby-identifier">changed</span> = <span class="ruby-identifier">changed</span>.<span class="ruby-identifier">dup</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;    <span class="ruby-identifier">vh</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">match</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">values</span>[<span class="ruby-identifier">c</span>].<span class="ruby-identifier">hash</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">changed</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)&#x000A;        <span class="ruby-identifier">changed</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">c</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">match</span>&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">changed</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">match</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">changed</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-changed_columns-source'>   <span class="ruby-comment"># File lib/sequel/plugins/modification_detection.rb</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">changed_columns</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-identifier">changed</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">vh</span> = <span class="ruby-ivar">@values_hashes</span>&#x000A;<span class="line-num">63</span>     <span class="ruby-identifier">values</span> = <span class="ruby-ivar">@values</span>&#x000A;<span class="line-num">64</span>     <span class="ruby-identifier">changed</span> = <span class="ruby-identifier">changed</span>.<span class="ruby-identifier">dup</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;<span class="line-num">65</span>     <span class="ruby-identifier">vh</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">66</span>       <span class="ruby-identifier">match</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">values</span>[<span class="ruby-identifier">c</span>].<span class="ruby-identifier">hash</span>&#x000A;<span class="line-num">67</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">changed</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="line-num">68</span>         <span class="ruby-identifier">changed</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">c</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">match</span>&#x000A;<span class="line-num">69</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">70</span>         <span class="ruby-identifier">changed</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">match</span>&#x000A;<span class="line-num">71</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">72</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">73</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">74</span>   <span class="ruby-identifier">changed</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

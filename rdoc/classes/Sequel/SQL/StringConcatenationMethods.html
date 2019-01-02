@@ -35,10 +35,7 @@ Sequel::SQL::StringConcatenationMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes the <code>+</code> method.  It is included in
-<code>StringExpression</code> and can be included elsewhere to allow the
-use of the + operator to represent concatenation of <a
-href="../SQL.html">SQL</a> Strings:</p>
+<p>This module includes the <code>+</code> method.  It is included in <code>StringExpression</code> and can be included elsewhere to allow the use of the + operator to represent concatenation of <a href="../SQL.html"><code>SQL</code></a> Strings:</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -61,8 +58,7 @@ href="../SQL.html">SQL</a> Strings:</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>StringExpression</code> representing the concatenation of
-the receiver with the given argument.</p>
+<p>Return a <code>StringExpression</code> representing the concatenation of the receiver with the given argument.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:x</span>].<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-value">:y</span> <span class="ruby-comment"># =&gt; &quot;x&quot; || &quot;y&quot;</span></pre>
 
@@ -71,7 +67,7 @@ the receiver with the given argument.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2B-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-2B-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 971</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">+</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;||&#39;</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-2B-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">972</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">+</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">973</span>   <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&#39;||&#39;</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">974</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

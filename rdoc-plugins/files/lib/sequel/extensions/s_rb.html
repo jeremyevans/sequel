@@ -36,10 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The s extension adds <a
-href="../../../../classes/Sequel/S.html">Sequel::S</a>, a module containing
-a private #S method that calls Sequel.expr.  It&#39;s designed as a
-shortcut so that instead of:</p>
+<p>The s extension adds <a href="../../../../classes/Sequel/S.html"><code>Sequel::S</code></a>, a module containing a private #S method that calls Sequel.expr.  It&#39;s designed as a shortcut so that instead of:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>}</pre>
 
@@ -51,25 +48,19 @@ shortcut so that instead of:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:s</span></pre>
 
-<p>Then you can include the <a
-href="../../../../classes/Sequel/S.html">Sequel::S</a> module into whatever
-classes or objects you care about:</p>
+<p>Then you can include the <a href="../../../../classes/Sequel/S.html"><code>Sequel::S</code></a> module into whatever classes or objects you care about:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>)   <span class="ruby-comment"># available in model instance methods</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>)           <span class="ruby-comment"># available in model class methods</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>) <span class="ruby-comment"># available in dataset methods</span></pre>
 
-<p>or just into <a href="../../../../classes/Object.html">Object</a> if you
-want it available everywhere:</p>
+<p>or just into <a href="../../../../classes/Object.html"><code>Object</code></a> if you want it available everywhere:</p>
 
 <pre class="ruby"><span class="ruby-constant">Object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>)</pre>
 
-<p>If you are using Ruby 2+, and you would like to use refinements, you can
-use <a href="../../../../classes/Sequel/S.html">Sequel::S</a> as a
-refinement, in which case the private #S method will be available on all
-objects while the refinement is active.</p>
+<p>If you are using Ruby 2+, and you would like to use refinements, you can use <a href="../../../../classes/Sequel/S.html"><code>Sequel::S</code></a> as a refinement, in which case the private #S method will be available on all objects while the refinement is active.</p>
 
 <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>&#x000A;&#x000A;<span class="ruby-constant">S</span>(<span class="ruby-value">:column</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span></pre>
 
-<p>Related module: <a href="../../../../classes/Sequel/S.html">Sequel::S</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/S.html"><code>Sequel::S</code></a></p>
 </div>
 <div id='context'>
 </div>

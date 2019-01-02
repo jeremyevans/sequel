@@ -36,8 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_inet_ops extension adds support to Sequel&#39;s DSL to make it
-easier to call PostgreSQL inet functions and operators.</p>
+<p>The pg_inet_ops extension adds support to Sequel&#39;s DSL to make it easier to call PostgreSQL inet functions and operators.</p>
 
 <p>To load the extension:</p>
 
@@ -47,37 +46,25 @@ easier to call PostgreSQL inet functions and operators.</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_inet_op</span>(<span class="ruby-value">:inet</span>)</pre>
 
-<p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-expression objects, you can call the pg_inet method:</p>
+<p>Also, on most <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> expression objects, you can call the pg_inet method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:ip</span>].<span class="ruby-identifier">pg_inet</span></pre>
 
-<p>If you have loaded the <a
-href="../../../doc/core_extensions_rdoc.html">core_extensions
-extension</a>, or you have loaded the core_refinements extension and have
-activated refinements for the file, you can also use <a
-href="../../../../classes/Sequel/Postgres/InetOpMethods.html#method-i-pg_inet">Sequel::Postgres::InetOpMethods#pg_inet</a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Sequel/Postgres/InetOpMethods.html#method-i-pg_inet"><code>Symbol#pg_inet</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-value">:inet</span>.<span class="ruby-identifier">pg_inet</span></pre>
 
-<p>This creates a <a
-href="../../../../classes/Sequel/Postgres/InetOp.html">Sequel::Postgres::InetOp</a>
-object that can be used for easier querying:</p>
+<p>This creates a <a href="../../../../classes/Sequel/Postgres/InetOp.html"><code>Sequel::Postgres::InetOp</code></a> object that can be used for easier querying:</p>
 
 <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-identifier">r</span>                                 <span class="ruby-comment"># ~inet</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">other</span>                          <span class="ruby-comment"># inet &amp; other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">other</span>                          <span class="ruby-comment"># inet | other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">:other</span>                        <span class="ruby-comment"># inet &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&gt;&gt;</span> <span class="ruby-value">:other</span>                        <span class="ruby-comment"># inet &gt;&gt; other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by</span>(<span class="ruby-value">:other</span>)             <span class="ruby-comment"># inet &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by_or_equals</span>(<span class="ruby-value">:other</span>)   <span class="ruby-comment"># inet &lt;&lt;= other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains</span>(<span class="ruby-value">:other</span>)                 <span class="ruby-comment"># inet &gt;&gt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains_or_equals</span>(<span class="ruby-value">:other</span>)       <span class="ruby-comment"># inet &gt;&gt;= other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains_or_contained_by</span>(<span class="ruby-value">:other</span>) <span class="ruby-comment"># inet &amp;&amp; other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">abbrev</span>           <span class="ruby-comment"># abbrev(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">broadcast</span>        <span class="ruby-comment"># broadcast(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">family</span>           <span class="ruby-comment"># family(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">host</span>             <span class="ruby-comment"># host(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">hostmask</span>         <span class="ruby-comment"># hostmask(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">masklen</span>          <span class="ruby-comment"># masklen(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">netmask</span>          <span class="ruby-comment"># netmask(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">network</span>          <span class="ruby-comment"># network(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">set_masklen</span>(<span class="ruby-value">16</span>)  <span class="ruby-comment"># set_masklen(inet, 16)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">text</span>             <span class="ruby-comment"># text(inet)</span></pre>
 
-<p>If a <a href="../../../../classes/String.html">String</a> or IPAddr
-instance is passed to Sequel.pg_inet_op, it will automatically be cast to
-<code>inet</code>.  To treat the object as a <code>cidr</code>, you must
-cast it before passing it to Sequel.pg_inet_op:</p>
+<p>If a <a href="../../../../classes/String.html"><code>String</code></a> or IPAddr instance is passed to Sequel.pg_inet_op, it will automatically be cast to <code>inet</code>.  To treat the object as a <code>cidr</code>, you must cast it before passing it to Sequel.pg_inet_op:</p>
 
 <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_inet_op</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1.2.3.4&#39;</span>, <span class="ruby-value">:cidr</span>))</pre>
 
-<p>See the PostgreSQL network function and operator documentation for more
-details on what these functions and operators do.</p>
+<p>See the PostgreSQL network function and operator documentation for more details on what these functions and operators do.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Postgres/InetOp.html">Sequel::Postgres::InetOp</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/InetOp.html"><code>Sequel::Postgres::InetOp</code></a></p>
 </div>
 <div id='context'>
 <div id='requires'>

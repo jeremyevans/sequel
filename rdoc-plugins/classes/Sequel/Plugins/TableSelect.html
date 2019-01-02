@@ -35,11 +35,7 @@ Sequel::Plugins::TableSelect
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The table_select plugin changes the default selection for a model dataset
-from <code>*</code> to <code>table.*</code>. This makes it so that if you
-join the model&#39;s dataset to other tables, columns in the other tables
-do not appear in the result sets (and possibly overwrite columns in the
-current model with the same name).</p>
+<p>The table_select plugin changes the default selection for a model dataset from <code>*</code> to <code>table.*</code>. This makes it so that if you join the model&#39;s dataset to other tables, columns in the other tables do not appear in the result sets (and possibly overwrite columns in the current model with the same name).</p>
 
 <p>Usage:</p>
 
@@ -72,15 +68,14 @@ current model with the same name).</p>
 </div>
 <div class='description'>
 
-<p>Modify the current model&#39;s dataset selection, if the model has a
-dataset.</p>
+<p>Modify the current model&#39;s dataset selection, if the model has a dataset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/table_select.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/table_select.rb</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">23</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">24</span>     <span class="ruby-keyword">self</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">25</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

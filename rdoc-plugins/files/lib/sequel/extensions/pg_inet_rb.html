@@ -36,35 +36,23 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_inet extension adds support for <a
-href="../../../../classes/Sequel.html">Sequel</a> to handle
-PostgreSQL&#39;s inet and cidr types using ruby&#39;s IPAddr class.</p>
+<p>The pg_inet extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL&#39;s inet and cidr types using ruby&#39;s IPAddr class.</p>
 
-<p>This extension integrates with Sequel&#39;s native postgres and
-jdbc/postgresql adapters, so that when inet/cidr fields are retrieved, they
-are returned as IPAddr instances.</p>
+<p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when inet/cidr fields are retrieved, they are returned as IPAddr instances.</p>
 
 <p>To use this extension, load it into your database:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_inet</span></pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use
-the inet[] or cidr[] types, load the pg_array extension before the pg_inet
-extension:</p>
+<p>This extension integrates with the pg_array extension.  If you plan to use the inet[] or cidr[] types, load the pg_array extension before the pg_inet extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_inet</span></pre>
 
-<p>This extension does not add special support for the macaddr type.  Ruby
-doesn&#39;t have a stdlib class that represents mac addresses, so these
-will still be returned as strings.  The exception to this is that the
-pg_array extension integration will recognize macaddr[] types return them
-as arrays of strings.</p>
+<p>This extension does not add special support for the macaddr type.  Ruby doesn&#39;t have a stdlib class that represents mac addresses, so these will still be returned as strings.  The exception to this is that the pg_array extension integration will recognize macaddr[] types return them as arrays of strings.</p>
 
-<p>See the schema modification guide for details on using inet/cidr columns in
-CREATE/ALTER TABLE statements.</p>
+<p>See the schema modification guide for details on using inet/cidr columns in CREATE/ALTER TABLE statements.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Postgres/InetDatabaseMethods.html">Sequel::Postgres::InetDatabaseMethods</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/InetDatabaseMethods.html"><code>Sequel::Postgres::InetDatabaseMethods</code></a></p>
 </div>
 <div id='context'>
 <div id='requires'>

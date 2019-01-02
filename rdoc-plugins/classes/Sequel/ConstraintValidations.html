@@ -103,9 +103,7 @@ Sequel::ConstraintValidations
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>The name of the table storing the validation metadata.  If modifying this
-from the default, this should be changed directly after loading the
-extension into the database</p>
+<p>The name of the table storing the validation metadata.  If modifying this from the default, this should be changed directly after loading the extension into the database</p>
 </td>
 </tr>
 </table>
@@ -122,15 +120,14 @@ extension into the database</p>
 </div>
 <div class='description'>
 
-<p>Set the default validation metadata table name if it has not already been
-set.</p>
+<p>Set the default validation metadata table name if it has not already been set.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-extended-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">constraint_validations_table</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">DEFAULT_CONSTRAINT_VALIDATIONS_TABLE</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-extended-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">146</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">147</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">constraint_validations_table</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">DEFAULT_CONSTRAINT_VALIDATIONS_TABLE</span>&#x000A;<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -143,15 +140,14 @@ set.</p>
 </div>
 <div class='description'>
 
-<p>Modify the default alter_table generator to include the constraint
-validation methods.</p>
+<p>Modify the default alter_table generator to include the constraint validation methods.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-alter_table_generator-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-alter_table_generator-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 306</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_table_generator</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extend</span> <span class="ruby-constant">AlterTableGeneratorMethods</span>&#x000A;    <span class="ruby-ivar">@validations</span> = []&#x000A;    <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-alter_table_generator-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">307</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">alter_table_generator</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">308</span>   <span class="ruby-keyword">super</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">309</span>     <span class="ruby-identifier">extend</span> <span class="ruby-constant">AlterTableGeneratorMethods</span>&#x000A;<span class="line-num">310</span>     <span class="ruby-ivar">@validations</span> = []&#x000A;<span class="line-num">311</span>     <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">312</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">313</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_constraint_validations_table'>
@@ -163,15 +159,14 @@ validation methods.</p>
 </div>
 <div class='description'>
 
-<p>Create the table storing the validation metadata for all of the constraints
-created by this extension.</p>
+<p>Create the table storing the validation metadata for all of the constraints created by this extension.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_constraint_validations_table-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_constraint_validations_table-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 244</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_constraint_validations_table</span>&#x000A;  <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">constraint_validations_table</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:table</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:constraint_name</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:validation_type</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:argument</span>&#x000A;    <span class="ruby-constant">String</span> <span class="ruby-value">:message</span>&#x000A;    <span class="ruby-constant">TrueClass</span> <span class="ruby-value">:allow_nil</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_constraint_validations_table-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">245</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_constraint_validations_table</span>&#x000A;<span class="line-num">246</span>   <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">constraint_validations_table</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">247</span>     <span class="ruby-constant">String</span> <span class="ruby-value">:table</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">248</span>     <span class="ruby-constant">String</span> <span class="ruby-value">:constraint_name</span>&#x000A;<span class="line-num">249</span>     <span class="ruby-constant">String</span> <span class="ruby-value">:validation_type</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">250</span>     <span class="ruby-constant">String</span> <span class="ruby-value">:column</span>, <span class="ruby-value">:null</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">251</span>     <span class="ruby-constant">String</span> <span class="ruby-value">:argument</span>&#x000A;<span class="line-num">252</span>     <span class="ruby-constant">String</span> <span class="ruby-value">:message</span>&#x000A;<span class="line-num">253</span>     <span class="ruby-constant">TrueClass</span> <span class="ruby-value">:allow_nil</span>&#x000A;<span class="line-num">254</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">255</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-create_table_generator'>
@@ -183,15 +178,14 @@ created by this extension.</p>
 </div>
 <div class='description'>
 
-<p>Modify the default create_table generator to include the constraint
-validation methods.</p>
+<p>Modify the default create_table generator to include the constraint validation methods.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-create_table_generator-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-create_table_generator-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 258</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_table_generator</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extend</span> <span class="ruby-constant">CreateTableGeneratorMethods</span>&#x000A;    <span class="ruby-ivar">@validations</span> = []&#x000A;    <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-create_table_generator-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create_table_generator</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">260</span>   <span class="ruby-keyword">super</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">261</span>     <span class="ruby-identifier">extend</span> <span class="ruby-constant">CreateTableGeneratorMethods</span>&#x000A;<span class="line-num">262</span>     <span class="ruby-ivar">@validations</span> = []&#x000A;<span class="line-num">263</span>     <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">264</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">265</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_constraint_validations_for'>
@@ -203,8 +197,7 @@ validation methods.</p>
 </div>
 <div class='description'>
 
-<p>Delete validation metadata for specific constraints.  At least one of the
-following options should be specified:</p>
+<p>Delete validation metadata for specific constraints.  At least one of the following options should be specified:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:table </td><td>
 <p>The table containing the constraint</p>
 </td></tr><tr><td class='label'>:column </td><td>
@@ -213,20 +206,14 @@ following options should be specified:</p>
 <p>The name of the related constraint</p>
 </td></tr></tbody></table>
 
-<p>The main reason for this method is when dropping tables or columns.  If you
-have previously defined a constraint validation on the table or column, you
-should delete the related metadata when dropping the table or column. For a
-table, this isn&#39;t a big issue, as it will just result in some wasted
-space, but for columns, if you don&#39;t drop the related metadata, it
-could make it impossible to save rows, since a validation for a nonexistent
-column will be created.</p>
+<p>The main reason for this method is when dropping tables or columns.  If you have previously defined a constraint validation on the table or column, you should delete the related metadata when dropping the table or column. For a table, this isn&#39;t a big issue, as it will just result in some wasted space, but for columns, if you don&#39;t drop the related metadata, it could make it impossible to save rows, since a validation for a nonexistent column will be created.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_constraint_validations_for-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop_constraint_validations_for-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_constraint_validations_for</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">from</span>(<span class="ruby-identifier">constraint_validations_table</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint_validations_literal_table</span>(<span class="ruby-identifier">table</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">constraint</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:constraint</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint</span>.<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">table</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">column</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">constraint</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must specify :table, :column, or :constraint when dropping constraint validations&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop_constraint_validations_for-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">288</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_constraint_validations_for</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">289</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">from</span>(<span class="ruby-identifier">constraint_validations_table</span>)&#x000A;<span class="line-num">290</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">table</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="line-num">291</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint_validations_literal_table</span>(<span class="ruby-identifier">table</span>))&#x000A;<span class="line-num">292</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">293</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>]&#x000A;<span class="line-num">294</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>)&#x000A;<span class="line-num">295</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">296</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">constraint</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:constraint</span>]&#x000A;<span class="line-num">297</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">:constraint_name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">constraint</span>.<span class="ruby-identifier">to_s</span>)&#x000A;<span class="line-num">298</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">299</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">table</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">column</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">constraint</span>&#x000A;<span class="line-num">300</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must specify :table, :column, or :constraint when dropping constraint validations&quot;</span>&#x000A;<span class="line-num">301</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">302</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">delete</span>&#x000A;<span class="line-num">303</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-drop_constraint_validations_table'>
@@ -245,7 +232,7 @@ column will be created.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-drop_constraint_validations_table-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-drop_constraint_validations_table-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 267</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_constraint_validations_table</span>&#x000A;  <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">constraint_validations_table</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-drop_constraint_validations_table-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">268</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">drop_constraint_validations_table</span>&#x000A;<span class="line-num">269</span>   <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">constraint_validations_table</span>)&#x000A;<span class="line-num">270</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

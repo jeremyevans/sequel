@@ -39,10 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This Module subclass is used by Model.dataset_module to add dataset methods
-to classes.  In addition to the methods offered by <a
-href="../Dataset/DatasetModule.html">Dataset::DatasetModule</a>, it also
-automatically creates class methods for public dataset methods.</p>
+<p>This Module subclass is used by Model.dataset_module to add dataset methods to classes.  In addition to the methods offered by <a href="../Dataset/DatasetModule.html"><code>Dataset::DatasetModule</code></a>, it also automatically creates class methods for public dataset methods.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -76,7 +73,7 @@ automatically creates class methods for public dataset methods.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-ivar">@model</span> = <span class="ruby-identifier">model</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/model/dataset_module.rb</span>&#x000A;<span class="line-num">12</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">13</span>   <span class="ruby-ivar">@model</span> = <span class="ruby-identifier">model</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -96,7 +93,7 @@ automatically creates class methods for public dataset methods.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-subset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 16</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-subset-source'>   <span class="ruby-comment"># File lib/sequel/model/dataset_module.rb</span>&#x000A;<span class="line-num">17</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">18</span>   <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">19</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -35,15 +35,11 @@ Sequel::Plugins::AccessedColumns
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The accessed_columns plugin records which columns have been accessed for a
-model instance.  This is useful if you are looking to remove other columns
-from being SELECTed by the dataset that retrieved the instance, which can
-significantly improve performance:</p>
+<p>The accessed_columns plugin records which columns have been accessed for a model instance.  This is useful if you are looking to remove other columns from being SELECTed by the dataset that retrieved the instance, which can significantly improve performance:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name]</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">accessed_columns</span> <span class="ruby-comment"># [:name, :artist_id]</span></pre>
 
-<p>Note that this plugin should probably not be used in production, as it
-causes a performance hit.</p>
+<p>Note that this plugin should probably not be used in production, as it causes a performance hit.</p>
 
 <p>Usage:</p>
 

@@ -35,17 +35,11 @@ Sequel::SQL::PatternMatchMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes methods for overriding the =~ method for <a
-href="../SQL.html">SQL</a> equality, inclusion, and pattern matching.  It
-returns the same result that <a href="../../Sequel.html">Sequel</a> would
-return when using a hash with a single entry, where the receiver was the
-key and the argument was the value. Example:</p>
+<p>This module includes methods for overriding the =~ method for <a href="../SQL.html"><code>SQL</code></a> equality, inclusion, and pattern matching.  It returns the same result that <a href="../../Sequel.html"><code>Sequel</code></a> would return when using a hash with a single entry, where the receiver was the key and the argument was the value. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a = 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NULL)</span></pre>
 
-<p>This also adds the !~ method, for easily setting up not equals, exclusion,
-and inverse pattern matching.  This is the same as as inverting the result
-of the =~ method</p>
+<p>This also adds the !~ method, for easily setting up not equals, exclusion, and inverse pattern matching.  This is the same as as inverting the result of the =~ method</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a NOT IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NOT NULL)</span></pre>
 </div>
@@ -76,7 +70,7 @@ of the =~ method</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-21~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-21~-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 831</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">!~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-operator">~</span>(<span class="ruby-keyword">self</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-21~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">832</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">!~</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">833</span>   <span class="ruby-operator">~</span>(<span class="ruby-keyword">self</span> <span class="ruby-operator">=~</span> <span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">834</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-3D~'>
@@ -88,15 +82,14 @@ of the =~ method</p>
 </div>
 <div class='description'>
 
-<p>Set up an equality, inclusion, or pattern match operation, based on the
-type of the argument.</p>
+<p>Set up an equality, inclusion, or pattern match operation, based on the type of the argument.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-3D~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-3D~-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 827</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-3D~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">828</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">829</span>   <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="line-num">830</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

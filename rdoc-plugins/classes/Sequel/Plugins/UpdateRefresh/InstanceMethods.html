@@ -56,15 +56,14 @@ Sequel::Plugins::UpdateRefresh::InstanceMethods
 </div>
 <div class='description'>
 
-<p>If the dataset does not support UPDATE RETURNING, then refresh after an
-update.</p>
+<p>If the dataset does not support UPDATE RETURNING, then refresh after an update.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_update-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">this</span>.<span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:update</span>)&#x000A;    <span class="ruby-identifier">refresh</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_update-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_update</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">this</span>.<span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:update</span>)&#x000A;<span class="line-num">63</span>     <span class="ruby-identifier">refresh</span>&#x000A;<span class="line-num">64</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

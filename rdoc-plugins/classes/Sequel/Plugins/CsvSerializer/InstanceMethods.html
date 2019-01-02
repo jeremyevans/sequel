@@ -57,11 +57,9 @@ Sequel::Plugins::CsvSerializer::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Update the object using the data provided in the first line in CSV.
-Options:</p>
+<p>Update the object using the data provided in the first line in CSV. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:headers </td><td>
-<p>The headers to use for the CSV line. Use nil for a header to specify the
-column should be ignored.</p>
+<p>The headers to use for the CSV line. Use nil for a header to specify the column should be ignored.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -69,7 +67,7 @@ column should be ignored.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-from_csv-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-from_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 131</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">row</span> = <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">parse_line</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)).<span class="ruby-identifier">to_hash</span>&#x000A;  <span class="ruby-identifier">row</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">set</span>(<span class="ruby-identifier">row</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-from_csv-source'>    <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">133</span>   <span class="ruby-identifier">row</span> = <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">parse_line</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)).<span class="ruby-identifier">to_hash</span>&#x000A;<span class="line-num">134</span>   <span class="ruby-identifier">row</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">135</span>   <span class="ruby-identifier">set</span>(<span class="ruby-identifier">row</span>)&#x000A;<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_csv'>
@@ -81,20 +79,13 @@ column should be ignored.</p>
 </div>
 <div class='description'>
 
-<p>Return a string in CSV format.  Accepts the same options as CSV.new, as
-well as the following options:</p>
+<p>Return a string in CSV format.  Accepts the same options as CSV.new, as well as the following options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:except </td><td>
-<p><a href="../../../Symbol.html">Symbol</a> or <a
-href="../../../Array.html">Array</a> of Symbols of columns not to include
-in the CSV output.</p>
+<p><a href="../../../Symbol.html"><code>Symbol</code></a> or <a href="../../../Array.html"><code>Array</code></a> of Symbols of columns not to include in the CSV output.</p>
 </td></tr><tr><td class='label'>:only </td><td>
-<p><a href="../../../Symbol.html">Symbol</a> or <a
-href="../../../Array.html">Array</a> of Symbols of columns to include in
-the CSV output, ignoring all other columns</p>
+<p><a href="../../../Symbol.html"><code>Symbol</code></a> or <a href="../../../Array.html"><code>Array</code></a> of Symbols of columns to include in the CSV output, ignoring all other columns</p>
 </td></tr><tr><td class='label'>:include </td><td>
-<p><a href="../../../Symbol.html">Symbol</a> or <a
-href="../../../Array.html">Array</a> of Symbols specifying non-column
-attributes to include in the CSV output.</p>
+<p><a href="../../../Symbol.html"><code>Symbol</code></a> or <a href="../../../Array.html"><code>Array</code></a> of Symbols specifying non-column attributes to include in the CSV output.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -102,7 +93,7 @@ attributes to include in the CSV output.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_csv-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 146</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_csv</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)&#x000A;&#x000A;  <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>].<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">k</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_csv-source'>    <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>&#x000A;<span class="line-num">147</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_csv</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">148</span>   <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">149</span> &#x000A;<span class="line-num">150</span>   <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">151</span>     <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>].<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="line-num">152</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -57,15 +57,14 @@ Sequel::Plugins::PreparedStatementsSafe::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Merge the current values into the default values to reduce the number of
-free columns.</p>
+<p>Merge the current values into the default values to reduce the number of free columns.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_create-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_create</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">prepared_statements_column_defaults</span>&#x000A;    <span class="ruby-ivar">@values</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">v</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_create-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_create</span>&#x000A;<span class="line-num">69</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">prepared_statements_column_defaults</span>&#x000A;<span class="line-num">70</span>     <span class="ruby-ivar">@values</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">v</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">71</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">72</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-save_changes'>
@@ -77,15 +76,14 @@ free columns.</p>
 </div>
 <div class='description'>
 
-<p>Always do a full save of all columns to reduce the number of prepared
-statements that can be used.</p>
+<p>Always do a full save of all columns to reduce the number of prepared statements that can be used.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-save_changes-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-save_changes-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">save</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-save_changes-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">78</span>   <span class="ruby-identifier">save</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -39,66 +39,39 @@ Last Update:
 <p>Model Improvements</p>
 <hr>
 <ul><li>
-<p>one_to_many/many_to_many associations now support a :limit option, adding a
-limit/offset to the records returned.  This was possible before using a
-block, so it is just added for convenience.</p>
+<p>one_to_many/many_to_many associations now support a :limit option, adding a limit/offset to the records returned.  This was possible before using a block, so it is just added for convenience.</p>
 </li><li>
-<p>Associations now support a :read_only option, which doesn&#39;t create
-methods that modify the database.</p>
+<p>Associations now support a :read_only option, which doesn&#39;t create methods that modify the database.</p>
 </li><li>
-<p>Associations now support a :graph_select option, which allows specifying
-the columns of associated models to include when using eager_graph.</p>
+<p>Associations now support a :graph_select option, which allows specifying the columns of associated models to include when using eager_graph.</p>
 </li><li>
-<p>one_to_many associations now have a :one_to_one option.  When used it
-creates a getter and setter method similar to many_to_one.  This fills the
-same role as ActiveRecord&#39;s has_one, but it is implemented as a couple
-of convenience methods over one_to_many, so it still requires that you
-specify the association name as a plural.</p>
+<p>one_to_many associations now have a :one_to_one option.  When used it creates a getter and setter method similar to many_to_one.  This fills the same role as ActiveRecord&#39;s has_one, but it is implemented as a couple of convenience methods over one_to_many, so it still requires that you specify the association name as a plural.</p>
 </li><li>
-<p>Model datasets now have to_hash augmented so that it can be called without
-any arguments, in which case it yields an identity map (a hash with keys
-being primary key values and values being model instances).</p>
+<p>Model datasets now have to_hash augmented so that it can be called without any arguments, in which case it yields an identity map (a hash with keys being primary key values and values being model instances).</p>
 </li><li>
-<p>The Model.set_sti_key method was added, for easily setting up single table
-inheritance.  It should be called only in the parent class.</p>
+<p>The Model.set_sti_key method was added, for easily setting up single table inheritance.  It should be called only in the parent class.</p>
 </li><li>
-<p>Calls to def_dataset_method with a block are now cached and reapplied to
-the new dataset if set_dataset is called afterward, or in a subclass.</p>
+<p>Calls to def_dataset_method with a block are now cached and reapplied to the new dataset if set_dataset is called afterward, or in a subclass.</p>
 </li><li>
-<p>All validation methods can now be made conditional via an :if option, which
-takes either a symbol (which specifies an instance method) or a proc (which
-is instance_evaled).</p>
+<p>All validation methods can now be made conditional via an :if option, which takes either a symbol (which specifies an instance method) or a proc (which is instance_evaled).</p>
 </li><li>
-<p>Model#set and Model#update have been added back, they are now aliases of
-set_with_params and update_with_params.</p>
+<p>Model#set and Model#update have been added back, they are now aliases of set_with_params and update_with_params.</p>
 </li><li>
-<p>Models now have set_only/set_except/update_only/update_except instance
-methods that take a hash (like you would provide to set or update) and
-additional arguments specifying which columns to allow or disallow.</p>
+<p>Models now have set_only/set_except/update_only/update_except instance methods that take a hash (like you would provide to set or update) and additional arguments specifying which columns to allow or disallow.</p>
 </li><li>
-<p>Models now have a set_allowed_columns and set_restricted_columns methods,
-which operate similarly to ActiveRecord&#39;s attr_accessible and
-attr_protected.  It is recommend that you use the set_only or update_only
-instead of these methods, though.  You can ignore the allowed or restricted
-columns by using set_all or update_all.</p>
+<p>Models now have a set_allowed_columns and set_restricted_columns methods, which operate similarly to ActiveRecord&#39;s attr_accessible and attr_protected.  It is recommend that you use the set_only or update_only instead of these methods, though.  You can ignore the allowed or restricted columns by using set_all or update_all.</p>
 </li><li>
-<p>The primary key column(s) is restricted by default. To allow it to be set
-via new/set/update, use:</p>
+<p>The primary key column(s) is restricted by default. To allow it to be set via new/set/update, use:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unrestrict_primary_key</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">unrestrict_primary_key</span> <span class="ruby-comment"># Per Class</span></pre>
 </li><li>
-<p>It is now easy to override the one_to_many/many_to_many association methods
-that modify the database (add_/remove_/remove_all_), as they have been
-broken into two methods, one that handles the caching features and a
-private one (prepended with an _) that handles the database changes (and
-which you can easily override without worrying about the caching).</p>
+<p>It is now easy to override the one_to_many/many_to_many association methods that modify the database (add_/remove_/remove_all_), as they have been broken into two methods, one that handles the caching features and a private one (prepended with an _) that handles the database changes (and which you can easily override without worrying about the caching).</p>
 </li></ul>
 
 <p>Table Joining</p>
 <hr>
 
-<p>Dataset#join_table got a nice overhaul.  You can now use any join type your
-database allows:</p>
+<p>Dataset#join_table got a nice overhaul.  You can now use any join type your database allows:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:artist</span>].<span class="ruby-identifier">join_table</span>(<span class="ruby-value">:natural</span>, <span class="ruby-value">:albums</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:numbers</span>].<span class="ruby-identifier">join_table</span>(<span class="ruby-value">:cross</span>, <span class="ruby-value">:numbers</span>)</pre>
 
@@ -117,14 +90,12 @@ database allows:</p>
 <ul><li>
 <p>join_table_alias - The alias/name of the table currently being joined</p>
 </li><li>
-<p>last_join_table_alias - The alias name of the last table joined (if there
-was one) or the first FROM table (if not).</p>
+<p>last_join_table_alias - The alias name of the last table joined (if there was one) or the first FROM table (if not).</p>
 </li><li>
 <p>joins - An array of JoinClause objects for all previous joins in the query.</p>
 </li></ul>
 
-<p>Using the block you can specify conditions for complex joins without
-needing to know in advance what table aliases will be used.</p>
+<p>Using the block you can specify conditions for complex joins without needing to know in advance what table aliases will be used.</p>
 
 <p>Expanded SQL Syntax Support</p>
 <hr>
@@ -133,8 +104,7 @@ needing to know in advance what table aliases will be used.</p>
 
 <pre>{:x &gt; 1 =&gt; 1}.case(0)&#x000A;# CASE WHEN x &gt; 1 THEN 1 ELSE 0 END&#x000A;[[{:x=&gt;1}, 0], [:x &lt; 1, 1], [:x &gt; 1, 2]].case(-1)&#x000A;# CASE WHEN x = 1 THEN 0 WHEN x &lt; 1 THEN 1 WHEN x &gt; 1 THEN 2&#x000A;  ELSE -1 END</pre>
 
-<p>You should use an array instead of a hash for multiple conditions unless
-all conditions are orthogonal.</p>
+<p>You should use an array instead of a hash for multiple conditions unless all conditions are orthogonal.</p>
 
 <p>The SQL extract function has special syntax:</p>
 
@@ -147,39 +117,25 @@ all conditions are orthogonal.</p>
 <p>Other Notable Changes</p>
 <hr>
 <ul><li>
-<p>The sequel command line tool can now run migrations.  The -m option
-specifies the directory holding the migration files, and the -M options
-specifies the version to which to migrate.</p>
+<p>The sequel command line tool can now run migrations.  The -m option specifies the directory holding the migration files, and the -M options specifies the version to which to migrate.</p>
 </li><li>
 <p>The PostgreSQL adapter supports nested transactions/savepoints.</p>
 </li><li>
-<p>The schema parser now understands decimal fields, and will typecast to
-BigDecimal.</p>
+<p>The schema parser now understands decimal fields, and will typecast to BigDecimal.</p>
 </li><li>
 <p>PostgreSQL&#39;s numeric type is now recognized and returned as BigDecimal.</p>
 </li><li>
-<p>HAVING now comes before ORDER BY, which most databases seem to prefer.  If
-your database wants HAVING after ORDER BY, please let us know.</p>
+<p>HAVING now comes before ORDER BY, which most databases seem to prefer.  If your database wants HAVING after ORDER BY, please let us know.</p>
 </li><li>
-<p>Symbol#qualify now exists, to specify the table name for a given symbol,
-similar to the use of as to specify an alias.  This is mainly helpful in
-conjuction with the join_table block, as that provides the table aliases to
-use to qualify the columns inside the block.</p>
+<p>Symbol#qualify now exists, to specify the table name for a given symbol, similar to the use of as to specify an alias.  This is mainly helpful in conjuction with the join_table block, as that provides the table aliases to use to qualify the columns inside the block.</p>
 </li><li>
-<p>BitwiseMethods (&amp;, |, ^, ~, &lt;&lt;, &gt;&gt;) have been added to the
-NumericExpression class, so you can do the following:</p>
+<p>BitwiseMethods (&amp;, |, ^, ~, &lt;&lt;, &gt;&gt;) have been added to the NumericExpression class, so you can do the following:</p>
 
 <p>(x + 1) ^ 10  # SQL: (x + 1) ^ 10 ~(x + 1) # SQL: ~(x + 1)</p>
 
-<p>Usually, &amp;, |, and ~ operate in a logical manner, but for
-NumericExpressions, they take on their usual bitwise meaning, since logical
-operations only make sense for booleans.</p>
+<p>Usually, &amp;, |, and ~ operate in a logical manner, but for NumericExpressions, they take on their usual bitwise meaning, since logical operations only make sense for booleans.</p>
 </li><li>
-<p>cast_numeric and cast_string exist for Symbols, Strings, and other <a
-href="../../../classes/Sequel.html">Sequel</a> Expressions, which return
-the results casted and wrapped in either NumericExpression or
-StringExpression, so you can use the BitwiseMethods (&amp;, |, ^, ~,
-&lt;&lt;, &gt;&gt;) or StringConcatenationMethods (+) directly.</p>
+<p>cast_numeric and cast_string exist for Symbols, Strings, and other <a href="../../../classes/Sequel.html"><code>Sequel</code></a> Expressions, which return the results casted and wrapped in either NumericExpression or StringExpression, so you can use the BitwiseMethods (&amp;, |, ^, ~, &lt;&lt;, &gt;&gt;) or StringConcatenationMethods (+) directly.</p>
 </li></ul>
 
 <p># Dataset#to_hash can take only one argument, in which case it uses</p>
@@ -205,23 +161,17 @@ StringExpression, so you can use the BitwiseMethods (&amp;, |, ^, ~,
 <p>ParseTree Support Officially Deprecated</p>
 <hr>
 
-<p>The support for ParseTree-based block filters has officially been
-deprecated and will be removed in <a
-href="../../../classes/Sequel.html">Sequel</a> 2.2.  To use the expression
-filters (which don&#39;t require ParseTree) inside blocks, use:</p>
+<p>The support for ParseTree-based block filters has officially been deprecated and will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.2.  To use the expression filters (which don&#39;t require ParseTree) inside blocks, use:</p>
 
 <pre class="ruby"><span class="ruby-constant">SEQUEL_NO_PARSE_TREE</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>&#x000A;<span class="ruby-comment"># OR</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">use_parse_tree</span> = <span class="ruby-keyword">false</span></pre>
 
-<p>This is the default if ParseTree cannot be loaded.  If ParseTree can be
-loaded, it remains the default, in order not to immediately break existing
-code.</p>
+<p>This is the default if ParseTree cannot be loaded.  If ParseTree can be loaded, it remains the default, in order not to immediately break existing code.</p>
 
 <p>With this set, you can use the expression filters inside of blocks:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{((<span class="ruby-value">:x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-value">10</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">:y</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-value">:z</span>}</pre>
 
-<p>That doesn&#39;t gain you all that much, but there are some methods that
-feed block arguments into filter, such as the following:</p>
+<p>That doesn&#39;t gain you all that much, but there are some methods that feed block arguments into filter, such as the following:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">5</span>){((<span class="ruby-value">:x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-value">10</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">:y</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-value">:z</span>}</pre>
 
@@ -234,26 +184,19 @@ feed block arguments into filter, such as the following:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> = <span class="ruby-constant">DateTime</span> <span class="ruby-comment"># instead of Sequel.time_class</span></pre>
 </li><li>
-<p>Models now raise errors if you try to access a missing or restricted method
-via new/set/update, instead of just silently skipping that parameter.  To
-get the old behavior:</p>
+<p>Models now raise errors if you try to access a missing or restricted method via new/set/update, instead of just silently skipping that parameter.  To get the old behavior:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span></pre>
 </li><li>
-<p>The association_dataset method now takes into account the :eager option and
-the block argument, where it didn&#39;t before. It also takes into account
-the new :limit option.</p>
+<p>The association_dataset method now takes into account the :eager option and the block argument, where it didn&#39;t before. It also takes into account the new :limit option.</p>
 </li><li>
-<p>Association methods now raise errors in most cases if the model doesn&#39;t
-have a valid primary key.</p>
+<p>Association methods now raise errors in most cases if the model doesn&#39;t have a valid primary key.</p>
 </li><li>
-<p>Dataset#join_table used to allow a symbol as a conditions argument as a
-shortcut for a hash:</p>
+<p>Dataset#join_table used to allow a symbol as a conditions argument as a shortcut for a hash:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:artist</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span>)&#x000A;<span class="ruby-comment"># ON albums.artist_id = artists.id</span></pre>
 
-<p>With the changes to join_table, this no longer works.  It would now be
-interpreted as a boolean column:</p>
+<p>With the changes to join_table, this no longer works.  It would now be interpreted as a boolean column:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:artist</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span>)&#x000A;<span class="ruby-comment"># ON artists.id</span></pre>
 
@@ -261,8 +204,7 @@ interpreted as a boolean column:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:artist</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:albums</span>, <span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:id</span>)&#x000A;<span class="ruby-comment"># ON albums.artist_id = artists.id</span></pre>
 </li><li>
-<p>MySQL users need to be careful when upgrading, the following code will once
-again cause an error:</p>
+<p>MySQL users need to be careful when upgrading, the following code will once again cause an error:</p>
 
 <pre>DB[:artists].each{|artist| DB[:albums].each{|album| ...}}</pre>
 
@@ -270,22 +212,13 @@ again cause an error:</p>
 
 <pre>DB[:artists].all{|artist| DB[:albums].each{|album| ...}}</pre>
 
-<p>The issue is the MySQL adapter doesn&#39;t release the database connection
-while running each, and the second call to each gets the same database
-connection (while the other query is still running), because it is in the
-same thread.  Using all for the outside query ensures that the database
-connection is released before the block is called.</p>
+<p>The issue is the MySQL adapter doesn&#39;t release the database connection while running each, and the second call to each gets the same database connection (while the other query is still running), because it is in the same thread.  Using all for the outside query ensures that the database connection is released before the block is called.</p>
 
-<p>The reason for this change was that the workaround provided for MySQL could
-potentially cause issues with transactions for all adapters.</p>
+<p>The reason for this change was that the workaround provided for MySQL could potentially cause issues with transactions for all adapters.</p>
 </li><li>
-<p>String#asc and String#desc are no longer defined, as ordering on a plain
-string column should be a no-op.  They are still defined on LiteralStrings.</p>
+<p>String#asc and String#desc are no longer defined, as ordering on a plain string column should be a no-op.  They are still defined on LiteralStrings.</p>
 </li><li>
-<p>You can no longer abuse the SQL::Function syntax to use a table alias with
-specified columns (e.g. :table[:col1, :col2, :col3]) or to cast to types
-(e.g. :<a href="20">x.cast_as(:varchar</a>)).  Use a LiteralString in both
-cases.</p>
+<p>You can no longer abuse the SQL::Function syntax to use a table alias with specified columns (e.g. :table[:col1, :col2, :col3]) or to cast to types (e.g. :<a href="20">x.cast_as(:varchar</a>)).  Use a LiteralString in both cases.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -39,26 +39,16 @@ Last Update:
 <p>JRuby and Ruby 1.9 Officially Supported</p>
 <hr>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> now officially supports
-JRuby 1.1.3 and Ruby 1.9 (svn revision 18194 at least).  Using JRuby with
-the JDBC adapter, PostgreSQL, MySQL, and SQLite now enjoy almost full
-support, though not everything works the same as using the native adapter. 
-Depending on what you are doing, it may make sense to use postgres-pr on
-JRuby instead of PostgreSQL-JDBC.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now officially supports JRuby 1.1.3 and Ruby 1.9 (svn revision 18194 at least).  Using JRuby with the JDBC adapter, PostgreSQL, MySQL, and SQLite now enjoy almost full support, though not everything works the same as using the native adapter.  Depending on what you are doing, it may make sense to use postgres-pr on JRuby instead of PostgreSQL-JDBC.</p>
 
-<p>To use the new JDBC support, the database connection string you give <a
-href="../../../classes/Sequel.html">Sequel</a> is now passed directly to
-JDBC, here are a few examples:</p>
+<p>To use the new JDBC support, the database connection string you give <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now passed directly to JDBC, here are a few examples:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgresql://host/database?user=*&amp;password=*&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:mysql://host/database?user=*&amp;password=*&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite::memory:&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite:relative/path.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:sqlite:/absolute/path.db&#39;</span>)</pre>
 
 <p>Single Gem</p>
 <hr>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> is now distributed as a
-single gem named sequel, by combining the previous sequel_core and sequel
-gems.  You can still just “require &#39;sequel_core&#39;” if you don&#39;t
-want the model functionality.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> is now distributed as a single gem named sequel, by combining the previous sequel_core and sequel gems.  You can still just “require &#39;sequel_core&#39;” if you don&#39;t want the model functionality.</p>
 
 <p>Database Adapter Improvements</p>
 <hr>
@@ -67,18 +57,13 @@ want the model functionality.</p>
 </li><li>
 <p>The Oracle adapter now works with a nonstandard database port.</p>
 </li><li>
-<p>The JDBC adapter should load JDBC drivers automatically for PostgreSQL,
-MySQL, SQLite, Oracle, and MSSQL.  For PostgreSQL, MySQL, and SQLite, the
-jdbc-* gem can be used, for the others, you must have the correct .jar in
-your CLASSPATH.</p>
+<p>The JDBC adapter should load JDBC drivers automatically for PostgreSQL, MySQL, SQLite, Oracle, and MSSQL.  For PostgreSQL, MySQL, and SQLite, the jdbc-* gem can be used, for the others, you must have the correct .jar in your CLASSPATH.</p>
 </li><li>
-<p>The PostgreSQL adapter no longer raises an error when inserting records
-into a table without a primary key.</p>
+<p>The PostgreSQL adapter no longer raises an error when inserting records into a table without a primary key.</p>
 </li><li>
 <p>Database#disconnect now works for the ADO adapter.</p>
 </li><li>
-<p>The ADO adapter no longer raises an error if the dataset contains no
-records.</p>
+<p>The ADO adapter no longer raises an error if the dataset contains no records.</p>
 </li><li>
 <p>The ODBC adapter no longer errors when converting ::ODBC::Time values.</p>
 </li></ul>
@@ -86,43 +71,25 @@ records.</p>
 <p>Backwards Incompatible Changes</p>
 <hr>
 <ul><li>
-<p>Sequel::Worker has been removed.  There are no known users, and the specs
-caused problems on JRuby.</p>
+<p>Sequel::Worker has been removed.  There are no known users, and the specs caused problems on JRuby.</p>
 </li><li>
-<p>Assigning an empty string to a non-string, non-blob model attribute
-converts it to nil by default.  You can use
-“Model.typecast_empty_string_to_nil = false” to get the old behavior.  This
-should make web development with <a
-href="../../../classes/Sequel.html">Sequel</a> significantly easier,
-hopefully at no expense to other uses.</p>
+<p>Assigning an empty string to a non-string, non-blob model attribute converts it to nil by default.  You can use “Model.typecast_empty_string_to_nil = false” to get the old behavior.  This should make web development with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> significantly easier, hopefully at no expense to other uses.</p>
 </li><li>
 <p>Database.uri_to_options is now a private class method.</p>
 </li><li>
-<p>Model.create_table! now acts the same as Database.create_table!, dropping
-the table unconditionally and then creating it.  This was done for
-consistency.  If you are using Model.create_table! in production code, you
-should change it to “Model.create_table unless Model.table_exists?”,
-otherwise you risk wiping out your production data.  I recommended you use
-the migration feature instead of Model.set_schema, as that handles altering
-existing tables.</p>
+<p>Model.create_table! now acts the same as Database.create_table!, dropping the table unconditionally and then creating it.  This was done for consistency.  If you are using Model.create_table! in production code, you should change it to “Model.create_table unless Model.table_exists?”, otherwise you risk wiping out your production data.  I recommended you use the migration feature instead of Model.set_schema, as that handles altering existing tables.</p>
 </li></ul>
 
 <p>Other Notable Changes</p>
 <hr>
 <ul><li>
-<p>Using validates_length_of more than once on the same attribute with
-different options without a tag no longer causes the first use to be
-ignored.  This was a side effect of the validation tags added in 2.2.0.</p>
+<p>Using validates_length_of more than once on the same attribute with different options without a tag no longer causes the first use to be ignored.  This was a side effect of the validation tags added in 2.2.0.</p>
 </li><li>
-<p>Other than the adapters, <a href="../../../classes/Sequel.html">Sequel</a>
-now has 100% code coverage (line coverage).</p>
+<p>Other than the adapters, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has 100% code coverage (line coverage).</p>
 </li><li>
 <p>Model#set* methods now return self.</p>
 </li><li>
-<p>An integration test suite was added, testing <a
-href="../../../classes/Sequel.html">Sequel</a> against a live database with
-nothing mocked, which helped greatly when testing the new support for JDBC
-adapters.</p>
+<p>An integration test suite was added, testing <a href="../../../classes/Sequel.html"><code>Sequel</code></a> against a live database with nothing mocked, which helped greatly when testing the new support for JDBC adapters.</p>
 </li></ul>
 </div>
 <div id='context'>

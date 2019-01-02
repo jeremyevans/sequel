@@ -38,27 +38,17 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#extension and Dataset#extension have been added and make it much
-easier to use extensions that just define modules, where you previously had
-to manually extend a Database or Dataset object with the module to get the
-extension&#39;s behavior. These methods operate similarly to model plugins,
-where you just specify the extension symbol, except that you can specify
-multiple extensions at once:</p>
+<p>Database#extension and Dataset#extension have been added and make it much easier to use extensions that just define modules, where you previously had to manually extend a Database or Dataset object with the module to get the extension&#39;s behavior. These methods operate similarly to model plugins, where you just specify the extension symbol, except that you can specify multiple extensions at once:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_hstore</span>)</pre>
 
-<p>For databases, these modify the Database itself (and potentially all of its
-datasets).  Dataset#extension operates like other dataset methods,
-returning a modified clone of the dataset with the extension added:</p>
+<p>For databases, these modify the Database itself (and potentially all of its datasets).  Dataset#extension operates like other dataset methods, returning a modified clone of the dataset with the extension added:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:columns_introspection</span>)</pre>
 
-<p>Dataset#extension! has also been added for modifying the receiver instead
-of returning a clone.</p>
+<p>Dataset#extension! has also been added for modifying the receiver instead of returning a clone.</p>
 
-<p>Not all extensions are usable by Database#extension or Dataset#extension,
-the extension has to have specific support for it.  The following
-extensions support both Database#extension and Dataset#extension:</p>
+<p>Not all extensions are usable by Database#extension or Dataset#extension, the extension has to have specific support for it.  The following extensions support both Database#extension and Dataset#extension:</p>
 <ul><li>
 <p>columns_introspection</p>
 </li><li>
@@ -92,266 +82,127 @@ extensions support both Database#extension and Dataset#extension:</p>
 <p>server_block</p>
 </li></ul>
 
-<p>Any user that was loading these extensions with <a
-href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>
-and then manually extending objects with the extension&#39;s module is
-encouraged to switch to Database#extension and/or Dataset#extension.</p>
+<p>Any user that was loading these extensions with <a href="../../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a> and then manually extending objects with the extension&#39;s module is encouraged to switch to Database#extension and/or Dataset#extension.</p>
 </li><li>
-<p>Dataset join methods now respect a :qualify=&gt;:deep option to do deep
-qualification of expressions, allowing qualification of subexpressions in
-the expression tree.  This can allow you to do things like:</p>
+<p>Dataset join methods now respect a :qualify=&gt;:deep option to do deep qualification of expressions, allowing qualification of subexpressions in the expression tree.  This can allow you to do things like:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:b</span>, {<span class="ruby-value">:c</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)<span class="ruby-operator">=&gt;</span><span class="ruby-value">:d</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)},&#x000A;            <span class="ruby-value">:qualify</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:deep</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a INNER JOIN b</span>&#x000A;<span class="ruby-comment"># ON (CAST(b.c AS INTEGER) = CAST(a.d AS INTEGER))</span></pre>
 
-<p>For backwards compatibility, by default <a
-href="../../../classes/Sequel.html">Sequel</a> will only do automatic
-qualification if the arguments are simple symbols. This may change in a
-future version, if automatic qualification of only symbols is desired,
-switch to using :qualify=&gt;:symbol.</p>
+<p>For backwards compatibility, by default <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will only do automatic qualification if the arguments are simple symbols. This may change in a future version, if automatic qualification of only symbols is desired, switch to using :qualify=&gt;:symbol.</p>
 
-<p>You can also choose to do no automatic qualification using the
-:qualify=&gt;false option.</p>
+<p>You can also choose to do no automatic qualification using the :qualify=&gt;false option.</p>
 </li><li>
-<p>All of Sequel&#39;s model associations now work with key expressions that
-are not simple column references, without creating a fully custom
-association.  So you can create associations where the primary/foreign key
-values are stored in PostgreSQL array or hstore columns, for example.</p>
+<p>All of Sequel&#39;s model associations now work with key expressions that are not simple column references, without creating a fully custom association.  So you can create associations where the primary/foreign key values are stored in PostgreSQL array or hstore columns, for example.</p>
 </li><li>
-<p>The pg_array extension has now been made more generic, so that it is easy
-to support array types for any scalar type that is currently supported. 
-All scalar types that Sequel&#39;s postgres adapter supports now have
-corresponding array types supported in the pg_array extension.  So if you
-load the pg_array extension and return a date array column, the returned
-values will be arrays of ruby Date objects.</p>
+<p>The pg_array extension has now been made more generic, so that it is easy to support array types for any scalar type that is currently supported.  All scalar types that Sequel&#39;s postgres adapter supports now have corresponding array types supported in the pg_array extension.  So if you load the pg_array extension and return a date array column, the returned values will be arrays of ruby Date objects.</p>
 
-<p>Other pg_* extensions that add support for PostgreSQL-specific scalar types
-now support array versions of those types if the pg_array extension is
-loaded first.</p>
+<p>Other pg_* extensions that add support for PostgreSQL-specific scalar types now support array versions of those types if the pg_array extension is loaded first.</p>
 </li><li>
-<p>A pg_range extension has been added, making it easy to deal with PostgreSQL
-9.2+&#39;s range types.  As ruby&#39;s Range class does not support all
-PostgreSQL range type values (such as empty ranges, unbounded ranges, or
-ranges with an exlusive beginning), range types are returned as instances
-of Sequel::Postgres::PGRange, which has an API similar to Range.  You can
-turn a PGRange into a Range using PGRange#to_range, assuming that the range
-type value does not use features that are incompatible with ruby&#39;s
-Range class.</p>
+<p>A pg_range extension has been added, making it easy to deal with PostgreSQL 9.2+&#39;s range types.  As ruby&#39;s Range class does not support all PostgreSQL range type values (such as empty ranges, unbounded ranges, or ranges with an exlusive beginning), range types are returned as instances of Sequel::Postgres::PGRange, which has an API similar to Range.  You can turn a PGRange into a Range using PGRange#to_range, assuming that the range type value does not use features that are incompatible with ruby&#39;s Range class.</p>
 
-<p>The pg_range extension supports all range types supported by default in
-PostgreSQL 9.2, and makes it easy to support custom range types.</p>
+<p>The pg_range extension supports all range types supported by default in PostgreSQL 9.2, and makes it easy to support custom range types.</p>
 </li><li>
-<p>A pg_range_ops extension has been added, which adds DSL support for
-PostgreSQL range operators and functions, similar to the pg_array_ops and
-pg_hstore_ops extensions.</p>
+<p>A pg_range_ops extension has been added, which adds DSL support for PostgreSQL range operators and functions, similar to the pg_array_ops and pg_hstore_ops extensions.</p>
 </li><li>
-<p>A pg_interval extension has been added, which makes <a
-href="../../../classes/Sequel.html">Sequel</a> return PostgreSQL interval
-types as instances of ActiveSupport::Duration. This is useful if you want
-to take the interval value and use it in calculations in ruby (assuming you
-load the appropriate parts of ActiveSupport).</p>
+<p>A pg_interval extension has been added, which makes <a href="../../../classes/Sequel.html"><code>Sequel</code></a> return PostgreSQL interval types as instances of ActiveSupport::Duration. This is useful if you want to take the interval value and use it in calculations in ruby (assuming you load the appropriate parts of ActiveSupport).</p>
 </li><li>
-<p>A split_array_nil extension has been added, which changes how <a
-href="../../../classes/Sequel.html">Sequel</a> compiles IN/NOT IN
-expressions with arrays with nil values.</p>
+<p>A split_array_nil extension has been added, which changes how <a href="../../../classes/Sequel.html"><code>Sequel</code></a> compiles IN/NOT IN expressions with arrays with nil values.</p>
 
 <pre class="ruby"><span class="ruby-identifier">where</span>(<span class="ruby-value">:col</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-keyword">nil</span>])&#x000A;<span class="ruby-comment"># Default:</span>&#x000A;<span class="ruby-comment">#   WHERE (col IN (1, NULL))</span>&#x000A;<span class="ruby-comment"># with split_array_nil extension:</span>&#x000A;<span class="ruby-comment">#   WHERE ((col IN (1)) OR (col IS NULL))</span>&#x000A;&#x000A;<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:col</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-keyword">nil</span>])&#x000A;<span class="ruby-comment"># Default:</span>&#x000A;<span class="ruby-comment">#   WHERE (col NOT IN (1, NULL))</span>&#x000A;<span class="ruby-comment"># with split_array_nil extension:</span>&#x000A;<span class="ruby-comment">#   WHERE ((col NOT IN (1)) AND (col IS NOT NULL))</span></pre>
 </li><li>
-<p>The nested_attributes plugin now allows the :fields option to be a proc,
-which is called with the associated object and should return an array of
-allowable fields.</p>
+<p>The nested_attributes plugin now allows the :fields option to be a proc, which is called with the associated object and should return an array of allowable fields.</p>
 </li><li>
-<p>You can now specify the graph alias base when using eager_graph on a
-per-call basis.  Previously, it could only be set on a per association
-basis.  This is helpful if you have multiple associations to the same
-class, and are cascading the eager graph to dependent associations of that
-class for both of the associations. Previously, there was no way to
-manually give descriptive names to the tables in the cascaded associations,
-but you can now do so by passing the association as an <a
-href="../../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
-instance instead of a plain Symbol.  Here&#39;s a usage example:</p>
+<p>You can now specify the graph alias base when using eager_graph on a per-call basis.  Previously, it could only be set on a per association basis.  This is helpful if you have multiple associations to the same class, and are cascading the eager graph to dependent associations of that class for both of the associations. Previously, there was no way to manually give descriptive names to the tables in the cascaded associations, but you can now do so by passing the association as an <a href="../../../classes/Sequel/SQL/AliasedExpression.html"><code>Sequel::SQL::AliasedExpression</code></a> instance instead of a plain Symbol.  Here&#39;s a usage example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">Game</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:winner</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:players</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:winning_players</span>),&#x000A;                      <span class="ruby-value">:loser</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:players</span>.<span class="ruby-identifier">as</span>(<span class="ruby-value">:losing_players</span>)).&#x000A;      <span class="ruby-identifier">where</span>(<span class="ruby-value">:winning_players__name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;A&#39;</span>,&#x000A;            <span class="ruby-value">:losing_players__name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;B&#39;</span>)</pre>
 </li><li>
-<p>many_through_many associations now differentiate between column references
-and method references, by supporting the :left_primary_key_column and
-:right_primary_key_method options that many_to_many associations support.</p>
+<p>many_through_many associations now differentiate between column references and method references, by supporting the :left_primary_key_column and :right_primary_key_method options that many_to_many associations support.</p>
 </li><li>
-<p>Custom :eager_loader procs that accept a single hash argument now have an
-additional entry passed in the hash, :id_map, which is easier to use than
-the :key_hash entry (which is still present for backwards compatibility). 
-Anyone with custom :eager_loader procs is encouraged to switch from using
-:key_hash to :id_map.</p>
+<p>Custom :eager_loader procs that accept a single hash argument now have an additional entry passed in the hash, :id_map, which is easier to use than the :key_hash entry (which is still present for backwards compatibility).  Anyone with custom :eager_loader procs is encouraged to switch from using :key_hash to :id_map.</p>
 </li><li>
-<p>You can now override the create_table/alter_table schema generators per
-database/adapter.  This allows for database specific generator subclasses,
-which have methods for unique features for that database.</p>
+<p>You can now override the create_table/alter_table schema generators per database/adapter.  This allows for database specific generator subclasses, which have methods for unique features for that database.</p>
 </li><li>
-<p>You can now setup exclusion constraints on PostgreSQL using the
-create_table and alter_table schema generators:</p>
+<p>You can now setup exclusion constraints on PostgreSQL using the create_table and alter_table schema generators:</p>
 
 <pre>DB.create_table(:t) do&#x000A;  ...&#x000A;  exclude([[:col1, &#39;&amp;&amp;&#39;], [:col2, &#39;=&#39;]])&#x000A;  # EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)&#x000A;end</pre>
 
-<p>One common use for exclusion constraints is to make sure that no two rows
-have overlapping values/ranges/circles.</p>
+<p>One common use for exclusion constraints is to make sure that no two rows have overlapping values/ranges/circles.</p>
 </li><li>
-<p>When adding foreign key constraints to an existing table on PostgreSQL, you
-can use the :not_valid option to mark the constraint as not yet valid. 
-This will make it so that future changes to the table need to respect the
-foreign key constraint, but existing rows do not.  After cleaning up the
-existing data, you can then use the alter_table validate_constraint method
-to mark the constraint as valid.</p>
+<p>When adding foreign key constraints to an existing table on PostgreSQL, you can use the :not_valid option to mark the constraint as not yet valid.  This will make it so that future changes to the table need to respect the foreign key constraint, but existing rows do not.  After cleaning up the existing data, you can then use the alter_table validate_constraint method to mark the constraint as valid.</p>
 </li><li>
-<p>An eval_inspect extension has been added that attempts to do do the
-following for <a
-href="../../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>
-instances:</p>
+<p>An eval_inspect extension has been added that attempts to do do the following for <a href="../../../classes/Sequel/SQL/Expression.html"><code>Sequel::SQL::Expression</code></a> instances:</p>
 
 <pre class="ruby"><span class="ruby-identifier">eval</span>(<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">inspect</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">obj</span> <span class="ruby-comment"># =&gt; true</span></pre>
 
-<p>There are a lot of cases that this extension does not handle, but it does a
-decent job in most cases.  This is currently only used internally in a
-specific case in the schema_dumper extension.</p>
+<p>There are a lot of cases that this extension does not handle, but it does a decent job in most cases.  This is currently only used internally in a specific case in the schema_dumper extension.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The filter by associations support now respects the method reference vs
-column reference distinction that other parts of the association code have
-respected since 3.32.0.</p>
+<p>The filter by associations support now respects the method reference vs column reference distinction that other parts of the association code have respected since 3.32.0.</p>
 </li><li>
-<p>In the nested_attributes plugin, new one_to_one associated values are saved
-once instead of twice.  Previously it attempted to save them before they
-were associated to the current model object, which can violate some
-validations/constraints.</p>
+<p>In the nested_attributes plugin, new one_to_one associated values are saved once instead of twice.  Previously it attempted to save them before they were associated to the current model object, which can violate some validations/constraints.</p>
 </li><li>
-<p>When saving an associated object in the one_to_one association setter
-method, <a href="../../../classes/Sequel.html">Sequel</a> no longer adds an
-unnecessary filter condition when nullifying the foreign key for existing
-rows in the associated table.</p>
+<p>When saving an associated object in the one_to_one association setter method, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer adds an unnecessary filter condition when nullifying the foreign key for existing rows in the associated table.</p>
 </li><li>
-<p>The list plugin&#39;s before_create method now calls super, which fixes
-usage when other plugins that define before_create are loaded before it.</p>
+<p>The list plugin&#39;s before_create method now calls super, which fixes usage when other plugins that define before_create are loaded before it.</p>
 </li><li>
-<p>In the pg_array extension, when typecasting an Array to PGArray, a
-recursive map is done on the input array to convert each value in the input
-array to the expected type, using the typecasting method that would be used
-for the scalar value.  For example, for model objects, where ids is an
-integer array column:</p>
+<p>In the pg_array extension, when typecasting an Array to PGArray, a recursive map is done on the input array to convert each value in the input array to the expected type, using the typecasting method that would be used for the scalar value.  For example, for model objects, where ids is an integer array column:</p>
 
 <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">:ids</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-string">&#39;2&#39;</span>]).<span class="ruby-identifier">ids</span>.<span class="ruby-identifier">to_a</span> <span class="ruby-comment"># =&gt; [1, 2]</span></pre>
 </li><li>
-<p>The pg_array extension now correctly handles bytea arrays used in bound
-variables.</p>
+<p>The pg_array extension now correctly handles bytea arrays used in bound variables.</p>
 </li><li>
-<p>The pg_array extension no longer uses the JSON-based parser for floating
-point types, since it doesn&#39;t handle NaN and Infinity values correctly.</p>
+<p>The pg_array extension no longer uses the JSON-based parser for floating point types, since it doesn&#39;t handle NaN and Infinity values correctly.</p>
 </li><li>
-<p>When typecasting in the pg_array extension, PGArray values are only
-returned verbatim if they have a matching database type. Otherwise, the
-underlying array is rewrapped in a new PGArray value with the correct
-database type.</p>
+<p>When typecasting in the pg_array extension, PGArray values are only returned verbatim if they have a matching database type. Otherwise, the underlying array is rewrapped in a new PGArray value with the correct database type.</p>
 </li><li>
-<p>H2 clob types are now recognized as strings instead of blobs. Previously
-the code attempted to do this, but it didn&#39;t do so correctly.</p>
+<p>H2 clob types are now recognized as strings instead of blobs. Previously the code attempted to do this, but it didn&#39;t do so correctly.</p>
 </li><li>
-<p>The jdbc/postgres adapter now converts scalar values of the array to the
-appropriate type.  Previously, if you retrieved a date array, you got back
-a ruby array of JavaSQL::SQL::Date instances.  Now, you get back a ruby
-array of ruby Date instances.</p>
+<p>The jdbc/postgres adapter now converts scalar values of the array to the appropriate type.  Previously, if you retrieved a date array, you got back a ruby array of JavaSQL::SQL::Date instances.  Now, you get back a ruby array of ruby Date instances.</p>
 </li><li>
-<p>The schema_dumper extension now dumps migrations as change migrations,
-instead of separate up/down migrations, resulting in simpler code.</p>
+<p>The schema_dumper extension now dumps migrations as change migrations, instead of separate up/down migrations, resulting in simpler code.</p>
 </li><li>
-<p>When dumping non-integer foreign keys in the schema dumper, an explicit
-type is now used.  Previously, the column would have been dumped as an
-integer column.</p>
+<p>When dumping non-integer foreign keys in the schema dumper, an explicit type is now used.  Previously, the column would have been dumped as an integer column.</p>
 </li><li>
-<p>When dumping unsigned integer columns in the schema dumper, add a column
-&gt; 0 constraint in the dumped migration.</p>
+<p>When dumping unsigned integer columns in the schema dumper, add a column &gt; 0 constraint in the dumped migration.</p>
 </li><li>
-<p>On Microsoft SQL Server, when updating a dataset with a limit, the limit is
-now respected.</p>
+<p>On Microsoft SQL Server, when updating a dataset with a limit, the limit is now respected.</p>
 </li><li>
-<p>When emulating offset using the ROW_NUMBER window function, do not require
-that the dataset be ordered.  If an order is not provided, default to
-ordering on all of the columns in the dataset.  If you want to override the
-default order used in such a case, you need to override the
-default_offset_order method for the dataset.</p>
+<p>When emulating offset using the ROW_NUMBER window function, do not require that the dataset be ordered.  If an order is not provided, default to ordering on all of the columns in the dataset.  If you want to override the default order used in such a case, you need to override the default_offset_order method for the dataset.</p>
 </li><li>
-<p>On SQLite, casting to Date/Time/DateTime now calls an SQLite date/datetime
-function instead of using a cast, as SQLite treats such a cast as a cast to
-integer.</p>
+<p>On SQLite, casting to Date/Time/DateTime now calls an SQLite date/datetime function instead of using a cast, as SQLite treats such a cast as a cast to integer.</p>
 </li><li>
-<p>When using JRuby 1.6 in ruby 1.9 mode and typecasting a time column,
-workaround a bug where Time#nsec is 0 even though Time#usec is not.</p>
+<p>When using JRuby 1.6 in ruby 1.9 mode and typecasting a time column, workaround a bug where Time#nsec is 0 even though Time#usec is not.</p>
 </li><li>
-<p>The odbc/mssql adapter now correctly handles the case where SCOPE_IDENTITY
-returns NULL after an insert.</p>
+<p>The odbc/mssql adapter now correctly handles the case where SCOPE_IDENTITY returns NULL after an insert.</p>
 </li><li>
-<p>bin/sequel now accepts multiple -l options for logging to multiple output
-files.</p>
+<p>bin/sequel now accepts multiple -l options for logging to multiple output files.</p>
 </li><li>
-<p>In addition to Sequel&#39;s rigorous pre-push testing, <a
-href="../../../classes/Sequel.html">Sequel</a> now also uses TravisCI for
-continuous integration testing across a wider range of ruby
-implementations.</p>
+<p>In addition to Sequel&#39;s rigorous pre-push testing, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now also uses TravisCI for continuous integration testing across a wider range of ruby implementations.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The keys in the :key_hash entry passed to the :eager_loader proc are now
-method references instead of column references.  For most associations,
-they are the same thing, but for associations using the
-:key_column/:primary_key_column/:left_primary_key_column options, the
-values could be different.  If you were using one of those options and had
-a custom eager_loader, you should switch from indexing into the :key_hash
-option to just using the :id_map option.</p>
+<p>The keys in the :key_hash entry passed to the :eager_loader proc are now method references instead of column references.  For most associations, they are the same thing, but for associations using the :key_column/:primary_key_column/:left_primary_key_column options, the values could be different.  If you were using one of those options and had a custom eager_loader, you should switch from indexing into the :key_hash option to just using the :id_map option.</p>
 </li><li>
-<p>The :key_hash entry passed to the :eager_loader proc is now no longer
-guaranteed to contain key maps for associations other than the one
-currently being eagerly loaded.  Previously, it contained  key maps for all
-associations that were being eagerly loaded.  If you have a custom
-:eager_loader proc that accessed a key map for a separate association that
-was being loaded concurrently, you&#39;ll now have to build the key map
-manually if it doesn&#39;t exist.</p>
+<p>The :key_hash entry passed to the :eager_loader proc is now no longer guaranteed to contain key maps for associations other than the one currently being eagerly loaded.  Previously, it contained  key maps for all associations that were being eagerly loaded.  If you have a custom :eager_loader proc that accessed a key map for a separate association that was being loaded concurrently, you&#39;ll now have to build the key map manually if it doesn&#39;t exist.</p>
 </li><li>
-<p>If you previously explicitly specified an :eager_loader_key option when
-defining an association, you may need to change it so that it is a method
-reference instead of a column reference, or possibly just omit the option.</p>
+<p>If you previously explicitly specified an :eager_loader_key option when defining an association, you may need to change it so that it is a method reference instead of a column reference, or possibly just omit the option.</p>
 </li><li>
-<p>If you have a custom :eager_loader proc for an association where the
-default :eager_loader_key option references a method that the model does
-not respond to (or raises an exception), you may need to specify the
-:eager_loader_key=&gt;nil option.</p>
+<p>If you have a custom :eager_loader proc for an association where the default :eager_loader_key option references a method that the model does not respond to (or raises an exception), you may need to specify the :eager_loader_key=&gt;nil option.</p>
 </li><li>
-<p>In the pg_auto_parameterize extension, String values are no longer
-automatically casted to text.  This is because the default type of a string
-literal in PostgreSQL is unknown, not text.  This makes it much less likely
-to require manual casts, but has the potential to break existing code
-relying on the automatic cast to text.  As a work around, any query that
-can no longer be automatically parameterized after this query just needs to
-add manual casting to text.</p>
+<p>In the pg_auto_parameterize extension, String values are no longer automatically casted to text.  This is because the default type of a string literal in PostgreSQL is unknown, not text.  This makes it much less likely to require manual casts, but has the potential to break existing code relying on the automatic cast to text.  As a work around, any query that can no longer be automatically parameterized after this query just needs to add manual casting to text.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now raises an exception
-if you attempt to clone associations with different types, except if one
-type is one_to_many and the other is one_to_one.  Cloning from other types
-was usually a bug, and raising an exception early will make it much easier
-to track such bugs down.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an exception if you attempt to clone associations with different types, except if one type is one_to_many and the other is one_to_one.  Cloning from other types was usually a bug, and raising an exception early will make it much easier to track such bugs down.</p>
 </li><li>
-<p>When running the plugin/extension and PostgreSQL adapter specs, a json
-library is now required.</p>
+<p>When running the plugin/extension and PostgreSQL adapter specs, a json library is now required.</p>
 </li><li>
-<p>The json/postgres adapter array typecasting internals have been modified,
-if you were relying on the internals, you may need to update your code.</p>
+<p>The json/postgres adapter array typecasting internals have been modified, if you were relying on the internals, you may need to update your code.</p>
 </li><li>
-<p>The pg_array extension internals changed significantly.  PGArray no longer
-has any subclasses by default, as parsing is now done in separate objects. 
-Anyone relying on the pg_array internals will need to update their code.</p>
+<p>The pg_array extension internals changed significantly.  PGArray no longer has any subclasses by default, as parsing is now done in separate objects.  Anyone relying on the pg_array internals will need to update their code.</p>
 </li><li>
-<p>The postgres adapter no longer sets up type conversion of int2vector and
-money types, since in both cases the conversion was incorrect in most
-cases.  These types will now be returned as strings.  If you are relying on
-the conversion, you&#39;ll need to add your own custom type procs.</p>
+<p>The postgres adapter no longer sets up type conversion of int2vector and money types, since in both cases the conversion was incorrect in most cases.  These types will now be returned as strings.  If you are relying on the conversion, you&#39;ll need to add your own custom type procs.</p>
 </li></ul>
 </div>
 <div id='context'>

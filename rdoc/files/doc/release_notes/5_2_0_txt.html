@@ -38,34 +38,22 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A pg_extended_date_support extension has been added.  This extension adds
-support for infinite and BC dates/timestamps on PostgreSQL.</p>
+<p>A pg_extended_date_support extension has been added.  This extension adds support for infinite and BC dates/timestamps on PostgreSQL.</p>
 
-<p>The postgres adapter already had a convert_infinite_timestamps setting, but
-it wasn&#39;t supported in the jdbc/postgresql adapter and it didn&#39;t
-handle BC dates/timestamps.  Setting a non-default
-convert_infinite_timestamps setting in the postgres adapter will now
-automatically load the extension for backwards compatibility.</p>
+<p>The postgres adapter already had a convert_infinite_timestamps setting, but it wasn&#39;t supported in the jdbc/postgresql adapter and it didn&#39;t handle BC dates/timestamps.  Setting a non-default convert_infinite_timestamps setting in the postgres adapter will now automatically load the extension for backwards compatibility.</p>
 
-<p>The pg_extended_date_support extension by default just fixes the handling
-of BC dates/timestamps.  To get it to handle infinite timestamps, you need
-to choose the appropriate setting for your application:</p>
+<p>The pg_extended_date_support extension by default just fixes the handling of BC dates/timestamps.  To get it to handle infinite timestamps, you need to choose the appropriate setting for your application:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_extended_date_support</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">convert_infinite_timestamps</span> = <span class="ruby-value">:string</span> <span class="ruby-comment"># or :float or :nil</span></pre>
 
-<p>This extension also enables the handling of timezone offsets with seconds,
-which is not natively supported by ruby&#39;s Time class in ruby &lt;2.5.</p>
+<p>This extension also enables the handling of timezone offsets with seconds, which is not natively supported by ruby&#39;s Time class in ruby &lt;2.5.</p>
 </li></ul>
 
 <h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The jdbc/mysql adapter now handles smallint unsigned and integer unsigned
-column types where the value for the column is outside of the range of a
-Java short or integer.</p>
+<p>The jdbc/mysql adapter now handles smallint unsigned and integer unsigned column types where the value for the column is outside of the range of a Java short or integer.</p>
 </li><li>
-<p>Sequel::Model.inherited no longer modifies an existing @dataset instance
-variable if one has already been set.  This fixes a regression that was
-introduced in <a href="../../../classes/Sequel.html">Sequel</a> 5.0.0.</p>
+<p>Sequel::Model.inherited no longer modifies an existing @dataset instance variable if one has already been set.  This fixes a regression that was introduced in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.0.0.</p>
 </li></ul>
 </div>
 <div id='context'>

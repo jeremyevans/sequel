@@ -56,15 +56,14 @@ Sequel::Postgres::InetOpMethods
 </div>
 <div class='description'>
 
-<p>Wrap the receiver in an <a href="InetOp.html">InetOp</a> so you can easily
-use the PostgreSQL inet functions and operators with it.</p>
+<p>Wrap the receiver in an <a href="InetOp.html"><code>InetOp</code></a> so you can easily use the PostgreSQL inet functions and operators with it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_inet-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_inet-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 162</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_inet</span>&#x000A;  <span class="ruby-constant">InetOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_inet-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb</span>&#x000A;<span class="line-num">163</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_inet</span>&#x000A;<span class="line-num">164</span>   <span class="ruby-constant">InetOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">165</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

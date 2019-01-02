@@ -36,10 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_enum extension adds support for <a
-href="../../../../classes/Sequel.html">Sequel</a> to handle
-PostgreSQL&#39;s enum types.  To use this extension, first load it into
-your Database instance:</p>
+<p>The pg_enum extension adds support for <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> to handle PostgreSQL&#39;s enum types.  To use this extension, first load it into your Database instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_enum</span></pre>
 
@@ -59,32 +56,25 @@ your Database instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_enum</span>(<span class="ruby-value">:enum_type_name</span>)</pre>
 
-<p>Just like any user-created type, after creating the type, you can create
-tables that have a column of that type:</p>
+<p>Just like any user-created type, after creating the type, you can create tables that have a column of that type:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">enum_type_name</span> <span class="ruby-value">:column_name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>When parsing the schema, enum types are recognized, and available values
-returned in the schema hash:</p>
+<p>When parsing the schema, enum types are recognized, and available values returned in the schema hash:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(<span class="ruby-value">:table_name</span>)&#x000A;[[<span class="ruby-value">:column_name</span>, {<span class="ruby-value">:type</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:enum</span>, <span class="ruby-value">:enum_values</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-string">&#39;value1&#39;</span>, <span class="ruby-string">&#39;value2&#39;</span>]}]]</pre>
 
-<p>If the pg_array extension is used, arrays of enums are returned as a
-PGArray:</p>
+<p>If the pg_array extension is used, arrays of enums are returned as a PGArray:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table_name</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">column</span> <span class="ruby-value">:column_name</span>, <span class="ruby-string">&#39;enum_type_name[]&#39;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table_name</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:column_name</span>)&#x000A;<span class="ruby-comment"># [&#39;value1&#39;, &#39;value2&#39;]</span></pre>
 
-<p>If the migration extension is loaded before this one (the order is
-important), you can use create_enum in a reversible migration:</p>
+<p>If the migration extension is loaded before this one (the order is important), you can use create_enum in a reversible migration:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_enum</span>(<span class="ruby-value">:enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>Finally, typecasting for enums is setup to cast to strings, which allows
-you to use symbols in your model code.  Similar, you can provide the enum
-values as symbols when creating enums using create_enum or add_enum_value.</p>
+<p>Finally, typecasting for enums is setup to cast to strings, which allows you to use symbols in your model code.  Similar, you can provide the enum values as symbols when creating enums using create_enum or add_enum_value.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Postgres/EnumDatabaseMethods.html">Sequel::Postgres::EnumDatabaseMethods</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/EnumDatabaseMethods.html"><code>Sequel::Postgres::EnumDatabaseMethods</code></a></p>
 </div>
 <div id='context'>
 </div>

@@ -57,15 +57,14 @@ Sequel::Plugins::PgRow::DatabaseMethods
 </div>
 <div class='description'>
 
-<p>Handle <a href="../../Model.html">Sequel::Model</a> instances in bound
-variables.</p>
+<p>Handle <a href="../../Model.html"><code>Sequel::Model</code></a> instances in bound variables.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-bound_variable_arg-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb, line 7</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;    <span class="ruby-node">&quot;(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(&#39;,&#39;)})&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-bound_variable_arg-source'>   <span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb</span>&#x000A;<span class="line-num"> 8</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;<span class="line-num"> 9</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;<span class="line-num">10</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="line-num">11</span>     <span class="ruby-node">&quot;(#{arg.values.values_at(*arg.columns).map{|v| bound_variable_array(v)}.join(&#39;,&#39;)})&quot;</span>&#x000A;<span class="line-num">12</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">13</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">14</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">15</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-row_type'>
@@ -77,15 +76,14 @@ variables.</p>
 </div>
 <div class='description'>
 
-<p>If a <a href="../../Model.html">Sequel::Model</a> instance is given, return
-it as-is instead of attempting to convert it.</p>
+<p>If a <a href="../../Model.html"><code>Sequel::Model</code></a> instance is given, return it as-is instead of attempting to convert it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-row_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-row_type-source'><span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">row_type</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-row_type-source'>   <span class="ruby-comment"># File lib/sequel/extensions/_model_pg_row.rb</span>&#x000A;<span class="line-num">19</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">row_type</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">20</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="line-num">21</span>     <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">22</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">23</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">24</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">25</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

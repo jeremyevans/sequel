@@ -46,12 +46,6 @@ Sequel::Plugins::HookClassMethods::ClassMethods
 </div>
 <div id='context'>
 </div>
-<div id='class-list'>
-<h2>Classes and Modules</h2>
-<ol>
-<li><a href="ClassMethods/Model.html">Sequel::Plugins::HookClassMethods::ClassMethods::Model</a></li>
-</ol>
-</div>
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
@@ -71,7 +65,7 @@ Sequel::Plugins::HookClassMethods::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@hooks</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">51</span>   <span class="ruby-ivar">@hooks</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-has_hooks-3F'>
@@ -90,7 +84,7 @@ Sequel::Plugins::HookClassMethods::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-has_hooks-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-has_hooks-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 55</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_hooks?</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-operator">!</span><span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-has_hooks-3F-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">56</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">has_hooks?</span>(<span class="ruby-identifier">hook</span>)&#x000A;<span class="line-num">57</span>   <span class="ruby-operator">!</span><span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hook_blocks'>
@@ -109,7 +103,7 @@ Sequel::Plugins::HookClassMethods::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hook_blocks-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hook_blocks-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;  <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hook_blocks-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;<span class="line-num">62</span>   <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

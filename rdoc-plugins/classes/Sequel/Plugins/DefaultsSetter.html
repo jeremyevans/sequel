@@ -35,9 +35,7 @@ Sequel::Plugins::DefaultsSetter
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The defaults_setter plugin makes the column getter methods return the
-default values for new objects, if the values have not already been set. 
-Example:</p>
+<p>The defaults_setter plugin makes the column getter methods return the default values for new objects, if the values have not already been set.  Example:</p>
 
 <pre class="ruby"><span class="ruby-comment"># column a default NULL</span>&#x000A;<span class="ruby-comment"># column b default 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; nil</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-comment"># =&gt; 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-comment"># =&gt; 3</span></pre>
 
@@ -57,8 +55,7 @@ Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:defaults_setter</span>, <span class="ruby-value">cache:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span>.<span class="ruby-identifier">equal?</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span>) <span class="ruby-comment"># =&gt; false</span></pre>
 
-<p>Note that if the cache is turned on, the cached values are stored in the
-values hash:</p>
+<p>Note that if the cache is turned on, the cached values are stored in the values hash:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:defaults_setter</span>, <span class="ruby-value">cache:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># =&gt; {}</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># =&gt; {:a =&gt; Date.today}</span></pre>
 
@@ -104,7 +101,7 @@ values hash:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">set_default_values</span>&#x000A;    <span class="ruby-ivar">@cache_default_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cache</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:cache</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">57</span>     <span class="ruby-identifier">set_default_values</span>&#x000A;<span class="line-num">58</span>     <span class="ruby-ivar">@cache_default_values</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:cache</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:cache</span>)&#x000A;<span class="line-num">59</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

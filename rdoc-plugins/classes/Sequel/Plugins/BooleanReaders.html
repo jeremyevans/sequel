@@ -35,12 +35,7 @@ Sequel::Plugins::BooleanReaders
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The boolean_readers plugin allows for the creation of attribute? methods
-for boolean columns, which provides a nicer API.  By default, the accessors
-are created for all columns of type :boolean.  However, you can provide a
-block to the plugin to change the criteria used to determine if a column is
-boolean.  The block is yielded with the column symbol for each column in
-the models dataset.</p>
+<p>The boolean_readers plugin allows for the creation of attribute? methods for boolean columns, which provides a nicer API.  By default, the accessors are created for all columns of type :boolean.  However, you can provide a block to the plugin to change the criteria used to determine if a column is boolean.  The block is yielded with the column symbol for each column in the models dataset.</p>
 
 <p>Usage:</p>
 
@@ -72,8 +67,7 @@ the models dataset.</p>
 <td class='context-item-value'>lambda{|c| s = db_schema[c] and s[:type] == :boolean}</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Default proc for determining if given column is a boolean, which just
-checks that the :type is boolean.</p>
+<p>Default proc for determining if given column is a boolean, which just checks that the :type is boolean.</p>
 </td>
 </tr>
 </table>
@@ -90,16 +84,14 @@ checks that the :type is boolean.</p>
 </div>
 <div class='description'>
 
-<p>Add the boolean_attribute? class method to the model, and create attribute?
-boolean reader methods for the class&#39;s columns if the class has a
-dataset.</p>
+<p>Add the boolean_attribute? class method to the model, and create attribute? boolean reader methods for the class&#39;s columns if the class has a dataset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/boolean_readers.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_attribute?</span>, <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_BOOLEAN_ATTRIBUTE_PROC</span>))&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-value">:create_boolean_readers</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/boolean_readers.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">32</span>     <span class="ruby-identifier">define_singleton_method</span>(<span class="ruby-value">:boolean_attribute?</span>, <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_BOOLEAN_ATTRIBUTE_PROC</span>))&#x000A;<span class="line-num">33</span>     <span class="ruby-identifier">send</span>(<span class="ruby-value">:create_boolean_readers</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -35,14 +35,9 @@ Sequel::Plugins::SplitValues
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The split_values plugin splits the values hash retreived from the database,
-and moves keys from the values hash that are not columns in the model&#39;s
-dataset to a separate hash.  This makes it so the values hash only stores
-columns from the model&#39;s dataset.</p>
+<p>The split_values plugin splits the values hash retreived from the database, and moves keys from the values hash that are not columns in the model&#39;s dataset to a separate hash.  This makes it so the values hash only stores columns from the model&#39;s dataset.</p>
 
-<p>Among other things, this allows you to save model objects even if they were
-retrieved with additional columns, and have equality comparisons with other
-instances not care about non-column values.</p>
+<p>Among other things, this allows you to save model objects even if they were retrieved with additional columns, and have equality comparisons with other instances not care about non-column values.</p>
 
 <p>Example:</p>
 

@@ -38,29 +38,20 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>An mssql_optimistic_locking plugin has been added.  This is similar to the
-regular optimistic_locking plugin, but instead of using an integer lock
-column, it uses a timestamp/rowversion lock column.</p>
+<p>An mssql_optimistic_locking plugin has been added.  This is similar to the regular optimistic_locking plugin, but instead of using an integer lock column, it uses a timestamp/rowversion lock column.</p>
 </li><li>
-<p>Database#create_table with the :temp=&gt;true option on PostgreSQL now
-supports an :on_commit option.  This option can be set to :drop or
-:delete_rows to either drop or empty the temporary table on transaction
-commit.</p>
+<p>Database#create_table with the :temp=&gt;true option on PostgreSQL now supports an :on_commit option.  This option can be set to :drop or :delete_rows to either drop or empty the temporary table on transaction commit.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset#insert no longer errors on PostgreSQL if the related table is a
-placeholder literal string.</p>
+<p>Dataset#insert no longer errors on PostgreSQL if the related table is a placeholder literal string.</p>
 </li><li>
-<p>Unique constraints are now copied when emulating alter_table operations on
-SQLite.</p>
+<p>Unique constraints are now copied when emulating alter_table operations on SQLite.</p>
 </li><li>
-<p>Clob column values are no longer returned as SQL::Blob instances by the db2
-and ibmdb adapters unless use_clob_as_blob is true.</p>
+<p>Clob column values are no longer returned as SQL::Blob instances by the db2 and ibmdb adapters unless use_clob_as_blob is true.</p>
 </li><li>
-<p>SQL::Blob objects now work correctly as prepared statement arguments in the
-jdbc/db2 adapter if use_clob_as_blob is false.</p>
+<p>SQL::Blob objects now work correctly as prepared statement arguments in the jdbc/db2 adapter if use_clob_as_blob is false.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -69,10 +60,7 @@ jdbc/db2 adapter if use_clob_as_blob is false.</p>
 </li><li>
 <p>On DB2, use_clob_as_blob now defaults to false instead of true.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses RubyForge.
-The <a href="../../../classes/Sequel.html">Sequel</a> website is now
-located at <a
-href="http://sequel.jeremyevans.net">sequel.jeremyevans.net</a>.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer uses RubyForge. The <a href="../../../classes/Sequel.html"><code>Sequel</code></a> website is now located at <a target="_top" href="http://sequel.jeremyevans.net">sequel.jeremyevans.net</a>.</p>
 </li></ul>
 </div>
 <div id='context'>

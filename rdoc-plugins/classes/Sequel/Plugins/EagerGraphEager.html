@@ -35,33 +35,23 @@ Sequel::Plugins::EagerGraphEager
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The eager_graph_eager plugin allows for chaining eager loads after
-eager_graph loads.  Given the following model associations:</p>
+<p>The eager_graph_eager plugin allows for chaining eager loads after eager_graph loads.  Given the following model associations:</p>
 
 <pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span></pre>
 
-<p>Let&#39;s say you wanted to return bands ordered by album name, and eagerly
-load those albums, you can do that using:</p>
+<p>Let&#39;s say you wanted to return bands ordered by album name, and eagerly load those albums, you can do that using:</p>
 
 <pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
 
-<p>Let&#39;s say you also wanted to eagerly load the tracks for each album.
-You could just add them to the eager_graph call:</p>
+<p>Let&#39;s say you also wanted to eagerly load the tracks for each album. You could just add them to the eager_graph call:</p>
 
 <pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">albums:</span> <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
 
-<p>However, the bloats the result set, and you aren&#39;t ordering by the
-track information, so a join is not required.  The eager_graph_eager plugin
-allows you to specify that the tracks be eagerly loaded in a separate query
-after the eager_graph load of albums:</p>
+<p>However, the bloats the result set, and you aren&#39;t ordering by the track information, so a join is not required.  The eager_graph_eager plugin allows you to specify that the tracks be eagerly loaded in a separate query after the eager_graph load of albums:</p>
 
 <pre class="ruby"><span class="ruby-constant">Band</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-value">:albums</span>).<span class="ruby-identifier">eager_graph_eager</span>([<span class="ruby-value">:albums</span>], <span class="ruby-value">:tracks</span>).<span class="ruby-identifier">order</span>{<span class="ruby-identifier">albums</span>[<span class="ruby-value">:name</span>]}</pre>
 
-<p><code>Dataset#eager_graph_eager</code>&#39;s first argument is a dependency
-chain, specified as an array of symbols.  This specifies the point at which
-to perform the eager load. The remaining arguments are arguments that could
-be passed to Dataset#eager to specify what dependent associations should be
-loaded at that point.</p>
+<p><code>Dataset#eager_graph_eager</code>&#39;s first argument is a dependency chain, specified as an array of symbols.  This specifies the point at which to perform the eager load. The remaining arguments are arguments that could be passed to Dataset#eager to specify what dependent associations should be loaded at that point.</p>
 
 <p>If you also have the following model association:</p>
 

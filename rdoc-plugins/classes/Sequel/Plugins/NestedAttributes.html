@@ -35,15 +35,11 @@ Sequel::Plugins::NestedAttributes
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The nested_attributes plugin allows you to create, update, and delete
-associated objects directly by calling a method on the current object.
-Nested attributes are defined using the nested_attributes class method:</p>
+<p>The nested_attributes plugin allows you to create, update, and delete associated objects directly by calling a method on the current object. Nested attributes are defined using the nested_attributes class method:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:nested_attributes</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span></pre>
 
-<p>The nested_attributes call defines a single method,
-<code><em>association</em>_attributes=</code>, (e.g.
-<code>albums_attributes=</code>).  So if you have an Artist instance:</p>
+<p>The nested_attributes call defines a single method, <code><em>association</em>_attributes=</code>, (e.g. <code>albums_attributes=</code>).  So if you have an Artist instance:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;YJM&#39;</span>)</pre>
 
@@ -51,47 +47,29 @@ Nested attributes are defined using the nested_attributes class method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">albums_attributes</span> = [{<span class="ruby-value">name:</span> <span class="ruby-string">&#39;RF&#39;</span>}, {<span class="ruby-value">name:</span> <span class="ruby-string">&#39;MO&#39;</span>}]</pre>
 
-<p>Note that this doesn&#39;t send any queries to the database yet.  That
-doesn&#39;t happen till you save the object:</p>
+<p>Note that this doesn&#39;t send any queries to the database yet.  That doesn&#39;t happen till you save the object:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">save</span></pre>
 
-<p>That will save the artist first, and then save both albums.  If either the
-artist is invalid or one of the albums is invalid, none of the objects will
-be saved to the database, and all related validation errors will be
-available in the artist&#39;s validation errors.</p>
+<p>That will save the artist first, and then save both albums.  If either the artist is invalid or one of the albums is invalid, none of the objects will be saved to the database, and all related validation errors will be available in the artist&#39;s validation errors.</p>
 
-<p>In addition to creating new associated objects, you can also update
-existing associated objects.  You just need to make sure that the primary
-key field is filled in for the associated object:</p>
+<p>In addition to creating new associated objects, you can also update existing associated objects.  You just need to make sure that the primary key field is filled in for the associated object:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:albums_attributes</span> <span class="ruby-operator">=&gt;</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">name:</span> <span class="ruby-string">&#39;T&#39;</span>}])</pre>
 
-<p>Since the primary key field is filled in, the plugin will update the album
-with id 1 instead of creating a new album.</p>
+<p>Since the primary key field is filled in, the plugin will update the album with id 1 instead of creating a new album.</p>
 
-<p>If you would like to delete the associated object instead of updating it,
-you add a _delete entry to the hash, and also pass the :destroy option when
-calling <code>nested_attributes</code>:</p>
+<p>If you would like to delete the associated object instead of updating it, you add a _delete entry to the hash, and also pass the :destroy option when calling <code>nested_attributes</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">destroy:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:albums_attributes</span> <span class="ruby-operator">=&gt;</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_delete:</span> <span class="ruby-keyword">true</span>}])</pre>
 
-<p>This will delete the related associated object from the database.  If you
-want to leave the associated object in the database, but just remove it
-from the association, add a _remove entry in the hash, and also pass the
-:remove option when calling <code>nested_attributes</code>:</p>
+<p>This will delete the related associated object from the database.  If you want to leave the associated object in the database, but just remove it from the association, add a _remove entry in the hash, and also pass the :remove option when calling <code>nested_attributes</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> <span class="ruby-value">:albums</span>, <span class="ruby-value">remove:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:albums_attributes</span> <span class="ruby-operator">=&gt;</span> [{<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">_remove:</span> <span class="ruby-keyword">true</span>}])</pre>
 
-<p>The above example was for a one_to_many association, but the plugin also
-works similarly for other association types.  For one_to_one and
-many_to_one associations, you need to pass a single hash instead of an
-array of hashes.</p>
+<p>The above example was for a one_to_many association, but the plugin also works similarly for other association types.  For one_to_one and many_to_one associations, you need to pass a single hash instead of an array of hashes.</p>
 
-<p>This plugin is mainly designed to make it easy to use on html forms, where
-a single form submission can contained nested attributes (and even nested
-attributes of those attributes). You just need to name your form inputs
-correctly:</p>
+<p>This plugin is mainly designed to make it easy to use on html forms, where a single form submission can contained nested attributes (and even nested attributes of those attributes). You just need to name your form inputs correctly:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span>[<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-identifier">artist</span>[<span class="ruby-identifier">albums_attributes</span>][<span class="ruby-value">0</span>][<span class="ruby-value">:name</span>]&#x000A;<span class="ruby-identifier">artist</span>[<span class="ruby-identifier">albums_attributes</span>][<span class="ruby-value">1</span>][<span class="ruby-value">:id</span>]&#x000A;<span class="ruby-identifier">artist</span>[<span class="ruby-identifier">albums_attributes</span>][<span class="ruby-value">1</span>][<span class="ruby-value">:name</span>]</pre>
 
@@ -103,8 +81,7 @@ correctly:</p>
 
 <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>(<span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-node">%w&#39;name albums_artists&#39;</span>)</pre>
 
-<p>To save changes to the artist, create the first album and associate it to
-the artist, and update the other existing associated album.</p>
+<p>To save changes to the artist, create the first album and associate it to the artist, and update the other existing associated album.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -141,7 +118,7 @@ the artist, and update the other existing associated album.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:validate_associated</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">80</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:validate_associated</span>)&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

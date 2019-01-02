@@ -118,8 +118,7 @@ Sequel::MySQL::DatabaseMethods
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>Set the default charset used for CREATE TABLE.  You can pass the :charset
-option to create_table to override this setting.</p>
+<p>Set the default charset used for CREATE TABLE.  You can pass the :charset option to create_table to override this setting.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -128,8 +127,7 @@ option to create_table to override this setting.</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>Set the default collation used for CREATE TABLE.  You can pass the :collate
-option to create_table to override this setting.</p>
+<p>Set the default collation used for CREATE TABLE.  You can pass the :collate option to create_table to override this setting.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -138,8 +136,7 @@ option to create_table to override this setting.</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>Set the default engine used for CREATE TABLE.  You can pass the :engine
-option to create_table to override this setting.</p>
+<p>Set the default engine used for CREATE TABLE.  You can pass the :engine option to create_table to override this setting.</p>
 </td>
 </tr>
 </table>
@@ -156,15 +153,14 @@ option to create_table to override this setting.</p>
 </div>
 <div class='description'>
 
-<p>MySQL&#39;s cast rules are restrictive in that you can&#39;t just cast to
-any possible database type.</p>
+<p>MySQL&#39;s cast rules are restrictive in that you can&#39;t just cast to any possible database type.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cast_type_literal-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cast_type_literal-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_type_literal</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-constant">CAST_TYPES</span>[<span class="ruby-identifier">type</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cast_type_literal-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cast_type_literal</span>(<span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-constant">CAST_TYPES</span>[<span class="ruby-identifier">type</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-commit_prepared_transaction'>
@@ -181,7 +177,7 @@ any possible database type.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-commit_prepared_transaction-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-commit_prepared_transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA COMMIT #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-commit_prepared_transaction-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">commit_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">43</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA COMMIT #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-database_type'>
@@ -198,7 +194,7 @@ any possible database type.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-database_type-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>&#x000A;  <span class="ruby-value">:mysql</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-database_type-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_type</span>&#x000A;<span class="line-num">47</span>   <span class="ruby-value">:mysql</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-foreign_key_list'>
@@ -210,15 +206,14 @@ any possible database type.</p>
 </div>
 <div class='description'>
 
-<p>Use the Information Schema&#39;s KEY_COLUMN_USAGE table to get basic
-information on foreign key columns, but include the constraint name.</p>
+<p>Use the Information Schema&#39;s KEY_COLUMN_USAGE table to get basic information on foreign key columns, but include the constraint name.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-foreign_key_list-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-foreign_key_list-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">metadata_dataset</span>.&#x000A;    <span class="ruby-identifier">from</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:INFORMATION_SCHEMA</span>][<span class="ruby-value">:KEY_COLUMN_USAGE</span>]).&#x000A;    <span class="ruby-identifier">where</span>(<span class="ruby-value">:TABLE_NAME</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>), <span class="ruby-value">:TABLE_SCHEMA</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:DATABASE</span>)).&#x000A;    <span class="ruby-identifier">exclude</span>(<span class="ruby-value">:CONSTRAINT_NAME</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;PRIMARY&#39;</span>).&#x000A;    <span class="ruby-identifier">exclude</span>(<span class="ruby-value">:REFERENCED_TABLE_NAME</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>).&#x000A;    <span class="ruby-identifier">order</span>(<span class="ruby-value">:CONSTRAINT_NAME</span>, <span class="ruby-value">:POSITION_IN_UNIQUE_CONSTRAINT</span>).&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:CONSTRAINT_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:name</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:COLUMN_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:column</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:REFERENCED_TABLE_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:table</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:REFERENCED_COLUMN_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:key</span>))&#x000A;  &#x000A;  <span class="ruby-identifier">h</span> = {}&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]]&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])&#x000A;      <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:key</span>])&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]] = {<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]), <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])], <span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>]), <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:key</span>])]}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-foreign_key_list-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">im</span> = <span class="ruby-identifier">input_identifier_meth</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">metadata_dataset</span>.&#x000A;<span class="line-num">57</span>     <span class="ruby-identifier">from</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:INFORMATION_SCHEMA</span>][<span class="ruby-value">:KEY_COLUMN_USAGE</span>]).&#x000A;<span class="line-num">58</span>     <span class="ruby-identifier">where</span>(<span class="ruby-value">:TABLE_NAME</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">im</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>), <span class="ruby-value">:TABLE_SCHEMA</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:DATABASE</span>)).&#x000A;<span class="line-num">59</span>     <span class="ruby-identifier">exclude</span>(<span class="ruby-value">:CONSTRAINT_NAME</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;PRIMARY&#39;</span>).&#x000A;<span class="line-num">60</span>     <span class="ruby-identifier">exclude</span>(<span class="ruby-value">:REFERENCED_TABLE_NAME</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">nil</span>).&#x000A;<span class="line-num">61</span>     <span class="ruby-identifier">order</span>(<span class="ruby-value">:CONSTRAINT_NAME</span>, <span class="ruby-value">:POSITION_IN_UNIQUE_CONSTRAINT</span>).&#x000A;<span class="line-num">62</span>     <span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:CONSTRAINT_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:name</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:COLUMN_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:column</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:REFERENCED_TABLE_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:table</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:REFERENCED_COLUMN_NAME</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:key</span>))&#x000A;<span class="line-num">63</span>   &#x000A;<span class="line-num">64</span>   <span class="ruby-identifier">h</span> = {}&#x000A;<span class="line-num">65</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">66</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]]&#x000A;<span class="line-num">67</span>       <span class="ruby-identifier">r</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])&#x000A;<span class="line-num">68</span>       <span class="ruby-identifier">r</span>[<span class="ruby-value">:key</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:key</span>])&#x000A;<span class="line-num">69</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">70</span>       <span class="ruby-identifier">h</span>[<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]] = {<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:name</span>]), <span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:column</span>])], <span class="ruby-value">:table</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:table</span>]), <span class="ruby-value">:key</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">row</span>[<span class="ruby-value">:key</span>])]}&#x000A;<span class="line-num">71</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">72</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">73</span>   <span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -235,7 +230,7 @@ information on foreign key columns, but include the constraint name.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-identifier">mariadb?</span>&#x000A;  <span class="ruby-identifier">supports_timestamp_usecs?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">76</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">77</span>   <span class="ruby-identifier">server_version</span>&#x000A;<span class="line-num">78</span>   <span class="ruby-identifier">mariadb?</span>&#x000A;<span class="line-num">79</span>   <span class="ruby-identifier">supports_timestamp_usecs?</span>&#x000A;<span class="line-num">80</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-global_index_namespace-3F'>
@@ -247,14 +242,14 @@ information on foreign key columns, but include the constraint name.</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> namespaces indexes per table.</p>
+<p><a href="../MySQL.html"><code>MySQL</code></a> namespaces indexes per table.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-global_index_namespace-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-global_index_namespace-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">global_index_namespace?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-global_index_namespace-3F-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">global_index_namespace?</span>&#x000A;<span class="line-num">85</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-indexes'>
@@ -268,15 +263,14 @@ information on foreign key columns, but include the constraint name.</p>
 
 <p>Use SHOW INDEX FROM to get the index information for the table.</p>
 
-<p>By default partial indexes are not included, you can use the option
-:partial to override this.</p>
+<p>By default partial indexes are not included, you can use the option :partial to override this.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-indexes-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">remove_indexes</span> = []&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table</span>)&#x000A;&#x000A;  <span class="ruby-identifier">table</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;SHOW INDEX FROM #{literal(table)}&quot;</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">schema</span>&#x000A;    <span class="ruby-identifier">schema</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">schema</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot; FROM #{literal(schema)}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">name</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">:Key_name</span>]&#x000A;    <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;PRIMARY&#39;</span>&#x000A;    <span class="ruby-identifier">name</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">name</span>)&#x000A;    <span class="ruby-identifier">remove_indexes</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:Sub_part</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:partial</span>]&#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">name</span>] <span class="ruby-operator">||=</span> {<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:Non_unique</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-identifier">i</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:Column_name</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">remove_indexes</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-indexes-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num"> 93</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num"> 94</span>   <span class="ruby-identifier">indexes</span> = {}&#x000A;<span class="line-num"> 95</span>   <span class="ruby-identifier">remove_indexes</span> = []&#x000A;<span class="line-num"> 96</span>   <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;<span class="line-num"> 97</span>   <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-identifier">schema_and_table</span>(<span class="ruby-identifier">table</span>)&#x000A;<span class="line-num"> 98</span> &#x000A;<span class="line-num"> 99</span>   <span class="ruby-identifier">table</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>)&#x000A;<span class="line-num">100</span>   <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;SHOW INDEX FROM #{literal(table)}&quot;</span>&#x000A;<span class="line-num">101</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">schema</span>&#x000A;<span class="line-num">102</span>     <span class="ruby-identifier">schema</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">schema</span>)&#x000A;<span class="line-num">103</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">+=</span> <span class="ruby-node">&quot; FROM #{literal(schema)}&quot;</span>&#x000A;<span class="line-num">104</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">105</span> &#x000A;<span class="line-num">106</span>   <span class="ruby-identifier">metadata_dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-identifier">sql</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">107</span>     <span class="ruby-identifier">name</span> = <span class="ruby-identifier">r</span>[<span class="ruby-value">:Key_name</span>]&#x000A;<span class="line-num">108</span>     <span class="ruby-keyword">next</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;PRIMARY&#39;</span>&#x000A;<span class="line-num">109</span>     <span class="ruby-identifier">name</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">110</span>     <span class="ruby-identifier">remove_indexes</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>[<span class="ruby-value">:Sub_part</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:partial</span>]&#x000A;<span class="line-num">111</span>     <span class="ruby-identifier">i</span> = <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">name</span>] <span class="ruby-operator">||=</span> {<span class="ruby-value">:columns</span><span class="ruby-operator">=&gt;</span>[], <span class="ruby-value">:unique</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:Non_unique</span>] <span class="ruby-operator">!=</span> <span class="ruby-value">1</span>}&#x000A;<span class="line-num">112</span>     <span class="ruby-identifier">i</span>[<span class="ruby-value">:columns</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:Column_name</span>])&#x000A;<span class="line-num">113</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">114</span>   <span class="ruby-identifier">indexes</span>.<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">remove_indexes</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="line-num">115</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-mariadb-3F'>
@@ -288,14 +282,14 @@ information on foreign key columns, but include the constraint name.</p>
 </div>
 <div class='description'>
 
-<p>Whether the database is MariaDB and not <a href="../MySQL.html">MySQL</a></p>
+<p>Whether the database is MariaDB and not <a href="../MySQL.html"><code>MySQL</code></a></p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-mariadb-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-mariadb-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">mariadb?</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@is_mariadb</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@is_mariadb</span>)&#x000A;  <span class="ruby-ivar">@is_mariadb</span> = <span class="ruby-operator">!</span>(<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT version()&#39;</span>).<span class="ruby-identifier">single_value!</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp">/mariadb/i</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-mariadb-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">122</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">mariadb?</span>&#x000A;<span class="line-num">123</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@is_mariadb</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@is_mariadb</span>)&#x000A;<span class="line-num">124</span>   <span class="ruby-ivar">@is_mariadb</span> = <span class="ruby-operator">!</span>(<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT version()&#39;</span>).<span class="ruby-identifier">single_value!</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp">/mariadb/i</span>)&#x000A;<span class="line-num">125</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-rollback_prepared_transaction'>
@@ -312,7 +306,7 @@ information on foreign key columns, but include the constraint name.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-rollback_prepared_transaction-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-rollback_prepared_transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA ROLLBACK #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-rollback_prepared_transaction-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">rollback_prepared_transaction</span>(<span class="ruby-identifier">transaction_id</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">118</span>   <span class="ruby-identifier">run</span>(<span class="ruby-node">&quot;XA ROLLBACK #{literal(transaction_id)}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-server_version'>
@@ -324,15 +318,14 @@ information on foreign key columns, but include the constraint name.</p>
 </div>
 <div class='description'>
 
-<p>Get version of <a href="../MySQL.html">MySQL</a> server, used for
-determined capabilities.</p>
+<p>Get version of <a href="../MySQL.html"><code>MySQL</code></a> server, used for determined capabilities.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-server_version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 127</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT version()&#39;</span>).<span class="ruby-identifier">single_value!</span>)&#x000A;    (<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span>) <span class="ruby-operator">+</span> (<span class="ruby-identifier">m</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_i</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-server_version-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>&#x000A;<span class="line-num">129</span>   <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">130</span>     <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT version()&#39;</span>).<span class="ruby-identifier">single_value!</span>)&#x000A;<span class="line-num">131</span>     (<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span>) <span class="ruby-operator">+</span> (<span class="ruby-identifier">m</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_i</span>&#x000A;<span class="line-num">132</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">133</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>
@@ -344,15 +337,14 @@ determined capabilities.</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> supports CREATE TABLE IF NOT EXISTS
-syntax.</p>
+<p><a href="../MySQL.html"><code>MySQL</code></a> supports CREATE TABLE IF NOT EXISTS syntax.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_create_table_if_not_exists-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_create_table_if_not_exists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 135</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_create_table_if_not_exists?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_create_table_if_not_exists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">136</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_create_table_if_not_exists?</span>&#x000A;<span class="line-num">137</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_generated_columns-3F'>
@@ -364,15 +356,14 @@ syntax.</p>
 </div>
 <div class='description'>
 
-<p>Generated columns are supported in MariaDB 5.2.0+ and <a
-href="../MySQL.html">MySQL</a> 5.7.6+.</p>
+<p>Generated columns are supported in MariaDB 5.2.0+ and <a href="../MySQL.html"><code>MySQL</code></a> 5.7.6+.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_generated_columns-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_generated_columns-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 140</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_generated_columns?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> (<span class="ruby-identifier">mariadb?</span> <span class="ruby-operator">?</span> <span class="ruby-value">50200</span> <span class="ruby-operator">:</span> <span class="ruby-value">50706</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_generated_columns-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_generated_columns?</span>&#x000A;<span class="line-num">142</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> (<span class="ruby-identifier">mariadb?</span> <span class="ruby-operator">?</span> <span class="ruby-value">50200</span> <span class="ruby-operator">:</span> <span class="ruby-value">50706</span>)&#x000A;<span class="line-num">143</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_prepared_transactions-3F'>
@@ -384,15 +375,14 @@ href="../MySQL.html">MySQL</a> 5.7.6+.</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> 5+ supports prepared transactions
-(two-phase commit) using XA</p>
+<p><a href="../MySQL.html"><code>MySQL</code></a> 5+ supports prepared transactions (two-phase commit) using XA</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_prepared_transactions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_prepared_transactions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_prepared_transactions?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_prepared_transactions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">146</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_prepared_transactions?</span>&#x000A;<span class="line-num">147</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50000</span>&#x000A;<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
@@ -404,14 +394,14 @@ href="../MySQL.html">MySQL</a> 5.7.6+.</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> 5+ supports savepoints</p>
+<p><a href="../MySQL.html"><code>MySQL</code></a> 5+ supports savepoints</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_savepoints-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 150</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50000</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_savepoints-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints?</span>&#x000A;<span class="line-num">152</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50000</span>&#x000A;<span class="line-num">153</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_savepoints_in_prepared_transactions-3F'>
@@ -423,16 +413,14 @@ href="../MySQL.html">MySQL</a> 5.7.6+.</p>
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> doesn&#39;t support savepoints inside
-prepared transactions in from 5.5.12 to 5.5.23, see <a
-href="http://bugs.mysql.com/bug.php?id=64374">bugs.mysql.com/bug.php?id=64374</a></p>
+<p><a href="../MySQL.html"><code>MySQL</code></a> doesn&#39;t support savepoints inside prepared transactions in from 5.5.12 to 5.5.23, see <a target="_top" href="http://bugs.mysql.com/bug.php?id=64374">bugs.mysql.com/bug.php?id=64374</a></p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_savepoints_in_prepared_transactions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_savepoints_in_prepared_transactions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 156</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints_in_prepared_transactions?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">server_version</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">50512</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50523</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_savepoints_in_prepared_transactions-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">157</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_savepoints_in_prepared_transactions?</span>&#x000A;<span class="line-num">158</span>   <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">server_version</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-value">50512</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50523</span>)&#x000A;<span class="line-num">159</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_usecs-3F'>
@@ -444,18 +432,14 @@ href="http://bugs.mysql.com/bug.php?id=64374">bugs.mysql.com/bug.php?id=64374</a
 </div>
 <div class='description'>
 
-<p>Support fractional timestamps on <a href="../MySQL.html">MySQL</a> 5.6.5+
-if the :fractional_seconds <a href="Database.html">Database</a> option is
-used.  Technically, <a href="../MySQL.html">MySQL</a> 5.6.4+ supports them,
-but automatic initialization of datetime values wasn&#39;t supported to
-5.6.5+, and this is related to that.</p>
+<p>Support fractional timestamps on <a href="../MySQL.html"><code>MySQL</code></a> 5.6.5+ if the :fractional_seconds <a href="Database.html"><code>Database</code></a> option is used.  Technically, <a href="../MySQL.html"><code>MySQL</code></a> 5.6.4+ supports them, but automatic initialization of datetime values wasn&#39;t supported to 5.6.5+, and this is related to that.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_timestamp_usecs-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_timestamp_usecs-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 164</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_usecs?</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_timestamp_usecs</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_timestamp_usecs</span>)&#x000A;  <span class="ruby-ivar">@supports_timestamp_usecs</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50605</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:fractional_seconds</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_timestamp_usecs-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">165</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_usecs?</span>&#x000A;<span class="line-num">166</span>   <span class="ruby-keyword">return</span> <span class="ruby-ivar">@supports_timestamp_usecs</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@supports_timestamp_usecs</span>)&#x000A;<span class="line-num">167</span>   <span class="ruby-ivar">@supports_timestamp_usecs</span> = <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">50605</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">typecast_value_boolean</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:fractional_seconds</span>])&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_transaction_isolation_levels-3F'>
@@ -467,14 +451,14 @@ but automatic initialization of datetime values wasn&#39;t supported to
 </div>
 <div class='description'>
 
-<p><a href="../MySQL.html">MySQL</a> supports transaction isolation levels</p>
+<p><a href="../MySQL.html"><code>MySQL</code></a> supports transaction isolation levels</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_transaction_isolation_levels-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_transaction_isolation_levels-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_transaction_isolation_levels?</span>&#x000A;<span class="line-num">172</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-tables'>
@@ -498,7 +482,7 @@ but automatic initialization of datetime values wasn&#39;t supported to
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-tables-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 178</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">full_tables</span>(<span class="ruby-string">&#39;BASE TABLE&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-tables-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">179</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">180</span>   <span class="ruby-identifier">full_tables</span>(<span class="ruby-string">&#39;BASE TABLE&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-views'>
@@ -522,7 +506,7 @@ but automatic initialization of datetime values wasn&#39;t supported to
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-views-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 186</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">full_tables</span>(<span class="ruby-string">&#39;VIEW&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-views-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">188</span>   <span class="ruby-identifier">full_tables</span>(<span class="ruby-string">&#39;VIEW&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

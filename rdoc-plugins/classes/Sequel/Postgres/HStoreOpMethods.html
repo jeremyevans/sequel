@@ -56,15 +56,14 @@ Sequel::Postgres::HStoreOpMethods
 </div>
 <div class='description'>
 
-<p>Wrap the receiver in an <a href="HStoreOp.html">HStoreOp</a> so you can
-easily use the PostgreSQL hstore functions and operators with it.</p>
+<p>Wrap the receiver in an <a href="HStoreOp.html"><code>HStoreOp</code></a> so you can easily use the PostgreSQL hstore functions and operators with it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hstore-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hstore-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 309</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hstore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb</span>&#x000A;<span class="line-num">310</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>&#x000A;<span class="line-num">311</span>   <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">312</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

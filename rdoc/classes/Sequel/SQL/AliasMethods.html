@@ -35,8 +35,7 @@ Sequel::SQL::AliasMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Includes an <code>as</code> method that creates an <a
-href="../SQL.html">SQL</a> alias.</p>
+<p>Includes an <code>as</code> method that creates an <a href="../SQL.html"><code>SQL</code></a> alias.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -59,9 +58,7 @@ href="../SQL.html">SQL</a> alias.</p>
 </div>
 <div class='description'>
 
-<p>Create an <a href="../SQL.html">SQL</a> alias
-(<code>AliasedExpression</code>) of the receiving column or expression to
-the given alias.</p>
+<p>Create an <a href="../SQL.html"><code>SQL</code></a> alias (<code>AliasedExpression</code>) of the receiving column or expression to the given alias.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>) <span class="ruby-comment"># func() AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:func</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>, [<span class="ruby-value">:col_alias1</span>, <span class="ruby-value">:col_alias2</span>]) <span class="ruby-comment"># func() AS &quot;alias&quot;(&quot;col_alias1&quot;, &quot;col_alias2&quot;)</span></pre>
 
@@ -70,7 +67,7 @@ the given alias.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-as-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-as-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 258</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as</span>(<span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">AliasedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-as-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">259</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as</span>(<span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">260</span>   <span class="ruby-constant">AliasedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">261</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

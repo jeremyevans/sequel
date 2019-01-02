@@ -36,22 +36,17 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The select_remove extension adds select_remove for removing existing
-selected columns from a dataset.  It&#39;s not part of <a
-href="../../../../classes/Sequel.html">Sequel</a> core as it is rarely
-needed and has some corner cases where it can&#39;t work correctly.</p>
+<p>The select_remove extension adds select_remove for removing existing selected columns from a dataset.  It&#39;s not part of <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> core as it is rarely needed and has some corner cases where it can&#39;t work correctly.</p>
 
 <p>You can load this extension into specific datasets:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:select_remove</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:select_remove</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/SelectRemove.html">Sequel::SelectRemove</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/SelectRemove.html"><code>Sequel::SelectRemove</code></a></p>
 </div>
 <div id='context'>
 </div>

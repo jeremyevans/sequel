@@ -60,10 +60,7 @@ Sequel::Plugins::ColumnConflicts::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p><a href="../../../Hash.html">Hash</a> for columns where the getter method
-already exists. keys are column symbols/strings that conflict with method
-names and should be looked up directly instead of calling a method, values
-are the column symbol to lookup in the values hash.</p>
+<p><a href="../../../Hash.html"><code>Hash</code></a> for columns where the getter method already exists. keys are column symbols/strings that conflict with method names and should be looked up directly instead of calling a method, values are the column symbol to lookup in the values hash.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -72,10 +69,7 @@ are the column symbol to lookup in the values hash.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p><a href="../../../Hash.html">Hash</a> for columns where the setter method
-already exists. keys are column symbols/strings suffixed with = that
-conflict with method names and should be set directly in the values hash,
-values are the column symbol to set in the values hash.</p>
+<p><a href="../../../Hash.html"><code>Hash</code></a> for columns where the setter method already exists. keys are column symbols/strings suffixed with = that conflict with method names and should be set directly in the values hash, values are the column symbol to set in the values hash.</p>
 </td>
 </tr>
 </table>
@@ -92,16 +86,14 @@ values are the column symbol to set in the values hash.</p>
 </div>
 <div class='description'>
 
-<p>Compare the column names for the model with the methods defined on <a
-href="../../Model.html">Sequel::Model</a>, and automatically setup the
-column conflicts.</p>
+<p>Compare the column names for the model with the methods defined on <a href="../../Model.html"><code>Sequel::Model</code></a>, and automatically setup the column conflicts.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-check_column_conflicts-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-check_column_conflicts-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_column_conflicts</span>&#x000A;  <span class="ruby-identifier">mod</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">get_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-node">&quot;#{c}=&quot;</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-check_column_conflicts-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">check_column_conflicts</span>&#x000A;<span class="line-num">63</span>   <span class="ruby-identifier">mod</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="line-num">64</span>   <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">get_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="line-num">65</span>   <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">find_all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">method_defined?</span>(<span class="ruby-node">&quot;#{c}=&quot;</span>)}.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">set_column_conflict!</span>(<span class="ruby-identifier">c</span>)}&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -120,7 +112,7 @@ column conflicts.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@get_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@set_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">70</span>   <span class="ruby-ivar">@get_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-ivar">@set_column_conflicts</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">72</span> &#x000A;<span class="line-num">73</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-get_column_conflict-21'>
@@ -139,7 +131,7 @@ column conflicts.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-get_column_conflict-21-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-get_column_conflict-21-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-get_column_conflict-21-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">get_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;<span class="line-num">78</span>   <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-ivar">@get_column_conflicts</span>[<span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_column_conflict-21'>
@@ -158,7 +150,7 @@ column conflicts.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_column_conflict-21-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_column_conflict-21-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-value">:&quot;#{column}=&quot;</span>] = <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-node">&quot;#{column}=&quot;</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_column_conflict-21-source'>   <span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb</span>&#x000A;<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_column_conflict!</span>(<span class="ruby-identifier">column</span>)&#x000A;<span class="line-num">83</span>   <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-value">:&quot;#{column}=&quot;</span>] = <span class="ruby-ivar">@set_column_conflicts</span>[<span class="ruby-node">&quot;#{column}=&quot;</span>] = <span class="ruby-identifier">column</span>.<span class="ruby-identifier">to_sym</span>&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

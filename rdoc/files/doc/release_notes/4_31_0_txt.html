@@ -38,56 +38,32 @@ Last Update:
 <div id='description'>
 <h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now works with ruby
-2.3&#39;s –enable-frozen-string-literal, and all of the library files are
-set to use frozen string literals by default.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now works with ruby 2.3&#39;s –enable-frozen-string-literal, and all of the library files are set to use frozen string literals by default.</p>
 
-<p>A couple adapters and extensions depend on libraries that have issues with
-frozen string literals.  Pull requests have been sent to each of those
-dependencies.</p>
+<p>A couple adapters and extensions depend on libraries that have issues with frozen string literals.  Pull requests have been sent to each of those dependencies.</p>
 </li><li>
-<p>The migrators will now raise an exception if a migration file contains no
-migrations or more than one migration.</p>
+<p>The migrators will now raise an exception if a migration file contains no migrations or more than one migration.</p>
 </li><li>
-<p>The jdbc/postgresql adapter now supports using PostgreSQL specific types in
-bound variables.  Note that the current version of jdbc-postgres (9.4.1204)
-has regressions that affect this, users who need this support should stick
-with jdbc-postgres 9.4.1200 or below.</p>
+<p>The jdbc/postgresql adapter now supports using PostgreSQL specific types in bound variables.  Note that the current version of jdbc-postgres (9.4.1204) has regressions that affect this, users who need this support should stick with jdbc-postgres 9.4.1200 or below.</p>
 </li><li>
-<p>The jdbc/postgresql adapter now works around a regression in Java method
-lookup in JRuby 9.0.5.0</p>
+<p>The jdbc/postgresql adapter now works around a regression in Java method lookup in JRuby 9.0.5.0</p>
 </li><li>
-<p>The setter methods added by the association_pks plugin now do type casting
-immediately, instead of right before the data will be used. This makes them
-more similar to column setter methods, and ensures that future calls to the
-getters that use cached values will return correctly typecast data.</p>
+<p>The setter methods added by the association_pks plugin now do type casting immediately, instead of right before the data will be used. This makes them more similar to column setter methods, and ensures that future calls to the getters that use cached values will return correctly typecast data.</p>
 </li><li>
-<p>The PostgreSQL array parser in the pg_array extension now handles arrays
-with explicit bounds.  The explicit bounds are ignored, so such values do
-not round trip, and there is currently no support for creating arrays with
-explicit bounds.</p>
+<p>The PostgreSQL array parser in the pg_array extension now handles arrays with explicit bounds.  The explicit bounds are ignored, so such values do not round trip, and there is currently no support for creating arrays with explicit bounds.</p>
 </li><li>
-<p>Creating a table with a simple non-incrementing primary key and a
-self-referential foreign key now works correctly on MySQL:</p>
+<p>Creating a table with a simple non-incrementing primary key and a self-referential foreign key now works correctly on MySQL:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> <span class="ruby-value">:id</span>, <span class="ruby-value">:primary_key</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> <span class="ruby-value">:fk</span>, <span class="ruby-value">:table</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>Database#disconnect in the oracle adapter now works correctly on more
-recent versions of oci8 where logoff can raise OCIException instead of
-OCIInvalidHandle.</p>
+<p>Database#disconnect in the oracle adapter now works correctly on more recent versions of oci8 where logoff can raise OCIException instead of OCIInvalidHandle.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The pg_array extension no longer defines
-Sequel::Postgres::PGArray::JSONCreator.  This should only affect backwards
-compatibility if you were accessing the constant directly. The :parser
-option to Sequel::Postgres::PGArray.register is also no longer respected,
-but that should not affect backwards compatibility.</p>
+<p>The pg_array extension no longer defines Sequel::Postgres::PGArray::JSONCreator.  This should only affect backwards compatibility if you were accessing the constant directly. The :parser option to Sequel::Postgres::PGArray.register is also no longer respected, but that should not affect backwards compatibility.</p>
 </li><li>
-<p>The Sequel::Model#convert_cpk_array private method that was added by the
-association_pks plugin has been removed. Sequel::Model#convert_pk_array
-handles both simple and composite primary keys now.</p>
+<p>The Sequel::Model#convert_cpk_array private method that was added by the association_pks plugin has been removed. Sequel::Model#convert_pk_array handles both simple and composite primary keys now.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -35,8 +35,7 @@ Sequel::Plugins::Uuid
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The uuid plugin creates hooks that automatically create a uuid for every
-instance.</p>
+<p>The uuid plugin creates hooks that automatically create a uuid for every instance.</p>
 
 <p>Usage:</p>
 
@@ -70,9 +69,7 @@ instance.</p>
 </div>
 <div class='description'>
 
-<p>Configure the plugin by setting the available options.  Note that if this
-method is run more than once, previous settings are ignored, and it will
-just use the settings given or the default settings.  Options:</p>
+<p>Configure the plugin by setting the available options.  Note that if this method is run more than once, previous settings are ignored, and it will just use the settings given or the default settings.  Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:field </td><td>
 <p>The field to hold the uuid (default: :uuid)</p>
 </td></tr><tr><td class='label'>:force </td><td>
@@ -84,7 +81,7 @@ just use the settings given or the default settings.  Options:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/uuid.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@uuid_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>]<span class="ruby-operator">||</span><span class="ruby-value">:uuid</span>&#x000A;    <span class="ruby-ivar">@uuid_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/uuid.rb</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">25</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">26</span>     <span class="ruby-ivar">@uuid_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:field</span>]<span class="ruby-operator">||</span><span class="ruby-value">:uuid</span>&#x000A;<span class="line-num">27</span>     <span class="ruby-ivar">@uuid_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;<span class="line-num">28</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

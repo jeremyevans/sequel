@@ -35,15 +35,11 @@ Sequel::SQL::BooleanMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This module includes the boolean/logical AND (&amp;), OR (|) and NOT (~)
-operators that are defined on objects that can be used in a boolean context
-in <a href="../SQL.html">SQL</a>.</p>
+<p>This module includes the boolean/logical AND (&amp;), OR (|) and NOT (~) operators that are defined on objects that can be used in a boolean context in <a href="../SQL.html"><code>SQL</code></a>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>] <span class="ruby-comment"># &quot;a&quot; AND &quot;b&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>] <span class="ruby-comment"># &quot;a&quot; OR &quot;b&quot;</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-comment"># NOT &quot;a&quot;</span></pre>
 
-<p>One exception to this is when a <a
-href="NumericExpression.html">NumericExpression</a> or Integer is the
-argument to &amp; or |, in which case a bitwise method will be used:</p>
+<p>One exception to this is when a <a href="NumericExpression.html"><code>NumericExpression</code></a> or Integer is the argument to &amp; or |, in which case a bitwise method will be used:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;a&quot; &amp; 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-operator">|</span> (<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;a&quot; | (&quot;b&quot; + 1)</span></pre>
 </div>
@@ -68,8 +64,7 @@ argument to &amp; or |, in which case a bitwise method will be used:</p>
 </div>
 <div class='description'>
 
-<p>Create a new <a href="BooleanExpression.html">BooleanExpression</a> with
-NOT, representing the inversion of whatever self represents.</p>
+<p>Create a new <a href="BooleanExpression.html"><code>BooleanExpression</code></a> with NOT, representing the inversion of whatever self represents.</p>
 
 <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:a</span>] <span class="ruby-comment"># NOT :a</span></pre>
 
@@ -78,7 +73,7 @@ NOT, representing the inversion of whatever self represents.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-~-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 315</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-~-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">316</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>&#x000A;<span class="line-num">317</span>   <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">318</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -71,8 +71,7 @@ Sequel::IBMDB
 }.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Hash holding type translation methods, used by <a
-href="IBMDB/Dataset.html#method-i-fetch_rows">Sequel::IBMDB::Dataset#fetch_rows</a>.</p>
+<p>Hash holding type translation methods, used by <a href="IBMDB/Dataset.html#method-i-fetch_rows"><code>Dataset#fetch_rows</code></a>.</p>
 </td>
 </tr>
 </table>
@@ -94,7 +93,7 @@ href="IBMDB/Dataset.html#method-i-fetch_rows">Sequel::IBMDB::Dataset#fetch_rows<
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-boolean-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-boolean-source'>   <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-int'>
@@ -111,7 +110,7 @@ href="IBMDB/Dataset.html#method-i-fetch_rows">Sequel::IBMDB::Dataset#fetch_rows<
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-int-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-int-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">int</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-int-source'>   <span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb</span>&#x000A;<span class="line-num">11</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">int</span>(<span class="ruby-identifier">s</span>) <span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

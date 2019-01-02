@@ -38,109 +38,75 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The =~ and !~ methods are now defined on ComplexExpressions in addition to
-GenericExpressions, allowing the following code to work:</p>
+<p>The =~ and !~ methods are now defined on ComplexExpressions in addition to GenericExpressions, allowing the following code to work:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">column1</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">column2</span>) <span class="ruby-operator">=~</span> <span class="ruby-identifier">column3</span>}</pre>
 </li><li>
-<p>Dataset#group_append has been added for appending to an existing GROUP BY
-clause:</p>
+<p>Dataset#group_append has been added for appending to an existing GROUP BY clause:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">group</span>(<span class="ruby-value">:column1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table GROUP BY column1</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">group_append</span>(<span class="ruby-value">:column2</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table GROUP BY column1, column2</span></pre>
 </li><li>
-<p>An inverted_subsets plugin has been added, for automatic creation of
-methods for the inversion of the subset criteria.  For example:</p>
+<p>An inverted_subsets plugin has been added, for automatic creation of methods for the inversion of the subset criteria.  For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:inverted_subsets</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">subset</span> <span class="ruby-value">:published</span>, <span class="ruby-value">:published</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE published IS TRUE</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">not_published</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE published IS NOT TRUE</span></pre>
 
-<p>By default, the subset method name is prefixed with “not_”.  You can pass a
-block to override the default behavior:</p>
+<p>By default, the subset method name is prefixed with “not_”.  You can pass a block to override the default behavior:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:inverted_subsets</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;exclude_#{name}&quot;</span>}&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">subset</span> <span class="ruby-value">:published</span>, <span class="ruby-value">:published</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">exclude_published</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE published IS NOT TRUE</span></pre>
 </li><li>
-<p>A singular_table_names plugin has been added, which changes <a
-href="../../../classes/Sequel.html">Sequel</a> to not pluralize table names
-by default.</p>
+<p>A singular_table_names plugin has been added, which changes <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to not pluralize table names by default.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:singular_table_names</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">FooBar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">FooBar</span>.<span class="ruby-identifier">table_name</span> <span class="ruby-comment"># =&gt; foo_bar</span></pre>
 </li><li>
-<p>Dataset#insert_conflict and insert_ignore have been added on PostgreSQL. 
-When using PostgreSQL 9.5+, they allow you to ignore unique or exclusion
-constraint violations on inserting, or to do an update instead:</p>
+<p>Dataset#insert_conflict and insert_ignore have been added on PostgreSQL.  When using PostgreSQL 9.5+, they allow you to ignore unique or exclusion constraint violations on inserting, or to do an update instead:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT DO NOTHING</span></pre>
 
-<p>You can pass a specific constraint name using :constraint, to only ignore a
-specific constraint violation:</p>
+<p>You can pass a specific constraint name using :constraint, to only ignore a specific constraint violation:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:constraint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:table_a_uidx</span>).&#x000A;  <span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT ON CONSTRAINT table_a_uidx DO NOTHING</span></pre>
 
-<p>If the unique or exclusion constraint covers the whole table (e.g. it
-isn&#39;t a partial unique index), then you can just specify the column
-using the :target option:</p>
+<p>If the unique or exclusion constraint covers the whole table (e.g. it isn&#39;t a partial unique index), then you can just specify the column using the :target option:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:target</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO NOTHING</span></pre>
 
-<p>If you want to update the existing row instead of ignoring the constraint
-violation, you can pass an :update option with a hash of values to update. 
-You must pass either the :target or :constraint options when passing the
-:update option:</p>
+<p>If you want to update the existing row instead of ignoring the constraint violation, you can pass an :update option with a hash of values to update.  You must pass either the :target or :constraint options when passing the :update option:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:target</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a</span>,&#x000A;                           <span class="ruby-value">:update</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:excluded__b</span>}).&#x000A;  <span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT (a) DO UPDATE SET b = excluded.b</span></pre>
 
-<p>Additionally, if you only want to do the update in certain cases, you can
-specify an :update_where option, which will be used as a filter.  If the
-row doesn&#39;t match the conditions, the constraint violation will be
-ignored, but the row will not be updated:</p>
+<p>Additionally, if you only want to do the update in certain cases, you can specify an :update_where option, which will be used as a filter.  If the row doesn&#39;t match the conditions, the constraint violation will be ignored, but the row will not be updated:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_conflict</span>(<span class="ruby-value">:constraint</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:table_a_uidx</span>,&#x000A;                           <span class="ruby-value">:update</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:excluded__b</span>},&#x000A;                           <span class="ruby-value">:update_where</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:table__status_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>}).&#x000A;  <span class="ruby-identifier">insert</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>, <span class="ruby-value">:b</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT ON CONSTRAINT table_a_uidx</span>&#x000A;<span class="ruby-comment"># DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)</span></pre>
 </li><li>
-<p>Dataset#group_rollup and group_cube are now supported when using PostgreSQL
-9.5+.</p>
+<p>Dataset#group_rollup and group_cube are now supported when using PostgreSQL 9.5+.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now supports
-Dataset#returning when using prepared statements and bound variables:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports Dataset#returning when using prepared statements and bound variables:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:insert</span>, <span class="ruby-value">:i</span>, <span class="ruby-value">:col</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$col</span>).&#x000A;  <span class="ruby-identifier">call</span>(<span class="ruby-value">:col</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">42</span>)&#x000A;<span class="ruby-comment"># =&gt; [{:col=&gt;42}]</span></pre>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The serialization plugin now integrates with the dirty plugin, so that
-column changes are detected correctly.  However, column values that are
-changed and then changed back to the original value are still detected as
-changed.</p>
+<p>The serialization plugin now integrates with the dirty plugin, so that column changes are detected correctly.  However, column values that are changed and then changed back to the original value are still detected as changed.</p>
 </li><li>
-<p>Dataset#for_update and similar locking methods now cause <a
-href="../../../classes/Sequel.html">Sequel</a> not to use the :read_only
-shard if sharding is used.</p>
+<p>Dataset#for_update and similar locking methods now cause <a href="../../../classes/Sequel.html"><code>Sequel</code></a> not to use the :read_only shard if sharding is used.</p>
 </li><li>
-<p>The association_pks plugin now clears cached delayed associated pks when
-the object is refreshed.</p>
+<p>The association_pks plugin now clears cached delayed associated pks when the object is refreshed.</p>
 </li><li>
-<p>The :collate column option when adding columns now literalizes non-String
-values on PostgreSQL. Previously, the :collate option value was used
-verbatim. This is because PostgreSQL&#39;s collations generally require
-quoting as they are uppercase or mixed-case.</p>
+<p>The :collate column option when adding columns now literalizes non-String values on PostgreSQL. Previously, the :collate option value was used verbatim. This is because PostgreSQL&#39;s collations generally require quoting as they are uppercase or mixed-case.</p>
 </li><li>
-<p>Sequel&#39;s metadata parsing methods now support Microsoft SQL Server
-2012+ when used in case sensitive mode.</p>
+<p>Sequel&#39;s metadata parsing methods now support Microsoft SQL Server 2012+ when used in case sensitive mode.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now recognizes an
-addition check constraint violation exception on SQLite.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes an addition check constraint violation exception on SQLite.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now recognizes constraint
-violations when using the swift/sqlite adapter.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes constraint violations when using the swift/sqlite adapter.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now automatically REORGs
-tables when altering them in the jdbc/db2 adapter.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now automatically REORGs tables when altering them in the jdbc/db2 adapter.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now defaults to ignoring
-NULL values when using IN/NOT IN with an empty array.  Previously, code
-such as:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now defaults to ignoring NULL values when using IN/NOT IN with an empty array.  Previously, code such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span>[])</pre>
 
@@ -148,32 +114,23 @@ such as:</p>
 
 <pre>SELECT * FROM table WHERE (column != column)</pre>
 
-<p>This yields a NULL value when column is NULL, similarly to how most other
-SQL operators work.  Unfortunately, most databases do not optimize this,
-and such a query can require a sequential scan of the table.</p>
+<p>This yields a NULL value when column is NULL, similarly to how most other SQL operators work.  Unfortunately, most databases do not optimize this, and such a query can require a sequential scan of the table.</p>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> previously shipped with a
-empty_array_ignore_nulls extension that literalized the query to:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> previously shipped with a empty_array_ignore_nulls extension that literalized the query to:</p>
 
 <pre>SELECT * FROM table WHERE (1 = 0)</pre>
 
-<p>which databases will generally optimize to a constant false value,
-resulting in much faster queries.  This behavior is now the default.</p>
+<p>which databases will generally optimize to a constant false value, resulting in much faster queries.  This behavior is now the default.</p>
 
-<p>Users that desire the previous behavior can use the new
-empty_array_consider_nulls extension.</p>
+<p>Users that desire the previous behavior can use the new empty_array_consider_nulls extension.</p>
 </li><li>
 <p>The deprecated firebird and informix adapters have been removed.</p>
 </li><li>
-<p>Calling prepare on a prepared statement now raises an exception. It was
-supported accidently before, as prepared statements are dataset instances.</p>
+<p>Calling prepare on a prepared statement now raises an exception. It was supported accidently before, as prepared statements are dataset instances.</p>
 </li><li>
-<p>Model::DatasetModule#subset now calls Model.subset instead of the other way
-around.  This makes it possible to modify the behavior of subset in a
-plugin.</p>
+<p>Model::DatasetModule#subset now calls Model.subset instead of the other way around.  This makes it possible to modify the behavior of subset in a plugin.</p>
 </li><li>
-<p>The :collate column option change on PostgreSQL can break code that used
-already quoted values in symbols.  For example:</p>
+<p>The :collate column option change on PostgreSQL can break code that used already quoted values in symbols.  For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">String</span> <span class="ruby-value">:column_name</span>, <span class="ruby-identifier">collate</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:&#39;&quot;C&quot;&#39;</span></pre>
 

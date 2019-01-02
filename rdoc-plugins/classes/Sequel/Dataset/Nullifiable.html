@@ -63,7 +63,7 @@ Sequel::Dataset::Nullifiable
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-nullify-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-nullify-source'><span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nullify</span>&#x000A;  <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_nullify_ds</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">NullDataset</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-nullify-source'>   <span class="ruby-comment"># File lib/sequel/extensions/null_dataset.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">nullify</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-value">:_nullify_ds</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">45</span>     <span class="ruby-identifier">with_extend</span>(<span class="ruby-constant">NullDataset</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -38,9 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A duplicate_columns_handler extension has been added, for printing a
-warning or raising an exception if a dataset returns multiple columns with
-the same name.  You can set this globally for the Database:</p>
+<p>A duplicate_columns_handler extension has been added, for printing a warning or raising an exception if a dataset returns multiple columns with the same name.  You can set this globally for the Database:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:duplicate_columns_handler</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_duplicate_columns</span>] = <span class="ruby-value">:warn</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:on_duplicate_columns</span>] = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:foo</span>) <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ignore</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -48,63 +46,39 @@ the same name.  You can set this globally for the Database:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:duplicate_columns_handler</span>)&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-value">:raise</span>)&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:foo</span>) <span class="ruby-operator">?</span> <span class="ruby-value">:raise</span> <span class="ruby-operator">:</span> <span class="ruby-value">:ignore</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>This makes it easier to detect when duplicate columns are returned, which
-in some cases can cause undesired behavior, such as the values for later
-columns of the same name overwriting values for earlier columns.</p>
+<p>This makes it easier to detect when duplicate columns are returned, which in some cases can cause undesired behavior, such as the values for later columns of the same name overwriting values for earlier columns.</p>
 </li><li>
-<p>The Dataset#to_hash, to_hash_groups, select_hash, and select_hash_groups
-methods now take an options hash as a third argument.  This options hash
-can now contain a :hash option, which specifies the object in which the
-resulting values should be placed.  You can use this to have the values
-inserted into a custom hash, or another object responding to [] and []=.</p>
+<p>The Dataset#to_hash, to_hash_groups, select_hash, and select_hash_groups methods now take an options hash as a third argument.  This options hash can now contain a :hash option, which specifies the object in which the resulting values should be placed.  You can use this to have the values inserted into a custom hash, or another object responding to [] and []=.</p>
 </li><li>
-<p>A validators_operator validation has been added to the validation_helpers
-plugin:</p>
+<p>A validators_operator validation has been added to the validation_helpers plugin:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Example</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&gt;</span>, <span class="ruby-value">3</span>, <span class="ruby-value">:column1</span>)&#x000A;    <span class="ruby-identifier">validates_operator</span>(<span class="ruby-value">:&lt;=</span>, <span class="ruby-value">4</span>, [<span class="ruby-value">:column2</span>, <span class="ruby-value">:column3</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>The pg_range extension now adds a register_range_type Database method,
-supporting per-Database custom range types:</p>
+<p>The pg_range extension now adds a register_range_type Database method, supporting per-Database custom range types:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)</pre>
 </li><li>
-<p>The dataset_associations plugin now supports a :dataset_associations_join
-association option on associations that use joined datasets.  This option
-will have the datasets returned by the dataset association methods join to
-the same tables that would be joined when retriving the associated objects,
-allowing selected columns, orders, and filters that reference columns in
-the joined tables to work correctly.</p>
+<p>The dataset_associations plugin now supports a :dataset_associations_join association option on associations that use joined datasets.  This option will have the datasets returned by the dataset association methods join to the same tables that would be joined when retriving the associated objects, allowing selected columns, orders, and filters that reference columns in the joined tables to work correctly.</p>
 </li><li>
-<p>The Database :preconnect option can now be set to :concurrently, which will
-create the connections in separate threads. This can significantly speed up
-preconnection in high-latency environments.</p>
+<p>The Database :preconnect option can now be set to :concurrently, which will create the connections in separate threads. This can significantly speed up preconnection in high-latency environments.</p>
 </li><li>
-<p>The Database :name option is now supported, holding an arbitrary name for
-the database.  Currently, it is only used in PoolTimeout exception
-messages, but it may be used in other places in the future.</p>
+<p>The Database :name option is now supported, holding an arbitrary name for the database.  Currently, it is only used in PoolTimeout exception messages, but it may be used in other places in the future.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The prepared_statements_safe plugin now works correctly when using
-CURRENT_DATE and CURRENT_TIMESTAMP default values for columns.</p>
+<p>The prepared_statements_safe plugin now works correctly when using CURRENT_DATE and CURRENT_TIMESTAMP default values for columns.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now recognizes an
-addition unique constraint violation on Microsoft SQL Server.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now recognizes an addition unique constraint violation on Microsoft SQL Server.</p>
 </li><li>
-<p>PoolTimeout exception messages now include the server/shard to which the
-connection was attempted when using the sharded threaded connection pool.</p>
+<p>PoolTimeout exception messages now include the server/shard to which the connection was attempted when using the sharded threaded connection pool.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Users of sequel_pg should upgrade to 1.6.17, as older versions of sequel_pg
-may not work with <a href="../../../classes/Sequel.html">Sequel</a>
-4.34.0+.</p>
+<p>Users of sequel_pg should upgrade to 1.6.17, as older versions of sequel_pg may not work with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.34.0+.</p>
 </li><li>
-<p>Any custom extensions that override Dataset#to_hash, to_hash_groups,
-select_hash, and select_hash_groups need to be modified to add support for
-accepting the options hash.</p>
+<p>Any custom extensions that override Dataset#to_hash, to_hash_groups, select_hash, and select_hash_groups need to be modified to add support for accepting the options hash.</p>
 </li></ul>
 </div>
 <div id='context'>

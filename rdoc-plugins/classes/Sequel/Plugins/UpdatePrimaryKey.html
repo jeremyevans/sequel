@@ -35,12 +35,7 @@ Sequel::Plugins::UpdatePrimaryKey
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The update_primary_key plugin allows you to modify an object&#39;s primary
-key and then save the record.  <a href="../../Sequel.html">Sequel</a> does
-not work correctly with primary key modifications by default.  <a
-href="../../Sequel.html">Sequel</a> is designed to work with surrogate
-primary keys that never need to be modified, but this plugin makes it work
-correctly with natural primary keys that may need to be modified. Example:</p>
+<p>The update_primary_key plugin allows you to modify an object&#39;s primary key and then save the record.  <a href="../../Sequel.html"><code>Sequel</code></a> does not work correctly with primary key modifications by default.  <a href="../../Sequel.html"><code>Sequel</code></a> is designed to work with surrogate primary keys that never need to be modified, but this plugin makes it work correctly with natural primary keys that may need to be modified. Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">id</span> = <span class="ruby-value">2</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span></pre>
 

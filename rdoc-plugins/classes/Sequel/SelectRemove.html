@@ -56,34 +56,25 @@ Sequel::SelectRemove
 </div>
 <div class='description'>
 
-<p>Remove columns from the list of selected columns.  If any of the currently
-selected columns use expressions/aliases, this will remove selected columns
-with the given aliases.  It will also remove entries from the selection
-that match exactly:</p>
+<p>Remove columns from the list of selected columns.  If any of the currently selected columns use expressions/aliases, this will remove selected columns with the given aliases.  It will also remove entries from the selection that match exactly:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Assume columns a, b, and c in items table</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>] <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>) <span class="ruby-comment"># SELECT a, b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:c</span>), <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:c</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:b</span>)).<span class="ruby-identifier">select_remove</span>(<span class="ruby-value">:c</span>) <span class="ruby-comment"># SELECT a, c AS b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:b</span>][<span class="ruby-value">:c</span>], <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:c</span>][<span class="ruby-value">:b</span>]).<span class="ruby-identifier">select_remove</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:c</span>][<span class="ruby-value">:b</span>]) <span class="ruby-comment"># SELECT a, b AS c FROM items</span></pre>
 
 <p>Note that there are a few cases where this method may not work correctly:</p>
 <ul><li>
-<p>This dataset joins multiple tables and does not have an existing explicit
-selection. In this case, the code will currently use unqualified column
-names for all columns the dataset returns, except for the columns given.</p>
+<p>This dataset joins multiple tables and does not have an existing explicit selection. In this case, the code will currently use unqualified column names for all columns the dataset returns, except for the columns given.</p>
 </li><li>
-<p>This dataset has an existing explicit selection containing an item that
-returns multiple database columns (e.g. <a href=":table">Sequel</a>.*,
-Sequel.lit(&#39;column1, column2&#39;)).  In this case, the behavior is
-undefined and this method should not be used.</p>
+<p>This dataset has an existing explicit selection containing an item that returns multiple database columns (e.g. <a href=":table">Sequel</a>.*, Sequel.lit(&#39;column1, column2&#39;)).  In this case, the behavior is undefined and this method should not be used.</p>
 </li></ul>
 
-<p>There may be other cases where this method does not work correctly, use it
-with caution.</p>
+<p>There may be other cases where this method does not work correctly, use it with caution.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-select_remove-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-select_remove-source'><span class="ruby-comment"># File lib/sequel/extensions/select_remove.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_remove</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sel</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sel</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">sel</span>).<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>} <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-select_remove-source'>   <span class="ruby-comment"># File lib/sequel/extensions/select_remove.rb</span>&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">select_remove</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;<span class="line-num">43</span>   <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sel</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sel</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">44</span>     <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">sel</span>).<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>} <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">46</span>     <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;<span class="line-num">47</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

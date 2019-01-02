@@ -35,18 +35,9 @@ Sequel::Plugins::Touch
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The touch plugin adds a touch method to model instances, which saves the
-object with a modified timestamp.  By default, it uses the :updated_at
-column, but you can set which column to use. It also supports touching of
-associations, so that when the current model object is updated or
-destroyed, the associated rows in the database can have their modified
-timestamp updated to the current timestamp.</p>
+<p>The touch plugin adds a touch method to model instances, which saves the object with a modified timestamp.  By default, it uses the :updated_at column, but you can set which column to use. It also supports touching of associations, so that when the current model object is updated or destroyed, the associated rows in the database can have their modified timestamp updated to the current timestamp.</p>
 
-<p>Since the instance touch method works on model instances, it uses Time.now
-for the timestamp.  The association touching works on datasets, so it
-updates all related rows in a single query, using the <a
-href="../SQL.html">SQL</a> standard CURRENT_TIMESTAMP.  Both of these can
-be overridden easily if necessary.</p>
+<p>Since the instance touch method works on model instances, it uses Time.now for the timestamp.  The association touching works on datasets, so it updates all related rows in a single query, using the <a href="../SQL.html"><code>SQL</code></a> standard CURRENT_TIMESTAMP.  Both of these can be overridden easily if necessary.</p>
 
 <p>Usage:</p>
 
@@ -86,7 +77,7 @@ be overridden easily if necessary.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@touched_associations</span>, {})&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -98,14 +89,9 @@ be overridden easily if necessary.</p>
 </div>
 <div class='description'>
 
-<p>Set the touch_column and touched_associations variables for the model.
-Options:</p>
+<p>Set the touch_column and touched_associations variables for the model. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
-<p>The associations to touch when a model instance is updated or destroyed. 
-Can be a symbol for a single association, a hash with association keys and
-column values, or an array of symbols and/or hashes.  If a symbol is used,
-the column used when updating the associated objects is the model&#39;s
-touch_column. If a hash is used, the value is used as the column to update.</p>
+<p>The associations to touch when a model instance is updated or destroyed.  Can be a symbol for a single association, a hash with association keys and column values, or an array of symbols and/or hashes.  If a symbol is used, the column used when updating the associated objects is the model&#39;s touch_column. If a hash is used, the value is used as the column to update.</p>
 </td></tr><tr><td class='label'>:column </td><td>
 <p>The column to modify when touching a model instance.</p>
 </td></tr></tbody></table>
@@ -115,7 +101,7 @@ touch_column. If a hash is used, the value is used as the column to update.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:updated_at</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/touch.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:updated_at</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;<span class="line-num">47</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_associations</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:associations</span>]&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

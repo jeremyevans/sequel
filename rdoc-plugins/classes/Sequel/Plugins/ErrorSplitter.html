@@ -35,9 +35,7 @@ Sequel::Plugins::ErrorSplitter
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The error_splitter plugin automatically splits errors entries related to
-multiple columns to have separate error entries, one per column.  For
-example, a multiple column uniqueness entry:</p>
+<p>The error_splitter plugin automatically splits errors entries related to multiple columns to have separate error entries, one per column.  For example, a multiple column uniqueness entry:</p>
 
 <pre class="ruby"><span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:artist_id</span>, <span class="ruby-value">:name</span>])</pre>
 
@@ -49,9 +47,7 @@ example, a multiple column uniqueness entry:</p>
 
 <pre class="ruby">{<span class="ruby-value">:artist_id</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;is already taken&#39;</span>}</pre>
 
-<p>The main reason to split errors is if you have a list of fields that you
-are checking for validation errors.  If you don&#39;t split the errors,
-then:</p>
+<p>The main reason to split errors is if you have a list of fields that you are checking for validation errors.  If you don&#39;t split the errors, then:</p>
 
 <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(<span class="ruby-value">:artist_id</span>)</pre>
 

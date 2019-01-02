@@ -64,7 +64,7 @@ Sequel::Plugins::StringStripper::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-skip_string_stripping-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-skip_string_stripping-source'><span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_string_stripping</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-value">:string_stripper</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-skip_string_stripping-source'>   <span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_string_stripping</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-value">:string_stripper</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-skip_string_stripping-3F'>
@@ -83,7 +83,7 @@ Sequel::Plugins::StringStripper::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-skip_string_stripping-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-skip_string_stripping-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_string_stripping?</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-identifier">skip_input_transformer?</span>(<span class="ruby-value">:string_stripper</span>, <span class="ruby-identifier">column</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-skip_string_stripping-3F-source'>   <span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_string_stripping?</span>(<span class="ruby-identifier">column</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">skip_input_transformer?</span>(<span class="ruby-value">:string_stripper</span>, <span class="ruby-identifier">column</span>)&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

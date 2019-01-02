@@ -36,9 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_loose_count extension looks at the table statistics in the
-PostgreSQL system tables to get a fast approximate count of the number of
-rows in a given table:</p>
+<p>The pg_loose_count extension looks at the table statistics in the PostgreSQL system tables to get a fast approximate count of the number of rows in a given table:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-value">:table</span>) <span class="ruby-comment"># =&gt; 123456</span></pre>
 
@@ -46,15 +44,13 @@ rows in a given table:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:schema</span>][<span class="ruby-value">:table</span>]) <span class="ruby-comment"># =&gt; 123456</span></pre>
 
-<p>How accurate this count is depends on the number of rows added/deleted from
-the table since the last time it was analyzed.</p>
+<p>How accurate this count is depends on the number of rows added/deleted from the table since the last time it was analyzed.</p>
 
 <p>To load the extension into the database:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_loose_count</span></pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Postgres/LooseCount.html">Sequel::Postgres::LooseCount</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/LooseCount.html"><code>Sequel::Postgres::LooseCount</code></a></p>
 </div>
 <div id='context'>
 </div>

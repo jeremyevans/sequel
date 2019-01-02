@@ -36,9 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The sql_expr extension adds the sql_expr method to every object, which
-returns an wrapped object that works nicely with Sequel&#39;s DSL by
-calling Sequel.expr:</p>
+<p>The sql_expr extension adds the sql_expr method to every object, which returns an wrapped object that works nicely with Sequel&#39;s DSL by calling Sequel.expr:</p>
 
 <pre class="ruby"><span class="ruby-value">1</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">:a</span>     <span class="ruby-comment"># 1 &lt; a</span>&#x000A;<span class="ruby-keyword">false</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">:a</span> <span class="ruby-comment"># FALSE AND a</span>&#x000A;<span class="ruby-keyword">true</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> <span class="ruby-value">:a</span>  <span class="ruby-comment"># TRUE OR a</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-keyword">nil</span>.<span class="ruby-identifier">sql_expr</span>       <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;b&quot;</span>  <span class="ruby-comment"># &#39;a&#39; || &#39;b&#39;</span></pre>
 

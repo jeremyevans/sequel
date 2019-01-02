@@ -90,10 +90,7 @@ Superclass:
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>The type of this array.  May be nil if no type was given. If a type is
-provided, the array is automatically casted to this type when literalizing.
-This type is the underlying type, not the array type itself, so for an
-int4[] database type, it should be :int4 or &#39;int4&#39;</p>
+<p>The type of this array.  May be nil if no type was given. If a type is provided, the array is automatically casted to this type when literalizing.  This type is the underlying type, not the array type itself, so for an int4[] database type, it should be :int4 or &#39;int4&#39;</p>
 </td>
 </tr>
 </table>
@@ -117,7 +114,7 @@ int4[] database type, it should be :int4 or &#39;int4&#39;</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 433</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)&#x000A;  <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">434</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">435</span>   <span class="ruby-keyword">super</span>(<span class="ruby-identifier">array</span>)&#x000A;<span class="line-num">436</span>   <span class="ruby-ivar">@array_type</span> = <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">437</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -130,16 +127,14 @@ int4[] database type, it should be :int4 or &#39;int4&#39;</p>
 </div>
 <div class='description'>
 
-<p>Wrap the <a href="PGArray.html">PGArray</a> instance in an <a
-href="ArrayOp.html">ArrayOp</a>, allowing you to easily use the PostgreSQL
-array functions and operators with literal arrays.</p>
+<p>Wrap the <a href="PGArray.html"><code>PGArray</code></a> instance in an <a href="ArrayOp.html"><code>ArrayOp</code></a>, allowing you to easily use the PostgreSQL array functions and operators with literal arrays.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-op-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 285</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;  <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">286</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;<span class="line-num">287</span>   <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">288</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -151,15 +146,14 @@ array functions and operators with literal arrays.</p>
 </div>
 <div class='description'>
 
-<p>Append the array <a href="../SQL.html">SQL</a> to the given sql string.  If
-the receiver has a type, add a cast to the database array type.</p>
+<p>Append the array <a href="../SQL.html"><code>SQL</code></a> to the given sql string.  If the receiver has a type, add a cast to the database array type.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 441</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>&#x000A;    <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">442</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">443</span>   <span class="ruby-identifier">at</span> = <span class="ruby-identifier">array_type</span>&#x000A;<span class="line-num">444</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">at</span>&#x000A;<span class="line-num">445</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;&#39;{}&#39;&quot;</span>&#x000A;<span class="line-num">446</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">447</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;ARRAY&quot;</span>&#x000A;<span class="line-num">448</span>     <span class="ruby-identifier">_literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">to_a</span>)&#x000A;<span class="line-num">449</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">450</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">at</span>&#x000A;<span class="line-num">451</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">at</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[]&#39;</span>&#x000A;<span class="line-num">452</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">453</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

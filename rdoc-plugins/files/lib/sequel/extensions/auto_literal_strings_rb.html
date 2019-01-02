@@ -36,17 +36,9 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The auto_literal_strings extension treats string values passed as filter
-arguments as SQL query fragments.  This is the behavior of previous
-versions of <a href="../../../../classes/Sequel.html">Sequel</a>.  Using
-this extension makes using raw SQL fragments easier, since you don&#39;t
-need to wrap them with Sequel.lit, but also makes it easier to introduce
-SQL injection vulnerabilities into the application. It is only recommended
-to use this extension for backwards compatibility with previous versions of
-<a href="../../../../classes/Sequel.html">Sequel</a>.</p>
+<p>The auto_literal_strings extension treats string values passed as filter arguments as SQL query fragments.  This is the behavior of previous versions of <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  Using this extension makes using raw SQL fragments easier, since you don&#39;t need to wrap them with Sequel.lit, but also makes it easier to introduce SQL injection vulnerabilities into the application. It is only recommended to use this extension for backwards compatibility with previous versions of <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 
-<p>With this extension, if a single string is given, it is used as an SQL
-query fragment:</p>
+<p>With this extension, if a single string is given, it is used as an SQL query fragment:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">extension</span>(<span class="ruby-value">:auto_literal_strings</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;A&#39;&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (name &gt; &#39;A&#39;)</span></pre>
 
@@ -58,13 +50,11 @@ query fragment:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; :a&quot;</span>, <span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&quot;A&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (name &gt; &#39;A&#39;)</span></pre>
 
-<p>This extension also allows the use of a plain string passed to
-Dataset#update:</p>
+<p>This extension also allows the use of a plain string passed to Dataset#update:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;column = column + 1&quot;</span>)&#x000A;<span class="ruby-comment"># UPDATE table SET column = column + 1</span></pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Dataset/AutoLiteralStrings.html">Sequel::Dataset::AutoLiteralStrings</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Dataset/AutoLiteralStrings.html"><code>Sequel::Dataset::AutoLiteralStrings</code></a></p>
 </div>
 <div id='context'>
 </div>

@@ -57,15 +57,14 @@ Sequel::Plugins::UpdateOrCreate::ClassMethods
 </div>
 <div class='description'>
 
-<p>Operates the same as <code>update_or_create</code>, but returns the objects
-without persisting changes (no UPDATE/INSERT queries).</p>
+<p>Operates the same as <code>update_or_create</code>, but returns the objects without persisting changes (no UPDATE/INSERT queries).</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-find_or_new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-find_or_new-source'><span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">attrs</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">set_attrs</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">set_attrs</span>&#x000A;  <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-identifier">obj</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-find_or_new-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">attrs</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attrs</span>)&#x000A;<span class="line-num">57</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">set_attrs</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">set_attrs</span>&#x000A;<span class="line-num">58</span>   <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;<span class="line-num">59</span>   <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-update_or_create'>
@@ -77,20 +76,14 @@ without persisting changes (no UPDATE/INSERT queries).</p>
 </div>
 <div class='description'>
 
-<p>Attempt to find an record with the <code>attrs</code>, which should be a
-hash with column symbol keys.  If such an record exists, update it with the
-values given in <code>set_attrs</code>.  If no such record exists, create a
-new record with the columns specified by both <code>attrs</code> and
-<code>set_attrs</code>, with the ones in <code>set_attrs</code> taking
-priority.  If a block is given, the object is yielded to the block before
-the object is saved.  Returns the new or updated object.</p>
+<p>Attempt to find an record with the <code>attrs</code>, which should be a hash with column symbol keys.  If such an record exists, update it with the values given in <code>set_attrs</code>.  If no such record exists, create a new record with the columns specified by both <code>attrs</code> and <code>set_attrs</code>, with the ones in <code>set_attrs</code> taking priority.  If a block is given, the object is yielded to the block before the object is saved.  Returns the new or updated object.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-update_or_create-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-update_or_create-source'><span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_or_create</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">save_changes</span>&#x000A;  <span class="ruby-identifier">obj</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-update_or_create-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">update_or_create</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">48</span>   <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">49</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">save_changes</span>&#x000A;<span class="line-num">50</span>   <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

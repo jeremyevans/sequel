@@ -38,31 +38,24 @@ Last Update:
 <div id='description'>
 <h1 id="label-Improvements">Improvements<span><a href="#label-Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#copy_into in the jdbc/postgresql adapter now works correctly when
-using multibyte characters in strings.</p>
+<p>Database#copy_into in the jdbc/postgresql adapter now works correctly when using multibyte characters in strings.</p>
 </li><li>
-<p>The alter_table add_foreign_key method is now reversible when the
-:foreign_key_constraint_name option is used.</p>
+<p>The alter_table add_foreign_key method is now reversible when the :foreign_key_constraint_name option is used.</p>
 </li><li>
-<p>The jdbc/h2 and jdbc/hsqldb adapters now respect the
-:foreign_key_constraint_name option.</p>
+<p>The jdbc/h2 and jdbc/hsqldb adapters now respect the :foreign_key_constraint_name option.</p>
 </li><li>
 <p>Calling Model.freeze on an already frozen model no longer raises an error.</p>
 </li><li>
-<p>An unnecessary database query is now avoided when loading the pg_inet
-extension when the pg_array extension is already loaded.</p>
+<p>An unnecessary database query is now avoided when loading the pg_inet extension when the pg_array extension is already loaded.</p>
 </li><li>
-<p>A better exception message is now used when migrating with an empty
-migration directory.</p>
+<p>A better exception message is now used when migrating with an empty migration directory.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Model.allowed_columns has been removed. Use the whitelist_security plugin
-if you want to call it.</p>
+<p>Model.allowed_columns has been removed. Use the whitelist_security plugin if you want to call it.</p>
 </li><li>
-<p>Model use_after_commit_rollback class and instance accessors have been
-removed.</p>
+<p>Model use_after_commit_rollback class and instance accessors have been removed.</p>
 </li><li>
 <p>Support for the Model#_before_validation method has been removed.</p>
 </li><li>

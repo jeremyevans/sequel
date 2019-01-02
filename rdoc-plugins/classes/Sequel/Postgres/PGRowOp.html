@@ -109,15 +109,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Wrap the expression in a <a href="PGRowOp.html">PGRowOp</a>, without
-changing the <a href="../SQL.html">SQL</a> it would use.</p>
+<p>Wrap the expression in a <a href="PGRowOp.html"><code>PGRowOp</code></a>, without changing the <a href="../SQL.html"><code>SQL</code></a> it would use.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-wrap-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-wrap-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 97</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">wrap</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">WRAP</span>, [<span class="ruby-identifier">expr</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-wrap-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>&#x000A;<span class="line-num"> 98</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">wrap</span>(<span class="ruby-identifier">expr</span>)&#x000A;<span class="line-num"> 99</span>   <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">WRAP</span>, [<span class="ruby-identifier">expr</span>])&#x000A;<span class="line-num">100</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -130,9 +129,7 @@ changing the <a href="../SQL.html">SQL</a> it would use.</p>
 </div>
 <div class='description'>
 
-<p>Use the (identifier).* syntax to reference the members of the composite
-type as separate columns.  Generally used when you want to expand the
-columns of a composite type to be separate columns in the result set.</p>
+<p>Use the (identifier).* syntax to reference the members of the composite type as separate columns.  Generally used when you want to expand the columns of a composite type to be separate columns in the result set.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">*</span>     <span class="ruby-comment"># (a).*</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-value">:a</span>)[<span class="ruby-value">:b</span>].<span class="ruby-identifier">*</span> <span class="ruby-comment"># ((a).b).*</span></pre>
 
@@ -141,7 +138,7 @@ columns of a composite type to be separate columns in the result set.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-2A-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 122</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>([<span class="ruby-keyword">self</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-2A-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>&#x000A;<span class="line-num">123</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;<span class="line-num">124</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">125</span>     <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>([<span class="ruby-keyword">self</span>])&#x000A;<span class="line-num">126</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">127</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">128</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -153,17 +150,14 @@ columns of a composite type to be separate columns in the result set.</p>
 </div>
 <div class='description'>
 
-<p>Access a member of the composite type if given a symbol or an
-SQL::Identifier.  For all other access, assuming the pg_array_ops extension
-is loaded and that it represents an array access.  In either case, return a
-PgRowOp so that access can be cascaded.</p>
+<p>Access a member of the composite type if given a symbol or an SQL::Identifier.  For all other access, assuming the pg_array_ops extension is loaded and that it represents an array access.  In either case, return a PgRowOp so that access can be cascaded.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 106</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">member</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">member</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">QUALIFY</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">member</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>(<span class="ruby-keyword">self</span>)[<span class="ruby-identifier">member</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>&#x000A;<span class="line-num">107</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">member</span>)&#x000A;<span class="line-num">108</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">member</span>&#x000A;<span class="line-num">109</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>&#x000A;<span class="line-num">110</span>     <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">QUALIFY</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">member</span>])&#x000A;<span class="line-num">111</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">112</span>     <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>(<span class="ruby-keyword">self</span>)[<span class="ruby-identifier">member</span>])&#x000A;<span class="line-num">113</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">114</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-splat'>
@@ -175,12 +169,7 @@ PgRowOp so that access can be cascaded.</p>
 </div>
 <div class='description'>
 
-<p>Use the (identifier.*) syntax to indicate that this expression represents
-the composite type of one of the tables being referenced, if it has the
-same name as one of the columns.  If the cast_to argument is given, also
-cast the expression to that type (which should be a symbol representing the
-composite type). This is used if you want to return whole table row as a
-composite type.</p>
+<p>Use the (identifier.*) syntax to indicate that this expression represents the composite type of one of the tables being referenced, if it has the same name as one of the columns.  If the cast_to argument is given, also cast the expression to that type (which should be a symbol representing the composite type). This is used if you want to return whole table row as a composite type.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">splat</span>[<span class="ruby-value">:b</span>] <span class="ruby-comment"># (a.*).b</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">splat</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># (a.*)::a</span></pre>
 
@@ -189,7 +178,7 @@ composite type.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-splat-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-splat-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">splat</span>(<span class="ruby-identifier">cast_to</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot splat a PGRowOp with multiple arguments&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cast_to</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW_CAST</span>, <span class="ruby-identifier">args</span> <span class="ruby-operator">+</span> [<span class="ruby-identifier">cast_to</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-splat-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">splat</span>(<span class="ruby-identifier">cast_to</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">143</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;<span class="line-num">144</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot splat a PGRowOp with multiple arguments&#39;</span>&#x000A;<span class="line-num">145</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">146</span> &#x000A;<span class="line-num">147</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">cast_to</span>&#x000A;<span class="line-num">148</span>     <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW_CAST</span>, <span class="ruby-identifier">args</span> <span class="ruby-operator">+</span> [<span class="ruby-identifier">cast_to</span>])&#x000A;<span class="line-num">149</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">150</span>     <span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">ROW</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">151</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">152</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -39,74 +39,45 @@ Last Update:
 <p>Overview</p>
 <hr>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> 2.12 is really just a
-stepping stone to <a href="../../../classes/Sequel.html">Sequel</a> 3.0,
-which will be released next month.  All major changes currently planned for
-3.0 have been made in 2.12, but 2.12 contains many features that have been
-deprecated and will be removed or moved into extensions or plugins in 3.0.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.12 is really just a stepping stone to <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.0, which will be released next month.  All major changes currently planned for 3.0 have been made in 2.12, but 2.12 contains many features that have been deprecated and will be removed or moved into extensions or plugins in 3.0.</p>
 
 <p>Deprecation Logging</p>
 <hr>
 
-<p>If you use a deprecated method or feature, <a
-href="../../../classes/Sequel.html">Sequel</a> will by default print a
-deprecation message and 10 lines of backtrace to standard error to easily
-allow you to figure out which code needs to be updated.  You can change
-where the deprecation messages go and how many lines of backtrace are given
-using the following:</p>
+<p>If you use a deprecated method or feature, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will by default print a deprecation message and 10 lines of backtrace to standard error to easily allow you to figure out which code needs to be updated.  You can change where the deprecation messages go and how many lines of backtrace are given using the following:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-comment"># Turn off all deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span></pre>
 
 <p>Deprecated Features Moving to Extensions</p>
 <hr>
 <ul><li>
-<p>Migrations are being moved into sequel/extensions/migration.  There
-isn&#39;t any reason that they should be loaded in normal use since they
-are used so rarely.  The sequel command line tool uses this extension to
-run the migrations.</p>
+<p>Migrations are being moved into sequel/extensions/migration.  There isn&#39;t any reason that they should be loaded in normal use since they are used so rarely.  The sequel command line tool uses this extension to run the migrations.</p>
 </li><li>
-<p>Adding the blank? method to all objects has been moved into
-sequel/extensions/blank.</p>
+<p>Adding the blank? method to all objects has been moved into sequel/extensions/blank.</p>
 </li><li>
-<p>Dataset#print and Sequel::PrettyTable have been moved into
-sequel/extensions/pretty_table.</p>
+<p>Dataset#print and Sequel::PrettyTable have been moved into sequel/extensions/pretty_table.</p>
 </li><li>
-<p>Dataset#query and related methods have been moved into
-sequel/extensions/query.</p>
+<p>Dataset#query and related methods have been moved into sequel/extensions/query.</p>
 </li><li>
-<p>Dataset#paginate and related methods have been moved into
-sequel/extensions/pagination.</p>
+<p>Dataset#paginate and related methods have been moved into sequel/extensions/pagination.</p>
 </li><li>
-<p>String inflection methods (e.g. “people”.singularize) have been moved into
-sequel/extensions/inflector.</p>
+<p>String inflection methods (e.g. “people”.singularize) have been moved into sequel/extensions/inflector.</p>
 </li><li>
-<p>String date/time conversion methods (e.g. &#39;2000-01-01&#39;.to_date)
-have been moved into sequel/extensions/string_date_time.</p>
+<p>String date/time conversion methods (e.g. &#39;2000-01-01&#39;.to_date) have been moved into sequel/extensions/string_date_time.</p>
 </li></ul>
 
 <p>Deprecated Model Features Moving to Plugins</p>
 <hr>
 <ul><li>
-<p>Model validation class methods have been moved to a plugin.  <a
-href="../../../classes/Sequel.html">Sequel</a> users are encouraged to
-write their own validate instance method instead. A new validation_helpers
-plugin has been added to make this easier, it&#39;s explained in the New
-Features section.  If you want to continue using the validation class
-methods:</p>
+<p>Model validation class methods have been moved to a plugin.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to write their own validate instance method instead. A new validation_helpers plugin has been added to make this easier, it&#39;s explained in the New Features section.  If you want to continue using the validation class methods:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_class_methods</span></pre>
 </li><li>
-<p>Model hook class methods have been moved to a plugin.  <a
-href="../../../classes/Sequel.html">Sequel</a> users are encouraged to
-write their own hook instance methods, and call super to get hooks
-specified in superclasses or plugins.  If you want to continue using the
-hook class methods:</p>
+<p>Model hook class methods have been moved to a plugin.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to write their own hook instance methods, and call super to get hooks specified in superclasses or plugins.  If you want to continue using the hook class methods:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:hook_class_methods</span></pre>
 </li><li>
-<p>Model schema methods (e.g. Model.set_schema, Model.create_table, 
-Model.drop_table) have been moved to a plugin.  The use of these methods
-has been discouraged for a long time.  If you want to use them:</p>
+<p>Model schema methods (e.g. Model.set_schema, Model.create_table,  Model.drop_table) have been moved to a plugin.  The use of these methods has been discouraged for a long time.  If you want to use them:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:schema</span></pre>
 </li><li>
@@ -134,26 +105,15 @@ has been discouraged for a long time.  If you want to use them:</p>
 
 <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:serialization</span>, <span class="ruby-value">:yaml</span>, <span class="ruby-value">:column</span></pre>
 
-<p>Because the previous serialization support depended on dataset transforms,
-the new serialization support is implemented differently, and behavior may
-not be identical in all cases. However, this should be a drop in
-replacement for most users.</p>
+<p>Because the previous serialization support depended on dataset transforms, the new serialization support is implemented differently, and behavior may not be identical in all cases. However, this should be a drop in replacement for most users.</p>
 </li></ul>
 
-<p>Deprecated Features To Be Removed in <a
-href="../../../classes/Sequel.html">Sequel</a> 3.0</p>
+<p>Deprecated Features To Be Removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.0</p>
 <hr>
 <ul><li>
-<p>Dataset#transform is deprecated without any replacement planned. It was
-announced on the <a href="../../../classes/Sequel.html">Sequel</a> mailing
-list that transforms would be removed unless someone said they needed them,
-and nobody said that they did.</p>
+<p>Dataset#transform is deprecated without any replacement planned. It was announced on the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> mailing list that transforms would be removed unless someone said they needed them, and nobody said that they did.</p>
 </li><li>
-<p>Dataset#multi_insert and Dataset#import are no longer aliases of each
-other.  Dataset#multi_insert now takes an array of hashes, and
-Dataset#import now takes an array of columns and an array of arrays of
-values.  Using multi_insert with import&#39;s API or vice-versa is
-deprecated.</p>
+<p>Dataset#multi_insert and Dataset#import are no longer aliases of each other.  Dataset#multi_insert now takes an array of hashes, and Dataset#import now takes an array of columns and an array of arrays of values.  Using multi_insert with import&#39;s API or vice-versa is deprecated.</p>
 </li><li>
 <p>Calling Dataset#[] with no arguments or an integer argument is deprecated.</p>
 </li><li>
@@ -161,43 +121,27 @@ deprecated.</p>
 </li><li>
 <p>Database#multi_threaded? and Database#logger are both deprecated.</p>
 </li><li>
-<p>Calling Database#transaction with a symbol to specify which server to use
-is deprecated.  You should now call it with an option hash with a :server
-key.</p>
+<p>Calling Database#transaction with a symbol to specify which server to use is deprecated.  You should now call it with an option hash with a :server key.</p>
 </li><li>
 <p>Array#extract_options! and Object#is_one_of? are both deprecated.</p>
 </li><li>
-<p>The metaprogramming methods taken from metaid are deprecated and have been
-moved into Sequel::Metaprogramming.  If you want them available to specific
-objects/classes, just include or extend with Sequel::Metaprogramming.  If
-you want all objects to have access to the metaprogramming methods, install
-metaid.  Note that the class_def method from metaid doesn&#39;t exist in
-Sequel::Metaprogramming, since it really isn&#39;t different from
-define_method (except it is public instead of private).</p>
+<p>The metaprogramming methods taken from metaid are deprecated and have been moved into Sequel::Metaprogramming.  If you want them available to specific objects/classes, just include or extend with Sequel::Metaprogramming.  If you want all objects to have access to the metaprogramming methods, install metaid.  Note that the class_def method from metaid doesn&#39;t exist in Sequel::Metaprogramming, since it really isn&#39;t different from define_method (except it is public instead of private).</p>
 </li><li>
-<p>Module#class_attr_overridable, class_attr_reader, and metaalias are
-deprecated.</p>
+<p>Module#class_attr_overridable, class_attr_reader, and metaalias are deprecated.</p>
 </li><li>
-<p>Using Model#set or update when the columns for the model are not set and
-you provide a hash with symbol keys is deprecated. Basically, you must have
-setter methods now for any columns used in set or update.</p>
+<p>Using Model#set or update when the columns for the model are not set and you provide a hash with symbol keys is deprecated. Basically, you must have setter methods now for any columns used in set or update.</p>
 </li><li>
-<p>Model#set_with_params and update_with_params are deprecated, use set and
-update instead.</p>
+<p>Model#set_with_params and update_with_params are deprecated, use set and update instead.</p>
 </li><li>
 <p>Model#save! is deprecated, use save(:validate=&gt;false).</p>
 </li><li>
 <p>Model.is and Model.is_a are deprecated, use Model.plugin.</p>
 </li><li>
-<p>Model.str_columns, Model#str_columns, set_values, and update_values are
-deprecated.  You should use set and update instead of set_values and
-update_values, though they operate differently.</p>
+<p>Model.str_columns, Model#str_columns, set_values, and update_values are deprecated.  You should use set and update instead of set_values and update_values, though they operate differently.</p>
 </li><li>
-<p>Model.delete_all, Model.destroy_all, Model.size, and Model.uniq are
-deprecated, use .delete, .destroy, .count, and .distinct.</p>
+<p>Model.delete_all, Model.destroy_all, Model.size, and Model.uniq are deprecated, use .delete, .destroy, .count, and .distinct.</p>
 </li><li>
-<p>Model.belongs_to, Model.has_many, and Model.has_and_belongs_to_many are
-deprecated, use .many_to_one, .one_to_many, and .many_to_many.</p>
+<p>Model.belongs_to, Model.has_many, and Model.has_and_belongs_to_many are deprecated, use .many_to_one, .one_to_many, and .many_to_many.</p>
 </li><li>
 <p>Model#dataset is deprecated, use Model.dataset.</p>
 </li><li>
@@ -213,23 +157,17 @@ deprecated, use .many_to_one, .one_to_many, and .many_to_many.</p>
 </li><li>
 <p>Dataset#size is deprecated, use count.</p>
 </li><li>
-<p>Passing options to Dataset#each, all, single_record, single_value, sql,
-select_sql, update, update_sql, delete, delete_sql, and exists is
-deprecated.  Modify the options first using clone or a related method, then
-call one of the above methods.</p>
+<p>Passing options to Dataset#each, all, single_record, single_value, sql, select_sql, update, update_sql, delete, delete_sql, and exists is deprecated.  Modify the options first using clone or a related method, then call one of the above methods.</p>
 </li><li>
-<p>Dataset#create_view and create_or_replace_view are deprecated, use the
-database methods instead.</p>
+<p>Dataset#create_view and create_or_replace_view are deprecated, use the database methods instead.</p>
 </li><li>
-<p>Dataset.dataset_classes, model_classes, polymorphic_key, and set_model are
-deprecated.</p>
+<p>Dataset.dataset_classes, model_classes, polymorphic_key, and set_model are deprecated.</p>
 </li><li>
 <p>Database#>> is deprecated.</p>
 </li><li>
 <p>String#to_blob and SQL::Blob#to_blob are deprecated, use to_sequel_blob.</p>
 </li><li>
-<p>The use of Symbol#| to create array subscripts is deprecated, use
-Symbol#sql_subscript.</p>
+<p>The use of Symbol#| to create array subscripts is deprecated, use Symbol#sql_subscript.</p>
 </li><li>
 <p>Symbol#to_column_ref is deprecated, use Dataset#literal.</p>
 </li><li>
@@ -245,48 +183,27 @@ Symbol#sql_subscript.</p>
 </li><li>
 <p>When using ruby 1.8, Hash#key is deprecated.</p>
 </li><li>
-<p>Sequel.open is deprecated, use <a
-href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>.</p>
+<p>Sequel.open is deprecated, use <a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>.</p>
 </li><li>
 <p>Sequel.use_parse_tree and Sequel.use_parse_tree= are deprecated.</p>
 </li><li>
-<p>All upcase_identifier methods and the :upcase_identifiers database option
-are deprecated, use identifier_input_method = :upcase instead.</p>
+<p>All upcase_identifier methods and the :upcase_identifiers database option are deprecated, use identifier_input_method = :upcase instead.</p>
 </li><li>
-<p>Using a virtual row block without an argument is deprecated, see
-Sequel.virtual_row_instance_eval= under New Features.</p>
+<p>Using a virtual row block without an argument is deprecated, see Sequel.virtual_row_instance_eval= under New Features.</p>
 </li><li>
-<p>When using the JDBC adapter, Java::JavaSQL::Timestamp#usec is deprecated. 
-<a href="../../../classes/Sequel.html">Sequel</a> has returned
-Java::JavaSQL::Timestamp as DateTime or Time for a few versions, so this
-shouldn&#39;t affect most people.</p>
+<p>When using the JDBC adapter, Java::JavaSQL::Timestamp#usec is deprecated.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has returned Java::JavaSQL::Timestamp as DateTime or Time for a few versions, so this shouldn&#39;t affect most people.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> will no longer require
-bigdecimal/util, enumerator, or yaml in 3.0.  If you need them in your
-code, make sure you require them yourself.  Using features added by
-requiring these standard libaries will not bring up a deprecation warning,
-for obvious reasons.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer require bigdecimal/util, enumerator, or yaml in 3.0.  If you need them in your code, make sure you require them yourself.  Using features added by requiring these standard libaries will not bring up a deprecation warning, for obvious reasons.</p>
 </li><li>
-<p>Sequel::Error::InvalidTransform, Sequel::Error::NoExistingFilter, and
-Sequel::Error::InvalidStatement exceptions will be removed in <a
-href="../../../classes/Sequel.html">Sequel</a> 3.0.  You will not get a
-deprecation message if you reference them in 2.12.</p>
+<p>Sequel::Error::InvalidTransform, Sequel::Error::NoExistingFilter, and Sequel::Error::InvalidStatement exceptions will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 3.0.  You will not get a deprecation message if you reference them in 2.12.</p>
 </li><li>
-<p>Sequel::Model::Validation::Errors is deprecated, use <a
-href="../../../classes/Sequel/Model/Errors.html">Sequel::Model::Errors</a>
-instead.  Referencing the old name will not bring up a deprecation message.</p>
+<p>Sequel::Model::Validation::Errors is deprecated, use <a href="../../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a> instead.  Referencing the old name will not bring up a deprecation message.</p>
 </li></ul>
 
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>Sequel.virtual_row_instance_eval= was added, which lets you give <a
-href="../../../classes/Sequel.html">Sequel</a> 2.12 the behavior that will
-be the standard in 3.0. It changes blocks passed to Dataset#filter, select,
-or order that don&#39;t accept arguments (or accept any number of
-arguments) to instance eval the block in the context of a new VirtualRow
-instance instead of passing a new VirtualRow instance to the block. It
-allows you to change code that looks like this:</p>
+<p>Sequel.virtual_row_instance_eval= was added, which lets you give <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 2.12 the behavior that will be the standard in 3.0. It changes blocks passed to Dataset#filter, select, or order that don&#39;t accept arguments (or accept any number of arguments) to instance eval the block in the context of a new VirtualRow instance instead of passing a new VirtualRow instance to the block. It allows you to change code that looks like this:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
 
@@ -294,101 +211,61 @@ allows you to change code that looks like this:</p>
 
 <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
 
-<p>When instance_eval is used, only local variables are available to the
-block.  Any calls to instance methods will be interpreted as calling
-VirtualRow#method_missing, which generates identifiers or functions.  When
-virtual_row_instance_eval is enabled, the following type of code will
-break:</p>
+<p>When instance_eval is used, only local variables are available to the block.  Any calls to instance methods will be interpreted as calling VirtualRow#method_missing, which generates identifiers or functions.  When virtual_row_instance_eval is enabled, the following type of code will break:</p>
 
 <pre class="ruby"><span class="ruby-comment"># amount is a instance method</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-value">:number</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">amount</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}</pre>
 
-<p>Just like this example, the only type of code that should break is when a
-virtual row block was used when it wasn&#39;t necessary (since it
-doesn&#39;t use the VirtualRow argument).</p>
+<p>Just like this example, the only type of code that should break is when a virtual row block was used when it wasn&#39;t necessary (since it doesn&#39;t use the VirtualRow argument).</p>
 
-<p>When Sequel.virtual_row_instance_eval = false, using a virtual row block
-that doesn&#39;t accept an argument will cause a deprecation message.</p>
+<p>When Sequel.virtual_row_instance_eval = false, using a virtual row block that doesn&#39;t accept an argument will cause a deprecation message.</p>
 
-<p>Here&#39;s a regular expression that should catch most places where you are
-using a virtual row block without an argument.</p>
+<p>Here&#39;s a regular expression that should catch most places where you are using a virtual row block without an argument.</p>
 
 <pre>egrep -nr &#39;[^A-Za-z0-9_](filter|select|select_more|order|order_more|get|where|having|from|first|and|or|exclude|find|subset|constraint|check)( *(\([^)]*\) *)?){*[^|]&#39; *</pre>
 
 <p>An RDoc page explaining virtual row blocks was added as well.</p>
 </li><li>
-<p>A validation_helpers model plugin was added that allows you to do
-validations similar to the old class level validations inside the
-Model#validate instance method.  The API has changed, but it&#39;s capable
-of most of the same validations.  It doesn&#39;t handle acceptance_of or
-confirmation_of validations, as those shouldn&#39;t be handled in the
-model.</p>
+<p>A validation_helpers model plugin was added that allows you to do validations similar to the old class level validations inside the Model#validate instance method.  The API has changed, but it&#39;s capable of most of the same validations.  It doesn&#39;t handle acceptance_of or confirmation_of validations, as those shouldn&#39;t be handled in the model.</p>
 
 <pre class="ruby"><span class="ruby-comment"># Old class level validations</span>&#x000A;<span class="ruby-identifier">validates_format_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:with</span><span class="ruby-operator">=&gt;</span><span class="ruby-regexp">/.../</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:maximum</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">5</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:minimum</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:is</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">4</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:within</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>&#x000A;<span class="ruby-identifier">validates_not_string</span> <span class="ruby-value">:col</span>&#x000A;<span class="ruby-identifier">validates_numericality_of</span> <span class="ruby-value">:col</span>&#x000A;<span class="ruby-identifier">validates_numericality_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:only_integer</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">validates_presence_of</span> <span class="ruby-value">:col</span>&#x000A;<span class="ruby-identifier">validates_inclusion_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:in</span><span class="ruby-operator">=&gt;</span>[<span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>]&#x000A;<span class="ruby-identifier">validates_uniqueness_of</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>&#x000A;<span class="ruby-identifier">validates_uniqueness_of</span>([<span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>])&#x000A;&#x000A;<span class="ruby-comment"># New instance level validations</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/.../</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_max_length</span> <span class="ruby-value">5</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_min_length</span> <span class="ruby-value">3</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_exact_length</span> <span class="ruby-value">4</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>, <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_not_string</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_numeric</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_integer</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> <span class="ruby-value">:col</span>&#x000A;  <span class="ruby-identifier">validates_includes</span>([<span class="ruby-value">3</span>,<span class="ruby-value">4</span>,<span class="ruby-value">5</span>], <span class="ruby-value">:col</span>)&#x000A;  <span class="ruby-identifier">validates_unique</span> <span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>&#x000A;  <span class="ruby-identifier">validates_unique</span>([<span class="ruby-value">:col</span>, <span class="ruby-value">:col2</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>Another change made is to specify the same type of validation on multiple
-attributes, you must use an array:</p>
+<p>Another change made is to specify the same type of validation on multiple attributes, you must use an array:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Old</span>&#x000A;<span class="ruby-identifier">validates_length_of</span> <span class="ruby-value">:name</span>, <span class="ruby-value">:password</span>, <span class="ruby-value">:within</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># New</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">validates_length_range</span> <span class="ruby-value">3</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>, [<span class="ruby-value">:name</span>, <span class="ruby-value">:password</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>The :message, :allow_blank, :allow_missing, and :allow_nil options are
-still respected.  The :tag option is not needed as instance level
-validations work with code reloading without workarounds. The :if option is
-also not needed for instance level validations:</p>
+<p>The :message, :allow_blank, :allow_missing, and :allow_nil options are still respected.  The :tag option is not needed as instance level validations work with code reloading without workarounds. The :if option is also not needed for instance level validations:</p>
 
 <pre># Old&#x000A;validates_presence_of :name, :if=&gt;:new?&#x000A;validates_presence_of :pass, :if=&gt;{flag &gt; 3}&#x000A;# New&#x000A;def validate&#x000A;  validates_presence(:name) if new?&#x000A;  validates_presence(:pass) if flag &gt; 3&#x000A;end</pre>
 
-<p>The validates_each also doesn&#39;t have an equivalent instance method,
-since it is much easier to just write your own validation:</p>
+<p>The validates_each also doesn&#39;t have an equivalent instance method, since it is much easier to just write your own validation:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Old</span>&#x000A;<span class="ruby-identifier">validates_each</span>(<span class="ruby-value">:date</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">o</span>,<span class="ruby-identifier">a</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">o</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># New</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>&#x000A;  <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-value">:date</span>, <span class="ruby-string">&#39;...&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
-<p>MySQL adapter datasets now have on_duplicate_key_update and insert_ignore
-methods which modify the SQL used to support ON DUPLICATE KEY UPDATE and
-INSERT INGORE syntax in multi_insert and import.</p>
+<p>MySQL adapter datasets now have on_duplicate_key_update and insert_ignore methods which modify the SQL used to support ON DUPLICATE KEY UPDATE and INSERT INGORE syntax in multi_insert and import.</p>
 </li><li>
 <p>If you use the MySQL native adapter, you can set:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">convert_invalid_date_time</span> = <span class="ruby-keyword">nil</span></pre>
 
-<p>to return dates like “0000-00-00” and times like “25:00:00” as nil values
-instead of raising an error.  You can also set it to :string to return the
-values as strings.</p>
+<p>to return dates like “0000-00-00” and times like “25:00:00” as nil values instead of raising an error.  You can also set it to :string to return the values as strings.</p>
 </li><li>
-<p>You can now use <a href="../../../classes/Sequel.html">Sequel</a> without
-modifying any core classes, by defining a SEQUEL_NO_CORE_EXTENSIONS
-constant or environment variable.  In 2.12, this may still add some
-deprecated methods to the core classes, but in 3.0 no methods will be added
-to the core classes if you use this.</p>
+<p>You can now use <a href="../../../classes/Sequel.html"><code>Sequel</code></a> without modifying any core classes, by defining a SEQUEL_NO_CORE_EXTENSIONS constant or environment variable.  In 2.12, this may still add some deprecated methods to the core classes, but in 3.0 no methods will be added to the core classes if you use this.</p>
 </li><li>
-<p>You can now use <a
-href="../../../classes/Sequel/Model.html">Sequel::Model</a> without the
-associations implementation by defining a SEQUEL_NO_ASSOCIATIONS constant
-or environment variable.</p>
+<p>You can now use <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> without the associations implementation by defining a SEQUEL_NO_ASSOCIATIONS constant or environment variable.</p>
 </li></ul>
 
 <p>Other Improvements</p>
 <hr>
 <ul><li>
-<p>Model column accessors have been made faster and the overhead of creating
-them has been reduced significantly.</p>
+<p>Model column accessors have been made faster and the overhead of creating them has been reduced significantly.</p>
 </li><li>
-<p>~{:bool_col=&gt;true} now generates an bool_col IS NOT TRUE filter instead
-of bool_col != TRUE.  This makes it return records with NULL values.  If
-you only want to have false records, you should use {:bool_col=&gt;false}. 
-This works better with SQL&#39;s 3 valued boolean logic.</p>
+<p>~{:bool_col=&gt;true} now generates an bool_col IS NOT TRUE filter instead of bool_col != TRUE.  This makes it return records with NULL values.  If you only want to have false records, you should use {:bool_col=&gt;false}.  This works better with SQL&#39;s 3 valued boolean logic.</p>
 
-<p>It is slightly inconsistent with ~{:col=&gt;1}, since that won&#39;t return
-values where col is NULL, but it gives the user the ability to create an IS
-[NOT] (TRUE|FALSE) filter, which <a
-href="../../../classes/Sequel.html">Sequel</a> previously did not support.</p>
+<p>It is slightly inconsistent with ~{:col=&gt;1}, since that won&#39;t return values where col is NULL, but it gives the user the ability to create an IS [NOT] (TRUE|FALSE) filter, which <a href="../../../classes/Sequel.html"><code>Sequel</code></a> previously did not support.</p>
 
-<p>If you really want the old behavior, you can change it to 
-~{true=&gt;:bool_col}.</p>
+<p>If you really want the old behavior, you can change it to  ~{true=&gt;:bool_col}.</p>
 </li><li>
-<p>Model.use_transactions was added for setting whether model objects should
-use transactions when destroying or saving records.  Like most <a
-href="../../../classes/Sequel.html">Sequel</a> options, it&#39;s settable
-on a global, per model, and per object basis:</p>
+<p>Model.use_transactions was added for setting whether model objects should use transactions when destroying or saving records.  Like most <a href="../../../classes/Sequel.html"><code>Sequel</code></a> options, it&#39;s settable on a global, per model, and per object basis:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">my_model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span></pre>
 
@@ -398,109 +275,65 @@ on a global, per model, and per object basis:</p>
 </li><li>
 <p>The Oracle adapter now supports schema parsing.</p>
 </li><li>
-<p>When using Model.db=, all current dataset options are copied to a new
-dataset created with the new db.</p>
+<p>When using Model.db=, all current dataset options are copied to a new dataset created with the new db.</p>
 </li><li>
 <p>Model::Errors#count was refactored to improve performance.</p>
 </li><li>
-<p>Most exception classes that were located under <a
-href="../../../classes/Sequel/Error.html">Sequel::Error</a> are now located
-directly under <a href="../../../classes/Sequel.html">Sequel</a>.  The old
-names are not deprecated (unless mentioned above), but their use is now
-discouraged.  The exceptions have the same name except that
-Sequel::Error::PoolTimeoutError changed to Sequel::PoolTimeout.</p>
+<p>Most exception classes that were located under <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> are now located directly under <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.  The old names are not deprecated (unless mentioned above), but their use is now discouraged.  The exceptions have the same name except that Sequel::Error::PoolTimeoutError changed to Sequel::PoolTimeout.</p>
 </li><li>
-<p>Dataset#where now always affects the WHERE clause.  Before, it was just an
-alias of filter, so it modified the HAVING clause if the dataset already
-had a HAVING clause.</p>
+<p>Dataset#where now always affects the WHERE clause.  Before, it was just an alias of filter, so it modified the HAVING clause if the dataset already had a HAVING clause.</p>
 </li><li>
-<p>The optimization of Model.[] introduced in 2.11.0 broke on databases that
-didn&#39;t support LIMIT.  The optimization now works on those databases.</p>
+<p>The optimization of Model.[] introduced in 2.11.0 broke on databases that didn&#39;t support LIMIT.  The optimization now works on those databases.</p>
 </li><li>
-<p>All of the the RDoc documentation was reviewed and many updates were made,
-resulting in significantly improved documentation quality.</p>
+<p>All of the the RDoc documentation was reviewed and many updates were made, resulting in significantly improved documentation quality.</p>
 </li><li>
-<p>Model.def_dataset_method now works when the model doesn&#39;t have an
-associated dataset, as it will add the method to a dataset given to
-set_dataset in the future.</p>
+<p>Model.def_dataset_method now works when the model doesn&#39;t have an associated dataset, as it will add the method to a dataset given to set_dataset in the future.</p>
 </li><li>
-<p>Database#get and select now take a block that is passed to the dataset they
-create.</p>
+<p>Database#get and select now take a block that is passed to the dataset they create.</p>
 </li><li>
-<p>You can disable the use of INSERT RETURNING in the shared PostgreSQL
-adapter using disable_insert_returning.  This is mostly useful if you are
-inserting a large number of records.</p>
+<p>You can disable the use of INSERT RETURNING in the shared PostgreSQL adapter using disable_insert_returning.  This is mostly useful if you are inserting a large number of records.</p>
 </li><li>
 <p>A bug relating to aliasing columns in the JDBC adapter has been fixed.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> can now create and drop
-schema-qualified views.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> can now create and drop schema-qualified views.</p>
 </li><li>
 <p>Performance of Dataset#destroy for model datasets was improved.</p>
 </li><li>
 <p>The specs now run on Rspec 1.2.</p>
 </li><li>
-<p>Internal dependence on the methods that <a
-href="../../../classes/Sequel.html">Sequel</a> adds to core classes has
-been eliminated, any internal use of methods that <a
-href="../../../classes/Sequel.html">Sequel</a> adds to the core classes is
-now considered a bug.</p>
+<p>Internal dependence on the methods that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> adds to core classes has been eliminated, any internal use of methods that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> adds to the core classes is now considered a bug.</p>
 </li><li>
-<p>A possible bug where Database#rename_table would not remove a cached schema
-entry has been fixed.</p>
+<p>A possible bug where Database#rename_table would not remove a cached schema entry has been fixed.</p>
 </li><li>
-<p>The Oracle and MySQL adapters now raise an error as soon as you call
-distinct on a dataset, instead of waiting until the SQL is generated.</p>
+<p>The Oracle and MySQL adapters now raise an error as soon as you call distinct on a dataset, instead of waiting until the SQL is generated.</p>
 </li></ul>
 
 <p>Backwards Compatibilty</p>
 <hr>
 <ul><li>
-<p>Saving a newly inserted record in an after_create or after_save hook is no
-longer broken.  It broke in 2.10 as a side effect of allowing the hook to
-check whether or not the record was a new record.  The code has been
-changed so that a @was_new instance variable will be defined to true if the
-record was just created.</p>
+<p>Saving a newly inserted record in an after_create or after_save hook is no longer broken.  It broke in 2.10 as a side effect of allowing the hook to check whether or not the record was a new record.  The code has been changed so that a @was_new instance variable will be defined to true if the record was just created.</p>
 
-<p>Similarly, instead of not modifying changed_columns until after the after
-hooks run, a @columns_updated instance variable will be available in the
-after hooks that is a hash of exactly what attribute keys and values were
-used in the update.</p>
+<p>Similarly, instead of not modifying changed_columns until after the after hooks run, a @columns_updated instance variable will be available in the after hooks that is a hash of exactly what attribute keys and values were used in the update.</p>
 
-<p>These changes break compatibility with 2.11.0 and 2.10.0, but restore
-compatibility with 2.9.0 and previous versions.</p>
+<p>These changes break compatibility with 2.11.0 and 2.10.0, but restore compatibility with 2.9.0 and previous versions.</p>
 </li><li>
-<p>PostgreSQL no longer uses savepoints for nested transactions by default. 
-If you want to use a savepoint, you have to pass the :savepoint option to
-the transaction method.  Using savepoints by default broke expectations
-when a method raised Rollback to rollback the transaction, and it only
-rolled back to the last savepoint.</p>
+<p>PostgreSQL no longer uses savepoints for nested transactions by default.  If you want to use a savepoint, you have to pass the :savepoint option to the transaction method.  Using savepoints by default broke expectations when a method raised Rollback to rollback the transaction, and it only rolled back to the last savepoint.</p>
 </li><li>
-<p>The anonymous model classes created by Sequel::Model() are now stored in
-Model::ANONYMOUS_MODEL_CLASSES instead of the @models class instance
-variable of the main module.</p>
+<p>The anonymous model classes created by Sequel::Model() are now stored in Model::ANONYMOUS_MODEL_CLASSES instead of the @models class instance variable of the main module.</p>
 </li><li>
-<p>The mappings of adapter schemes to classes are now stored in
-Sequel::ADAPTER_MAP instead of the Database @@adapters class variable.</p>
+<p>The mappings of adapter schemes to classes are now stored in Sequel::ADAPTER_MAP instead of the Database @@adapters class variable.</p>
 </li><li>
-<p>Model instances no longer contain a reference to their class&#39;s
-@db_schema.</p>
+<p>Model instances no longer contain a reference to their class&#39;s @db_schema.</p>
 </li><li>
 <p>Database schema sql methods (e.g. alter_table_sql) are now private.</p>
 </li><li>
-<p>Database#[] no longer accepts a block.  It&#39;s not possible to call it
-with a block in general usage, anyway.</p>
+<p>Database#[] no longer accepts a block.  It&#39;s not possible to call it with a block in general usage, anyway.</p>
 </li><li>
-<p>The Sequel::Schema::SQL module no longer exists, the methods it included
-were placed directly in the <a
-href="../../../classes/Sequel/Database.html">Sequel::Database</a> class.</p>
+<p>The Sequel::Schema::SQL module no longer exists, the methods it included were placed directly in the <a href="../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> class.</p>
 </li><li>
-<p>The Sequel::SQL::SpecificExpression class has been removed, subclasses now
-inherit from <a
-href="../../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>.</p>
+<p>The Sequel::SQL::SpecificExpression class has been removed, subclasses now inherit from <a href="../../../classes/Sequel/SQL/Expression.html"><code>Sequel::SQL::Expression</code></a>.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now requires its own
-files with an absolute path.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now requires its own files with an absolute path.</p>
 </li><li>
 <p>The file hierarchy of the sequel library changed significantly.</p>
 </li></ul>

@@ -56,15 +56,14 @@ Sequel::Postgres::IntervalDatasetMethods
 </div>
 <div class='description'>
 
-<p>Handle literalization of ActiveSupport::Duration objects, treating them as
-PostgreSQL intervals.</p>
+<p>Handle literalization of ActiveSupport::Duration objects, treating them as PostgreSQL intervals.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-literal_other_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-literal_other_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_other_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">IntervalDatabaseMethods</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">v</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::interval&#39;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-literal_other_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_other_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">184</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">185</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;<span class="line-num">186</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">IntervalDatabaseMethods</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">v</span>))&#x000A;<span class="line-num">187</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::interval&#39;</span>&#x000A;<span class="line-num">188</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">189</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">190</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

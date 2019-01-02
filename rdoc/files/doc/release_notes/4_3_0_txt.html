@@ -40,10 +40,7 @@ Last Update:
 <ul><li>
 <p>The tree and rcte_tree plugins now support composite keys.</p>
 </li><li>
-<p>An error_sql Database extension has been added.  This extension adds the
-DatabaseError#sql method, which should return the database query that
-caused the error.  This is useful for drivers that don&#39;t include the
-SQL used as part of the error message.</p>
+<p>An error_sql Database extension has been added.  This extension adds the DatabaseError#sql method, which should return the database query that caused the error.  This is useful for drivers that don&#39;t include the SQL used as part of the error message.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -52,15 +49,11 @@ SQL used as part of the error message.</p>
 </li><li>
 <p>Empty arrays are now literalized correctly on PostgreSQL &lt;8.4.</p>
 </li><li>
-<p>In the pagination extension, Dataset#page_count is now 1 even if the
-dataset is empty.  This fixes issues with last_page? and page_range
-returning bad values for empty datasets.</p>
+<p>In the pagination extension, Dataset#page_count is now 1 even if the dataset is empty.  This fixes issues with last_page? and page_range returning bad values for empty datasets.</p>
 </li><li>
-<p>In the pagination extension, calling Dataset#each_page without a block now
-returns an Enumerator.</p>
+<p>In the pagination extension, calling Dataset#each_page without a block now returns an Enumerator.</p>
 </li><li>
-<p>Dataset#qualify and Sequel.delay now work together, qualifying the object
-returned by the delayed evaluation.</p>
+<p>Dataset#qualify and Sequel.delay now work together, qualifying the object returned by the delayed evaluation.</p>
 </li><li>
 <p>Migrator.migrator_class is now a public method.</p>
 </li><li>
@@ -68,15 +61,12 @@ returned by the delayed evaluation.</p>
 </li><li>
 <p>Another disconnect error is now recognized in the jdbc/as400 adapter.</p>
 </li><li>
-<p>Guides about using and creating <a
-href="../../../classes/Sequel.html">Sequel</a> extensions and model plugins
-have been added.</p>
+<p>Guides about using and creating <a href="../../../classes/Sequel.html"><code>Sequel</code></a> extensions and model plugins have been added.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>If you were expecting Dataset#page_count on a empty paginated dataset to
-return 0, you need to update your code.</p>
+<p>If you were expecting Dataset#page_count on a empty paginated dataset to return 0, you need to update your code.</p>
 </li></ul>
 </div>
 <div id='context'>

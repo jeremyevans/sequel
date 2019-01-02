@@ -36,15 +36,11 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<h1 id="label-Sequel-3A-3AModel+Mass+Assignment"><a href="../../classes/Sequel/Model.html">Sequel::Model</a> Mass Assignment<span><a href="#label-Sequel-3A-3AModel+Mass+Assignment">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Sequel-3A-3AModel+Mass+Assignment"><a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> Mass Assignment<span><a href="#label-Sequel-3A-3AModel+Mass+Assignment">&para;</a> <a href="#top">&uarr;</a></span></h1>
 
-<p>Most Model methods that take a hash of attribute keys and values, including
-<code>Model.new</code>, <code>Model.create</code>, <code>Model#set</code>
-and <code>Model#update</code> are subject to Sequel&#39;s mass assignment
-rules.</p>
+<p>Most Model methods that take a hash of attribute keys and values, including <code>Model.new</code>, <code>Model.create</code>, <code>Model#set</code> and <code>Model#update</code> are subject to Sequel&#39;s mass assignment rules.</p>
 
-<p>If you have an instance of a plain <a
-href="../../classes/Sequel/Model.html">Sequel::Model</a> class:</p>
+<p>If you have an instance of a plain <a href="../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> class:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">new</span></pre>
 
@@ -52,79 +48,51 @@ href="../../classes/Sequel/Model.html">Sequel::Model</a> class:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">set</span>(<span class="ruby-value">title:</span> <span class="ruby-string">&#39;T&#39;</span>, <span class="ruby-value">body:</span> <span class="ruby-string">&#39;B&#39;</span>)</pre>
 
-<p>the mass assignment method will go through each key in the hash, append
-<code>=</code> to it to determine the setter method, and if the setter
-method is defined and access to it is not restricted, <a
-href="../../classes/Sequel.html">Sequel</a> will call the setter method
-with the hash value.  So if we assume that the posts table has title and
-body columns, what the above mass assignment call actually does is:</p>
+<p>the mass assignment method will go through each key in the hash, append <code>=</code> to it to determine the setter method, and if the setter method is defined and access to it is not restricted, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will call the setter method with the hash value.  So if we assume that the posts table has title and body columns, what the above mass assignment call actually does is:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">title</span>=(<span class="ruby-string">&#39;T&#39;</span>)&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">body</span>=(<span class="ruby-string">&#39;B&#39;</span>)</pre>
 
-<p>By default, there are two types of setter methods that are restricted. The
-first is methods like <code>typecast_on_assignment=</code> and
-<code>==</code>, which don&#39;t affect columns. These methods cannot be
-enabled for mass assignment. The second is primary key setters.</p>
+<p>By default, there are two types of setter methods that are restricted. The first is methods like <code>typecast_on_assignment=</code> and <code>==</code>, which don&#39;t affect columns. These methods cannot be enabled for mass assignment. The second is primary key setters.</p>
 
 <p>So if you do:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>)</pre>
 
-<p><a href="../../classes/Sequel.html">Sequel</a> will raise a
-Sequel::MassAssignmentRestriction exception, since by default setting the
-primary key is not allowed.</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> will raise a Sequel::MassAssignmentRestriction exception, since by default setting the primary key is not allowed.</p>
 
-<p>To enable use of primary key setters, you need to call
-<code>unrestrict_primary_key</code> for that model:</p>
+<p>To enable use of primary key setters, you need to call <code>unrestrict_primary_key</code> for that model:</p>
 
 <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">unrestrict_primary_key</span></pre>
 
-<p>If you want to change mass assignment so it ignores attempts to access
-restricted setter methods, you can do:</p>
+<p>If you want to change mass assignment so it ignores attempts to access restricted setter methods, you can do:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Global default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Class level</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Instance level</span>&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span></pre>
 
-<p>Since mass assignment by default allows modification of all column values
-except for primary key columns, it can be a security risk in some cases. If
-you are dealing with untrusted input, you are generally going to want to
-restrict what should be updated.</p>
+<p>Since mass assignment by default allows modification of all column values except for primary key columns, it can be a security risk in some cases. If you are dealing with untrusted input, you are generally going to want to restrict what should be updated.</p>
 
-<p><a href="../../classes/Sequel.html">Sequel</a> has
-<code>Model#set_fields</code> and <code>Model#update_fields</code> methods,
-which are designed to be used with untrused input. These methods take two
-arguments, the untrusted hash as the first argument, and a trusted array of
-field names as the second argument:</p>
+<p><a href="../../classes/Sequel.html"><code>Sequel</code></a> has <code>Model#set_fields</code> and <code>Model#update_fields</code> methods, which are designed to be used with untrused input. These methods take two arguments, the untrusted hash as the first argument, and a trusted array of field names as the second argument:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_fields</span>({<span class="ruby-value">title:</span> <span class="ruby-string">&#39;T&#39;</span>, <span class="ruby-value">body:</span> <span class="ruby-string">&#39;B&#39;</span>}, [<span class="ruby-value">:title</span>, <span class="ruby-value">:body</span>])</pre>
 
-<p>Instead of looking at every key in the untrusted hash,
-<code>set_fields</code> will iterate over the trusted field names, looking
-each up in the hash, and calling the setter method appropriately with the
-result.  <code>set_fields</code> basically translates the above method call
-to:</p>
+<p>Instead of looking at every key in the untrusted hash, <code>set_fields</code> will iterate over the trusted field names, looking each up in the hash, and calling the setter method appropriately with the result.  <code>set_fields</code> basically translates the above method call to:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">title</span>=(<span class="ruby-string">&#39;T&#39;</span>)&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">body</span>=(<span class="ruby-string">&#39;B&#39;</span>)</pre>
 
-<p>By using this method, you can be sure that the mass assignment method only
-sets the fields you expect it to set.</p>
+<p>By using this method, you can be sure that the mass assignment method only sets the fields you expect it to set.</p>
 
 <p>Note that if one of the fields does not exist in the hash:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_fields</span>({<span class="ruby-value">title:</span> <span class="ruby-string">&#39;T&#39;</span>}, [<span class="ruby-value">:title</span>, <span class="ruby-value">:body</span>])</pre>
 
-<p><code>set_fields</code> will set the value to nil (the default hash value)
-by default, with behavior equivalent to:</p>
+<p><code>set_fields</code> will set the value to nil (the default hash value) by default, with behavior equivalent to:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">title</span>=(<span class="ruby-string">&#39;T&#39;</span>)&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">body</span>=(<span class="ruby-keyword">nil</span>)</pre>
 
-<p>You can use the :missing option to <code>set_fields</code> to change the
-behavior:</p>
+<p>You can use the :missing option to <code>set_fields</code> to change the behavior:</p>
 
 <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_fields</span>({<span class="ruby-value">title:</span> <span class="ruby-string">&#39;T&#39;</span>}, [<span class="ruby-value">:title</span>, <span class="ruby-value">:body</span>], <span class="ruby-value">missing:</span> <span class="ruby-value">:skip</span>)&#x000A;<span class="ruby-comment"># post.title=(&#39;T&#39;) # only</span>&#x000A;&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_fields</span>({<span class="ruby-value">title:</span> <span class="ruby-string">&#39;T&#39;</span>}, [<span class="ruby-value">:title</span>, <span class="ruby-value">:body</span>], <span class="ruby-value">missing:</span> <span class="ruby-value">:raise</span>)&#x000A;<span class="ruby-comment"># raises Sequel::Error</span></pre>
 
-<p>If you want to set a model level default for the <code>set_fields</code>
-options, you can use the <code>default_set_fields_options</code> class
-accessor:</p>
+<p>If you want to set a model level default for the <code>set_fields</code> options, you can use the <code>default_set_fields_options</code> class accessor:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Global default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_set_fields_options</span>[<span class="ruby-value">:missing</span>] = <span class="ruby-value">:skip</span>&#x000A;<span class="ruby-comment"># Class level</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">default_set_fields_options</span>[<span class="ruby-value">:missing</span>] = <span class="ruby-value">:skip</span></pre>
 
@@ -134,22 +102,16 @@ accessor:</p>
 </td></tr><tr><td class='label'>Model.create(hash) </td><td>
 <p>Calls Model.new(hash).save</p>
 </td></tr><tr><td class='label'>Model#set(hash) </td><td>
-<p>Calls related setter method (unless access is restricted) for each key in
-the hash, then returns self</p>
+<p>Calls related setter method (unless access is restricted) for each key in the hash, then returns self</p>
 </td></tr><tr><td class='label'>Model#update(hash) </td><td>
 <p>Calls set(hash).save_changes</p>
 </td></tr><tr><td class='label'>Model#set_fields(hash, columns, options) </td><td>
-<p>For each column in columns, looks up related entry in hash, and calls the
-related setter method</p>
+<p>For each column in columns, looks up related entry in hash, and calls the related setter method</p>
 </td></tr><tr><td class='label'>Model#update_fields(hash, columns, options) </td><td>
 <p>Calls set_fields(hash, columns, options).save_changes</p>
 </td></tr></tbody></table>
 
-<p>For backwards compatibility, <a href="../../classes/Sequel.html">Sequel</a>
-also ships with a whitelist_security and blacklist_security plugins that
-offer additional mass assignment methods, but it is recommended to use
-<code>set_fields</code> or <code>update_fields</code> for untrusted input,
-and the other methods for trusted input.</p>
+<p>For backwards compatibility, <a href="../../classes/Sequel.html"><code>Sequel</code></a> also ships with a whitelist_security and blacklist_security plugins that offer additional mass assignment methods, but it is recommended to use <code>set_fields</code> or <code>update_fields</code> for untrusted input, and the other methods for trusted input.</p>
 </div>
 <div id='context'>
 </div>

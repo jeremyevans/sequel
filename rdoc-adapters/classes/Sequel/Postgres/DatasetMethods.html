@@ -126,7 +126,7 @@ Sequel::Postgres::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-analyze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-analyze-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1364</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">analyze</span>&#x000A;  <span class="ruby-identifier">explain</span>(<span class="ruby-value">:analyze</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-analyze-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1365</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">analyze</span>&#x000A;<span class="line-num">1366</span>   <span class="ruby-identifier">explain</span>(<span class="ruby-value">:analyze</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">1367</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
@@ -138,15 +138,14 @@ Sequel::Postgres::DatasetMethods
 </div>
 <div class='description'>
 
-<p>Handle converting the ruby xor operator (^) into the PostgreSQL xor
-operator (#), and use the ILIKE and NOT ILIKE operators.</p>
+<p>Handle converting the ruby xor operator (^) into the PostgreSQL xor operator (#), and use the ILIKE and NOT ILIKE operators.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-complex_expression_sql_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1371</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>&#x000A;    <span class="ruby-identifier">j</span> = <span class="ruby-string">&#39; # &#39;</span>&#x000A;    <span class="ruby-identifier">c</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">j</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">a</span>)&#x000A;      <span class="ruby-identifier">c</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&#39;NOT ILIKE&#39;</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; &#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">op</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; &#39;</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; ESCAPE &quot;</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-string">&quot;\\&quot;</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-complex_expression_sql_append-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1372</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1373</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;<span class="line-num">1374</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:^</span>&#x000A;<span class="line-num">1375</span>     <span class="ruby-identifier">j</span> = <span class="ruby-string">&#39; # &#39;</span>&#x000A;<span class="line-num">1376</span>     <span class="ruby-identifier">c</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">1377</span>     <span class="ruby-identifier">args</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">1378</span>       <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">j</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>&#x000A;<span class="line-num">1379</span>       <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">a</span>)&#x000A;<span class="line-num">1380</span>       <span class="ruby-identifier">c</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1381</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1382</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&#39;NOT ILIKE&#39;</span>&#x000A;<span class="line-num">1383</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;(&#39;</span>&#x000A;<span class="line-num">1384</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>])&#x000A;<span class="line-num">1385</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; &#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">op</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39; &#39;</span>&#x000A;<span class="line-num">1386</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>])&#x000A;<span class="line-num">1387</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; ESCAPE &quot;</span>&#x000A;<span class="line-num">1388</span>     <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-string">&quot;\\&quot;</span>)&#x000A;<span class="line-num">1389</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;)&#39;</span>&#x000A;<span class="line-num">1390</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1391</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">1392</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1393</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-disable_insert_returning'>
@@ -158,25 +157,18 @@ operator (#), and use the ILIKE and NOT ILIKE operators.</p>
 </div>
 <div class='description'>
 
-<p>Disables automatic use of INSERT … RETURNING.  You can still use returning
-manually to force the use of RETURNING when inserting.</p>
+<p>Disables automatic use of INSERT … RETURNING.  You can still use returning manually to force the use of RETURNING when inserting.</p>
 
-<p>This is designed for cases where INSERT RETURNING cannot be used, such as
-when you are using partitioning with trigger functions or conditional
-rules, or when you are using a PostgreSQL version less than 8.2, or a
-PostgreSQL derivative that does not support returning.</p>
+<p>This is designed for cases where INSERT RETURNING cannot be used, such as when you are using partitioning with trigger functions or conditional rules, or when you are using a PostgreSQL version less than 8.2, or a PostgreSQL derivative that does not support returning.</p>
 
-<p>Note that when this method is used, insert will not return the primary key
-of the inserted row, you will have to get the primary key of the inserted
-row before inserting via nextval, or after inserting via currval or lastval
-(making sure to use the same database connection for currval or lastval).</p>
+<p>Note that when this method is used, insert will not return the primary key of the inserted row, you will have to get the primary key of the inserted row before inserting via nextval, or after inserting via currval or lastval (making sure to use the same database connection for currval or lastval).</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-disable_insert_returning-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-disable_insert_returning-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1408</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disable_insert_returning</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:disable_insert_returning</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-disable_insert_returning-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1409</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">disable_insert_returning</span>&#x000A;<span class="line-num">1410</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:disable_insert_returning</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">1411</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-explain'>
@@ -195,7 +187,7 @@ row before inserting via nextval, or after inserting via currval or lastval
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-explain-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-explain-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1413</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">explain</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">with_sql</span>((<span class="ruby-identifier">opts</span>[<span class="ruby-value">:analyze</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;EXPLAIN ANALYZE &#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;EXPLAIN &#39;</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">select_sql</span>).<span class="ruby-identifier">map</span>(<span class="ruby-value">:&#39;QUERY PLAN&#39;</span>).<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\r\n&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-explain-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1414</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">explain</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1415</span>   <span class="ruby-identifier">with_sql</span>((<span class="ruby-identifier">opts</span>[<span class="ruby-value">:analyze</span>] <span class="ruby-operator">?</span> <span class="ruby-string">&#39;EXPLAIN ANALYZE &#39;</span> <span class="ruby-operator">:</span> <span class="ruby-string">&#39;EXPLAIN &#39;</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">select_sql</span>).<span class="ruby-identifier">map</span>(<span class="ruby-value">:&#39;QUERY PLAN&#39;</span>).<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\r\n&quot;</span>)&#x000A;<span class="line-num">1416</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-for_share'>
@@ -214,7 +206,7 @@ row before inserting via nextval, or after inserting via currval or lastval
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-for_share-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-for_share-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1418</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">for_share</span>&#x000A;  <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:share</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-for_share-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1419</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">for_share</span>&#x000A;<span class="line-num">1420</span>   <span class="ruby-identifier">lock_style</span>(<span class="ruby-value">:share</span>)&#x000A;<span class="line-num">1421</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-full_text_search'>
@@ -226,37 +218,25 @@ row before inserting via nextval, or after inserting via currval or lastval
 </div>
 <div class='description'>
 
-<p>Run a full text search on PostgreSQL.  By default, searching for the
-inclusion of any of the terms in any of the cols.</p>
+<p>Run a full text search on PostgreSQL.  By default, searching for the inclusion of any of the terms in any of the cols.</p>
 
 <p>Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:headline </td><td>
-<p>Append a expression to the selected columns aliased to headline that
-contains an extract of the matched text.</p>
+<p>Append a expression to the selected columns aliased to headline that contains an extract of the matched text.</p>
 </td></tr><tr><td class='label'>:language </td><td>
 <p>The language to use for the search (default: &#39;simple&#39;)</p>
 </td></tr><tr><td class='label'>:plain </td><td>
-<p>Whether a plain search should be used (default: false).  In this case,
-terms should be a single string, and it will do a search where cols
-contains all of the words in terms.  This ignores search operators in
-terms.</p>
+<p>Whether a plain search should be used (default: false).  In this case, terms should be a single string, and it will do a search where cols contains all of the words in terms.  This ignores search operators in terms.</p>
 </td></tr><tr><td class='label'>:phrase </td><td>
-<p>Similar to :plain, but also adding an ILIKE filter to ensure that returned
-rows also include the exact phrase used.</p>
+<p>Similar to :plain, but also adding an ILIKE filter to ensure that returned rows also include the exact phrase used.</p>
 </td></tr><tr><td class='label'>:rank </td><td>
-<p>Set to true to order by the rank, so that closer matches are returned
-first.</p>
+<p>Set to true to order by the rank, so that closer matches are returned first.</p>
 </td></tr><tr><td class='label'>:to_tsquery </td><td>
-<p>Can be set to :plain or :phrase to specify the function to use to convert
-the terms to a ts_query.</p>
+<p>Can be set to :plain or :phrase to specify the function to use to convert the terms to a ts_query.</p>
 </td></tr><tr><td class='label'>:tsquery </td><td>
-<p>Specifies the terms argument is already a valid <a
-href="../SQL.html">SQL</a> expression returning a tsquery, and can be used
-directly in the query.</p>
+<p>Specifies the terms argument is already a valid SQL expression returning a tsquery, and can be used directly in the query.</p>
 </td></tr><tr><td class='label'>:tsvector </td><td>
-<p>Specifies the cols argument is already a valid <a
-href="../SQL.html">SQL</a> expression returning a tsvector, and can be used
-directly in the query.</p>
+<p>Specifies the cols argument is already a valid SQL expression returning a tsvector, and can be used directly in the query.</p>
 </td></tr></tbody></table>
 
 </div>
@@ -264,7 +244,7 @@ directly in the query.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-full_text_search-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-full_text_search-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1441</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_search</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">lang</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:language</span>] <span class="ruby-operator">||</span> <span class="ruby-string">&#39;simple&#39;</span>, <span class="ruby-value">:regconfig</span>)&#x000A;&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsvector</span>]&#x000A;    <span class="ruby-identifier">phrase_cols</span> = <span class="ruby-identifier">full_text_string_join</span>(<span class="ruby-identifier">cols</span>)&#x000A;    <span class="ruby-identifier">cols</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:to_tsvector</span>, <span class="ruby-identifier">lang</span>, <span class="ruby-identifier">phrase_cols</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsquery</span>]&#x000A;    <span class="ruby-identifier">phrase_terms</span> = <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39; | &#39;</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">terms</span>&#x000A;&#x000A;    <span class="ruby-identifier">query_func</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">to_tsquery</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:to_tsquery</span>]&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:phrase</span>, <span class="ruby-value">:plain</span>&#x000A;      <span class="ruby-value">:&quot;#{to_tsquery}to_tsquery&quot;</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:phrase</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:plain</span>]) <span class="ruby-operator">?</span> <span class="ruby-value">:plainto_tsquery</span> <span class="ruby-operator">:</span> <span class="ruby-value">:to_tsquery</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">terms</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">query_func</span>, <span class="ruby-identifier">lang</span>, <span class="ruby-identifier">phrase_terms</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;&quot;</span>, <span class="ruby-string">&quot; @@ &quot;</span>, <span class="ruby-string">&quot;&quot;</span>], <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>))&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:phrase</span>]&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t use :phrase with either :tsvector or :tsquery arguments to full_text_search together&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsvector</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsquery</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">grep</span>(<span class="ruby-identifier">phrase_cols</span>, <span class="ruby-node">&quot;%#{escape_like(phrase_terms)}%&quot;</span>, <span class="ruby-value">:case_insensitive</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rank</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">reverse</span>{<span class="ruby-identifier">ts_rank_cd</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headline</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_append</span>{<span class="ruby-identifier">ts_headline</span>(<span class="ruby-identifier">lang</span>, <span class="ruby-identifier">phrase_cols</span>, <span class="ruby-identifier">terms</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:headline</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-full_text_search-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1442</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">full_text_search</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1443</span>   <span class="ruby-identifier">lang</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:language</span>] <span class="ruby-operator">||</span> <span class="ruby-string">&#39;simple&#39;</span>, <span class="ruby-value">:regconfig</span>)&#x000A;<span class="line-num">1444</span> &#x000A;<span class="line-num">1445</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsvector</span>]&#x000A;<span class="line-num">1446</span>     <span class="ruby-identifier">phrase_cols</span> = <span class="ruby-identifier">full_text_string_join</span>(<span class="ruby-identifier">cols</span>)&#x000A;<span class="line-num">1447</span>     <span class="ruby-identifier">cols</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:to_tsvector</span>, <span class="ruby-identifier">lang</span>, <span class="ruby-identifier">phrase_cols</span>)&#x000A;<span class="line-num">1448</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1449</span> &#x000A;<span class="line-num">1450</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsquery</span>]&#x000A;<span class="line-num">1451</span>     <span class="ruby-identifier">phrase_terms</span> = <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">terms</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39; | &#39;</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">terms</span>&#x000A;<span class="line-num">1452</span> &#x000A;<span class="line-num">1453</span>     <span class="ruby-identifier">query_func</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">to_tsquery</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:to_tsquery</span>]&#x000A;<span class="line-num">1454</span>     <span class="ruby-keyword">when</span> <span class="ruby-value">:phrase</span>, <span class="ruby-value">:plain</span>&#x000A;<span class="line-num">1455</span>       <span class="ruby-value">:&quot;#{to_tsquery}to_tsquery&quot;</span>&#x000A;<span class="line-num">1456</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1457</span>       (<span class="ruby-identifier">opts</span>[<span class="ruby-value">:phrase</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:plain</span>]) <span class="ruby-operator">?</span> <span class="ruby-value">:plainto_tsquery</span> <span class="ruby-operator">:</span> <span class="ruby-value">:to_tsquery</span>&#x000A;<span class="line-num">1458</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1459</span> &#x000A;<span class="line-num">1460</span>     <span class="ruby-identifier">terms</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">query_func</span>, <span class="ruby-identifier">lang</span>, <span class="ruby-identifier">phrase_terms</span>)&#x000A;<span class="line-num">1461</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1462</span> &#x000A;<span class="line-num">1463</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&quot;&quot;</span>, <span class="ruby-string">&quot; @@ &quot;</span>, <span class="ruby-string">&quot;&quot;</span>], <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>))&#x000A;<span class="line-num">1464</span> &#x000A;<span class="line-num">1465</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:phrase</span>]&#x000A;<span class="line-num">1466</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t use :phrase with either :tsvector or :tsquery arguments to full_text_search together&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsvector</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:tsquery</span>]&#x000A;<span class="line-num">1467</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">grep</span>(<span class="ruby-identifier">phrase_cols</span>, <span class="ruby-node">&quot;%#{escape_like(phrase_terms)}%&quot;</span>, <span class="ruby-value">:case_insensitive</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="line-num">1468</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1469</span> &#x000A;<span class="line-num">1470</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rank</span>]&#x000A;<span class="line-num">1471</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">reverse</span>{<span class="ruby-identifier">ts_rank_cd</span>(<span class="ruby-identifier">cols</span>, <span class="ruby-identifier">terms</span>)}&#x000A;<span class="line-num">1472</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1473</span> &#x000A;<span class="line-num">1474</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headline</span>]&#x000A;<span class="line-num">1475</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select_append</span>{<span class="ruby-identifier">ts_headline</span>(<span class="ruby-identifier">lang</span>, <span class="ruby-identifier">phrase_cols</span>, <span class="ruby-identifier">terms</span>).<span class="ruby-identifier">as</span>(<span class="ruby-value">:headline</span>)}&#x000A;<span class="line-num">1476</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1477</span> &#x000A;<span class="line-num">1478</span>   <span class="ruby-identifier">ds</span>&#x000A;<span class="line-num">1479</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert'>
@@ -283,7 +263,7 @@ directly in the query.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1481</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-comment"># Already know which columns to return, let the standard code handle it</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;    <span class="ruby-comment"># Raw SQL used or RETURNING disabled, just use the default behavior</span>&#x000A;    <span class="ruby-comment"># and return nil since sequence is not known.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Force the use of RETURNING with the primary key value,</span>&#x000A;    <span class="ruby-comment"># unless it has been disabled.</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1482</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">1483</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;<span class="line-num">1484</span>     <span class="ruby-comment"># Already know which columns to return, let the standard code handle it</span>&#x000A;<span class="line-num">1485</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">1486</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;<span class="line-num">1487</span>     <span class="ruby-comment"># Raw SQL used or RETURNING disabled, just use the default behavior</span>&#x000A;<span class="line-num">1488</span>     <span class="ruby-comment"># and return nil since sequence is not known.</span>&#x000A;<span class="line-num">1489</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">1490</span>     <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">1491</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1492</span>     <span class="ruby-comment"># Force the use of RETURNING with the primary key value,</span>&#x000A;<span class="line-num">1493</span>     <span class="ruby-comment"># unless it has been disabled.</span>&#x000A;<span class="line-num">1494</span>     <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;<span class="line-num">1495</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1496</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_conflict'>
@@ -295,9 +275,7 @@ directly in the query.</p>
 </div>
 <div class='description'>
 
-<p>Handle uniqueness violations when inserting, by updating the conflicting
-row, using ON CONFLICT. With no options, uses ON CONFLICT DO NOTHING. 
-Options:</p>
+<p>Handle uniqueness violations when inserting, by updating the conflicting row, using ON CONFLICT. With no options, uses ON CONFLICT DO NOTHING.  Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:conflict_where </td><td>
 <p>The index filter, when using a partial index to determine uniqueness.</p>
 </td></tr><tr><td class='label'>:constraint </td><td>
@@ -319,7 +297,7 @@ Options:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert_conflict-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert_conflict-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1532</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert_conflict-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1533</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_conflict</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1534</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:insert_conflict</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">1535</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_ignore'>
@@ -331,9 +309,7 @@ Options:</p>
 </div>
 <div class='description'>
 
-<p>Ignore uniqueness/exclusion violations when inserting, using ON CONFLICT DO
-NOTHING. Exists mostly for compatibility to MySQL&#39;s insert_ignore.
-Example:</p>
+<p>Ignore uniqueness/exclusion violations when inserting, using ON CONFLICT DO NOTHING. Exists mostly for compatibility to MySQL&#39;s insert_ignore. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">insert_ignore</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-value">a:</span> <span class="ruby-value">1</span>, <span class="ruby-value">b:</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># INSERT INTO TABLE (a, b) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># ON CONFLICT DO NOTHING</span></pre>
 
@@ -342,7 +318,7 @@ Example:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert_ignore-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert_ignore-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1542</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>&#x000A;  <span class="ruby-identifier">insert_conflict</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert_ignore-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1543</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_ignore</span>&#x000A;<span class="line-num">1544</span>   <span class="ruby-identifier">insert_conflict</span>&#x000A;<span class="line-num">1545</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select'>
@@ -354,17 +330,14 @@ Example:</p>
 </div>
 <div class='description'>
 
-<p>Insert a record, returning the record inserted, using RETURNING.  Always
-returns nil without running an INSERT statement if <a
-href="DatasetMethods.html#method-i-disable_insert_returning">#disable_insert_returning</a>
-is used.  If the query runs but returns no values, returns false.</p>
+<p>Insert a record, returning the record inserted, using RETURNING.  Always returns nil without running an INSERT statement if <a href="DatasetMethods.html#method-i-disable_insert_returning"><code>disable_insert_returning</code></a> is used.  If the query runs but returns no values, returns false.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert_select-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1549</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>&#x000A;  <span class="ruby-comment"># Handle case where query does not return a row</span>&#x000A;  <span class="ruby-identifier">server?</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert_select-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1550</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">1551</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>&#x000A;<span class="line-num">1552</span>   <span class="ruby-comment"># Handle case where query does not return a row</span>&#x000A;<span class="line-num">1553</span>   <span class="ruby-identifier">server?</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">with_sql_first</span>(<span class="ruby-identifier">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">1554</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-insert_select_sql'>
@@ -376,17 +349,14 @@ is used.  If the query runs but returns no values, returns false.</p>
 </div>
 <div class='description'>
 
-<p>The <a href="../SQL.html">SQL</a> to use for an <a
-href="DatasetMethods.html#method-i-insert_select">#insert_select</a>, adds
-a RETURNING clause to the insert unless the RETURNING clause is already
-present.</p>
+<p>The SQL to use for an <a href="DatasetMethods.html#method-i-insert_select"><code>insert_select</code></a>, adds a RETURNING clause to the insert unless the RETURNING clause is already present.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-insert_select_sql-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-insert_select_sql-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1557</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">returning</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-insert_select_sql-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1558</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">insert_select_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">1559</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:returning</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">returning</span>&#x000A;<span class="line-num">1560</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">1561</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lock'>
@@ -398,18 +368,14 @@ present.</p>
 </div>
 <div class='description'>
 
-<p>Locks all tables in the dataset&#39;s FROM clause (but not in JOINs) with
-the specified mode (e.g. &#39;EXCLUSIVE&#39;).  If a block is given, starts
-a new transaction, locks the table, and yields.  If a block is not given,
-just locks the tables.  Note that PostgreSQL will probably raise an error
-if you lock the table outside of an existing transaction.  Returns nil.</p>
+<p>Locks all tables in the dataset&#39;s FROM clause (but not in JOINs) with the specified mode (e.g. &#39;EXCLUSIVE&#39;).  If a block is given, starts a new transaction, locks the table, and yields.  If a block is not given, just locks the tables.  Note that PostgreSQL will probably raise an error if you lock the table outside of an existing transaction.  Returns nil.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lock-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lock-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1567</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span> <span class="ruby-comment"># perform locking inside a transaction and yield to block</span>&#x000A;    <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>); <span class="ruby-keyword">yield</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">sql</span> = <span class="ruby-string">&#39;LOCK TABLE &#39;</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-identifier">source_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>])&#x000A;    <span class="ruby-identifier">mode</span> = <span class="ruby-identifier">mode</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>.<span class="ruby-identifier">strip</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-constant">LOCK_MODES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">mode</span>)&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported lock mode: #{mode}&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; IN #{mode} MODE&quot;</span>&#x000A;    <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lock-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1568</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1569</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span> <span class="ruby-comment"># perform locking inside a transaction and yield to block</span>&#x000A;<span class="line-num">1570</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>){<span class="ruby-identifier">lock</span>(<span class="ruby-identifier">mode</span>, <span class="ruby-identifier">opts</span>); <span class="ruby-keyword">yield</span>}&#x000A;<span class="line-num">1571</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1572</span>     <span class="ruby-identifier">sql</span> = <span class="ruby-string">&#39;LOCK TABLE &#39;</span>.<span class="ruby-identifier">dup</span>&#x000A;<span class="line-num">1573</span>     <span class="ruby-identifier">source_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:from</span>])&#x000A;<span class="line-num">1574</span>     <span class="ruby-identifier">mode</span> = <span class="ruby-identifier">mode</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">upcase</span>.<span class="ruby-identifier">strip</span>&#x000A;<span class="line-num">1575</span>     <span class="ruby-keyword">unless</span> <span class="ruby-constant">LOCK_MODES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">mode</span>)&#x000A;<span class="line-num">1576</span>       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported lock mode: #{mode}&quot;</span>&#x000A;<span class="line-num">1577</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1578</span>     <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; IN #{mode} MODE&quot;</span>&#x000A;<span class="line-num">1579</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">1580</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1581</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">1582</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-overriding_system_value'>
@@ -421,16 +387,14 @@ if you lock the table outside of an existing transaction.  Returns nil.</p>
 </div>
 <div class='description'>
 
-<p>Use OVERRIDING USER VALUE for INSERT statements, so that identity columns
-always use the user supplied value, and an error is not raised for identity
-columns that are GENERATED ALWAYS.</p>
+<p>Use OVERRIDING USER VALUE for INSERT statements, so that identity columns always use the user supplied value, and an error is not raised for identity columns that are GENERATED ALWAYS.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-overriding_system_value-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-overriding_system_value-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1586</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_system_value</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:system</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-overriding_system_value-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1587</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_system_value</span>&#x000A;<span class="line-num">1588</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:system</span>)&#x000A;<span class="line-num">1589</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-overriding_user_value'>
@@ -442,15 +406,14 @@ columns that are GENERATED ALWAYS.</p>
 </div>
 <div class='description'>
 
-<p>Use OVERRIDING USER VALUE for INSERT statements, so that identity columns
-always use the sequence value instead of the user supplied value.</p>
+<p>Use OVERRIDING USER VALUE for INSERT statements, so that identity columns always use the sequence value instead of the user supplied value.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-overriding_user_value-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-overriding_user_value-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1592</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_user_value</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:user</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-overriding_user_value-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1593</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">overriding_user_value</span>&#x000A;<span class="line-num">1594</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:override</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:user</span>)&#x000A;<span class="line-num">1595</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -467,7 +430,7 @@ always use the sequence value instead of the user supplied value.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_cte-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1596</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>&#x000A;    <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90100</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_cte-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1597</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;<span class="line-num">1598</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>&#x000A;<span class="line-num">1599</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;<span class="line-num">1600</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1601</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90100</span>&#x000A;<span class="line-num">1602</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1603</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte_in_subqueries-3F'>
@@ -479,15 +442,14 @@ always use the sequence value instead of the user supplied value.</p>
 </div>
 <div class='description'>
 
-<p>PostgreSQL supports using the WITH clause in subqueries if it supports
-using WITH at all (i.e. on PostgreSQL 8.4+).</p>
+<p>PostgreSQL supports using the WITH clause in subqueries if it supports using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_cte_in_subqueries-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_cte_in_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1606</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>&#x000A;  <span class="ruby-identifier">supports_cte?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_cte_in_subqueries-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1607</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte_in_subqueries?</span>&#x000A;<span class="line-num">1608</span>   <span class="ruby-identifier">supports_cte?</span>&#x000A;<span class="line-num">1609</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_distinct_on-3F'>
@@ -506,7 +468,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_distinct_on-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_distinct_on-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1611</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_distinct_on?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_distinct_on-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1612</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_distinct_on?</span>&#x000A;<span class="line-num">1613</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1614</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_cube-3F'>
@@ -525,7 +487,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_group_cube-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_group_cube-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1616</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_group_cube-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1617</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_cube?</span>&#x000A;<span class="line-num">1618</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="line-num">1619</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
@@ -544,7 +506,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_group_rollup-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_group_rollup-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1621</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_group_rollup-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1622</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_group_rollup?</span>&#x000A;<span class="line-num">1623</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="line-num">1624</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_grouping_sets-3F'>
@@ -563,7 +525,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_grouping_sets-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_grouping_sets-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1626</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_grouping_sets-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1627</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_grouping_sets?</span>&#x000A;<span class="line-num">1628</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="line-num">1629</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_insert_conflict-3F'>
@@ -582,7 +544,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_insert_conflict-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_insert_conflict-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1636</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_conflict?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_insert_conflict-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1637</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_conflict?</span>&#x000A;<span class="line-num">1638</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="line-num">1639</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_insert_select-3F'>
@@ -601,7 +563,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_insert_select-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_insert_select-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1631</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_select?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_insert_select-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1632</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_insert_select?</span>&#x000A;<span class="line-num">1633</span>   <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;<span class="line-num">1634</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_lateral_subqueries-3F'>
@@ -620,7 +582,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_lateral_subqueries-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_lateral_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1641</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_lateral_subqueries?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90300</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_lateral_subqueries-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1642</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_lateral_subqueries?</span>&#x000A;<span class="line-num">1643</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90300</span>&#x000A;<span class="line-num">1644</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_modifying_joins-3F'>
@@ -639,7 +601,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_modifying_joins-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_modifying_joins-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1646</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_modifying_joins-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1647</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_modifying_joins?</span>&#x000A;<span class="line-num">1648</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1649</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_nowait-3F'>
@@ -658,7 +620,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_nowait-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_nowait-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1651</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_nowait-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1652</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_nowait?</span>&#x000A;<span class="line-num">1653</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1654</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_regexp-3F'>
@@ -677,7 +639,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_regexp-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_regexp-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1661</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_regexp-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1662</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_regexp?</span>&#x000A;<span class="line-num">1663</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1664</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_returning-3F'>
@@ -696,7 +658,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_returning-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_returning-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1656</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_returning-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1657</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_returning?</span>(<span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">1658</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1659</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_skip_locked-3F'>
@@ -715,7 +677,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_skip_locked-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_skip_locked-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1666</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_skip_locked-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1667</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_skip_locked?</span>&#x000A;<span class="line-num">1668</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90500</span>&#x000A;<span class="line-num">1669</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -734,7 +696,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_timestamp_timezones-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1671</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_timestamp_timezones-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1672</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_timestamp_timezones?</span>&#x000A;<span class="line-num">1673</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1674</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_clause-3F'>
@@ -753,7 +715,7 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_window_clause-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_window_clause-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1676</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_window_clause-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1677</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_clause?</span>&#x000A;<span class="line-num">1678</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;<span class="line-num">1679</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_function_frame_option-3F'>
@@ -765,15 +727,14 @@ using WITH at all (i.e. on PostgreSQL 8.4+).</p>
 </div>
 <div class='description'>
 
-<p>Base support added in 8.4, offset supported added in 9.0, GROUPS and
-EXCLUDE support added in 11.0.</p>
+<p>Base support added in 8.4, offset supported added in 9.0, GROUPS and EXCLUDE support added in 11.0.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_window_function_frame_option-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_window_function_frame_option-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1687</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">option</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>&#x000A;    <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:offset</span>&#x000A;    <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:groups</span>, <span class="ruby-value">:exclude</span>&#x000A;    <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">110000</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_window_function_frame_option-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1688</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_function_frame_option?</span>(<span class="ruby-identifier">option</span>)&#x000A;<span class="line-num">1689</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">option</span>&#x000A;<span class="line-num">1690</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:rows</span>, <span class="ruby-value">:range</span>&#x000A;<span class="line-num">1691</span>     <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">1692</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:offset</span>&#x000A;<span class="line-num">1693</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">90000</span>&#x000A;<span class="line-num">1694</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:groups</span>, <span class="ruby-value">:exclude</span>&#x000A;<span class="line-num">1695</span>     <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">110000</span>&#x000A;<span class="line-num">1696</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1697</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -792,7 +753,7 @@ EXCLUDE support added in 11.0.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_window_functions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_window_functions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1681</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>&#x000A;  <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_window_functions-3F-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1682</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_window_functions?</span>&#x000A;<span class="line-num">1683</span>   <span class="ruby-identifier">server_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">80400</span>&#x000A;<span class="line-num">1684</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-truncate'>
@@ -808,8 +769,7 @@ EXCLUDE support added in 11.0.</p>
 
 <p>Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:cascade </td><td>
-<p>whether to use the CASCADE option, useful when truncating tables with
-foreign keys.</p>
+<p>whether to use the CASCADE option, useful when truncating tables with foreign keys.</p>
 </td></tr><tr><td class='label'>:only </td><td>
 <p>truncate using ONLY, so child tables are unaffected</p>
 </td></tr><tr><td class='label'>:restart </td><td>
@@ -827,7 +787,7 @@ foreign keys.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-truncate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-truncate-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1714</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>()&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:truncate_opts</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>).<span class="ruby-identifier">truncate</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-truncate-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1715</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1716</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">1717</span>     <span class="ruby-keyword">super</span>()&#x000A;<span class="line-num">1718</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1719</span>     <span class="ruby-identifier">clone</span>(<span class="ruby-value">:truncate_opts</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>).<span class="ruby-identifier">truncate</span>&#x000A;<span class="line-num">1720</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1721</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Protected Instance methods</h2>
@@ -840,17 +800,14 @@ foreign keys.</p>
 </div>
 <div class='description'>
 
-<p>If returned primary keys are requested, use RETURNING unless already set on
-the dataset.  If RETURNING is already set, use existing returning values. 
-If RETURNING is only set to return a single columns, return an array of
-just that column. Otherwise, return an array of hashes.</p>
+<p>If returned primary keys are requested, use RETURNING unless already set on the dataset.  If RETURNING is already set, use existing returning values.  If RETURNING is only set to return a single columns, return an array of just that column. Otherwise, return an array of hashes.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_import-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-_import-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1728</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-identifier">statements</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)&#x000A;    <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">statements</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">st</span><span class="ruby-operator">|</span> <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">st</span>)}&#x000A;    <span class="ruby-keyword">end</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-_import-source'>     <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">1729</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">1730</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;<span class="line-num">1731</span>     <span class="ruby-identifier">statements</span> = <span class="ruby-identifier">multi_insert_sql</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">1732</span>     <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:server</span>])) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">1733</span>       <span class="ruby-identifier">statements</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">st</span><span class="ruby-operator">|</span> <span class="ruby-identifier">returning_fetch_rows</span>(<span class="ruby-identifier">st</span>)}&#x000A;<span class="line-num">1734</span>     <span class="ruby-keyword">end</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">1735</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:return</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:primary_key</span>&#x000A;<span class="line-num">1736</span>     <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">_import</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">1737</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1738</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">1739</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1740</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

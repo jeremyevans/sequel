@@ -35,14 +35,11 @@ Sequel::Plugins::Finder
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The finder plugin adds Model.finder for defining optimized finder methods.
-There are two ways to use this.  The recommended way is to pass a symbol
-that represents a model class method that returns a dataset:</p>
+<p>The finder plugin adds Model.finder for defining optimized finder methods. There are two ways to use this.  The recommended way is to pass a symbol that represents a model class method that returns a dataset:</p>
 
 <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier ruby-title">by_name</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> <span class="ruby-value">:by_name</span></pre>
 
-<p>This creates an optimized first_by_name method, which you can call
-normally:</p>
+<p>This creates an optimized first_by_name method, which you can call normally:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-string">&quot;Joe&quot;</span>)</pre>
 
@@ -50,10 +47,7 @@ normally:</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span>(<span class="ruby-value">name:</span> <span class="ruby-value">:first_by_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)}</pre>
 
-<p>Additionally, there is a Model.prepared_finder method.  This works
-similarly to Model.finder, but uses a prepared statement.  This limits the
-types of arguments that will be accepted, but can perform better in the
-database.</p>
+<p>Additionally, there is a Model.prepared_finder method.  This works similarly to Model.finder, but uses a prepared statement.  This limits the types of arguments that will be accepted, but can perform better in the database.</p>
 
 <p>Usage:</p>
 
@@ -105,7 +99,7 @@ database.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/finder.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;    <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/finder.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">41</span>     <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">42</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

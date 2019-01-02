@@ -56,15 +56,14 @@ Sequel::Postgres::PGRange::DatasetMethods
 </div>
 <div class='description'>
 
-<p>Handle literalization of ruby <a href="../../../Range.html">Range</a>
-objects, treating them as PostgreSQL ranges.</p>
+<p>Handle literalization of ruby <a href="../../../Range.html"><code>Range</code></a> objects, treating them as PostgreSQL ranges.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-literal_other_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-literal_other_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 308</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_other_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Range</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-identifier">v</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-literal_other_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>&#x000A;<span class="line-num">309</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_other_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">310</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">311</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Range</span>&#x000A;<span class="line-num">312</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-identifier">v</span>))&#x000A;<span class="line-num">313</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">314</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">315</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">316</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

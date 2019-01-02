@@ -38,8 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>LATERAL subqueries are now supported on PostgreSQL 9.3+, HSQLDB, and DB2
-via Dataset#lateral:</p>
+<p>LATERAL subqueries are now supported on PostgreSQL 9.3+, HSQLDB, and DB2 via Dataset#lateral:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a__d</span>).<span class="ruby-identifier">lateral</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a,</span>&#x000A;<span class="ruby-comment"># LATERAL (SELECT * FROM b WHERE (c = a.d)) AS t1</span></pre>
 
@@ -47,113 +46,61 @@ via Dataset#lateral:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">cross_join</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:c</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:a__d</span>).<span class="ruby-identifier">lateral</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM a</span>&#x000A;<span class="ruby-comment"># CROSS JOIN LATERAL (SELECT * FROM b WHERE (c = a.d)) AS t1</span></pre>
 
-<p>If you are using Microsoft SQL Server, you can use the new
-mssql_emulate_lateral_with_apply extension to emulate LATERAL subqueries
-via CROSS/OUTER APPLY.</p>
+<p>If you are using Microsoft SQL Server, you can use the new mssql_emulate_lateral_with_apply extension to emulate LATERAL subqueries via CROSS/OUTER APPLY.</p>
 </li><li>
-<p>The static_cache plugin now supports a :frozen=&gt;false option.  When this
-option is used, instead of returning the frozen cached values, the model
-now returns new, unfrozen objects that can be modified. Note that if you
-make any database modifications, you are responsible for updating the cache
-manually.</p>
+<p>The static_cache plugin now supports a :frozen=&gt;false option.  When this option is used, instead of returning the frozen cached values, the model now returns new, unfrozen objects that can be modified. Note that if you make any database modifications, you are responsible for updating the cache manually.</p>
 </li><li>
-<p>A pg_static_cache_updater extension has been added.  This extension can
-automatically update the caches used by the static_cache plugin, whenever
-the underlying database table is updated, using PostgreSQL&#39;s
-notification channels.</p>
+<p>A pg_static_cache_updater extension has been added.  This extension can automatically update the caches used by the static_cache plugin, whenever the underlying database table is updated, using PostgreSQL&#39;s notification channels.</p>
 
-<p>This works by defining triggers on the underlying model tables that use
-NOTIFY, and spinning up a thread in your application processes that uses
-LISTEN, and refreshes the cache for the related model whenever it receives
-a notification that the underlying table has been modified.</p>
+<p>This works by defining triggers on the underlying model tables that use NOTIFY, and spinning up a thread in your application processes that uses LISTEN, and refreshes the cache for the related model whenever it receives a notification that the underlying table has been modified.</p>
 
-<p>This extension should make it possible to use the static_cache plugin with
-the :frozen=&gt;false option for any table that is small and not frequently
-updated.</p>
+<p>This extension should make it possible to use the static_cache plugin with the :frozen=&gt;false option for any table that is small and not frequently updated.</p>
 </li><li>
-<p>A from_block extension has been added that makes Database#from operate like
-Dataset#from in regards to a passed block, allowing you to write code like:</p>
+<p>A from_block extension has been added that makes Database#from operate like Dataset#from in regards to a passed block, allowing you to write code like:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg1</span>, <span class="ruby-identifier">arg2</span>)}</pre>
 </li><li>
-<p>Database#supports_partial_indexes? has been added for checking for partial
-index support.  Partial indexes are now supported on SQLite 3.8.0+.</p>
+<p>Database#supports_partial_indexes? has been added for checking for partial index support.  Partial indexes are now supported on SQLite 3.8.0+.</p>
 </li><li>
-<p>A pg_loose_count extension has been added for fast approximate counts of
-PostgreSQL tables.  This uses the system tables and should be fairly
-accurate if the table statistics are up to date:</p>
+<p>A pg_loose_count extension has been added for fast approximate counts of PostgreSQL tables.  This uses the system tables and should be fairly accurate if the table statistics are up to date:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(<span class="ruby-value">:table</span>)</pre>
 </li><li>
-<p>The Dataset#use_cursor method in the postgres adapter now supports a
-:cursor_name option.  You can set this option if you want to use nested
-cursors.</p>
+<p>The Dataset#use_cursor method in the postgres adapter now supports a :cursor_name option.  You can set this option if you want to use nested cursors.</p>
 </li><li>
-<p>The mysql2 adapter now supports a :flags Database option allowing to set
-custom mysql2 flags (e.g. ::Mysql2::Client::MULTI_STATEMENTS).</p>
+<p>The mysql2 adapter now supports a :flags Database option allowing to set custom mysql2 flags (e.g. ::Mysql2::Client::MULTI_STATEMENTS).</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset#freeze has been implemented.  Previously, it was not implemented,
-so Object#freeze was used, which resulted in a dataset that wasn&#39;t
-cloneable.  Dataset#freeze now works as expected, resulting in a cloneable
-dataset, but it doesn&#39;t allow methods to be called that mutate the
-receiver.</p>
+<p>Dataset#freeze has been implemented.  Previously, it was not implemented, so Object#freeze was used, which resulted in a dataset that wasn&#39;t cloneable.  Dataset#freeze now works as expected, resulting in a cloneable dataset, but it doesn&#39;t allow methods to be called that mutate the receiver.</p>
 </li><li>
-<p>Dataset#dup has been implemented.  Previously, it was not implemented, so
-Object#dup was used, which resulted in a dataset that shared an options
-hash with the receiver, so modifying the dup&#39;s opts could also change
-the original dataset. Now dup works similarly to clone, except that the
-returned object will not be frozen.</p>
+<p>Dataset#dup has been implemented.  Previously, it was not implemented, so Object#dup was used, which resulted in a dataset that shared an options hash with the receiver, so modifying the dup&#39;s opts could also change the original dataset. Now dup works similarly to clone, except that the returned object will not be frozen.</p>
 </li><li>
-<p>Model#dup has been implemented.  Previously, it was not implemented, so
-Object#dup was used, which resulted in a model instance that shared the
-values hash with the receiver, so modifying the dup&#39;s values also
-changed the original&#39;s values.  Now, dup does a shallow copy of some of
-the internal data structures as well, so the copy is more independent.</p>
+<p>Model#dup has been implemented.  Previously, it was not implemented, so Object#dup was used, which resulted in a model instance that shared the values hash with the receiver, so modifying the dup&#39;s values also changed the original&#39;s values.  Now, dup does a shallow copy of some of the internal data structures as well, so the copy is more independent.</p>
 
 <p>Note that you still need to be careful if you mutate objects:</p>
 
 <pre class="ruby"><span class="ruby-identifier">m</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;a&#39;</span>)&#x000A;<span class="ruby-identifier">m2</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">dup</span>&#x000A;<span class="ruby-identifier">m</span>.<span class="ruby-identifier">a</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># also changes m2</span></pre>
 </li><li>
-<p>Model#clone has been implemented.  Previously, it had the same issues as
-dup.  Now, it calls the new Model#dup, but also freezes the returned object
-if the receiver is frozen.</p>
+<p>Model#clone has been implemented.  Previously, it had the same issues as dup.  Now, it calls the new Model#dup, but also freezes the returned object if the receiver is frozen.</p>
 </li><li>
-<p>Placeholder literal strings with an empty parameter hash are now handled
-correctly.</p>
+<p>Placeholder literal strings with an empty parameter hash are now handled correctly.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The static_cache plugin now disallows saving/destroying instances unless
-the :frozen=&gt;false option is used.  As the cached objects returned by
-the model were frozen anyway, this affects creating new instances or
-saving/destroying instances returned from the underlying dataset.</p>
+<p>The static_cache plugin now disallows saving/destroying instances unless the :frozen=&gt;false option is used.  As the cached objects returned by the model were frozen anyway, this affects creating new instances or saving/destroying instances returned from the underlying dataset.</p>
 </li><li>
-<p>Model#set_values has been removed (it was deprecated starting in <a
-href="../../../classes/Sequel.html">Sequel</a> 4.0).</p>
+<p>Model#set_values has been removed (it was deprecated starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.0).</p>
 </li><li>
-<p>The following Model class methods are no longer defined: insert_multiple,
-set, to_csv, paginate, query, set_overrides, set_defaults.  By default,
-these methods used call the dataset method of the same name, but as those
-methods are no longer defined on datasets by default, they also resulted in
-a NoMethodError.</p>
+<p>The following Model class methods are no longer defined: insert_multiple, set, to_csv, paginate, query, set_overrides, set_defaults.  By default, these methods used call the dataset method of the same name, but as those methods are no longer defined on datasets by default, they also resulted in a NoMethodError.</p>
 </li><li>
-<p>Dataset#query!, set_defaults!, and set_overrides! are no longer defined on
-all datasets.  They are now only defined on datasets that use the query or
-set_overrides extensions.</p>
+<p>Dataset#query!, set_defaults!, and set_overrides! are no longer defined on all datasets.  They are now only defined on datasets that use the query or set_overrides extensions.</p>
 </li><li>
-<p>Partial indexes are no longer returned by Database#indexes on MSSQL, for
-consistency with PostgreSQL.  Note that the same change was desired for
-SQLite, but SQLite currently does not offer reflection support for
-determining which indexes are partial.</p>
+<p>Partial indexes are no longer returned by Database#indexes on MSSQL, for consistency with PostgreSQL.  Note that the same change was desired for SQLite, but SQLite currently does not offer reflection support for determining which indexes are partial.</p>
 </li><li>
-<p>Database#foreign_key_list on MSSQL now will return a
-SQL::QualifiedIdentifier instead of a symbol for the :table entry if the
-schema of the referenced table does not match the schema of the referencing
-table.</p>
+<p>Database#foreign_key_list on MSSQL now will return a SQL::QualifiedIdentifier instead of a symbol for the :table entry if the schema of the referenced table does not match the schema of the referencing table.</p>
 </li></ul>
 </div>
 <div id='context'>

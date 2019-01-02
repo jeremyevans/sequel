@@ -35,8 +35,7 @@ Sequel::ConstraintValidations::CreateTableGeneratorMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Additional methods for the create_table generator to support constraint
-validations.</p>
+<p>Additional methods for the create_table generator to support constraint validations.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -60,8 +59,7 @@ validations.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>An array of stored validation metadata, used later by the database to
-create constraints.</p>
+<p>An array of stored validation metadata, used later by the database to create constraints.</p>
 </td>
 </tr>
 </table>
@@ -85,7 +83,7 @@ create constraints.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-validate-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 216</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">Generator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>).<span class="ruby-identifier">process</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-validate-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">217</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validate</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">218</span>   <span class="ruby-constant">Generator</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>).<span class="ruby-identifier">process</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">219</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-validation'>
@@ -104,7 +102,7 @@ create constraints.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-validation-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-validation-source'><span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb, line 211</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validation</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-ivar">@validations</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-validation-source'>    <span class="ruby-comment"># File lib/sequel/extensions/constraint_validations.rb</span>&#x000A;<span class="line-num">212</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">validation</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">213</span>   <span class="ruby-ivar">@validations</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>&#x000A;<span class="line-num">214</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

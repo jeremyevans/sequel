@@ -35,14 +35,11 @@ Sequel::Plugins::StringStripper
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="StringStripper.html">StringStripper</a> is a plugin that strips
-all input strings when assigning to the model&#39;s values. Example:</p>
+<p><a href="StringStripper.html"><code>StringStripper</code></a> is a plugin that strips all input strings when assigning to the model&#39;s values. Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39; A &#39;</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span> <span class="ruby-comment"># =&gt; &#39;A&#39;</span></pre>
 
-<p>SQL::Blob instances and all non-strings are not modified by this plugin. 
-Additionally, strings passed to a blob column setter are also not modified.
-You can explicitly set other columns to skip the stripping:</p>
+<p>SQL::Blob instances and all non-strings are not modified by this plugin.  Additionally, strings passed to a blob column setter are also not modified.  You can explicitly set other columns to skip the stripping:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">skip_string_stripping</span> <span class="ruby-value">:foo</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">foo:</span> <span class="ruby-string">&#39; A &#39;</span>).<span class="ruby-identifier">foo</span> <span class="ruby-comment"># =&gt; &#39; A &#39;</span></pre>
 
@@ -83,7 +80,7 @@ You can explicitly set other columns to skip the stripping:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:input_transformer</span>, <span class="ruby-value">:string_stripper</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">strip</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb</span>&#x000A;<span class="line-num">27</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">28</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:input_transformer</span>, <span class="ruby-value">:string_stripper</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">strip</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -100,7 +97,7 @@ You can explicitly set other columns to skip the stripping:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-identifier">set_skipped_string_stripping_columns</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/string_stripper.rb</span>&#x000A;<span class="line-num">30</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">31</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span>{<span class="ruby-identifier">set_skipped_string_stripping_columns</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>}&#x000A;<span class="line-num">32</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

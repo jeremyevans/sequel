@@ -58,11 +58,7 @@ Sequel::Plugins::ConstraintValidations::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>A hash of reflections of constraint validations.  Keys are type name
-symbols.  Each value is an array of pairs, with the first element being the
-validation type symbol (e.g. :presence) and the second element being
-options for the validation.  If the validation takes an argument, it
-appears as the :argument entry in the validation option hash.</p>
+<p>A hash of reflections of constraint validations.  Keys are type name symbols.  Each value is an array of pairs, with the first element being the validation type symbol (e.g. :presence) and the second element being options for the validation.  If the validation takes an argument, it appears as the :argument entry in the validation option hash.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -71,8 +67,7 @@ appears as the :argument entry in the validation option hash.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>An array of validation method call arrays.  Each array is an array that is
-splatted to send to perform a validation via validation_helpers.</p>
+<p>An array of validation method call arrays.  Each array is an array that is splatted to send to perform a validation via validation_helpers.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -105,7 +100,7 @@ splatted to send to perform a validation via validation_helpers.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@constraint_validations</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;  <span class="ruby-ivar">@constraint_validation_reflections</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">freeze</span>&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-ivar">@constraint_validation_options</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/constraint_validations.rb</span>&#x000A;<span class="line-num"> 94</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num"> 95</span>   <span class="ruby-ivar">@constraint_validations</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num"> 96</span>   <span class="ruby-ivar">@constraint_validation_reflections</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num"> 97</span>     <span class="ruby-identifier">v</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num"> 98</span>     <span class="ruby-identifier">v</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num"> 99</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">100</span>   <span class="ruby-ivar">@constraint_validation_options</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num">101</span> &#x000A;<span class="line-num">102</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

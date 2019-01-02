@@ -57,8 +57,7 @@ Sequel::Plugins::TacticalEagerLoading::InstanceMethods
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>The dataset that retrieved this object, set if the object was reteived via
-Dataset#all.</p>
+<p>The dataset that retrieved this object, set if the object was reteived via Dataset#all.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -67,8 +66,7 @@ Dataset#all.</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>All model objects retrieved with this object, set if the object was
-reteived via Dataset#all.</p>
+<p>All model objects retrieved with this object, set if the object was reteived via Dataset#all.</p>
 </td>
 </tr>
 </table>
@@ -85,22 +83,14 @@ reteived via Dataset#all.</p>
 </div>
 <div class='description'>
 
-<p>Remove <a
-href="InstanceMethods.html#attribute-i-retrieved_by">#retrieved_by</a> and
-<a
-href="InstanceMethods.html#attribute-i-retrieved_with">#retrieved_with</a>
-when marshalling.  <a
-href="InstanceMethods.html#attribute-i-retrieved_by">#retrieved_by</a>
-contains unmarshallable objects, and <a
-href="InstanceMethods.html#attribute-i-retrieved_with">#retrieved_with</a>
-can be very large and is not helpful without retrieved_by.</p>
+<p>Remove <a href="InstanceMethods.html#attribute-i-retrieved_by"><code>retrieved_by</code></a> and <a href="InstanceMethods.html#attribute-i-retrieved_with"><code>retrieved_with</code></a> when marshalling.  <a href="InstanceMethods.html#attribute-i-retrieved_by"><code>retrieved_by</code></a> contains unmarshallable objects, and <a href="InstanceMethods.html#attribute-i-retrieved_with"><code>retrieved_with</code></a> can be very large and is not helpful without retrieved_by.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-marshallable-21-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-marshallable-21-source'><span class="ruby-comment"># File lib/sequel/plugins/tactical_eager_loading.rb, line 131</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">marshallable!</span>&#x000A;  <span class="ruby-ivar">@retrieved_by</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-ivar">@retrieved_with</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-marshallable-21-source'>    <span class="ruby-comment"># File lib/sequel/plugins/tactical_eager_loading.rb</span>&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">marshallable!</span>&#x000A;<span class="line-num">133</span>   <span class="ruby-ivar">@retrieved_by</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">134</span>   <span class="ruby-ivar">@retrieved_with</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">135</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

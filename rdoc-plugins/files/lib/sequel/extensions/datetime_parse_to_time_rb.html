@@ -36,12 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This switches the default parsing of strings into Time values from using
-Time.parse to using DateTime.parse.to_time.  This fixes issues when the
-times being parsed have no timezone information, the implicit timezone for
-the Database instance is set to <code>:utc</code>, and the timestamps being
-used include values not valid in the local timezone, such as during a
-daylight savings time switch.</p>
+<p>This switches the default parsing of strings into Time values from using Time.parse to using DateTime.parse.to_time.  This fixes issues when the times being parsed have no timezone information, the implicit timezone for the Database instance is set to <code>:utc</code>, and the timestamps being used include values not valid in the local timezone, such as during a daylight savings time switch.</p>
 
 <p>To load the extension:</p>
 

@@ -56,15 +56,14 @@ Sequel::Plugins::DatasetAssociations::ClassMethods
 </div>
 <div class='description'>
 
-<p>Set up a dataset method for each association to return an associated
-dataset</p>
+<p>Set up a dataset method for each association to return an associated dataset</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-associate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/plugins/dataset_associations.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pluralize</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_sym</span>&#x000A;  <span class="ruby-identifier">dataset_module</span>{<span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-identifier">associated</span>(<span class="ruby-identifier">name</span>)}}&#x000A;  <span class="ruby-identifier">ret</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-associate-source'>   <span class="ruby-comment"># File lib/sequel/plugins/dataset_associations.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span>)&#x000A;<span class="line-num">62</span>   <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">63</span>   <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">64</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pluralize</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_sym</span>&#x000A;<span class="line-num">65</span>   <span class="ruby-identifier">dataset_module</span>{<span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-identifier">associated</span>(<span class="ruby-identifier">name</span>)}}&#x000A;<span class="line-num">66</span>   <span class="ruby-identifier">ret</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

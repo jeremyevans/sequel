@@ -38,259 +38,129 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>An auto_validations plugin has been added, which automatically adds not
-null, type, and unique validations based on information obtained from
-parsing the database schema.  If you don&#39;t require customization of the
-validation error message per column, this can significantly DRY up
-validation code.  Currently this plugin requires the database support index
-parsing; that restriction will be removed in <a
-href="../../../classes/Sequel.html">Sequel</a> 4.</p>
+<p>An auto_validations plugin has been added, which automatically adds not null, type, and unique validations based on information obtained from parsing the database schema.  If you don&#39;t require customization of the validation error message per column, this can significantly DRY up validation code.  Currently this plugin requires the database support index parsing; that restriction will be removed in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
-<p>An input_transformer plugin has been added, for automatically running a
-transformation proc on all model column setter input before use.  This is a
-generalization of the string_stripper plugin, allowing arbitrary
-modifications to the input.</p>
+<p>An input_transformer plugin has been added, for automatically running a transformation proc on all model column setter input before use.  This is a generalization of the string_stripper plugin, allowing arbitrary modifications to the input.</p>
 </li><li>
-<p>An error_splitter plugin has been added, for splitting validation errors
-applying to multiple columns into a separate validation error per column. 
-This is useful if you want to to include such errors when using Errors#on
-to get all errors on the column. In general, only uniqueness errors apply
-to multiple columns, so those are the only errors likely to be affected.</p>
+<p>An error_splitter plugin has been added, for splitting validation errors applying to multiple columns into a separate validation error per column.  This is useful if you want to to include such errors when using Errors#on to get all errors on the column. In general, only uniqueness errors apply to multiple columns, so those are the only errors likely to be affected.</p>
 </li></ul>
 
 <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database.extension has been added, allowing you to load an extension into
-all future databases.  This is similar to loading a plugin into <a
-href="../../../classes/Sequel/Model.html">Sequel::Model</a> itself.  For
-example, if you want all Database instances to use the query_literals
-extension, run the following before creating your Database instances:</p>
+<p>Database.extension has been added, allowing you to load an extension into all future databases.  This is similar to loading a plugin into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> itself.  For example, if you want all Database instances to use the query_literals extension, run the following before creating your Database instances:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:query_literals</span></pre>
 </li><li>
-<p>Database.after_initialize has been added for running a hook on all new
-databases created.</p>
+<p>Database.after_initialize has been added for running a hook on all new databases created.</p>
 </li><li>
-<p>Model.default_set_fields_options has been added, allowing you to set the
-default options for the set_fields and update_fields methods.  This is
-useful if you want to make :missing=&gt;:raise or :missing=&gt;:skip the
-default behavior.</p>
+<p>Model.default_set_fields_options has been added, allowing you to set the default options for the set_fields and update_fields methods.  This is useful if you want to make :missing=&gt;:raise or :missing=&gt;:skip the default behavior.</p>
 </li><li>
-<p>The :setter, :adder, :remover, and :clearer association options have been
-added.  These allow you to override the default implementation used to
-modify the association.  :setter affects the *_to_one setter method, :adder
-the *_to_many add_* method, :remover the *_to_many remove_* method, and
-:clearer the *_to_many remove_all_* method.</p>
+<p>The :setter, :adder, :remover, and :clearer association options have been added.  These allow you to override the default implementation used to modify the association.  :setter affects the *_to_one setter method, :adder the *_to_many add_* method, :remover the *_to_many remove_* method, and :clearer the *_to_many remove_all_* method.</p>
 
-<p>Previously, you had to override a private method to get the same behavior,
-this just offers a nicer API for that.</p>
+<p>Previously, you had to override a private method to get the same behavior, this just offers a nicer API for that.</p>
 </li><li>
-<p>A :keep_reference Database option has been added.  When set to false, a
-reference to the Database instance is not kept in Sequel::DATABASES.  This
-is designed for Database instances created by libraries, so they don&#39;t
-accidentally get chosen as the default <a
-href="../../../classes/Sequel/Model.html">Sequel::Model</a> database.</p>
+<p>A :keep_reference Database option has been added.  When set to false, a reference to the Database instance is not kept in Sequel::DATABASES.  This is designed for Database instances created by libraries, so they don&#39;t accidentally get chosen as the default <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> database.</p>
 </li><li>
-<p>Model#modified! now accepts a column and marks that column as changed. 
-This is useful if you plan on mutating the column value as opposed to
-reassigning it.</p>
+<p>Model#modified! now accepts a column and marks that column as changed.  This is useful if you plan on mutating the column value as opposed to reassigning it.</p>
 </li><li>
-<p>Model#modified? now accepts a column and returns whether the column has
-been changed.</p>
+<p>Model#modified? now accepts a column and returns whether the column has been changed.</p>
 </li><li>
-<p>The migrators now support an :allow_missing_migration_files option, which
-makes them silently ignore errors related to missing migration files.</p>
+<p>The migrators now support an :allow_missing_migration_files option, which makes them silently ignore errors related to missing migration files.</p>
 </li><li>
-<p>validates_schema_types has been added to validation_helpers, which
-validates that the column values are instances of the expected ruby type
-for the given database schema type.  This is a more robust version of the
-validates_not_string extension, and users of validates_not_string are
-encouraged to switch soon, as validates_not_string is going away in <a
-href="../../../classes/Sequel.html">Sequel</a> 4.</p>
+<p>validates_schema_types has been added to validation_helpers, which validates that the column values are instances of the expected ruby type for the given database schema type.  This is a more robust version of the validates_not_string extension, and users of validates_not_string are encouraged to switch soon, as validates_not_string is going away in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 
-<p>validates_schema_type has been added to validation_class_methods, which
-preforms the same validation, but it requires the columns be listed
-explicitly.</p>
+<p>validates_schema_type has been added to validation_class_methods, which preforms the same validation, but it requires the columns be listed explicitly.</p>
 
-<p>validates_type in validation_helpers has been expanded to accept an array
-of allowable classes.</p>
+<p>validates_type in validation_helpers has been expanded to accept an array of allowable classes.</p>
 
-<p>Related to this is the addition of Database#schema_type_class for returning
-the type class(es) for the given schema type symbol.</p>
+<p>Related to this is the addition of Database#schema_type_class for returning the type class(es) for the given schema type symbol.</p>
 </li><li>
-<p>validates_not_null has been added to the validation_helpers plugin.  This
-is similar to the validates_presence validation, but only checks for nil
-values, allowing empty/blank strings.</p>
+<p>validates_not_null has been added to the validation_helpers plugin.  This is similar to the validates_presence validation, but only checks for nil values, allowing empty/blank strings.</p>
 </li><li>
-<p>In the caching plugin, when the :ignore_exceptions option is true,
-exceptions raised when deleting an object from the cache are now ignored
-correctly.</p>
+<p>In the caching plugin, when the :ignore_exceptions option is true, exceptions raised when deleting an object from the cache are now ignored correctly.</p>
 </li><li>
-<p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now
-supports a :search_path Database option to automatically set the client
-connection search_path. This allows you to control which schemas do no
-require qualification, and in which order to check schemas when referencing
-unqualified objects.  If you were using the default_schema setting, it is
-recommended that you switch to using :search_path instead.</p>
+<p>On PostgreSQL, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports a :search_path Database option to automatically set the client connection search_path. This allows you to control which schemas do no require qualification, and in which order to check schemas when referencing unqualified objects.  If you were using the default_schema setting, it is recommended that you switch to using :search_path instead.</p>
 </li><li>
-<p>The pg_array extension can now register array types on a per-Database basis
-via Database#register_array_type. Previously, only global registration of
-array types was allowed.  Additionally, when registering array types on a
-per-Database basis, the oids can be looked up automatically, making it
-possible to register array types with just a type name:</p>
+<p>The pg_array extension can now register array types on a per-Database basis via Database#register_array_type. Previously, only global registration of array types was allowed.  Additionally, when registering array types on a per-Database basis, the oids can be looked up automatically, making it possible to register array types with just a type name:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_array_type</span>(<span class="ruby-value">:interval</span>)</pre>
 </li><li>
-<p>The pg_array extension now automatically creates conversion procs for array
-types of all named types used by the database.  This means that if you use
-the pg_array and pg_hstore extensions, the hstore[] type is now handled
-correctly.</p>
+<p>The pg_array extension now automatically creates conversion procs for array types of all named types used by the database.  This means that if you use the pg_array and pg_hstore extensions, the hstore[] type is now handled correctly.</p>
 </li><li>
-<p>The postgres adapter now supports :use_iso_date_format and
-:convert_infinite_timestamps Database options.  Previously,
-use_iso_date_format was only a global setting, and
-convert_infinite_timestamps could only be set after initialization.</p>
+<p>The postgres adapter now supports :use_iso_date_format and :convert_infinite_timestamps Database options.  Previously, use_iso_date_format was only a global setting, and convert_infinite_timestamps could only be set after initialization.</p>
 </li><li>
-<p>Database#supports_schema_parsing? has been added to check if schema parsing
-via the Database#schema method is supported.</p>
+<p>Database#supports_schema_parsing? has been added to check if schema parsing via the Database#schema method is supported.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>A race condition related to prepared_sql for newly prepared statements has
-been fixed.</p>
+<p>A race condition related to prepared_sql for newly prepared statements has been fixed.</p>
 </li><li>
-<p>Dataset#get now works correctly if given an array with multiple columns if
-there were no returned rows.</p>
+<p>Dataset#get now works correctly if given an array with multiple columns if there were no returned rows.</p>
 </li><li>
-<p>The plugins that ship with <a
-href="../../../classes/Sequel.html">Sequel</a> now handle frozen model
-instances correctly.</p>
+<p>The plugins that ship with <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handle frozen model instances correctly.</p>
 </li><li>
-<p>Freezing of model instances now works correctly for models without primary
-keys.</p>
+<p>Freezing of model instances now works correctly for models without primary keys.</p>
 </li><li>
-<p>Database constraints added with the constraint_validations plugin now
-handle NULL values correctly if the :allow_nil=&gt;true setting is used.</p>
+<p>Database constraints added with the constraint_validations plugin now handle NULL values correctly if the :allow_nil=&gt;true setting is used.</p>
 </li><li>
-<p>The  pagination, pretty_table, query, schema_caching, schema_dumper, and
-select_remove extensions can now be loaded by Database#extension.  If you
-are loading them globally via <a
-href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>,
-switch to using Database#extension, since that will be required starting in
-<a href="../../../classes/Sequel.html">Sequel</a> 4.</p>
+<p>The  pagination, pretty_table, query, schema_caching, schema_dumper, and select_remove extensions can now be loaded by Database#extension.  If you are loading them globally via <a href="../../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a>, switch to using Database#extension, since that will be required starting in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
-<p>The lazy_attributes plugin no longer uses the identity_map plugin
-internally, and eager loading lazy attributes now works correctly without
-an active identity map.</p>
+<p>The lazy_attributes plugin no longer uses the identity_map plugin internally, and eager loading lazy attributes now works correctly without an active identity map.</p>
 </li><li>
-<p>The many_to_one_pk_lookup plugin now handles many more corner cases, and
-should be safe to enable by default.</p>
+<p>The many_to_one_pk_lookup plugin now handles many more corner cases, and should be safe to enable by default.</p>
 </li><li>
-<p>The static_cache plugin now has optimized implementations of Model.map,
-.to_hash, and .to_hash_groups which work without a database query. 
-Model.count without arguments has also been optimized to not require a
-database query.</p>
+<p>The static_cache plugin now has optimized implementations of Model.map, .to_hash, and .to_hash_groups which work without a database query.  Model.count without arguments has also been optimized to not require a database query.</p>
 </li><li>
-<p>Fetching new records has been made faster when using the update_primary_key
-plugin, since it was changed to cache the primary key values lazily.</p>
+<p>Fetching new records has been made faster when using the update_primary_key plugin, since it was changed to cache the primary key values lazily.</p>
 </li><li>
-<p>When using the update_primary_key plugin, if the primary key changes, clear
-the associations cache of all non-many_to_one associations (since those
-will likely be based on the primary key).</p>
+<p>When using the update_primary_key plugin, if the primary key changes, clear the associations cache of all non-many_to_one associations (since those will likely be based on the primary key).</p>
 </li><li>
-<p>The pg_typecast_on_load plugin no longer errors if given a column that
-doesn&#39;t have a matching oid conversion proc.</p>
+<p>The pg_typecast_on_load plugin no longer errors if given a column that doesn&#39;t have a matching oid conversion proc.</p>
 </li><li>
-<p>Handling of domain types on PostgreSQL has been significantly improved. 
-Domain type columns now have correct model typecasting, and the pg_row
-extension correctly sets up conversion procs for domain types inside
-composite types.</p>
+<p>Handling of domain types on PostgreSQL has been significantly improved.  Domain type columns now have correct model typecasting, and the pg_row extension correctly sets up conversion procs for domain types inside composite types.</p>
 </li><li>
-<p>Postgres::HStoreOp#- now automatically casts string input to text, so that
-PostgreSQL doesn&#39;t assume the string is an hstore.</p>
+<p>Postgres::HStoreOp#- now automatically casts string input to text, so that PostgreSQL doesn&#39;t assume the string is an hstore.</p>
 </li><li>
-<p>Postgres::PGRangeOp#starts_before and ends_after have been renamed to
-ends_before and starts_after.  The previous names were misleading.  The old
-names are still available for backwards compatibility, but they will be
-removed in the <a href="../../../classes/Sequel.html">Sequel</a> 4.</p>
+<p>Postgres::PGRangeOp#starts_before and ends_after have been renamed to ends_before and starts_after.  The previous names were misleading.  The old names are still available for backwards compatibility, but they will be removed in the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4.</p>
 </li><li>
 <p>The pg_row plugin now handles aliased tables correctly.</p>
 </li><li>
-<p>Model#validate in the validation_class_methods plugin no longer skips
-validate methods in superclasses or previously loaded plugins.</p>
+<p>Model#validate in the validation_class_methods plugin no longer skips validate methods in superclasses or previously loaded plugins.</p>
 </li><li>
-<p>Loading the touch plugin into a model subclass after it has been loaded
-into a model superclass no longer ignores inherited touched associations.</p>
+<p>Loading the touch plugin into a model subclass after it has been loaded into a model superclass no longer ignores inherited touched associations.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> no longer resets the
-conversion procs for the Database instance when using Databaset#extension
-to load a pg_* extension that adds global conversion procs.  Instead, the
-global conversion procs are added to the instance-specific conversion
-procs.  The result of this is that manually added conversion procs will not
-be lost if an extension is loaded afterward.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer resets the conversion procs for the Database instance when using Databaset#extension to load a pg_* extension that adds global conversion procs.  Instead, the global conversion procs are added to the instance-specific conversion procs.  The result of this is that manually added conversion procs will not be lost if an extension is loaded afterward.</p>
 </li><li>
-<p>The jdbc adapter now references the driver class before loading subadapter
-specific code, which can fix issues if the database tries to connect on
-initialization (such as the jdbc/postgres adapter if the pg_hstore
-extension is loaded previously).</p>
+<p>The jdbc adapter now references the driver class before loading subadapter specific code, which can fix issues if the database tries to connect on initialization (such as the jdbc/postgres adapter if the pg_hstore extension is loaded previously).</p>
 </li><li>
-<p>A guide describing Sequel&#39;s support for advanced PostgreSQL features
-has been added.</p>
+<p>A guide describing Sequel&#39;s support for advanced PostgreSQL features has been added.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>If you have already used the constraint_validations plugin to create
-validations with the :allow_nil=&gt;true option, you should drop and
-regenerate those constraints to ensure they handle NULL values correctly.</p>
+<p>If you have already used the constraint_validations plugin to create validations with the :allow_nil=&gt;true option, you should drop and regenerate those constraints to ensure they handle NULL values correctly.</p>
 </li><li>
-<p>The change to make PostgreSQL automatically handle domain types can break
-previous code that set up special conversions and typecasts per domain
-type.  In the schema parsing, if you want to get the domain type
-information, it will be contained in the :db_domain_type and :domain_oid
-schema entries.</p>
+<p>The change to make PostgreSQL automatically handle domain types can break previous code that set up special conversions and typecasts per domain type.  In the schema parsing, if you want to get the domain type information, it will be contained in the :db_domain_type and :domain_oid schema entries.</p>
 </li><li>
-<p>Sequel::Postgres.use_iso_date_format is now only defined if you are using
-the postgres adapter.  Previously, it could be defined when using other
-adapters with a pg_* extension, even though the setting had no effect in
-that case.</p>
+<p>Sequel::Postgres.use_iso_date_format is now only defined if you are using the postgres adapter.  Previously, it could be defined when using other adapters with a pg_* extension, even though the setting had no effect in that case.</p>
 </li><li>
-<p>The validation_class_methods plugin now copies validations into the
-subclass upon inheritance, instead of recursing into the superclass on
-validation.  This makes it more similar to how all the other <a
-href="../../../classes/Sequel.html">Sequel</a> plugins work.  However, it
-also means that if you add validations to a superclass after creating a
-subclass, the subclass won&#39;t have those validations.  Additionally if
-you skip superclass validations in a child class after creating a
-grandchild class, the grandchild class could still have the parent
-class&#39;s validations.</p>
+<p>The validation_class_methods plugin now copies validations into the subclass upon inheritance, instead of recursing into the superclass on validation.  This makes it more similar to how all the other <a href="../../../classes/Sequel.html"><code>Sequel</code></a> plugins work.  However, it also means that if you add validations to a superclass after creating a subclass, the subclass won&#39;t have those validations.  Additionally if you skip superclass validations in a child class after creating a grandchild class, the grandchild class could still have the parent class&#39;s validations.</p>
 </li><li>
-<p>The validates_unique validation in validation_helpers no longer attempts to
-do the uniqueness query if the underlying columns have validation errors. 
-The reasoning behind this is that if the underlying columns are not valid,
-the uniqueness query can cause a DatabaseError.</p>
+<p>The validates_unique validation in validation_helpers no longer attempts to do the uniqueness query if the underlying columns have validation errors.  The reasoning behind this is that if the underlying columns are not valid, the uniqueness query can cause a DatabaseError.</p>
 </li><li>
-<p>If you were passing strings in hstore format to Postgres::HStoreOp#-, you
-should manually cast them to hstore:</p>
+<p>If you were passing strings in hstore format to Postgres::HStoreOp#-, you should manually cast them to hstore:</p>
 
 <pre class="ruby"><span class="ruby-identifier">hstore_op</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;a=&gt;b&#39;</span>, <span class="ruby-value">:hstore</span>)</pre>
 </li><li>
 <p>The default validation error message for validates_type has been modified.</p>
 </li><li>
-<p>Database#schema_column_type was made public accidently by an adapter and a
-few extensions.  That has been fixed, but if you were calling it with an
-explicit receiver and it happened to work by accident before, you&#39;ll
-need to update your code.</p>
+<p>Database#schema_column_type was made public accidently by an adapter and a few extensions.  That has been fixed, but if you were calling it with an explicit receiver and it happened to work by accident before, you&#39;ll need to update your code.</p>
 </li></ul>
 
-<h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html">Sequel</a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> 4 implementation work
-will begin shortly.  All <a href="../../../classes/Sequel.html">Sequel</a>
-users are encouraged to read about the proposed changes and provide
-feedback on the implementation plan. For details, see <a
-href="https://github.com/jeremyevans/sequel-4-plans">github.com/jeremyevans/sequel-4-plans</a>.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> 4 implementation work will begin shortly.  All <a href="../../../classes/Sequel.html"><code>Sequel</code></a> users are encouraged to read about the proposed changes and provide feedback on the implementation plan. For details, see <a href="https://github.com/jeremyevans/sequel-4-plans">github.com/jeremyevans/sequel-4-plans</a>.</p>
 </li></ul>
 </div>
 <div id='context'>

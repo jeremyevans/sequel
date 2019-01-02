@@ -57,17 +57,14 @@ Sequel::Plugins::PgArrayAssociations::ClassMethods
 </div>
 <div class='description'>
 
-<p>Create a <a
-href="ClassMethods.html#method-i-many_to_pg_array">#many_to_pg_array</a>
-association, for the case where the associated table contains the array
-with foreign keys pointing to the current table. See associate for options.</p>
+<p>Create a <a href="ClassMethods.html#method-i-many_to_pg_array"><code>many_to_pg_array</code></a> association, for the case where the associated table contains the array with foreign keys pointing to the current table. See associate for options.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-many_to_pg_array-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-many_to_pg_array-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 308</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_to_pg_array</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_pg_array</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-many_to_pg_array-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb</span>&#x000A;<span class="line-num">309</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">many_to_pg_array</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">310</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_pg_array</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">311</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_array_to_many'>
@@ -79,17 +76,14 @@ with foreign keys pointing to the current table. See associate for options.</p>
 </div>
 <div class='description'>
 
-<p>Create a <a
-href="ClassMethods.html#method-i-pg_array_to_many">#pg_array_to_many</a>
-association, for the case where the current table contains the array with
-foreign keys pointing to the associated table. See associate for options.</p>
+<p>Create a <a href="ClassMethods.html#method-i-pg_array_to_many"><code>pg_array_to_many</code></a> association, for the case where the current table contains the array with foreign keys pointing to the associated table. See associate for options.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_array_to_many-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_array_to_many-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 315</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:pg_array_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_array_to_many-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb</span>&#x000A;<span class="line-num">316</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">317</span>   <span class="ruby-identifier">associate</span>(<span class="ruby-value">:pg_array_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">318</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

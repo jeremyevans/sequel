@@ -36,9 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The dataset_source_alias extension changes Sequel&#39;s default behavior of
-automatically aliasing datasets from using t1, t2, etc. to using an alias
-based on the source of the dataset.  Example:</p>
+<p>The dataset_source_alias extension changes Sequel&#39;s default behavior of automatically aliasing datasets from using t1, t2, etc. to using an alias based on the source of the dataset.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>))&#x000A;<span class="ruby-comment"># default: SELECT * FROM (SELECT * FROM a) AS t1</span>&#x000A;<span class="ruby-comment"># with extension: SELECT * FROM (SELECT * FROM a) AS a</span></pre>
 
@@ -46,30 +44,23 @@ based on the source of the dataset.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">join</span>(<span class="ruby-constant">DB</span>[<span class="ruby-value">:b</span>], [<span class="ruby-value">:id</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM a INNER JOIN (SELECT * FROM b) AS b USING (id)</span></pre>
 
-<p>To avoid conflicting aliases, this attempts to alias tables uniquely if it
-detects a conflict:</p>
+<p>To avoid conflicting aliases, this attempts to alias tables uniquely if it detects a conflict:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>, <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-value">:a</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM a) AS a_0</span></pre>
 
-<p>Note that not all conflicts are correctly detected and handled. It is
-encouraged to alias your datasets manually instead of relying on the
-auto-aliasing if there would be a conflict.</p>
+<p>Note that not all conflicts are correctly detected and handled. It is encouraged to alias your datasets manually instead of relying on the auto-aliasing if there would be a conflict.</p>
 
-<p>In the places where <a href="../../../../classes/Sequel.html">Sequel</a>
-cannot determine the appropriate alias to use for the dataset, it will
-fallback to the standard t1, t2, etc. aliasing.</p>
+<p>In the places where <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> cannot determine the appropriate alias to use for the dataset, it will fallback to the standard t1, t2, etc. aliasing.</p>
 
 <p>You can load this extension into specific datasets:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:dataset_source_alias</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:dataset_source_alias</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Dataset/DatasetSourceAlias.html">Sequel::Dataset::DatasetSourceAlias</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Dataset/DatasetSourceAlias.html"><code>Sequel::Dataset::DatasetSourceAlias</code></a></p>
 </div>
 <div id='context'>
 </div>

@@ -38,59 +38,34 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>The :nulls option when creating ordered expressions is now supported on all
-databases that <a href="../../../classes/Sequel.html">Sequel</a> ships
-support for.  For databases that do not support NULLS FIRST/NULLS LAST,
-support is emulated.</p>
+<p>The :nulls option when creating ordered expressions is now supported on all databases that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> ships support for.  For databases that do not support NULLS FIRST/NULLS LAST, support is emulated.</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(<span class="ruby-value">:name</span>, <span class="ruby-value">:nulls</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:last</span>))&#x000A;<span class="ruby-comment"># When emulated:</span>&#x000A;<span class="ruby-comment"># ORDER BY (CASE WHEN (name IS NULL) THEN 2 ELSE 1 END), name ASC</span></pre>
 </li><li>
-<p>Model#pk_equal? has been added as a more descriptive name for Model#===. 
-Model#=== is now an alias of Model#pk_equal?.</p>
+<p>Model#pk_equal? has been added as a more descriptive name for Model#===.  Model#=== is now an alias of Model#pk_equal?.</p>
 </li><li>
-<p>The roots and roots_dataset class methods in the tree plugin are now also
-available as dataset methods.</p>
+<p>The roots and roots_dataset class methods in the tree plugin are now also available as dataset methods.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Inverting expressions using the ANY/SOME/ALL SQL operators now works
-correctly:</p>
+<p>Inverting expressions using the ANY/SOME/ALL SQL operators now works correctly:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Sequel &lt;5.14.0</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:any</span>, <span class="ruby-value">:x</span>))&#x000A;<span class="ruby-comment"># &quot;(a != any(x))&quot;</span>&#x000A;&#x000A;<span class="ruby-comment"># Sequel &gt;=5.14.0</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-value">:a</span><span class="ruby-operator">=&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:any</span>, <span class="ruby-value">:x</span>))&#x000A;<span class="ruby-comment"># &quot;NOT (a = any(x))&quot;</span></pre>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> has always tried to push
-inversion down to create SQL that is easier to reason about.  However,
-inversion cannot be pushed down if an ANY/SOME/ALL SQL operator is used,
-because that is a different type of operation that just happens to use the
-same syntax.  <a href="../../../classes/Sequel.html">Sequel</a> now avoids
-inversion push down for boolean operators where the right hand side is an
-SQL::Function, LiteralString, or SQL::PlaceholderLiteralString.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> has always tried to push inversion down to create SQL that is easier to reason about.  However, inversion cannot be pushed down if an ANY/SOME/ALL SQL operator is used, because that is a different type of operation that just happens to use the same syntax.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids inversion push down for boolean operators where the right hand side is an SQL::Function, LiteralString, or SQL::PlaceholderLiteralString.</p>
 </li><li>
-<p>When creating a boolean expression from a hash or array of pairs, if the
-right hand side is an unfrozen array and string, use a frozen copy in the
-expression, so that mutating the array or string argument later does not
-affect the expression.</p>
+<p>When creating a boolean expression from a hash or array of pairs, if the right hand side is an unfrozen array and string, use a frozen copy in the expression, so that mutating the array or string argument later does not affect the expression.</p>
 </li><li>
-<p>When using the defaults_setter plugin with the :cache option, do not cache
-values for columns without parseable defaults.  If the default value exists
-but is not parseable, caching such values could result in incorrect
-behavior if the model instance is saved later.</p>
+<p>When using the defaults_setter plugin with the :cache option, do not cache values for columns without parseable defaults.  If the default value exists but is not parseable, caching such values could result in incorrect behavior if the model instance is saved later.</p>
 </li><li>
-<p>For models with composite primary keys, Model#=== now returns false if any
-primary key value is nil, mirroring the behavior for the scalar primary key
-case.</p>
+<p>For models with composite primary keys, Model#=== now returns false if any primary key value is nil, mirroring the behavior for the scalar primary key case.</p>
 </li><li>
-<p>Model datasets no longer cache SQL if they include a subquery that cannot
-cache SQL.</p>
+<p>Model datasets no longer cache SQL if they include a subquery that cannot cache SQL.</p>
 </li><li>
-<p>The SQL used for constraints in the constraint_validations extension when
-the :allow_nil option is used is now clearer and easier to understand.</p>
+<p>The SQL used for constraints in the constraint_validations extension when the :allow_nil option is used is now clearer and easier to understand.</p>
 </li><li>
-<p>The postgres adapter no longer specifies a default port when using the pg
-driver, in order to work with configurations where the :service option is
-used in the :driver_options hash.  The pg driver defaults to port 5432 if
-no port is given, so this should not affect backwards compatibility.</p>
+<p>The postgres adapter no longer specifies a default port when using the pg driver, in order to work with configurations where the :service option is used in the :driver_options hash.  The pg driver defaults to port 5432 if no port is given, so this should not affect backwards compatibility.</p>
 </li></ul>
 </div>
 <div id='context'>

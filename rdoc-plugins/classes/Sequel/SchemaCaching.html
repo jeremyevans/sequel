@@ -66,7 +66,7 @@ Sequel::SchemaCaching
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-dump_schema_cache-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-dump_schema_cache-source'><span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-identifier">sch</span> = {}&#x000A;  <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">sch</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">h</span>]&#x000A;      <span class="ruby-identifier">h</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:callable_default</span>)&#x000A;      [<span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span>]&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">sch</span>))}&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-dump_schema_cache-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">sch</span> = {}&#x000A;<span class="line-num">55</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">56</span>     <span class="ruby-identifier">sch</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">57</span>       <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">h</span>]&#x000A;<span class="line-num">58</span>       <span class="ruby-identifier">h</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:callable_default</span>)&#x000A;<span class="line-num">59</span>       [<span class="ruby-identifier">c</span>, <span class="ruby-identifier">h</span>]&#x000A;<span class="line-num">60</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">sch</span>))}&#x000A;<span class="line-num">63</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-dump_schema_cache-3F'>
@@ -78,15 +78,14 @@ Sequel::SchemaCaching
 </div>
 <div class='description'>
 
-<p>Dump the cached schema to the filename given unless the file already
-exists.</p>
+<p>Dump the cached schema to the filename given unless the file already exists.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-dump_schema_cache-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-dump_schema_cache-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache?</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-identifier">dump_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-dump_schema_cache-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_schema_cache?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">69</span>   <span class="ruby-identifier">dump_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-load_schema_cache'>
@@ -98,15 +97,14 @@ exists.</p>
 </div>
 <div class='description'>
 
-<p>Replace the schema cache with the data from the given file, which should be
-in Marshal format.</p>
+<p>Replace the schema cache with the data from the given file, which should be in Marshal format.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-load_schema_cache-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-load_schema_cache-source'><span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-ivar">@schemas</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>))&#x000A;  <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">schema_post_process</span>(<span class="ruby-identifier">v</span>)}&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-load_schema_cache-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">75</span>   <span class="ruby-ivar">@schemas</span> = <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">file</span>))&#x000A;<span class="line-num">76</span>   <span class="ruby-ivar">@schemas</span>.<span class="ruby-identifier">each_value</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">schema_post_process</span>(<span class="ruby-identifier">v</span>)}&#x000A;<span class="line-num">77</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">78</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-load_schema_cache-3F'>
@@ -118,15 +116,14 @@ in Marshal format.</p>
 </div>
 <div class='description'>
 
-<p>Replace the schema cache with the data from the given file if the file
-exists.</p>
+<p>Replace the schema cache with the data from the given file if the file exists.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-load_schema_cache-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-load_schema_cache-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache?</span>(<span class="ruby-identifier">file</span>)&#x000A;  <span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-load_schema_cache-3F-source'>   <span class="ruby-comment"># File lib/sequel/extensions/schema_caching.rb</span>&#x000A;<span class="line-num">82</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_schema_cache?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">83</span>   <span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-identifier">file</span>) <span class="ruby-keyword">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exist?</span>(<span class="ruby-identifier">file</span>)&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

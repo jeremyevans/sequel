@@ -35,19 +35,11 @@ Sequel::Plugins::InstanceFilters
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This plugin allows you to add filters on a per object basis that restrict
-updating or deleting the object.  It&#39;s designed for cases where you
-would normally have to drop down to the dataset level to get the necessary
-control, because you only want to delete or update the rows in certain
-cases based on the current status of the row in the database.  The main
-purpose of this plugin is to avoid race conditions by relying on the atomic
-properties of database transactions.</p>
+<p>This plugin allows you to add filters on a per object basis that restrict updating or deleting the object.  It&#39;s designed for cases where you would normally have to drop down to the dataset level to get the necessary control, because you only want to delete or update the rows in certain cases based on the current status of the row in the database.  The main purpose of this plugin is to avoid race conditions by relying on the atomic properties of database transactions.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Item</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># These are two separate objects that represent the same</span>&#x000A;<span class="ruby-comment"># database row.</span>&#x000A;<span class="ruby-identifier">i1</span> = <span class="ruby-constant">Item</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">delete_allowed:</span> <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-identifier">i2</span> = <span class="ruby-constant">Item</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">id:</span> <span class="ruby-value">1</span>, <span class="ruby-value">delete_allowed:</span> <span class="ruby-keyword">false</span>)&#x000A;&#x000A;<span class="ruby-comment"># Add an instance filter to the object. This filter is in effect</span>&#x000A;<span class="ruby-comment"># until the object is successfully updated or deleted.</span>&#x000A;<span class="ruby-identifier">i1</span>.<span class="ruby-identifier">instance_filter</span>(<span class="ruby-value">delete_allowed:</span> <span class="ruby-keyword">true</span>)&#x000A;&#x000A;<span class="ruby-comment"># Attempting to delete the object where the filter doesn&#39;t</span>&#x000A;<span class="ruby-comment"># match any rows raises an error.</span>&#x000A;<span class="ruby-identifier">i1</span>.<span class="ruby-identifier">delete</span> <span class="ruby-comment"># raises Sequel::NoExistingObject</span>&#x000A;&#x000A;<span class="ruby-comment"># The other object that represents the same row has no</span>&#x000A;<span class="ruby-comment"># instance filters, and can be updated normally.</span>&#x000A;<span class="ruby-identifier">i2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">delete_allowed:</span> <span class="ruby-keyword">true</span>)&#x000A;&#x000A;<span class="ruby-comment"># Even though the filter is now still in effect, since the</span>&#x000A;<span class="ruby-comment"># database row has been updated to allow deleting,</span>&#x000A;<span class="ruby-comment"># delete now works.</span>&#x000A;<span class="ruby-identifier">i1</span>.<span class="ruby-identifier">delete</span></pre>
 
-<p>This plugin sets the require_modification flag on the model, so if the
-model&#39;s dataset doesn&#39;t provide an accurate number of matched rows,
-this could result in invalid exceptions being raised.</p>
+<p>This plugin sets the require_modification flag on the model, so if the model&#39;s dataset doesn&#39;t provide an accurate number of matched rows, this could result in invalid exceptions being raised.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -75,8 +67,7 @@ this could result in invalid exceptions being raised.</p>
 <td class='context-item-value'>Sequel::NoExistingObject</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Exception class raised when updating or deleting an object does not affect
-exactly one row.</p>
+<p>Exception class raised when updating or deleting an object does not affect exactly one row.</p>
 </td>
 </tr>
 </table>
@@ -100,7 +91,7 @@ exactly one row.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb</span>&#x000A;<span class="line-num">49</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">50</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

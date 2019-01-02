@@ -39,9 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Internal class used by the <a
-href="../Sequel.html#method-c-migration">Sequel.migration</a> DSL, part of
-the <code>migration</code> extension.</p>
+<p>Internal class used by the <a href="../Sequel.html#method-c-migration"><code>Sequel.migration</code></a> DSL, part of the <code>migration</code> extension.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -73,7 +71,7 @@ the <code>migration</code> extension.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The underlying <a href="SimpleMigration.html">SimpleMigration</a> instance</p>
+<p>The underlying <a href="SimpleMigration.html"><code>SimpleMigration</code></a> instance</p>
 </td>
 </tr>
 </table>
@@ -95,7 +93,7 @@ the <code>migration</code> extension.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-create-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-create-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">migration</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-create-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">117</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">118</span>   <span class="ruby-identifier">new</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">migration</span>&#x000A;<span class="line-num">119</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-new'>
@@ -114,7 +112,7 @@ the <code>migration</code> extension.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@migration</span> = <span class="ruby-constant">SimpleMigration</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-constant">Migration</span>.<span class="ruby-identifier">descendants</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">migration</span>&#x000A;  <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">122</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">123</span>   <span class="ruby-ivar">@migration</span> = <span class="ruby-constant">SimpleMigration</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="line-num">124</span>   <span class="ruby-constant">Migration</span>.<span class="ruby-identifier">descendants</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">migration</span>&#x000A;<span class="line-num">125</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -127,20 +125,16 @@ the <code>migration</code> extension.</p>
 </div>
 <div class='description'>
 
-<p>Creates a reversible migration.  This is the same as creating the same
-block with <code>up</code>, but it also calls the block and attempts to
-create a <code>down</code> block that will reverse the changes made by the
-block.</p>
+<p>Creates a reversible migration.  This is the same as creating the same block with <code>up</code>, but it also calls the block and attempts to create a <code>down</code> block that will reverse the changes made by the block.</p>
 
-<p>There are no guarantees that this will work perfectly in all cases, but it
-works for some simple cases.</p>
+<p>There are no guarantees that this will work perfectly in all cases, but it works for some simple cases.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-change-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-change-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">change</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-constant">MigrationReverser</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-change-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">155</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">change</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">156</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">157</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-constant">MigrationReverser</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">158</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-down'>
@@ -159,7 +153,7 @@ works for some simple cases.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-down-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-down-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">down</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-down-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">129</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">down</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">130</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">down</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-no_transaction'>
@@ -178,7 +172,7 @@ works for some simple cases.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-no_transaction-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-no_transaction-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">no_transaction</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-no_transaction-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">134</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">no_transaction</span>&#x000A;<span class="line-num">135</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-transaction'>
@@ -197,7 +191,7 @@ works for some simple cases.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-transaction-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-transaction-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transaction</span>&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-transaction-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">139</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transaction</span>&#x000A;<span class="line-num">140</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">141</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-up'>
@@ -216,7 +210,7 @@ works for some simple cases.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-up-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-up-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">up</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-up-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">144</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">up</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">145</span>   <span class="ruby-identifier">migration</span>.<span class="ruby-identifier">up</span> = <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">146</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

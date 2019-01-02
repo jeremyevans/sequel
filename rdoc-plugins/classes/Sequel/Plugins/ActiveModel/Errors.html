@@ -39,7 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="../ActiveModel.html">ActiveModel</a> compliant error class</p>
+<p><a href="../ActiveModel.html"><code>ActiveModel</code></a> compliant error class</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -62,15 +62,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Add autovivification so that <a href="Errors.html#method-i-5B-5D">[]</a>
-always returns an array.</p>
+<p>Add autovivification so that <a href="Errors.html#method-i-5B-5D"><code>[]</code></a> always returns an array.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">k</span>)&#x000A;  <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">k</span>){<span class="ruby-keyword">self</span>[<span class="ruby-identifier">k</span>] = []}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/active_model.rb</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-identifier">k</span>)&#x000A;<span class="line-num">25</span>   <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">k</span>){<span class="ruby-keyword">self</span>[<span class="ruby-identifier">k</span>] = []}&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

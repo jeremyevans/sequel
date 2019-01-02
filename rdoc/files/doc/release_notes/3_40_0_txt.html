@@ -38,79 +38,49 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now has vastly improved
-support for Microsoft Access.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has vastly improved support for Microsoft Access.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now supports the CUBRID
-database, with a cubrid adapter that uses the cubrid gem, and a jdbc/cubrid
-adapter for accessing CUBRID via JDBC on JRuby.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports the CUBRID database, with a cubrid adapter that uses the cubrid gem, and a jdbc/cubrid adapter for accessing CUBRID via JDBC on JRuby.</p>
 </li><li>
 <p>The association_pks plugin now supports composite keys.</p>
 </li><li>
-<p>Database#transaction now accepts a :disconnect=&gt;:retry option, in which
-case it will automatically retry the block if it detects a disconnection. 
-This is potentially dangerous, and should only be used if the entire block
-is idempotent.  There is also no checking against an infinite retry loop.</p>
+<p>Database#transaction now accepts a :disconnect=&gt;:retry option, in which case it will automatically retry the block if it detects a disconnection.  This is potentially dangerous, and should only be used if the entire block is idempotent.  There is also no checking against an infinite retry loop.</p>
 </li><li>
-<p>SQL::CaseExpression#with_merged_expression has been added, for converting a
-CaseExpression with an associated expression to one without an associated
-expression, by merging the expression into each condition.</p>
+<p>SQL::CaseExpression#with_merged_expression has been added, for converting a CaseExpression with an associated expression to one without an associated expression, by merging the expression into each condition.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now quotes
-arguments/columns in common table expressions.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now quotes arguments/columns in common table expressions.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now handles nil values
-correctly in the pg_row extension.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles nil values correctly in the pg_row extension.</p>
 </li><li>
 <p>Sequel::Postgres::HStore instances can now be marshalled.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now uses clob for String
-:text=&gt;true types on databases that don&#39;t support a text type.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses clob for String :text=&gt;true types on databases that don&#39;t support a text type.</p>
 </li><li>
-<p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now quotes
-channel identifier names when using LISTEN/NOTIFY.</p>
+<p>On PostgreSQL, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now quotes channel identifier names when using LISTEN/NOTIFY.</p>
 </li><li>
-<p>On PostgreSQL, <a href="../../../classes/Sequel.html">Sequel</a> now
-correctly handles the case where named type conversion procs have been
-added before the Database object is instantiated.</p>
+<p>On PostgreSQL, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now correctly handles the case where named type conversion procs have been added before the Database object is instantiated.</p>
 </li><li>
-<p>On DB2, <a href="../../../classes/Sequel.html">Sequel</a> now explicitly
-sets NOT NULL for unique constraint columns instead of foreign key columns.
-DB2 does not allow columns in unique constraints to be NULL, but does allow
-foreign key columns to be NULL.</p>
+<p>On DB2, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now explicitly sets NOT NULL for unique constraint columns instead of foreign key columns.  DB2 does not allow columns in unique constraints to be NULL, but does allow foreign key columns to be NULL.</p>
 </li><li>
-<p>In the oracle adapter, clob values are now returned as ruby strings upon
-retrieval.</p>
+<p>In the oracle adapter, clob values are now returned as ruby strings upon retrieval.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now detects more types of
-disconnections in the postgres, mysql, and mysql2 adapters.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now detects more types of disconnections in the postgres, mysql, and mysql2 adapters.</p>
 </li><li>
-<p>If a database provides a default column value that isn&#39;t a ruby string,
-it is used directly as the ruby default, instead of causing the schema
-parsing to fail.</p>
+<p>If a database provides a default column value that isn&#39;t a ruby string, it is used directly as the ruby default, instead of causing the schema parsing to fail.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Code using Sequel&#39;s oracle adapter that expected clob values to be
-returned as OCI8::CLOB instances needs to be modified to work with ruby
-strings.</p>
+<p>Code using Sequel&#39;s oracle adapter that expected clob values to be returned as OCI8::CLOB instances needs to be modified to work with ruby strings.</p>
 </li><li>
-<p>Because <a href="../../../classes/Sequel.html">Sequel</a> now quotes column
-names in common table expressions, those names are now case sensitive,
-which could break certain poorly coded queries.  Similar issues exist with
-the quoting of channel identifier names in LISTEN/NOTIFY on PostgreSQL.</p>
+<p>Because <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now quotes column names in common table expressions, those names are now case sensitive, which could break certain poorly coded queries.  Similar issues exist with the quoting of channel identifier names in LISTEN/NOTIFY on PostgreSQL.</p>
 </li><li>
-<p>The private Database#requires_return_generated_keys? method has been
-removed from the jdbc adapter.  Custom jdbc subadapters relying on this
-method should override the private Database#execute_statement_insert method
-instead to ensure that RETURN_GENERATED_KEYS is used for insert statements.</p>
+<p>The private Database#requires_return_generated_keys? method has been removed from the jdbc adapter.  Custom jdbc subadapters relying on this method should override the private Database#execute_statement_insert method instead to ensure that RETURN_GENERATED_KEYS is used for insert statements.</p>
 </li><li>
-<p>The private Dataset#argument_list and argument_list_append methods have
-been removed.</p>
+<p>The private Dataset#argument_list and argument_list_append methods have been removed.</p>
 </li></ul>
 </div>
 <div id='context'>

@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Time subclass that gets literalized with only the time value, so it
-operates like a standard <a href="SQL.html">SQL</a> time type.</p>
+<p>Time subclass that gets literalized with only the time value, so it operates like a standard <a href="SQL.html"><code>SQL</code></a> time type.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -70,7 +69,7 @@ operates like a standard <a href="SQL.html">SQL</a> time type.</p>
 </td>
 <td class='context-item-value'>[W]</td>
 <td class='context-item-desc'>
-<p>Set the date used for <a href="SQLTime.html">SQLTime</a> instances.</p>
+<p>Set the date used for <a href="SQLTime.html"><code>SQLTime</code></a> instances.</p>
 </td>
 </tr>
 </table>
@@ -87,15 +86,14 @@ operates like a standard <a href="SQL.html">SQL</a> time type.</p>
 </div>
 <div class='description'>
 
-<p>Create a new <a href="SQLTime.html">SQLTime</a> instance given an hour,
-minute, second, and usec.</p>
+<p>Create a new <a href="SQLTime.html"><code>SQLTime</code></a> instance given an hour, minute, second, and usec.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-create-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-create-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create</span>(<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span> = <span class="ruby-value">0</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-identifier">date</span>&#x000A;  <span class="ruby-identifier">meth</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>&#x000A;  <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">day</span>, <span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-create-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">create</span>(<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span> = <span class="ruby-value">0</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-identifier">t</span> = <span class="ruby-identifier">date</span>&#x000A;<span class="line-num">53</span>   <span class="ruby-identifier">meth</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">day</span>, <span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span>)&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-date'>
@@ -107,15 +105,14 @@ minute, second, and usec.</p>
 </div>
 <div class='description'>
 
-<p>Use the date explicitly set, or the current date if there is not a date
-set.</p>
+<p>Use the date explicitly set, or the current date if there is not a date set.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-date-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-date-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date</span>&#x000A;  <span class="ruby-ivar">@date</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">now</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-date-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">date</span>&#x000A;<span class="line-num">32</span>   <span class="ruby-ivar">@date</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">now</span>&#x000A;<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-parse'>
@@ -134,7 +131,7 @@ set.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-parse-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-parse-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">parse</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">t</span> = <span class="ruby-keyword">super</span>&#x000A;&#x000A;  <span class="ruby-identifier">utc</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span>&#x000A;  <span class="ruby-identifier">d</span> = <span class="ruby-ivar">@date</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">d</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">utc</span>&#x000A;    <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>&#x000A;    <span class="ruby-identifier">d</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">t</span>&#x000A;    <span class="ruby-identifier">t</span> = <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">d</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">d</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">d</span>.<span class="ruby-identifier">day</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">min</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">sec</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">usec</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">t</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-parse-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">parse</span>(<span class="ruby-operator">*</span>)&#x000A;<span class="line-num">37</span>   <span class="ruby-identifier">t</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">38</span> &#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">utc</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span>&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">d</span> = <span class="ruby-ivar">@date</span>&#x000A;<span class="line-num">41</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">d</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">utc</span>&#x000A;<span class="line-num">42</span>     <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>&#x000A;<span class="line-num">43</span>     <span class="ruby-identifier">d</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">t</span>&#x000A;<span class="line-num">44</span>     <span class="ruby-identifier">t</span> = <span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">d</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">d</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">d</span>.<span class="ruby-identifier">day</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">min</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">sec</span>, <span class="ruby-identifier">t</span>.<span class="ruby-identifier">usec</span>)&#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">46</span> &#x000A;<span class="line-num">47</span>   <span class="ruby-identifier">t</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -147,15 +144,14 @@ set.</p>
 </div>
 <div class='description'>
 
-<p>Show that this is an <a href="SQLTime.html">SQLTime</a>, and the time
-represented</p>
+<p>Show that this is an <a href="SQLTime.html"><code>SQLTime</code></a>, and the time represented</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A; <span class="ruby-node">&quot;#&lt;#{self.class} #{to_s}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">60</span>  <span class="ruby-node">&quot;#&lt;#{self.class} #{to_s}&gt;&quot;</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_s'>
@@ -174,7 +170,7 @@ represented</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_s-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_s-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%H:%M:%S&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Superclass may have defined a method that takes a format string,</span>&#x000A;    <span class="ruby-comment"># and we shouldn&#39;t override in that case.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_s-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_s</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">65</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="line-num">66</span>     <span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%H:%M:%S&#39;</span>)&#x000A;<span class="line-num">67</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">68</span>     <span class="ruby-comment"># Superclass may have defined a method that takes a format string,</span>&#x000A;<span class="line-num">69</span>     <span class="ruby-comment"># and we shouldn&#39;t override in that case.</span>&#x000A;<span class="line-num">70</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

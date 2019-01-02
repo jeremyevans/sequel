@@ -35,21 +35,11 @@ Sequel::Plugins::InstanceHooks
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The instance_hooks plugin allows you to add hooks to specific instances, by
-passing a block to a _hook method (e.g. before_save_hook{do_something}).
-The block is executed when the hook is called (e.g. before_save).</p>
+<p>The instance_hooks plugin allows you to add hooks to specific instances, by passing a block to a _hook method (e.g. before_save_hook{do_something}). The block is executed when the hook is called (e.g. before_save).</p>
 
-<p>All of the standard hooks are supported. Instance level before hooks are
-executed in reverse order of addition before calling super.  Instance level
-after hooks are executed in order of addition after calling super.</p>
+<p>All of the standard hooks are supported. Instance level before hooks are executed in reverse order of addition before calling super.  Instance level after hooks are executed in order of addition after calling super.</p>
 
-<p>Instance level hooks for before and after are cleared after all related
-after level instance hooks have run.  This means that if you add a
-before_create and before_update instance hooks to a new object, the
-before_create hook will be run the first time you save the object (creating
-it), and the before_update hook will be run the second time you save the
-object (updating it), and no hooks will be run the third time you save the
-object.</p>
+<p>Instance level hooks for before and after are cleared after all related after level instance hooks have run.  This means that if you add a before_create and before_update instance hooks to a new object, the before_create hook will be run the first time you save the object (creating it), and the before_update hook will be run the second time you save the object (updating it), and no hooks will be run the third time you save the object.</p>
 
 <p>Validation hooks are not cleared until after a successful save.</p>
 

@@ -36,31 +36,21 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The current_datetime_timestamp extension makes Dataset#current_datetime
-return an object that operates like Sequel.datetime_class.now, but will be
-literalized as CURRENT_TIMESTAMP.</p>
+<p>The current_datetime_timestamp extension makes Dataset#current_datetime return an object that operates like Sequel.datetime_class.now, but will be literalized as CURRENT_TIMESTAMP.</p>
 
-<p>This allows you to use the defaults_setter, timestamps, and touch model
-plugins and make sure that CURRENT_TIMESTAMP is used instead of a
-literalized timestamp value.</p>
+<p>This allows you to use the defaults_setter, timestamps, and touch model plugins and make sure that CURRENT_TIMESTAMP is used instead of a literalized timestamp value.</p>
 
-<p>The reason that CURRENT_TIMESTAMP is better than a literalized version of
-the timestamp is that it obeys correct transactional semantics (all calls
-to CURRENT_TIMESTAMP in the same transaction return the same timestamp, at
-least on some databases).</p>
+<p>The reason that CURRENT_TIMESTAMP is better than a literalized version of the timestamp is that it obeys correct transactional semantics (all calls to CURRENT_TIMESTAMP in the same transaction return the same timestamp, at least on some databases).</p>
 
-<p>To have current_datetime be literalized as CURRENT_TIMESTAMP for a single
-dataset:</p>
+<p>To have current_datetime be literalized as CURRENT_TIMESTAMP for a single dataset:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:current_datetime_timestamp</span>)</pre>
 
-<p>To have current_datetime be literalized as CURRENT_TIMESTAMP for all
-datasets of a given database.</p>
+<p>To have current_datetime be literalized as CURRENT_TIMESTAMP for all datasets of a given database.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:current_datetime_timestamp</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/CurrentDateTimeTimestamp.html">Sequel::CurrentDateTimeTimestamp</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/CurrentDateTimeTimestamp.html"><code>Sequel::CurrentDateTimeTimestamp</code></a></p>
 </div>
 <div id='context'>
 </div>

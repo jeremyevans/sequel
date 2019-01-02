@@ -39,150 +39,86 @@ Last Update:
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>Common table expressions (CTEs) are now supported.  CTEs use the SQL WITH
-clause, and specify inline views that queries can use. They also support a
-recursive mode, where the CTE can recursively query its own output,
-allowing you do do things like load all branches for a given node in a
-plain tree structure.</p>
+<p>Common table expressions (CTEs) are now supported.  CTEs use the SQL WITH clause, and specify inline views that queries can use. They also support a recursive mode, where the CTE can recursively query its own output, allowing you do do things like load all branches for a given node in a plain tree structure.</p>
 
 <p>The standard with takes an alias and a dataset:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:vw</span>].<span class="ruby-identifier">with</span>(<span class="ruby-value">:vw</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">col</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>})&#x000A;<span class="ruby-comment"># WITH vw AS (SELECT * FROM table WHERE col &lt; 1)</span>&#x000A;<span class="ruby-comment"># SELECT * FROM vw</span></pre>
 
-<p>The recursive with takes an alias, a nonrecursive dataset, and a recursive
-dataset:</p>
+<p>The recursive with takes an alias, a nonrecursive dataset, and a recursive dataset:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:vw</span>].<span class="ruby-identifier">with_recursive</span>(<span class="ruby-value">:vw</span>,&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:tree</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>),&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:tree</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value">:vw</span>, <span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:parent_id</span>).&#x000A;            <span class="ruby-identifier">select</span>(<span class="ruby-value">:vw__id</span>, <span class="ruby-value">:vw__parent_id</span>))&#x000A;<span class="ruby-comment"># WITH RECURSIVE vw AS (SELECT * FROM tree</span>&#x000A;<span class="ruby-comment">#     WHERE (id = 1)</span>&#x000A;<span class="ruby-comment">#     UNION ALL</span>&#x000A;<span class="ruby-comment">#     SELECT vw.id, vw.parent_id</span>&#x000A;<span class="ruby-comment">#     FROM tree</span>&#x000A;<span class="ruby-comment">#     INNER JOIN vw ON (vw.id = tree.parent_id))</span>&#x000A;<span class="ruby-comment"># SELECT * FROM vw</span></pre>
 
-<p>CTEs are supported by Microsoft SQL Server 2005+, DB2 7+, Firebird 2.1+,
-Oracle 9+, and PostgreSQL 8.4+.</p>
+<p>CTEs are supported by Microsoft SQL Server 2005+, DB2 7+, Firebird 2.1+, Oracle 9+, and PostgreSQL 8.4+.</p>
 </li><li>
-<p>SQL window functions are now supported, and a DSL has been added to ease
-their creation.  Window functions act similarly to aggregate functions but
-operate on sliding ranges of rows.</p>
+<p>SQL window functions are now supported, and a DSL has been added to ease their creation.  Window functions act similarly to aggregate functions but operate on sliding ranges of rows.</p>
 
-<p>In virtual row blocks (blocks passed to filter, select, order, etc.) you
-can now provide a block to method calls to change the default behavior to
-create functions that weren&#39;t possible previously.  The blocks
-aren&#39;t called, but their presence serves as a flag.</p>
+<p>In virtual row blocks (blocks passed to filter, select, order, etc.) you can now provide a block to method calls to change the default behavior to create functions that weren&#39;t possible previously.  The blocks aren&#39;t called, but their presence serves as a flag.</p>
 
 <p>What function is created depends on the arguments to the method:</p>
 <ul><li>
-<p>If there are no arguments, an SQL::Function is created with the name of
-method used, and no arguments.  Previously, it was not possible to create
-functions without arguments using the virtual row block DSL.  Example:</p>
+<p>If there are no arguments, an SQL::Function is created with the name of method used, and no arguments.  Previously, it was not possible to create functions without arguments using the virtual row block DSL.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">version</span>{}} <span class="ruby-comment"># SELECT version()</span></pre>
 </li><li>
-<p>If the first argument is :*, an SQL::Function is created with a single
-wildcard argument (*).  This is mostly useful for count:</p>
+<p>If the first argument is :*, an SQL::Function is created with a single wildcard argument (*).  This is mostly useful for count:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:*</span>){}} <span class="ruby-comment"># SELECT count(*) FROM t</span></pre>
 </li><li>
-<p>If the first argument is :distinct, an SQL::Function is created with the
-keyword DISTINCT prefacing all remaining arguments. This is useful for
-aggregate functions such as count:</p>
+<p>If the first argument is :distinct, an SQL::Function is created with the keyword DISTINCT prefacing all remaining arguments. This is useful for aggregate functions such as count:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-value">:distinct</span>, <span class="ruby-identifier">col1</span>){}}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1) FROM t</span></pre>
 </li><li>
-<p>If the first argument is :over, the second argument, if provided, should be
-a hash of options to pass to SQL::Window.  The options hash can also
-contain :*=&gt;true to use a wildcard argument as the function argument, or
-:args=&gt;… to specify an array of arguments to use as the function
-arguments.</p>
+<p>If the first argument is :over, the second argument, if provided, should be a hash of options to pass to SQL::Window.  The options hash can also contain :*=&gt;true to use a wildcard argument as the function argument, or :args=&gt;… to specify an array of arguments to use as the function arguments.</p>
 
 <pre>DB[:t].select{rank(:over){}} # SELECT rank() OVER ()&#x000A;DB[:t].select{count(:over, :*=&gt;true){}} # SELECT count(*) OVER ()&#x000A;DB[:t].select{sum(:over, :args=&gt;col1,&#x000A;              :partition=&gt;col2, :order=&gt;col3){}}&#x000A;# SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)</pre>
 </li></ul>
 
-<p>PostgreSQL also supports named windows.  Named windows can be specified by
-Dataset#window, and window functions can reference them using the :window
-option.</p>
+<p>PostgreSQL also supports named windows.  Named windows can be specified by Dataset#window, and window functions can reference them using the :window option.</p>
 </li><li>
-<p>Schema information for columns now includes a :ruby_default entry which
-contains a ruby object that represents the default given by the database
-(which is stored in :default).  Not all :default entries can be parsed into
-a :ruby_default, but if the schema_dumper extension previously supported
-it, it should work.</p>
+<p>Schema information for columns now includes a :ruby_default entry which contains a ruby object that represents the default given by the database (which is stored in :default).  Not all :default entries can be parsed into a :ruby_default, but if the schema_dumper extension previously supported it, it should work.</p>
 </li><li>
-<p>Methods to create compound datasets (union, intersect, except), now take an
-options hash instead of a true/false flag.  The previous API is still
-supported, but switching to specifying the ALL setting using :all=&gt;true
-is recommended.</p>
+<p>Methods to create compound datasets (union, intersect, except), now take an options hash instead of a true/false flag.  The previous API is still supported, but switching to specifying the ALL setting using :all=&gt;true is recommended.</p>
 
-<p>Additionally, you can now set :from_self=&gt;false to not wrap the returned
-dataset in a “SELECT * FROM (…)”.</p>
+<p>Additionally, you can now set :from_self=&gt;false to not wrap the returned dataset in a “SELECT * FROM (…)”.</p>
 </li><li>
-<p>Dataset#ungraphed was added that removes the graphing information from the
-dataset.  This allows you to use Dataset#graph for the automatic aliasing,
-or eager_graph for the automatic aliasing and joining, and then remove the
-graphing information so that the resulting objects will not be split into
-subhashes or associations.</p>
+<p>Dataset#ungraphed was added that removes the graphing information from the dataset.  This allows you to use Dataset#graph for the automatic aliasing, or eager_graph for the automatic aliasing and joining, and then remove the graphing information so that the resulting objects will not be split into subhashes or associations.</p>
 </li><li>
-<p>There were some introspection methods added to Dataset to describe which
-capabilities that dataset does or does not support:</p>
+<p>There were some introspection methods added to Dataset to describe which capabilities that dataset does or does not support:</p>
 
 <pre class="ruby"><span class="ruby-identifier">supports_cte?</span>&#x000A;<span class="ruby-identifier">supports_distinct_on?</span>&#x000A;<span class="ruby-identifier">supports_intersect_except?</span>&#x000A;<span class="ruby-identifier">supports_intersect_except_all?</span>&#x000A;<span class="ruby-identifier">supports_window_functions?</span></pre>
 
-<p>In addition to being available for the user to use, these are also used
-internally, so attempting to use a CTE on a dataset that doesn&#39;t
-support it will raise an Error.</p>
+<p>In addition to being available for the user to use, these are also used internally, so attempting to use a CTE on a dataset that doesn&#39;t support it will raise an Error.</p>
 </li><li>
-<p>Dataset#qualify was added, which is like qualify_to with a default of
-first_source.</p>
+<p>Dataset#qualify was added, which is like qualify_to with a default of first_source.</p>
 
-<p>Additionally, qualify now affects PlaceholderLiteralStrings.  It
-doesn&#39;t scan the string (as <a
-href="../../../classes/Sequel.html">Sequel</a> never attempts to parse
-SQL), but if you provide the column as a symbol placeholder argument, it
-will qualify it.</p>
+<p>Additionally, qualify now affects PlaceholderLiteralStrings.  It doesn&#39;t scan the string (as <a href="../../../classes/Sequel.html"><code>Sequel</code></a> never attempts to parse SQL), but if you provide the column as a symbol placeholder argument, it will qualify it.</p>
 </li><li>
-<p>You can now specify the table and column <a
-href="../../../classes/Sequel/Migrator.html">Sequel::Migrator</a> will use
-to record the current schema version.  The new Migrator.run method must be
-used to use these new options.</p>
+<p>You can now specify the table and column <a href="../../../classes/Sequel/Migrator.html"><code>Sequel::Migrator</code></a> will use to record the current schema version.  The new Migrator.run method must be used to use these new options.</p>
 </li><li>
-<p>The JDBC adapter now accepts :user and :password options, instead of
-requiring them to be specified in the connection string and  handled by the
-JDBC driver.  This should allow connections to Oracle using the Thin JDBC
-driver.</p>
+<p>The JDBC adapter now accepts :user and :password options, instead of requiring them to be specified in the connection string and  handled by the JDBC driver.  This should allow connections to Oracle using the Thin JDBC driver.</p>
 </li><li>
-<p>You can now specify the max_connections, pool_timeout, and single_threaded
-settings directly in the connection string:</p>
+<p>You can now specify the max_connections, pool_timeout, and single_threaded settings directly in the connection string:</p>
 
 <pre>postgres:///database?single_threaded=t&#x000A;postgres:///database?max_connections=10&amp;pool_timeout=20</pre>
 </li><li>
-<p>Dataset#on_duplicate_key_update now affects Dataset#insert when using
-MySQL.</p>
+<p>Dataset#on_duplicate_key_update now affects Dataset#insert when using MySQL.</p>
 </li><li>
-<p>You can now specify the :opclass option when creating PostgreSQL indexes. 
-Currently, this only supports a single operator class for all columns.  If
-you need different operator classes per column, please post on sequel-talk.</p>
+<p>You can now specify the :opclass option when creating PostgreSQL indexes.  Currently, this only supports a single operator class for all columns.  If you need different operator classes per column, please post on sequel-talk.</p>
 </li><li>
-<p>Model#autoincrementing_primary_key was added and can be used if the
-autoincrementing key isn&#39;t the same as the primary key.  The only
-likely use for this is on MySQL MyISAM tables with composite primary keys
-where only one of the composite parts is autoincrementing.</p>
+<p>Model#autoincrementing_primary_key was added and can be used if the autoincrementing key isn&#39;t the same as the primary key.  The only likely use for this is on MySQL MyISAM tables with composite primary keys where only one of the composite parts is autoincrementing.</p>
 </li><li>
-<p>You can now use database column values as search patterns and specify the
-text to search as a String or Regexp:</p>
+<p>You can now use database column values as search patterns and specify the text to search as a String or Regexp:</p>
 
 <pre class="ruby"><span class="ruby-constant">String</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringMethods</span>)&#x000A;<span class="ruby-constant">Regexp</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringMethods</span>)&#x000A;&#x000A;<span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>)  <span class="ruby-comment"># (&#39;a&#39; LIKE x)</span>&#x000A;<span class="ruby-regexp">/a/</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>)  <span class="ruby-comment"># (&#39;a&#39; ~ x)</span>&#x000A;<span class="ruby-regexp">/a/i</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>) <span class="ruby-comment"># (&#39;a&#39; ~* x)</span>&#x000A;<span class="ruby-regexp">/a/</span>.<span class="ruby-identifier">like</span>(<span class="ruby-value">:x</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># ((&#39;a&#39; ~ x) OR (&#39;a&#39; ~ &#39;b&#39;))</span></pre>
 </li><li>
-<p>The Dataset#dataset_alias private method was added.  It can be overridden
-if you have tables named t0, t1, etc and want to make sure the default
-dataset aliases that <a href="../../../classes/Sequel.html">Sequel</a> uses
-do not clash with existing table names.</p>
+<p>The Dataset#dataset_alias private method was added.  It can be overridden if you have tables named t0, t1, etc and want to make sure the default dataset aliases that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses do not clash with existing table names.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now raises an Error if
-you call <a
-href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
-with something that is not a Hash or String.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an Error if you call <a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> with something that is not a Hash or String.</p>
 </li><li>
 <p>bin/sequel now accepts a -N option to not test the database connection.</p>
 </li><li>
-<p>An opening_databases.rdoc file was added to the documentation directory,
-which should be a good introduction for new users about how to set up your
-Database connection.</p>
+<p>An opening_databases.rdoc file was added to the documentation directory, which should be a good introduction for new users about how to set up your Database connection.</p>
 </li></ul>
 
 <p>Other Improvements</p>
@@ -190,87 +126,57 @@ Database connection.</p>
 <ul><li>
 <p>MySQL native adapter SELECT is much faster than before, up to 75% faster.</p>
 </li><li>
-<p>JDBC SELECT is about 10% faster than before.  It&#39;s still much slower
-than the native adapters, due to conversion issues.</p>
+<p>JDBC SELECT is about 10% faster than before.  It&#39;s still much slower than the native adapters, due to conversion issues.</p>
 </li><li>
 <p>bin/sequel now works with a YAML file on ruby 1.9.</p>
 </li><li>
 <p>MySQL foreign key table constraints have been fixed.</p>
 </li><li>
-<p>Database#indexes now works on PostgreSQL if the schema used is a Symbol. 
-It also works on PostgreSQL versions all the way back to 7.4.</p>
+<p>Database#indexes now works on PostgreSQL if the schema used is a Symbol.  It also works on PostgreSQL versions all the way back to 7.4.</p>
 </li><li>
 <p>Graphing of datasets with dataset sources has been fixed.</p>
 </li><li>
-<p>Changing a columns name, type, or NULL status on MySQL now supports a much
-wider selection of column defaults.</p>
+<p>Changing a columns name, type, or NULL status on MySQL now supports a much wider selection of column defaults.</p>
 </li><li>
-<p>The stored procedure code is now thread-safe.  <a
-href="../../../classes/Sequel.html">Sequel</a> is thread-safe in general,
-but due to a bug the previous stored  procedure code was not thread-safe.</p>
+<p>The stored procedure code is now thread-safe.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> is thread-safe in general, but due to a bug the previous stored  procedure code was not thread-safe.</p>
 </li><li>
-<p>The ODBC adapter now drops statements automatically instead of requiring
-the user to do so manually, making it more similar to other adapters.</p>
+<p>The ODBC adapter now drops statements automatically instead of requiring the user to do so manually, making it more similar to other adapters.</p>
 </li><li>
-<p>The single_table_inheritance plugin no longer overwrites the STI field if
-the field already has a value.  This allows you to use create in the
-generic class to insert a value that will be returned as a subclass:</p>
+<p>The single_table_inheritance plugin no longer overwrites the STI field if the field already has a value.  This allows you to use create in the generic class to insert a value that will be returned as a subclass:</p>
 
 <pre class="ruby"><span class="ruby-constant">Person</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">:kind</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-string">&quot;Manager&quot;</span>)</pre>
 </li><li>
-<p>When altering colums on MySQL, :unsigned, :elements, :size and other
-options given are no longer ignored.</p>
+<p>When altering colums on MySQL, :unsigned, :elements, :size and other options given are no longer ignored.</p>
 </li><li>
-<p>The PostgreSQL shared adapter&#39;s explain and analyze methods have been
-fixed, they had been broken in 3.0.</p>
+<p>The PostgreSQL shared adapter&#39;s explain and analyze methods have been fixed, they had been broken in 3.0.</p>
 </li><li>
-<p>Parsing of the server&#39;s version is more robust on PostgreSQL. It should
-now work correctly for 8.4 and 8.4rc1 type versions.</p>
+<p>Parsing of the server&#39;s version is more robust on PostgreSQL. It should now work correctly for 8.4 and 8.4rc1 type versions.</p>
 </li></ul>
 
 <p>Backwards Compatibility</p>
 <hr>
 <ul><li>
-<p>Dataset#table_exists? has been removed, since it never worked perfectly. 
-Use Database#table_exists? instead.</p>
+<p>Dataset#table_exists? has been removed, since it never worked perfectly.  Use Database#table_exists? instead.</p>
 </li><li>
-<p>Model.grep now calls Dataset#grep instead of Enumerable#grep. If you are
-using Model.grep, you need to modify your application.</p>
+<p>Model.grep now calls Dataset#grep instead of Enumerable#grep. If you are using Model.grep, you need to modify your application.</p>
 </li><li>
-<p>The MSSQL shared adapter previously used the :with option for storing the
-NOLOCK setting of the query.  That option has been renamed to
-:table_options, since :with is now used for CTEs. This should not have an
-effect unless you where using the option manually.</p>
+<p>The MSSQL shared adapter previously used the :with option for storing the NOLOCK setting of the query.  That option has been renamed to :table_options, since :with is now used for CTEs. This should not have an effect unless you where using the option manually.</p>
 </li><li>
-<p>Previously, providing a block to a method calls in virtual row blocks did
-not change behavior, where now it causes a different code path to be used. 
-In both cases, the block is not evaluated, but that may change in a future
-version.</p>
+<p>Previously, providing a block to a method calls in virtual row blocks did not change behavior, where now it causes a different code path to be used.  In both cases, the block is not evaluated, but that may change in a future version.</p>
 </li><li>
-<p>Dataset#to_table_reference protected method was removed, as it was no
-longer used.</p>
+<p>Dataset#to_table_reference protected method was removed, as it was no longer used.</p>
 </li><li>
-<p>The pool_timeout setting is now converted to an Integer, so if you used to
-pass in a Float, it no longer works the same way.</p>
+<p>The pool_timeout setting is now converted to an Integer, so if you used to pass in a Float, it no longer works the same way.</p>
 </li><li>
-<p>Most files in adapters/utils have been removed, in favor of  integrating
-the code directly into Database and Dataset.  If you were previously
-checking for the UnsupportedIntersectExcept or related modules, use the
-Dataset introspection methods instead (e.g. supports_intersect_except?).</p>
+<p>Most files in adapters/utils have been removed, in favor of  integrating the code directly into Database and Dataset.  If you were previously checking for the UnsupportedIntersectExcept or related modules, use the Dataset introspection methods instead (e.g. supports_intersect_except?).</p>
 </li><li>
-<p>If you were using the ODBC adapter and manually dropping returned
-statements, you should note that now statements are dropped automatically,
-and the execute method doesn&#39;t return a statement object.</p>
+<p>If you were using the ODBC adapter and manually dropping returned statements, you should note that now statements are dropped automatically, and the execute method doesn&#39;t return a statement object.</p>
 </li><li>
 <p>The MySQL adapter on_duplicate_key_update_sql is now a private method.</p>
 </li><li>
-<p>If you were modifying the :from dataset option directly, note that <a
-href="../../../classes/Sequel.html">Sequel</a> now expects this option to
-be preprocessed.  See the new implementation of Dataset#from for an idea of
-the changes required.</p>
+<p>If you were modifying the :from dataset option directly, note that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now expects this option to be preprocessed.  See the new implementation of Dataset#from for an idea of the changes required.</p>
 </li><li>
-<p>Dataset#simple_select_all? now returns false instead of true for a dataset
-that selects from another dataset.</p>
+<p>Dataset#simple_select_all? now returns false instead of true for a dataset that selects from another dataset.</p>
 </li></ul>
 </div>
 <div id='context'>

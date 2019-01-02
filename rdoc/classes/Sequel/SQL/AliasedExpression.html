@@ -76,8 +76,7 @@ Superclass:
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The columns aliases (derived column list) to use, for when the aliased
-expression is a record or set of records (such as a dataset).</p>
+<p>The columns aliases (derived column list) to use, for when the aliased expression is a record or set of records (such as a dataset).</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -103,15 +102,14 @@ expression is a record or set of records (such as a dataset).</p>
 </div>
 <div class='description'>
 
-<p>Create an object with the given expression, alias, and optional column
-aliases.</p>
+<p>Create an object with the given expression, alias, and optional column aliases.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1004</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-ivar">@alias</span> = <span class="ruby-identifier">aliaz</span>&#x000A;  <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1005</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">1006</span>   <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;<span class="line-num">1007</span>   <span class="ruby-ivar">@alias</span> = <span class="ruby-identifier">aliaz</span>&#x000A;<span class="line-num">1008</span>   <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>&#x000A;<span class="line-num">1009</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">1010</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

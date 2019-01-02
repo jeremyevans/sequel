@@ -164,23 +164,17 @@ Sequel
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Top level module for <a href="Sequel.html">Sequel</a></p>
+<p>Top level module for <a href="Sequel.html"><code>Sequel</code></a></p>
 
-<p>There are some module methods that are added via metaprogramming, one for
-each supported adapter.  For example:</p>
+<p>There are some module methods that are added via metaprogramming, one for each supported adapter.  For example:</p>
 
 <pre>DB = Sequel.sqlite # Memory database&#x000A;DB = Sequel.sqlite(&#39;blog.db&#39;)&#x000A;DB = Sequel.postgres(&#39;database_name&#39;,&#x000A;       user:&#39;user&#39;, &#x000A;       password: &#39;password&#39;,&#x000A;       host: &#39;host&#39;&#x000A;       port: 5432, &#x000A;       max_connections: 10)</pre>
 
-<p>If a block is given to these methods, it is passed the opened <a
-href="Sequel/Database.html">Database</a> object, which is closed
-(disconnected) when the block exits, just like a block passed to <a
-href="Sequel.html#method-c-connect">::connect</a>.  For example:</p>
+<p>If a block is given to these methods, it is passed the opened <a href="Sequel/Database.html"><code>Database</code></a> object, which is closed (disconnected) when the block exits, just like a block passed to <a href="Sequel.html#method-c-connect"><code>Sequel.connect</code></a>.  For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}</pre>
 
-<p>For a more expanded introduction, see the <a
-href="../files/README_rdoc.html">README</a>. For a quicker introduction,
-see the <a href="../files/doc/cheat_sheet_rdoc.html">cheat sheet</a>.</p>
+<p>For a more expanded introduction, see the <a href="../files/README_rdoc.html">README</a>. For a quicker introduction, see the <a href="../files/doc/cheat_sheet_rdoc.html">cheat sheet</a>.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -270,8 +264,7 @@ see the <a href="../files/doc/cheat_sheet_rdoc.html">cheat sheet</a>.</p>
 <td class='context-item-value'>{}</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Hash of adapters that have been used. The key is the adapter scheme symbol,
-and the value is the <a href="Sequel/Database.html">Database</a> subclass.</p>
+<p>Hash of adapters that have been used. The key is the adapter scheme symbol, and the value is the <a href="Sequel/Database.html"><code>Database</code></a> subclass.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -280,8 +273,7 @@ and the value is the <a href="Sequel/Database.html">Database</a> subclass.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when the adapter requested
-doesn&#39;t exist or can&#39;t be loaded.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when the adapter requested doesn&#39;t exist or can&#39;t be loaded.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -290,9 +282,7 @@ doesn&#39;t exist or can&#39;t be loaded.</p>
 <td class='context-item-value'>Class.new(ConstraintViolation)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when <a
-href="Sequel.html">Sequel</a> determines a database check constraint has
-been violated.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when <a href="Sequel.html"><code>Sequel</code></a> determines a database check constraint has been violated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -301,8 +291,7 @@ been violated.</p>
 <td class='context-item-value'>Class.new(DatabaseError)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Generic error raised when <a href="Sequel.html">Sequel</a> determines a
-database constraint has been violated.</p>
+<p>Generic error raised when <a href="Sequel.html"><code>Sequel</code></a> determines a database constraint has been violated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -311,11 +300,7 @@ database constraint has been violated.</p>
 <td class='context-item-value'>[]</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Array of all databases to which <a href="Sequel.html">Sequel</a> has
-connected.  If you are developing an application that can connect to an
-arbitrary number of  databases, delete the database objects from this (or
-use the :keep_reference <a href="Sequel/Database.html">Database</a> option
-or a block when connecting) or they will not get garbage collected.</p>
+<p>Array of all databases to which <a href="Sequel.html"><code>Sequel</code></a> has connected.  If you are developing an application that can connect to an arbitrary number of  databases, delete the database objects from this (or use the :keep_reference <a href="Sequel/Database.html"><code>Database</code></a> option or a block when connecting) or they will not get garbage collected.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -364,8 +349,7 @@ uncountable(%w(equipment information rice money species series fish sheep news))
 end</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Proc that is instance_execed to create the default inflections for both the
-model inflector and the inflector extension.</p>
+<p>Proc that is instance_execed to create the default inflections for both the model inflector and the inflector extension.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -374,9 +358,7 @@ model inflector and the inflector extension.</p>
 <td class='context-item-value'>Class.new(DatabaseError)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when the <a
-href="Sequel.html">Sequel</a> is unable to connect to the database with the
-connection parameters it was given.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when the <a href="Sequel.html"><code>Sequel</code></a> is unable to connect to the database with the connection parameters it was given.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -385,10 +367,7 @@ connection parameters it was given.</p>
 <td class='context-item-value'>Class.new(DatabaseError)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised by adapters when they
-determine that the connection to the database has been lost.  Instructs the
-connection pool code to  remove that connection from the pool so that other
-connections can be acquired automatically.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised by adapters when they determine that the connection to the database has been lost.  Instructs the connection pool code to  remove that connection from the pool so that other connections can be acquired automatically.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -397,9 +376,7 @@ connections can be acquired automatically.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Generic error raised by the database adapters, indicating a problem
-originating from the database server.  Usually raised because incorrect <a
-href="Sequel/SQL.html">SQL</a> syntax is used.</p>
+<p>Generic error raised by the database adapters, indicating a problem originating from the database server.  Usually raised because incorrect <a href="Sequel/SQL.html"><code>SQL</code></a> syntax is used.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -408,11 +385,7 @@ href="Sequel/SQL.html">SQL</a> syntax is used.</p>
 <td class='context-item-value'>Class.new(DatabaseError)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when <a
-href="Sequel.html">Sequel</a> determines the database could not acquire a
-necessary lock before timing out. Use of <a
-href="Sequel/Dataset.html#method-i-nowait">Sequel::Dataset#nowait</a> can
-often cause this exception when retrieving rows.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when <a href="Sequel.html"><code>Sequel</code></a> determines the database could not acquire a necessary lock before timing out. Use of <a href="Sequel/Dataset.html#method-i-nowait"><code>Dataset#nowait</code></a> can often cause this exception when retrieving rows.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -421,9 +394,7 @@ often cause this exception when retrieving rows.</p>
 <td class='context-item-value'>Class.new(ConstraintViolation)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when <a
-href="Sequel.html">Sequel</a> determines a database foreign key constraint
-has been violated.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when <a href="Sequel.html"><code>Sequel</code></a> determines a database foreign key constraint has been violated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -432,9 +403,7 @@ has been violated.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised on an invalid operation, such
-as trying to update or delete a joined or grouped dataset when the database
-does not support that.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised on an invalid operation, such as trying to update or delete a joined or grouped dataset when the database does not support that.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -443,8 +412,7 @@ does not support that.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when attempting an invalid
-type conversion.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when attempting an invalid type conversion.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -453,18 +421,16 @@ type conversion.</p>
 <td class='context-item-value'>5</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>The major version of <a href="Sequel.html">Sequel</a>.  Only bumped for
-major changes.</p>
+<p>The major version of <a href="Sequel.html"><code>Sequel</code></a>.  Only bumped for major changes.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>MINOR</td>
 <td>=</td>
-<td class='context-item-value'>15</td>
+<td class='context-item-value'>16</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>The minor version of <a href="Sequel.html">Sequel</a>.  Bumped for every
-non-patch level release, generally around once a month.</p>
+<p>The minor version of <a href="Sequel.html"><code>Sequel</code></a>.  Bumped for every non-patch level release, generally around once a month.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -473,8 +439,7 @@ non-patch level release, generally around once a month.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Raised when a mass assignment method is called in strict mode with either a
-restricted column or a column without a setter method.</p>
+<p>Raised when a mass assignment method is called in strict mode with either a restricted column or a column without a setter method.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -483,9 +448,7 @@ restricted column or a column without a setter method.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Exception class raised when <code>require_modification</code> is set and an
-UPDATE or DELETE statement to modify the dataset doesn&#39;t modify a
-single row.</p>
+<p>Exception class raised when <code>require_modification</code> is set and an UPDATE or DELETE statement to modify the dataset doesn&#39;t modify a single row.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -494,9 +457,7 @@ single row.</p>
 <td class='context-item-value'>Class.new(ConstraintViolation)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when <a
-href="Sequel.html">Sequel</a> determines a database NOT NULL constraint has
-been violated.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when <a href="Sequel.html"><code>Sequel</code></a> determines a database NOT NULL constraint has been violated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -514,8 +475,7 @@ been violated.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when the connection pool
-cannot acquire a database connection before the timeout.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when the connection pool cannot acquire a database connection before the timeout.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -524,10 +484,7 @@ cannot acquire a database connection before the timeout.</p>
 <td class='context-item-value'>Class.new(Error)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> that you should raise to signal a
-rollback of the current transaction. The transaction block will catch this
-exception, rollback the current transaction, and won&#39;t reraise it
-(unless a reraise is requested).</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> that you should raise to signal a rollback of the current transaction. The transaction block will catch this exception, rollback the current transaction, and won&#39;t reraise it (unless a reraise is requested).</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -536,9 +493,7 @@ exception, rollback the current transaction, and won&#39;t reraise it
 <td class='context-item-value'>{}</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Hash of shared adapters that have been registered.  The key is the adapter
-scheme symbol, and the value is the <a href="Sequel.html">Sequel</a> module
-containing the shared adapter.</p>
+<p>Hash of shared adapters that have been registered.  The key is the adapter scheme symbol, and the value is the <a href="Sequel.html"><code>Sequel</code></a> module containing the shared adapter.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -554,9 +509,7 @@ containing the shared adapter.</p>
 <td class='context-item-value'>Class.new(DatabaseError)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when <a
-href="Sequel.html">Sequel</a> determines a serialization failure/deadlock
-in the database.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when <a href="Sequel.html"><code>Sequel</code></a> determines a serialization failure/deadlock in the database.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -565,8 +518,7 @@ in the database.</p>
 <td class='context-item-value'>0</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>The tiny version of <a href="Sequel.html">Sequel</a>.  Usually 0, only
-bumped for bugfix releases that fix regressions from previous versions.</p>
+<p>The tiny version of <a href="Sequel.html"><code>Sequel</code></a>.  Usually 0, only bumped for bugfix releases that fix regressions from previous versions.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -584,9 +536,7 @@ bumped for bugfix releases that fix regressions from previous versions.</p>
 <td class='context-item-value'>Class.new(ConstraintViolation)</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p><a href="Sequel/Error.html">Error</a> raised when <a
-href="Sequel.html">Sequel</a> determines a database unique constraint has
-been violated.</p>
+<p><a href="Sequel/Error.html"><code>Error</code></a> raised when <a href="Sequel.html"><code>Sequel</code></a> determines a database unique constraint has been violated.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -595,8 +545,7 @@ been violated.</p>
 <td class='context-item-value'>[MAJOR, MINOR, TINY].join('.').freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>The version of <a href="Sequel.html">Sequel</a> you are using, as a string
-(e.g. “2.11.0”)</p>
+<p>The version of <a href="Sequel.html"><code>Sequel</code></a> you are using, as a string (e.g. “2.11.0”)</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -605,8 +554,7 @@ been violated.</p>
 <td class='context-item-value'>MAJOR*10000 + MINOR*10 + TINY</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>The version of <a href="Sequel.html">Sequel</a> you are using, as a number
-(2.11.0 -&gt; 20110)</p>
+<p>The version of <a href="Sequel.html"><code>Sequel</code></a> you are using, as a number (2.11.0 -&gt; 20110)</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -628,9 +576,7 @@ been violated.</p>
 <td>-&gt;</td>
 <td class='context-item-value'><a href="#method-c-require">require</a></td>
 <td class='context-item-desc'>
-<p>Alias of original require method, as <a
-href="Sequel.html#method-c-require">::require</a> is does a relative
-require for backwards compatibility.</p>
+<p>Alias of original require method, as <a href="Sequel.html#method-c-require"><code>Sequel.require</code></a> is does a relative require for backwards compatibility.</p>
 </td>
 </tr>
 </table>
@@ -646,11 +592,7 @@ require for backwards compatibility.</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p><a href="Sequel.html">Sequel</a> converts two digit years in
-<code>Date</code>s and <code>DateTime</code>s by default, so 01/02/03 is
-interpreted at January 2nd, 2003, and 12/13/99 is interpreted as December
-13, 1999. You can override this to treat those dates as January 2nd, 0003
-and December 13, 0099, respectively, by:</p>
+<p><a href="Sequel.html"><code>Sequel</code></a> converts two digit years in <code>Date</code>s and <code>DateTime</code>s by default, so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted as December 13, 1999. You can override this to treat those dates as January 2nd, 0003 and December 13, 0099, respectively, by:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span> = <span class="ruby-keyword">false</span></pre>
 </td>
@@ -661,16 +603,11 @@ and December 13, 0099, respectively, by:</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p><a href="Sequel.html">Sequel</a> can use either <code>Time</code> or
-<code>DateTime</code> for times returned from the database.  It defaults to
-<code>Time</code>.  To change it to <code>DateTime</code>:</p>
+<p><a href="Sequel.html"><code>Sequel</code></a> can use either <code>Time</code> or <code>DateTime</code> for times returned from the database.  It defaults to <code>Time</code>.  To change it to <code>DateTime</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> = <span class="ruby-constant">DateTime</span></pre>
 
-<p>Note that <code>Time</code> and <code>DateTime</code> objects have a
-different API, and in cases where they implement the same methods, they
-often implement them differently (e.g. + using seconds on <code>Time</code>
-and days on <code>DateTime</code>).</p>
+<p>Note that <code>Time</code> and <code>DateTime</code> objects have a different API, and in cases where they implement the same methods, they often implement them differently (e.g. + using seconds on <code>Time</code> and days on <code>DateTime</code>).</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -679,12 +616,7 @@ and days on <code>DateTime</code>).</p>
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>Set whether <a href="Sequel.html">Sequel</a> is being used in single
-threaded mode. by default, <a href="Sequel.html">Sequel</a> uses a
-thread-safe connection pool, which isn&#39;t as fast as the single threaded
-connection pool, and also has some additional thread safety checks.  If
-your program will only have one thread, and speed is a priority, you should
-set this to true:</p>
+<p>Set whether <a href="Sequel.html"><code>Sequel</code></a> is being used in single threaded mode. by default, <a href="Sequel.html"><code>Sequel</code></a> uses a thread-safe connection pool, which isn&#39;t as fast as the single threaded connection pool, and also has some additional thread safety checks.  If your program will only have one thread, and speed is a priority, you should set this to true:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span> = <span class="ruby-keyword">true</span></pre>
 </td>
@@ -703,9 +635,7 @@ set this to true:</p>
 </div>
 <div class='description'>
 
-<p>Returns true if the passed object could be a specifier of conditions, false
-otherwise. Currently, <a href="Sequel.html">Sequel</a> considers hashes and
-arrays of two element arrays as condition specifiers.</p>
+<p>Returns true if the passed object could be a specifier of conditions, false otherwise. Currently, <a href="Sequel.html"><code>Sequel</code></a> considers hashes and arrays of two element arrays as condition specifiers.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>({}) <span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]) <span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>([]) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>([<span class="ruby-value">1</span>]) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># =&gt; false</span></pre>
 
@@ -714,7 +644,7 @@ arrays of two element arrays as condition specifiers.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-condition_specifier-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-condition_specifier-3F-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">condition_specifier?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-operator">!</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>)}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-condition_specifier-3F-source'>   <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">condition_specifier?</span>(<span class="ruby-identifier">obj</span>)&#x000A;<span class="line-num">78</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">79</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;<span class="line-num">80</span>     <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">81</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;<span class="line-num">82</span>     <span class="ruby-operator">!</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>)}&#x000A;<span class="line-num">83</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">84</span>     <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">85</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-connect'>
@@ -726,10 +656,7 @@ arrays of two element arrays as condition specifiers.</p>
 </div>
 <div class='description'>
 
-<p>Creates a new database object based on the supplied connection string and
-optional arguments.  The specified scheme determines the database class
-used, and the rest of the string specifies the connection options. For
-example:</p>
+<p>Creates a new database object based on the supplied connection string and optional arguments.  The specified scheme determines the database class used, and the rest of the string specifies the connection options. For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:/&#39;</span>) <span class="ruby-comment"># Memory database</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>) <span class="ruby-comment"># ./blog.db</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///blog.db&#39;</span>) <span class="ruby-comment"># /blog.db</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@host:port/database_name&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///blog.db&#39;</span>, <span class="ruby-value">max_connections:</span> <span class="ruby-value">10</span>)</pre>
 
@@ -737,30 +664,20 @@ example:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-value">adapter:</span> <span class="ruby-string">&#39;sqlite&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;./blog.db&#39;</span>)</pre>
 
-<p>If a block is given, it is passed the opened <code>Database</code> object,
-which is closed when the block exits.  For example:</p>
+<p>If a block is given, it is passed the opened <code>Database</code> object, which is closed when the block exits.  For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}</pre>
 
-<p>If a block is not given, a reference to this database will be held in
-<code>Sequel::DATABASES</code> until it is removed manually.  This is by
-design, and used by <code>Sequel::Model</code> to pick the default
-database.  It is recommended to pass a block if you do not want the
-resulting <a href="Sequel/Database.html">Database</a> object to remain in
-memory until the process terminates, or use the <code>keep_reference:&#x000A;false</code> <a href="Sequel/Database.html">Database</a> option.</p>
+<p>If a block is not given, a reference to this database will be held in <code>Sequel::DATABASES</code> until it is removed manually.  This is by design, and used by <code>Sequel::Model</code> to pick the default database.  It is recommended to pass a block if you do not want the resulting <a href="Sequel/Database.html"><code>Database</code></a> object to remain in memory until the process terminates, or use the <code>keep_reference: false</code> <a href="Sequel/Database.html"><code>Database</code></a> option.</p>
 
-<p>For details, see the <a
-href="../files/doc/opening_databases_rdoc.html">“Connecting to a Database”
-guide</a>. To set up a primary/replica or sharded database connection, see
-the <a href="../files/doc/sharding_rdoc.html">“Primary/Replica Database
-Configurations and Sharding” guide</a>.</p>
+<p>For details, see the <a href="../files/doc/opening_databases_rdoc.html">“Connecting to a Database” guide</a>. To set up a primary/replica or sharded database connection, see the <a href="../files/doc/sharding_rdoc.html">“Primary/Replica Database Configurations and Sharding” guide</a>.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-connect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-connect-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">Database</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-connect-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">120</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">121</span>   <span class="ruby-constant">Database</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">122</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-convert_exception_class'>
@@ -772,17 +689,14 @@ Configurations and Sharding” guide</a>.</p>
 </div>
 <div class='description'>
 
-<p>Convert the <code>exception</code> to the given class.  The given class
-should be <code>Sequel::Error</code> or a subclass.  Returns an instance of
-<code>klass</code> with the message and backtrace of
-<code>exception</code>.</p>
+<p>Convert the <code>exception</code> to the given class.  The given class should be <code>Sequel::Error</code> or a subclass.  Returns an instance of <code>klass</code> with the message and backtrace of <code>exception</code>.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-convert_exception_class-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-convert_exception_class-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">convert_exception_class</span>(<span class="ruby-identifier">exception</span>, <span class="ruby-identifier">klass</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">exception</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">exception</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-identifier">klass</span>)&#x000A;  <span class="ruby-identifier">e</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{exception.class}: #{exception.message}&quot;</span>)&#x000A;  <span class="ruby-identifier">e</span>.<span class="ruby-identifier">wrapped_exception</span> = <span class="ruby-identifier">exception</span>&#x000A;  <span class="ruby-identifier">e</span>.<span class="ruby-identifier">set_backtrace</span>(<span class="ruby-identifier">exception</span>.<span class="ruby-identifier">backtrace</span>)&#x000A;  <span class="ruby-identifier">e</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-convert_exception_class-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">133</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">convert_exception_class</span>(<span class="ruby-identifier">exception</span>, <span class="ruby-identifier">klass</span>)&#x000A;<span class="line-num">134</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">exception</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">exception</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-identifier">klass</span>)&#x000A;<span class="line-num">135</span>   <span class="ruby-identifier">e</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{exception.class}: #{exception.message}&quot;</span>)&#x000A;<span class="line-num">136</span>   <span class="ruby-identifier">e</span>.<span class="ruby-identifier">wrapped_exception</span> = <span class="ruby-identifier">exception</span>&#x000A;<span class="line-num">137</span>   <span class="ruby-identifier">e</span>.<span class="ruby-identifier">set_backtrace</span>(<span class="ruby-identifier">exception</span>.<span class="ruby-identifier">backtrace</span>)&#x000A;<span class="line-num">138</span>   <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">139</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-core_extensions-3F'>
@@ -794,16 +708,14 @@ should be <code>Sequel::Error</code> or a subclass.  Returns an instance of
 </div>
 <div class='description'>
 
-<p>Assume the core extensions are not loaded by default, if the <a
-href="../files/doc/core_extensions_rdoc.html">core_extensions</a> extension
-is loaded, this will be overridden.</p>
+<p>Assume the core extensions are not loaded by default, if the <a href="../files/doc/core_extensions_rdoc.html">core_extensions</a> extension is loaded, this will be overridden.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-core_extensions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-core_extensions-3F-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">core_extensions?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-core_extensions-3F-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">core_extensions?</span>&#x000A;<span class="line-num">127</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-elapsed_seconds_since'>
@@ -815,16 +727,14 @@ is loaded, this will be overridden.</p>
 </div>
 <div class='description'>
 
-<p>The elapsed seconds since the given timer object was created.  The timer
-object should have been created via <a
-href="Sequel.html#method-c-start_timer">::start_timer</a>.</p>
+<p>The elapsed seconds since the given timer object was created.  The timer object should have been created via <a href="Sequel.html#method-c-start_timer"><code>Sequel.start_timer</code></a>.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-elapsed_seconds_since-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-elapsed_seconds_since-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 326</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">elapsed_seconds_since</span>(<span class="ruby-identifier">timer</span>)&#x000A;  <span class="ruby-identifier">start_timer</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">timer</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-elapsed_seconds_since-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">327</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">elapsed_seconds_since</span>(<span class="ruby-identifier">timer</span>)&#x000A;<span class="line-num">328</span>   <span class="ruby-identifier">start_timer</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">timer</span>&#x000A;<span class="line-num">329</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-extension'>
@@ -836,13 +746,9 @@ href="Sequel.html#method-c-start_timer">::start_timer</a>.</p>
 </div>
 <div class='description'>
 
-<p>Load all <a href="Sequel.html">Sequel</a> extensions given.  Extensions are
-just files that exist under <code>sequel/extensions</code> in the load
-path, and are just required.</p>
+<p>Load all <a href="Sequel.html"><code>Sequel</code></a> extensions given.  Extensions are just files that exist under <code>sequel/extensions</code> in the load path, and are just required.</p>
 
-<p>In some cases, requiring an extension modifies classes directly, and in
-others, it just loads a module that you can extend other classes with. 
-Consult the documentation for each extension you plan on using for usage.</p>
+<p>In some cases, requiring an extension modifies classes directly, and in others, it just loads a module that you can extend other classes with.  Consult the documentation for each extension you plan on using for usage.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:blank</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:core_extensions</span>, <span class="ruby-value">:named_timezones</span>)</pre>
 
@@ -851,7 +757,7 @@ Consult the documentation for each extension you plan on using for usage.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-extension-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-extension-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 148</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">extensions</span>)&#x000A;  <span class="ruby-identifier">extensions</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">orig_require</span>(<span class="ruby-node">&quot;sequel/extensions/#{e}&quot;</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-extension-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">149</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">extensions</span>)&#x000A;<span class="line-num">150</span>   <span class="ruby-identifier">extensions</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">orig_require</span>(<span class="ruby-node">&quot;sequel/extensions/#{e}&quot;</span>)}&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-inflections'>
@@ -863,16 +769,14 @@ Consult the documentation for each extension you plan on using for usage.</p>
 </div>
 <div class='description'>
 
-<p>Yield the <a href="Sequel/Inflections.html">Inflections</a> module if a
-block is given, and return the <a
-href="Sequel/Inflections.html">Inflections</a> module.</p>
+<p>Yield the <a href="Sequel/Inflections.html"><code>Inflections</code></a> module if a block is given, and return the <a href="Sequel/Inflections.html"><code>Inflections</code></a> module.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-inflections-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-inflections-source'><span class="ruby-comment"># File lib/sequel/model/inflections.rb, line 5</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;  <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-constant">Inflections</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-inflections-source'>  <span class="ruby-comment"># File lib/sequel/model/inflections.rb</span>&#x000A;<span class="line-num">6</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inflections</span>&#x000A;<span class="line-num">7</span>   <span class="ruby-keyword">yield</span> <span class="ruby-constant">Inflections</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;<span class="line-num">8</span>   <span class="ruby-constant">Inflections</span>&#x000A;<span class="line-num">9</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-json_parser_error_class'>
@@ -884,15 +788,14 @@ href="Sequel/Inflections.html">Inflections</a> module.</p>
 </div>
 <div class='description'>
 
-<p>The exception classed raised if there is an error parsing JSON. This can be
-overridden to use an alternative json implementation.</p>
+<p>The exception classed raised if there is an error parsing JSON. This can be overridden to use an alternative json implementation.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-json_parser_error_class-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-json_parser_error_class-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">json_parser_error_class</span>&#x000A;  <span class="ruby-constant">JSON</span><span class="ruby-operator">::</span><span class="ruby-constant">ParserError</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-json_parser_error_class-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">155</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">json_parser_error_class</span>&#x000A;<span class="line-num">156</span>   <span class="ruby-constant">JSON</span><span class="ruby-operator">::</span><span class="ruby-constant">ParserError</span>&#x000A;<span class="line-num">157</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-migration'>
@@ -904,20 +807,18 @@ overridden to use an alternative json implementation.</p>
 </div>
 <div class='description'>
 
-<p>The preferred method for writing <a href="Sequel.html">Sequel</a>
-migrations, using a DSL:</p>
+<p>The preferred method for writing <a href="Sequel.html"><code>Sequel</code></a> migrations, using a DSL:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(<span class="ruby-value">:artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> <span class="ruby-value">:id</span>&#x000A;      <span class="ruby-constant">String</span> <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(<span class="ruby-value">:artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>Designed to be used with the <code>Migrator</code> class, part of the
-<code>migration</code> extension.</p>
+<p>Designed to be used with the <code>Migrator</code> class, part of the <code>migration</code> extension.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-migration-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-migration-source'>    <span class="ruby-comment"># File lib/sequel/extensions/migration.rb</span>&#x000A;<span class="line-num">288</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">289</span>   <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">290</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-object_to_json'>
@@ -929,15 +830,14 @@ migrations, using a DSL:</p>
 </div>
 <div class='description'>
 
-<p>Convert given object to json and return the result. This can be overridden
-to use an alternative json implementation.</p>
+<p>Convert given object to json and return the result. This can be overridden to use an alternative json implementation.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-object_to_json-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-object_to_json-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 160</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-object_to_json-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">162</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">163</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-parse_json'>
@@ -949,15 +849,14 @@ to use an alternative json implementation.</p>
 </div>
 <div class='description'>
 
-<p>Parse the string as JSON and return the result. This can be overridden to
-use an alternative json implementation.</p>
+<p>Parse the string as JSON and return the result. This can be overridden to use an alternative json implementation.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-parse_json-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-parse_json-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 166</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">parse_json</span>(<span class="ruby-identifier">json</span>)&#x000A;  <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">json</span>, <span class="ruby-value">:create_additions</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-parse_json-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">167</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">parse_json</span>(<span class="ruby-identifier">json</span>)&#x000A;<span class="line-num">168</span>   <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">json</span>, <span class="ruby-value">:create_additions</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-recursive_map'>
@@ -969,16 +868,14 @@ use an alternative json implementation.</p>
 </div>
 <div class='description'>
 
-<p>Convert each item in the array to the correct type, handling
-multi-dimensional arrays.  For each element in the array or subarrays, call
-the converter, unless the value is nil.</p>
+<p>Convert each item in the array to the correct type, handling multi-dimensional arrays.  For each element in the array or subarrays, call the converter, unless the value is nil.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-recursive_map-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-recursive_map-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 173</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">recursive_map</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">converter</span>)&#x000A;  <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;      <span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">i</span>, <span class="ruby-identifier">converter</span>)&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">i</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-recursive_map-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">174</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">recursive_map</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">converter</span>)&#x000A;<span class="line-num">175</span>   <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">176</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="line-num">177</span>       <span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">i</span>, <span class="ruby-identifier">converter</span>)&#x000A;<span class="line-num">178</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">i</span>.<span class="ruby-identifier">nil?</span>&#x000A;<span class="line-num">179</span>       <span class="ruby-identifier">converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">180</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">181</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-require'>
@@ -997,7 +894,7 @@ the converter, unless the value is nil.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-require-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-require-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 184</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">require</span>(<span class="ruby-identifier">files</span>, <span class="ruby-identifier">subdir</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-comment"># Use Kernel.require_relative to work around JRuby 9.0 bug</span>&#x000A;  <span class="ruby-constant">Array</span>(<span class="ruby-identifier">files</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">require_relative</span> <span class="ruby-node">&quot;#{&quot;#{subdir}/&quot; if subdir}#{f}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-require-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">require</span>(<span class="ruby-identifier">files</span>, <span class="ruby-identifier">subdir</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">186</span>   <span class="ruby-comment"># Use Kernel.require_relative to work around JRuby 9.0 bug</span>&#x000A;<span class="line-num">187</span>   <span class="ruby-constant">Array</span>(<span class="ruby-identifier">files</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">require_relative</span> <span class="ruby-node">&quot;#{&quot;#{subdir}/&quot; if subdir}#{f}&quot;</span>}&#x000A;<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-split_symbol'>
@@ -1009,20 +906,16 @@ the converter, unless the value is nil.</p>
 </div>
 <div class='description'>
 
-<p>Splits the symbol into three parts, if symbol splitting is enabled (not the
-default). Each part will either be a string or nil. If symbol splitting is
-disabled, returns an array with the first and third parts being nil, and
-the second part beind a string version of the symbol.</p>
+<p>Splits the symbol into three parts, if symbol splitting is enabled (not the default). Each part will either be a string or nil. If symbol splitting is disabled, returns an array with the first and third parts being nil, and the second part beind a string version of the symbol.</p>
 
-<p>For columns, these parts are the table, column, and alias. For tables,
-these parts are the schema, table, and alias.</p>
+<p>For columns, these parts are the table, column, and alias. For tables, these parts are the schema, table, and alias.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-split_symbol-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-split_symbol-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 198</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">split_symbol</span>(<span class="ruby-identifier">sym</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>[<span class="ruby-identifier">sym</span>]}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">split_symbols?</span>&#x000A;      <span class="ruby-identifier">v</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span> = <span class="ruby-identifier">sym</span>.<span class="ruby-identifier">to_s</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/</span>&#x000A;        [<span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$3</span>.<span class="ruby-identifier">freeze</span>].<span class="ruby-identifier">freeze</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!___).)+)___(.+)\z/</span>&#x000A;        [<span class="ruby-keyword">nil</span>, <span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>].<span class="ruby-identifier">freeze</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!__).)+)__(.+)\z/</span>&#x000A;        [<span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        [<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">v</span> = [<span class="ruby-keyword">nil</span>,<span class="ruby-identifier">sym</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">freeze</span>,<span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>[<span class="ruby-identifier">sym</span>] = <span class="ruby-identifier">v</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-split_symbol-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">199</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">split_symbol</span>(<span class="ruby-identifier">sym</span>)&#x000A;<span class="line-num">200</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>[<span class="ruby-identifier">sym</span>]}&#x000A;<span class="line-num">201</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">split_symbols?</span>&#x000A;<span class="line-num">202</span>       <span class="ruby-identifier">v</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span> = <span class="ruby-identifier">sym</span>.<span class="ruby-identifier">to_s</span>&#x000A;<span class="line-num">203</span>       <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/</span>&#x000A;<span class="line-num">204</span>         [<span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$3</span>.<span class="ruby-identifier">freeze</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">205</span>       <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!___).)+)___(.+)\z/</span>&#x000A;<span class="line-num">206</span>         [<span class="ruby-keyword">nil</span>, <span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">207</span>       <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!__).)+)__(.+)\z/</span>&#x000A;<span class="line-num">208</span>         [<span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">209</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">210</span>         [<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">211</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">212</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">213</span>       <span class="ruby-identifier">v</span> = [<span class="ruby-keyword">nil</span>,<span class="ruby-identifier">sym</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">freeze</span>,<span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">214</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">215</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>[<span class="ruby-identifier">sym</span>] = <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">216</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">217</span>   <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">218</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-split_symbols-3D'>
@@ -1034,26 +927,17 @@ these parts are the schema, table, and alias.</p>
 </div>
 <div class='description'>
 
-<p>Setting this to true enables Sequel&#39;s historical behavior of splitting
-symbols on double or triple underscores:</p>
+<p>Setting this to true enables Sequel&#39;s historical behavior of splitting symbols on double or triple underscores:</p>
 
 <pre class="ruby"><span class="ruby-value">:table__column</span>         <span class="ruby-comment"># table.column</span>&#x000A;<span class="ruby-value">:column___alias</span>        <span class="ruby-comment"># column AS alias</span>&#x000A;<span class="ruby-value">:table__column___alias</span> <span class="ruby-comment"># table.column AS alias</span></pre>
 
-<p>It is only recommended to turn this on for backwards compatibility until
-such symbols have been converted to use newer <a
-href="Sequel.html">Sequel</a> APIs such as:</p>
+<p>It is only recommended to turn this on for backwards compatibility until such symbols have been converted to use newer <a href="Sequel.html"><code>Sequel</code></a> APIs such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>]            <span class="ruby-comment"># table.column</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)         <span class="ruby-comment"># column AS alias</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>) <span class="ruby-comment"># table.column AS alias</span></pre>
 
-<p><a href="Sequel/Database.html">Sequel::Database</a> instances do their own
-caching of literalized symbols, and changing this setting does not affect
-those caches.  It is recommended that if you want to change this setting,
-you do so directly after requiring <a href="Sequel.html">Sequel</a>, before
-creating any <a href="Sequel/Database.html">Sequel::Database</a> instances.</p>
+<p><a href="Sequel/Database.html"><code>Sequel::Database</code></a> instances do their own caching of literalized symbols, and changing this setting does not affect those caches.  It is recommended that if you want to change this setting, you do so directly after requiring <a href="Sequel.html"><code>Sequel</code></a>, before creating any <a href="Sequel/Database.html"><code>Sequel::Database</code></a> instances.</p>
 
-<p>Disabling symbol splitting will also disable the handling of double
-underscores in virtual row methods, causing such methods to yield regular
-identifers instead of qualified identifiers:</p>
+<p>Disabling symbol splitting will also disable the handling of double underscores in virtual row methods, causing such methods to yield regular identifers instead of qualified identifiers:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Sequel.split_symbols = true</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table__column</span>}  <span class="ruby-comment"># table.column</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]} <span class="ruby-comment"># table.column</span>&#x000A;&#x000A;<span class="ruby-comment"># Sequel.split_symbols = false</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table__column</span>}  <span class="ruby-comment"># table__column</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]} <span class="ruby-comment"># table.column</span></pre>
 
@@ -1062,7 +946,7 @@ identifers instead of qualified identifiers:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-split_symbols-3D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-split_symbols-3D-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 249</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">split_symbols=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>.<span class="ruby-identifier">clear</span>}&#x000A;  <span class="ruby-ivar">@split_symbols</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-split_symbols-3D-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">250</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">split_symbols=</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">251</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>.<span class="ruby-identifier">clear</span>}&#x000A;<span class="line-num">252</span>   <span class="ruby-ivar">@split_symbols</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">253</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-split_symbols-3F'>
@@ -1074,15 +958,14 @@ identifers instead of qualified identifiers:</p>
 </div>
 <div class='description'>
 
-<p>Whether <a href="Sequel.html">Sequel</a> currently splits symbols into
-qualified/aliased identifiers.</p>
+<p>Whether <a href="Sequel.html"><code>Sequel</code></a> currently splits symbols into qualified/aliased identifiers.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-split_symbols-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-split_symbols-3F-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 255</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">split_symbols?</span>&#x000A;  <span class="ruby-ivar">@split_symbols</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-split_symbols-3F-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">256</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">split_symbols?</span>&#x000A;<span class="line-num">257</span>   <span class="ruby-ivar">@split_symbols</span>&#x000A;<span class="line-num">258</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-start_timer'>
@@ -1094,16 +977,14 @@ qualified/aliased identifiers.</p>
 </div>
 <div class='description'>
 
-<p>A timer object that can be passed to <a
-href="Sequel.html#method-c-elapsed_seconds_since">::elapsed_seconds_since</a>
-to return the number of seconds elapsed.</p>
+<p>A timer object that can be passed to <a href="Sequel.html#method-c-elapsed_seconds_since"><code>Sequel.elapsed_seconds_since</code></a> to return the number of seconds elapsed.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-start_timer-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-start_timer-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 313</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">start_timer</span>&#x000A;  <span class="ruby-constant">Process</span>.<span class="ruby-identifier">clock_gettime</span>(<span class="ruby-constant">Process</span><span class="ruby-operator">::</span><span class="ruby-constant">CLOCK_MONOTONIC</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-start_timer-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">314</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">start_timer</span>&#x000A;<span class="line-num">315</span>   <span class="ruby-constant">Process</span>.<span class="ruby-identifier">clock_gettime</span>(<span class="ruby-constant">Process</span><span class="ruby-operator">::</span><span class="ruby-constant">CLOCK_MONOTONIC</span>)&#x000A;<span class="line-num">316</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-string_to_date'>
@@ -1124,7 +1005,7 @@ to return the number of seconds elapsed.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-string_to_date-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-string_to_date-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 262</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_to_date</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-string_to_date-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">263</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_to_date</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">264</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">265</span>     <span class="ruby-constant">Date</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)&#x000A;<span class="line-num">266</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">267</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">268</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">269</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-string_to_datetime'>
@@ -1136,9 +1017,7 @@ to return the number of seconds elapsed.</p>
 </div>
 <div class='description'>
 
-<p>Converts the given <code>string</code> into a <code>Time</code> or
-<code>DateTime</code> object, depending on the value of
-<code>Sequel.datetime_class</code>.</p>
+<p>Converts the given <code>string</code> into a <code>Time</code> or <code>DateTime</code> object, depending on the value of <code>Sequel.datetime_class</code>.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_datetime</span>(<span class="ruby-string">&#39;2010-09-10 10:20:30&#39;</span>) <span class="ruby-comment"># Time.local(2010, 09, 10, 10, 20, 30)</span></pre>
 
@@ -1147,7 +1026,7 @@ to return the number of seconds elapsed.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-string_to_datetime-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-string_to_datetime-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 274</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_to_datetime</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>&#x000A;      <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>, <span class="ruby-identifier">convert_two_digit_years</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">datetime_class</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-string_to_datetime-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">275</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_to_datetime</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">276</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">277</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>&#x000A;<span class="line-num">278</span>       <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>, <span class="ruby-identifier">convert_two_digit_years</span>)&#x000A;<span class="line-num">279</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">280</span>       <span class="ruby-identifier">datetime_class</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">281</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">282</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">283</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">284</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">285</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-string_to_time'>
@@ -1159,8 +1038,7 @@ to return the number of seconds elapsed.</p>
 </div>
 <div class='description'>
 
-<p>Converts the given <code>string</code> into a <code>Sequel::SQLTime</code>
-object.</p>
+<p>Converts the given <code>string</code> into a <code>Sequel::SQLTime</code> object.</p>
 
 <pre class="ruby"><span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-string">&#39;10:20:30&#39;</span>) <span class="ruby-comment"># Sequel::SQLTime.parse(&#39;10:20:30&#39;)</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># =&gt; &#39;10:20:30&#39;</span></pre>
 
@@ -1169,7 +1047,7 @@ object.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-string_to_time-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-string_to_time-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 290</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_to_time</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-string_to_time-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">291</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">string_to_time</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">292</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">293</span>     <span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">294</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">295</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">296</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">297</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-synchronize'>
@@ -1181,18 +1059,14 @@ object.</p>
 </div>
 <div class='description'>
 
-<p>Unless in single threaded mode, protects access to any mutable global data
-structure in <a href="Sequel.html">Sequel</a>. Uses a non-reentrant mutex,
-so calling code should be careful. In general, this should only be used
-around the minimal possible code such as Hash#[], Hash#[]=, Hash#delete,
-Array#<<, and Array#delete.</p>
+<p>Unless in single threaded mode, protects access to any mutable global data structure in <a href="Sequel.html"><code>Sequel</code></a>. Uses a non-reentrant mutex, so calling code should be careful. In general, this should only be used around the minimal possible code such as Hash#[], Hash#[]=, Hash#delete, Array#<<, and Array#delete.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-synchronize-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-synchronize-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 306</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@single_threaded</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@data_mutex</span>.<span class="ruby-identifier">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-synchronize-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">307</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">308</span>   <span class="ruby-ivar">@single_threaded</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@data_mutex</span>.<span class="ruby-identifier">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">309</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-transaction'>
@@ -1212,23 +1086,16 @@ Array#<<, and Array#delete.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB1</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB2</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB3</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>except that if <a href="Sequel.html#Rollback">Sequel::Rollback</a> is
-raised by the block, the transaction is rolled back on all databases
-instead of just the last one.</p>
+<p>except that if <a href="Sequel.html#Rollback"><code>Sequel::Rollback</code></a> is raised by the block, the transaction is rolled back on all databases instead of just the last one.</p>
 
-<p>Note that this method cannot guarantee that all databases will commit or
-rollback.  For example, if DB3 commits but attempting to commit on DB2
-fails (maybe because foreign key checks are deferred), there is no way to
-uncommit the changes on DB3.  For that kind of support, you need to have
-two-phase commit/prepared transactions (which <a
-href="Sequel.html">Sequel</a> supports on some databases).</p>
+<p>Note that this method cannot guarantee that all databases will commit or rollback.  For example, if DB3 commits but attempting to commit on DB2 fails (maybe because foreign key checks are deferred), there is no way to uncommit the changes on DB3.  For that kind of support, you need to have two-phase commit/prepared transactions (which <a href="Sequel.html"><code>Sequel</code></a> supports on some databases).</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-transaction-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-transaction-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 352</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">transaction</span>(<span class="ruby-identifier">dbs</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rollback</span>]&#x000A;    <span class="ruby-identifier">rescue_rollback</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:reraise</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">dbs</span>.<span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">bl</span>, <span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">bl</span>)}}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">rescue_rollback</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;      <span class="ruby-keyword">nil</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-transaction-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">353</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">transaction</span>(<span class="ruby-identifier">dbs</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">354</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rollback</span>]&#x000A;<span class="line-num">355</span>     <span class="ruby-identifier">rescue_rollback</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">356</span>     <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:reraise</span>)&#x000A;<span class="line-num">357</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">358</span>   <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">dbs</span>.<span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">bl</span>, <span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">bl</span>)}}&#x000A;<span class="line-num">359</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rescue_rollback</span>&#x000A;<span class="line-num">360</span>     <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">361</span>       <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">362</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="line-num">363</span>       <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">364</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">365</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">366</span>     <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">367</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">368</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-version'>
@@ -1240,15 +1107,14 @@ href="Sequel.html">Sequel</a> supports on some databases).</p>
 </div>
 <div class='description'>
 
-<p>The version of <a href="Sequel.html">Sequel</a> you are using, as a string
-(e.g. “2.11.0”)</p>
+<p>The version of <a href="Sequel.html"><code>Sequel</code></a> you are using, as a string (e.g. “2.11.0”)</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-version-source'><span class="ruby-comment"># File lib/sequel/version.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">version</span>&#x000A;  <span class="ruby-constant">VERSION</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-version-source'>   <span class="ruby-comment"># File lib/sequel/version.rb</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">version</span>&#x000A;<span class="line-num">23</span>   <span class="ruby-constant">VERSION</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-virtual_row'>
@@ -1260,10 +1126,7 @@ href="Sequel.html">Sequel</a> supports on some databases).</p>
 </div>
 <div class='description'>
 
-<p>If the supplied block takes a single argument, yield an
-<code>SQL::VirtualRow</code> instance to the block argument.  Otherwise,
-evaluate the block in the context of a <code>SQL::VirtualRow</code>
-instance.</p>
+<p>If the supplied block takes a single argument, yield an <code>SQL::VirtualRow</code> instance to the block argument.  Otherwise, evaluate the block in the context of a <code>SQL::VirtualRow</code> instance.</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">a</span>} <span class="ruby-comment"># Sequel::SQL::Identifier.new(:a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>} <span class="ruby-comment"># Sequel::SQL::Function.new(:a)</span></pre>
 
@@ -1272,7 +1135,7 @@ instance.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-virtual_row-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-virtual_row-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 376</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">vr</span> = <span class="ruby-constant">VIRTUAL_ROW</span>&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">block</span>.<span class="ruby-identifier">arity</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">-1</span>, <span class="ruby-value">0</span>&#x000A;    <span class="ruby-identifier">vr</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">vr</span>)&#x000A;  <span class="ruby-keyword">end</span>  &#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-virtual_row-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">377</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">378</span>   <span class="ruby-identifier">vr</span> = <span class="ruby-constant">VIRTUAL_ROW</span>&#x000A;<span class="line-num">379</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">block</span>.<span class="ruby-identifier">arity</span>&#x000A;<span class="line-num">380</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">-1</span>, <span class="ruby-value">0</span>&#x000A;<span class="line-num">381</span>     <span class="ruby-identifier">vr</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">382</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">383</span>     <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">vr</span>)&#x000A;<span class="line-num">384</span>   <span class="ruby-keyword">end</span>  &#x000A;<span class="line-num">385</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

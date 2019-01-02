@@ -130,9 +130,7 @@ Sequel::CoreRefinements
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
-hash, matching all of the conditions in this hash and the condition
-specified by the given argument.</p>
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this hash, matching all of the conditions in this hash and the condition specified by the given argument.</p>
 
 <pre class="ruby">{<span class="ruby-value">a:</span> <span class="ruby-value">1</span>} <span class="ruby-operator">&amp;</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># SQL: ((a = 1) AND b)</span>&#x000A;{<span class="ruby-value">a:</span> <span class="ruby-keyword">true</span>} <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span><span class="ruby-value">:b</span> <span class="ruby-comment"># SQL: ((a IS TRUE) AND NOT b)</span></pre>
 
@@ -141,7 +139,7 @@ specified by the given argument.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-26-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-26-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 99</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">&amp;</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-26-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">100</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">&amp;</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">101</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">102</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-case'>
@@ -153,8 +151,7 @@ specified by the given argument.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::CaseExpression</code> with this array as the
-conditions and the given default value and expression.</p>
+<p>Return a <code>Sequel::SQL::CaseExpression</code> with this array as the conditions and the given default value and expression.</p>
 
 <pre class="ruby">[[{<span class="ruby-value">a:</span> [<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}, <span class="ruby-value">1</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN (a IN (2, 3)) THEN 1 ELSE 0 END</span>&#x000A;[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, <span class="ruby-value">2</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">:d</span>, <span class="ruby-value">:c</span>) <span class="ruby-comment"># SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END</span></pre>
 
@@ -163,7 +160,7 @@ conditions and the given default value and expression.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-case-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-case-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">case</span>(<span class="ruby-operator">*</span><span class="ruby-identifier ruby-title">args</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-case-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">case</span>(<span class="ruby-operator">*</span><span class="ruby-identifier ruby-title">args</span>)&#x000A;<span class="line-num">32</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">33</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-hstore'>
@@ -180,7 +177,7 @@ conditions and the given default value and expression.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hstore-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hstore-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 335</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hstore-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb</span>&#x000A;<span class="line-num">336</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hstore</span>&#x000A;<span class="line-num">337</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">338</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-identifier'>
@@ -201,7 +198,7 @@ conditions and the given default value and expression.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-identifier-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-identifier-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 202</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">identifier</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-identifier-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">identifier</span>&#x000A;<span class="line-num">204</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">205</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
@@ -213,13 +210,11 @@ conditions and the given default value and expression.</p>
 </div>
 <div class='description'>
 
-<p>Converts a string into a <code>Sequel::LiteralString</code>, in order to
-override string literalization, e.g.:</p>
+<p>Converts a string into a <code>Sequel::LiteralString</code>, in order to override string literalization, e.g.:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">abc:</span> <span class="ruby-string">&#39;def&#39;</span>)&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (abc = &#39;def&#39;)&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">abc:</span> <span class="ruby-string">&#39;def&#39;</span>.<span class="ruby-identifier">lit</span>)&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE (abc = def)&quot;</span></pre>
 
-<p>You can also provide arguments, to create a
-<code>Sequel::SQL::PlaceholderLiteralString</code>:</p>
+<p>You can also provide arguments, to create a <code>Sequel::SQL::PlaceholderLiteralString</code>:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-string">&#39;DISTINCT ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-value">:a</span>))}&#x000A;<span class="ruby-comment"># &quot;SELECT count(DISTINCT a) FROM items&quot;</span></pre>
 
@@ -228,7 +223,7 @@ override string literalization, e.g.:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lit-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lit-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">179</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_array'>
@@ -245,7 +240,7 @@ override string literalization, e.g.:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_array-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 515</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb</span>&#x000A;<span class="line-num">516</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>(<span class="ruby-identifier">type</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">517</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">518</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_json'>
@@ -262,7 +257,7 @@ override string literalization, e.g.:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_json-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 361</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_json-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>&#x000A;<span class="line-num">362</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_json</span>&#x000A;<span class="line-num">363</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">364</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_jsonb'>
@@ -279,7 +274,7 @@ override string literalization, e.g.:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_jsonb-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 365</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_jsonb-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>&#x000A;<span class="line-num">366</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_jsonb</span>&#x000A;<span class="line-num">367</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">368</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_range'>
@@ -296,7 +291,7 @@ override string literalization, e.g.:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_range-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 558</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_range</span>(<span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">db_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_range-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>&#x000A;<span class="line-num">559</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_range</span>(<span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">560</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">db_type</span>)&#x000A;<span class="line-num">561</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-pg_row'>
@@ -313,7 +308,7 @@ override string literalization, e.g.:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_row-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_row-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 573</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_row</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_row-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb</span>&#x000A;<span class="line-num">574</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_row</span>&#x000A;<span class="line-num">575</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">576</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_expr'>
@@ -325,13 +320,7 @@ override string literalization, e.g.:</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
-array, matching all of the conditions.  Rarely do you need to call this
-explicitly, as <a href="../Sequel.html">Sequel</a> generally assumes that
-arrays of two element arrays specify this type of condition.  One case
-where it can be necessary to use this is if you are using the object as a
-value in a filter hash and want to use the = operator instead of the IN
-operator (which is used by default for arrays of two element arrays).</p>
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this array, matching all of the conditions.  Rarely do you need to call this explicitly, as <a href="../Sequel.html"><code>Sequel</code></a> generally assumes that arrays of two element arrays specify this type of condition.  One case where it can be necessary to use this is if you are using the object as a value in a filter hash and want to use the = operator instead of the IN operator (which is used by default for arrays of two element arrays).</p>
 
 <pre class="ruby">[[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]].<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: (a IS TRUE)</span>&#x000A;[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: ((a = 1) AND (b IN (2, 3)))</span></pre>
 
@@ -340,7 +329,7 @@ operator (which is used by default for arrays of two element arrays).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_expr-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_expr-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_expr</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_expr-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_expr</span>&#x000A;<span class="line-num">58</span>   <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_function'>
@@ -352,8 +341,7 @@ operator (which is used by default for arrays of two element arrays).</p>
 </div>
 <div class='description'>
 
-<p>Returns a <code>Sequel::SQL::Function</code> with this as the function
-name, and the given arguments.</p>
+<p>Returns a <code>Sequel::SQL::Function</code> with this as the function name, and the given arguments.</p>
 
 <pre class="ruby"><span class="ruby-value">:now</span>.<span class="ruby-identifier">sql_function</span> <span class="ruby-comment"># SQL: now()</span>&#x000A;<span class="ruby-value">:sum</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:a</span>) <span class="ruby-comment"># SQL: sum(a)</span>&#x000A;<span class="ruby-value">:concat</span>.<span class="ruby-identifier">sql_function</span>(<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>) <span class="ruby-comment"># SQL: concat(a, b)</span></pre>
 
@@ -362,7 +350,7 @@ name, and the given arguments.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_function-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_function-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 212</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_function-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">213</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">214</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">215</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_negate'>
@@ -374,8 +362,7 @@ name, and the given arguments.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
-array, matching none of the conditions.</p>
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this array, matching none of the conditions.</p>
 
 <pre class="ruby">[[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]].<span class="ruby-identifier">sql_negate</span> <span class="ruby-comment"># SQL: (a IS NOT TRUE)</span>&#x000A;[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_negate</span> <span class="ruby-comment"># SQL: ((a != 1) AND (b NOT IN (2, 3)))</span></pre>
 
@@ -384,7 +371,7 @@ array, matching none of the conditions.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_negate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_negate-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 65</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_negate</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_negate-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_negate</span>&#x000A;<span class="line-num">67</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_or'>
@@ -396,8 +383,7 @@ array, matching none of the conditions.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
-array, matching any of the conditions.</p>
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this array, matching any of the conditions.</p>
 
 <pre class="ruby">[[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: (a IS TRUE)</span>&#x000A;[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: ((a = 1) OR (b IN (2, 3)))</span></pre>
 
@@ -406,7 +392,7 @@ array, matching any of the conditions.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_or-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_or-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_or</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_or-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_or</span>&#x000A;<span class="line-num">76</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_string_join'>
@@ -418,10 +404,7 @@ array, matching any of the conditions.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::StringExpression</code> representing an <a
-href="SQL.html">SQL</a> string made up of the concatenation of this
-array&#39;s elements.  If an argument is passed it is used in between each
-element of the array in the <a href="SQL.html">SQL</a> concatenation.</p>
+<p>Return a <code>Sequel::SQL::StringExpression</code> representing an <a href="SQL.html"><code>SQL</code></a> string made up of the concatenation of this array&#39;s elements.  If an argument is passed it is used in between each element of the array in the <a href="SQL.html"><code>SQL</code></a> concatenation.</p>
 
 <pre class="ruby">[<span class="ruby-value">:a</span>].<span class="ruby-identifier">sql_string_join</span> <span class="ruby-comment"># SQL: a</span>&#x000A;[<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>].<span class="ruby-identifier">sql_string_join</span> <span class="ruby-comment"># SQL: (a || b)</span>&#x000A;[<span class="ruby-value">:a</span>, <span class="ruby-string">&#39;b&#39;</span>].<span class="ruby-identifier">sql_string_join</span> <span class="ruby-comment"># SQL: (a || &#39;b&#39;)</span>&#x000A;[<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-value">:b</span>].<span class="ruby-identifier">sql_string_join</span>(<span class="ruby-string">&#39; &#39;</span>) <span class="ruby-comment"># SQL: (&#39;a&#39; || &#39; &#39; || b)</span></pre>
 
@@ -430,7 +413,7 @@ element of the array in the <a href="SQL.html">SQL</a> concatenation.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_string_join-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_string_join-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_string_join</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">joiner</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_string_join-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">88</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_string_join</span>(<span class="ruby-identifier">joiner</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">89</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">joiner</span>)&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-sql_value_list'>
@@ -442,12 +425,7 @@ element of the array in the <a href="SQL.html">SQL</a> concatenation.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::ValueList</code> created from this array.  Used
-if this array contains all two element arrays and you want it treated as an
-<a href="SQL.html">SQL</a> value list (IN predicate)  instead of as a
-conditions specifier (similar to a hash).  This is not necessary if you are
-using this array as a value in a filter, but may be necessary if you are
-using it as a value with placeholder SQL:</p>
+<p>Return a <code>Sequel::SQL::ValueList</code> created from this array.  Used if this array contains all two element arrays and you want it treated as an <a href="SQL.html"><code>SQL</code></a> value list (IN predicate)  instead of as a conditions specifier (similar to a hash).  This is not necessary if you are using this array as a value in a filter, but may be necessary if you are using it as a value with placeholder SQL:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>([<span class="ruby-value">:a</span>, <span class="ruby-value">:b</span>]<span class="ruby-operator">=&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: ((a, b) IN ((1, 2), (3, 4)))</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: ((a, b) IN ((1 = 2) AND (3 = 4)))</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_value_list</span>) <span class="ruby-comment"># SQL: ((a, b) IN ((1, 2), (3, 4)))</span></pre>
 
@@ -456,7 +434,7 @@ using it as a value with placeholder SQL:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_value_list-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_value_list-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_value_list</span>&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_value_list-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">44</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_value_list</span>&#x000A;<span class="line-num">45</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -468,15 +446,14 @@ using it as a value with placeholder SQL:</p>
 </div>
 <div class='description'>
 
-<p>Returns a <code>Sequel::SQL::Blob</code> that holds the same data as this
-string. Blobs provide proper escaping of binary data.</p>
+<p>Returns a <code>Sequel::SQL::Blob</code> that holds the same data as this string. Blobs provide proper escaping of binary data.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_sequel_blob-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_sequel_blob-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">184</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;<span class="line-num">185</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">186</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-7C'>
@@ -488,9 +465,7 @@ string. Blobs provide proper escaping of binary data.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
-hash, matching all of the conditions in this hash or the condition
-specified by the given argument.</p>
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this hash, matching all of the conditions in this hash or the condition specified by the given argument.</p>
 
 <pre class="ruby">{<span class="ruby-value">a:</span> <span class="ruby-value">1</span>} <span class="ruby-operator">|</span> <span class="ruby-value">:b</span> <span class="ruby-comment"># SQL: ((a = 1) OR b)</span>&#x000A;{<span class="ruby-value">a:</span> <span class="ruby-keyword">true</span>} <span class="ruby-operator">|</span> <span class="ruby-operator">~</span><span class="ruby-value">:b</span> <span class="ruby-comment"># SQL: ((a IS TRUE) OR NOT b)</span></pre>
 
@@ -499,7 +474,7 @@ specified by the given argument.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-7C-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-7C-source'>    <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">|</span>(<span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">111</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-~'>
@@ -511,8 +486,7 @@ specified by the given argument.</p>
 </div>
 <div class='description'>
 
-<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
-array, not matching all of the conditions.</p>
+<p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this array, not matching all of the conditions.</p>
 
 <pre class="ruby"><span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-keyword">true</span>]] <span class="ruby-comment"># SQL: (a IS NOT TRUE)</span>&#x000A;<span class="ruby-operator">~</span>[[<span class="ruby-value">:a</span>, <span class="ruby-value">1</span>], [<span class="ruby-value">:b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]] <span class="ruby-comment"># SQL: ((a != 1) OR (b NOT IN (2, 3)))</span></pre>
 
@@ -521,7 +495,7 @@ array, not matching all of the conditions.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-~-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-~-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-~-source'>   <span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">~</span>&#x000A;<span class="line-num">23</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">~</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

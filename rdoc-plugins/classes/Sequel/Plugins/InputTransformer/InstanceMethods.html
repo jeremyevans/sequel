@@ -56,15 +56,14 @@ Sequel::Plugins::InputTransformer::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Transform the input using all of the transformers, except those explicitly
-skipped, before setting the value in the model object.</p>
+<p>Transform the input using all of the transformers, except those explicitly skipped, before setting the value in the model object.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-3D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-3D-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]=</span>(<span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">input_transformers</span>.<span class="ruby-identifier">reverse_each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">transformer</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">skip_input_transformer?</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">k</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-3D-source'>   <span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]=</span>(<span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">81</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">input_transformers</span>.<span class="ruby-identifier">reverse_each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">transformer</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">82</span>     <span class="ruby-identifier">v</span> = <span class="ruby-identifier">transformer</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">skip_input_transformer?</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">k</span>)&#x000A;<span class="line-num">83</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">84</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">85</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

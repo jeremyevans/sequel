@@ -54,24 +54,11 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><code>Sequel::Model</code> is an object relational mapper built on top of
-<a href="../Sequel.html">Sequel</a> core.  Each model class is backed by a
-dataset instance, and many dataset methods can be called directly on the
-class.  <a href="Model.html">Model</a> datasets return rows as model
-instances, which are wrappers around the underlying hash that allow easily
-updating or deleting the individual row.</p>
+<p><code>Sequel::Model</code> is an object relational mapper built on top of <a href="../Sequel.html"><code>Sequel</code></a> core.  Each model class is backed by a dataset instance, and many dataset methods can be called directly on the class.  <a href="Model.html"><code>Model</code></a> datasets return rows as model instances, which are wrappers around the underlying hash that allow easily updating or deleting the individual row.</p>
 
-<p><code>Sequel::Model</code> is built completely out of plugins.  <a
-href="Plugins.html">Plugins</a> can override any class, instance, or
-dataset method defined by a previous plugin and call super to get the
-default behavior.  By default, <code>Sequel::Model</code> loads two
-plugins, <code>Sequel::Model</code> (which is itself a plugin) for the base
-support, and <code>Sequel::Model::Associations</code> for the associations
-support.</p>
+<p><code>Sequel::Model</code> is built completely out of plugins.  <a href="Plugins.html"><code>Plugins</code></a> can override any class, instance, or dataset method defined by a previous plugin and call super to get the default behavior.  By default, <code>Sequel::Model</code> loads two plugins, <code>Sequel::Model</code> (which is itself a plugin) for the base support, and <code>Sequel::Model::Associations</code> for the associations support.</p>
 
-<p>You can set the <code>SEQUEL_NO_ASSOCIATIONS</code> constant or environment
-variable to make <a href="../Sequel.html">Sequel</a> not load the
-associations plugin by default.</p>
+<p>You can set the <code>SEQUEL_NO_ASSOCIATIONS</code> constant or environment variable to make <a href="../Sequel.html"><code>Sequel</code></a> not load the associations plugin by default.</p>
 </div>
 <div id='context'>
 </div>
@@ -108,12 +95,7 @@ associations plugin by default.</p>
 ].freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Empty instance methods to create that the user can override. Just like any
-other method defined by <a href="../Sequel.html">Sequel</a>, if you
-override one of these, you should call <code>super</code> to get the
-default behavior (while empty by default, they are often overridden by
-plugins).  See the <a href="../../files/doc/model_hooks_rdoc.html">“Model
-Hooks” guide</a> for more detail on hooks.</p>
+<p>Empty instance methods to create that the user can override. Just like any other method defined by <a href="../Sequel.html"><code>Sequel</code></a>, if you override one of these, you should call <code>super</code> to get the default behavior (while empty by default, they are often overridden by plugins).  See the <a href="../../files/doc/model_hooks_rdoc.html">“Model Hooks” guide</a> for more detail on hooks.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -129,9 +111,7 @@ Hooks” guide</a> for more detail on hooks.</p>
 <td class='context-item-value'>instance_methods.map(&:to_s).select{|l| l.end_with?('=')}.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>The setter methods (methods ending with =) that are never allowed to be
-called automatically via
-<code>set</code>/<code>update</code>/<code>new</code>/etc..</p>
+<p>The setter methods (methods ending with =) that are never allowed to be called automatically via <code>set</code>/<code>update</code>/<code>new</code>/etc..</p>
 </td>
 </tr>
 </table>

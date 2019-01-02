@@ -78,8 +78,7 @@ Sequel::MySQL
 <td class='context-item-value'>{}</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Hash with integer keys and callable values for converting <a
-href="MySQL.html">MySQL</a> types.</p>
+<p>Hash with integer keys and callable values for converting <a href="MySQL.html"><code>MySQL</code></a> types.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -112,7 +111,7 @@ end.new.freeze</td>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 10</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">50617</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb</span>&#x000A;<span class="line-num">11</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">12</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">13</span>     <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">50617</span>&#x000A;<span class="line-num">14</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">15</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

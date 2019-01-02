@@ -65,15 +65,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Handle <a href="../HSQLDB.html">HSQLDB</a> specific case insensitive LIKE
-and bitwise operator support.</p>
+<p>Handle <a href="../HSQLDB.html"><code>HSQLDB</code></a> specific case insensitive LIKE and bitwise operator support.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-complex_expression_sql_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&quot;NOT ILIKE&quot;</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:ILIKE</span> <span class="ruby-operator">?</span> <span class="ruby-value">:LIKE</span> <span class="ruby-operator">:</span> <span class="ruby-value">:&quot;NOT LIKE&quot;</span>), <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:ucase</span>, <span class="ruby-identifier">v</span>)})&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:%</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>, <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;    <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-complex_expression_sql_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">143</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;<span class="line-num">144</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:ILIKE</span>, <span class="ruby-value">:&quot;NOT ILIKE&quot;</span>&#x000A;<span class="line-num">145</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, (<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:ILIKE</span> <span class="ruby-operator">?</span> <span class="ruby-value">:LIKE</span> <span class="ruby-operator">:</span> <span class="ruby-value">:&quot;NOT LIKE&quot;</span>), <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:ucase</span>, <span class="ruby-identifier">v</span>)})&#x000A;<span class="line-num">146</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:%</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>, <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;<span class="line-num">147</span>     <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">148</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">149</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">150</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">151</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-recursive_cte_requires_column_aliases-3F'>
@@ -85,15 +84,14 @@ and bitwise operator support.</p>
 </div>
 <div class='description'>
 
-<p><a href="../HSQLDB.html">HSQLDB</a> requires recursive CTEs to have column
-aliases.</p>
+<p><a href="../HSQLDB.html"><code>HSQLDB</code></a> requires recursive CTEs to have column aliases.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-recursive_cte_requires_column_aliases-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-recursive_cte_requires_column_aliases-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">recursive_cte_requires_column_aliases?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-recursive_cte_requires_column_aliases-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">recursive_cte_requires_column_aliases?</span>&#x000A;<span class="line-num">155</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">156</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-requires_sql_standard_datetimes-3F'>
@@ -105,15 +103,14 @@ aliases.</p>
 </div>
 <div class='description'>
 
-<p><a href="../HSQLDB.html">HSQLDB</a> requires <a
-href="../../SQL.html">SQL</a> standard datetimes in some places.</p>
+<p><a href="../HSQLDB.html"><code>HSQLDB</code></a> requires SQL standard datetimes in some places.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-requires_sql_standard_datetimes-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-requires_sql_standard_datetimes-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 158</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">requires_sql_standard_datetimes?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-requires_sql_standard_datetimes-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb</span>&#x000A;<span class="line-num">159</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">requires_sql_standard_datetimes?</span>&#x000A;<span class="line-num">160</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -125,20 +122,14 @@ href="../../SQL.html">SQL</a> standard datetimes in some places.</p>
 </div>
 <div class='description'>
 
-<p><a href="../HSQLDB.html">HSQLDB</a> does support common table expressions,
-but the support is broken. CTEs operate more like temprorary tables or
-views, lasting longer than the duration of the expression. CTEs in earlier
-queries might take precedence over CTEs with the same name in later
-queries. Also, if any CTE is recursive, all CTEs must be recursive. If you
-want to use CTEs with <a href="../HSQLDB.html">HSQLDB</a>, you&#39;ll have
-to manually modify the dataset to allow it.</p>
+<p><a href="../HSQLDB.html"><code>HSQLDB</code></a> does support common table expressions, but the support is broken. CTEs operate more like temprorary tables or views, lasting longer than the duration of the expression. CTEs in earlier queries might take precedence over CTEs with the same name in later queries. Also, if any CTE is recursive, all CTEs must be recursive. If you want to use CTEs with <a href="../HSQLDB.html"><code>HSQLDB</code></a>, you&#39;ll have to manually modify the dataset to allow it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_cte-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 167</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_cte-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;<span class="line-num">169</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -150,14 +141,14 @@ to manually modify the dataset to allow it.</p>
 </div>
 <div class='description'>
 
-<p><a href="../HSQLDB.html">HSQLDB</a> does not support IS TRUE.</p>
+<p><a href="../HSQLDB.html"><code>HSQLDB</code></a> does not support IS TRUE.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_is_true-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 172</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_is_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb</span>&#x000A;<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>&#x000A;<span class="line-num">174</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">175</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_lateral_subqueries-3F'>
@@ -169,14 +160,14 @@ to manually modify the dataset to allow it.</p>
 </div>
 <div class='description'>
 
-<p><a href="../HSQLDB.html">HSQLDB</a> supports lateral subqueries.</p>
+<p><a href="../HSQLDB.html"><code>HSQLDB</code></a> supports lateral subqueries.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_lateral_subqueries-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_lateral_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_lateral_subqueries?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_lateral_subqueries-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_lateral_subqueries?</span>&#x000A;<span class="line-num">179</span>   <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

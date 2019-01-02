@@ -36,26 +36,21 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This changes Sequel&#39;s literalization of IN/NOT IN with an empty array
-value to consider NULL values if one of the referenced columns is NULL:</p>
+<p>This changes Sequel&#39;s literalization of IN/NOT IN with an empty array value to consider NULL values if one of the referenced columns is NULL:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> [])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (name != name)</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">name:</span> [])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (name = name)</span></pre>
 
-<p>The default <a href="../../../../classes/Sequel.html">Sequel</a> behavior
-is to ignore NULLs, as the above query is not generally optimized well by
-databases.</p>
+<p>The default <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> behavior is to ignore NULLs, as the above query is not generally optimized well by databases.</p>
 
 <p>You can load this extension into specific datasets:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:empty_array_consider_nulls</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:empty_array_consider_nulls</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/EmptyArrayConsiderNulls.html">Sequel::EmptyArrayConsiderNulls</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/EmptyArrayConsiderNulls.html"><code>Sequel::EmptyArrayConsiderNulls</code></a></p>
 </div>
 <div id='context'>
 </div>

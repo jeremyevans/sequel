@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Represents an <a href="../SQL.html">SQL</a> JOIN clause, used for joining
-tables.</p>
+<p>Represents an <a href="../SQL.html"><code>SQL</code></a> JOIN clause, used for joining tables.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -79,9 +78,7 @@ tables.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The expression representing the table/set related to the JOIN. Is an <a
-href="AliasedExpression.html">AliasedExpression</a> if the JOIN uses an
-alias.</p>
+<p>The expression representing the table/set related to the JOIN. Is an <a href="AliasedExpression.html"><code>AliasedExpression</code></a> if the JOIN uses an alias.</p>
 </td>
 </tr>
 </table>
@@ -98,16 +95,14 @@ alias.</p>
 </div>
 <div class='description'>
 
-<p>Create an object with the given <a
-href="JoinClause.html#attribute-i-join_type">#join_type</a> and table
-expression.</p>
+<p>Create an object with the given <a href="JoinClause.html#attribute-i-join_type"><code>join_type</code></a> and table expression.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1517</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)&#x000A;  <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>&#x000A;  <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1518</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)&#x000A;<span class="line-num">1519</span>   <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>&#x000A;<span class="line-num">1520</span>   <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>&#x000A;<span class="line-num">1521</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">1522</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -120,15 +115,14 @@ expression.</p>
 </div>
 <div class='description'>
 
-<p>The column aliases to use for the JOIN , or nil if the JOIN does not use a
-derived column list.</p>
+<p>The column aliases to use for the JOIN , or nil if the JOIN does not use a derived column list.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-column_aliases-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-column_aliases-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1542</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column_aliases</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-column_aliases-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1543</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">column_aliases</span>&#x000A;<span class="line-num">1544</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;<span class="line-num">1545</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>&#x000A;<span class="line-num">1546</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1547</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-table'>
@@ -147,7 +141,7 @@ derived column list.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-table-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-table-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1524</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@table_expr</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-table-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1525</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table</span>&#x000A;<span class="line-num">1526</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;<span class="line-num">1527</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>&#x000A;<span class="line-num">1528</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1529</span>     <span class="ruby-ivar">@table_expr</span>&#x000A;<span class="line-num">1530</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1531</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-table_alias'>
@@ -159,15 +153,14 @@ derived column list.</p>
 </div>
 <div class='description'>
 
-<p>The table alias to use for the JOIN , or nil if the JOIN does not alias the
-table.</p>
+<p>The table alias to use for the JOIN , or nil if the JOIN does not alias the table.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-table_alias-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-table_alias-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1534</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_alias</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-table_alias-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1535</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">table_alias</span>&#x000A;<span class="line-num">1536</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;<span class="line-num">1537</span>     <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>&#x000A;<span class="line-num">1538</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1539</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

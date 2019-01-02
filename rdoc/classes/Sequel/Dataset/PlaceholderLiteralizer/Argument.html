@@ -39,10 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>A placeholder argument used by the <a
-href="../PlaceholderLiteralizer.html">PlaceholderLiteralizer</a>.  This
-records the offset that the argument should be used in the resulting <a
-href="../../SQL.html">SQL</a>.</p>
+<p>A placeholder argument used by the <a href="../PlaceholderLiteralizer.html"><code>PlaceholderLiteralizer</code></a>.  This records the offset that the argument should be used in the resulting <a href="../../SQL.html"><code>SQL</code></a>.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -70,15 +67,14 @@ href="../../SQL.html">SQL</a>.</p>
 </div>
 <div class='description'>
 
-<p>Set the recorder, the argument position, and any transforming block to use
-for this placeholder.</p>
+<p>Set the recorder, the argument position, and any transforming block to use for this placeholder.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">recorder</span>, <span class="ruby-identifier">pos</span>, <span class="ruby-identifier">transformer</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@recorder</span> = <span class="ruby-identifier">recorder</span>&#x000A;  <span class="ruby-ivar">@pos</span> = <span class="ruby-identifier">pos</span>&#x000A;  <span class="ruby-ivar">@transformer</span> = <span class="ruby-identifier">transformer</span>&#x000A;  <span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">recorder</span>, <span class="ruby-identifier">pos</span>, <span class="ruby-identifier">transformer</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-ivar">@recorder</span> = <span class="ruby-identifier">recorder</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-ivar">@pos</span> = <span class="ruby-identifier">pos</span>&#x000A;<span class="line-num">53</span>   <span class="ruby-ivar">@transformer</span> = <span class="ruby-identifier">transformer</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <h2>Public Instance methods</h2>
@@ -91,15 +87,14 @@ for this placeholder.</p>
 </div>
 <div class='description'>
 
-<p>Record the <a href="../../SQL.html">SQL</a> query offset, argument
-position, and transforming block where the argument should be literalized.</p>
+<p>Record the <a href="../../SQL.html"><code>SQL</code></a> query offset, argument position, and transforming block where the argument should be literalized.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:placeholder_literal_null</span>]&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:literal_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-ivar">@transformer</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-sql_literal_append-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">59</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">60</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:placeholder_literal_null</span>]&#x000A;<span class="line-num">61</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:literal_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">63</span>     <span class="ruby-ivar">@recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-ivar">@transformer</span>)&#x000A;<span class="line-num">64</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-transform'>
@@ -111,15 +106,14 @@ position, and transforming block where the argument should be literalized.</p>
 </div>
 <div class='description'>
 
-<p>Return a new <a href="Argument.html">Argument</a> object for the same
-recorder and argument position, but with a different transformer block.</p>
+<p>Return a new <a href="Argument.html"><code>Argument</code></a> object for the same recorder and argument position, but with a different transformer block.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-transform-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-transform-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transform</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@recorder</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-transform-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transform</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">70</span>   <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@recorder</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">71</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

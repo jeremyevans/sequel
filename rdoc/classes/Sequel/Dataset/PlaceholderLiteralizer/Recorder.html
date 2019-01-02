@@ -39,8 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Records the offsets at which the placeholder arguments are used in the <a
-href="../../SQL.html">SQL</a> query.</p>
+<p>Records the offsets at which the placeholder arguments are used in the <a href="../../SQL.html"><code>SQL</code></a> query.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -65,16 +64,14 @@ href="../../SQL.html">SQL</a> query.</p>
 </div>
 <div class='description'>
 
-<p>Return an <a href="Argument.html">Argument</a> with the specified position,
-or the next position. In general you shouldn&#39;t mix calls with an
-argument and calls without an argument for the same receiver.</p>
+<p>Return an <a href="Argument.html"><code>Argument</code></a> with the specified position, or the next position. In general you shouldn&#39;t mix calls with an argument and calls without an argument for the same receiver.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-arg-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-arg-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">arg</span>(<span class="ruby-identifier">v</span>=(<span class="ruby-identifier">no_arg_given</span> = <span class="ruby-keyword">true</span>; <span class="ruby-ivar">@argn</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>))&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">no_arg_given</span>&#x000A;    <span class="ruby-ivar">@argn</span> = <span class="ruby-identifier">v</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@argn</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-arg-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">87</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">arg</span>(<span class="ruby-identifier">v</span>=(<span class="ruby-identifier">no_arg_given</span> = <span class="ruby-keyword">true</span>; <span class="ruby-ivar">@argn</span><span class="ruby-operator">+=</span><span class="ruby-value">1</span>))&#x000A;<span class="line-num">88</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">no_arg_given</span>&#x000A;<span class="line-num">89</span>     <span class="ruby-ivar">@argn</span> = <span class="ruby-identifier">v</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@argn</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">90</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">91</span>   <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">92</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-loader'>
@@ -86,16 +83,14 @@ argument and calls without an argument for the same receiver.</p>
 </div>
 <div class='description'>
 
-<p>Yields the receiver and the dataset to the block, which should call <a
-href="Recorder.html#method-i-arg">arg</a> on the receiver for each
-placeholder argument, and return the dataset that you want to load.</p>
+<p>Yields the receiver and the dataset to the block, which should call <a href="Recorder.html#method-i-arg"><code>arg</code></a> on the receiver for each placeholder argument, and return the dataset that you want to load.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-loader-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-loader-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">PlaceholderLiteralizer</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">process</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-loader-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">loader</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">81</span>   <span class="ruby-constant">PlaceholderLiteralizer</span>.<span class="ruby-identifier">new</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">process</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;<span class="line-num">82</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-use'>
@@ -107,15 +102,14 @@ placeholder argument, and return the dataset that you want to load.</p>
 </div>
 <div class='description'>
 
-<p>Record the offset at which the argument is used in the <a
-href="../../SQL.html">SQL</a> query, and any transforming block.</p>
+<p>Record the offset at which the argument is used in the <a href="../../SQL.html"><code>SQL</code></a> query, and any transforming block.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-use-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-use-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 95</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">transformer</span>)&#x000A;  <span class="ruby-ivar">@args</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">length</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">transformer</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-use-source'>   <span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb</span>&#x000A;<span class="line-num">96</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">transformer</span>)&#x000A;<span class="line-num">97</span>   <span class="ruby-ivar">@args</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">length</span>, <span class="ruby-identifier">arg</span>, <span class="ruby-identifier">transformer</span>]&#x000A;<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -35,8 +35,7 @@ Sequel::Model::DatasetMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="DatasetMethods.html">DatasetMethods</a> contains methods that all
-model datasets have.</p>
+<p><a href="DatasetMethods.html"><code>DatasetMethods</code></a> contains methods that all model datasets have.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -67,9 +66,7 @@ model datasets have.</p>
 </div>
 <div class='description'>
 
-<p>Assume if a single integer is given that it is a lookup by primary key, and
-call <a href="DatasetMethods.html#method-i-with_pk">#with_pk</a> with the
-argument.</p>
+<p>Assume if a single integer is given that it is a lookup by primary key, and call <a href="DatasetMethods.html#method-i-with_pk"><code>with_pk</code></a> with the argument.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># SELECT * FROM artists WHERE (id = 1) LIMIT 1</span></pre>
 
@@ -78,7 +75,7 @@ argument.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-5B-5D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2075</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)&#x000A;    <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-5B-5D-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2078</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">[]</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">2079</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span> = <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Integer</span>)&#x000A;<span class="line-num">2080</span>     <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">2081</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">2082</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">2083</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">2084</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-as_hash'>
@@ -90,9 +87,7 @@ argument.</p>
 </div>
 <div class='description'>
 
-<p>This allows you to call <code>as_hash</code> without any arguments, which
-will result in a hash with the primary key value being the key and the
-model object being the value.</p>
+<p>This allows you to call <code>as_hash</code> without any arguments, which will result in a hash with the primary key value being the key and the model object being the value.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">as_hash</span> <span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;#&lt;Artist {:id=&gt;1, ...}&gt;,</span>&#x000A;<span class="ruby-comment">#     2=&gt;#&lt;Artist {:id=&gt;2, ...}&gt;,</span>&#x000A;<span class="ruby-comment">#     ...}</span></pre>
 
@@ -101,7 +96,7 @@ model object being the value.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-as_hash-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-as_hash-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key for model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">pk</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>)&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) &#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-as_hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2137</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">as_hash</span>(<span class="ruby-identifier">key_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">2138</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>&#x000A;<span class="line-num">2139</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">2140</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">2141</span>     <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key for model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">pk</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>)&#x000A;<span class="line-num">2142</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) &#x000A;<span class="line-num">2143</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">2144</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-destroy'>
@@ -113,10 +108,7 @@ model object being the value.</p>
 </div>
 <div class='description'>
 
-<p>Destroy each row in the dataset by instantiating it and then calling
-destroy on the resulting model object.  This isn&#39;t as fast as deleting
-the dataset, which does a single <a href="../SQL.html">SQL</a> call, but
-this runs any destroy hooks on each object in the dataset.</p>
+<p>Destroy each row in the dataset by instantiating it and then calling destroy on the resulting model object.  This isn&#39;t as fast as deleting the dataset, which does a single <a href="../SQL.html"><code>SQL</code></a> call, but this runs any destroy hooks on each object in the dataset.</p>
 
 <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">destroy</span>&#x000A;<span class="ruby-comment"># DELETE FROM artists WHERE (id = 1)</span>&#x000A;<span class="ruby-comment"># DELETE FROM artists WHERE (id = 2)</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
 
@@ -125,7 +117,7 @@ this runs any destroy hooks on each object in the dataset.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-destroy-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2092</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:destroy</span>).<span class="ruby-identifier">length</span>}&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">use_transactions</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-destroy-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2095</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">destroy</span>&#x000A;<span class="line-num">2096</span>   <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:destroy</span>).<span class="ruby-identifier">length</span>}&#x000A;<span class="line-num">2097</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">use_transactions</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:server</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">2098</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-last'>
@@ -137,8 +129,7 @@ this runs any destroy hooks on each object in the dataset.</p>
 </div>
 <div class='description'>
 
-<p>If there is no order already defined on this dataset, order it by the
-primary key and call last.</p>
+<p>If there is no order already defined on this dataset, order it by the primary key and call last.</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id DESC LIMIT 1</span></pre>
 
@@ -147,7 +138,7 @@ primary key and call last.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-last-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-last-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-last-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2105</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">2106</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>&#x000A;<span class="line-num">2107</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">last</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">2108</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">2109</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">2110</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">2111</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-model'>
@@ -168,7 +159,7 @@ primary key and call last.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-model-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-model-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2067</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">model</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:model</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-model-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2070</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">model</span>&#x000A;<span class="line-num">2071</span>   <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:model</span>]&#x000A;<span class="line-num">2072</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-paged_each'>
@@ -180,8 +171,7 @@ primary key and call last.</p>
 </div>
 <div class='description'>
 
-<p>If there is no order already defined on this dataset, order it by the
-primary key and call paged_each.</p>
+<p>If there is no order already defined on this dataset, order it by the primary key and call paged_each.</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">paged_each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 0</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
 
@@ -190,7 +180,7 @@ primary key and call paged_each.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-paged_each-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2118</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-paged_each-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2121</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">2122</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">_primary_key_order</span>&#x000A;<span class="line-num">2123</span>     <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">paged_each</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">2124</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">2125</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">2126</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">2127</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_hash'>
@@ -202,15 +192,14 @@ primary key and call paged_each.</p>
 </div>
 <div class='description'>
 
-<p>Alias of <a href="DatasetMethods.html#method-i-as_hash">#as_hash</a> for
-backwards compatibility.</p>
+<p>Alias of <a href="DatasetMethods.html#method-i-as_hash"><code>as_hash</code></a> for backwards compatibility.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_hash-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_hash-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2144</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;  <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_hash-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2147</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="line-num">2148</span>   <span class="ruby-identifier">as_hash</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="line-num">2149</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_pk'>
@@ -222,8 +211,7 @@ backwards compatibility.</p>
 </div>
 <div class='description'>
 
-<p>Given a primary key value, return the first record in the dataset with that
-primary key value.  If no records matches, returns nil.</p>
+<p>Given a primary key value, return the first record in the dataset with that primary key value.  If no records matches, returns nil.</p>
 
 <pre class="ruby"><span class="ruby-comment"># Single primary key</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (artists.id = 1) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-comment"># Composite primary key</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_pk</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE ((artists.id1 = 1) AND (artists.id2 = 2)) LIMIT 1</span></pre>
 
@@ -232,7 +220,7 @@ primary key value.  If no records matches, returns nil.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_pk-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_pk-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2158</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_with_pk_loader</span>)&#x000A;    <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_pk-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2161</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">2162</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">loader</span> = <span class="ruby-identifier">_with_pk_loader</span>)&#x000A;<span class="line-num">2163</span>     <span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">2164</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">2165</span>     <span class="ruby-identifier">first</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">2166</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">2167</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-with_pk-21'>
@@ -244,16 +232,14 @@ primary key value.  If no records matches, returns nil.</p>
 </div>
 <div class='description'>
 
-<p>Same as <a href="DatasetMethods.html#method-i-with_pk">#with_pk</a>, but
-raises <a href="../NoMatchingRow.html">NoMatchingRow</a> instead of
-returning nil if no row matches.</p>
+<p>Same as <a href="DatasetMethods.html#method-i-with_pk"><code>with_pk</code></a>, but raises <a href="../NoMatchingRow.html"><code>NoMatchingRow</code></a> instead of returning nil if no row matches.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_pk-21-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_pk-21-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2168</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk!</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NoMatchingRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_pk-21-source'>     <span class="ruby-comment"># File lib/sequel/model/base.rb</span>&#x000A;<span class="line-num">2171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_pk!</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">2172</span>   <span class="ruby-identifier">with_pk</span>(<span class="ruby-identifier">pk</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NoMatchingRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>))&#x000A;<span class="line-num">2173</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -56,15 +56,14 @@ Sequel::SQLComments
 </div>
 <div class='description'>
 
-<p>Return a modified copy of the dataset that will use the given comment. To
-uncomment a commented dataset, pass nil as the argument.</p>
+<p>Return a modified copy of the dataset that will use the given comment. To uncomment a commented dataset, pass nil as the argument.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-comment-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-comment-source'><span class="ruby-comment"># File lib/sequel/extensions/sql_comments.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">comment</span>(<span class="ruby-identifier">comment</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:comment</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">format_sql_comment</span>(<span class="ruby-identifier">comment</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">comment</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-comment-source'>   <span class="ruby-comment"># File lib/sequel/extensions/sql_comments.rb</span>&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">comment</span>(<span class="ruby-identifier">comment</span>)&#x000A;<span class="line-num">59</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:comment</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-identifier">format_sql_comment</span>(<span class="ruby-identifier">comment</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">comment</span>))&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

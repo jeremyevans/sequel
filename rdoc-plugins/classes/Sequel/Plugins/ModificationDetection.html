@@ -35,21 +35,13 @@ Sequel::Plugins::ModificationDetection
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>This plugin automatically detects in-place modifications to columns as well
-as direct modifications of the values hash.</p>
+<p>This plugin automatically detects in-place modifications to columns as well as direct modifications of the values hash.</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:modification_detection</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; &#39;a&#39;</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;b&#39;</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-comment"># UPDATE users SET a = &#39;ab&#39; WHERE (id = 1)</span></pre>
 
-<p>Note that for this plugin to work correctly, the column values must
-correctly implement the hash method, returning the same value if the object
-is equal, and a different value if the object is not equal. As this solely
-uses hash values to check for modification, there may be cases where a
-modification is made and the hash value is the same, resulting in a false
-negative.</p>
+<p>Note that for this plugin to work correctly, the column values must correctly implement the hash method, returning the same value if the object is equal, and a different value if the object is not equal. As this solely uses hash values to check for modification, there may be cases where a modification is made and the hash value is the same, resulting in a false negative.</p>
 
-<p>Note that this plugin causes a performance hit for all retrieved objects,
-so it shouldn&#39;t be used in cases where performance is a primary
-concern.</p>
+<p>Note that this plugin causes a performance hit for all retrieved objects, so it shouldn&#39;t be used in cases where performance is a primary concern.</p>
 
 <p>Usage:</p>
 

@@ -63,8 +63,7 @@ Sequel::Plugins::AutoValidations::ClassMethods
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The columns with automatic not_null validations for columns present in the
-values.</p>
+<p>The columns with automatic not_null validations for columns present in the values.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -73,9 +72,7 @@ values.</p>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
-<p>The columns or sets of columns with automatic max_length validations, as an
-array of pairs, with the first entry being the column name and second entry
-being the maximum length.</p>
+<p>The columns or sets of columns with automatic max_length validations, as an array of pairs, with the first entry being the column name and second entry being the maximum length.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -126,7 +123,7 @@ being the maximum length.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-auto_validate_presence-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-auto_validate_presence-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">auto_validate_presence?</span>&#x000A;  <span class="ruby-ivar">@auto_validate_presence</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-auto_validate_presence-3F-source'>    <span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb</span>&#x000A;<span class="line-num">121</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">auto_validate_presence?</span>&#x000A;<span class="line-num">122</span>   <span class="ruby-ivar">@auto_validate_presence</span>&#x000A;<span class="line-num">123</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-auto_validate_types-3F'>
@@ -145,7 +142,7 @@ being the maximum length.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-auto_validate_types-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-auto_validate_types-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">auto_validate_types?</span>&#x000A;  <span class="ruby-ivar">@auto_validate_types</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-auto_validate_types-3F-source'>    <span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb</span>&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">auto_validate_types?</span>&#x000A;<span class="line-num">127</span>   <span class="ruby-ivar">@auto_validate_types</span>&#x000A;<span class="line-num">128</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -164,7 +161,7 @@ being the maximum length.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@auto_validate_not_null_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@auto_validate_max_length_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@auto_validate_unique_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb</span>&#x000A;<span class="line-num">131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">132</span>   <span class="ruby-ivar">@auto_validate_not_null_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">133</span>   <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">134</span>   <span class="ruby-ivar">@auto_validate_max_length_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">135</span>   <span class="ruby-ivar">@auto_validate_unique_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">136</span> &#x000A;<span class="line-num">137</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">138</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-skip_auto_validations'>
@@ -176,15 +173,14 @@ being the maximum length.</p>
 </div>
 <div class='description'>
 
-<p>Skip automatic validations for the given validation type (:not_null,
-:types, :unique). If :all is given as the type, skip all auto validations.</p>
+<p>Skip automatic validations for the given validation type (:not_null, :types, :unique). If :all is given as the type, skip all auto validations.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-skip_auto_validations-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-skip_auto_validations-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_auto_validations</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>&#x000A;    [<span class="ruby-value">:not_null</span>, <span class="ruby-value">:types</span>, <span class="ruby-value">:unique</span>, <span class="ruby-value">:max_length</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-identifier">v</span>)}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:not_null</span>&#x000A;    <span class="ruby-identifier">auto_validate_not_null_columns</span>.<span class="ruby-identifier">clear</span>&#x000A;    <span class="ruby-identifier">auto_validate_explicit_not_null_columns</span>.<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:types</span>&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">public_send</span>(<span class="ruby-node">&quot;auto_validate_#{type}_columns&quot;</span>).<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-skip_auto_validations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">skip_auto_validations</span>(<span class="ruby-identifier">type</span>)&#x000A;<span class="line-num">143</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;<span class="line-num">144</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:all</span>&#x000A;<span class="line-num">145</span>     [<span class="ruby-value">:not_null</span>, <span class="ruby-value">:types</span>, <span class="ruby-value">:unique</span>, <span class="ruby-value">:max_length</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">skip_auto_validations</span>(<span class="ruby-identifier">v</span>)}&#x000A;<span class="line-num">146</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:not_null</span>&#x000A;<span class="line-num">147</span>     <span class="ruby-identifier">auto_validate_not_null_columns</span>.<span class="ruby-identifier">clear</span>&#x000A;<span class="line-num">148</span>     <span class="ruby-identifier">auto_validate_explicit_not_null_columns</span>.<span class="ruby-identifier">clear</span>&#x000A;<span class="line-num">149</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">:types</span>&#x000A;<span class="line-num">150</span>     <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">151</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">152</span>     <span class="ruby-identifier">public_send</span>(<span class="ruby-node">&quot;auto_validate_#{type}_columns&quot;</span>).<span class="ruby-identifier">clear</span>&#x000A;<span class="line-num">153</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

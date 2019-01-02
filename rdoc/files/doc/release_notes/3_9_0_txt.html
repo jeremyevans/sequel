@@ -39,66 +39,37 @@ Last Update:
 <p>New Features</p>
 <hr>
 <ul><li>
-<p>The ConnectionPool classes were refactored from 2 separate classes to a 5
-class hierarchy, with one main class and 4  subclasses, one for each
-combination of sharding and threading.</p>
+<p>The ConnectionPool classes were refactored from 2 separate classes to a 5 class hierarchy, with one main class and 4  subclasses, one for each combination of sharding and threading.</p>
 
-<p>The primary reason for this refactoring is to make it so that the user
-doesn&#39;t have to pay a performance penalty for sharding if they
-aren&#39;t using it.  A connection pool that supports sharding is
-automatically used if the :servers option is used when setting up the
-database connection.</p>
+<p>The primary reason for this refactoring is to make it so that the user doesn&#39;t have to pay a performance penalty for sharding if they aren&#39;t using it.  A connection pool that supports sharding is automatically used if the :servers option is used when setting up the database connection.</p>
 
-<p>In addition, the default connection pool no longer contains the code to
-schedule future disconnections of currently allocated connections.  The
-sharded connection pool must be used if that feature is desired.</p>
+<p>In addition, the default connection pool no longer contains the code to schedule future disconnections of currently allocated connections.  The sharded connection pool must be used if that feature is desired.</p>
 
-<p>The unsharded connection pools are about 25-30% faster than the sharded
-versions.</p>
+<p>The unsharded connection pools are about 25-30% faster than the sharded versions.</p>
 </li><li>
-<p>An optimistic_locking plugin was added to <a
-href="../../../classes/Sequel/Model.html">Sequel::Model</a>.  This plugin
-implements a simple database-independent locking mechanism to ensure that
-concurrent updates do not override changes:</p>
+<p>An optimistic_locking plugin was added to <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>.  This plugin implements a simple database-independent locking mechanism to ensure that concurrent updates do not override changes:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> <span class="ruby-value">:optimistic_locking</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-comment"># raises Sequel::Plugins::OptimisticLocking::Error</span>&#x000A;<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
 
-<p>In order for this plugin to work, you need to make sure that the database
-table has a lock_version column (or other column you name via the
-lock_column class level accessor) that defaults to 0.</p>
+<p>In order for this plugin to work, you need to make sure that the database table has a lock_version column (or other column you name via the lock_column class level accessor) that defaults to 0.</p>
 
-<p>The optimistic_locking plugin does not work with the
-class_table_inheritance plugin.</p>
+<p>The optimistic_locking plugin does not work with the class_table_inheritance plugin.</p>
 </li><li>
-<p>Dataset#unused_table_alias was added, which takes a symbol and returns
-either that symbol or a new symbol which can be used as a table alias when
-joining a table to the dataset.  The symbol returned is guaranteed to not
-already be used by the dataset:</p>
+<p>Dataset#unused_table_alias was added, which takes a symbol and returns either that symbol or a new symbol which can be used as a table alias when joining a table to the dataset.  The symbol returned is guaranteed to not already be used by the dataset:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">unused_table_alias</span>(<span class="ruby-value">:blah</span>) <span class="ruby-comment"># =&gt; :blah</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:test</span>].<span class="ruby-identifier">unused_table_alias</span>(<span class="ruby-value">:test</span>) <span class="ruby-comment"># =&gt; :test_0</span></pre>
 
-<p>The use case is when you need to join a table to a dataset, where the table
-may already be used inside the dataset, and you want to generate a unique
-alias:</p>
+<p>The use case is when you need to join a table to a dataset, where the table may already be used inside the dataset, and you want to generate a unique alias:</p>
 
 <pre>ds.join(:table.as(ds.unused_table_alias(:table)), ...)</pre>
 </li><li>
-<p>The <a
-href="../../../classes/Sequel/ValidationFailed.html">Sequel::ValidationFailed</a>
-exception now has an errors accessor which returns the <a
-href="../../../classes/Sequel/Model/Errors.html">Sequel::Model::Errors</a>
-instance with the validation errors.  This can be helpful in situations
-where a generalized rescue is done where the model object reference is not
-available.</p>
+<p>The <a href="../../../classes/Sequel/ValidationFailed.html"><code>Sequel::ValidationFailed</code></a> exception now has an errors accessor which returns the <a href="../../../classes/Sequel/Model/Errors.html"><code>Sequel::Model::Errors</code></a> instance with the validation errors.  This can be helpful in situations where a generalized rescue is done where the model object reference is not available.</p>
 </li><li>
-<p>bin/sequel now works without an argument, which is useful for testing SQL
-generation (and not much else).</p>
+<p>bin/sequel now works without an argument, which is useful for testing SQL generation (and not much else).</p>
 </li><li>
-<p>Support SELECT … INTO in the MSSQL adapter, using Dataset#into, which takes
-a table argument.</p>
+<p>Support SELECT … INTO in the MSSQL adapter, using Dataset#into, which takes a table argument.</p>
 </li><li>
-<p>You can now provide your own connection pool class via the :pool_class
-option when instantiating the database.</p>
+<p>You can now provide your own connection pool class via the :pool_class option when instantiating the database.</p>
 </li></ul>
 
 <p>Other Improvements</p>
@@ -108,160 +79,93 @@ option when instantiating the database.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[]) <span class="ruby-comment"># IN</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">exclude</span>(<span class="ruby-value">:id</span><span class="ruby-operator">=&gt;</span>[]) <span class="ruby-comment"># NOT IN</span></pre>
 
-<p>Before, the IN construct would mostly work, other than some minor
-differences in NULL semantics.  However, the NOT IN construct would not
-work.  <a href="../../../classes/Sequel.html">Sequel</a> now handles the
-NOT IN case using an expression that evaluates to true.</p>
+<p>Before, the IN construct would mostly work, other than some minor differences in NULL semantics.  However, the NOT IN construct would not work.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles the NOT IN case using an expression that evaluates to true.</p>
 </li><li>
-<p>If using an IN/NOT IN construct with multiple columns and a dataset
-argument, where multiple column IN/NOT IN support is emulated, a separate
-query is done to get the records, which is then handled like an array of
-values.  This means that the following type of query now works on all
-tested databases:</p>
+<p>If using an IN/NOT IN construct with multiple columns and a dataset argument, where multiple column IN/NOT IN support is emulated, a separate query is done to get the records, which is then handled like an array of values.  This means that the following type of query now works on all tested databases:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table1</span>].<span class="ruby-identifier">filter</span>([<span class="ruby-value">:id1</span>, <span class="ruby-value">:id2</span>]<span class="ruby-operator">=&gt;</span><span class="ruby-constant">DB</span>[<span class="ruby-value">:table2</span>].<span class="ruby-identifier">select</span>(<span class="ruby-value">:id1</span>, <span class="ruby-value">:id2</span>))</pre>
 </li><li>
 <p>Schemas and aliases are now handled correctly when eager graphing.</p>
 </li><li>
-<p>Implicitly qualified symbols are now handled correctly in update
-statements, useful if you are updating a joined dataset and need to
-reference a column that appears in multiple tables.</p>
+<p>Implicitly qualified symbols are now handled correctly in update statements, useful if you are updating a joined dataset and need to reference a column that appears in multiple tables.</p>
 </li><li>
-<p>The active_model plugin has been brought up to date with activemodel 3.0
-beta (though it doesn&#39;t work on edge). Additionally, the active_model
-plugin now requires active_model in order to use ActiveModel::Naming.</p>
+<p>The active_model plugin has been brought up to date with activemodel 3.0 beta (though it doesn&#39;t work on edge). Additionally, the active_model plugin now requires active_model in order to use ActiveModel::Naming.</p>
 </li><li>
-<p>In the schema_dumper extension, always include the varchar limit, even if
-it is 255 columns (the default).  This makes it so that PostgreSQL will use
-a varchar(255) column instead of a text column when restoring a schema dump
-of a varchar(255) column from another database.</p>
+<p>In the schema_dumper extension, always include the varchar limit, even if it is 255 columns (the default).  This makes it so that PostgreSQL will use a varchar(255) column instead of a text column when restoring a schema dump of a varchar(255) column from another database.</p>
 </li><li>
-<p>You can now load adapters from outside the <a
-href="../../../classes/Sequel.html">Sequel</a> lib directory, now they just
-need to be in a sequel/adapters directory somewhere in the LOAD_PATH.</p>
+<p>You can now load adapters from outside the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> lib directory, now they just need to be in a sequel/adapters directory somewhere in the LOAD_PATH.</p>
 </li><li>
-<p>You can now load extensions from outside the <a
-href="../../../classes/Sequel.html">Sequel</a> lib directory using <a
-href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>.
-External extensions need to be in a sequel/extensions directory somewhere
-in the LOAD_PATH.</p>
+<p>You can now load extensions from outside the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> lib directory using <a href="../../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a>.  External extensions need to be in a sequel/extensions directory somewhere in the LOAD_PATH.</p>
 </li><li>
-<p>Using bound variables for limit and offset in prepared statements now works
-correctly.</p>
+<p>Using bound variables for limit and offset in prepared statements now works correctly.</p>
 </li><li>
-<p>Performance of prepared statements was improved in the native SQLite
-adapter.</p>
+<p>Performance of prepared statements was improved in the native SQLite adapter.</p>
 </li><li>
-<p>The schema_dumper extension now passes the options hash from
-dump_*_migration to Database#tables.</p>
+<p>The schema_dumper extension now passes the options hash from dump_*_migration to Database#tables.</p>
 </li><li>
-<p>In the single_table_inheritance plugin, qualify the sti_key column with the
-table name, so that subclass datasets can safely be joined to other tables
-having the same column name.</p>
+<p>In the single_table_inheritance plugin, qualify the sti_key column with the table name, so that subclass datasets can safely be joined to other tables having the same column name.</p>
 </li><li>
-<p>In the single_table_inheritance plugin, handle case where the sti_key value
-is nil or &#39;&#39; specially, so that those cases always return an
-instance of the main model class.  This fixes issues if constantize(nil)
-returns Object instead of raising an exception.</p>
+<p>In the single_table_inheritance plugin, handle case where the sti_key value is nil or &#39;&#39; specially, so that those cases always return an instance of the main model class.  This fixes issues if constantize(nil) returns Object instead of raising an exception.</p>
 </li><li>
-<p>No longer use Date#to_s for literalization, always use ISO8601 format for
-dates.</p>
+<p>No longer use Date#to_s for literalization, always use ISO8601 format for dates.</p>
 </li><li>
-<p>A couple lambdas which were instance_evaled were changed to procs for ruby
-1.9.2 compatibility.</p>
+<p>A couple lambdas which were instance_evaled were changed to procs for ruby 1.9.2 compatibility.</p>
 </li><li>
-<p>MSSQL emulated offset support was simplified to only use one subquery, and
-made to work correctly on ruby 1.9.</p>
+<p>MSSQL emulated offset support was simplified to only use one subquery, and made to work correctly on ruby 1.9.</p>
 </li><li>
-<p>Emulate multiple column IN/NOT IN on H2, since it doesn&#39;t handle all
-cases correctly.</p>
+<p>Emulate multiple column IN/NOT IN on H2, since it doesn&#39;t handle all cases correctly.</p>
 </li><li>
 <p>ODBC timestamps are now handled correctly if the database_timezone is nil.</p>
 </li><li>
-<p>ArgumentErrors raised when running queries in the ODBC adapter are now
-raised as DatabaseErrors.</p>
+<p>ArgumentErrors raised when running queries in the ODBC adapter are now raised as DatabaseErrors.</p>
 </li><li>
-<p>Attempting to use DISTINCT ON on SQLite now raises an error before sending
-the query to the database.</p>
+<p>Attempting to use DISTINCT ON on SQLite now raises an error before sending the query to the database.</p>
 </li><li>
-<p>The options hash passed to the database connection method is no longer
-modified.  However, there may be additional options present in
-Database#opts that weren&#39;t specified by the options hash passed to the
-database connection method.</p>
+<p>The options hash passed to the database connection method is no longer modified.  However, there may be additional options present in Database#opts that weren&#39;t specified by the options hash passed to the database connection method.</p>
 </li><li>
-<p>Make Dataset#add_graph_aliases handle the case where the dataset has not
-yet been graphed.</p>
+<p>Make Dataset#add_graph_aliases handle the case where the dataset has not yet been graphed.</p>
 </li><li>
-<p>You can now provide an SQL::Identifier as a 4th argument to
-Dataset#join_table, and unsupported arguments are caught and an exception
-is raised.</p>
+<p>You can now provide an SQL::Identifier as a 4th argument to Dataset#join_table, and unsupported arguments are caught and an exception is raised.</p>
 </li><li>
-<p>The gem specification has been moved out of the Rakefile, so that the gem
-can now be built without rake, and works well with gem build and bundler.</p>
+<p>The gem specification has been moved out of the Rakefile, so that the gem can now be built without rake, and works well with gem build and bundler.</p>
 </li><li>
-<p>The Rakefile no longer assumes the current directory is in the $LOAD_PATH,
-so it should work correctly on ruby 1.9.2.</p>
+<p>The Rakefile no longer assumes the current directory is in the $LOAD_PATH, so it should work correctly on ruby 1.9.2.</p>
 </li><li>
 <p>All internal uses of require are now thread safe.</p>
 </li><li>
-<p>Empty query parameter keys in connection strings are now ignored instead of
-raising an exception.</p>
+<p>Empty query parameter keys in connection strings are now ignored instead of raising an exception.</p>
 </li><li>
-<p>The specs were changed so that you can run them in parallel. Previously
-there was a race condition in the migration extension specs.</p>
+<p>The specs were changed so that you can run them in parallel. Previously there was a race condition in the migration extension specs.</p>
 </li></ul>
 
 <p>Backwards Compatibility</p>
 <hr>
 <ul><li>
-<p>If you plan on using sharding at any point, you now must pass a :servers
-option when connecting to the database, even if it is an empty hash.  You
-can no longer just call Database#add_servers later.</p>
+<p>If you plan on using sharding at any point, you now must pass a :servers option when connecting to the database, even if it is an empty hash.  You can no longer just call Database#add_servers later.</p>
 </li><li>
-<p>The connection_proc and disconnection_proc accessors were removed from the
-connection pools, so you can no longer modify the procs after the
-connection pool has been instantiated.  You must now provide the
-connection_proc as the block argument when instantiating the pool, and the
-disconnection_proc via the :disconnection_proc option.</p>
+<p>The connection_proc and disconnection_proc accessors were removed from the connection pools, so you can no longer modify the procs after the connection pool has been instantiated.  You must now provide the connection_proc as the block argument when instantiating the pool, and the disconnection_proc via the :disconnection_proc option.</p>
 </li><li>
-<p>In the hash passed to Dataset#update, symbol keys with a double embedded
-underscore are now considerated as implicit qualifiers, instead of being
-used verbatim.  If you have a column that includes a double underscore, you
-now need to wrap it in an SQL::Identifier or use a String instead.</p>
+<p>In the hash passed to Dataset#update, symbol keys with a double embedded underscore are now considerated as implicit qualifiers, instead of being used verbatim.  If you have a column that includes a double underscore, you now need to wrap it in an SQL::Identifier or use a String instead.</p>
 </li><li>
-<p>The connection pools no longer convert non-StandardError based exceptions
-to RuntimeErrors.  Previously, all of the common adapters turned this
-feature off, so there is no change for most users.</p>
+<p>The connection pools no longer convert non-StandardError based exceptions to RuntimeErrors.  Previously, all of the common adapters turned this feature off, so there is no change for most users.</p>
 </li><li>
-<p><a
-href="../../../classes/Sequel/ConnectionPool.html">Sequel::ConnectionPool</a>
-is now considered an abstract class and should not be instantiated
-directly.  Use ConnectionPool.get_pool to return an instance of the
-appropriate subclass.</p>
+<p><a href="../../../classes/Sequel/ConnectionPool.html"><code>Sequel::ConnectionPool</code></a> is now considered an abstract class and should not be instantiated directly.  Use ConnectionPool.get_pool to return an instance of the appropriate subclass.</p>
 </li><li>
 <p>The Sequel::SingleThreadedPool constant is no longer defined.</p>
 </li><li>
-<p>The private Dataset#eager_unique_table_alias method was removed, use the
-new public Dataset#unused_table_alias method instead, which has a slightly
-different API.</p>
+<p>The private Dataset#eager_unique_table_alias method was removed, use the new public Dataset#unused_table_alias method instead, which has a slightly different API.</p>
 </li><li>
-<p>The private Dataset#eager_graph_qualify_order method was removed, used
-Dataset#qualified_expression instead.</p>
+<p>The private Dataset#eager_graph_qualify_order method was removed, used Dataset#qualified_expression instead.</p>
 </li><li>
-<p>The private <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>
-class methods plugin_gem_location and plugin_gem_location_old have been
-removed.</p>
+<p>The private <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> class methods plugin_gem_location and plugin_gem_location_old have been removed.</p>
 </li><li>
-<p>Gems built with the rake tasks now show up in the root directory instead of
-the pkg subdirectory, and no tarball package is created.</p>
+<p>Gems built with the rake tasks now show up in the root directory instead of the pkg subdirectory, and no tarball package is created.</p>
 </li></ul>
 
 <p>Other News</p>
 <hr>
 <ul><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now has an official blog
-at <a
-href="http://sequel.jeremyevans.net/blog.html">sequel.jeremyevans.net/blog.html</a>.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has an official blog at <a target="_top" href="http://sequel.jeremyevans.net/blog.html">sequel.jeremyevans.net/blog.html</a>.</p>
 </li></ul>
 </div>
 <div id='context'>

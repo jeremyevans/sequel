@@ -40,10 +40,7 @@ Last Update:
 
 <h6 id="label-"><span><a href="#label-">&para;</a> <a href="#top">&uarr;</a></span></h6>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> now supports prepared
-statements and bound variables.  No matter which database you are using, <a
-href="../../../classes/Sequel.html">Sequel</a> uses exactly the same API.
-To specify placeholders, you use the :$placeholder syntax:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports prepared statements and bound variables.  No matter which database you are using, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses exactly the same API. To specify placeholders, you use the :$placeholder syntax:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$n</span>)</pre>
 
@@ -51,18 +48,13 @@ To specify placeholders, you use the :$placeholder syntax:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)</pre>
 
-<p>This will do the equivalent of selecting records that have the name
-&#39;Jim&#39;.  In addition to :select, you can use :first or :delete.
-There is also support for bound variables when inserting or updating
-records:</p>
+<p>This will do the equivalent of selecting records that have the name &#39;Jim&#39;.  In addition to :select, you can use :first or :delete. There is also support for bound variables when inserting or updating records:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:update</span>, {<span class="ruby-value">:n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">:new_n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>}, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$new_n</span>)</pre>
 
-<p>Which will update all records that have the name &#39;Jim&#39; to have the
-name &#39;Bob&#39;.</p>
+<p>Which will update all records that have the name &#39;Jim&#39; to have the name &#39;Bob&#39;.</p>
 
-<p>Prepared statement support is very similar to bound variable support,
-except that the statement is first prepared with a name:</p>
+<p>Prepared statement support is very similar to bound variable support, except that the statement is first prepared with a name:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:select</span>, <span class="ruby-value">:select_by_name</span>)</pre>
 
@@ -70,35 +62,25 @@ except that the statement is first prepared with a name:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:select_by_name</span>, <span class="ruby-value">:n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same as above</span></pre>
 
-<p>For inserting or updating, the hash to use when inserting or updating is
-given to prepare:</p>
+<p>For inserting or updating, the hash to use when inserting or updating is given to prepare:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ps2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-value">:update</span>, <span class="ruby-value">:update_name</span>, <span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:$new_n</span>)&#x000A;<span class="ruby-identifier">ps2</span>.<span class="ruby-identifier">call</span>(<span class="ruby-value">:n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, <span class="ruby-value">:new_n</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)</pre>
 
-<p>There is some level of native support for these features in the PostgreSQL,
-MySQL, SQLite, and JDBC adapters.  For other adapters, support is emulated,
-but it shouldn&#39;t be too difficult to add native support for them.</p>
+<p>There is some level of native support for these features in the PostgreSQL, MySQL, SQLite, and JDBC adapters.  For other adapters, support is emulated, but it shouldn&#39;t be too difficult to add native support for them.</p>
 
-<p>For more details see: <a
-href="http://sequel.rubyforge.org/rdoc/files/doc/prepared_statements_rdoc.html">sequel.rubyforge.org/rdoc/files/doc/prepared_statements_rdoc.html</a></p>
+<p>For more details see: <a target="_top" href="http://sequel.rubyforge.org/rdoc/files/doc/prepared_statements_rdoc.html">sequel.rubyforge.org/rdoc/files/doc/prepared_statements_rdoc.html</a></p>
 
 <p>Read-Only Slave/Writable Master and Database Sharding</p>
 
 <h6 id="label-"><span><a href="#label-">&para;</a> <a href="#top">&uarr;</a></span></h6>
 
-<p><a href="../../../classes/Sequel.html">Sequel</a> now has built in support
-for master/slave database configurations, just by setting an option in <a
-href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has built in support for master/slave database configurations, just by setting an option in <a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>, \&#x000A;  <span class="ruby-value">:servers</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:read_only</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;slave_server&#39;</span>}})</pre>
 
-<p>That will use slave_server for SELECT queries and master_server for other
-queries.  It&#39;s fairly easy to use multiple slaves or even multiple
-masters, examples are included in the link below.</p>
+<p>That will use slave_server for SELECT queries and master_server for other queries.  It&#39;s fairly easy to use multiple slaves or even multiple masters, examples are included in the link below.</p>
 
-<p>Sharding support requires some code other than the database configuration,
-but is still fairly simple.  For example, to set up a 16 shard
-configuration based on a hex character:</p>
+<p>Sharding support requires some code other than the database configuration, but is still fairly simple.  For example, to set up a 16 shard configuration based on a hex character:</p>
 
 <pre class="ruby"><span class="ruby-identifier">servers</span> = {}&#x000A;((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, <span class="ruby-value">:servers</span><span class="ruby-operator">=&gt;</span><span class="ruby-identifier">servers</span>)</pre>
 
@@ -106,41 +88,27 @@ configuration based on a hex character:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:hashes</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:a</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:hash</span><span class="ruby-operator">=&gt;</span><span class="ruby-regexp">/31337/</span>)</pre>
 
-<p>For more details see: <a
-href="http://sequel.rubyforge.org/rdoc/files/doc/sharding_rdoc.html">sequel.rubyforge.org/rdoc/files/doc/sharding_rdoc.html</a></p>
+<p>For more details see: <a target="_top" href="http://sequel.rubyforge.org/rdoc/files/doc/sharding_rdoc.html">sequel.rubyforge.org/rdoc/files/doc/sharding_rdoc.html</a></p>
 
 <p>Other Changes</p>
 
 <h6 id="label-"><span><a href="#label-">&para;</a> <a href="#top">&uarr;</a></span></h6>
 <ul><li>
-<p>The sequel.rubyforge.org website has a new design thanks to boof. The
-online RDoc is now located at <a
-href="http://sequel.rubyforge.org/rdoc">sequel.rubyforge.org/rdoc</a>.</p>
+<p>The sequel.rubyforge.org website has a new design thanks to boof. The online RDoc is now located at <a target="_top" href="http://sequel.rubyforge.org/rdoc">sequel.rubyforge.org/rdoc</a>.</p>
 </li><li>
 <p>Support was added for anonymous column names in the ADO adapter.</p>
 </li><li>
-<p>Better MSSQL support in the ADO, ODBC, and JDBC adapters.  The odbc_mssql
-adapter has been removed. If you use MSSQL with ODBC, please use the odbc
-adapter with a :db_type=&gt;&#39;mssql&#39; option.</p>
+<p>Better MSSQL support in the ADO, ODBC, and JDBC adapters.  The odbc_mssql adapter has been removed. If you use MSSQL with ODBC, please use the odbc adapter with a :db_type=&gt;&#39;mssql&#39; option.</p>
 </li><li>
-<p>The following <a
-href="../../../classes/Sequel/Error.html">Sequel::Error</a> exception
-subclasses were removed: InvalidExpression, InvalidFilter, InvalidJoinType,
-and WorkerStop.</p>
+<p>The following <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> exception subclasses were removed: InvalidExpression, InvalidFilter, InvalidJoinType, and WorkerStop.</p>
 </li><li>
-<p>Documentation was added for the PostgreSQL, MySQL, SQLite, and JDBC
-adapters.</p>
+<p>Documentation was added for the PostgreSQL, MySQL, SQLite, and JDBC adapters.</p>
 </li><li>
-<p>Various internal interfaces were refactored.  For example, if you use an
-adapter not included with <a
-href="../../../classes/Sequel.html">Sequel</a>, it probably won&#39;t work
-until you update it to the new internal API.</p>
+<p>Various internal interfaces were refactored.  For example, if you use an adapter not included with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, it probably won&#39;t work until you update it to the new internal API.</p>
 </li><li>
-<p>Many low level methods (such as Database#transaction), now take an optional
-server argument to indicate which server to use.</p>
+<p>Many low level methods (such as Database#transaction), now take an optional server argument to indicate which server to use.</p>
 </li><li>
-<p>Model plugins that have a DatasetMethods module with non-public methods no
-longer have Model methods created that call those methods.</p>
+<p>Model plugins that have a DatasetMethods module with non-public methods no longer have Model methods created that call those methods.</p>
 </li></ul>
 </div>
 <div id='context'>

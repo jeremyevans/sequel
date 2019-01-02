@@ -35,24 +35,15 @@ Sequel::Plugins::UpdateRefresh
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The update_refresh plugin makes the model class refresh the object after
-updating.  By default, <a href="../../Sequel.html">Sequel</a> only
-refreshes automatically after inserting new rows, not after updating. 
-However, if you are using triggers to modify the contents of updated rows,
-it can be helpful to immediately get the current data after updating.</p>
+<p>The update_refresh plugin makes the model class refresh the object after updating.  By default, <a href="../../Sequel.html"><code>Sequel</code></a> only refreshes automatically after inserting new rows, not after updating.  However, if you are using triggers to modify the contents of updated rows, it can be helpful to immediately get the current data after updating.</p>
 
-<p>If the dataset supports UPDATE RETURNING, this plugin will use it so that
-it can retrieve the current data in the same query it uses for the update.</p>
+<p>If the dataset supports UPDATE RETURNING, this plugin will use it so that it can retrieve the current data in the same query it uses for the update.</p>
 
 <p>Usage:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Make all model subclasses refresh after update</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_refresh</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class refresh after update</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_refresh</span></pre>
 
-<p>As a performance optimisation, if you know only specific columns will have
-changed, you can specify them to the <code>columns</code> option. This can
-be a performance gain if it would avoid pointlessly comparing many other
-columns. Note that this option currently only has an effect if the dataset
-supports RETURNING.</p>
+<p>As a performance optimisation, if you know only specific columns will have changed, you can specify them to the <code>columns</code> option. This can be a performance gain if it would avoid pointlessly comparing many other columns. Note that this option currently only has an effect if the dataset supports RETURNING.</p>
 
 <pre class="ruby"><span class="ruby-comment"># Only include the artist column in RETURNING</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_refresh</span>, <span class="ruby-value">columns:</span> <span class="ruby-value">:artist</span>&#x000A;&#x000A;<span class="ruby-comment"># Only include the artist and title columns in RETURNING</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:update_refresh</span>, <span class="ruby-value">columns:</span> [<span class="ruby-value">:artist</span>, <span class="ruby-value">:title</span>]</pre>
 </div>
@@ -91,7 +82,7 @@ supports RETURNING.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@update_refresh_columns</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:columns</span>]) <span class="ruby-operator">||</span> []&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">42</span>     <span class="ruby-ivar">@update_refresh_columns</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:columns</span>]) <span class="ruby-operator">||</span> []&#x000A;<span class="line-num">43</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">44</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

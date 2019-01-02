@@ -38,36 +38,26 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Model#qualified_pk_hash has been added, which is similar to Model#pk_hash,
-but uses qualified keys.</p>
+<p>Model#qualified_pk_hash has been added, which is similar to Model#pk_hash, but uses qualified keys.</p>
 </li><li>
 <p>Dataset#distinct now accepts a virtual row block.</p>
 </li><li>
-<p>Database#drop_table with :foreign=&gt;true option now drops foreign tables
-on PostgreSQL.  Database#create_table with :foreign option is now
-reversible on PostgreSQL.</p>
+<p>Database#drop_table with :foreign=&gt;true option now drops foreign tables on PostgreSQL.  Database#create_table with :foreign option is now reversible on PostgreSQL.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Sequel::Model.cache_associations = false now skips the database&#39;s
-schema cache when loading the schema for a model.  This fixes some issues
-in environments that use code reloading.</p>
+<p>Sequel::Model.cache_associations = false now skips the database&#39;s schema cache when loading the schema for a model.  This fixes some issues in environments that use code reloading.</p>
 </li><li>
-<p>Database#create_table? and create_join_table? no longer use IF NOT EXISTS
-if indexes are being created.</p>
+<p>Database#create_table? and create_join_table? no longer use IF NOT EXISTS if indexes are being created.</p>
 </li><li>
 <p>Model.primary_key_hash and .qualified_primary_key_hash have been optimized.</p>
 </li><li>
-<p>validates_unique in the validation_helpers plugin now uses a qualified
-primary key if the model&#39;s dataset is joined.  This fixes a case when
-the auto_validations and class_table_inheritance plugins are used together.</p>
+<p>validates_unique in the validation_helpers plugin now uses a qualified primary key if the model&#39;s dataset is joined.  This fixes a case when the auto_validations and class_table_inheritance plugins are used together.</p>
 </li><li>
-<p>Disconnect errors are now recognized in the postgres adapter when SSL is
-used for connecting.</p>
+<p>Disconnect errors are now recognized in the postgres adapter when SSL is used for connecting.</p>
 </li><li>
-<p>Empty string default values are no longer converted to nil default values
-on MySQL.</p>
+<p>Empty string default values are no longer converted to nil default values on MySQL.</p>
 </li><li>
 <p>Database#foreign_key_list now works correctly on Microsoft SQL Server 2005.</p>
 </li></ul>

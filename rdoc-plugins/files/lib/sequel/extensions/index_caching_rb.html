@@ -36,43 +36,27 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The index_caching extension adds a few methods to Sequel::Database that
-make it easy to dump information about database indexes to a file, and load
-it from that file.  Loading index information from a dumped file is faster
-than parsing it from the database, so this can save bootup time for
-applications with large numbers of index.</p>
+<p>The index_caching extension adds a few methods to Sequel::Database that make it easy to dump information about database indexes to a file, and load it from that file.  Loading index information from a dumped file is faster than parsing it from the database, so this can save bootup time for applications with large numbers of index.</p>
 
 <p>Basic usage in application code:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:index_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_index_cache</span>(<span class="ruby-string">&#39;/path/to/index_cache.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span></pre>
 
-<p>Then, whenever database indicies are modified, write a new cached file. 
-You can do that with <code>bin/sequel</code>&#39;s -X option:</p>
+<p>Then, whenever database indicies are modified, write a new cached file.  You can do that with <code>bin/sequel</code>&#39;s -X option:</p>
 
 <pre>bin/sequel -X /path/to/index_cache.dump postgres://...</pre>
 
-<p>Alternatively, if you don&#39;t want to dump the index information for all
-tables, and you don&#39;t worry about race conditions, you can choose to
-use the following in your application code:</p>
+<p>Alternatively, if you don&#39;t want to dump the index information for all tables, and you don&#39;t worry about race conditions, you can choose to use the following in your application code:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:index_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_index_cache?</span>(<span class="ruby-string">&#39;/path/to/index_cache.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_index_cache?</span>(<span class="ruby-string">&#39;/path/to/index_cache.dump&#39;</span>)</pre>
 
-<p>With this method, you just have to delete the index dump file if the schema
-is modified, and the application will recreate it for you using just the
-tables that your models use.</p>
+<p>With this method, you just have to delete the index dump file if the schema is modified, and the application will recreate it for you using just the tables that your models use.</p>
 
-<p>Note that it is up to the application to ensure that the dumped index cache
-reflects the current state of the database.  <a
-href="../../../../classes/Sequel.html">Sequel</a> does no checking to
-ensure this, as checking would take time and the purpose of this code is to
-take a shortcut.</p>
+<p>Note that it is up to the application to ensure that the dumped index cache reflects the current state of the database.  <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does no checking to ensure this, as checking would take time and the purpose of this code is to take a shortcut.</p>
 
-<p>The index cache is dumped in Marshal format, since it is the fastest and it
-handles all ruby objects used in the indexes hash.  Because of this, you
-should not attempt to load from an untrusted file.</p>
+<p>The index cache is dumped in Marshal format, since it is the fastest and it handles all ruby objects used in the indexes hash.  Because of this, you should not attempt to load from an untrusted file.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/IndexCaching.html">Sequel::IndexCaching</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/IndexCaching.html"><code>Sequel::IndexCaching</code></a></p>
 </div>
 <div id='context'>
 </div>

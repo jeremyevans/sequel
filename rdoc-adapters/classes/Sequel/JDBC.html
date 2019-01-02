@@ -95,7 +95,6 @@ Sequel::JDBC
 <li><a href="JDBC/H2.html">Sequel::JDBC::H2</a></li>
 <li><a href="JDBC/HSQLDB.html">Sequel::JDBC::HSQLDB</a></li>
 <li><a href="JDBC/JTDS.html">Sequel::JDBC::JTDS</a></li>
-<li><a href="JDBC/Java.html">Sequel::JDBC::Java</a></li>
 <li><a href="JDBC/JavaSQL.html">Sequel::JDBC::JavaSQL</a></li>
 <li><a href="JDBC/MSSQL.html">Sequel::JDBC::MSSQL</a></li>
 <li><a href="JDBC/MySQL.html">Sequel::JDBC::MySQL</a></li>
@@ -130,8 +129,7 @@ Sequel::JDBC
 <td class='context-item-value'>{}</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Contains procs keyed on subadapter type that extend the given database
-object so it supports the correct database type.</p>
+<p>Contains procs keyed on subadapter type that extend the given database object so it supports the correct database type.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -149,9 +147,7 @@ object so it supports the correct database type.</p>
 <td class='context-item-value'>java.lang.Exception</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Create custom <a href="JDBC.html#NativeException">NativeException</a> alias
-for nicer access, and also so that JRuby 9.2+ so it doesn&#39;t use the
-deprecated ::NativeException</p>
+<p>Create custom <a href="JDBC.html#NativeException"><code>NativeException</code></a> alias for nicer access, and also so that JRuby 9.2+ so it doesn&#39;t use the deprecated ::NativeException</p>
 </td>
 </tr>
 </table>
@@ -168,18 +164,14 @@ deprecated ::NativeException</p>
 </div>
 <div class='description'>
 
-<p>Attempt to load the <a href="JDBC.html">JDBC</a> driver class, which should
-be specified as a string containing the driver class name (which JRuby
-should autoload). Note that the string is evaled, so this method is not
-safe to call with untrusted input. Raise a Sequel::AdapterNotFound if
-evaluating the class name raises a NameError.</p>
+<p>Attempt to load the <a href="JDBC.html"><code>JDBC</code></a> driver class, which should be specified as a string containing the driver class name (which JRuby should autoload). Note that the string is evaled, so this method is not safe to call with untrusted input. Raise a Sequel::AdapterNotFound if evaluating the class name raises a NameError.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-load_driver-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-load_driver-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">load_driver</span>(<span class="ruby-identifier">drv</span>, <span class="ruby-identifier">gem</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">load_gem</span>(<span class="ruby-identifier">gem</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">gem</span>&#x000A;  <span class="ruby-identifier">eval</span> <span class="ruby-identifier">drv</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">NameError</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">AdapterNotFound</span>, <span class="ruby-node">&quot;#{drv} not loaded#{&quot;, try installing jdbc-#{gem.to_s.downcase} gem&quot; if gem}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-load_driver-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb</span>&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">load_driver</span>(<span class="ruby-identifier">drv</span>, <span class="ruby-identifier">gem</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">53</span>   <span class="ruby-identifier">load_gem</span>(<span class="ruby-identifier">gem</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">gem</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">eval</span> <span class="ruby-identifier">drv</span>&#x000A;<span class="line-num">55</span> <span class="ruby-keyword">rescue</span> <span class="ruby-constant">NameError</span>&#x000A;<span class="line-num">56</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">AdapterNotFound</span>, <span class="ruby-node">&quot;#{drv} not loaded#{&quot;, try installing jdbc-#{gem.to_s.downcase} gem&quot; if gem}&quot;</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-load_gem'>
@@ -191,14 +183,14 @@ evaluating the class name raises a NameError.</p>
 </div>
 <div class='description'>
 
-<p>Allow loading the necessary <a href="JDBC.html">JDBC</a> support via a gem.</p>
+<p>Allow loading the necessary <a href="JDBC.html"><code>JDBC</code></a> support via a gem.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-load_gem-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-load_gem-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">load_gem</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">require</span> <span class="ruby-node">&quot;jdbc/#{name.to_s.downcase}&quot;</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">LoadError</span>&#x000A;    <span class="ruby-comment"># jdbc gem not used, hopefully the user has the .jar in their CLASSPATH</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>) <span class="ruby-operator">&amp;&amp;</span> ( <span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-keyword">nil</span> )&#x000A;      <span class="ruby-identifier">jdbc_module</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>) <span class="ruby-comment"># e.g. Jdbc::SQLite3</span>&#x000A;      <span class="ruby-identifier">jdbc_module</span>.<span class="ruby-identifier">load_driver</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">jdbc_module</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:load_driver</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-load_gem-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb</span>&#x000A;<span class="line-num">34</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">load_gem</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">35</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">36</span>     <span class="ruby-identifier">require</span> <span class="ruby-node">&quot;jdbc/#{name.to_s.downcase}&quot;</span>&#x000A;<span class="line-num">37</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">LoadError</span>&#x000A;<span class="line-num">38</span>     <span class="ruby-comment"># jdbc gem not used, hopefully the user has the .jar in their CLASSPATH</span>&#x000A;<span class="line-num">39</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>) <span class="ruby-operator">&amp;&amp;</span> ( <span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-keyword">nil</span> )&#x000A;<span class="line-num">41</span>       <span class="ruby-identifier">jdbc_module</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Jdbc</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>) <span class="ruby-comment"># e.g. Jdbc::SQLite3</span>&#x000A;<span class="line-num">42</span>       <span class="ruby-identifier">jdbc_module</span>.<span class="ruby-identifier">load_driver</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">jdbc_module</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:load_driver</span>)&#x000A;<span class="line-num">43</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">44</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

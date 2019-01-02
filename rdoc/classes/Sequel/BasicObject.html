@@ -39,10 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The <code>Sequel::BasicObject</code> class is just like the default
-<code>BasicObject</code> class, except that missing constants are resolved
-in <code>Object</code>.  This allows the virtual row support to work with
-classes without prefixing them with ::, such as:</p>
+<p>The <code>Sequel::BasicObject</code> class is just like the default <code>BasicObject</code> class, except that missing constants are resolved in <code>Object</code>.  This allows the virtual row support to work with classes without prefixing them with ::, such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:bonds</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">maturity_date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}</pre>
 </div>
@@ -74,7 +71,7 @@ classes without prefixing them with ::, such as:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-const_missing-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-const_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">const_missing</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-const_missing-source'>   <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">12</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">const_missing</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">13</span>   <span class="ruby-operator">::</span><span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

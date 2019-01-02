@@ -35,30 +35,19 @@ Sequel::Plugins
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Empty namespace that plugins should use to store themselves, so they can be
-loaded via Model.plugin.</p>
+<p>Empty namespace that plugins should use to store themselves, so they can be loaded via Model.plugin.</p>
 
-<p><a href="Plugins.html">Plugins</a> should be modules with one of the
-following conditions:</p>
+<p><a href="Plugins.html"><code>Plugins</code></a> should be modules with one of the following conditions:</p>
 <ul><li>
-<p>A singleton method named apply, which takes a model,  additional arguments,
-and an optional block.  This is called the first time the plugin is loaded
-for this model (unless it was already loaded by an ancestor class), before
-including/extending any modules, with the arguments and block provided to
-the call to Model.plugin.</p>
+<p>A singleton method named apply, which takes a model,  additional arguments, and an optional block.  This is called the first time the plugin is loaded for this model (unless it was already loaded by an ancestor class), before including/extending any modules, with the arguments and block provided to the call to Model.plugin.</p>
 </li><li>
-<p>A module inside the plugin module named ClassMethods, which will extend the
-model class.</p>
+<p>A module inside the plugin module named ClassMethods, which will extend the model class.</p>
 </li><li>
-<p>A module inside the plugin module named InstanceMethods, which will be
-included in the model class.</p>
+<p>A module inside the plugin module named InstanceMethods, which will be included in the model class.</p>
 </li><li>
-<p>A module inside the plugin module named DatasetMethods, which will extend
-the model&#39;s dataset.</p>
+<p>A module inside the plugin module named DatasetMethods, which will extend the model&#39;s dataset.</p>
 </li><li>
-<p>A singleton method named configure, which takes a model,  additional
-arguments, and an optional block.  This is called every time the
-Model.plugin method is called, after including/extending any modules.</p>
+<p>A singleton method named configure, which takes a model,  additional arguments, and an optional block.  This is called every time the Model.plugin method is called, after including/extending any modules.</p>
 </li></ul>
 </div>
 <div id='method-list'>
@@ -84,15 +73,14 @@ Model.plugin method is called, after including/extending any modules.</p>
 </div>
 <div class='description'>
 
-<p>Add method to <code>mod</code> that overrides set_dataset to call the
-method afterward.</p>
+<p>Add method to <code>mod</code> that overrides set_dataset to call the method afterward.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-after_set_dataset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-after_set_dataset-source'><span class="ruby-comment"># File lib/sequel/model/plugins.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">after_set_dataset</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:set_dataset</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;    <span class="ruby-comment"># Allow calling private class methods as methods this specifies are usually private</span>&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-after_set_dataset-source'>   <span class="ruby-comment"># File lib/sequel/model/plugins.rb</span>&#x000A;<span class="line-num">46</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">after_set_dataset</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;<span class="line-num">47</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:set_dataset</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">48</span>     <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;<span class="line-num">49</span>     <span class="ruby-comment"># Allow calling private class methods as methods this specifies are usually private</span>&#x000A;<span class="line-num">50</span>     <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>)&#x000A;<span class="line-num">51</span>     <span class="ruby-identifier">r</span>&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-def_dataset_methods'>
@@ -104,20 +92,16 @@ method afterward.</p>
 </div>
 <div class='description'>
 
-<p>In the given module <code>mod</code>, define methods that are call the same
-method on the dataset.  This is designed for plugins to define dataset
-methods inside ClassMethods that call the implementations in
-DatasetMethods.</p>
+<p>In the given module <code>mod</code>, define methods that are call the same method on the dataset.  This is designed for plugins to define dataset methods inside ClassMethods that call the implementations in DatasetMethods.</p>
 
-<p>This should not be called with untrusted input or method names that
-can&#39;t be used literally, since it uses class_eval.</p>
+<p>This should not be called with untrusted input or method names that can&#39;t be used literally, since it uses class_eval.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-def_dataset_methods-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-def_dataset_methods-source'><span class="ruby-comment"># File lib/sequel/model/plugins.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_dataset_methods</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meths</span>)&#x000A;  <span class="ruby-constant">Array</span>(<span class="ruby-identifier">meths</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">meth</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">class_eval</span>(<span class="ruby-node">&quot;def #{meth}(*args, &amp;block); dataset.#{meth}(*args, &amp;block) end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-def_dataset_methods-source'>   <span class="ruby-comment"># File lib/sequel/model/plugins.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">def_dataset_methods</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meths</span>)&#x000A;<span class="line-num">32</span>   <span class="ruby-constant">Array</span>(<span class="ruby-identifier">meths</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">meth</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">33</span>     <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">class_eval</span>(<span class="ruby-node">&quot;def #{meth}(*args, &amp;block); dataset.#{meth}(*args, &amp;block) end&quot;</span>, <span class="ruby-keyword">__FILE__</span>, <span class="ruby-keyword">__LINE__</span>)&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-inherited_instance_variables'>
@@ -129,16 +113,14 @@ can&#39;t be used literally, since it uses class_eval.</p>
 </div>
 <div class='description'>
 
-<p>Add method to <code>mod</code> that overrides <a
-href="Plugins.html#method-c-inherited_instance_variables">::inherited_instance_variables</a>
-to include the values in this hash.</p>
+<p>Add method to <code>mod</code> that overrides <a href="Plugins.html#method-c-inherited_instance_variables"><code>inherited_instance_variables</code></a> to include the values in this hash.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-inherited_instance_variables-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-inherited_instance_variables-source'><span class="ruby-comment"># File lib/sequel/model/plugins.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inherited_instance_variables</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:inherited_instance_variables</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">||</span>&#x000A;    <span class="ruby-keyword">super</span>().<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">hash</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-inherited_instance_variables-source'>   <span class="ruby-comment"># File lib/sequel/model/plugins.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">inherited_instance_variables</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">hash</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:inherited_instance_variables</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">||</span>&#x000A;<span class="line-num">41</span>     <span class="ruby-keyword">super</span>().<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">hash</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -38,37 +38,23 @@ Last Update:
 <div id='description'>
 <p>The pg_interval extension adds support for PostgreSQL&#39;s interval type.</p>
 
-<p>This extension integrates with Sequel&#39;s native postgres and
-jdbc/postgresql adapters, so that when interval type values are retrieved,
-they are parsed and returned as instances of ActiveSupport::Duration.</p>
+<p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when interval type values are retrieved, they are parsed and returned as instances of ActiveSupport::Duration.</p>
 
-<p>In addition to the parser, this extension adds literalizers for
-ActiveSupport::Duration that use the standard <a
-href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
-so they work on all adapters.</p>
+<p>In addition to the parser, this extension adds literalizers for ActiveSupport::Duration that use the standard <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> literalization callbacks, so they work on all adapters.</p>
 
 <p>To use this extension, load it into the Database instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_interval</span></pre>
 
-<p>This extension integrates with the pg_array extension.  If you plan to use
-arrays of interval types, load the pg_array extension before the
-pg_interval extension:</p>
+<p>This extension integrates with the pg_array extension.  If you plan to use arrays of interval types, load the pg_array extension before the pg_interval extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_interval</span></pre>
 
-<p>The parser this extension uses requires that IntervalStyle for PostgreSQL
-is set to postgres (the default setting).  If IntervalStyle is changed from
-the default setting, the parser will probably not work.  The parser used is
-very simple, and is only designed to parse PostgreSQL&#39;s default output
-format, it is not designed to support all input formats that PostgreSQL
-supports.</p>
+<p>The parser this extension uses requires that IntervalStyle for PostgreSQL is set to postgres (the default setting).  If IntervalStyle is changed from the default setting, the parser will probably not work.  The parser used is very simple, and is only designed to parse PostgreSQL&#39;s default output format, it is not designed to support all input formats that PostgreSQL supports.</p>
 
-<p>See the schema modification guide for details on using interval columns in
-CREATE/ALTER TABLE statements.</p>
+<p>See the schema modification guide for details on using interval columns in CREATE/ALTER TABLE statements.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Postgres/IntervalDatabaseMethods.html">Sequel::Postgres::IntervalDatabaseMethods</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/IntervalDatabaseMethods.html"><code>Sequel::Postgres::IntervalDatabaseMethods</code></a></p>
 </div>
 <div id='context'>
 <div id='requires'>

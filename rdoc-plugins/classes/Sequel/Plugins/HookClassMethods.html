@@ -35,16 +35,11 @@ Sequel::Plugins::HookClassMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Sequel&#39;s built-in hook_class_methods plugin is designed for backwards
-compatibility.  Its use is not encouraged, it is recommended to use
-instance methods and super instead of this plugin.  This plugin allows
-calling class methods with blocks to define hooks:</p>
+<p>Sequel&#39;s built-in hook_class_methods plugin is designed for backwards compatibility.  Its use is not encouraged, it is recommended to use instance methods and super instead of this plugin.  This plugin allows calling class methods with blocks to define hooks:</p>
 
 <pre class="ruby"><span class="ruby-comment"># Block only, can cause duplicate hooks if code is reloaded</span>&#x000A;<span class="ruby-identifier">before_save</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}&#x000A;<span class="ruby-comment"># Block with tag, safe for reloading</span>&#x000A;<span class="ruby-identifier">before_save</span>(<span class="ruby-value">:set_created_at</span>){<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}&#x000A;<span class="ruby-comment"># Tag only, safe for reloading, calls instance method</span>&#x000A;<span class="ruby-identifier">before_save</span>(<span class="ruby-value">:set_created_at</span>)</pre>
 
-<p>Pretty much anything you can do with a hook class method, you can also do
-with an instance method instead (making sure to call super), which is the
-recommended way to add hooks in Sequel:</p>
+<p>Pretty much anything you can do with a hook class method, you can also do with an instance method instead (making sure to call super), which is the recommended way to add hooks in Sequel:</p>
 
 <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -87,7 +82,7 @@ recommended way to add hooks in Sequel:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">hooks</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@hooks</span>, {})&#x000A;  <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hooks</span>[<span class="ruby-identifier">h</span>] = []}&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">36</span>   <span class="ruby-identifier">hooks</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@hooks</span>, {})&#x000A;<span class="line-num">37</span>   <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">HOOKS</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-identifier">hooks</span>[<span class="ruby-identifier">h</span>] = []}&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

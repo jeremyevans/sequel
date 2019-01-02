@@ -35,9 +35,7 @@ Sequel::UnthreadedServerBlock
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Adds <a
-href="UnthreadedServerBlock.html#method-i-with_server">#with_server</a>
-support for the sharded single connection pool.</p>
+<p>Adds <a href="UnthreadedServerBlock.html#method-i-with_server"><code>with_server</code></a> support for the sharded single connection pool.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -67,7 +65,7 @@ support for the sharded single connection pool.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_server-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-with_server-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">set_default_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>)&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">clear_default_server</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-with_server-source'>   <span class="ruby-comment"># File lib/sequel/extensions/server_block.rb</span>&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>=<span class="ruby-identifier">default_server</span>)&#x000A;<span class="line-num">85</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">86</span>     <span class="ruby-identifier">set_default_server</span>(<span class="ruby-identifier">default_server</span>, <span class="ruby-identifier">read_only_server</span>)&#x000A;<span class="line-num">87</span>     <span class="ruby-keyword">yield</span>&#x000A;<span class="line-num">88</span>   <span class="ruby-keyword">ensure</span>&#x000A;<span class="line-num">89</span>     <span class="ruby-identifier">clear_default_server</span>&#x000A;<span class="line-num">90</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">91</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

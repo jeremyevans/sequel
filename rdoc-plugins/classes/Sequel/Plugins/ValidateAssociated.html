@@ -35,11 +35,7 @@ Sequel::Plugins::ValidateAssociated
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The validates_associated plugin allows you to validate associated objects. 
-It also offers the ability to delay the validation of associated objects
-until the current object is validated. If the associated object is invalid,
-validation error messages from the associated object will be added to the
-current object&#39;s validation errors.</p>
+<p>The validates_associated plugin allows you to validate associated objects.  It also offers the ability to delay the validation of associated objects until the current object is validated. If the associated object is invalid, validation error messages from the associated object will be added to the current object&#39;s validation errors.</p>
 
 <p>Usage:</p>
 
@@ -79,7 +75,7 @@ current object&#39;s validation errors.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/validate_associated.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_hooks</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/validate_associated.rb</span>&#x000A;<span class="line-num">39</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;<span class="line-num">40</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_hooks</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

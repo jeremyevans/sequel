@@ -35,8 +35,7 @@ Sequel::SQL::OrderMethods
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Methods that create <code>OrderedExpressions</code>, used for sorting by
-columns or more complex expressions.</p>
+<p>Methods that create <code>OrderedExpressions</code>, used for sorting by columns or more complex expressions.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -60,12 +59,9 @@ columns or more complex expressions.</p>
 </div>
 <div class='description'>
 
-<p>Mark the receiving <a href="../SQL.html">SQL</a> column as sorting in an
-ascending fashion (generally a no-op). Options:</p>
+<p>Mark the receiving <a href="../SQL.html"><code>SQL</code></a> column as sorting in an ascending fashion (generally a no-op). Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:nulls </td><td>
-<p>Set to :first to use NULLS FIRST (so NULL values are ordered before other
-values), or :last to use NULLS LAST (so NULL values are ordered after other
-values).</p>
+<p>Set to :first to use NULLS FIRST (so NULL values are ordered before other values), or :last to use NULLS LAST (so NULL values are ordered after other values).</p>
 </td></tr></tbody></table>
 
 </div>
@@ -73,7 +69,7 @@ values).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-asc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-asc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 895</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">asc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-keyword">false</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-asc-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">896</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">asc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">897</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-keyword">false</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">898</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-desc'>
@@ -85,12 +81,9 @@ values).</p>
 </div>
 <div class='description'>
 
-<p>Mark the receiving <a href="../SQL.html">SQL</a> column as sorting in a
-descending fashion. Options:</p>
+<p>Mark the receiving <a href="../SQL.html"><code>SQL</code></a> column as sorting in a descending fashion. Options:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:nulls </td><td>
-<p>Set to :first to use NULLS FIRST (so NULL values are ordered before other
-values), or :last to use NULLS LAST (so NULL values are ordered after other
-values).</p>
+<p>Set to :first to use NULLS FIRST (so NULL values are ordered before other values), or :last to use NULLS LAST (so NULL values are ordered after other values).</p>
 </td></tr></tbody></table>
 
 </div>
@@ -98,7 +91,7 @@ values).</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-desc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-desc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 905</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">desc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-desc-source'>    <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">906</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">desc</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">907</span>   <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">908</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

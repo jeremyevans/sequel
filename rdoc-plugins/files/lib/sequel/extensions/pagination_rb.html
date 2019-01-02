@@ -36,9 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pagination extension adds the Sequel::Dataset#paginate and each_page
-methods, which return paginated (limited and offset) datasets with the
-following methods added that make creating a paginated display easier:</p>
+<p>The pagination extension adds the Sequel::Dataset#paginate and each_page methods, which return paginated (limited and offset) datasets with the following methods added that make creating a paginated display easier:</p>
 <ul><li>
 <p><code>page_size</code></p>
 </li><li>
@@ -69,15 +67,11 @@ following methods added that make creating a paginated display easier:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pagination</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pagination</span>)</pre>
 
-<p>Related modules: <a
-href="../../../../classes/Sequel/DatasetPagination.html">Sequel::DatasetPagination</a>,
-<a
-href="../../../../classes/Sequel/Dataset/Pagination.html">Sequel::Dataset::Pagination</a></p>
+<p>Related modules: <a href="../../../../classes/Sequel/DatasetPagination.html"><code>Sequel::DatasetPagination</code></a>, <a href="../../../../classes/Sequel/Dataset/Pagination.html"><code>Sequel::Dataset::Pagination</code></a></p>
 </div>
 <div id='context'>
 </div>

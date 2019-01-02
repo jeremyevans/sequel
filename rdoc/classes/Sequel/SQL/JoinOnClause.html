@@ -39,7 +39,7 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Represents an <a href="../SQL.html">SQL</a> JOIN clause with ON conditions.</p>
+<p>Represents an <a href="../SQL.html"><code>SQL</code></a> JOIN clause with ON conditions.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -82,15 +82,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Create an object with the ON conditions and call super with the remaining
-args.</p>
+<p>Create an object with the ON conditions and call super with the remaining args.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1558</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">on</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@on</span> = <span class="ruby-identifier">on</span>&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-new-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">1559</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-identifier">on</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1560</span>   <span class="ruby-ivar">@on</span> = <span class="ruby-identifier">on</span>&#x000A;<span class="line-num">1561</span>   <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">1562</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

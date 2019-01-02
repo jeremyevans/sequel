@@ -35,10 +35,7 @@ Sequel::Plugins::PreparedStatementsSafe
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The prepared_statements_safe plugin modifies the model to reduce the number
-of prepared statements that can be created, by setting as many columns as
-possible before creating, and by changing <code>save_changes</code> to save
-all columns instead of just the changed ones.</p>
+<p>The prepared_statements_safe plugin modifies the model to reduce the number of prepared statements that can be created, by setting as many columns as possible before creating, and by changing <code>save_changes</code> to save all columns instead of just the changed ones.</p>
 
 <p>This plugin depends on the <code>prepared_statements</code> plugin.</p>
 
@@ -82,7 +79,7 @@ all columns instead of just the changed ones.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:prepared_statements</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>&#x000A;<span class="line-num">21</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">22</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:prepared_statements</span>)&#x000A;<span class="line-num">23</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-class' id='method-method-c-configure'>
@@ -101,7 +98,7 @@ all columns instead of just the changed ones.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_prepared_statements_column_defaults</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb</span>&#x000A;<span class="line-num">26</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">27</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_prepared_statements_column_defaults</span>)&#x000A;<span class="line-num">28</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

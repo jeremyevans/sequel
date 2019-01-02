@@ -67,7 +67,7 @@ Sequel::Plugins::InstanceHooks::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_destroy</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_destroy</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_destroy</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb</span>&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_destroy</span>&#x000A;<span class="line-num">53</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">54</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;<span class="line-num">55</span>   <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_destroy</span>)&#x000A;<span class="line-num">56</span>   <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_destroy</span>)&#x000A;<span class="line-num">57</span>   <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_destroy</span>)&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-after_save'>
@@ -86,7 +86,7 @@ Sequel::Plugins::InstanceHooks::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_validation</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_validation</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_save-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;<span class="line-num">69</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">70</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_save</span>)&#x000A;<span class="line-num">72</span>   <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_save</span>)&#x000A;<span class="line-num">73</span>   <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_save</span>)&#x000A;<span class="line-num">74</span>   <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_validation</span>)&#x000A;<span class="line-num">75</span>   <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_validation</span>)&#x000A;<span class="line-num">76</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-after_validation'>
@@ -105,7 +105,7 @@ Sequel::Plugins::InstanceHooks::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_validation-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_validation</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_validation</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_validation-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_validation</span>&#x000A;<span class="line-num">62</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">63</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;<span class="line-num">64</span>   <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_validation</span>)&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_destroy'>
@@ -117,16 +117,14 @@ Sequel::Plugins::InstanceHooks::InstanceMethods
 </div>
 <div class='description'>
 
-<p>Run <a
-href="InstanceMethods.html#method-i-before_destroy">#before_destroy</a>
-instance hooks.</p>
+<p>Run <a href="InstanceMethods.html#method-i-before_destroy"><code>before_destroy</code></a> instance hooks.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_destroy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;  <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_destroy</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_destroy-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_destroy</span>&#x000A;<span class="line-num">80</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;<span class="line-num">81</span>   <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_destroy</span>)&#x000A;<span class="line-num">82</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-before_save'>
@@ -138,15 +136,14 @@ instance hooks.</p>
 </div>
 <div class='description'>
 
-<p>Run <a href="InstanceMethods.html#method-i-before_save">#before_save</a>
-instance hooks.</p>
+<p>Run <a href="InstanceMethods.html#method-i-before_save"><code>before_save</code></a> instance hooks.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;  <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_save</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_save-source'>   <span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb</span>&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_save</span>&#x000A;<span class="line-num">87</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@instance_hooks</span>&#x000A;<span class="line-num">88</span>   <span class="ruby-identifier">run_before_instance_hooks</span>(<span class="ruby-value">:before_save</span>)&#x000A;<span class="line-num">89</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

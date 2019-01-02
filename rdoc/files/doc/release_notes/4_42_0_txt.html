@@ -38,136 +38,66 @@ Last Update:
 <div id='description'>
 <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>There have been numerous improvements this release related to frozen
-datasets.  Frozen datasets now work in almost all cases, except when
-calling a dataset mutation method.</p>
+<p>There have been numerous improvements this release related to frozen datasets.  Frozen datasets now work in almost all cases, except when calling a dataset mutation method.</p>
 
-<p>When using ruby 2.4, <a href="../../../classes/Sequel.html">Sequel</a> uses
-the new support for clone(:freeze=&gt;false) to actually freeze datasets
-while allowing them to copy singleton classes/extended modules from the
-dataset calling clone.  On earlier versions of ruby, the dataset opts are
-now frozen, preventing more types of accidental modification.</p>
+<p>When using ruby 2.4, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses the new support for clone(:freeze=&gt;false) to actually freeze datasets while allowing them to copy singleton classes/extended modules from the dataset calling clone.  On earlier versions of ruby, the dataset opts are now frozen, preventing more types of accidental modification.</p>
 
-<p>The dataset internals were refactored to reduce the number of instance
-variables.  Now, datasets store all of their state in opts.  Additionally,
-all datasets now use a thread-safe cache for storing cached state such as
-the dataset&#39;s columns. Previously, accessing/setting the columns was
-not thread-safe, unless the ruby interpreter used thread-safe methods for
-instance variable getting/setting.</p>
+<p>The dataset internals were refactored to reduce the number of instance variables.  Now, datasets store all of their state in opts.  Additionally, all datasets now use a thread-safe cache for storing cached state such as the dataset&#39;s columns. Previously, accessing/setting the columns was not thread-safe, unless the ruby interpreter used thread-safe methods for instance variable getting/setting.</p>
 
-<p>Frozen datasets use this new cache to optimize repeated method calls,
-resulting in substantial performance speedups.  This can include caching
-returned and/or intermediate datasets, SELECT and DELETE SQL generated, as
-well as internal objects designed to optimize the building of SQL strings
-with different arguments.</p>
+<p>Frozen datasets use this new cache to optimize repeated method calls, resulting in substantial performance speedups.  This can include caching returned and/or intermediate datasets, SELECT and DELETE SQL generated, as well as internal objects designed to optimize the building of SQL strings with different arguments.</p>
 
-<p>Even for fairly simple datasets, this can result in up to 10x performance
-improvements for dataset methods that don&#39;t require database access,
-and up to 3x performance improvements for dataset methods that do require
-database access.</p>
+<p>Even for fairly simple datasets, this can result in up to 10x performance improvements for dataset methods that don&#39;t require database access, and up to 3x performance improvements for dataset methods that do require database access.</p>
 </li><li>
-<p>A freeze_datasets Database extension has been added which automatically
-freezes all datasets for the Database instance. This also enables dataset
-caching when creating datasets using Database#[] and from using a single
-symbol, such as <a href=":table_name">DB</a>.  In addition to speeding up
-the methods themselves, this also allows code such as:</p>
+<p>A freeze_datasets Database extension has been added which automatically freezes all datasets for the Database instance. This also enables dataset caching when creating datasets using Database#[] and from using a single symbol, such as <a href=":table_name">DB</a>.  In addition to speeding up the methods themselves, this also allows code such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:foo</span>].<span class="ruby-identifier">for_update</span>.<span class="ruby-identifier">first</span></pre>
 
-<p>To run much faster by avoiding any dataset creation or SQL string building
-after the first call.</p>
+<p>To run much faster by avoiding any dataset creation or SQL string building after the first call.</p>
 
-<p>The freeze_datasets extension makes dup an alias of clone, ensuring that
-all cloned datasets that were originally created by the Database instance
-are frozen.</p>
+<p>The freeze_datasets extension makes dup an alias of clone, ensuring that all cloned datasets that were originally created by the Database instance are frozen.</p>
 
-<p>It is highly recommended that you start using the freeze_datasets extension
-in your applications using <a
-href="../../../classes/Sequel.html">Sequel</a>, as this extension will
-become the default and only behavior in <a
-href="../../../classes/Sequel.html">Sequel</a> 5.  Unfrozen datasets and
-dataset mutation will not be supported in <a
-href="../../../classes/Sequel.html">Sequel</a> 5.</p>
+<p>It is highly recommended that you start using the freeze_datasets extension in your applications using <a href="../../../classes/Sequel.html"><code>Sequel</code></a>, as this extension will become the default and only behavior in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.  Unfrozen datasets and dataset mutation will not be supported in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.</p>
 </li><li>
-<p>The dataset methods created by Model#subset and Model::DatasetModule#subset
-now cache the returned dataset if the current dataset is frozen, none of
-the arguments are Procs, and a block is not provided.  This can result in
-up to a 3x performance  improvement for method chains that use subsets,
-such as:</p>
+<p>The dataset methods created by Model#subset and Model::DatasetModule#subset now cache the returned dataset if the current dataset is frozen, none of the arguments are Procs, and a block is not provided.  This can result in up to a 3x performance  improvement for method chains that use subsets, such as:</p>
 
 <pre class="ruby"><span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">subset1</span>.<span class="ruby-identifier">subset2</span>.<span class="ruby-identifier">subset3</span>.<span class="ruby-identifier">first</span></pre>
 </li><li>
-<p>Model::DatasetModule has had the following methods added to it: distinct,
-exclude, exclude_having, grep, group, group_and_count, group_append,
-having, limit, offset, order, order_append, order_prepend, select,
-select_all, select_append, select_group, where, and server. These methods
-create dataset methods that when called call the dataset method with the
-same name on the receiver.  Example:</p>
+<p>Model::DatasetModule has had the following methods added to it: distinct, exclude, exclude_having, grep, group, group_and_count, group_append, having, limit, offset, order, order_append, order_prepend, select, select_all, select_append, select_group, where, and server. These methods create dataset methods that when called call the dataset method with the same name on the receiver.  Example:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">ModelClass</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">select</span> <span class="ruby-value">:with_id_and_name</span>, <span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>&#x000A;    <span class="ruby-identifier">where</span> <span class="ruby-value">:active</span>, <span class="ruby-value">:active</span>&#x000A;    <span class="ruby-identifier">order</span> <span class="ruby-value">:by_name</span>, <span class="ruby-value">:name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">active</span>.<span class="ruby-identifier">by_name</span>.<span class="ruby-identifier">with_id_and_name</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT id, name FROM model_classes WHERE active ORDER BY name</span>&#x000A;<span class="ruby-comment"># Equivalent to:</span>&#x000A;<span class="ruby-constant">ModelClass</span>.&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-value">:active</span>).&#x000A;  <span class="ruby-identifier">order</span>(<span class="ruby-value">:name</span>).&#x000A;  <span class="ruby-identifier">select</span>(<span class="ruby-value">:id</span>, <span class="ruby-value">:name</span>).&#x000A;  <span class="ruby-identifier">all</span></pre>
 
-<p>In addition to being easier than defining the methods manually, this also
-enables caching of the datasets in most cases, so that the above method
-chain does not create any additional datasets after the first call.</p>
+<p>In addition to being easier than defining the methods manually, this also enables caching of the datasets in most cases, so that the above method chain does not create any additional datasets after the first call.</p>
 </li><li>
-<p>Dataset#with_extend now accepts a block and will create a module with that
-block that will be used to extend the object, after any modules given as
-arguments have been applied:</p>
+<p>Dataset#with_extend now accepts a block and will create a module with that block that will be used to extend the object, after any modules given as arguments have been applied:</p>
 
 <pre>DB[:table].with_extend{def foo; 1 end}.foo =&gt; 1</pre>
 </li><li>
-<p>The identifier mangling support for datasets (identifier_input_method and
-identifier_output_method) has been moved to a identifier_mangling database
-extension, but it is still loaded by default.  You can disable the loading
-of this extension by using the :identifier_mangling=&gt;false Database
-option.  <a href="../../../classes/Sequel.html">Sequel</a> 5 will stop
-loading of this extension by default, requiring you to load it manually via
-Database#extension if you need it.</p>
+<p>The identifier mangling support for datasets (identifier_input_method and identifier_output_method) has been moved to a identifier_mangling database extension, but it is still loaded by default.  You can disable the loading of this extension by using the :identifier_mangling=&gt;false Database option.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5 will stop loading of this extension by default, requiring you to load it manually via Database#extension if you need it.</p>
 
-<p>Sequel&#39;s default remains the same as before, to convert identifiers to
-uppercase on input and lowercase on output on databases that fold unquoted
-identifiers to uppercase (per the SQL standard), and to not mangle
-identifiers at all on databases that fold unquoted identifiers to lowercase
-(MySQL, PostgreSQL, SQLite).  The identifier_mangling extension just allows
-you to change the default behavior.</p>
+<p>Sequel&#39;s default remains the same as before, to convert identifiers to uppercase on input and lowercase on output on databases that fold unquoted identifiers to uppercase (per the SQL standard), and to not mangle identifiers at all on databases that fold unquoted identifiers to lowercase (MySQL, PostgreSQL, SQLite).  The identifier_mangling extension just allows you to change the default behavior.</p>
 </li><li>
-<p>On DB2, Dataset#with_convert_smallint_to_bool has been added, which returns
-a modified dataset with the convert_smallint_to_bool setting changed. 
-Previously, chaging the smallint_to_bool setting required mutating a
-dataset.</p>
+<p>On DB2, Dataset#with_convert_smallint_to_bool has been added, which returns a modified dataset with the convert_smallint_to_bool setting changed.  Previously, chaging the smallint_to_bool setting required mutating a dataset.</p>
 </li><li>
-<p>The mock adapter now supports Dataset#with_{autoid,fetch,numrows}, allowing
-mocking of results when using frozen datasets.</p>
+<p>The mock adapter now supports Dataset#with_{autoid,fetch,numrows}, allowing mocking of results when using frozen datasets.</p>
 </li></ul>
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Using an eager load callback when eager loading a one_to_one association
-that uses an order or offset now works correctly on databases that do not
-support window functions.</p>
+<p>Using an eager load callback when eager loading a one_to_one association that uses an order or offset now works correctly on databases that do not support window functions.</p>
 </li><li>
-<p>Dataset#== and Dataset#hash are now faster as they don&#39;t need to
-generate SQL.  As all internal state is now stored in the opts, it just
-considers the class, db, and opts.</p>
+<p>Dataset#== and Dataset#hash are now faster as they don&#39;t need to generate SQL.  As all internal state is now stored in the opts, it just considers the class, db, and opts.</p>
 </li><li>
-<p>The prepared statement/bound variable internals were heavily refactored to
-be simpler and more robust, to more easily support native prepared
-statements, and to work with frozen datasets.</p>
+<p>The prepared statement/bound variable internals were heavily refactored to be simpler and more robust, to more easily support native prepared statements, and to work with frozen datasets.</p>
 </li><li>
-<p>When emulating alter table operations on SQLite, integer primary keys now
-use AUTOINCREMENT, since that is Sequel&#39;s default when creating tables
-on SQLite.</p>
+<p>When emulating alter table operations on SQLite, integer primary keys now use AUTOINCREMENT, since that is Sequel&#39;s default when creating tables on SQLite.</p>
 </li><li>
-<p>On SQLite, Database#schema no longer uses :auto_increment entries when the
-table has a composite primary key.</p>
+<p>On SQLite, Database#schema no longer uses :auto_increment entries when the table has a composite primary key.</p>
 </li><li>
-<p>Most dataset opts values are now frozen to prevent accidental modification
-and allow for thread-safe access.</p>
+<p>Most dataset opts values are now frozen to prevent accidental modification and allow for thread-safe access.</p>
 </li><li>
 <p>SQL::Expression subclass instances are now always frozen.</p>
 </li><li>
-<p>Dataset::PlaceholderLiteralizer and 
-Dataset::PlaceholderLiteralizer::Argument instances are now always frozen.</p>
+<p>Dataset::PlaceholderLiteralizer and  Dataset::PlaceholderLiteralizer::Argument instances are now always frozen.</p>
 </li><li>
 <p>Dataset#ungraphed now works on a frozen model dataset.</p>
 </li><li>
@@ -175,66 +105,38 @@ Dataset::PlaceholderLiteralizer::Argument instances are now always frozen.</p>
 </li><li>
 <p>The pagination and null_dataset extensions now work on frozen datasets.</p>
 </li><li>
-<p>Dataset#server now works for frozen model datasets when the model uses the
-sharding plugin.</p>
+<p>Dataset#server now works for frozen model datasets when the model uses the sharding plugin.</p>
 </li><li>
-<p>Calling eager_graph or association_join on a model dataset is now
-deprecated if it would ignore the association&#39;s :conditions option and
-the :graph_conditions, :graph_block, or :graph_only_conditions association
-option is not used.</p>
+<p>Calling eager_graph or association_join on a model dataset is now deprecated if it would ignore the association&#39;s :conditions option and the :graph_conditions, :graph_block, or :graph_only_conditions association option is not used.</p>
 </li><li>
-<p>Using the :eager_limit dataset option in an eager_load callback with a
-singular association now raises an Error. Previously, the behavior was
-undefined.</p>
+<p>Using the :eager_limit dataset option in an eager_load callback with a singular association now raises an Error. Previously, the behavior was undefined.</p>
 </li><li>
-<p>Calling Dataset#prepare without a name argument is now deprecated. 
-Previously, it raised an Error in the mysql, mysql2, and postgres adapters,
-but was allowed on other adapters.</p>
+<p>Calling Dataset#prepare without a name argument is now deprecated.  Previously, it raised an Error in the mysql, mysql2, and postgres adapters, but was allowed on other adapters.</p>
 </li><li>
-<p>The looser_typecasting extension now handles the strict BigDecimal parsing
-introduced in ruby 2.4.</p>
+<p>The looser_typecasting extension now handles the strict BigDecimal parsing introduced in ruby 2.4.</p>
 </li><li>
-<p>When using the duplicate_columns_handler extension with
-:on_duplicate_columns=&gt;:warn, the warning message is now prepend with
-the file and line.</p>
+<p>When using the duplicate_columns_handler extension with :on_duplicate_columns=&gt;:warn, the warning message is now prepend with the file and line.</p>
 </li><li>
-<p>Internally, <a href="../../../classes/Sequel.html">Sequel</a> uses
-Dataset#where instead of filter, reverse instead of reverse_order, and
-select_append instead of select_more to save a method call and array
-creation.</p>
+<p>Internally, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> uses Dataset#where instead of filter, reverse instead of reverse_order, and select_append instead of select_more to save a method call and array creation.</p>
 </li><li>
-<p>Dataset#db= and opts= in the sequel_3_dataset_methods extension now raise a
-RuntimeError if the dataset is frozen.</p>
+<p>Dataset#db= and opts= in the sequel_3_dataset_methods extension now raise a RuntimeError if the dataset is frozen.</p>
 </li><li>
 <p>Sequel&#39;s tests now run without warnings when using Minitest 5.10.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html">Sequel</a> now issues a deprecation
-message instead of a warning when used with PostgreSQL &lt;8.2.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now issues a deprecation message instead of a warning when used with PostgreSQL &lt;8.2.</p>
 </li></ul>
 
 <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Any external dataset extensions or adapters that modified or directly
-accessed dataset instance variables other than @db and @opts (such as
-@columns) needs to be updated to work with the new dataset internals.</p>
+<p>Any external dataset extensions or adapters that modified or directly accessed dataset instance variables other than @db and @opts (such as @columns) needs to be updated to work with the new dataset internals.</p>
 </li><li>
-<p>Any external adapters that implemented native prepared statements/ bound
-variables need to be updated to work with the new internal prepared
-statement API.</p>
+<p>Any external adapters that implemented native prepared statements/ bound variables need to be updated to work with the new internal prepared statement API.</p>
 </li><li>
-<p>Model.set_dataset and .dataset= now operate on a clone of the dataset
-given, instead of mutating the dataset that is passed in. This allows them
-to work with frozen datasets, but can change the behavior if you mutate a
-dataset after passing it to one of these methods.  Anyone doing that needs
-to change their code to get the current copy of the model&#39;s dataset,
-and mutate that, or better yet, avoid mutating datasets at all.</p>
+<p>Model.set_dataset and .dataset= now operate on a clone of the dataset given, instead of mutating the dataset that is passed in. This allows them to work with frozen datasets, but can change the behavior if you mutate a dataset after passing it to one of these methods.  Anyone doing that needs to change their code to get the current copy of the model&#39;s dataset, and mutate that, or better yet, avoid mutating datasets at all.</p>
 </li><li>
-<p>Dataset#columns now calls columns! instead of the other way around, which
-may require external plugins/extensions that override columns to switch to
-overriding columns!.</p>
+<p>Dataset#columns now calls columns! instead of the other way around, which may require external plugins/extensions that override columns to switch to overriding columns!.</p>
 </li><li>
-<p>External adapters that want to disable identifier mangling by default need
-to be updated.</p>
+<p>External adapters that want to disable identifier mangling by default need to be updated.</p>
 </li></ul>
 </div>
 <div id='context'>

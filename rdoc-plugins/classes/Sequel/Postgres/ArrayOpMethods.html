@@ -56,15 +56,14 @@ Sequel::Postgres::ArrayOpMethods
 </div>
 <div class='description'>
 
-<p>Wrap the receiver in an <a href="ArrayOp.html">ArrayOp</a> so you can
-easily use the PostgreSQL array functions and operators with it.</p>
+<p>Wrap the receiver in an <a href="ArrayOp.html"><code>ArrayOp</code></a> so you can easily use the PostgreSQL array functions and operators with it.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_array-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 276</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>&#x000A;  <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_array-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb</span>&#x000A;<span class="line-num">277</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_array</span>&#x000A;<span class="line-num">278</span>   <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">279</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -36,9 +36,7 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pretty_table extension adds Sequel::Dataset#print and the <a
-href="../../../../classes/Sequel/PrettyTable.html">Sequel::PrettyTable</a>
-class for creating nice-looking plain-text tables.  Example:</p>
+<p>The pretty_table extension adds Sequel::Dataset#print and the <a href="../../../../classes/Sequel/PrettyTable.html"><code>Sequel::PrettyTable</code></a> class for creating nice-looking plain-text tables.  Example:</p>
 
 <pre>+--+-------+&#x000A;|id|name   |&#x000A;|--+-------|&#x000A;|1 |fasdfas|&#x000A;|2 |test   |&#x000A;+--+-------+</pre>
 
@@ -46,13 +44,11 @@ class for creating nice-looking plain-text tables.  Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pretty_table</span>)</pre>
 
-<p>Or you can load it into all of a database&#39;s datasets, which is probably
-the desired behavior if you are using this extension:</p>
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:pretty_table</span>)</pre>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/DatasetPrinter.html">Sequel::DatasetPrinter</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/DatasetPrinter.html"><code>Sequel::DatasetPrinter</code></a></p>
 </div>
 <div id='context'>
 </div>

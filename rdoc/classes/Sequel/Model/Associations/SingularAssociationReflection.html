@@ -35,8 +35,7 @@ Sequel::Model::Associations::SingularAssociationReflection
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>Methods that turn an association that returns multiple objects into an
-association that returns a single object.</p>
+<p>Methods that turn an association that returns multiple objects into an association that returns a single object.</p>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -62,17 +61,14 @@ association that returns a single object.</p>
 </div>
 <div class='description'>
 
-<p>Singular associations do not assign singular if they are using the ruby
-eager limit strategy and have a slice range, since they need to store the
-array of associated objects in order to pick the correct one with an
-offset.</p>
+<p>Singular associations do not assign singular if they are using the ruby eager limit strategy and have a slice range, since they need to store the array of associated objects in order to pick the correct one with an offset.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-assign_singular-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-assign_singular-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">assign_singular?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">eager_limit_strategy</span> <span class="ruby-operator">!=</span> <span class="ruby-value">:ruby</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">slice_range</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-assign_singular-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>&#x000A;<span class="line-num">1131</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">assign_singular?</span>&#x000A;<span class="line-num">1132</span>   <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">eager_limit_strategy</span> <span class="ruby-operator">!=</span> <span class="ruby-value">:ruby</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">slice_range</span>)&#x000A;<span class="line-num">1133</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-filter_by_associations_add_conditions-3F'>
@@ -84,15 +80,14 @@ offset.</p>
 </div>
 <div class='description'>
 
-<p>Add conditions when filtering by singular associations with orders, since
-the underlying relationship is probably not one-to-one.</p>
+<p>Add conditions when filtering by singular associations with orders, since the underlying relationship is probably not one-to-one.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-filter_by_associations_add_conditions-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-filter_by_associations_add_conditions-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1136</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">filter_by_associations_add_conditions?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:eager_limit_strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:filter_limit_strategy</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-filter_by_associations_add_conditions-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>&#x000A;<span class="line-num">1137</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">filter_by_associations_add_conditions?</span>&#x000A;<span class="line-num">1138</span>   <span class="ruby-keyword">super</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:eager_limit_strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:filter_limit_strategy</span>]&#x000A;<span class="line-num">1139</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-limit_and_offset'>
@@ -111,7 +106,7 @@ the underlying relationship is probably not one-to-one.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-limit_and_offset-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-limit_and_offset-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">limit_and_offset</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    [<span class="ruby-value">1</span>, <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-limit_and_offset-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>&#x000A;<span class="line-num">1142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">limit_and_offset</span>&#x000A;<span class="line-num">1143</span>   <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">1144</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;<span class="line-num">1145</span>     <span class="ruby-identifier">r</span>&#x000A;<span class="line-num">1146</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">1147</span>     [<span class="ruby-value">1</span>, <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]]&#x000A;<span class="line-num">1148</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">1149</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-returns_array-3F'>
@@ -130,7 +125,7 @@ the underlying relationship is probably not one-to-one.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-returns_array-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-returns_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1151</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returns_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-returns_array-3F-source'>     <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>&#x000A;<span class="line-num">1152</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">returns_array?</span>&#x000A;<span class="line-num">1153</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">1154</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -35,21 +35,13 @@ Sequel::Plugins::AssociationProxies
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="../../Sequel.html">Sequel</a> by default does not use proxies for
-associations.  The association method for *_to_many associations returns an
-array, and the association_dataset method returns a dataset.  This plugin
-makes the association method return a proxy that will load the association
-and call a method on the association array if sent an array method, and
-otherwise send the method to the association&#39;s dataset.</p>
+<p><a href="../../Sequel.html"><code>Sequel</code></a> by default does not use proxies for associations.  The association method for *_to_many associations returns an array, and the association_dataset method returns a dataset.  This plugin makes the association method return a proxy that will load the association and call a method on the association array if sent an array method, and otherwise send the method to the association&#39;s dataset.</p>
 
-<p>You can override which methods to forward to the dataset by passing a block
-to the plugin:</p>
+<p>You can override which methods to forward to the dataset by passing a block to the plugin:</p>
 
 <pre class="ruby"><span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_proxies</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opts</span><span class="ruby-operator">|</span>&#x000A;  [<span class="ruby-value">:find</span>, <span class="ruby-value">:where</span>, <span class="ruby-value">:create</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:method</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>If the block returns false or nil, the method is sent to the array of
-associated objects.  Otherwise, the method is sent to the association
-dataset.  Here are the entries in the hash passed to the block:</p>
+<p>If the block returns false or nil, the method is sent to the array of associated objects.  Otherwise, the method is sent to the association dataset.  Here are the entries in the hash passed to the block:</p>
 <table class="rdoc-list note-list"><tbody><tr><td class='label'>:method </td><td>
 <p>The name of the method</p>
 </td></tr><tr><td class='label'>:arguments </td><td>
@@ -111,7 +103,7 @@ dataset.  Here are the entries in the hash passed to the block:</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/association_proxies.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@association_proxy_to_dataset</span> = <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-ivar">@association_proxy_to_dataset</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">AssociationProxy</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_PROXY_TO_DATASET</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_proxies.rb</span>&#x000A;<span class="line-num">53</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">54</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">55</span>     <span class="ruby-ivar">@association_proxy_to_dataset</span> = <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">56</span>     <span class="ruby-ivar">@association_proxy_to_dataset</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">AssociationProxy</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_PROXY_TO_DATASET</span>&#x000A;<span class="line-num">57</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">58</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -36,57 +36,29 @@ Last Update:
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>The pg_hstore extension adds support for the PostgreSQL hstore type to <a
-href="../../../../classes/Sequel.html">Sequel</a>.  hstore is an extension
-that ships with PostgreSQL, and the hstore type stores an arbitrary
-key-value table, where the keys are strings and the values are strings or
-NULL.</p>
+<p>The pg_hstore extension adds support for the PostgreSQL hstore type to <a href="../../../../classes/Sequel.html"><code>Sequel</code></a>.  hstore is an extension that ships with PostgreSQL, and the hstore type stores an arbitrary key-value table, where the keys are strings and the values are strings or NULL.</p>
 
-<p>This extension integrates with Sequel&#39;s native postgres and
-jdbc/postgresql adapters, so that when hstore fields are retrieved, they
-are parsed and returned as instances of <a
-href="../../../../classes/Sequel/Postgres/HStore.html">Sequel::Postgres::HStore</a>.
-HStore is a DelegateClass of <a
-href="../../../../classes/Hash.html">Hash</a>, so it mostly acts like a
-hash, but not completely (is_a?(Hash) is false).  If you want the actual
-hash, you can call HStore#to_hash.  This is done so that <a
-href="../../../../classes/Sequel.html">Sequel</a> does not treat a HStore
-like a <a href="../../../../classes/Hash.html">Hash</a> by default, which
-would cause issues.</p>
+<p>This extension integrates with Sequel&#39;s native postgres and jdbc/postgresql adapters, so that when hstore fields are retrieved, they are parsed and returned as instances of <a href="../../../../classes/Sequel/Postgres/HStore.html"><code>Sequel::Postgres::HStore</code></a>.  HStore is a DelegateClass of <a href="../../../../classes/Hash.html"><code>Hash</code></a>, so it mostly acts like a hash, but not completely (is_a?(Hash) is false).  If you want the actual hash, you can call HStore#to_hash.  This is done so that <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> does not treat a HStore like a <a href="../../../../classes/Hash.html"><code>Hash</code></a> by default, which would cause issues.</p>
 
-<p>In addition to the parsers, this extension comes with literalizers for
-HStore using the standard <a
-href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
-so they work with on all adapters.</p>
+<p>In addition to the parsers, this extension comes with literalizers for HStore using the standard <a href="../../../../classes/Sequel.html"><code>Sequel</code></a> literalization callbacks, so they work with on all adapters.</p>
 
-<p>To turn an existing <a href="../../../../classes/Hash.html">Hash</a> into
-an HStore, use Sequel.hstore:</p>
+<p>To turn an existing <a href="../../../../classes/Hash.html"><code>Hash</code></a> into an HStore, use Sequel.hstore:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">hash</span>)</pre>
 
-<p>If you have loaded the <a
-href="../../../doc/core_extensions_rdoc.html">core_extensions
-extension</a>, or you have loaded the core_refinements extension and have
-activated refinements for the file, you can also use <a
-href="../../../../classes/Hash.html#method-i-hstore">Hash#hstore</a>:</p>
+<p>If you have loaded the <a href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>, or you have loaded the core_refinements extension and have activated refinements for the file, you can also use <a href="../../../../classes/Hash.html#method-i-hstore"><code>Hash#hstore</code></a>:</p>
 
 <pre class="ruby"><span class="ruby-identifier">hash</span>.<span class="ruby-identifier">hstore</span></pre>
 
-<p>Since the hstore type only supports strings, non string keys and values are
-converted to strings</p>
+<p>Since the hstore type only supports strings, non string keys and values are converted to strings</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-value">foo:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>({})&#x000A;<span class="ruby-identifier">v</span>[<span class="ruby-value">:foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
 
-<p>However, to make life easier, lookups by key are converted to strings (even
-when accessing the underlying hash directly):</p>
+<p>However, to make life easier, lookups by key are converted to strings (even when accessing the underlying hash directly):</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>)[<span class="ruby-value">:foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">to_hash</span>[<span class="ruby-value">:foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span></pre>
 
-<p>HStore instances mostly just delegate to the underlying hash instance, so
-<a href="../../../../classes/Hash.html">Hash</a> methods that modify the
-receiver or returned modified copies of the receiver may not do string
-conversion. The following methods will handle string conversion, and more
-can be added later if desired:</p>
+<p>HStore instances mostly just delegate to the underlying hash instance, so <a href="../../../../classes/Hash.html"><code>Hash</code></a> methods that modify the receiver or returned modified copies of the receiver may not do string conversion. The following methods will handle string conversion, and more can be added later if desired:</p>
 <ul><li>
 <p>[]</p>
 </li><li>
@@ -133,13 +105,11 @@ can be added later if desired:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_hstore</span></pre>
 
-<p>See the schema modification guide for details on using hstore columns in
-CREATE/ALTER TABLE statements.</p>
+<p>See the schema modification guide for details on using hstore columns in CREATE/ALTER TABLE statements.</p>
 
 <p>This extension requires the delegate and strscan libraries.</p>
 
-<p>Related module: <a
-href="../../../../classes/Sequel/Postgres/HStore.html">Sequel::Postgres::HStore</a></p>
+<p>Related module: <a href="../../../../classes/Sequel/Postgres/HStore.html"><code>Sequel::Postgres::HStore</code></a></p>
 </div>
 <div id='context'>
 <div id='requires'>

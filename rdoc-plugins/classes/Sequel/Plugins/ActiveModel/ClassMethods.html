@@ -70,7 +70,7 @@ Sequel::Plugins::ActiveModel::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_to_partial_path-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-_to_partial_path-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_to_partial_path</span>&#x000A;  <span class="ruby-ivar">@_to_partial_path</span> <span class="ruby-operator">||=</span> <span class="ruby-node">&quot;#{underscore(pluralize(to_s))}/#{underscore(demodulize(to_s))}&quot;</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-_to_partial_path-source'>   <span class="ruby-comment"># File lib/sequel/plugins/active_model.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_to_partial_path</span>&#x000A;<span class="line-num">42</span>   <span class="ruby-ivar">@_to_partial_path</span> <span class="ruby-operator">||=</span> <span class="ruby-node">&quot;#{underscore(pluralize(to_s))}/#{underscore(demodulize(to_s))}&quot;</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -89,7 +89,7 @@ Sequel::Plugins::ActiveModel::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-identifier">model_name</span>&#x000A;  <span class="ruby-identifier">_to_partial_path</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/active_model.rb</span>&#x000A;<span class="line-num">33</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">model_name</span>&#x000A;<span class="line-num">35</span>   <span class="ruby-identifier">_to_partial_path</span>&#x000A;<span class="line-num">36</span> &#x000A;<span class="line-num">37</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

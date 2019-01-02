@@ -77,8 +77,7 @@ Sequel::Plugins::Tree::ClassMethods
 </td>
 <td class='context-item-value'>[RW]</td>
 <td class='context-item-desc'>
-<p>The symbol for the column containing the value pointing to the parent of
-the leaf.</p>
+<p>The symbol for the column containing the value pointing to the parent of the leaf.</p>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -111,7 +110,7 @@ the leaf.</p>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;  <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/tree.rb</span>&#x000A;<span class="line-num">76</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">77</span>   <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@tree_order</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="line-num">78</span> &#x000A;<span class="line-num">79</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

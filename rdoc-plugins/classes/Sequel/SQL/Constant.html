@@ -59,7 +59,7 @@ Superclass:
 <td class='context-item-value'>[:CURRENT_DATE, :CURRENT_TIMESTAMP, :CURRENT_TIME, :SQLTRUE, :SQLFALSE, :NULL, :NOTNULL]</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'>
-<p>Constants to lookup in the <a href="../../Sequel.html">Sequel</a> module.</p>
+<p>Constants to lookup in the <a href="../../Sequel.html"><code>Sequel</code></a> module.</p>
 </td>
 </tr>
 </table>
@@ -76,15 +76,14 @@ Superclass:
 </div>
 <div class='description'>
 
-<p>Reference the constant in the <a href="../../Sequel.html">Sequel</a> module
-if there is one that matches.</p>
+<p>Reference the constant in the <a href="../../Sequel.html"><code>Sequel</code></a> module if there is one that matches.</p>
 
 </div>
 <div class='source'>
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/extensions/eval_inspect.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;  <span class="ruby-constant">INSPECT_LOOKUPS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-node">&quot;Sequel::#{c}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'>    <span class="ruby-comment"># File lib/sequel/extensions/eval_inspect.rb</span>&#x000A;<span class="line-num">108</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">109</span>   <span class="ruby-constant">INSPECT_LOOKUPS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">110</span>     <span class="ruby-keyword">return</span> <span class="ruby-node">&quot;Sequel::#{c}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">self</span>&#x000A;<span class="line-num">111</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">112</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">113</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

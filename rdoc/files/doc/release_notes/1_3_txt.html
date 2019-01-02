@@ -38,17 +38,9 @@ Last Update:
 <div id='description'>
 <h3 id="label-Better+model+associations">Better model associations<span><a href="#label-Better+model+associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
-<p>The latest release of sequel_model includes a new associations
-functionality written by Jeremy Evans which replaces the old relations code
-in previous versions. Please note that this version is not completely
-backward-compatible and you should therefore upgrade with caution.</p>
+<p>The latest release of sequel_model includes a new associations functionality written by Jeremy Evans which replaces the old relations code in previous versions. Please note that this version is not completely backward-compatible and you should therefore upgrade with caution.</p>
 
-<p>The new implementation supports three kinds of relations: one_to_many,
-many_to_one and many_to_many, which correspond to has_many, belongs_to and
-has_and_belongs_to_many relations in ActiveRecord. In fact, the new
-implementation includes aliases for ActiveRecord assocation macros and is
-basically compatible with ActiveRecord conventions. It also supports DRY
-implicit class name references. Here&#39;s a simple example:</p>
+<p>The new implementation supports three kinds of relations: one_to_many, many_to_one and many_to_many, which correspond to has_many, belongs_to and has_and_belongs_to_many relations in ActiveRecord. In fact, the new implementation includes aliases for ActiveRecord assocation macros and is basically compatible with ActiveRecord conventions. It also supports DRY implicit class name references. Here&#39;s a simple example:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span> <span class="ruby-comment"># equivalent to one_to_many</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Book</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> <span class="ruby-value">:author</span> <span class="ruby-comment"># equivalent to many_to_one</span>&#x000A;  <span class="ruby-identifier">has_and_belongs_to_many</span> <span class="ruby-value">:categories</span> <span class="ruby-comment"># equivalent to many_to_many</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Category</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_and_belongs_to_many</span> <span class="ruby-value">:books</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
@@ -64,30 +56,25 @@ implicit class name references. Here&#39;s a simple example:</p>
 <p>Category#books, Category#add_book, Category#remove_book</p>
 </li></ul>
 
-<p>Unlike ActiveRecord, one_to_many and many_to_many association methods
-return a dataset:</p>
+<p>Unlike ActiveRecord, one_to_many and many_to_many association methods return a dataset:</p>
 
 <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">books</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt; &#39;SELECT * FROM books WHERE (author_id = 1234)&#39;</span></pre>
 
-<p>You can also tell <a href="../../../classes/Sequel.html">Sequel</a> to
-cache the association result set and return it as an array:</p>
+<p>You can also tell <a href="../../../classes/Sequel.html"><code>Sequel</code></a> to cache the association result set and return it as an array:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span>, <span class="ruby-value">:cache</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>].<span class="ruby-identifier">books</span>.<span class="ruby-identifier">class</span> <span class="ruby-comment">#=&gt; Array</span></pre>
 
-<p>You can of course bypass the defaults and specify class names and key
-names:</p>
+<p>You can of course bypass the defaults and specify class names and key names:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> <span class="ruby-value">:parent</span>, <span class="ruby-value">:class</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-constant">Node</span>&#x000A;  <span class="ruby-identifier">belongs_to</span> <span class="ruby-value">:session</span>, <span class="ruby-value">:key</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:producer_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>Another useful option is :order, which sets the order for the association
-dataset:</p>
+<p>Another useful option is :order, which sets the order for the association dataset:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">has_many</span> <span class="ruby-value">:books</span>, <span class="ruby-value">:order</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-value">:title</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Author</span>[<span class="ruby-value">1234</span>].<span class="ruby-identifier">books</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment">#=&gt; &#39;SELECT * FROM books WHERE (author_id =</span></pre>
 
 <p>1234) ORDER BY title&#39;</p>
 
-<p>More information about associations can be found in the <a
-href="../../../classes/Sequel.html">Sequel</a> documentation.</p>
+<p>More information about associations can be found in the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> documentation.</p>
 
 <h3 id="label-Other+changes">Other changes<span><a href="#label-Other+changes">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
@@ -110,8 +97,7 @@ href="../../../classes/Sequel.html">Sequel</a> documentation.</p>
 <p>Changed SQLite adapter to catch RuntimeError raised when executing a</p>
 </li></ul>
 
-<p>statement and raise Error::InvalidStatement with the offending SQL and
-error message (#188).</p>
+<p>statement and raise Error::InvalidStatement with the offending SQL and error message (#188).</p>
 <ul><li>
 <p>Fixed Dataset#reverse to not raise for unordered dataset (#189).</p>
 </li><li>
