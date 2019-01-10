@@ -3275,7 +3275,7 @@ module Sequel
           if association.is_a?(SQL::AliasedExpression)
             expr = association.expression
             if expr.is_a?(SQL::Identifier)
-              expr = expr.value.to_sym
+              expr = expr.value
               if expr.is_a?(String)
                 expr = expr.to_sym
               end
