@@ -120,7 +120,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       end
     end
     @db = @c.new
-    @p = Proc.new do
+    @p = proc do
       create_table(:a, :foo=>:bar){Integer :a}
       add_column :a, :b, String
       add_index :a, :b

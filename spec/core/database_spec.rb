@@ -2607,7 +2607,7 @@ describe "Database extensions" do
     @db = Sequel.mock
   end
   after do
-    Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
+    Sequel::Database.instance_variable_set(:@initialize_hook, proc{|db| })
   end
 
   it "should be able to register an extension with a module have Database#extension extend the module" do
@@ -2707,7 +2707,7 @@ end
 
 describe "Database.after_initialize" do
   after do
-    Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
+    Sequel::Database.instance_variable_set(:@initialize_hook, proc{|db| })
   end
 
   it "should allow a block to be run after each new instance is created" do

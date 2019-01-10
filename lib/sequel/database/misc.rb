@@ -27,7 +27,7 @@ module Sequel
       :blob=>Sequel::SQL::Blob}.freeze
 
     # Nested hook Proc; each new hook Proc just wraps the previous one.
-    @initialize_hook = Proc.new {|db| }
+    @initialize_hook = proc{|db| }
 
     # Register a hook that will be run when a new Database is instantiated. It is
     # called with the new database handle.
@@ -35,7 +35,7 @@ module Sequel
       raise Error, "must provide block to after_initialize" unless block
       Sequel.synchronize do
         previous = @initialize_hook
-        @initialize_hook = Proc.new do |db|
+        @initialize_hook = proc do |db|
           previous.call(db)
           block.call(db)
         end

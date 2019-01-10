@@ -48,7 +48,7 @@ describe "Dataset#clone" do
   end
   
   it "should create an exact copy of the dataset" do
-    @dataset = @dataset.with_row_proc(Proc.new{|r| r})
+    @dataset = @dataset.with_row_proc(proc{|r| r})
     clone = @dataset.clone
     @dataset.dup.must_be_same_as @dataset
 
@@ -63,7 +63,7 @@ describe "Dataset#clone" do
   end
   
   it "should create an exact copy of the dataset when given an empty hash" do
-    @dataset = @dataset.with_row_proc(Proc.new{|r| r})
+    @dataset = @dataset.with_row_proc(proc{|r| r})
     clone = @dataset.clone({})
 
     clone.object_id.wont_equal @dataset.object_id
@@ -1877,7 +1877,7 @@ end
 
 describe "Dataset#naked" do
   it "should returned clone dataset without row_proc" do
-    d = Sequel.mock.dataset.with_row_proc(Proc.new{|r| r})
+    d = Sequel.mock.dataset.with_row_proc(proc{|r| r})
     d.naked.row_proc.must_be_nil
     d.row_proc.wont_be_nil
   end
