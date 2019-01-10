@@ -41,7 +41,8 @@ module Sequel
     #   # => 6
     #   DB[:table].interval{function(column)} # SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1
     #   # => 7
-    def interval(column=Sequel.virtual_row(&Proc.new))
+    def interval(column=(no_arg = true), &block)
+      column = Sequel.virtual_row(&block) if no_arg
       if loader = cached_placeholder_literalizer(:_interval_loader) do |pl|
           arg = pl.arg
           aggregate_dataset.limit(1).select((SQL::Function.new(:max, arg) - SQL::Function.new(:min, arg)).as(:interval))
@@ -60,7 +61,8 @@ module Sequel
     #   # => 1..10
     #   DB[:table].interval{function(column)} # SELECT max(function(column)) AS v1, min(function(column)) AS v2 FROM table LIMIT 1
     #   # => 0..7
-    def range(column=Sequel.virtual_row(&Proc.new))
+    def range(column=(no_arg = true), &block)
+      column = Sequel.virtual_row(&block) if no_arg
       r = if loader = cached_placeholder_literalizer(:_range_loader) do |pl|
             arg = pl.arg
             aggregate_dataset.limit(1).select(SQL::Function.new(:min, arg).as(:v1), SQL::Function.new(:max, arg).as(:v2))

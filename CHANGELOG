@@ -1,5 +1,7 @@
 === master
 
+* Avoid usage of Proc.new with implicit block as ruby 2.7+ deprecates this behavior (jeremyevans)
+
 * Allow Sequel[].as to be used for constructing aliases with eager_graph (e.g. Model.eager_graph(Sequel[:a].as(:b))) (jeremyevans) (#1588)
 
 === 5.16.0 (2019-01-02)

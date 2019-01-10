@@ -752,8 +752,8 @@ module Sequel
 
         # If +s+ is an array, map +s+ over the block.  Otherwise, just call the
         # block with +s+.
-        def transform(s)
-          s.is_a?(Array) ? s.map(&Proc.new) : (yield s)
+        def transform(s, &block)
+          s.is_a?(Array) ? s.map(&block) : (yield s)
         end
 
         # What eager limit strategy should be used when true is given as the value,

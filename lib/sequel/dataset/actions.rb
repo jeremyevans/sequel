@@ -58,7 +58,8 @@ module Sequel
     #   # => 3
     #   DB[:table].avg{function(column)} # SELECT avg(function(column)) FROM table LIMIT 1
     #   # => 1
-    def avg(arg=Sequel.virtual_row(&Proc.new))
+    def avg(arg=(no_arg = true), &block)
+      arg = Sequel.virtual_row(&block) if no_arg
       _aggregate(:avg, arg)
     end
   
@@ -450,7 +451,8 @@ module Sequel
     #   # => 10
     #   DB[:table].max{function(column)} # SELECT max(function(column)) FROM table LIMIT 1
     #   # => 7
-    def max(arg=Sequel.virtual_row(&Proc.new))
+    def max(arg=(no_arg = true), &block)
+      arg = Sequel.virtual_row(&block) if no_arg
       _aggregate(:max, arg)
     end
 
@@ -461,7 +463,8 @@ module Sequel
     #   # => 1
     #   DB[:table].min{function(column)} # SELECT min(function(column)) FROM table LIMIT 1
     #   # => 0
-    def min(arg=Sequel.virtual_row(&Proc.new))
+    def min(arg=(no_arg = true), &block)
+      arg = Sequel.virtual_row(&block) if no_arg
       _aggregate(:min, arg)
     end
 
@@ -733,7 +736,8 @@ module Sequel
     #   # => 55
     #   DB[:table].sum{function(column)} # SELECT sum(function(column)) FROM table LIMIT 1
     #   # => 10
-    def sum(arg=Sequel.virtual_row(&Proc.new))
+    def sum(arg=(no_arg = true), &block)
+      arg = Sequel.virtual_row(&block) if no_arg
       _aggregate(:sum, arg)
     end
 

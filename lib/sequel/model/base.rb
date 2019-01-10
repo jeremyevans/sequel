@@ -324,14 +324,14 @@ module Sequel
       # Any public methods in the dataset module will have class methods created that
       # call the method on the dataset, assuming that the class method is not already
       # defined.
-      def dataset_module(mod = nil)
+      def dataset_module(mod = nil, &block)
         if mod
-          raise Error, "can't provide both argument and block to Model.dataset_module" if block_given?
+          raise Error, "can't provide both argument and block to Model.dataset_module" if block
           dataset_extend(mod)
           mod
         else
           @dataset_module ||= dataset_module_class.new(self)
-          @dataset_module.module_eval(&Proc.new) if block_given?
+          @dataset_module.module_eval(&block) if block
           dataset_extend(@dataset_module)
           @dataset_module
         end

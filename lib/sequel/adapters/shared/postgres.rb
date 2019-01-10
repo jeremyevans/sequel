@@ -195,8 +195,8 @@ module Sequel
 
       # Set a conversion proc for the given oid.  The callable can
       # be passed either as a argument or a block.
-      def add_conversion_proc(oid, callable=Proc.new)
-        conversion_procs[oid] = callable
+      def add_conversion_proc(oid, callable=nil, &block)
+        conversion_procs[oid] = callable || block
       end
 
       # Add a conversion proc for a named type, using the given block.
