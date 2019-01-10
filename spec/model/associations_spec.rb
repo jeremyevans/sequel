@@ -4247,6 +4247,12 @@ describe "Sequel::Model Associations with clashing column names" do
     @Bar.exclude(Sequel::SQL::BooleanExpression.new(:IN, :foo, Sequel.function(:srf))).sql.must_equal 'SELECT * FROM bars WHERE (foo NOT IN srf())'
   end
 
+  it "should have working eager graphing methods when using SQL::Identifier inside SQL::AliasedExpression" do
+    @db.fetch = {:id=>1, :object_id=>2, :f_id=>1, :f_object_id=>2}
+    @Bar.eager_graph(Sequel[:foo].as(:f)).all.map{|o| [o, o.foo]}.must_equal [[@bar, @foo]]
+    @db.sqls.must_equal ["SELECT bars.id, bars.object_id, f.id AS f_id, f.object_id AS f_object_id FROM bars LEFT OUTER JOIN foos AS f ON (f.object_id = bars.object_id)"]
+  end
+
   it "should have working filter by associations with model instances" do
     @Bar.first(:foo=>@foo).must_equal @bar
     @db.sqls.must_equal ["SELECT * FROM bars WHERE (bars.object_id = 2) LIMIT 1"]

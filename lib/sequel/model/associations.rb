@@ -3273,7 +3273,15 @@ module Sequel
         # per-call determining of the alias base.
         def eager_graph_check_association(model, association)
           if association.is_a?(SQL::AliasedExpression)
-            SQL::AliasedExpression.new(check_association(model, association.expression), association.alias)
+            expr = association.expression
+            if expr.is_a?(SQL::Identifier)
+              expr = expr.value.to_sym
+              if expr.is_a?(String)
+                expr = expr.to_sym
+              end
+            end
+
+            SQL::AliasedExpression.new(check_association(model, expr), association.alias)
           else
             check_association(model, association)
           end
