@@ -357,7 +357,8 @@ module Sequel
       end
       
       # Add a column with the given name, type, and opts.
-      # See CreateTableGenerator#column for the available options.
+      # See CreateTableGenerator#column for the available options (except for +:index+, use a
+      # separate +add_index+ call to add an index for the column).
       #
       #   add_column(:name, String) # ADD COLUMN name varchar(255)
       #
@@ -399,7 +400,8 @@ module Sequel
       end
 
       # Add a foreign key with the given name and referencing the given table.
-      # See CreateTableGenerator#column for the available options.
+      # See CreateTableGenerator#column for the available options (except for +:index+, use a
+      # separate +add_index+ call to add an index for the column).
       #
       # You can also pass an array of column names for creating composite foreign
       # keys. In this case, it will assume the columns exist and will only add
