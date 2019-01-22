@@ -1,5 +1,7 @@
 === master
 
+* Support :preconnect_extensions Database option for loading extensions before :preconnect option (jeremyevans)
+
 * Avoid usage of Proc.new with implicit block as ruby 2.7+ deprecates this behavior (jeremyevans)
 
 * Allow Sequel[].as to be used for constructing aliases with eager_graph (e.g. Model.eager_graph(Sequel[:a].as(:b))) (jeremyevans) (#1588)

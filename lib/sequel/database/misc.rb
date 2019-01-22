@@ -97,14 +97,19 @@ module Sequel
     # Accepts the following options:
     # :cache_schema :: Whether schema should be cached for this Database instance
     # :default_string_column_size :: The default size of string columns, 255 by default.
+    # :extensions :: Extensions to load into this Database instance.  Can be a symbol, array of symbols,
+    #                or string with extensions separated by columns.  These extensions are loaded after
+    #                connections are made by the :preconnect option.
     # :keep_reference :: Whether to keep a reference to this instance in Sequel::DATABASES, true by default.
     # :logger :: A specific logger to use.
     # :loggers :: An array of loggers to use.
     # :log_connection_info :: Whether connection information should be logged when logging queries.
     # :log_warn_duration :: The number of elapsed seconds after which queries should be logged at warn level.
-    # :name :: A name to use for the Database object.
-    # :preconnect :: Whether to automatically connect to the maximum number of servers.  Can use a valid
-    #                of 'concurrently' to preconnect in separate threads.
+    # :name :: A name to use for the Database object, displayed in PoolTimeout .
+    # :preconnect :: Whether to setup the maximum number of connections during initialization.
+    #                Can use a value of 'concurrently' to preconnect in separate threads.
+    # :preconnect_extensions :: Similar to the :extensions option, but loads the extensions before the
+    #                           connections are made by the :preconnect option.
     # :quote_identifiers :: Whether to quote identifiers.
     # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .
     # :single_threaded :: Whether to use a single-threaded connection pool.
@@ -147,23 +152,15 @@ module Sequel
         Sequel.synchronize{::Sequel::DATABASES.push(self)}
       end
       Sequel::Database.run_after_initialize(self)
+
+      initialize_load_extensions(:preconnect_extensions)
+
       if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
         concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
         @pool.send(:preconnect, concurrent)
       end
 
-      case exts = @opts[:extensions]
-      when String
-        extension(*exts.split(',').map(&:to_sym))
-      when Array
-        extension(*exts)
-      when Symbol
-        extension(exts)
-      when nil
-        # nothing
-      else
-        raise Error, "unsupported Database :extensions option: #{@opts[:extensions].inspect}"
-      end
+      initialize_load_extensions(:extensions)
     end
 
     # Freeze internal data structures for the Database instance.
@@ -412,6 +409,22 @@ module Sequel
       opts[:disconnect]
     end
     
+    # Load extensions during initialization from the given key in opts.
+    def initialize_load_extensions(key)
+      case exts = @opts[key]
+      when String
+        extension(*exts.split(',').map(&:to_sym))
+      when Array
+        extension(*exts)
+      when Symbol
+        extension(exts)
+      when nil
+        # nothing
+      else
+        raise Error, "unsupported Database #{key.inspect} option: #{@opts[key].inspect}"
+      end
+    end
+
     # Convert the given exception to an appropriate Sequel::DatabaseError
     # subclass, keeping message and backtrace.
     def raise_error(exception, opts=OPTS)

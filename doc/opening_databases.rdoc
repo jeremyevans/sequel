@@ -75,14 +75,23 @@ These options are shared by all adapters unless otherwise noted.
 
 :adapter :: The adapter to use
 :database :: The name of the database to which to connect
+:extensions :: Extensions to load into this Database instance.  Can be a symbol, array of symbols,
+               or string with extensions separated by columns.  These extensions are loaded after
+               connections are made by the :preconnect option.
 :cache_schema :: Whether schema should be cached for this database (true by default)
 :default_string_column_size :: The default size for string columns (255 by default)
 :host :: The hostname of the database server to which to connect
 :keep_reference :: Whether to keep a reference to the database in Sequel::DATABASES (true by default)
+:logger :: A specific SQL logger to log to
 :loggers :: An array of SQL loggers to log to
 :log_connection_info :: Whether to include connection information in log messages (false by default)
 :log_warn_duration :: The amount of seconds after which the queries are logged at :warn level
 :password :: The password for the user account
+:preconnect :: Whether to automatically make the maximum number of connections when setting up the pool.
+               Can be set to "concurrently" to connect in parallel.
+:preconnect_extensions :: Similar to the :extensions option, but loads the extensions before the
+                          connections are made by the :preconnect option.
+:quote_identifiers :: Whether to quote identifiers.
 :servers :: A hash with symbol keys and hash or proc values, used with primary/replica and sharded database configurations
 :sql_log_level :: The level at which to issue queries to the loggers (:info by default)
 :test :: Whether to test that a valid database connection can be made (true by default)
@@ -95,8 +104,6 @@ The following options can be specified and are passed to the database's internal
                   useful for customizations that you want to apply to all connections (nil by default).
 :max_connections :: The maximum size of the connection pool (4 connections by default on most databases)
 :pool_timeout :: The number of seconds to wait if a connection cannot be acquired before raising an error (5 seconds by default)
-:preconnect :: Whether to automatically make the maximum number of connections when setting up the pool.
-               Can be set to "concurrently" to connect in parallel.
 :single_threaded :: Whether to use a single-threaded (non-thread safe) connection pool
 
 == Adapter specific connection options

@@ -2676,6 +2676,29 @@ describe "Database extensions" do
     proc{Sequel.mock(:extensions=>nil).a}.must_raise NoMethodError
     proc{Sequel.mock(:extensions=>Object.new)}.must_raise Sequel::Error
   end
+
+  it "should support :preconnect_extensions Database option to load extensions before :preconnect" do
+    x = []
+    Sequel::Database.register_extension(:a, Module.new{define_singleton_method(:extended){|_| x << :a}})
+    Sequel::Database.register_extension(:b, Module.new{define_singleton_method(:extended){|_| x << :b}})
+    c = Class.new(Sequel::Database) do
+      def dataset_class_default; Sequel::Dataset end
+      define_method(:connect) do |_|
+        x << :c
+        :connect
+      end
+    end
+
+    db = c.new(:max_connections=>2, :preconnect=>true, :preconnect_extensions=>:a, :extensions=>:b)
+    db.pool.size.must_equal db.pool.max_size
+    x.must_equal [:a, :c, :c, :b]
+
+    x.clear
+    db = c.new(:max_connections=>3, :preconnect=>:concurrently, :preconnect_extensions=>:b, :extensions=>:a)
+    x.must_equal [:b, :c, :c, :c, :a]
+    db.pool.size.must_equal db.pool.max_size
+  end
+  
 end
 
 describe "Database specific exception classes" do
