@@ -197,19 +197,12 @@ module Sequel
 
 
           unless skip.include?(:not_null)
+            not_null_method = model.auto_validate_presence? ? :validates_presence : :validates_not_null
             unless (not_null_columns = model.auto_validate_not_null_columns).empty?
-              if model.auto_validate_presence?
-                validates_presence(not_null_columns, opts[:not_null])
-              else
-                validates_not_null(not_null_columns, opts[:not_null])
-              end
+              public_send(not_null_method, not_null_columns, opts[:not_null])
             end
             unless (not_null_columns = model.auto_validate_explicit_not_null_columns).empty?
-              if model.auto_validate_presence?
-                validates_presence(not_null_columns, opts[:explicit_not_null])
-              else
-                validates_not_null(not_null_columns, opts[:explicit_not_null])
-              end
+              public_send(not_null_method, not_null_columns, opts[:explicit_not_null])
             end
           end
 
