@@ -111,6 +111,9 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal false
     @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
 
+    @m.skip_auto_validations(:types, :unique) do
+      @m.valid?.must_equal true
+    end
     @m.skip_auto_validations(:types) do
       @m.valid?.must_equal false
       @m.errors.must_equal([:name, :num]=>["is already taken"])

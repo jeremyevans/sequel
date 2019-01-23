@@ -1,5 +1,7 @@
 === master
 
+* Support skip_auto_validations instance method in auto_validations plugin (oldgreen, jeremyevans) (#1592)
+
 * Support :preconnect_extensions Database option for loading extensions before :preconnect option (jeremyevans)
 
 * Avoid usage of Proc.new with implicit block as ruby 2.7+ deprecates this behavior (jeremyevans)

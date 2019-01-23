@@ -32,7 +32,7 @@ module Sequel
     #
     # It is possible to skip auto validations on a per-model-instance basis via:
     #
-    #   instance.skip_auto_validations(:unique) do
+    #   instance.skip_auto_validations(:unique, :not_null) do
     #     puts instance.valid?
     #   end
     #
@@ -64,6 +64,7 @@ module Sequel
       MAX_LENGTH_OPTIONS = {:from=>:values, :allow_nil=>true}.freeze
       SCHEMA_TYPES_OPTIONS = NOT_NULL_OPTIONS
       UNIQUE_OPTIONS = NOT_NULL_OPTIONS
+      EMPTY_ARRAY = [].freeze
 
       def self.apply(model, opts=OPTS)
         model.instance_exec do
@@ -178,56 +179,56 @@ module Sequel
       end
 
       module InstanceMethods
-        def skip_auto_validations(type = :all)
-          begin
-            @_skip_auto_validations = type
-            yield
-          ensure
-            @_skip_auto_validations = nil
-          end
+        # Skip the given types of auto validations on this instance inside the block.
+        def skip_auto_validations(*types)
+          types << :all if types.empty?
+          @_skip_auto_validations = types
+          yield
+        ensure
+          @_skip_auto_validations = nil
         end
 
         # Validate the model's auto validations columns
         def validate
           super
-          unless @_skip_auto_validations == :all
-            opts = model.auto_validate_options
+          skip = @_skip_auto_validations || EMPTY_ARRAY
+          return if skip.include?(:all)
+          opts = model.auto_validate_options
 
-            unless @_skip_auto_validations == :not_null
-              unless (not_null_columns = model.auto_validate_not_null_columns).empty?
-                if model.auto_validate_presence?
-                  validates_presence(not_null_columns, opts[:not_null])
-                else
-                  validates_not_null(not_null_columns, opts[:not_null])
-                end
-              end
-              unless (not_null_columns = model.auto_validate_explicit_not_null_columns).empty?
-                if model.auto_validate_presence?
-                  validates_presence(not_null_columns, opts[:explicit_not_null])
-                else
-                  validates_not_null(not_null_columns, opts[:explicit_not_null])
-                end
+
+          unless skip.include?(:not_null)
+            unless (not_null_columns = model.auto_validate_not_null_columns).empty?
+              if model.auto_validate_presence?
+                validates_presence(not_null_columns, opts[:not_null])
+              else
+                validates_not_null(not_null_columns, opts[:not_null])
               end
             end
-
-            unless (@_skip_auto_validations == :max_length) or
-              (max_length_columns = model.auto_validate_max_length_columns).empty?
-              max_length_columns.each do |col, len|
-                validates_max_length(len, col, opts[:max_length])
+            unless (not_null_columns = model.auto_validate_explicit_not_null_columns).empty?
+              if model.auto_validate_presence?
+                validates_presence(not_null_columns, opts[:explicit_not_null])
+              else
+                validates_not_null(not_null_columns, opts[:explicit_not_null])
               end
             end
+          end
 
-            if model.auto_validate_types? and (@_skip_auto_validations != :types)
-              validates_schema_types(keys, opts[:schema_types])
+          unless skip.include?(:max_length) || (max_length_columns = model.auto_validate_max_length_columns).empty?
+            max_length_columns.each do |col, len|
+              validates_max_length(len, col, opts[:max_length])
             end
+          end
 
-            unless @_skip_auto_validations == :unique
-              unique_opts = Hash[opts[:unique]]
-              if model.respond_to?(:sti_dataset)
-                unique_opts[:dataset] = model.sti_dataset
-              end
-              model.auto_validate_unique_columns.each{|cols| validates_unique(cols, unique_opts)}
+          unless skip.include?(:types) || !model.auto_validate_types?
+            validates_schema_types(keys, opts[:schema_types])
+          end
+
+          unless skip.include?(:unique)
+            unique_opts = Hash[opts[:unique]]
+            if model.respond_to?(:sti_dataset)
+              unique_opts[:dataset] = model.sti_dataset
             end
+            model.auto_validate_unique_columns.each{|cols| validates_unique(cols, unique_opts)}
           end
         end
       end
