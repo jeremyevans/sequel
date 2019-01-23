@@ -96,6 +96,12 @@ describe "Sequel::Plugins::AutoValidations" do
   it "should allow skipping validations by type" do
     @c = Class.new(@c)
     @m = @c.new
+    @m.skip_auto_validations(:not_null) do
+      @m.valid?.must_equal true
+      @m.nnd = nil
+      @m.valid?.must_equal true
+    end
+    @m.set(:nnd => 'nnd')
     @c.skip_auto_validations(:not_null)
     @m.valid?.must_equal true
     @m.nnd = nil
@@ -105,10 +111,17 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal false
     @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
 
+    @m.skip_auto_validations(:types) do
+      @m.valid?.must_equal false
+      @m.errors.must_equal([:name, :num]=>["is already taken"])
+    end
     @c.skip_auto_validations(:types)
     @m.valid?.must_equal false
     @m.errors.must_equal([:name, :num]=>["is already taken"])
 
+    @m.skip_auto_validations(:unique) do
+      @m.valid?.must_equal true
+    end
     @c.skip_auto_validations(:unique)
     @m.valid?.must_equal true
 
@@ -116,12 +129,23 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal false
     @m.errors.must_equal(:name=>["is longer than 50 characters"])
 
+    @m.skip_auto_validations(:max_length) do
+      @m.valid?.must_equal true
+    end
     @c.skip_auto_validations(:max_length)
     @m.valid?.must_equal true
   end
 
   it "should allow skipping all auto validations" do
     @c = Class.new(@c)
+    @m = @c.new
+    @m.skip_auto_validations(:all) do
+      @m.valid?.must_equal true
+      @m.set(:d=>'/', :num=>'a', :name=>'1')
+      @m.valid?.must_equal true
+      @m.set(:name=>'a'*51)
+      @m.valid?.must_equal true
+    end
     @m = @c.new
     @c.skip_auto_validations(:all)
     @m.valid?.must_equal true
