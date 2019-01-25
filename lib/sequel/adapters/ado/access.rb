@@ -111,7 +111,7 @@ module Sequel
               log_connection_yield(sql, conn){conn.Execute(sql)}
               last_insert_sql = "SELECT @@IDENTITY"
               res = log_connection_yield(last_insert_sql, conn){conn.Execute(last_insert_sql)}
-              res.getRows.transpose.each{|r| return r.shift}
+              res.GetRows.transpose.each{|r| return r.shift}
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)
             end
@@ -296,7 +296,7 @@ module Sequel
           execute_open_ado_schema(type, criteria) do |s|
             cols = []
             s.Fields.each{|f| cols << f.Name}
-            s.getRows.transpose.each do |r|
+            s.GetRows.transpose.each do |r|
               row = {}
               cols.each{|c| row[c] = r.shift}
               yield row
