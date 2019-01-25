@@ -7,17 +7,14 @@ module Sequel
     module MSSQL
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
-        # Issue a separate query to get the rows modified.  ADO appears to
-        # use pass by reference with an integer variable, which is
-        # not supported directly in ruby, and I'm not aware of a workaround.
+
         def execute_dui(sql, opts=OPTS)
           return super unless @opts[:provider]
           synchronize(opts[:server]) do |conn|
             begin
-              log_connection_yield(sql, conn){conn.Execute(sql)}
-              rows_affected_sql = "SELECT @@ROWCOUNT AS AffectedRows"
-              res = log_connection_yield(rows_affected_sql, conn){conn.Execute(rows_affected_sql)}
-              res.getRows.transpose.each{|r| return r.shift}
+              sql = "SET NOCOUNT ON; #{sql}; SELECT @@ROWCOUNT"
+              rst = log_connection_yield(sql, conn){conn.Execute(sql)}
+              rst.GetRows[0][0]
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)
             end
