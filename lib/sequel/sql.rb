@@ -18,7 +18,8 @@ module Sequel
   end
 
   # Time subclass that gets literalized with only the time value, so it operates
-  # like a standard SQL time type.
+  # like a standard SQL time type.  This type does not support timezones, by design,
+  # so it will not work correctly with <tt>time with time zone</tt> types.
   class SQLTime < ::Time
     @date = nil
 
