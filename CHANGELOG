@@ -1,4 +1,4 @@
-=== master
+=== 5.17.0 (2019-02-01)
 
 * Support skip_auto_validations instance method in auto_validations plugin (oldgreen, jeremyevans) (#1592)
 
