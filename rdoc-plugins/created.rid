@@ -1,4 +1,4 @@
-Wed, 02 Jan 2019 10:15:52 -0800
+Fri, 01 Feb 2019 08:19:51 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -62,7 +62,7 @@ lib/sequel/extensions/s.rb	Wed, 21 Jun 2017 13:54:47 -0700
 lib/sequel/extensions/schema_caching.rb	Sun, 25 Feb 2018 09:15:12 -0800
 lib/sequel/extensions/schema_dumper.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/extensions/select_remove.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/extensions/sequel_4_dataset_methods.rb	Fri, 30 Jun 2017 07:59:10 -0700
+lib/sequel/extensions/sequel_4_dataset_methods.rb	Thu, 10 Jan 2019 07:53:39 -0800
 lib/sequel/extensions/server_block.rb	Tue, 16 May 2017 17:16:37 -0700
 lib/sequel/extensions/server_logging.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/extensions/split_array_nil.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -84,7 +84,7 @@ lib/sequel/plugins/after_initialize.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/association_dependencies.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/association_pks.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/association_proxies.rb	Wed, 18 Apr 2018 08:29:10 -0700
-lib/sequel/plugins/auto_validations.rb	Tue, 01 Aug 2017 08:12:01 -0700
+lib/sequel/plugins/auto_validations.rb	Wed, 23 Jan 2019 08:01:55 -0800
 lib/sequel/plugins/before_after_save.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/blacklist_security.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/boolean_readers.rb	Tue, 01 Aug 2017 08:12:01 -0700

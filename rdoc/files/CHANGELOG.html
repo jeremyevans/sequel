@@ -30,12 +30,23 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-01-02 10:09:14 -0800</span>
+<span class='datetime'>2019-02-01 08:14:28 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.17.0+-282019-02-01-29">5.17.0 (2019-02-01)<span><a href="#label-5.17.0+-282019-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support skip_auto_validations instance method in auto_validations plugin (oldgreen, jeremyevans) (#1592)</p>
+</li><li>
+<p>Support :preconnect_extensions Database option for loading extensions before :preconnect option (jeremyevans)</p>
+</li><li>
+<p>Avoid usage of Proc.new with implicit block as ruby 2.7+ deprecates this behavior (jeremyevans)</p>
+</li><li>
+<p>Allow Sequel[].as to be used for constructing aliases with eager_graph (e.g. <a href=":a">Model.eager_graph(Sequel</a>.as(:b))) (jeremyevans) (#1588)</p>
+</li></ul>
+
 <h3 id="label-5.16.0+-282019-01-02-29">5.16.0 (2019-01-02)<span><a href="#label-5.16.0+-282019-01-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Convert integer columns to bigint columns when copying SQLite databases to other databases using bin/sequel -C (jeremyevans) (#1584)</p>

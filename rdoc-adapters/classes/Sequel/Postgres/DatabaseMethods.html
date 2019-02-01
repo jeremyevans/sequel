@@ -233,7 +233,7 @@ end_sql
 <a name='method-i-add_conversion_proc'></a>
 <div class='synopsis'>
 <span class='name'>add_conversion_proc</span>
-<span class='arguments'>(oid, callable=Proc.new)</span>
+<span class='arguments'>(oid, callable=nil, &block)</span>
 
 </div>
 <div class='description'>
@@ -245,7 +245,7 @@ end_sql
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-add_conversion_proc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-add_conversion_proc-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">198</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_conversion_proc</span>(<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">callable</span>=<span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>)&#x000A;<span class="line-num">199</span>   <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">callable</span>&#x000A;<span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-add_conversion_proc-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">198</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">add_conversion_proc</span>(<span class="ruby-identifier">oid</span>, <span class="ruby-identifier">callable</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">199</span>   <span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">callable</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">block</span>&#x000A;<span class="line-num">200</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-add_named_conversion_proc'>

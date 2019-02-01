@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-12-07 10:50:17 -0800</span>
+<span class='datetime'>2019-01-21 20:58:02 -0800</span>
 </div>
 </div>
 <div id='content'>
@@ -94,6 +94,8 @@ Last Update:
 <p>The adapter to use</p>
 </td></tr><tr><td class='label'>:database </td><td>
 <p>The name of the database to which to connect</p>
+</td></tr><tr><td class='label'>:extensions </td><td>
+<p>Extensions to load into this Database instance.  Can be a symbol, array of symbols, or string with extensions separated by columns.  These extensions are loaded after connections are made by the :preconnect option.</p>
 </td></tr><tr><td class='label'>:cache_schema </td><td>
 <p>Whether schema should be cached for this database (true by default)</p>
 </td></tr><tr><td class='label'>:default_string_column_size </td><td>
@@ -102,6 +104,8 @@ Last Update:
 <p>The hostname of the database server to which to connect</p>
 </td></tr><tr><td class='label'>:keep_reference </td><td>
 <p>Whether to keep a reference to the database in Sequel::DATABASES (true by default)</p>
+</td></tr><tr><td class='label'>:logger </td><td>
+<p>A specific SQL logger to log to</p>
 </td></tr><tr><td class='label'>:loggers </td><td>
 <p>An array of SQL loggers to log to</p>
 </td></tr><tr><td class='label'>:log_connection_info </td><td>
@@ -110,6 +114,12 @@ Last Update:
 <p>The amount of seconds after which the queries are logged at :warn level</p>
 </td></tr><tr><td class='label'>:password </td><td>
 <p>The password for the user account</p>
+</td></tr><tr><td class='label'>:preconnect </td><td>
+<p>Whether to automatically make the maximum number of connections when setting up the pool. Can be set to “concurrently” to connect in parallel.</p>
+</td></tr><tr><td class='label'>:preconnect_extensions </td><td>
+<p>Similar to the :extensions option, but loads the extensions before the connections are made by the :preconnect option.</p>
+</td></tr><tr><td class='label'>:quote_identifiers </td><td>
+<p>Whether to quote identifiers.</p>
 </td></tr><tr><td class='label'>:servers </td><td>
 <p>A hash with symbol keys and hash or proc values, used with primary/replica and sharded database configurations</p>
 </td></tr><tr><td class='label'>:sql_log_level </td><td>
@@ -127,8 +137,6 @@ Last Update:
 <p>The maximum size of the connection pool (4 connections by default on most databases)</p>
 </td></tr><tr><td class='label'>:pool_timeout </td><td>
 <p>The number of seconds to wait if a connection cannot be acquired before raising an error (5 seconds by default)</p>
-</td></tr><tr><td class='label'>:preconnect </td><td>
-<p>Whether to automatically make the maximum number of connections when setting up the pool. Can be set to “concurrently” to connect in parallel.</p>
 </td></tr><tr><td class='label'>:single_threaded </td><td>
 <p>Whether to use a single-threaded (non-thread safe) connection pool</p>
 </td></tr></tbody></table>
