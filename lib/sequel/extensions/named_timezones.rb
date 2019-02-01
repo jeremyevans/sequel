@@ -63,24 +63,41 @@ module Sequel
 
     private 
     
-    # Assume the given DateTime has a correct time but a wrong timezone.  It is
-    # currently in UTC timezone, but it should be converted to the input_timezone.
-    # Keep the time the same but convert the timezone to the input_timezone.
-    # Expects the input_timezone to be a TZInfo::Timezone instance.
-    def convert_input_datetime_other(v, input_timezone)
-      local_offset = input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset_rational
-      (v - local_offset).new_offset(local_offset)
-    end
+    # Handle both TZInfo 1 and TZInfo 2
+    if defined?(TZInfo::VERSION) && TZInfo::VERSION > '2'
+      # :nodoc:
+      def convert_input_datetime_other(v, input_timezone)
+        local_offset = Rational(input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset, 86400)
+        (v - local_offset).new_offset(local_offset)
+      end
 
-    # Convert the given DateTime to use the given output_timezone.
-    # Expects the output_timezone to be a TZInfo::Timezone instance.
-    def convert_output_datetime_other(v, output_timezone)
-      # TZInfo converts times, but expects the given DateTime to have an offset
-      # of 0 and always leaves the timezone offset as 0
-      v = output_timezone.utc_to_local(v.new_offset(0))
-      local_offset = output_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset_rational
-      # Convert timezone offset from UTC to the offset for the output_timezone
-      (v - local_offset).new_offset(local_offset)
+      def convert_output_datetime_other(v, output_timezone)
+        v = output_timezone.utc_to_local(v.new_offset(0))
+
+        # Force DateTime output instead of TZInfo::DateTimeWithOffset
+        DateTime.jd(v.jd, v.hour, v.minute, v.second + v.sec_fraction, v.offset, v.start)
+      end
+      # :nodoc:
+    else
+      # Assume the given DateTime has a correct time but a wrong timezone.  It is
+      # currently in UTC timezone, but it should be converted to the input_timezone.
+      # Keep the time the same but convert the timezone to the input_timezone.
+      # Expects the input_timezone to be a TZInfo::Timezone instance.
+      def convert_input_datetime_other(v, input_timezone)
+        local_offset = input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset_rational
+        (v - local_offset).new_offset(local_offset)
+      end
+
+      # Convert the given DateTime to use the given output_timezone.
+      # Expects the output_timezone to be a TZInfo::Timezone instance.
+      def convert_output_datetime_other(v, output_timezone)
+        # TZInfo 1 converts times, but expects the given DateTime to have an offset
+        # of 0 and always leaves the timezone offset as 0
+        v = output_timezone.utc_to_local(v.new_offset(0))
+        local_offset = output_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset_rational
+        # Convert timezone offset from UTC to the offset for the output_timezone
+        (v - local_offset).new_offset(local_offset)
+      end
     end
     
     # Returns TZInfo::Timezone instance if given a String.

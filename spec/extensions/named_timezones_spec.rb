@@ -73,11 +73,13 @@ describe "Sequel named_timezones extension" do
 
   it "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30')
+    dt.must_be_instance_of DateTime
     dt.must_equal @dt
     dt.offset.must_equal(-7/24.0)
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30')
-    dt.must_equal @dt + 1/6.0
+    dt.must_be_instance_of DateTime
+    dt.must_equal(@dt + 1/6.0)
     dt.offset.must_equal(-7/24.0)
   end
   
