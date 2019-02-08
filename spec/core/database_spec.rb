@@ -2681,10 +2681,11 @@ describe "Database extensions" do
     x = []
     Sequel::Database.register_extension(:a, Module.new{define_singleton_method(:extended){|_| x << :a}})
     Sequel::Database.register_extension(:b, Module.new{define_singleton_method(:extended){|_| x << :b}})
+    m = Mutex.new
     c = Class.new(Sequel::Database) do
       def dataset_class_default; Sequel::Dataset end
       define_method(:connect) do |_|
-        x << :c
+        m.synchronize{x << :c}
         :connect
       end
     end
