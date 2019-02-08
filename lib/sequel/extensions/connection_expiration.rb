@@ -31,7 +31,10 @@
 #
 module Sequel
   module ConnectionExpiration
-    class Retry < Error; end
+    class Retry < Error
+      RETRY = new
+      RETRY.set_backtrace([])
+    end
 
     # The number of seconds that need to pass since
     # connection creation before expiring a connection.
@@ -84,7 +87,7 @@ module Sequel
           end
 
           disconnect_connection(conn)
-          raise Retry
+          raise Retry::RETRY
         end
       rescue Retry
         retry

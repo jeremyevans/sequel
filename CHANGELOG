@@ -1,5 +1,7 @@
 === master
 
+* Avoid creating backtraces for flow-control exceptions in connection_expiration and connection_validator extensions (jeremyevans)
+
 * Support tzinfo 2 in addition to tzinfo 1 in the named_timezones extension (jeremyevans) (#1596)
 
 === 5.17.0 (2019-02-01)

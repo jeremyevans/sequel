@@ -50,7 +50,10 @@
 #
 module Sequel
   module ConnectionValidator
-    class Retry < Error; end
+    class Retry < Error
+      RETRY = new
+      RETRY.set_backtrace([])
+    end
 
     # The number of seconds that need to pass since
     # connection checkin before attempting to validate
@@ -107,7 +110,7 @@ module Sequel
           end
 
           disconnect_connection(conn)
-          raise Retry
+          raise Retry::RETRY
         end
       rescue Retry
         retry
