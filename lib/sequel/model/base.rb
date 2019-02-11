@@ -1459,7 +1459,7 @@ module Sequel
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
         unless _save_valid?(opts)
-          raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
+          raise(validation_failed_error) if raise_on_failure?(opts)
           return
         end
         checked_save_failure(opts){checked_transaction(opts){_save(opts)}}
@@ -1916,6 +1916,11 @@ module Sequel
         Errors
       end
 
+      # A HookFailed exception for the given message tied to the current instance.
+      def hook_failed_error(msg)
+        HookFailed.new(msg, self)
+      end
+  
       # Clone constructor -- freeze internal data structures if the original's
       # are frozen.
       def initialize_clone(other)
@@ -1965,9 +1970,9 @@ module Sequel
           "a hook failed"
         end
 
-        raise HookFailed.new(msg, self)
+        raise hook_failed_error(msg)
       end
-  
+
       # Get the ruby class or classes related to the given column's type.
       def schema_type_class(column)
         if (sch = db_schema[column]) && (type = sch[:type])
@@ -2059,6 +2064,11 @@ module Sequel
       # object's default (if set), or class's default (if not).
       def use_transaction?(opts = OPTS)
         opts.fetch(:transaction, use_transactions)
+      end
+
+      # An ValidationFailed exception instance to raise for this instance.
+      def validation_failed_error
+        ValidationFailed.new(self)
       end
     end
 

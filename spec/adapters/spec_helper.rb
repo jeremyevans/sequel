@@ -20,6 +20,7 @@ Sequel::Database.extension :duplicate_column_handler if ENV['SEQUEL_DUPLICATE_CO
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
 Sequel::Model.plugin :prepared_statements if ENV['SEQUEL_MODEL_PREPARED_STATEMENTS']
+Sequel::Model.plugin :throw_failures if ENV['SEQUEL_MODEL_THROW_FAILURES']
 Sequel::Model.cache_anonymous_models = false
 
 require_relative '../guards_helper'

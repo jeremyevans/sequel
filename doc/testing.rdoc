@@ -161,6 +161,7 @@ SEQUEL_FREEZE_DATABASE :: Freeze the database before running the integration spe
 SEQUEL_IDENTIFIER_MANGLING :: Use the identifier_mangling extension when running the specs
 SEQUEL_INTEGER64 :: Use the integer64 extension when running the adapter or integration specs
 SEQUEL_MODEL_PREPARED_STATEMENTS :: Use the prepared_statements plugin when running the specs
+SEQUEL_MODEL_THROW_FAILURES :: Use the throw_failures plugin when running the specs
 SEQUEL_NO_CACHE_ASSOCIATIONS :: Don't cache association metadata when running the specs
 SEQUEL_NO_CHECK_SQLS :: Don't check for specific SQL syntax when running the specs
 SEQUEL_CHECK_PENDING :: Try running all specs (note, can cause lockups for some adapters), and raise errors for skipped specs that don't fail
