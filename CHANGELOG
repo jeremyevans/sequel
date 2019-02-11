@@ -1,8 +1,8 @@
 === master
 
-* Add throw_failures plugin for throwing ValidationFailed and HookFailed exceptions instead of raising them, up to 10x on JRuby (jeremyevans)
+* Remove flow-control exceptions in connection_expiration and connection_validator extensions (jeremyevans)
 
-* Avoid creating backtraces for flow-control exceptions in connection_expiration and connection_validator extensions (jeremyevans)
+* Add throw_failures plugin for throwing ValidationFailed and HookFailed exceptions instead of raising them, up to 10x on JRuby (jeremyevans)
 
 * Support tzinfo 2 in addition to tzinfo 1 in the named_timezones extension (jeremyevans) (#1596)
 

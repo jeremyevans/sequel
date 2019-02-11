@@ -31,10 +31,8 @@
 #
 module Sequel
   module ConnectionExpiration
-    class Retry < Error
-      RETRY = new
-      RETRY.set_backtrace([])
-    end
+    class Retry < Error; end
+    Sequel::Deprecation.deprecate_constant(self, :Retry)
 
     # The number of seconds that need to pass since
     # connection creation before expiring a connection.
@@ -75,7 +73,8 @@ module Sequel
     # If it is expired, disconnect the connection, and retry with a new
     # connection.
     def acquire(*a)
-      begin
+      conn = nil
+      1.times do
         if (conn = super) &&
            (cet = sync{@connection_expiration_timestamps[conn]}) &&
            Sequel.elapsed_seconds_since(cet[0]) > cet[1]
@@ -87,10 +86,8 @@ module Sequel
           end
 
           disconnect_connection(conn)
-          raise Retry::RETRY
+          redo
         end
-      rescue Retry
-        retry
       end
 
       conn

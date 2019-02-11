@@ -50,10 +50,8 @@
 #
 module Sequel
   module ConnectionValidator
-    class Retry < Error
-      RETRY = new
-      RETRY.set_backtrace([])
-    end
+    class Retry < Error; end
+    Sequel::Deprecation.deprecate_constant(self, :Retry)
 
     # The number of seconds that need to pass since
     # connection checkin before attempting to validate
@@ -97,7 +95,9 @@ module Sequel
     # test the connection for validity.  If it is not valid,
     # disconnect the connection, and retry with a new connection.
     def acquire(*a)
-      begin
+      conn = nil
+
+      1.times do
         if (conn = super) &&
            (timer = sync{@connection_timestamps.delete(conn)}) &&
            Sequel.elapsed_seconds_since(timer) > @connection_validation_timeout &&
@@ -110,10 +110,8 @@ module Sequel
           end
 
           disconnect_connection(conn)
-          raise Retry::RETRY
+          redo
         end
-      rescue Retry
-        retry
       end
 
       conn
