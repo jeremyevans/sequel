@@ -588,9 +588,12 @@ describe Sequel::Model, ".fetch" do
   end
 
   it "should return true for .empty? and not raise an error on empty selection" do
-    rows = @c.fetch("SELECT * FROM items WHERE FALSE")
-    @c.send(:define_method, :fetch_rows){|sql| yield({:count => 0})}
-    rows.empty?
+    @c.dataset = @c.dataset.with_extend do
+      def fetch_rows(sql)
+        yield({:count => 0})
+      end
+    end
+    @c.fetch("SELECT * FROM items WHERE FALSE").empty?
   end
 end
 
