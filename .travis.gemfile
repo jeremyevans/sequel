@@ -11,7 +11,7 @@ gem 'tzinfo'
 
 if RUBY_VERSION < '2.1.0'
   gem 'nokogiri', '<1.7.0'
-if RUBY_VERSION < '2.3.0'
+elsif RUBY_VERSION < '2.3.0'
   gem 'nokogiri', '<1.10.0'
 else
   gem 'nokogiri'
