@@ -64,7 +64,7 @@ module Sequel
           end
         end
 
-        if RUBY_VERSION >= '2.2'
+        if RUBY_VERSION >= '2.2' && (!defined?(JRUBY_VERSION) || JRUBY_VERSION > '9.1')
           # Throw HookFailed with the generated error.  If the throw is not
           # caught, just return the originally generated error.
           def hook_failed_error(msg)
