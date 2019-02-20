@@ -245,6 +245,9 @@ module Sequel
       # it hasn't been disabled.
       def paged_each(opts=OPTS, &block)
         if STREAMING_SUPPORTED && opts[:stream] != false
+          unless block_given?
+            return enum_for(:paged_each, opts)
+          end
           stream.each(&block)
         else
           super

@@ -150,6 +150,10 @@ describe "Simple Dataset operations" do
     end
 
     rows = []
+    @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3).each{|row| rows << row}
+    rows.must_equal((26..75).map{|i| {:id=>i, :number=>i*10}})
+
+    rows = []
     @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3){|row| rows << row}
     rows.must_equal((26..75).map{|i| {:id=>i, :number=>i*10}})
 

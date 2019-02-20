@@ -612,6 +612,9 @@ module Sequel
       
       # Use a cursor for paging.
       def paged_each(opts=OPTS, &block)
+        unless block_given?
+          return enum_for(:paged_each, opts)
+        end
         use_cursor(opts).each(&block)
       end
 
