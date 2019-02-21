@@ -70,7 +70,12 @@ module Sequel
     #
     # Then you can do:
     #
-    #   artist.update_fields(params['artist'], %w'name albums_artists')
+    #   artist.update_fields(params['artist'], %w'name albums_attributes')
+    #
+    # Note that Rails 5+ does not use a Hash for submitted parameters, and therefore
+    # the above will not work.  With Rails 5+, you have to use:
+    #
+    #   artist.update_fields(params.to_unsafe_h['artist'], %w'name albums_attributes')
     #
     # To save changes to the artist, create the first album and associate it to the artist,
     # and update the other existing associated album.
