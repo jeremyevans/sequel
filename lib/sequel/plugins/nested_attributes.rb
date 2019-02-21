@@ -79,6 +79,12 @@ module Sequel
     #
     # To save changes to the artist, create the first album and associate it to the artist,
     # and update the other existing associated album.
+    #
+    # You can pass options for individual nested attributes, which will override the default
+    # nested attributes options for that association.  This is useful for per-call filtering
+    # of the allowed fields:
+    #
+    #   a.set_nested_attributes(:albums, params['artist'], :fields=>%w'name')
     module NestedAttributes
       # Depend on the validate_associated plugin.
       def self.apply(model)
