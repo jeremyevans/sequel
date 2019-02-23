@@ -21,4 +21,8 @@ describe "Sequel::Plugins::AfterInitialize" do
   it "should have after_initialize hook be called for objects loaded from the database" do
     @c.call(:id=>1, :name=>'foo').values.must_equal(:id=>3, :name=>'foofoo')
   end
+
+  it "should not allow .call to be called without arguments" do
+    proc{@c.call}.must_raise ArgumentError
+  end
 end

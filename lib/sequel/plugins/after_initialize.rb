@@ -15,7 +15,7 @@ module Sequel
     module AfterInitialize
       module ClassMethods
         # Call after_initialize for model objects loaded from the database.
-        def call(h={})
+        def call(_)
           v = super
           v.after_initialize
           v
