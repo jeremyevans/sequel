@@ -7,67 +7,72 @@ module Sequel
   module SQLite
     FALSE_VALUES = (%w'0 false f no n' + [0]).freeze
 
-    tt = Class.new do
-      def blob(s)
-        Sequel::SQL::Blob.new(s.to_s)
-      end
+    blob = Object.new
+    def blob.call(s)
+      Sequel::SQL::Blob.new(s.to_s)
+    end
 
-      def boolean(s)
-        s = s.downcase if s.is_a?(String)
-        !FALSE_VALUES.include?(s)
-      end
+    boolean = Object.new
+    def boolean.call(s)
+      s = s.downcase if s.is_a?(String)
+      !FALSE_VALUES.include?(s)
+    end
 
-      def date(s)
-        case s
-        when String
-          Sequel.string_to_date(s)
-        when Integer
-          Date.jd(s)
-        when Float
-          Date.jd(s.to_i)
-        else
-          raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
-        end
+    date = Object.new
+    def date.call(s)
+      case s
+      when String
+        Sequel.string_to_date(s)
+      when Integer
+        Date.jd(s)
+      when Float
+        Date.jd(s.to_i)
+      else
+        raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
       end
+    end
 
-      def integer(s)
-        s.to_i
-      end
+    integer = Object.new
+    def integer.call(s)
+      s.to_i
+    end
 
-      def float(s)
-        s.to_f
-      end
+    float = Object.new
+    def float.call(s)
+      s.to_f
+    end
 
-      def numeric(s)
-        s = s.to_s unless s.is_a?(String)
-        BigDecimal(s) rescue s
-      end
+    numeric = Object.new
+    def numeric.call(s)
+      s = s.to_s unless s.is_a?(String)
+      BigDecimal(s) rescue s
+    end
 
-      def time(s)
-        case s
-        when String
-          Sequel.string_to_time(s)
-        when Integer
-          Sequel::SQLTime.create(s/3600, (s % 3600)/60, s % 60)
-        when Float
-          s, f = s.divmod(1)
-          Sequel::SQLTime.create(s/3600, (s % 3600)/60, s % 60, (f*1000000).round)
-        else
-          raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
-        end
+    time = Object.new
+    def time.call(s)
+      case s
+      when String
+        Sequel.string_to_time(s)
+      when Integer
+        Sequel::SQLTime.create(s/3600, (s % 3600)/60, s % 60)
+      when Float
+        s, f = s.divmod(1)
+        Sequel::SQLTime.create(s/3600, (s % 3600)/60, s % 60, (f*1000000).round)
+      else
+        raise Sequel::Error, "unhandled type when converting to date: #{s.inspect} (#{s.class.inspect})"
       end
-    end.new
+    end
 
     # Hash with string keys and callable values for converting SQLite types.
     SQLITE_TYPES = {}
     {
-      %w'date' => tt.method(:date),
-      %w'time' => tt.method(:time),
-      %w'bit bool boolean' => tt.method(:boolean),
-      %w'integer smallint mediumint int bigint' => tt.method(:integer),
-      %w'numeric decimal money' => tt.method(:numeric),
-      %w'float double real dec fixed' + ['double precision'] => tt.method(:float),
-      %w'blob' => tt.method(:blob)
+      %w'date' => date,
+      %w'time' => time,
+      %w'bit bool boolean' => boolean,
+      %w'integer smallint mediumint int bigint' => integer,
+      %w'numeric decimal money' => numeric,
+      %w'float double real dec fixed' + ['double precision'] => float,
+      %w'blob' => blob
     }.each do |k,v|
       k.each{|n| SQLITE_TYPES[n] = v}
     end

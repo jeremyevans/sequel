@@ -78,12 +78,14 @@ module Sequel
           super
           @type_convertor_map[Java::JavaSQL::Types::INTEGER] = @type_convertor_map[Java::JavaSQL::Types::BIGINT]
           @basic_type_convertor_map[Java::JavaSQL::Types::INTEGER] = @basic_type_convertor_map[Java::JavaSQL::Types::BIGINT]
-          @type_convertor_map[Java::JavaSQL::Types::DATE] = lambda do |r, i|
+          x = @type_convertor_map[Java::JavaSQL::Types::DATE] = Object.new
+          def x.call(r, i)
             if v = r.getString(i)
               Sequel.string_to_date(v)
             end
           end
-          @type_convertor_map[Java::JavaSQL::Types::BLOB] = lambda do |r, i|
+          x = @type_convertor_map[Java::JavaSQL::Types::BLOB] = Object.new
+          def x.call(r, i)
             if v = r.getBytes(i)
               Sequel::SQL::Blob.new(String.from_java_bytes(v))
             elsif !r.wasNull

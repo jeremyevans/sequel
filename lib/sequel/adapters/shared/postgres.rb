@@ -23,43 +23,47 @@ module Sequel
     PLUS_INFINITY   = 1.0/0.0
     MINUS_INFINITY  = -1.0/0.0
 
-    TYPE_TRANSLATOR = tt = Class.new do
-      def boolean(s) s == 't' end
-      def integer(s) s.to_i end
-      def float(s) 
-        case s
-        when 'NaN'
-          NAN
-        when 'Infinity'
-          PLUS_INFINITY
-        when '-Infinity'
-          MINUS_INFINITY
-        else
-          s.to_f 
-        end
+    boolean = Object.new
+    def boolean.call(s) s == 't' end
+    integer = Object.new
+    def integer.call(s) s.to_i end
+    float = Object.new
+    def float.call(s) 
+      case s
+      when 'NaN'
+        NAN
+      when 'Infinity'
+        PLUS_INFINITY
+      when '-Infinity'
+        MINUS_INFINITY
+      else
+        s.to_f 
       end
-      def date(s) ::Date.new(*s.split('-').map(&:to_i)) end
-      def bytea(str)
-        str = if str =~ /\A\\x/
-          # PostgreSQL 9.0+ bytea hex format
-          str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
-        else
-          # Historical PostgreSQL bytea escape format
-          str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
-            if s.size == 2 then s[1,1] else s[1,3].oct.chr end
-          }
-        end
-        ::Sequel::SQL::Blob.new(str)
+    end
+    date = Object.new
+    def date.call(s) ::Date.new(*s.split('-').map(&:to_i)) end
+    TYPE_TRANSLATOR_DATE = date.freeze
+    bytea = Object.new
+    def bytea.call(str)
+      str = if str =~ /\A\\x/
+        # PostgreSQL 9.0+ bytea hex format
+        str[2..-1].gsub(/(..)/){|s| s.to_i(16).chr}
+      else
+        # Historical PostgreSQL bytea escape format
+        str.gsub(/\\(\\|'|[0-3][0-7][0-7])/) {|s|
+          if s.size == 2 then s[1,1] else s[1,3].oct.chr end
+        }
       end
-    end.new.freeze
+      ::Sequel::SQL::Blob.new(str)
+    end
 
     CONVERSION_PROCS = {}
 
     {
-      [16] => tt.method(:boolean),
-      [17] => tt.method(:bytea),
-      [20, 21, 23, 26] => tt.method(:integer),
-      [700, 701] => tt.method(:float),
+      [16] => boolean,
+      [17] => bytea,
+      [20, 21, 23, 26] => integer,
+      [700, 701] => float,
       [1700] => ::Kernel.method(:BigDecimal),
       [1083, 1266] => ::Sequel.method(:string_to_time),
       [1082] => ::Sequel.method(:string_to_date),

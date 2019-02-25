@@ -30,11 +30,6 @@ module Sequel
     end
 
     module SqlAnywhere
-      def self.SqlAnywhereBoolean(r, i)
-        v = r.getShort(i)
-        v != 0 unless r.wasNull
-      end
-
       module DatabaseMethods
         include Sequel::SqlAnywhere::DatabaseMethods
         include Sequel::JDBC::Transactions
@@ -58,7 +53,11 @@ module Sequel
         private
 
         SMALLINT_TYPE = Java::JavaSQL::Types::SMALLINT
-        BOOLEAN_METHOD = SqlAnywhere.method(:SqlAnywhereBoolean)
+        BOOLEAN_METHOD = Object.new
+        def BOOLEAN_METHOD.call(r, i)
+          v = r.getShort(i)
+          v != 0 unless r.wasNull
+        end
 
         def type_convertor(map, meta, type, i)
           if convert_smallint_to_bool && type == SMALLINT_TYPE

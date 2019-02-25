@@ -508,7 +508,7 @@ module Sequel
         @use_iso_date_format = typecast_value_boolean(@opts.fetch(:use_iso_date_format, true))
         initialize_postgres_adapter
         add_conversion_proc(17, method(:unescape_bytea)) if USES_PG
-        add_conversion_proc(1082, TYPE_TRANSLATOR.method(:date)) if @use_iso_date_format
+        add_conversion_proc(1082, TYPE_TRANSLATOR_DATE) if @use_iso_date_format
         self.convert_infinite_timestamps = @opts[:convert_infinite_timestamps]
       end
 

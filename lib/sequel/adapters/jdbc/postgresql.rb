@@ -14,24 +14,6 @@ module Sequel
     end
 
     module Postgres
-      # Return PostgreSQL array types as ruby Arrays instead of
-      # JDBC PostgreSQL driver-specific array type. Only used if the
-      # database does not have a conversion proc for the type.
-      def self.RubyPGArray(r, i)
-        if v = r.getArray(i)
-          v.array.to_ary
-        end
-      end 
-
-      # Return PostgreSQL hstore types as ruby Hashes instead of
-      # Java HashMaps.  Only used if the database does not have a
-      # conversion proc for the type.
-      def self.RubyPGHstore(r, i)
-        if v = r.getObject(i)
-          v.to_hash
-        end
-      end 
-
       module DatabaseMethods
         include Sequel::Postgres::DatabaseMethods
 
@@ -213,9 +195,27 @@ module Sequel
 
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
-        ARRAY_METHOD = Postgres.method(:RubyPGArray)
         PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze
-        HSTORE_METHOD = Postgres.method(:RubyPGHstore)
+
+        # Return PostgreSQL array types as ruby Arrays instead of
+        # JDBC PostgreSQL driver-specific array type. Only used if the
+        # database does not have a conversion proc for the type.
+        ARRAY_METHOD = Object.new
+        def ARRAY_METHOD.call(r, i)
+          if v = r.getArray(i)
+            v.array.to_ary
+          end
+        end 
+
+        # Return PostgreSQL hstore types as ruby Hashes instead of
+        # Java HashMaps.  Only used if the database does not have a
+        # conversion proc for the type.
+        HSTORE_METHOD = Object.new
+        def HSTORE_METHOD.call(r, i)
+          if v = r.getObject(i)
+            v.to_hash
+          end
+        end 
 
         def type_convertor(map, meta, type, i)
           case type

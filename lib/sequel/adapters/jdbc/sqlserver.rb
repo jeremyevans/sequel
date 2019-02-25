@@ -15,7 +15,8 @@ module Sequel
     end
 
     module SQLServer
-      def self.MSSQLRubyTime(r, i)
+      MSSQL_RUBY_TIME = Object.new
+      def MSSQL_RUBY_TIME.call(r, i)
         # MSSQL-Server TIME should be fetched as string to keep the precision intact, see:
         # https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients
         if v = r.getString(i)
@@ -29,7 +30,7 @@ module Sequel
         def setup_type_convertor_map
           super
           map = @type_convertor_map
-          map[Java::JavaSQL::Types::TIME] = SQLServer.method(:MSSQLRubyTime)
+          map[Java::JavaSQL::Types::TIME] = MSSQL_RUBY_TIME
 
           # Work around constant lazy loading in some drivers
           begin

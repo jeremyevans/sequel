@@ -57,45 +57,53 @@ module Sequel
     end
 
     class TypeConvertor
+      CONVERTORS = convertors = {}
       %w'Boolean Float Double Int Long Short'.each do |meth|
-        class_eval("def #{meth}(r, i) v = r.get#{meth}(i); v unless r.wasNull end", __FILE__, __LINE__)
+        x = convertors[meth.to_sym] = Object.new
+        class_eval("def x.call(r, i) v = r.get#{meth}(i); v unless r.wasNull end", __FILE__, __LINE__)
       end
       %w'Object Array String Time Date Timestamp BigDecimal Blob Bytes Clob'.each do |meth|
-        class_eval("def #{meth}(r, i) r.get#{meth}(i) end", __FILE__, __LINE__)
+        x = convertors[meth.to_sym] = Object.new
+        class_eval("def x.call(r, i) r.get#{meth}(i) end", __FILE__, __LINE__)
       end
-      def RubyTime(r, i)
+      x = convertors[:RubyTime] = Object.new
+      def x.call(r, i)
         if v = r.getTime(i)
           Sequel.string_to_time("#{v.to_string}.#{sprintf('%03i', v.getTime.divmod(1000).last)}")
         end
       end
-      def RubyDate(r, i)
+      x = convertors[:RubyDate] = Object.new
+      def x.call(r, i)
         if v = r.getDate(i)
           Date.civil(v.getYear + 1900, v.getMonth + 1, v.getDate)
         end
       end
-      def RubyTimestamp(r, i)
+      x = convertors[:RubyTimestamp] = Object.new
+      def x.call(r, i)
         if v = r.getTimestamp(i)
           Sequel.database_to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
         end
       end
-      def RubyBigDecimal(r, i)
+      x = convertors[:RubyBigDecimal] = Object.new
+      def x.call(r, i)
         if v = r.getBigDecimal(i)
           ::Kernel::BigDecimal(v.to_string)
         end
       end
-      def RubyBlob(r, i)
+      x = convertors[:RubyBlob] = Object.new
+      def x.call(r, i)
         if v = r.getBytes(i)
           Sequel::SQL::Blob.new(String.from_java_bytes(v))
         end
       end
-      def RubyClob(r, i)
+      x = convertors[:RubyClob] = Object.new
+      def x.call(r, i)
         if v = r.getClob(i)
           v.getSubString(1, v.length)
         end
       end
 
-      o = new
-      MAP = Hash.new(o.method(:Object))
+      MAP = Hash.new(convertors[:Object])
       types = Java::JavaSQL::Types
 
       {
@@ -113,7 +121,7 @@ module Sequel
         :TINYINT => :Short,
         :VARCHAR => :String,
       }.each do |type, meth|
-        MAP[types.const_get(type)] = o.method(meth) 
+        MAP[types.const_get(type)] = convertors[meth]
       end
       BASIC_MAP = MAP.dup
 
@@ -130,13 +138,11 @@ module Sequel
         :TIMESTAMP => :Timestamp,
         :VARBINARY => :Blob,
       }.each do |type, meth|
-        BASIC_MAP[types.const_get(type)] = o.method(meth) 
-        MAP[types.const_get(type)] = o.method(:"Ruby#{meth}") 
+        BASIC_MAP[types.const_get(type)] = convertors[meth]
+        MAP[types.const_get(type)] = convertors[:"Ruby#{meth}"]
       end
-
       MAP.freeze
       BASIC_MAP.freeze
-      freeze
     end
 
     class Database < Sequel::Database

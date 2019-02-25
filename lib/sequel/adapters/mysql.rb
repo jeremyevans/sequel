@@ -8,19 +8,22 @@ require_relative 'utils/mysql_prepared_statements'
 
 module Sequel
   module MySQL
-    TYPE_TRANSLATOR = tt = Class.new do
-      def boolean(s) s.to_i != 0 end
-      def integer(s) s.to_i end
-      def float(s) s.to_f end
-    end.new.freeze
+    boolean = Object.new
+    def boolean.call(s) s.to_i != 0 end
+    TYPE_TRANSLATOR_BOOLEAN = boolean.freeze
+    integer = Object.new
+    def integer.call(s) s.to_i end
+    TYPE_TRANSLATOR_INTEGER = integer.freeze
+    float = Object.new
+    def float.call(s) s.to_f end
 
     # Hash with integer keys and callable values for converting MySQL types.
     MYSQL_TYPES = {}
     {
       [0, 246] => ::Kernel.method(:BigDecimal),
-      [2, 3, 8, 9, 13, 247, 248] => tt.method(:integer),
-      [4, 5] => tt.method(:float),
-      [249, 250, 251, 252] => ::Sequel::SQL::Blob.method(:new)
+      [2, 3, 8, 9, 13, 247, 248] => integer,
+      [4, 5] => float,
+      [249, 250, 251, 252] => ::Sequel::SQL::Blob
     }.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
@@ -131,7 +134,7 @@ module Sequel
       # Modify the type translator used for the tinyint type based
       # on the value given.
       def convert_tinyint_to_bool=(v)
-        @conversion_procs[1] = TYPE_TRANSLATOR.method(v ? :boolean : :integer)
+        @conversion_procs[1] = v ? TYPE_TRANSLATOR_BOOLEAN : TYPE_TRANSLATOR_INTEGER
         @convert_tinyint_to_bool = v
       end
 

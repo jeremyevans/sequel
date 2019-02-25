@@ -16,8 +16,8 @@ module Sequel
 
     module Oracle
       JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
-
-      def self.OracleDecimal(r, i)
+      ORACLE_DECIMAL = Object.new
+      def ORACLE_DECIMAL.call(r, i)
         if v = r.getBigDecimal(i)
           i = v.long_value
           if v == JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i)
@@ -28,7 +28,8 @@ module Sequel
         end
       end 
 
-      def self.OracleClob(r, i)
+      ORACLE_CLOB = Object.new
+      def ORACLE_CLOB.call(r, i)
         return unless clob = r.getClob(i)
         str = clob.getSubString(1, clob.length)
         clob.freeTemporary if clob.isTemporary
@@ -110,8 +111,8 @@ module Sequel
 
         def setup_type_convertor_map
           super
-          @type_convertor_map[:OracleDecimal] = Oracle.method(:OracleDecimal)
-          @type_convertor_map[:OracleClob] = Oracle.method(:OracleClob)
+          @type_convertor_map[:OracleDecimal] = ORACLE_DECIMAL
+          @type_convertor_map[:OracleClob] = ORACLE_CLOB
         end
       end
       
