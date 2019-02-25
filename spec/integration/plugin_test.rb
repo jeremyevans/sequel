@@ -140,7 +140,7 @@ describe "Class Table Inheritance Plugin" do
   end
   
   it "should update rows in all tables" do
-    Executive.first.update(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
+    Executive[:id=>@i4].update(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     @db[:employees][:id=>@i4].must_equal(:id=>@i4, :name=>'Ex2', :kind=>'Executive')
     @db[:managers][:id=>@i4].must_equal(:id=>@i4, :num_staff=>9)
     @db[:executives][:id=>@i4].must_equal(:id=>@i4, :num_managers=>8)
