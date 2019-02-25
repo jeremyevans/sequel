@@ -1,5 +1,7 @@
 === master
 
+* Use while instead of each for inner loops in sqlite and jdbc adapters for better performance (jeremyevans)
+
 * Make after_initialize plugin not make the argument to Model.call optional (jeremyevans)
 
 * Allow Dataset#paged_each to be called without a block in the postgres and mysql2 adapters (jeremyevans)

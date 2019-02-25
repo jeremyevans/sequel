@@ -317,10 +317,13 @@ module Sequel
           cps = db.conversion_procs
           type_procs = result.types.map{|t| cps[base_type_name(t)]}
           cols = result.columns.map{|c| i+=1; [output_identifier(c), i, type_procs[i]]}
+          max = i+1
           self.columns = cols.map(&:first)
           result.each do |values|
             row = {}
-            cols.each do |name,id,type_proc|
+            i = -1
+            while (i += 1) < max
+              name, id, type_proc = cols[i]
               v = values[id]
               if type_proc && v
                 v = type_proc.call(v)

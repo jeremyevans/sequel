@@ -785,11 +785,14 @@ module Sequel
           i += 1
           cols << [output_identifier(meta.getColumnLabel(i)), i, convert ? type_convertor(map, meta, meta.getColumnType(i), i) : basic_type_convertor(map, meta, meta.getColumnType(i), i)]
         end
+        max = i
         self.columns = cols.map{|c| c[0]}
 
         while result.next
           row = {}
-          cols.each do |n, j, pr|
+          i = -1
+          while (i += 1) < max
+            n, j, pr = cols[i]
             row[n] = pr.call(result, j)
           end
           yield row
