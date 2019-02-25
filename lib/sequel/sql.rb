@@ -1020,6 +1020,11 @@ module Sequel
       include SQL::AliasMethods
       include SQL::CastMethods
 
+      class << self
+        # Alias new to call for usage in conversion procs
+        alias call new
+      end
+
       # Return a LiteralString with the same content if no args are given, otherwise
       # return a SQL::PlaceholderLiteralString with the current string and the given args.
       def lit(*args)

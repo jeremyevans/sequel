@@ -1,5 +1,7 @@
 === master
 
+* Add Sequel::SQL::Blob.call to avoid indirection when converting values from the database (jeremyevans)
+
 * Use while instead of each for inner loops in sqlite and jdbc adapters for better performance (jeremyevans)
 
 * Make after_initialize plugin not make the argument to Model.call optional (jeremyevans)

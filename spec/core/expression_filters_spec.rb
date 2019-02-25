@@ -1280,8 +1280,12 @@ describe "Sequel::SQL::Wrapper" do
   end
 end
 
-describe "Sequel::SQL::Blob#to_sequel_blob" do
-  it "should return self" do
+describe "Sequel::SQL::Blob" do
+  it ".call should be an alias for .new" do
+    Sequel::SQL::Blob.call('a').must_equal Sequel::SQL::Blob.new('a')
+  end
+
+  it "#to_sequel_blob should return self" do
     c = Sequel::SQL::Blob.new('a')
     c.to_sequel_blob.must_be_same_as(c)
   end
