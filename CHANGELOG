@@ -1,4 +1,4 @@
-=== master
+=== 5.18.0 (2019-03-01)
 
 * Use singleton .call methods on plain objects instead of procs/methods for faster type conversion (jeremyevans)
 
