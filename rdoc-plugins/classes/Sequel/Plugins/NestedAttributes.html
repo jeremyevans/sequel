@@ -79,9 +79,17 @@ Sequel::Plugins::NestedAttributes
 
 <p>Then you can do:</p>
 
-<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>(<span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-node">%w&#39;name albums_artists&#39;</span>)</pre>
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>(<span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-node">%w&#39;name albums_attributes&#39;</span>)</pre>
+
+<p>Note that Rails 5+ does not use a <a href="../../Hash.html"><code>Hash</code></a> for submitted parameters, and therefore the above will not work.  With Rails 5+, you have to use:</p>
+
+<pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update_fields</span>(<span class="ruby-identifier">params</span>.<span class="ruby-identifier">to_unsafe_h</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-node">%w&#39;name albums_attributes&#39;</span>)</pre>
 
 <p>To save changes to the artist, create the first album and associate it to the artist, and update the other existing associated album.</p>
+
+<p>You can pass options for individual nested attributes, which will override the default nested attributes options for that association.  This is useful for per-call filtering of the allowed fields:</p>
+
+<pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">set_nested_attributes</span>(<span class="ruby-value">:albums</span>, <span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;artist&#39;</span>], <span class="ruby-value">:fields</span><span class="ruby-operator">=&gt;</span><span class="ruby-node">%w&#39;name&#39;</span>)</pre>
 </div>
 <div id='method-list'>
 <h2>Methods</h2>
@@ -118,7 +126,7 @@ Sequel::Plugins::NestedAttributes
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">80</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:validate_associated</span>)&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">91</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:validate_associated</span>)&#x000A;<span class="line-num">92</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

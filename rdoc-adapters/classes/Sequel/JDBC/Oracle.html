@@ -35,14 +35,6 @@ Sequel::JDBC::Oracle
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
-<div id='method-list'>
-<h2>Methods</h2>
-<h3>Public Class</h3>
-<ol>
-<li><a href="#method-c-OracleClob">OracleClob</a></li>
-<li><a href="#method-c-OracleDecimal">OracleDecimal</a></li>
-</ol>
-</div>
 <div id='context'>
 </div>
 <div id='class-list'>
@@ -64,44 +56,21 @@ Sequel::JDBC::Oracle
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>ORACLE_CLOB</td>
+<td>=</td>
+<td class='context-item-value'>Object.new</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>ORACLE_DECIMAL</td>
+<td>=</td>
+<td class='context-item-value'>Object.new</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
 </table>
-</div>
-</div>
-<div id='methods'>
-<h2>Public Class methods</h2>
-<div class='method public-class' id='method-method-c-OracleClob'>
-<a name='method-c-OracleClob'></a>
-<div class='synopsis'>
-<span class='name'>OracleClob</span>
-<span class='arguments'>(r, i)</span>
-
-</div>
-<div class='description'>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-OracleClob-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-c-OracleClob-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb</span>&#x000A;<span class="line-num">31</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">OracleClob</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">32</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">clob</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getClob</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">33</span>   <span class="ruby-identifier">str</span> = <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">length</span>)&#x000A;<span class="line-num">34</span>   <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">freeTemporary</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">clob</span>.<span class="ruby-identifier">isTemporary</span>&#x000A;<span class="line-num">35</span>   <span class="ruby-identifier">str</span>&#x000A;<span class="line-num">36</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-class' id='method-method-c-OracleDecimal'>
-<a name='method-c-OracleDecimal'></a>
-<div class='synopsis'>
-<span class='name'>OracleDecimal</span>
-<span class='arguments'>(r, i)</span>
-
-</div>
-<div class='description'>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-OracleDecimal-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-c-OracleDecimal-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb</span>&#x000A;<span class="line-num">20</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">OracleDecimal</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">21</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBigDecimal</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">22</span>     <span class="ruby-identifier">i</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">long_value</span>&#x000A;<span class="line-num">23</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-constant">JAVA_BIG_DECIMAL_CONSTRUCTOR</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">24</span>       <span class="ruby-identifier">i</span>&#x000A;<span class="line-num">25</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">26</span>       <span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span><span class="ruby-operator">::</span><span class="ruby-constant">BigDecimal</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>)&#x000A;<span class="line-num">27</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">28</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">end</span></pre>
-</div>
 </div>
 </div>
 </div>

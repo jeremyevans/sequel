@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
 <head>
-<title>Sequel::Plugins::AfterInitialize::ClassMethods</title>
+<title>Sequel::Plugins::ThrowFailures::InstanceMethods</title>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -24,11 +24,11 @@
 <div class='class' id='wrapper'>
 <div class='header'>
 <h1 class='name'><span class='type'>module</span>
-Sequel::Plugins::AfterInitialize::ClassMethods
+Sequel::Plugins::ThrowFailures::InstanceMethods
 </h1>
 <ol class='paths'>
 <li>
-<a href="../../../../files/lib/sequel/plugins/after_initialize_rb.html">lib/sequel/plugins/after_initialize.rb</a>
+<a href="../../../../files/lib/sequel/plugins/throw_failures_rb.html">lib/sequel/plugins/throw_failures.rb</a>
 </li>
 </ol>
 </div>
@@ -39,7 +39,7 @@ Sequel::Plugins::AfterInitialize::ClassMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
-<li><a href="#method-i-call">call</a></li>
+<li><a href="#method-i-valid-3F">valid?</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -47,23 +47,23 @@ Sequel::Plugins::AfterInitialize::ClassMethods
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-call'>
-<a name='method-i-call'></a>
+<div class='method public-instance' id='method-method-i-valid-3F'>
+<a name='method-i-valid-3F'></a>
 <div class='synopsis'>
-<span class='name'>call</span>
-<span class='arguments'>(_)</span>
+<span class='name'>valid?</span>
+<span class='arguments'>(opts = OPTS)</span>
 
 </div>
 <div class='description'>
 
-<p>Call after_initialize for model objects loaded from the database.</p>
+<p>Catch any thrown HookFailed exceptions.</p>
 
 </div>
 <div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-valid-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/after_initialize.rb</span>&#x000A;<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">_</span>)&#x000A;<span class="line-num">19</span>   <span class="ruby-identifier">v</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">20</span>   <span class="ruby-identifier">v</span>.<span class="ruby-identifier">after_initialize</span>&#x000A;<span class="line-num">21</span>   <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">22</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-valid-3F-source'>   <span class="ruby-comment"># File lib/sequel/plugins/throw_failures.rb</span>&#x000A;<span class="line-num">41</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">valid?</span>(<span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">42</span>   <span class="ruby-identifier">catch_hook_failures</span>{<span class="ruby-keyword">super</span>} <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

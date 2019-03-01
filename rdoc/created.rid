@@ -1,8 +1,8 @@
-Fri, 01 Feb 2019 08:18:20 -0800
+Fri, 01 Mar 2019 06:21:51 -0800
 README.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
-CHANGELOG	Fri, 01 Feb 2019 08:14:28 -0800
+CHANGELOG	Fri, 01 Mar 2019 05:59:39 -0800
 doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
-MIT-LICENSE	Fri, 26 Jan 2018 06:42:13 -0800
+MIT-LICENSE	Sat, 23 Feb 2019 12:14:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool.rb	Thu, 10 May 2018 14:41:34 -0700
@@ -12,9 +12,9 @@ lib/sequel/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/deprecated.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/sql.rb	Mon, 28 Jan 2019 10:39:22 -0800
+lib/sequel/sql.rb	Sun, 24 Feb 2019 14:58:00 -0800
 lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
-lib/sequel/version.rb	Fri, 01 Feb 2019 08:14:28 -0800
+lib/sequel/version.rb	Fri, 01 Mar 2019 05:59:39 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -39,7 +39,7 @@ lib/sequel/dataset/prepared_statements.rb	Mon, 17 Sep 2018 07:14:53 -0700
 lib/sequel/dataset/query.rb	Mon, 10 Sep 2018 12:59:06 -0700
 lib/sequel/dataset/sql.rb	Sat, 01 Dec 2018 17:38:41 -0800
 lib/sequel/model/associations.rb	Thu, 10 Jan 2019 07:53:39 -0800
-lib/sequel/model/base.rb	Thu, 10 Jan 2019 07:53:39 -0800
+lib/sequel/model/base.rb	Mon, 11 Feb 2019 14:31:32 -0800
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -71,7 +71,7 @@ doc/schema_modification.rdoc	Mon, 30 Oct 2017 13:46:56 -0700
 doc/security.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
 doc/sharding.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
 doc/sql.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
-doc/testing.rdoc	Sat, 19 May 2018 07:18:43 -0700
+doc/testing.rdoc	Mon, 11 Feb 2019 14:31:32 -0800
 doc/thread_safety.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/transactions.rdoc	Thu, 06 Dec 2018 09:53:17 -0800
 doc/validations.rdoc	Thu, 15 Nov 2018 08:53:33 -0800
@@ -203,6 +203,7 @@ doc/release_notes/5.14.0.txt	Thu, 01 Nov 2018 07:32:49 -0700
 doc/release_notes/5.15.0.txt	Fri, 30 Nov 2018 09:22:15 -0800
 doc/release_notes/5.16.0.txt	Wed, 02 Jan 2019 10:09:14 -0800
 doc/release_notes/5.17.0.txt	Fri, 01 Feb 2019 08:14:28 -0800
+doc/release_notes/5.18.0.txt	Fri, 01 Mar 2019 05:59:39 -0800
 doc/release_notes/5.2.0.txt	Fri, 27 Oct 2017 08:36:52 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800

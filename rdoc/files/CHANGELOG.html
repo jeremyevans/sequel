@@ -30,12 +30,31 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-02-01 08:14:28 -0800</span>
+<span class='datetime'>2019-03-01 05:59:39 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.18.0+-282019-03-01-29">5.18.0 (2019-03-01)<span><a href="#label-5.18.0+-282019-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Use singleton .call methods on plain objects instead of procs/methods for faster type conversion (jeremyevans)</p>
+</li><li>
+<p>Add Sequel::SQL::Blob.call to avoid indirection when converting values from the database (jeremyevans)</p>
+</li><li>
+<p>Use while instead of each for inner loops in sqlite and jdbc adapters for better performance (jeremyevans)</p>
+</li><li>
+<p>Make after_initialize plugin not make the argument to Model.call optional (jeremyevans)</p>
+</li><li>
+<p>Allow Dataset#paged_each to be called without a block in the postgres and mysql2 adapters (jeremyevans)</p>
+</li><li>
+<p>Remove flow-control exceptions in connection_expiration and connection_validator extensions (jeremyevans)</p>
+</li><li>
+<p>Add throw_failures plugin for throwing ValidationFailed and HookFailed exceptions instead of raising them, up to 10x performance increase on JRuby (jeremyevans)</p>
+</li><li>
+<p>Support tzinfo 2 in addition to tzinfo 1 in the named_timezones extension (jeremyevans) (#1596)</p>
+</li></ul>
+
 <h3 id="label-5.17.0+-282019-02-01-29">5.17.0 (2019-02-01)<span><a href="#label-5.17.0+-282019-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support skip_auto_validations instance method in auto_validations plugin (oldgreen, jeremyevans) (#1592)</p>

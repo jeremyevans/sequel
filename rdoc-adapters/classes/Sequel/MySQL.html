@@ -82,13 +82,16 @@ Sequel::MySQL
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
-<td class='context-item-name'>TYPE_TRANSLATOR</td>
+<td class='context-item-name'>TYPE_TRANSLATOR_BOOLEAN</td>
 <td>=</td>
-<td class='context-item-value'>tt = Class.new do
-def boolean(s) s.to_i != 0 end
-def integer(s) s.to_i end
-def float(s) s.to_f end
-end.new.freeze</td>
+<td class='context-item-value'>boolean.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>TYPE_TRANSLATOR_INTEGER</td>
+<td>=</td>
+<td class='context-item-value'>integer.freeze</td>
 <td>&nbsp;</td>
 <td class='context-item-desc'></td>
 </tr>

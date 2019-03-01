@@ -55,9 +55,11 @@ Superclass:
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>ARRAY_METHOD</td>
 <td>=</td>
-<td class='context-item-value'>Postgres.method(:RubyPGArray)</td>
+<td class='context-item-value'>Object.new</td>
 <td>&nbsp;</td>
-<td class='context-item-desc'></td>
+<td class='context-item-desc'>
+<p>Return PostgreSQL array types as ruby Arrays instead of <a href="../../JDBC.html"><code>JDBC</code></a> PostgreSQL driver-specific array type. Only used if the database does not have a conversion proc for the type.</p>
+</td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>ARRAY_TYPE</td>
@@ -69,9 +71,11 @@ Superclass:
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>HSTORE_METHOD</td>
 <td>=</td>
-<td class='context-item-value'>Postgres.method(:RubyPGHstore)</td>
+<td class='context-item-value'>Object.new</td>
 <td>&nbsp;</td>
-<td class='context-item-desc'></td>
+<td class='context-item-desc'>
+<p>Return PostgreSQL hstore types as ruby Hashes instead of Java HashMaps.  Only used if the database does not have a conversion proc for the type.</p>
+</td>
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>PG_SPECIFIC_TYPES</td>

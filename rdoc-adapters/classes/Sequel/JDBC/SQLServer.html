@@ -35,13 +35,6 @@ Sequel::JDBC::SQLServer
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
-<div id='method-list'>
-<h2>Methods</h2>
-<h3>Public Class</h3>
-<ol>
-<li><a href="#method-c-MSSQLRubyTime">MSSQLRubyTime</a></li>
-</ol>
-</div>
 <div id='context'>
 </div>
 <div id='class-list'>
@@ -51,24 +44,18 @@ Sequel::JDBC::SQLServer
 </ol>
 </div>
 <div id='section'>
-<div id='methods'>
-<h2>Public Class methods</h2>
-<div class='method public-class' id='method-method-c-MSSQLRubyTime'>
-<a name='method-c-MSSQLRubyTime'></a>
-<div class='synopsis'>
-<span class='name'>MSSQLRubyTime</span>
-<span class='arguments'>(r, i)</span>
-
-</div>
-<div class='description'>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-MSSQLRubyTime-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-c-MSSQLRubyTime-source'>   <span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb</span>&#x000A;<span class="line-num">18</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">MSSQLRubyTime</span>(<span class="ruby-identifier ruby-title">r</span>, <span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">19</span>   <span class="ruby-comment"># MSSQL-Server TIME should be fetched as string to keep the precision intact, see:</span>&#x000A;<span class="line-num">20</span>   <span class="ruby-comment"># https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql#a-namebackwardcompatibilityfordownlevelclientsa-backward-compatibility-for-down-level-clients</span>&#x000A;<span class="line-num">21</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getString</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">22</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v}&quot;</span>)&#x000A;<span class="line-num">23</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">24</span> <span class="ruby-keyword">end</span></pre>
-</div>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MSSQL_RUBY_TIME</td>
+<td>=</td>
+<td class='context-item-value'>Object.new</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
 </div>
 </div>
 </div>
