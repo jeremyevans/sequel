@@ -473,9 +473,7 @@ module Sequel
     
     if RUBY_VERSION >= '2.4'
       # Typecast a string to a BigDecimal
-      def _typecast_value_string_to_decimal(value)
-        BigDecimal(value)
-      end
+      alias _typecast_value_string_to_decimal BigDecimal
     else
       # :nocov:
       def _typecast_value_string_to_decimal(value)
@@ -510,9 +508,7 @@ module Sequel
     end
 
     # Typecast the value to a Float
-    def typecast_value_float(value)
-      Float(value)
-    end
+    alias typecast_value_float Float
 
     # Typecast the value to an Integer
     def typecast_value_integer(value)
