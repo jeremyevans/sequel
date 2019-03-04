@@ -1,5 +1,7 @@
 === master
 
+* Speed up row fetching in the sqlite adapter (jeremyevans)
+
 * Speed up row fetching and type conversion in the sqlanywhere adapter (jeremyevans)
 
 === 5.18.0 (2019-03-01)

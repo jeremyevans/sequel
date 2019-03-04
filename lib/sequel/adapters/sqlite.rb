@@ -318,18 +318,18 @@ module Sequel
 
       def fetch_rows(sql)
         execute(sql) do |result|
-          i = -1
           cps = db.conversion_procs
           type_procs = result.types.map{|t| cps[base_type_name(t)]}
-          cols = result.columns.map{|c| i+=1; [output_identifier(c), i, type_procs[i]]}
-          max = i+1
+          j = -1
+          cols = result.columns.map{|c| [output_identifier(c), type_procs[(j+=1)]]}
           self.columns = cols.map(&:first)
+          max = cols.length
           result.each do |values|
             row = {}
             i = -1
             while (i += 1) < max
-              name, id, type_proc = cols[i]
-              v = values[id]
+              name, type_proc = cols[i]
+              v = values[i]
               if type_proc && v
                 v = type_proc.call(v)
               end
