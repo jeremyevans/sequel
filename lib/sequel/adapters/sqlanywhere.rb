@@ -17,21 +17,34 @@ module Sequel
       end
     end
 
-    tt = Class.new do
-      def blob(s) ::Sequel::SQL::Blob.new(s) end
-      def boolean(s) s.to_i != 0 end
-      def date(s) ::Date.strptime(s) end
-      def decimal(s) BigDecimal(s) end
-      def time(s) ::Sequel.string_to_time(s) end
-    end.new
+    boolean = Object.new
+    def boolean.call(s)
+      s.to_i != 0
+    end
+
+    date = Object.new
+    def date.call(s)
+      ::Date.strptime(s)
+    end
+
+    decimal = Object.new
+    class << decimal
+      alias call BigDecimal
+      public :call
+    end
+
+    time = Object.new
+    def time.call(s)
+      ::Sequel.string_to_time(s)
+    end
 
     SQLANYWHERE_TYPES = {}
     {
-        [0, 484] => tt.method(:decimal),
-        [384] => tt.method(:date),
-        [388] =>  tt.method(:time),
-        [500] => tt.method(:boolean),
-        [524, 528] => tt.method(:blob)
+        [0, 484] => decimal,
+        [384] => date,
+        [388] => time,
+        [500] => boolean,
+        [524, 528] => ::Sequel::SQL::Blob
     }.each do |k,v|
       k.each{|n| SQLANYWHERE_TYPES[n] = v}
     end
@@ -153,17 +166,20 @@ module Sequel
             else
               cps[type]
             end
-            col_infos << [i, output_identifier(name), cp]
+            col_infos << [output_identifier(name), cp]
           end
 
-          self.columns = col_infos.map{|a| a[1]}
+          self.columns = col_infos.map(&:first)
+          max = col_infos.length
 
           if rs
             while api.sqlany_fetch_next(rs) == 1
+              i = -1
               h = {}
-              col_infos.each do |i, name, cp|
-                _, v = api.sqlany_get_column(rs, i)
-                h[name] = cp && v ? cp[v] : v
+              while (i+=1) < max
+                name, cp = col_infos[i]
+                v = api.sqlany_get_column(rs, i)[1]
+                h[name] = cp && v ? cp.call(v) : v
               end
               yield h
             end
