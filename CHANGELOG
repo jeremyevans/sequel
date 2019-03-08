@@ -1,5 +1,7 @@
 === master
 
+* Make Database#drop_table delete constraint validations metadata for that table if using the constraint_validations extension (jeremyevans)
+
 * Speed up row fetching in the sqlite adapter (jeremyevans)
 
 * Speed up row fetching and type conversion in the sqlanywhere adapter (jeremyevans)

@@ -20,6 +20,7 @@ describe "constraint_validations extension" do
   before do
     @db = Sequel.mock
     @db.extend(Module.new{attr_writer :schema; def schema(table, *) execute("parse schema for #{table}"); @schema; end})
+    def @db.table_exists?(_) true; end
     @db.extension(:constraint_validations)
   end
 
@@ -36,18 +37,35 @@ describe "constraint_validations extension" do
 
   it "should allow dropping the sequel_constraint_validations table" do
     @db.drop_constraint_validations_table
-    @db.sqls.must_equal ["DROP TABLE sequel_constraint_validations"]
+    @db.sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE (table = 'sequel_constraint_validations')", "DROP TABLE sequel_constraint_validations"]
   end
 
   it "should allow dropping the sequel_constraint_validations table with a non-default table name" do
     @db.constraint_validations_table = :foo
     @db.drop_constraint_validations_table
-    @db.sqls.must_equal ["DROP TABLE foo"]
+    @db.sqls.must_equal ["DELETE FROM foo WHERE (table = 'foo')", "DROP TABLE foo"]
   end
 
   it "should allow dropping validations for a given table" do
     @db.drop_constraint_validations_for(:table=>:foo)
     @db.sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE (table = 'foo')"]
+  end
+
+  it "should drop validations for a given table when dropping the table" do
+    @db.drop_table(:foo)
+    @db.sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE (table = 'foo')", "DROP TABLE foo"]
+
+    @db.drop_table(:foo, :if_exists => true)
+    @db.sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE (table = 'foo')", "DROP TABLE IF EXISTS foo"]
+
+    @db.drop_table?(:foo)
+    @db.sqls.must_equal ["DELETE FROM sequel_constraint_validations WHERE (table = 'foo')", "DROP TABLE foo"]
+  end
+
+  it "should not drop validations for a given table if the constraint validations table does not exist" do
+    def @db.table_exists?(_) false; end
+    @db.drop_table(:foo)
+    @db.sqls.must_equal ["DROP TABLE foo"]
   end
 
   it "should allow dropping validations for a given table and column" do

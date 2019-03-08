@@ -130,6 +130,10 @@
 #   readd all constraints you want to use inside the alter table block,
 #   making no other changes inside the alter_table block.
 #
+# Dropping a table will automatically delete all constraint validations for
+# that table.  However, altering a table (e.g. to drop a column) will not
+# currently make any changes to the constraint validations metadata.
+#
 # Related module: Sequel::ConstraintValidations
 
 #
@@ -262,6 +266,16 @@ module Sequel
         @validations = []
         instance_exec(&block) if block
       end
+    end
+
+    # Drop all constraint validations for a table if dropping the table.
+    def drop_table(*names)
+      names.each do |name|
+        if !name.is_a?(Hash) && table_exists?(constraint_validations_table)
+          drop_constraint_validations_for(:table=>name)
+        end
+      end
+      super
     end
 
     # Drop the constraint validations table.
