@@ -326,7 +326,7 @@ module Sequel
 
     # The SQL query to issue to check if a connection is valid.
     def valid_connection_sql
-      @valid_connection_sql ||= select(nil).sql
+      @valid_connection_sql ||= select("/* from Ruby Sequel */").sql
     end
   end
 end
