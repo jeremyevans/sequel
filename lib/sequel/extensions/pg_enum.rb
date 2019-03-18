@@ -92,35 +92,24 @@ module Sequel
         elsif v = opts[:after]
           sql << " AFTER #{literal(v.to_s)}"
         end
-        run sql
-        parse_enum_labels
-        nil
+        _process_enum_change_sql(sql)
       end
 
       # Run the SQL to create an enum type with the given name and values.
       def create_enum(enum, values)
-        sql = "CREATE TYPE #{quote_schema_table(enum)} AS ENUM (#{values.map{|v| literal(v.to_s)}.join(', ')})"
-        run sql
-        parse_enum_labels
-        nil
+        _process_enum_change_sql("CREATE TYPE #{quote_schema_table(enum)} AS ENUM (#{values.map{|v| literal(v.to_s)}.join(', ')})")
       end
 
       # Run the SQL to rename the enum type with the given name
       # to the another given name.
       def rename_enum(enum, new_name)
-        sql = "ALTER TYPE #{quote_schema_table(enum)} RENAME TO #{quote_schema_table(new_name)}"
-        run sql
-        parse_enum_labels
-        nil
+        _process_enum_change_sql("ALTER TYPE #{quote_schema_table(enum)} RENAME TO #{quote_schema_table(new_name)}")
       end
 
       # Run the SQL to rename the enum value with the given name
       # to the another given name.
       def rename_enum_value(enum, old_name, new_name)
-        sql = "ALTER TYPE #{quote_schema_table(enum)} RENAME VALUE #{literal(old_name.to_s)} TO #{literal(new_name.to_s)}"
-        run sql
-        parse_enum_labels
-        nil
+        _process_enum_change_sql("ALTER TYPE #{quote_schema_table(enum)} RENAME VALUE #{literal(old_name.to_s)} TO #{literal(new_name.to_s)}")
       end
 
       # Run the SQL to drop the enum type with the given name.
@@ -128,13 +117,17 @@ module Sequel
       # :if_exists :: Do not raise an error if the enum type does not exist
       # :cascade :: Also drop other objects that depend on the enum type
       def drop_enum(enum, opts=OPTS)
-        sql = "DROP TYPE#{' IF EXISTS' if opts[:if_exists]} #{quote_schema_table(enum)}#{' CASCADE' if opts[:cascade]}"
-        run sql
-        parse_enum_labels
-        nil
+        _process_enum_change_sql("DROP TYPE#{' IF EXISTS' if opts[:if_exists]} #{quote_schema_table(enum)}#{' CASCADE' if opts[:cascade]}")
       end
 
       private
+
+      # Run the SQL on the database, reparsing the enum labels after it is run.
+      def _process_enum_change_sql(sql)
+        run(sql)
+        parse_enum_labels
+        nil
+      end
 
       # Parse the pg_enum table to get enum values, and
       # the pg_type table to get names and array oids for
