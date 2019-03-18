@@ -3937,7 +3937,7 @@ describe 'PostgreSQL enum types' do
     new_enum_values[new_enum_values.index('b')] = 'x'
     @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal new_enum_values
     @db.rename_enum_value(:test_enum, :x, :b)
-  end
+  end if DB.server_version >= 100000
 end
 
 describe "PostgreSQL stored procedures for datasets" do
