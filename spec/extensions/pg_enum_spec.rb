@@ -49,6 +49,11 @@ describe "pg_enum extension" do
     @db.sqls.first.must_equal "ALTER TYPE sch.foo RENAME TO sch.bar"
   end
 
+  it "should support #rename_enum_value method for renameing an enum value" do
+    @db.rename_enum_value(:foo, :b, :x)
+    @db.sqls.first.must_equal "ALTER TYPE foo RENAME VALUE 'b' TO 'x'"
+  end
+
   it "should support #drop_enum method for dropping an enum" do
     @db.drop_enum(:foo)
     @db.sqls.first.must_equal "DROP TYPE foo"

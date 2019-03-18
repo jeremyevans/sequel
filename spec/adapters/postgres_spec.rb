@@ -3930,6 +3930,14 @@ describe 'PostgreSQL enum types' do
     @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal @initial_enum_values
     @db.rename_enum(:new_enum, :test_enum)
   end
+
+  it "should rename enum values" do
+    @db.rename_enum_value(:test_enum, :b, :x)
+    new_enum_values = @initial_enum_values
+    new_enum_values[new_enum_values.index('b')] = 'x'
+    @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal new_enum_values
+    @db.rename_enum_value(:test_enum, :x, :b)
+  end
 end
 
 describe "PostgreSQL stored procedures for datasets" do
