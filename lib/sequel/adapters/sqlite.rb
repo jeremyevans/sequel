@@ -5,7 +5,7 @@ require_relative 'shared/sqlite'
 
 module Sequel
   module SQLite
-    FALSE_VALUES = (%w'0 false f no n' + [0]).freeze
+    FALSE_VALUES = (%w'0 false f no n'.each(&:freeze) + [0]).freeze
 
     blob = Object.new
     def blob.call(s)
