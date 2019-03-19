@@ -329,7 +329,7 @@ module Sequel
     #   # => {:id=>1}
     def bind(bind_vars=OPTS)
       bind_vars = if bv = @opts[:bind_vars]
-        Hash[bv].merge!(bind_vars).freeze
+        bv.merge(bind_vars).freeze
       else
         if bind_vars.frozen?
           bind_vars

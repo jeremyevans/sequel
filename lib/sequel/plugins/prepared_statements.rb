@@ -149,7 +149,7 @@ module Sequel
         # Use a prepared statement to update this model's columns in the database.
         def _update_without_checking(columns)
           if use_prepared_statements_for?(:update)
-            _set_prepared_statement_server(model.send(:prepared_update, columns.keys)).call(Hash[columns].merge!(pk_hash))
+            _set_prepared_statement_server(model.send(:prepared_update, columns.keys)).call(columns.merge(pk_hash))
           else
             super
           end

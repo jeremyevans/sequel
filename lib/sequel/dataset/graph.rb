@@ -21,7 +21,7 @@ module Sequel
         raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      select_append(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>Hash[ga].merge!(graph_aliases).freeze).freeze)
+      select_append(*columns).clone(:graph => graph.merge(:column_aliases=>ga.merge(graph_aliases).freeze).freeze)
     end
 
     # Similar to Dataset#join_table, but uses unambiguous aliases for selected
@@ -244,7 +244,7 @@ module Sequel
     def set_graph_aliases(graph_aliases)
       columns, graph_aliases = graph_alias_columns(graph_aliases)
       if graph = opts[:graph]
-        select(*columns).clone(:graph => Hash[graph].merge!(:column_aliases=>graph_aliases.freeze).freeze)
+        select(*columns).clone(:graph => graph.merge(:column_aliases=>graph_aliases.freeze).freeze)
       else
         raise Error, "cannot call #set_graph_aliases on an ungraphed dataset"
       end

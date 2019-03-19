@@ -971,7 +971,8 @@ module Sequel
     # separate insert commands for each row.  Otherwise, call #multi_insert_sql
     # and execute each statement it gives separately.
     def _import(columns, values, opts)
-      trans_opts = Hash[opts].merge!(:server=>@opts[:server])
+      trans_opts = Hash[opts]
+      trans_opts[:server] = @opts[:server]
       if opts[:return] == :primary_key
         @db.transaction(trans_opts){values.map{|v| insert(columns, v)}}
       else

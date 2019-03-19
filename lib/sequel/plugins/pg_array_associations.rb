@@ -337,8 +337,10 @@ module Sequel
           end
           opts[:eager_loader] ||= proc do |eo|
             id_map = eo[:id_map]
+            eo = Hash[eo]
+            eo[:loader] = false
 
-            eager_load_results(opts, Hash[eo].merge!(:loader=>false)) do |assoc_record|
+            eager_load_results(opts, eo) do |assoc_record|
               if pks ||= assoc_record.get_column_value(key)
                 pks.each do |pkv|
                   next unless objects = id_map[pkv]
@@ -374,7 +376,7 @@ module Sequel
 
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, Hash[eo].merge!(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
             ds
           end
 
@@ -433,7 +435,9 @@ module Sequel
               end
             end
 
-            eager_load_results(opts, Hash[eo].merge!(:id_map=>id_map)) do |assoc_record|
+            eo = Hash[eo]
+            eo[:id_map] = id_map
+            eager_load_results(opts, eo) do |assoc_record|
               if objects = id_map[assoc_record.get_column_value(pkm)]
                 objects.each do |object| 
                   object.associations[name].push(assoc_record)
@@ -466,7 +470,7 @@ module Sequel
 
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, Hash[eo].merge!(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
             ds
           end
 

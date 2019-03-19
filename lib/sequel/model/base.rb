@@ -1517,7 +1517,7 @@ module Sequel
       #   # Sequel::Error raised
       def set_fields(hash, fields, opts=nil)
         opts = if opts
-          Hash[model.default_set_fields_options].merge!(opts)
+          model.default_set_fields_options.merge(opts)
         else
           model.default_set_fields_options
         end

@@ -254,7 +254,9 @@ module Sequel
                 log_connection_yield(sql, conn){stmt.execute(sql)}
               when :insert
                 log_connection_yield(sql, conn){execute_statement_insert(stmt, sql)}
-                last_insert_id(conn, Hash[opts].merge!(:stmt=>stmt))
+                opts = Hash[opts]
+                opts[:stmt] = stmt
+                last_insert_id(conn, opts)
               else
                 log_connection_yield(sql, conn){stmt.executeUpdate(sql)}
               end
@@ -449,7 +451,10 @@ module Sequel
                 log_connection_yield(msg, conn, args){cps.execute}
               when :insert
                 log_connection_yield(msg, conn, args){execute_prepared_statement_insert(cps)}
-                last_insert_id(conn, Hash[opts].merge!(:prepared=>true, :stmt=>cps))
+                opts = Hash[opts]
+                opts[:prepared] = true
+                opts[:stmt] = cps
+                last_insert_id(conn, opts)
               else
                 log_connection_yield(msg, conn, args){cps.executeUpdate}
               end

@@ -155,7 +155,7 @@ module Sequel
         def set_nested_attributes(assoc, obj, opts=OPTS)
           raise(Error, "no association named #{assoc} for #{model.inspect}") unless ref = model.association_reflection(assoc)
           raise(Error, "nested attributes are not enabled for association #{assoc} for #{model.inspect}") unless meta = ref[:nested_attributes]
-          meta = Hash[meta].merge!(opts)
+          meta = meta.merge(opts)
           meta[:reflection] = ref
           if ref.returns_array?
             nested_attributes_list_setter(meta, obj)

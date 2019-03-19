@@ -244,7 +244,7 @@ module Sequel
         def validates_unique(*atts)
           opts = default_validation_helpers_options(:unique)
           if atts.last.is_a?(Hash)
-            opts = Hash[opts].merge!(atts.pop)
+            opts = opts.merge(atts.pop)
           end
           message = validation_error_message(opts[:message])
           from_values = opts[:from] == :values
@@ -302,7 +302,7 @@ module Sequel
         # Merge the given options with the default options for the given type
         # and call validatable_attributes with the merged options.
         def validatable_attributes_for_type(type, atts, opts, &block)
-          validatable_attributes(atts, Hash[default_validation_helpers_options(type)].merge!(opts), &block)
+          validatable_attributes(atts, default_validation_helpers_options(type).merge(opts), &block)
         end
         
         # The validation error message to use, as a string.  If message

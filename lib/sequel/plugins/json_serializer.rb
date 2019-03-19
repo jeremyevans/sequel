@@ -279,7 +279,7 @@ module Sequel
         #   obj.json_serializer_opts(only: :name)
         #   [obj].to_json # => '[{"name":"..."}]'
         def json_serializer_opts(opts=OPTS)
-          @json_serializer_opts = Hash[@json_serializer_opts||OPTS].merge!(opts)
+          @json_serializer_opts = (@json_serializer_opts||OPTS).merge(opts)
         end
 
         # Return a string in JSON format.  Accepts the following
@@ -301,9 +301,9 @@ module Sequel
         #          use an underscored version of the model's name.
         def to_json(*a)
           opts = model.json_serializer_opts
-          opts = Hash[opts].merge!(@json_serializer_opts) if @json_serializer_opts
+          opts = opts.merge(@json_serializer_opts) if @json_serializer_opts
           if (arg_opts = a.first).is_a?(Hash)
-            opts = Hash[opts].merge!(arg_opts)
+            opts = opts.merge(arg_opts)
             a = []
           end
 

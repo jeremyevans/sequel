@@ -1733,7 +1733,9 @@ module Sequel
       def _import(columns, values, opts=OPTS)
         if @opts[:returning]
           statements = multi_insert_sql(columns, values)
-          @db.transaction(Hash[opts].merge!(:server=>@opts[:server])) do
+          trans_opts = Hash[opts]
+          trans_opts[:server] = @opts[:server]
+          @db.transaction(trans_opts) do
             statements.map{|st| returning_fetch_rows(st)}
           end.first.map{|v| v.length == 1 ? v.values.first : v}
         elsif opts[:return] == :primary_key
