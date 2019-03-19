@@ -77,6 +77,10 @@ module Sequel
       k.each{|n| SQLITE_TYPES[n] = v}
     end
     SQLITE_TYPES.freeze
+
+    sqlite_version = SQLite3::VERSION.split('.').map(&:to_i)[0..1]
+    sqlite_version = sqlite_version[0] * 100 + sqlite_version[1]
+    USE_EXTENDED_RESULT_CODES = sqlite_version >= 104
     
     class Database < Sequel::Database
       include ::Sequel::SQLite::DatabaseMethods
@@ -109,6 +113,10 @@ module Sequel
         sqlite3_opts[:readonly] = typecast_value_boolean(opts[:readonly]) if opts.has_key?(:readonly)
         db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
         db.busy_timeout(opts.fetch(:timeout, 5000))
+
+        if USE_EXTENDED_RESULT_CODES
+          db.extended_result_codes = true
+        end
         
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
         
@@ -279,13 +287,12 @@ module Sequel
         Dataset
       end
 
-      # Support SQLite exception codes if ruby-sqlite3 supports them.
-      # This is disabled by default because ruby-sqlite3 doesn't currently
-      # support them (returning nil), and even if it did, it doesn't support
-      # extended error codes, which would lead to worse behavior.
-      #def sqlite_error_code(exception)
-      #  exception.code if exception.respond_to?(:code)
-      #end
+      if USE_EXTENDED_RESULT_CODES
+        # Support SQLite exception codes if ruby-sqlite3 supports them.
+        def sqlite_error_code(exception)
+          exception.code if exception.respond_to?(:code)
+        end
+      end
     end
     
     class Dataset < Sequel::Dataset
