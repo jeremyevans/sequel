@@ -13,10 +13,10 @@ module Sequel
 
     # Array of SQL loggers to use for this database.
     attr_accessor :loggers
-    
+
     # Whether to include information about the connection in use when logging queries.
     attr_accessor :log_connection_info
-    
+
     # Log level at which to log SQL queries.  This is actually the method
     # sent to the logger, so it should be the method name symbol. The default
     # is :info, it can be set to :debug to log at DEBUG level.
@@ -63,7 +63,7 @@ module Sequel
     def connection_info(conn)
       "(conn: #{conn.__id__}) "
     end
-    
+
     # Log the given SQL and then execute it on the connection, used by
     # the transaction code.
     def log_connection_execute(conn, sql)

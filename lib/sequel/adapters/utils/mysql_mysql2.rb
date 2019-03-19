@@ -21,13 +21,13 @@ module Sequel
         END
         # Error messages for mysql and mysql2 that indicate the current connection should be disconnected
         MYSQL_DATABASE_DISCONNECT_ERRORS = /\A#{Regexp.union(disconnect_errors)}/
-       
+
         # Support stored procedures on MySQL
         def call_sproc(name, opts=OPTS, &block)
-          args = opts[:args] || [] 
+          args = opts[:args] || []
           execute("CALL #{name}#{args.empty? ? '()' : literal(args)}", opts.merge(:sproc=>false), &block)
         end
-        
+
         # Executes the given SQL using an available connection, yielding the
         # connection if the block is given.
         def execute(sql, opts=OPTS, &block)
@@ -39,7 +39,7 @@ module Sequel
             synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
           end
         end
-        
+
         private
 
         def add_prepared_statements_cache(conn)
@@ -67,11 +67,11 @@ module Sequel
 
       module DatasetMethods
         include Sequel::Dataset::StoredProcedures
-       
+
         StoredProcedureMethods = Sequel::Dataset.send(:prepared_statements_module,
           "sql = @opts[:sproc_name]; opts = Hash[opts]; opts[:args] = @opts[:sproc_args]; opts[:sproc] = true",
           Sequel::Dataset::StoredProcedureMethods, %w'execute execute_dui')
-        
+
         private
 
         # Extend the dataset with the MySQL stored procedure methods.

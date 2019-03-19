@@ -38,9 +38,9 @@ module Sequel
               prepared_sql
           end
         end
-        
+
         PreparedStatementMethods = Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)
-        
+
         private
 
         def bound_variable_modules

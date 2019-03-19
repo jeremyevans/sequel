@@ -7,7 +7,7 @@ module Sequel
     # These methods all return booleans, with most describing whether or not the
     # database supprots a given feature.
     # ---------------------
-    
+
     # Whether the database uses a global namespace for the index, true by default.  If
     # false, the indexes are going to be namespaced per table.
     def global_index_namespace?
@@ -121,7 +121,7 @@ module Sequel
     def folds_unquoted_identifiers_to_uppercase?
       true
     end
-    
+
     # Whether the database supports combining multiple alter table
     # operations into a single query, false by default.
     def supports_combining_alter_table_ops?

@@ -18,7 +18,7 @@ module Sequel
   # modify a single row.
   NoExistingObject = Class.new(Error)
   ).name
-  
+
   (
   # Raised when an undefined association is used when eager loading.
   UndefinedAssociation = Class.new(Error)
@@ -29,7 +29,7 @@ module Sequel
   # or a column without a setter method.
   MassAssignmentRestriction = Class.new(Error)
   ).name
-  
+
   # Exception class raised when +raise_on_save_failure+ is set and validation fails
   class ValidationFailed < Error
     # The Sequel::Model object related to this exception.

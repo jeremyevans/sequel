@@ -16,14 +16,14 @@ module Sequel
           :views   => 23,
           :foreign_keys => 27
         }.freeze
-        
+
         attr_reader :type, :criteria
 
         def initialize(type, crit)
           @type     = QUERY_TYPE[type]
           @criteria = Array(crit)
         end
-        
+
         class Column
           DATA_TYPE = {
             2   => "SMALLINT",
@@ -44,23 +44,23 @@ module Sequel
             205 => "IMAGE"
           }.freeze
           DATA_TYPE.each_value(&:freeze)
-          
+
           def initialize(row)
             @row = row
           end
-          
+
           def [](col)
             @row[col]
           end
-          
+
           def allow_null
             self["IS_NULLABLE"]
           end
-          
+
           def default
             self["COLUMN_DEFAULT"]
           end
-          
+
           def db_type
             t = DATA_TYPE[self["DATA_TYPE"]]
             if t == "DECIMAL" && precision
@@ -71,25 +71,25 @@ module Sequel
               t
             end
           end
-          
+
           def precision
             self["NUMERIC_PRECISION"]
           end
-          
+
           def scale
             self["NUMERIC_SCALE"]
           end
-          
+
           def maximum_length
             self["CHARACTER_MAXIMUM_LENGTH"]
           end
         end
-      end      
+      end
 
       module DatabaseMethods
         include Sequel::Access::DatabaseMethods
         include Sequel::Database::SplitAlterTable
-    
+
         # Remove cached schema after altering a table, since otherwise it can be cached
         # incorrectly in the rename column case.
         def alter_table(name, *)
@@ -128,7 +128,7 @@ module Sequel
           m = output_identifier_meth
           ado_schema_views.map {|tbl| m.call(tbl['TABLE_NAME'])}
         end
-        
+
         # OpenSchema returns compound indexes as multiple rows
         def indexes(table_name,opts=OPTS)
           m = output_identifier_meth
@@ -164,7 +164,7 @@ module Sequel
           end
           fks.values
         end
-                
+
         private
 
         # Emulate rename_column by adding the column, copying data from the old
@@ -203,15 +203,15 @@ module Sequel
         def begin_transaction(conn, opts=OPTS)
           log_connection_yield('Transaction.begin', conn){conn.BeginTrans}
         end
-          
+
         def commit_transaction(conn, opts=OPTS)
           log_connection_yield('Transaction.commit', conn){conn.CommitTrans}
         end
-          
+
         def rollback_transaction(conn, opts=OPTS)
           log_connection_yield('Transaction.rollback', conn){conn.RollbackTrans}
         end
-          
+
         def schema_column_type(db_type)
           case db_type.downcase
           when 'bit'
@@ -224,18 +224,18 @@ module Sequel
             super
           end
         end
-        
+
         def schema_parse_table(table_name, opts)
           m = output_identifier_meth(opts[:dataset])
           m2 = input_identifier_meth(opts[:dataset])
           tn = m2.call(table_name.to_s)
           idxs = ado_schema_indexes(tn)
           ado_schema_columns(tn).map {|row|
-            specs = { 
+            specs = {
               :allow_null => row.allow_null,
               :db_type => row.db_type,
               :default => row.default,
-              :primary_key => !!idxs.find {|idx| 
+              :primary_key => !!idxs.find {|idx|
                                 idx["COLUMN_NAME"] == row["COLUMN_NAME"] &&
                                 idx["PRIMARY_KEY"]
                               },
@@ -267,7 +267,7 @@ module Sequel
           end
           rows
         end
-        
+
         def ado_schema_indexes(table_name)
           rows=[]
           fetch_ado_schema(:indexes, [nil,nil,nil,nil,table_name.to_s]) do |row|
@@ -275,23 +275,23 @@ module Sequel
           end
           rows
         end
-        
+
         def ado_schema_columns(table_name)
           rows=[]
-          fetch_ado_schema(:columns, [nil,nil,table_name.to_s,nil]) do |row| 
+          fetch_ado_schema(:columns, [nil,nil,table_name.to_s,nil]) do |row|
             rows << AdoSchema::Column.new(row)
           end
           rows.sort!{|a,b| a["ORDINAL_POSITION"] <=> b["ORDINAL_POSITION"]}
         end
-        
+
         def ado_schema_foreign_keys(table_name)
           rows=[]
-          fetch_ado_schema(:foreign_keys, [nil,nil,nil,nil,nil,table_name.to_s]) do |row| 
+          fetch_ado_schema(:foreign_keys, [nil,nil,nil,nil,nil,table_name.to_s]) do |row|
             rows << row
           end
           rows.sort!{|a,b| a["ORDINAL"] <=> b["ORDINAL"]}
         end
-        
+
         def fetch_ado_schema(type, criteria=[])
           execute_open_ado_schema(type, criteria) do |s|
             cols = []
@@ -303,7 +303,7 @@ module Sequel
             end unless s.eof
           end
         end
-             
+
         # This is like execute() in that it yields an ADO RecordSet, except
         # instead of an SQL interface there's this OpenSchema call
         # cf. http://msdn.microsoft.com/en-us/library/ee275721(v=bts.10)
@@ -311,11 +311,11 @@ module Sequel
           ado_schema = AdoSchema.new(type, criteria)
           synchronize(opts[:server]) do |conn|
             begin
-              r = log_connection_yield("OpenSchema #{type.inspect}, #{criteria.inspect}", conn) { 
+              r = log_connection_yield("OpenSchema #{type.inspect}, #{criteria.inspect}", conn) {
                 if ado_schema.criteria.empty?
-                  conn.OpenSchema(ado_schema.type) 
+                  conn.OpenSchema(ado_schema.type)
                 else
-                  conn.OpenSchema(ado_schema.type, ado_schema.criteria) 
+                  conn.OpenSchema(ado_schema.type, ado_schema.criteria)
                 end
               }
               yield(r) if block_given?
@@ -326,7 +326,7 @@ module Sequel
           nil
         end
       end
-      
+
       class Dataset < ADO::Dataset
         include Sequel::Access::DatasetMethods
       end

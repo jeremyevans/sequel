@@ -5,7 +5,7 @@ require_relative '../utils/emulate_offset_with_row_number'
 module Sequel
   module Oracle
     Sequel::Database.set_shared_adapter_scheme(:oracle, self)
-    
+
     def self.mock_adapter_setup(db)
       db.instance_exec do
         @server_version = 11000000
@@ -94,22 +94,22 @@ module Sequel
           map{|r| m.call(r[:table_name])}
       end
 
-      def views(opts=OPTS) 
+      def views(opts=OPTS)
         m = output_identifier_meth
         metadata_dataset.from(:all_views).
           server(opts[:server]).
           exclude(:owner=>IGNORE_OWNERS).
           select(:view_name).
           map{|r| m.call(r[:view_name])}
-      end 
- 
-      def view_exists?(name) 
+      end
+
+      def view_exists?(name)
         m = input_identifier_meth
         metadata_dataset.from(:all_views).
           exclude(:owner=>IGNORE_OWNERS).
           where(:view_name=>m.call(name)).
           count > 0
-      end 
+      end
 
       # The version of the Oracle server, used for determining capability.
       def server_version(server=nil)
@@ -243,7 +243,7 @@ module Sequel
         Sequel.synchronize{@primary_key_sequences.delete(table)}
         super
       end
-      
+
       TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ COMMITTED'.freeze,
         :committed=>'READ COMMITTED'.freeze,
         :repeatable=>'SERIALIZABLE'.freeze,
@@ -253,7 +253,7 @@ module Sequel
       def set_transaction_isolation_sql(level)
         "SET TRANSACTION ISOLATION LEVEL #{TRANSACTION_ISOLATION_LEVELS[level]}"
       end
-    
+
       def sequence_for_table(table)
         return nil unless autosequence
         Sequel.synchronize{return @primary_key_sequences[table] if @primary_key_sequences.has_key?(table)}
@@ -482,12 +482,12 @@ module Sequel
       def supports_is_true?
         false
       end
-      
+
       # Oracle does not support limits in correlated subqueries.
       def supports_limits_in_correlated_subqueries?
         false
       end
-    
+
       # Oracle supports NOWAIT.
       def supports_nowait?
         true
@@ -502,7 +502,7 @@ module Sequel
       def supports_select_all_and_column?
         false
       end
-      
+
       # Oracle supports SKIP LOCKED.
       def supports_skip_locked?
         true
@@ -512,7 +512,7 @@ module Sequel
       def supports_timestamp_timezones?
         true
       end
-      
+
       # Oracle does not support WHERE 'Y' for WHERE TRUE.
       def supports_where_true?
         false
@@ -577,7 +577,7 @@ module Sequel
           literal_append(sql, Sequel::SQL::Function.new(:length, Sequel.join([f.args.first, 'x'])) - 1)
         end
       end
-      
+
       # If this dataset is associated with a sequence, return the most recently
       # inserted sequence value.
       def execute_insert(sql, opts=OPTS)

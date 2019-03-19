@@ -7,9 +7,9 @@ module Sequel
     module MSSQL
       module DatabaseMethods
         include Sequel::MSSQL::DatabaseMethods
-        
+
         private
-        
+
         # Get the last inserted id using SCOPE_IDENTITY().
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
@@ -19,7 +19,7 @@ module Sequel
             rs.getLong(1)
           end
         end
-        
+
         # Primary key indexes appear to start with pk__ on MSSQL
         def primary_key_index_re
           /\Apk__/i

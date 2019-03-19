@@ -10,7 +10,7 @@
 # Note that it doesn't make sense to use this extension on SQLite, since
 # the integer type will automatically handle 64-bit integers, and it treats
 # the integer type specially when the column is also the primary key.
-# 
+#
 # To load the extension into the database:
 #
 #   DB.extension :integer64

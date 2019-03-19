@@ -71,7 +71,7 @@ module Sequel
         super
       end
     end
-    
+
     # If server is a hash, the entry for it probably doesn't
     # exist in the @allocated hash, so check for existence to
     # avoid calling nil.[]
@@ -103,7 +103,7 @@ module Sequel
         a.delete(server)
         @allocated.delete(thread) if a.empty?
         disconnect_connection(conn)
-      else  
+      else
         super
       end
     end

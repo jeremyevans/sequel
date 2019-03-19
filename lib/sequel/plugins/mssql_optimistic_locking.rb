@@ -6,7 +6,7 @@ module Sequel
     # using a timestamp/rowversion column to ensure that concurrent updates are
     # detected and previous changes are not automatically overridden. This is
     # best implemented by a code example:
-    # 
+    #
     #   class Person < Sequel::Model
     #     plugin :mssql_optimistic_locking
     #   end
@@ -47,15 +47,15 @@ module Sequel
           lock_column_instance_filter
           super
         end
-        
+
         # Add the lock column instance filter to the object before updating it.
         def before_update
           lock_column_instance_filter
           super
         end
-        
+
         private
-        
+
         # Add the lock column instance filter to the object.
         def lock_column_instance_filter
           lc = model.lock_column

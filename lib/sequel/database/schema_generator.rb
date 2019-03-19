@@ -19,7 +19,7 @@ module Sequel
     class CreateTableGenerator
       # Classes specifying generic types that Sequel will convert to database-specific types.
       GENERIC_TYPES=%w'String Integer Float Numeric BigDecimal Date DateTime Time File TrueClass FalseClass'.freeze
-      
+
       # Column hashes created by this generator
       attr_reader :columns
 
@@ -46,8 +46,8 @@ module Sequel
       def Bignum(name, opts=OPTS)
         column(name, :Bignum, opts)
       end
-      
-      # Use custom Fixnum method to use Integer instead of Fixnum class, to avoid 
+
+      # Use custom Fixnum method to use Integer instead of Fixnum class, to avoid
       # warnings on ruby 2.4+.
       def Fixnum(name, opts=OPTS)
         column(name, Integer, opts)
@@ -71,7 +71,7 @@ module Sequel
         end
         nil
       end
-      
+
       # Add an unnamed constraint, specified by the given block
       # or args:
       #
@@ -144,7 +144,7 @@ module Sequel
         end
         nil
       end
-      
+
       # Adds a named constraint (or unnamed if name is nil),
       # with the given block or args. To provide options for the constraint, pass
       # a hash as the first argument.
@@ -158,7 +158,7 @@ module Sequel
         constraints << opts.merge(:type=>:check, :check=>block || args)
         nil
       end
-      
+
       # Add a foreign key in the table that references another table. See #column
       # for available options.
       #
@@ -202,12 +202,12 @@ module Sequel
       def full_text_index(columns, opts = OPTS)
         index(columns, opts.merge(:type => :full_text))
       end
-      
+
       # True if the generator includes the creation of a column with the given name.
       def has_column?(name)
         columns.any?{|c| c[:name] == name}
       end
-      
+
       # Add an index on the given column(s) with the given options.
       # General options:
       #
@@ -241,7 +241,7 @@ module Sequel
         indexes << {:columns => Array(columns)}.merge!(opts)
         nil
       end
-      
+
       # Add a column with the given type, name, and opts.  See #column for available
       # options.
       def method_missing(type, name = nil, opts = OPTS)
@@ -252,13 +252,13 @@ module Sequel
       def respond_to_missing?(meth, include_private)
         true
       end
-      
+
       # Adds an autoincrementing primary key column or a primary key constraint.
       # To just create a constraint, the first argument should be an array of column symbols
       # specifying the primary key columns. To create an autoincrementing primary key
       # column, a single symbol can be used. In both cases, an options hash can be used
       # as the second argument.
-      # 
+      #
       # If you want to create a primary key column that is not autoincrementing, you
       # should not use this method.  Instead, you should use the regular +column+ method
       # with a <tt>primary_key: true</tt> option.
@@ -270,7 +270,7 @@ module Sequel
       # :keep_order :: For non-composite primary keys, respects the existing order of
       #                columns, overriding the default behavior of making the primary
       #                key the first column.
-      # 
+      #
       # Examples:
       #   primary_key(:id)
       #   primary_key(:id, type: :Bignum, keep_order: true)
@@ -278,7 +278,7 @@ module Sequel
       def primary_key(name, *args)
         return composite_primary_key(name, *args) if name.is_a?(Array)
         column = @db.serial_primary_key_options.merge({:name => name})
-        
+
         if opts = args.pop
           opts = {:type => opts} unless opts.is_a?(Hash)
           if type = args.pop
@@ -300,7 +300,7 @@ module Sequel
       def primary_key_name
         @primary_key[:name] if @primary_key
       end
-      
+
       # Add a spatial index on the given columns.
       def spatial_index(columns, opts = OPTS)
         index(columns, opts.merge(:type => :spatial))
@@ -331,7 +331,7 @@ module Sequel
         constraints << {:type => :foreign_key, :columns => columns}.merge!(opts)
         nil
       end
-      
+
       add_type_method(*GENERIC_TYPES)
     end
 
@@ -347,7 +347,7 @@ module Sequel
     class AlterTableGenerator
       # An array of operations to perform
       attr_reader :operations
-      
+
       # Set the Database object to which to apply the changes, and evaluate the
       # block in the context of this object.
       def initialize(db, &block)
@@ -355,7 +355,7 @@ module Sequel
         @operations = []
         instance_exec(&block) if block
       end
-      
+
       # Add a column with the given name, type, and opts.
       # See CreateTableGenerator#column for the available options (except for +:index+, use a
       # separate +add_index+ call to add an index for the column).
@@ -374,7 +374,7 @@ module Sequel
         @operations << {:op => :add_column, :name => name, :type => type}.merge!(opts)
         nil
       end
-      
+
       # Add a constraint with the given name and args.
       # See CreateTableGenerator#constraint.
       #
@@ -426,13 +426,13 @@ module Sequel
         return add_composite_foreign_key(name, table, opts) if name.is_a?(Array)
         add_column(name, Integer, {:table=>table}.merge!(opts))
       end
-      
+
       # Add a full text index on the given columns.
       # See CreateTableGenerator#index for available options.
       def add_full_text_index(columns, opts = OPTS)
         add_index(columns, {:type=>:full_text}.merge!(opts))
       end
-      
+
       # Add an index on the given columns. See
       # CreateTableGenerator#index for available options.
       #
@@ -469,7 +469,7 @@ module Sequel
         @operations << {:op => :add_index, :columns => Array(columns)}.merge!(opts)
         nil
       end
-      
+
       # Add a primary key.  See CreateTableGenerator#column
       # for the available options.  Like +add_foreign_key+, if you specify
       # the column name as an array, it just creates a constraint:
@@ -481,13 +481,13 @@ module Sequel
         opts = @db.serial_primary_key_options.merge(opts)
         add_column(name, opts.delete(:type), opts)
       end
-      
+
       # Add a spatial index on the given columns.
       # See CreateTableGenerator#index for available options.
       def add_spatial_index(columns, opts = OPTS)
         add_index(columns, {:type=>:spatial}.merge!(opts))
       end
-      
+
       # Remove a column from the table.
       #
       #   drop_column(:artist_id) # DROP COLUMN artist_id
@@ -497,7 +497,7 @@ module Sequel
       #
       # :cascade :: CASCADE the operation, dropping other objects that depend on
       #             the dropped column.
-      # 
+      #
       # PostgreSQL specific options:
       # :if_exists :: Use IF EXISTS, so no error is raised if the column does not
       #               exist.
@@ -505,7 +505,7 @@ module Sequel
         @operations << {:op => :drop_column, :name => name}.merge!(opts)
         nil
       end
-      
+
       # Remove a constraint from the table:
       #
       #   drop_constraint(:unique_name) # DROP CONSTRAINT unique_name
@@ -519,7 +519,7 @@ module Sequel
         @operations << {:op => :drop_constraint, :name => name}.merge!(opts)
         nil
       end
-      
+
       # Remove a foreign key and the associated column from the table. General options:
       #
       # :name :: The name of the constraint to drop.  If not given, uses the same name
@@ -538,7 +538,7 @@ module Sequel
         drop_composite_foreign_key(Array(name), opts)
         drop_column(name) unless name.is_a?(Array)
       end
-      
+
       # Remove an index from the table. General options:
       #
       # :name :: The name of the index to drop.  If not given, uses the same name
@@ -566,7 +566,7 @@ module Sequel
         @operations << {:op => :rename_column, :name => name, :new_name => new_name}.merge!(opts)
         nil
       end
-      
+
       # Modify the default value for one of the table's column.
       #
       #   set_column_default(:artist_name, 'a') # ALTER COLUMN artist_name SET DEFAULT 'a'
@@ -596,7 +596,7 @@ module Sequel
         @operations << {:op => :set_column_type, :name => name, :type => type}.merge!(opts)
         nil
       end
-      
+
       # Set a given column as allowing NULL values.
       #
       #   set_column_allow_null(:artist_name) # ALTER COLUMN artist_name DROP NOT NULL

@@ -3,7 +3,7 @@
 # This is the fastest connection pool, since it isn't a connection pool at all.
 # It is just a wrapper around a single connection that uses the connection pool
 # API.
-class Sequel::SingleConnectionPool < Sequel::ConnectionPool  
+class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   def initialize(db, opts=OPTS)
     super
     @conn = []
@@ -39,11 +39,11 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   def max_size
     1
   end
-  
+
   def pool_type
     :single
   end
-  
+
   # The SingleConnectionPool always has a size of 1 if connected
   # and 0 if not.
   def size

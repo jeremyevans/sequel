@@ -26,18 +26,18 @@ module Sequel
     # the Overview).
     #
     #   Model.plugin :rcte_tree
-    #   
+    #
     #   # Lazy loading
     #   model = Model.first
     #   model.parent
     #   model.children
     #   model.ancestors # Populates :parent association for all ancestors
     #   model.descendants # Populates :children association for all descendants
-    #   
+    #
     #   # Eager loading - also populates the :parent and children associations
     #   # for all ancestors and descendants
     #   Model.where(id: [1, 2]).eager(:ancestors, :descendants).all
-    #   
+    #
     #   # Eager loading children and grandchildren
     #   Model.where(id: [1, 2]).eager(descendants: 2).all
     #   # Eager loading children, grandchildren, and great grandchildren
@@ -81,7 +81,7 @@ module Sequel
         opts[:class] = model
         opts[:methods_module] = Module.new
         model.send(:include, opts[:methods_module])
-        
+
         key = opts[:key] ||= :parent_id
         prkey = opts[:primary_key] ||= model.primary_key
         ka = opts[:key_alias] ||= :x_root_x
@@ -95,7 +95,7 @@ module Sequel
         else
           [SQL::ColumnAll.new(model.table_name)]
         end
-        
+
         bd_conv = lambda{|v| conv_bd && v.is_a?(BigDecimal) ? v.to_i : v}
 
         key_array = Array(key)
@@ -118,10 +118,10 @@ module Sequel
           recursive_case_columns = [SQL::QualifiedIdentifier.new(t, ka)] + c_all
           extract_key_alias = lambda{|m| bd_conv[m.values.delete(ka)]}
         end
-        
+
         parent = opts.merge(opts.fetch(:parent, OPTS)).fetch(:name, :parent)
         childrena = opts.merge(opts.fetch(:children, OPTS)).fetch(:name, :children)
-        
+
         opts[:reciprocal] = nil
         a = opts.merge(opts.fetch(:ancestors, OPTS))
         ancestors = a.fetch(:name, :ancestors)
@@ -201,7 +201,7 @@ module Sequel
               parent_map[opk] = obj
               (children_map[key_conv[obj]] ||= []) << obj
             end
-            
+
             if roots = id_map[extract_key_alias[obj]]
               roots.each do |root|
                 root.associations[ancestors] << obj
@@ -217,7 +217,7 @@ module Sequel
           end
         end
         model.one_to_many ancestors, a
-        
+
         d = opts.merge(opts.fetch(:descendants, OPTS))
         descendants = d.fetch(:name, :descendants)
         d[:read_only] = true unless d.has_key?(:read_only)
@@ -298,7 +298,7 @@ module Sequel
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end
-            
+
             opk = prkey_conv[obj]
             if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
@@ -309,11 +309,11 @@ module Sequel
               obj.associations[childrena] = [] unless no_cache
               parent_map[opk] = obj
             end
-            
+
             if root = id_map[extract_key_alias[obj]].first
               root.associations[descendants] << obj
             end
-            
+
             (children_map[key_conv[obj]] ||= []) << obj
           end
           children_map.each do |parent_id, objs|

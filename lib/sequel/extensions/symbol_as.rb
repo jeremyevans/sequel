@@ -17,7 +17,7 @@
 # If you are using Ruby 2+, and you would like to use refinements, there
 # is a refinement version of this in the symbol_as_refinement extension.
 
-# 
+#
 class Symbol
   include Sequel::SQL::AliasMethods
 end

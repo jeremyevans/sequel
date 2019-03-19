@@ -3,7 +3,7 @@
 module Sequel
   # A dataset represents an SQL query. Datasets
   # can be used to select, insert, update and delete records.
-  # 
+  #
   # Query results are always retrieved on demand, so a dataset can be kept
   # around and reused indefinitely (datasets never cache results):
   #
@@ -41,7 +41,7 @@ module Sequel
     include SQL::OrderMethods
     include SQL::StringMethods
   end
-  
+
   require_relative "dataset/query"
   require_relative "dataset/actions"
   require_relative "dataset/features"

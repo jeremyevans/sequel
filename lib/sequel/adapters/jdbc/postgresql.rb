@@ -70,7 +70,7 @@ module Sequel
             end
           end
         end
-        
+
         # See Sequel::Postgres::Adapter#copy_table
         def copy_table(table, opts=OPTS)
           synchronize(opts[:server]) do |conn|
@@ -116,7 +116,7 @@ module Sequel
         end
 
         private
-        
+
         def disconnect_error?(exception, opts)
           super || exception.message =~ /\A(This connection has been closed\.|FATAL: terminating connection due to administrator command|An I\/O error occurred while sending to the backend\.)\z/
         end
@@ -177,12 +177,12 @@ module Sequel
           @oid_convertor_map = {}
         end
       end
-      
+
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
-        
+
         private
-        
+
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
           sql << "'" << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << "'"
@@ -205,7 +205,7 @@ module Sequel
           if v = r.getArray(i)
             v.array.to_ary
           end
-        end 
+        end
 
         # Return PostgreSQL hstore types as ruby Hashes instead of
         # Java HashMaps.  Only used if the database does not have a
@@ -215,7 +215,7 @@ module Sequel
           if v = r.getObject(i)
             v.to_hash
           end
-        end 
+        end
 
         def type_convertor(map, meta, type, i)
           case type

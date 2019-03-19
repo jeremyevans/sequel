@@ -9,7 +9,7 @@
 #   Sequel[:table][:column] # table.column
 #
 # you can just write:
-#   
+#
 #   :table[:column] # table.column
 #
 # To load the extension:

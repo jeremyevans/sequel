@@ -13,7 +13,7 @@ module Sequel
       :committed=>'READ COMMITTED'.freeze,
       :repeatable=>'REPEATABLE READ'.freeze,
       :serializable=>'SERIALIZABLE'.freeze}.freeze
-    
+
     # The default transaction isolation level for this database,
     # used for all future transactions.  For MSSQL, this should be set
     # to something if you ever plan to use the :isolation option to
@@ -37,7 +37,7 @@ module Sequel
         end
       end
     end
-    
+
     # If a transaction is not currently in progress, ignore the block.
     # Otherwise, add the block to the list of the blocks to call after the currently
     # in progress transaction rolls back (and only if it rolls back).
@@ -198,7 +198,7 @@ module Sequel
 
           if already_in_transaction?(conn, opts)
             if opts[:rollback] == :always && !opts.has_key?(:savepoint)
-              if supports_savepoints? 
+              if supports_savepoints?
                 opts[:savepoint] = true
               else
                 raise Sequel::Error, "cannot set :rollback=>:always transaction option if already inside a transaction"
@@ -221,9 +221,9 @@ module Sequel
         end
       end
     end
-    
+
     private
-    
+
     # Internal generic transaction method.  Any exception raised by the given
     # block will cause the transaction to be rolled back.  If the exception is
     # not a Sequel::Rollback, the error will be reraised. If no exception occurs
@@ -296,7 +296,7 @@ module Sequel
       end
 
       Sequel.synchronize{@transactions[conn] = hash}
-    end    
+    end
 
     # Set the given callable as a hook to be called. Type should be either
     # :after_commit or :after_rollback.
@@ -340,7 +340,7 @@ module Sequel
         begin_new_transaction(conn, opts)
       end
     end
-    
+
     # SQL to BEGIN a transaction.
     def begin_transaction_sql
       'BEGIN'
@@ -364,7 +364,7 @@ module Sequel
         end
       end
     end
-    
+
     # SQL to commit a savepoint
     def commit_savepoint_sql(depth)
       "RELEASE SAVEPOINT autopoint_#{depth}"
@@ -384,7 +384,7 @@ module Sequel
     def commit_transaction_sql
       'COMMIT'
     end
-    
+
     # Method called on the connection object to execute SQL on the database,
     # used by the transaction code.
     def connection_execute_method
@@ -453,7 +453,7 @@ module Sequel
     def rollback_transaction_sql
       'ROLLBACK'
     end
-    
+
     # Set the transaction isolation level on the given connection
     def set_transaction_isolation(conn, opts)
       if supports_transaction_isolation_levels? and level = opts.fetch(:isolation, transaction_isolation_level)

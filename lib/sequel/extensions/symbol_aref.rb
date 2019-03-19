@@ -38,7 +38,7 @@ if RUBY_VERSION >= '2.0'
 else
   class Symbol
     if method_defined?(:[])
-      alias_method :aref_before_sequel, :[] 
+      alias_method :aref_before_sequel, :[]
     end
 
     def [](v)

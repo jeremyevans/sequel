@@ -41,7 +41,7 @@ module Sequel
     #   # Eagerly reload all artists for these albums
     #   # SELECT * FROM artists WHERE id IN (...)
     #   albums.first.artists(eager_reload: true)
-    # 
+    #
     # You can also use the :eager option to specify dependent associations
     # to eager load:
     #

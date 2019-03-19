@@ -119,7 +119,7 @@ module Sequel
         self
       end
 
-      # Return an expression for the bitwise NOT of the receiver 
+      # Return an expression for the bitwise NOT of the receiver
       def ~
         self.class.new(super)
       end
@@ -140,7 +140,7 @@ module Sequel
       end
 
       alias contained_by <<
-      alias contains >> 
+      alias contains >>
 
       undef_method :*, :/
 

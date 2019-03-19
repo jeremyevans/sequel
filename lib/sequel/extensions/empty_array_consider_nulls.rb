@@ -32,7 +32,7 @@ module Sequel
       c = Array(cols)
       SQL::BooleanExpression.from_value_pairs(c.zip(c), :AND, op == :IN)
     end
-    
+
   end
 
   Dataset.register_extension(:empty_array_consider_nulls, EmptyArrayConsiderNulls)

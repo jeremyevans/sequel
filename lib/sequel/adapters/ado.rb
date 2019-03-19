@@ -112,7 +112,7 @@ module Sequel
         handle.Open(s)
         handle
       end
-      
+
       def disconnect_connection(conn)
         conn.Close
       rescue WIN32OLERuntimeError
@@ -133,7 +133,7 @@ module Sequel
       def execute_insert(sql, opts=OPTS)
         execute(sql, opts)
       end
-      
+
       # Use pass by reference in WIN32OLE to get the number of affected rows,
       # unless is a provider is in use (since some providers don't seem to
       # return the number of affected rows, but the default provider appears
@@ -170,7 +170,7 @@ module Sequel
       end
 
       private
-      
+
       def adapter_initialize
         case @opts[:conn_string]
         when /Microsoft\.(Jet|ACE)\.OLEDB/io
@@ -197,7 +197,7 @@ module Sequel
         Dataset
       end
 
-      # The ADO adapter's default provider doesn't support transactions, since it 
+      # The ADO adapter's default provider doesn't support transactions, since it
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.
       def begin_transaction(conn, opts=OPTS)
@@ -220,7 +220,7 @@ module Sequel
         super if @opts[:provider]
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       def fetch_rows(sql)
         execute(sql) do |recordset|
@@ -260,12 +260,12 @@ module Sequel
                 v
               end
             end
-            
+
             yield h
           end
         end
       end
-      
+
       # ADO can return for for delete and update statements, depending on the provider.
       def provides_accurate_rows_matched?
         false

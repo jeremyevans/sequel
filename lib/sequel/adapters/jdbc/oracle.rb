@@ -26,7 +26,7 @@ module Sequel
             ::Kernel::BigDecimal(v.to_string)
           end
         end
-      end 
+      end
 
       ORACLE_CLOB = Object.new
       def ORACLE_CLOB.call(r, i)
@@ -46,7 +46,7 @@ module Sequel
             @primary_key_sequences = {}
           end
         end
-        
+
         private
 
         # Oracle exception handling with SQLState is less accurate than with regexps.
@@ -62,7 +62,7 @@ module Sequel
         def default_fetch_size
           100
         end
-        
+
         def last_insert_id(conn, opts)
           unless sequence = opts[:sequence]
             if t = opts[:table]
@@ -115,7 +115,7 @@ module Sequel
           @type_convertor_map[:OracleClob] = ORACLE_CLOB
         end
       end
-      
+
       class Dataset < JDBC::Dataset
         include Sequel::Oracle::DatasetMethods
 
@@ -134,7 +134,7 @@ module Sequel
             end
           when *TIMESTAMPTZ_TYPES
             map[TIMESTAMP_TYPE]
-          when CLOB_TYPE 
+          when CLOB_TYPE
             map[:OracleClob]
           else
             super

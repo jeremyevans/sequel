@@ -11,7 +11,7 @@ module Sequel
     # +prepared_statements_safe+ plugin in addition to this plugin to reduce the number
     # of prepared statements that can be created, unless you tightly control how your
     # model instances are saved.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses use prepared statements  (called before loading subclasses)
@@ -22,7 +22,7 @@ module Sequel
     module PreparedStatements
       # Synchronize access to the integer sequence so that no two calls get the same integer.
       MUTEX = Mutex.new
-      
+
       i = 0
       # This plugin names prepared statements uniquely using an integer sequence, this
       # lambda returns the next integer to use.
@@ -46,8 +46,8 @@ module Sequel
           s = ds.opts[meth]
           if f && f.length == 1 && !ds.opts[:join] && (!s || s.empty?)
             ds = ds.public_send(meth, *columns.map{|c| Sequel.identifier(c)})
-          end 
-          
+          end
+
           prepare_statement(ds, type, vals)
         end
 

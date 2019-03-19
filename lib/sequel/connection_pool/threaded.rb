@@ -9,11 +9,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # The maximum number of connections this pool will create (per shard/server
   # if sharding).
   attr_reader :max_size
-  
+
   # An array of connections that are available for use by the pool.
   # The calling code should already have the mutex before calling this.
   attr_reader :available_connections
-  
+
   # A hash with thread keys and connection values for currently allocated connections.
   # The calling code should already have the mutex before calling this.
   attr_reader :allocated
@@ -27,14 +27,14 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     super
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
-    @mutex = Mutex.new  
+    @mutex = Mutex.new
     @connection_handling = opts[:connection_handling]
     @available_connections = []
     @allocated = {}
     @timeout = Float(opts[:pool_timeout] || 5)
     @waiter = ConditionVariable.new
   end
-  
+
   # Yield all of the available connections, and the one currently allocated to
   # this thread.  This will not yield connections currently allocated to other
   # threads, as it is not safe to operate on them.  This holds the mutex while
@@ -48,15 +48,15 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
       end
     end
   end
-  
+
   # Removes all connections currently available, optionally
-  # yielding each connection to the given block. This method has the effect of 
+  # yielding each connection to the given block. This method has the effect of
   # disconnecting from the database, assuming that no connections are currently
   # being used.  If you want to be able to disconnect connections that are
   # currently in use, use the ShardedThreadedConnectionPool, which can do that.
   # This connection pool does not, for performance reasons. To use the sharded pool,
   # pass the <tt>servers: {}</tt> option when connecting to the database.
-  # 
+  #
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
   def disconnect(opts=OPTS)
@@ -68,13 +68,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     end
     conns.each{|conn| disconnect_connection(conn)}
   end
-  
+
   # Chooses the first available connection, or if none are
   # available, creates a new connection.  Passes the connection to the supplied
   # block:
-  # 
+  #
   #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
-  # 
+  #
   # Pool#hold is re-entrant, meaning it can be called recursively in
   # the same thread without blocking.
   #
@@ -95,7 +95,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
         oconn = conn
         conn = nil
         disconnect_connection(oconn) if oconn
-        sync do 
+        sync do
           @allocated.delete(t)
           @waiter.signal
         end
@@ -114,13 +114,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   def pool_type
     :threaded
   end
-  
+
   # The total number of connections opened, either available or allocated.
   # The calling code should not have the mutex before calling this.
   def size
     @mutex.synchronize{_size}
   end
-  
+
   private
 
   # The total number of connections opened, either available or allocated.
@@ -242,7 +242,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   def owned_connection(thread)
     sync{@allocated[thread]}
   end
-  
+
   # Create the maximum number of connections immediately.  The calling code should
   # NOT have the mutex before calling this.
   def preconnect(concurrent = false)
@@ -263,7 +263,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     name = db.opts[:name]
     raise ::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{elapsed}#{", database name: #{name}" if name}"
   end
-  
+
   # Releases the connection assigned to the supplied thread back to the pool.
   # The calling code should already have the mutex before calling this.
   def release(thread)

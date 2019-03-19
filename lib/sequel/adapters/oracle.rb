@@ -15,7 +15,7 @@ module Sequel
       # ORA-03113: end-of-file on communication channel
       # ORA-03114: not connected to ORACLE
       CONNECTION_ERROR_CODES = [ 28, 1012, 2396, 3113, 3114 ].freeze
-      
+
       ORACLE_TYPES = {
         :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
         :clob=>:read.to_proc
@@ -38,7 +38,7 @@ module Sequel
         end
         conn.autocommit = true
         conn.non_blocking = true
-        
+
         # The ruby-oci8 gem which retrieves oracle columns with a type of
         # DATE, TIMESTAMP, TIMESTAMP WITH TIME ZONE is complex based on the
         # ruby version and Oracle version (9 or later)
@@ -49,12 +49,12 @@ module Sequel
         if Sequel.application_timezone == :utc
           conn.exec("ALTER SESSION SET TIME_ZONE='-00:00'")
         end
-        
+
         class << conn
           attr_reader :prepared_statements
         end
         conn.instance_variable_set(:@prepared_statements, {})
-        
+
         conn
       end
 
@@ -224,7 +224,7 @@ module Sequel
         log_connection_yield('Transaction.begin', conn){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
-      
+
       def commit_transaction(conn, opts=OPTS)
         log_connection_yield('Transaction.commit', conn){conn.commit}
       end
@@ -232,7 +232,7 @@ module Sequel
       def disconnect_error?(e, opts)
         super || (e.is_a?(::OCIError) && CONNECTION_ERROR_CODES.include?(e.code))
       end
-      
+
       def oracle_column_type(h)
         case h[:oci8_type]
         when :number
@@ -256,7 +256,7 @@ module Sequel
       ensure
         super
       end
-      
+
       def rollback_transaction(conn, opts=OPTS)
         log_connection_yield('Transaction.rollback', conn){conn.rollback}
       end
@@ -325,24 +325,24 @@ module Sequel
         table_schema
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
       # Oracle already supports named bind arguments, so use directly.
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
-        
+
         protected
-        
+
         # Return a hash with the same values as the given hash,
         # but with the keys converted to strings.
         def map_to_prepared_args(bind_vars)
           prepared_args.map{|v, t| [bind_vars[v], t]}
         end
-        
+
         private
-        
+
         # Oracle uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
@@ -352,7 +352,7 @@ module Sequel
           LiteralString.new(":#{i}")
         end
       end
-      
+
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
       PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 

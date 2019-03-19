@@ -15,7 +15,7 @@ module Sequel
     #   Album.subset(:gold){copies_sold >= 500000}
     #
     # This exists for backwards compatibility with previous Sequel versions.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses support Model.def_dataset_method

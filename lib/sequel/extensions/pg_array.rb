@@ -198,7 +198,7 @@ module Sequel
           typecast_method_map = @pg_array_schema_types
 
           if soid
-            raise Error, "can't provide both a converter and :scalar_oid option to register" if has_converter 
+            raise Error, "can't provide both a converter and :scalar_oid option to register" if has_converter
             converter = conversion_procs[soid]
           end
 
@@ -313,7 +313,7 @@ module Sequel
           # which will be ignored.
           def initialize(source, converter=nil)
             super(source)
-            @converter = converter 
+            @converter = converter
             @stack = [[]]
             @encoding = string.encoding
             @recorded = String.new.force_encoding(@encoding)
@@ -436,7 +436,7 @@ module Sequel
         @array_type = type
       end
 
-      # Append the array SQL to the given sql string. 
+      # Append the array SQL to the given sql string.
       # If the receiver has a type, add a cast to the
       # database array type.
       def sql_literal_append(ds, sql)

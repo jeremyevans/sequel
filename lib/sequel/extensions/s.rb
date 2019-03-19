@@ -40,7 +40,7 @@
 # Related module: Sequel::S
 
 
-# 
+#
 module Sequel::S
   private
 

@@ -27,9 +27,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
   end
-  
+
   # Adds new servers to the connection pool.  Allows for dynamic expansion of the potential replicas/shards
-  # at runtime. +servers+ argument should be an array of symbols. 
+  # at runtime. +servers+ argument should be an array of symbols.
   def add_servers(servers)
     sync do
       servers.each do |server|
@@ -42,7 +42,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       end
     end
   end
-  
+
   # A hash of connections currently being used for the given server, key is the
   # Thread, value is the connection.  Nonexistent servers will return nil.  Treat
   # this as read only, do not modify the resulting object.
@@ -50,7 +50,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def allocated(server=:default)
     @allocated[server]
   end
-  
+
   # Yield all of the available connections, and the ones currently allocated to
   # this thread.  This will not yield connections currently allocated to other
   # threads, as it is not safe to operate on them.  This holds the mutex while
@@ -67,7 +67,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       @available_connections.values.each{|v| v.each{|c| yield c}}
     end
   end
-  
+
   # An array of connections opened but not currently used, for the given
   # server. Nonexistent servers will return nil. Treat this as read only, do
   # not modify the resulting object.
@@ -75,20 +75,20 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def available_connections(server=:default)
     @available_connections[server]
   end
-  
+
   # The total number of connections opened for the given server.
   # Nonexistent servers will return the created count of the default server.
   # The calling code should NOT have the mutex before calling this.
   def size(server=:default)
     @mutex.synchronize{_size(server)}
   end
-  
+
   # Removes all connections currently available on all servers, optionally
-  # yielding each connection to the given block. This method has the effect of 
+  # yielding each connection to the given block. This method has the effect of
   # disconnecting from the database, assuming that no connections are currently
   # being used.  If connections are being used, they are scheduled to be
   # disconnected as soon as they are returned to the pool.
-  # 
+  #
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database. Options:
   # :server :: Should be a symbol specifing the server to disconnect from,
@@ -100,18 +100,18 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       end
     end
   end
-  
+
   def freeze
     @servers.freeze
     super
   end
-  
+
   # Chooses the first available connection to the given server, or if none are
   # available, creates a new connection.  Passes the connection to the supplied
   # block:
-  # 
+  #
   #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
-  # 
+  #
   # Pool#hold is re-entrant, meaning it can be called recursively in
   # the same thread without blocking.
   #
@@ -170,7 +170,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def pool_type
     :sharded_threaded
   end
-  
+
   private
 
   # The total number of connections opened for the given server.
@@ -179,7 +179,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     server = @servers[server]
     @allocated[server].length + @available_connections[server].length
   end
-  
+
   # Assigns a connection to the supplied thread, if one
   # is available. The calling code should NOT already have the mutex when
   # calling this.
@@ -306,7 +306,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       available_connections(server).shift
     end
   end
-  
+
   # Returns the connection owned by the supplied thread for the given server,
   # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread, server)
@@ -317,7 +317,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def pick_server(server)
     sync{@servers[server]}
   end
-  
+
   # Create the maximum number of connections immediately.  The calling code should
   # NOT have the mutex before calling this.
   def preconnect(concurrent = false)
@@ -338,7 +338,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     name = db.opts[:name]
     raise ::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{elapsed}, server: #{server}#{", database name: #{name}" if name}"
   end
-  
+
   # Releases the connection assigned to the supplied thread and server. If the
   # server or connection given is scheduled for disconnection, remove the
   # connection instead of releasing it back to the pool.

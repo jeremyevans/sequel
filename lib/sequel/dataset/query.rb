@@ -20,7 +20,7 @@ module Sequel
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
     NON_SQL_OPTIONS = [:server, :graph, :row_proc, :quote_identifiers, :skip_symbol_cache].freeze
-    
+
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
     # block from the method call.
@@ -30,10 +30,10 @@ module Sequel
     # They accept a table argument and options hash which is passed to join_table,
     # and they raise an error if called with a block.
     UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross].freeze
-    
+
     # All methods that return modified datasets with a joined table added.
     JOIN_METHODS = ((CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]).freeze
-    
+
     # Methods that return modified datasets
     QUERY_METHODS = ((<<-METHS).split.map(&:to_sym) + JOIN_METHODS).freeze
       add_graph_aliases distinct except exclude exclude_having
@@ -158,7 +158,7 @@ module Sequel
     #
     #   DB[:items].exclude(category: 'software')
     #   # SELECT * FROM items WHERE (category != 'software')
-    #   
+    #
     #   DB[:items].exclude(category: 'software', id: 3)
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     #
@@ -215,7 +215,7 @@ module Sequel
     def filter(*cond, &block)
       where(*cond, &block)
     end
-    
+
     # Returns a cloned dataset with a :update lock style.
     #
     #   DB[:table].for_update # SELECT * FROM table FOR UPDATE
@@ -343,7 +343,7 @@ module Sequel
       end
     end
 
-    # Returns a copy of the dataset with the results grouped by the value of 
+    # Returns a copy of the dataset with the results grouped by the value of
     # the given columns.  If a block is given, it is treated
     # as a virtual row block, similar to +where+.
     #
@@ -359,7 +359,7 @@ module Sequel
     def group_by(*columns, &block)
       group(*columns, &block)
     end
-    
+
     # Returns a dataset grouped by the given column with count by group.
     # Column aliases may be supplied, and will be included in the select clause.
     # If a block is given, it is treated as a virtual row block, similar to +where+.
@@ -367,7 +367,7 @@ module Sequel
     # Examples:
     #
     #   DB[:items].group_and_count(:name).all
-    #   # SELECT name, count(*) AS count FROM items GROUP BY name 
+    #   # SELECT name, count(*) AS count FROM items GROUP BY name
     #   # => [{:name=>'a', :count=>1}, ...]
     #
     #   DB[:items].group_and_count(:first_name, :last_name).all
@@ -421,7 +421,7 @@ module Sequel
     def having(*cond, &block)
       add_filter(:having, cond, &block)
     end
-    
+
     # Adds an INTERSECT clause using a second dataset object.
     # An INTERSECT compound dataset returns all rows in both the current dataset
     # and the given dataset.
@@ -494,7 +494,7 @@ module Sequel
     #                                 primary table (or the :implicit_qualifier option).
     #                                 To specify multiple conditions on a single joined table column,
     #                                 you must use an array.  Uses a JOIN with an ON clause.
-    #         Array :: If all members of the array are symbols, considers them as columns and 
+    #         Array :: If all members of the array are symbols, considers them as columns and
     #                  uses a JOIN with a USING clause.  Most databases will remove duplicate columns from
     #                  the result set if this is used.
     #         nil :: If a block is not given, doesn't use ON or USING, so the JOIN should be a NATURAL
@@ -608,7 +608,7 @@ module Sequel
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
     end
-    
+
     CONDITIONED_JOIN_TYPES.each do |jtype|
       class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end", __FILE__, __LINE__)
     end
@@ -659,7 +659,7 @@ module Sequel
       ds = ds.offset(o) unless no_offset
       ds
     end
-    
+
     # Returns a cloned dataset with the given lock style.  If style is a
     # string, it will be used directly. You should never pass a string
     # to this method that is derived from user input, as that can lead to
@@ -675,7 +675,7 @@ module Sequel
     def lock_style(style)
       clone(:lock => style)
     end
-    
+
     # Returns a cloned dataset without a row_proc.
     #
     #   ds = DB[:items].with_row_proc(:invert.to_proc)
@@ -709,8 +709,8 @@ module Sequel
       end
       clone(:offset => o)
     end
-    
-    # Adds an alternate filter to an existing WHERE clause using OR.  If there 
+
+    # Adds an alternate filter to an existing WHERE clause using OR.  If there
     # is no WHERE clause, then the default is WHERE true, and OR would be redundant,
     # so return the dataset in that case.
     #
@@ -742,7 +742,7 @@ module Sequel
       virtual_row_columns(columns, block)
       clone(:order => (columns.compact.empty?) ? nil : columns.freeze)
     end
-    
+
     # Returns a copy of the dataset with the order columns added
     # to the end of the existing order.
     #
@@ -762,7 +762,7 @@ module Sequel
     def order_more(*columns, &block)
       order_append(*columns, &block)
     end
-    
+
     # Returns a copy of the dataset with the order columns added
     # to the beginning of the existing order.
     #
@@ -772,7 +772,7 @@ module Sequel
       ds = order(*columns, &block)
       @opts[:order] ? ds.order_append(*@opts[:order]) : ds
     end
-    
+
     # Qualify to the given table, or first source if no table is given.
     #
     #   DB[:items].where(id: 1).qualify
@@ -858,7 +858,7 @@ module Sequel
       virtual_row_columns(columns, block)
       clone(:select => columns.freeze)
     end
-    
+
     # Returns a copy of the dataset selecting the wildcard if no arguments
     # are given.  If arguments are given, treat them as tables and select
     # all columns (using the wildcard) from each table.
@@ -873,7 +873,7 @@ module Sequel
         select(*tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze)
       end
     end
-    
+
     # Returns a copy of the dataset with the given columns added
     # to the existing selected columns.  If no columns are currently selected,
     # it will select the columns given in addition to *.
@@ -906,18 +906,18 @@ module Sequel
       select(*columns).group(*columns.map{|c| unaliased_identifier(c)})
     end
 
-    # Alias for select_append. 
+    # Alias for select_append.
     def select_more(*columns, &block)
       select_append(*columns, &block)
     end
-    
+
     # Set the server for this dataset to use.  Used to pick a specific database
     # shard to run a query against, or to override the default (where SELECT uses
     # :read_only database and all other queries use the :default database).  This
     # method is always available but is only useful when database sharding is being
     # used.
     #
-    #   DB[:items].all # Uses the :read_only or :default server 
+    #   DB[:items].all # Uses the :read_only or :default server
     #   DB[:items].delete # Uses the :default server
     #   DB[:items].server(:blah).delete # Uses the :blah server
     def server(servr)
@@ -951,7 +951,7 @@ module Sequel
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
-    # 
+    #
     #   DB[:items].group(:a).having(a: 1).where(:b).unfiltered
     #   # SELECT * FROM items GROUP BY a
     def unfiltered
@@ -959,7 +959,7 @@ module Sequel
     end
 
     # Returns a copy of the dataset with no grouping (GROUP or HAVING clause) applied.
-    # 
+    #
     #   DB[:items].group(:a).having(a: 1).where(:b).ungrouped
     #   # SELECT * FROM items WHERE b
     def ungrouped
@@ -985,23 +985,23 @@ module Sequel
     def union(dataset, opts=OPTS)
       compound_clone(:union, dataset, opts)
     end
-    
+
     # Returns a copy of the dataset with no limit or offset.
-    # 
+    #
     #   DB[:items].limit(10, 20).unlimited # SELECT * FROM items
     def unlimited
       cached_dataset(:_unlimited_ds){clone(:limit=>nil, :offset=>nil)}
     end
 
     # Returns a copy of the dataset with no order.
-    # 
+    #
     #   DB[:items].order(:a).unordered # SELECT * FROM items
     def unordered
       cached_dataset(:_unordered_ds){clone(:order=>nil)}
     end
-    
-    # Returns a copy of the dataset with the given WHERE conditions imposed upon it.  
-    # 
+
+    # Returns a copy of the dataset with the given WHERE conditions imposed upon it.
+    #
     # Accepts the following argument types:
     #
     # Hash, Array of pairs :: list of equality/inclusion expressions
@@ -1035,7 +1035,7 @@ module Sequel
     #
     #   DB[:items].where{price < 100}
     #   # SELECT * FROM items WHERE (price < 100)
-    # 
+    #
     # Multiple where calls can be chained for scoping:
     #
     #   software = dataset.where(category: 'software').where{price < 100}
@@ -1045,7 +1045,7 @@ module Sequel
     def where(*cond, &block)
       add_filter(:where, cond, &block)
     end
-    
+
     # Return a clone of the dataset with an addition named window that can be
     # referenced in window functions. See Sequel::SQL::Window for a list of
     # options that can be passed in. Example:
@@ -1084,7 +1084,7 @@ module Sequel
     #     DB[:i1].select(:id, :parent_id).where(parent_id: nil),
     #     DB[:i1].join(:t, id: :parent_id).select(Sequel[:i1][:id], Sequel[:i1][:parent_id]),
     #     :args=>[:id, :parent_id])
-    #   
+    #
     #   # WITH RECURSIVE t(id, parent_id) AS (
     #   #   SELECT id, parent_id FROM i1 WHERE (parent_id IS NULL)
     #   #   UNION ALL
@@ -1102,7 +1102,7 @@ module Sequel
         clone(:with=>((@opts[:with]||EMPTY_ARRAY) + [Hash[opts].merge!(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))]).freeze)
       end
     end
-    
+
     if TRUE_FREEZE
       # Return a clone of the dataset extended with the given modules.
       # Note that like Object#extend, when multiple modules are provided
@@ -1173,7 +1173,7 @@ module Sequel
       end
       clone(:sql=>sql)
     end
-    
+
     protected
 
     # Add the dataset to the list of compounds
@@ -1237,13 +1237,13 @@ module Sequel
       if cond == EMPTY_ARRAY && !block
         raise Error, "must provide an argument to a filtering method if not passing a block"
       end
-      
+
       cond = cond.first if cond.size == 1
 
       empty = cond == OPTS || cond == EMPTY_ARRAY
 
       if empty && !block
-        self 
+        self
       else
         if cond == nil
           cond = Sequel::NULL
@@ -1268,7 +1268,7 @@ module Sequel
     def default_join_table_qualification
       :symbol
     end
-    
+
     # SQL expression object based on the expr type.  See +where+.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == EMPTY_ARRAY
@@ -1308,7 +1308,7 @@ module Sequel
         expr
       end
     end
-    
+
     # Return two datasets, the first a clone of the receiver with the WITH
     # clause from the given dataset added to it, and the second a clone of
     # the given dataset with the WITH clause removed.

@@ -3,11 +3,11 @@
 module Sequel
   module Plugins
     # The timestamps plugin creates hooks that automatically set create and
-    # update timestamp fields.  Both field names used are configurable, and you 
+    # update timestamp fields.  Both field names used are configurable, and you
     # can also set whether to overwrite existing create timestamps (false
     # by default), or whether to set the update timestamp when creating (also
     # false by default).
-    # 
+    #
     # Usage:
     #
     #   # Timestamp all model instances using +created_at+ and +updated_at+
@@ -45,19 +45,19 @@ module Sequel
 
         # The field to store the update timestamp
         attr_reader :update_timestamp_field
-        
+
         # Whether to overwrite the create timestamp if it already exists
         def create_timestamp_overwrite?
           @create_timestamp_overwrite
         end
-        
+
         Plugins.inherited_instance_variables(self,
           :@allow_manual_timestamp_update=>nil,
           :@create_timestamp_field=>nil,
           :@create_timestamp_overwrite=>nil,
           :@set_update_timestamp_on_create=>nil,
           :@update_timestamp_field=>nil)
-        
+
         # Whether to allow manual setting of the update timestamp when creating
         def allow_manual_timestamp_update?
           @allow_manual_timestamp_update
@@ -75,13 +75,13 @@ module Sequel
           set_update_timestamp
           super
         end
-        
+
         # Set the create timestamp when creating
         def before_validation
           set_create_timestamp if new?
           super
         end
-        
+
         private
 
         # If the object has accessor methods for the create timestamp field, and
@@ -95,7 +95,7 @@ module Sequel
           set_column_value(meth, time||=model.dataset.current_datetime) if respond_to?(field) && respond_to?(meth) && (model.create_timestamp_overwrite? || get_column_value(field).nil?)
           set_update_timestamp(time) if model.set_update_timestamp_on_create?
         end
-        
+
         # Set the update timestamp to the time given or the current time if the
         # object has a setter method for the update timestamp field.
         def set_update_timestamp(time=nil)

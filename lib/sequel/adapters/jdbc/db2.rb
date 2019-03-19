@@ -48,7 +48,7 @@ module Sequel
             super
           end
         end
-        
+
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1"
@@ -57,7 +57,7 @@ module Sequel
             rs.getLong(1)
           end
         end
-        
+
         # Primary key indexes appear to be named sqlNNNN on DB2
         def primary_key_index_re
           /\Asql\d+\z/i

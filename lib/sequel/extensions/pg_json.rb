@@ -171,7 +171,7 @@ module Sequel
         case value
         when Array
           (jsonb ? JSONBArray : JSONArray).new(value)
-        when Hash 
+        when Hash
           (jsonb ? JSONBHash : JSONHash).new(value)
         when String, Numeric, true, false, nil
           value
@@ -245,7 +245,7 @@ module Sequel
           value
         when Array
           JSONArray.new(value)
-        when Hash 
+        when Hash
           JSONHash.new(value)
         when JSONBArray
           JSONArray.new(value.to_a)
@@ -265,7 +265,7 @@ module Sequel
           value
         when Array
           JSONBArray.new(value)
-        when Hash 
+        when Hash
           JSONBHash.new(value)
         when JSONArray
           JSONBArray.new(value.to_a)

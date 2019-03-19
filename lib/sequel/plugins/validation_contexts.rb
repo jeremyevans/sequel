@@ -29,7 +29,7 @@ module Sequel
     # of that model, you can no longer specify a validation context when
     # validating the instance.
     module ValidationContexts
-      module InstanceMethods 
+      module InstanceMethods
         # The validation context to use for the current validation.
         # Set via the :validation_context option passed to save/valid?.
         attr_reader :validation_context

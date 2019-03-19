@@ -46,7 +46,7 @@ require 'tzinfo'
 #
 module Sequel
   self.datetime_class = DateTime
-  
+
   module NamedTimezones
     module DatabaseMethods
       def timezone=(tz)
@@ -61,8 +61,8 @@ module Sequel
     #   Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
     attr_accessor :tzinfo_disambiguator
 
-    private 
-    
+    private
+
     # Handle both TZInfo 1 and TZInfo 2
     if defined?(TZInfo::VERSION) && TZInfo::VERSION > '2'
       # :nodoc:
@@ -99,7 +99,7 @@ module Sequel
         (v - local_offset).new_offset(local_offset)
       end
     end
-    
+
     # Returns TZInfo::Timezone instance if given a String.
     def convert_timezone_setter_arg(tz)
       tz.is_a?(String) ? TZInfo::Timezone.get(tz) : super
@@ -114,7 +114,7 @@ module Sequel
       end
     end
   end
-  
+
   extend NamedTimezones
   Database.register_extension(:named_timezones, NamedTimezones::DatabaseMethods)
 end

@@ -24,7 +24,7 @@
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension
 # and have activated refinements for the file, you can also use Hash#hstore:
-# 
+#
 #   hash.hstore
 #
 # Since the hstore type only supports strings, non string keys and
@@ -40,7 +40,7 @@
 #
 #   Sequel.hstore('foo'=>'bar')[:foo] # 'bar'
 #   Sequel.hstore('foo'=>'bar').to_hash[:foo] # 'bar'
-# 
+#
 # HStore instances mostly just delegate to the underlying hash
 # instance, so Hash methods that modify the receiver or returned
 # modified copies of the receiver may not do string conversion.
@@ -118,7 +118,7 @@ module Sequel
           end
           @result = hash
         end
-          
+
         private
 
         # Parse and unescape a quoted key/value.

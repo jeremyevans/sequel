@@ -17,7 +17,7 @@ module Sequel
     #
     # Note that this plugin should probably not be used in production,
     # as it causes a performance hit.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances record accessed columns (called before loading subclasses)

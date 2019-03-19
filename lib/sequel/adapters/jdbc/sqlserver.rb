@@ -72,7 +72,7 @@ module Sequel
             end
           end
         end
-        
+
         private
 
         def _metadata_dataset

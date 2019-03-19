@@ -55,27 +55,27 @@ module Sequel
       #   Sequel::Model.plugins
       #   # => [Sequel::Model, Sequel::Model::Associations]
       attr_reader :plugins
-  
+
       # The primary key for the class.  Sequel can determine this automatically for
       # many databases, but not all, so you may need to set it manually.  If not
       # determined automatically, the default is :id.
       attr_reader :primary_key
-  
+
       # Whether to raise an error instead of returning nil on a failure
       # to save/create/save_changes/update/destroy due to a validation failure or
-      # a before_* hook returning false (default: true). 
+      # a before_* hook returning false (default: true).
       attr_accessor :raise_on_save_failure
-  
+
       # Whether to raise an error when unable to typecast data for a column
       # (default: false).  This should be set to true if you want to have model
       # setter methods raise errors if the argument cannot be typecast properly.
       attr_accessor :raise_on_typecast_failure
-      
+
       # Whether to raise an error if an UPDATE or DELETE query related to
       # a model instance does not modify exactly 1 row.  If set to false,
       # Sequel will not check the number of rows modified (default: true).
       attr_accessor :require_modification
-  
+
       # If true (the default), requires that all models have valid tables,
       # raising exceptions if creating a model without a valid table backing it.
       # Setting this to false will allow the creation of model classes where the
@@ -85,30 +85,30 @@ module Sequel
       # Should be the literal primary key column name if this Model's table has a simple primary key, or
       # nil if the model has a compound primary key or no primary key.
       attr_reader :simple_pk
-  
+
       # Should be the literal table name if this Model's dataset is a simple table (no select, order, join, etc.),
       # or nil otherwise.  This and simple_pk are used for an optimization in Model.[].
       attr_reader :simple_table
-  
+
       # Whether mass assigning via .create/.new/#set/#update should raise an error
       # if an invalid key is used.  A key is invalid if no setter method exists
       # for that key or the access to the setter method is restricted (e.g. due to it
       # being a primary key field).  If set to false, silently skip
       # any key where the setter method doesn't exist or access to it is restricted.
       attr_accessor :strict_param_setting
-  
+
       # Whether to typecast the empty string ('') to nil for columns that
       # are not string or blob.  In most cases the empty string would be the
       # way to specify a NULL SQL value in string form (nil.to_s == ''),
       # and an empty string would not usually be typecast correctly for other
       # types, so the default is true.
       attr_accessor :typecast_empty_string_to_nil
-  
+
       # Whether to typecast attribute values on assignment (default: true).
       # If set to false, no typecasting is done, so it will be left up to the
       # database to typecast the value correctly.
       attr_accessor :typecast_on_assignment
-  
+
       # Whether to use a transaction by default when saving/deleting records (default: true).
       # If you are sending database queries in before_* or after_* hooks, you shouldn't change
       # the default setting without a good reason.
@@ -149,8 +149,8 @@ module Sequel
       #             from the returned class, where the name of the
       #             subclass sets the table name (which is combined
       #             with the +Database+ in +source+ to create the
-      #             dataset to use) 
-      # Dataset :: Sets the dataset for this model to +source+. 
+      #             dataset to use)
+      # Dataset :: Sets the dataset for this model to +source+.
       # other :: Sets the table name for this model to +source+. The
       #          class will use the default database for model
       #          classes in order to create the dataset.
@@ -198,12 +198,12 @@ module Sequel
 
         klass
       end
-  
+
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
       # object is given, it finds the first record whose primary key(s) match
       # the given argument(s).  If no object is returned by the dataset, returns nil.
-      # 
+      #
       #   Artist[1] # SELECT * FROM artists WHERE id = 1
       #   # => #<Artist {:id=>1, ...}>
       #
@@ -223,12 +223,12 @@ module Sequel
         o.instance_variable_set(:@values, values)
         o
       end
-      
+
       # Clear the setter_methods cache
       def clear_setter_methods_cache
         @setter_methods = nil unless frozen?
       end
-  
+
       # Returns the columns in the result set in their original order.
       # Generally, this will use the columns determined via the database
       # schema, but in certain cases (e.g. models that are based on a joined
@@ -241,9 +241,9 @@ module Sequel
         return nil if frozen?
         set_columns(dataset.naked.columns)
       end
-    
+
       # Creates instance using new with the given values and block, and saves it.
-      # 
+      #
       #   Artist.create(name: 'Bob')
       #   # INSERT INTO artists (name) VALUES ('Bob')
       #
@@ -253,7 +253,7 @@ module Sequel
       def create(values = OPTS, &block)
         new(values, &block).save
       end
-  
+
       # Returns the dataset associated with the Model class.  Raises
       # an +Error+ if there is no associated dataset for this class.
       # In most cases, you don't need to call this directly, as Model
@@ -353,7 +353,7 @@ module Sequel
         raise(Error, "No database associated with #{self}: have you called Sequel.connect or #{self}.db= ?") unless @db
         @db
       end
-      
+
       # Sets the database associated with the Model class.
       # Should only be used if the Model class currently does not
       # have a dataset defined.
@@ -372,7 +372,7 @@ module Sequel
         raise Error, "Cannot use Sequel::Model.db= on model with existing dataset.  Use Sequel::Model.dataset= instead." if @dataset
         @db = db
       end
-      
+
       # Returns the cached schema information if available or gets it
       # from the database.  This is a hash where keys are column symbols
       # and values are hashes of information related to the column.  See
@@ -380,13 +380,13 @@ module Sequel
       #
       #   Artist.db_schema
       #   # {:id=>{:type=>:integer, :primary_key=>true, ...},
-      #   #  :name=>{:type=>:string, :primary_key=>false, ...}} 
+      #   #  :name=>{:type=>:string, :primary_key=>false, ...}}
       def db_schema
         return @db_schema if @db_schema
         return nil if frozen?
         @db_schema = get_db_schema
       end
-  
+
       # Create a column alias, where the column methods have one name, but the underlying storage uses a
       # different name.
       def def_column_alias(meth, column)
@@ -396,7 +396,7 @@ module Sequel
           define_method("#{meth}="){|v| self[column] = v}
         end
       end
-  
+
       # Finds a single record according to the supplied filter.
       # You are encouraged to use Model.[] or Model.first instead of this method.
       #
@@ -408,7 +408,7 @@ module Sequel
       def find(*args, &block)
         first(*args, &block)
       end
-      
+
       # Like +find+ but invokes create with given conditions when record does not
       # exist.  Unlike +find+ in that the block used in this method is not passed
       # to +find+, but instead is passed to +create+ only if +find+ does not
@@ -509,7 +509,7 @@ module Sequel
       def implicit_table_name
         pluralize(underscore(demodulize(name))).to_sym
       end
-  
+
       # Calls #call with the values hash.
       def load(values)
         call(values)
@@ -520,7 +520,7 @@ module Sequel
         clear_setter_methods_cache if meth.to_s.end_with?('=')
         super
       end
-  
+
       # Mark the model as not having a primary key. Not having a primary key
       # can cause issues, among which is that you won't be able to update records.
       #
@@ -531,7 +531,7 @@ module Sequel
         clear_setter_methods_cache
         self.simple_pk = @primary_key = nil
       end
-      
+
       # Loads a plugin for use with the model class, passing optional arguments
       # to the plugin.  If the plugin is a module, load it directly.  Otherwise,
       # require the plugin from sequel/plugins/#{plugin} and then attempt to load
@@ -590,7 +590,7 @@ module Sequel
           raise(Error, "#{self} does not have a primary key")
         end
       end
-  
+
       # Restrict the setting of the primary key(s) when using mass assignment (e.g. +set+).  Because
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
@@ -598,13 +598,13 @@ module Sequel
         clear_setter_methods_cache
         @restrict_primary_key = true
       end
-  
+
       # Whether or not setting the primary key(s) when using mass assignment (e.g. +set+) is
       # restricted, true by default.
       def restrict_primary_key?
         @restrict_primary_key
       end
-  
+
       # Sets the dataset associated with the Model class. +ds+ can be a +Symbol+,
       # +LiteralString+, <tt>SQL::Identifier</tt>, <tt>SQL::QualifiedIdentifier</tt>,
       # <tt>SQL::AliasedExpression</tt>
@@ -648,7 +648,7 @@ module Sequel
         self
       end
 
-      # Sets the primary key for this model. You can use either a regular 
+      # Sets the primary key for this model. You can use either a regular
       # or a composite primary key.  To not use a primary key, set to nil
       # or use +no_primary_key+. On most adapters, Sequel can automatically
       # determine the primary key to use, so this method is not needed often.
@@ -676,7 +676,7 @@ module Sequel
         end
         @primary_key = key
       end
-  
+
       # Cache of setter methods to allow by default, in order to speed up mass assignment.
       def setter_methods
         return @setter_methods if @setter_methods
@@ -692,7 +692,7 @@ module Sequel
       def table_name
         dataset.first_source_alias
       end
-  
+
       # Allow the setting of the primary key(s) when using the mass assignment methods.
       # Using this method can open up security issues, be very careful before using it.
       #
@@ -713,12 +713,12 @@ module Sequel
       def with_pk!(pk)
         with_pk(pk) || raise(NoMatchingRow.new(dataset))
       end
-  
+
       # Add model methods that call dataset methods
       Plugins.def_dataset_methods(self, (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server]) - [:<<, :or, :[], :columns, :columns!, :delete, :update, :set_graph_aliases, :add_graph_aliases])
-  
+
       private
-      
+
       # Yield to the passed block and if do_raise is false, swallow all errors other than DatabaseConnectionErrors.
       def check_non_connection_error(do_raise=require_valid_table)
         begin
@@ -772,7 +772,7 @@ module Sequel
           define_method(meth){|v| self[column] = v} unless im.include?(meth)
         end
       end
-  
+
       # Create the column accessors.  For columns that can be used as method names directly in ruby code,
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
@@ -786,7 +786,7 @@ module Sequel
           overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end", __FILE__, __LINE__) unless im.include?(meth)
         end
       end
-  
+
       # Define a model method that calls the dataset method with the same name,
       # only used for methods with names that can't be represented directly in
       # ruby code.
@@ -853,7 +853,7 @@ module Sequel
         meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
         meths
       end
-  
+
       # A hash of instance variables to automatically set up in subclasses.
       # Keys are instance variable symbols, values should be:
       # nil :: Assign directly from superclass to subclass (frozen objects)
@@ -885,7 +885,7 @@ module Sequel
           :@use_transactions=>nil
         }
       end
-    
+
       # For the given opts hash and default name or :class option, add a
       # :class_name option unless already present which contains the name
       # of the class to use as a string.  The purpose is to allow late
@@ -907,15 +907,15 @@ module Sequel
 
         opts[:class_name] ||= '::' + ((name || '').split("::")[0..-2] + [camelize(default)]).join('::')
       end
-  
+
       # Module that the class includes that holds methods the class adds for column accessors and
       # associations so that the methods can be overridden with +super+.
       def overridable_methods_module
         include(@overridable_methods_module = Module.new) unless @overridable_methods_module
         @overridable_methods_module
       end
-      
-      # Returns the module for the specified plugin. If the module is not 
+
+      # Returns the module for the specified plugin. If the module is not
       # defined, the corresponding plugin required.
       def plugin_module(plugin)
         module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
@@ -947,7 +947,7 @@ module Sequel
       def reload_db_schema?
         false
       end
-      
+
       # Reset the cached fast primary lookup SQL if a simple table and primary key
       # are used, or set it to nil if not used.
       def reset_fast_pk_lookup_sql
@@ -964,7 +964,7 @@ module Sequel
       def reset_instance_dataset
         @instance_dataset = @dataset.limit(1).naked.skip_limit_check if @dataset
       end
-  
+
       # Set the columns for this model and create accessor methods for each column.
       def set_columns(new_columns)
         @columns = new_columns
@@ -1016,14 +1016,14 @@ module Sequel
 
       # Define instance method(s) that calls class method(s) of the
       # same name. Replaces the construct:
-      #   
+      #
       #   define_method(meth){self.class.public_send(meth)}
       [:columns, :db, :primary_key, :db_schema].each{|meth| class_eval("def #{meth}; self.class.#{meth} end", __FILE__, __LINE__)}
 
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable.
-      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, 
+      [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting,
         :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions].each do |meth|
         class_eval("def #{meth}; !defined?(@#{meth}) ? (frozen? ? self.class.#{meth} : (@#{meth} = self.class.#{meth})) : @#{meth} end", __FILE__, __LINE__)
         attr_writer(meth)
@@ -1057,7 +1057,7 @@ module Sequel
       # If a block is given, yield the instance to the block.
       #
       # Arguments:
-      # values :: should be a hash to pass to set. 
+      # values :: should be a hash to pass to set.
       #
       #   Artist.new(name: 'Bob')
       #
@@ -1079,7 +1079,7 @@ module Sequel
       def [](column)
         @values[column]
       end
-  
+
       # Sets the value for the given column.  If typecasting is enabled for
       # this object, typecast the value based on the column's type.
       # If this is a new record or the typecasted value isn't the same
@@ -1099,12 +1099,12 @@ module Sequel
           change_column_value(column, v)
         end
       end
-  
+
       # Alias of eql?
       def ==(obj)
         eql?(obj)
       end
-  
+
       # Case equality.  By default, checks equality of the primary key value, see
       # pk_equal?.
       #
@@ -1154,7 +1154,7 @@ module Sequel
       def cancel_action(msg=nil)
         raise_hook_failure(msg)
       end
-  
+
       # The columns that have been updated.  This isn't completely accurate,
       # as it could contain columns whose values have not changed.
       #
@@ -1176,7 +1176,7 @@ module Sequel
         _delete
         self
       end
-      
+
       # Like delete but runs hooks before and after delete.
       # Uses a transaction if use_transactions is true or if the
       # :transaction option is given and true.
@@ -1196,7 +1196,7 @@ module Sequel
       def each(&block)
         @values.each(&block)
       end
-  
+
       # Compares model instances by values.
       #
       #   Artist[1] == Artist[1] # => true
@@ -1210,7 +1210,7 @@ module Sequel
       # See +Errors+.
       def errors
         @errors ||= errors_class.new
-      end 
+      end
 
       # Returns true when current instance exists, false otherwise.
       # Generally an object that isn't new will exist unless it has
@@ -1225,7 +1225,7 @@ module Sequel
       def exists?
         new? ? false : !this.get(SQL::AliasedExpression.new(1, :one)).nil?
       end
-      
+
       # Ignore the model's setter method cache when this instances extends a module, as the
       # module may contain setter methods.
       def extend(mod)
@@ -1246,7 +1246,7 @@ module Sequel
         this if !new? && model.primary_key
         super
       end
-  
+
       # Value that should be unique for objects with the same class and pk (if pk is not nil), or
       # the same class and values (if pk is nil).
       #
@@ -1264,7 +1264,7 @@ module Sequel
           [model, @values].hash
         end
       end
-  
+
       # Returns value for the :id attribute, even if the primary key is
       # not id. To get the primary key value, use +pk+.
       #
@@ -1272,13 +1272,13 @@ module Sequel
       def id
         @values[:id]
       end
-  
+
       # Returns a string representation of the model instance including
       # the class name and values.
       def inspect
         "#<#{model.name} @values=#{inspect_values}>"
       end
-  
+
       # Returns the keys in +values+.  May not include all column names.
       #
       #   Artist.new.keys # => []
@@ -1287,7 +1287,7 @@ module Sequel
       def keys
         @values.keys
       end
-      
+
       # Refresh this record using +for_update+ (by default, or the specified style when given)
       # unless this is a new record.  Returns self. This can be used to make sure no other
       # process is updating the record at the same time.
@@ -1315,7 +1315,7 @@ module Sequel
         _refresh(this.lock_style(style)) unless new?
         self
       end
-      
+
       # Remove elements of the model object that make marshalling fail. Returns self.
       #
       #   a = Artist[1]
@@ -1368,7 +1368,7 @@ module Sequel
           @modified || !changed_columns.empty?
         end
       end
-  
+
       # Returns true if the current instance represents a new record.
       #
       #   Artist.new.new? # => true
@@ -1376,7 +1376,7 @@ module Sequel
       def new?
         defined?(@new) ? @new : (@new = false)
       end
-      
+
       # Returns the primary key value identifying the model instance.
       # Raises an +Error+ if this model does not have a primary key.
       # If the model has a composite primary key, returns an array of values.
@@ -1392,17 +1392,17 @@ module Sequel
           @values[key]
         end
       end
-      
+
       # Returns a hash mapping the receivers primary key column(s) to their values.
-      # 
+      #
       #   Artist[1].pk_hash # => {:id=>1}
       #   Artist[[1, 2]].pk_hash # => {:id1=>1, :id2=>2}
       def pk_hash
         model.primary_key_hash(pk)
       end
-      
+
       # Returns a hash mapping the receivers qualified primary key column(s) to their values.
-      # 
+      #
       #   Artist[1].qualified_pk_hash
       #   # => {Sequel[:artists][:id]=>1}
       #   Artist[[1, 2]].qualified_pk_hash
@@ -1410,7 +1410,7 @@ module Sequel
       def qualified_pk_hash(qualifier=model.table_name)
         model.qualified_primary_key_hash(pk, qualifier)
       end
-      
+
       # Reloads attributes from database and returns self. Also clears all
       # changed_columns information.  Raises an +Error+ if the record no longer
       # exists in the database.
@@ -1429,7 +1429,7 @@ module Sequel
       def reload
         refresh
       end
-  
+
       # Creates or updates the record, after making sure the record
       # is valid and before hooks execute successfully. Fails if:
       #
@@ -1457,7 +1457,7 @@ module Sequel
       # :validate :: set to false to skip validation
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
-        set_server(opts[:server]) if opts[:server] 
+        set_server(opts[:server]) if opts[:server]
         unless _save_valid?(opts)
           raise(validation_failed_error) if raise_on_failure?(opts)
           return
@@ -1475,9 +1475,9 @@ module Sequel
       #   a.save_changes # UPDATE artists SET name = 'Bob' WHERE (id = 1)
       #   # => #<Artist {:id=>1, :name=>'Jim', ...}
       def save_changes(opts=OPTS)
-        save(Hash[opts].merge!(:changed=>true)) || false if modified? 
+        save(Hash[opts].merge!(:changed=>true)) || false if modified?
       end
-  
+
       # Updates the instance with the supplied values with support for virtual
       # attributes, raising an exception if a value is used that doesn't have
       # a setter method (or ignoring it if <tt>strict_param_setting = false</tt>).
@@ -1488,7 +1488,7 @@ module Sequel
       def set(hash)
         set_restricted(hash, :default)
       end
-  
+
       # For each of the fields in the given array +fields+, call the setter
       # method with the value of that +hash+ entry for the field. Returns self.
       #
@@ -1526,7 +1526,7 @@ module Sequel
         when :skip, :raise
           do_raise = true if missing == :raise
           fields.each do |f|
-            if hash.has_key?(f) 
+            if hash.has_key?(f)
               set_column_value("#{f}=", hash[f])
             elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
               set_column_value("#{sf}=", hash[sf])
@@ -1539,7 +1539,7 @@ module Sequel
         end
         self
       end
-  
+
       # Set the shard that this object is tied to.  Returns self.
       def set_server(s)
         @server = s
@@ -1552,7 +1552,7 @@ module Sequel
         @singleton_setter_added = true if meth.to_s.end_with?('=')
         super
       end
-  
+
       # Skip all validation of the object on the next call to #save,
       # including the running of validation hooks. This is designed for
       # and should only be used in cases where #valid? is called before
@@ -1571,14 +1571,14 @@ module Sequel
         raise Error, "No dataset for model #{model}" unless ds = model.instance_dataset
         @this = use_server(ds.where(pk_hash))
       end
-      
+
       # Runs #set with the passed hash and then runs save_changes.
       #
       #   artist.update(name: 'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update(hash)
         update_restricted(hash, :default)
       end
-  
+
       # Update the instance's values by calling set_fields with the arguments, then
       # calls save_changes.
       #
@@ -1615,7 +1615,7 @@ module Sequel
       end
 
       private
-      
+
       # Add a column as a changed column.
       def _add_changed_column(column)
         cc = _changed_columns
@@ -1626,7 +1626,7 @@ module Sequel
       def _changed_columns
         @changed_columns ||= []
       end
-  
+
       # Do the deletion of the object's dataset, and check that the row
       # was actually deleted.
       def _delete
@@ -1634,13 +1634,13 @@ module Sequel
         raise(NoExistingObject, "Attempt to delete object did not result in a single row modification (Rows Deleted: #{n}, SQL: #{_delete_dataset.delete_sql})") if require_modification && n != 1
         n
       end
-      
+
       # The dataset to use when deleting the object.  The same as the object's
       # dataset by default.
       def _delete_dataset
         this
       end
-  
+
       # Actually do the deletion of the object's dataset.  Return the
       # number of rows modified.
       def _delete_without_checking
@@ -1650,7 +1650,7 @@ module Sequel
           ds.literal_append(sql, pk)
           ds.with_sql_delete(sql)
         else
-          _delete_dataset.delete 
+          _delete_dataset.delete
         end
       end
 
@@ -1667,7 +1667,7 @@ module Sequel
         raise_hook_failure(:around_destroy) unless called
         self
       end
-      
+
       # Internal delete method to call when destroying an object,
       # separated from delete to allow you to override destroy's version
       # without affecting delete.
@@ -1698,7 +1698,7 @@ module Sequel
       def _insert_dataset
         use_server(model.instance_dataset)
       end
-  
+
       # Insert into the given dataset and return the primary key created (if any).
       def _insert_raw(ds)
         ds.insert(_insert_values)
@@ -1711,7 +1711,7 @@ module Sequel
 
       # The values hash to use when inserting a new record.
       alias _insert_values values
-      
+
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
@@ -1730,7 +1730,7 @@ module Sequel
           dataset.first
         end
       end
-      
+
       # Set the values to the given hash after refreshing.
       def _refresh_set_values(h)
         @values = h
@@ -1847,7 +1847,7 @@ module Sequel
         raise(NoExistingObject, "Attempt to update object did not result in a single row modification (SQL: #{_update_dataset.update_sql(columns)})") if require_modification && n != 1
         n
       end
-      
+
       # The dataset to use when updating an object.  The same as the object's
       # dataset by default.
       def _update_dataset
@@ -1861,7 +1861,7 @@ module Sequel
 
       # Whether to use insert_select when inserting a new row.
       def _use_insert_select?(ds)
-        (!ds.opts[:select] || ds.opts[:returning]) && ds.supports_insert_select? 
+        (!ds.opts[:select] || ds.opts[:returning]) && ds.supports_insert_select?
       end
 
       # Internal validation method, running validation hooks.
@@ -1894,12 +1894,12 @@ module Sequel
         else
           begin
             yield
-          rescue HookFailed 
+          rescue HookFailed
             nil
           end
         end
       end
-      
+
       # If transactions should be used, wrap the yield in a transaction block.
       def checked_transaction(opts=OPTS)
         use_transaction?(opts) ? db.transaction({:server=>this_server}.merge!(opts)){yield} : yield
@@ -1920,7 +1920,7 @@ module Sequel
       def hook_failed_error(msg)
         HookFailed.new(msg, self)
       end
-  
+
       # Clone constructor -- freeze internal data structures if the original's
       # are frozen.
       def initialize_clone(other)
@@ -2005,11 +2005,11 @@ module Sequel
         end
         self
       end
-      
+
       # Returns all methods that can be used for attribute assignment (those that end with =),
       # depending on the type:
       #
-      # :default :: Use the default methods allowed in the model class. 
+      # :default :: Use the default methods allowed in the model class.
       # :all :: Allow setting all setters, except those specifically restricted (such as ==).
       # Array :: Only allow setting of columns in the given array.
       def setter_methods(type)
@@ -2033,7 +2033,7 @@ module Sequel
           model.dataset.opts[:server] || :default
         end
       end
-  
+
       # Typecast the value to the column's type if typecasting.  Calls the database's
       # typecast_value method, so database adapters can override/augment the handling
       # for database specific column types.
@@ -2047,7 +2047,7 @@ module Sequel
           raise_on_typecast_failure ? raise : value
         end
       end
-  
+
       # Set the columns, filtered by the only and except arrays.
       def update_restricted(hash, type)
         set_restricted(hash, type)
@@ -2058,7 +2058,7 @@ module Sequel
       def use_server(ds)
         @server ? ds.server(@server) : ds
       end
-      
+
       # Whether to use a transaction for this action.  If the :transaction
       # option is present in the hash, use that, otherwise, fallback to the
       # object's default (if set), or class's default (if not).
@@ -2149,7 +2149,7 @@ module Sequel
           super
         else
           raise(Sequel::Error, "No primary key for model") unless model && (pk = model.primary_key)
-          super(pk, value_column, opts) 
+          super(pk, value_column, opts)
         end
       end
 

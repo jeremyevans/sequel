@@ -58,7 +58,7 @@ module Sequel
           end
         end
       end
-      
+
       module InstanceMethods
         private
 

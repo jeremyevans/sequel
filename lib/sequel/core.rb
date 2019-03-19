@@ -10,17 +10,17 @@
 #   DB = Sequel.sqlite # Memory database
 #   DB = Sequel.sqlite('blog.db')
 #   DB = Sequel.postgres('database_name',
-#          user:'user', 
+#          user:'user',
 #          password: 'password',
 #          host: 'host'
-#          port: 5432, 
+#          port: 5432,
 #          max_connections: 10)
 #
 # If a block is given to these methods, it is passed the opened Database
 # object, which is closed (disconnected) when the block exits, just
 # like a block passed to Sequel.connect.  For example:
 #
-#   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
+#   Sequel.sqlite('blog.db'){|db| puts db[:users].count}
 #
 # For a more expanded introduction, see the {README}[rdoc-ref:README.rdoc].
 # For a quicker introduction, see the {cheat sheet}[rdoc-ref:doc/cheat_sheet.rdoc].
@@ -106,7 +106,7 @@ module Sequel
   # If a block is given, it is passed the opened +Database+ object, which is
   # closed when the block exits.  For example:
   #
-  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
+  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}
   #
   # If a block is not given, a reference to this database will be held in
   # <tt>Sequel::DATABASES</tt> until it is removed manually.  This is by
@@ -139,7 +139,7 @@ module Sequel
   end
 
   # Load all Sequel extensions given.  Extensions are just files that exist under
-  # <tt>sequel/extensions</tt> in the load path, and are just required.  
+  # <tt>sequel/extensions</tt> in the load path, and are just required.
   # In some cases, requiring an extension modifies classes directly, and in others,
   # it just loads a module that you can extend other classes with.  Consult the documentation
   # for each extension you plan on using for usage.
@@ -149,7 +149,7 @@ module Sequel
   def self.extension(*extensions)
     extensions.each{|e| orig_require("sequel/extensions/#{e}")}
   end
-  
+
   # The exception classed raised if there is an error parsing JSON.
   # This can be overridden to use an alternative json implementation.
   def self.json_parser_error_class
@@ -381,7 +381,7 @@ module Sequel
       vr.instance_exec(&block)
     else
       block.call(vr)
-    end  
+    end
   end
 
   ### Private Class Methods ###

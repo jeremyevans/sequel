@@ -68,9 +68,9 @@ module Sequel
         # A hash with composition name keys and composition reflection
         # hash values.
         attr_reader :compositions
-        
+
         # Define a composition for this model, with name being the name of the composition.
-        # You must provide either a :mapping option or both the :composer and :decomposer options. 
+        # You must provide either a :mapping option or both the :composer and :decomposer options.
         #
         # Options:
         # :class :: if using the :mapping option, the class to use, as a Class, String or Symbol.
@@ -96,7 +96,7 @@ module Sequel
           compositions[name] = opts
           if mapping = opts[:mapping]
             keys = mapping.map{|k| k.is_a?(Array) ? k.first : k}
-            if !opts[:composer]              
+            if !opts[:composer]
               late_binding_class_option(opts, name)
               klass = opts[:class]
               class_proc = proc{klass || constantize(opts[:class_name])}
@@ -124,14 +124,14 @@ module Sequel
           raise(Error, "Must provide :composer and :decomposer options, or :mapping option") unless opts[:composer] && opts[:decomposer]
           define_composition_accessor(name, opts)
         end
-        
+
         Plugins.inherited_instance_variables(self, :@compositions=>:dup)
-        
+
         # Define getter and setter methods for the composition object.
         def define_composition_accessor(name, opts=OPTS)
           composer = opts[:composer]
           @composition_module.class_eval do
-            define_method(name) do 
+            define_method(name) do
               if compositions.has_key?(name)
                 compositions[name]
               elsif frozen?
@@ -174,7 +174,7 @@ module Sequel
           @compositions.keys.each{|n| instance_exec(&model.compositions[n][:decomposer])} if @compositions
           super
         end
-        
+
         private
 
         # Clear the cached compositions when manually refreshing.

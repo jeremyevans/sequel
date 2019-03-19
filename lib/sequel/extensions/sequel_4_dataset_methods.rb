@@ -28,13 +28,13 @@ module Sequel
     def and(*cond, &block)
       where(*cond, &block)
     end
-    
+
     # Alias for exclude.
     def exclude_where(*cond, &block)
       exclude(*cond, &block)
     end
 
-    # Returns the interval between minimum and maximum values for the given 
+    # Returns the interval between minimum and maximum values for the given
     # column/expression. Uses a virtual row block if no argument is given.
     #
     #   DB[:table].interval(:id) # SELECT (max(id) - min(id)) FROM table LIMIT 1
@@ -77,7 +77,7 @@ module Sequel
         (r[:v1]..r[:v2])
       end
     end
-    
+
   end
 
   Dataset.register_extension(:sequel_4_dataset_methods, Sequel4DatasetMethods)

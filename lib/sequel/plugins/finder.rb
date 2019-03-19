@@ -23,7 +23,7 @@ module Sequel
     # Additionally, there is a Model.prepared_finder method.  This works similarly
     # to Model.finder, but uses a prepared statement.  This limits the types of
     # arguments that will be accepted, but can perform better in the database.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses support Model.finder
@@ -149,7 +149,7 @@ module Sequel
                 ds
               end
 
-              Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block) 
+              Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block)
             end
           end
 

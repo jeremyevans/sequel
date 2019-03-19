@@ -17,7 +17,7 @@ module Sequel
       FOREIGN_KEY_ACTION_MAP = {0 => :no_action, 1 => :cascade, 2 => :set_null, 3 => :set_default}.freeze
 
       include Sequel::Database::SplitAlterTable
-      
+
       # Whether to use N'' to quote strings, which allows unicode characters inside the
       # strings.  True by default for compatibility, can be set to false for a possible
       # performance increase.  This sets the default for all datasets created from this
@@ -40,7 +40,7 @@ module Sequel
       # :numrows :: The number of rows affected by the stored procedure
       # output params :: Values for any output paramters, using the name given for the output parameter
       #
-      # Because Sequel datasets only support a single result set per query, and retrieving 
+      # Because Sequel datasets only support a single result set per query, and retrieving
       # the result code and number of rows requires a query, this does not support
       # stored procedures which also return result sets.  To handle such stored procedures,
       # you should drop down to the connection/driver level by using Sequel::Database#synchronize
@@ -112,7 +112,7 @@ module Sequel
       def database_type
         :mssql
       end
-      
+
       # Microsoft SQL Server namespaces indexes per table.
       def global_index_namespace?
         false
@@ -134,12 +134,12 @@ module Sequel
           join(Sequel.lit('[sys].[all_columns]').as(:rc), :object_id => fkc[:referenced_object_id], :column_id => fkc[:referenced_column_id]).
           where{{object_schema_name(fk[:parent_object_id]) => im.call(schema || current_schema)}}.
           where{{object_name(fk[:parent_object_id]) => im.call(table)}}.
-          select{[fk[:name], 
-                  fk[:delete_referential_action], 
-                  fk[:update_referential_action], 
-                  pc[:name].as(:column), 
-                  rc[:name].as(:referenced_column), 
-                  object_schema_name(fk[:referenced_object_id]).as(:schema), 
+          select{[fk[:name],
+                  fk[:delete_referential_action],
+                  fk[:update_referential_action],
+                  pc[:name].as(:column),
+                  rc[:name].as(:referenced_column),
+                  object_schema_name(fk[:referenced_object_id]).as(:schema),
                   object_name(fk[:referenced_object_id]).as(:table)]}.
           order(fk[:name], fkc[:constraint_column_id])
         h = {}
@@ -150,11 +150,11 @@ module Sequel
           else
             referenced_schema = m.call(row[:schema])
             referenced_table = m.call(row[:table])
-            h[row[:name]] = { :name      => m.call(row[:name]), 
+            h[row[:name]] = { :name      => m.call(row[:name]),
                               :table     => (referenced_schema == current_schema) ? referenced_table : Sequel.qualify(referenced_schema, referenced_table),
-                              :columns   => [m.call(row[:column])], 
-                              :key       => [m.call(row[:referenced_column])], 
-                              :on_update => fk_action_map[row[:update_referential_action]], 
+                              :columns   => [m.call(row[:column])],
+                              :key       => [m.call(row[:referenced_column])],
+                              :on_update => fk_action_map[row[:update_referential_action]],
                               :on_delete => fk_action_map[row[:delete_referential_action]] }
           end
         end
@@ -209,7 +209,7 @@ module Sequel
         end
         @server_version
       end
-        
+
       # MSSQL 2008+ supports partial indexes.
       def supports_partial_indexes?
         dataset.send(:is_2008_or_later?)
@@ -219,7 +219,7 @@ module Sequel
       def supports_savepoints?
         true
       end
-      
+
       # MSSQL supports transaction isolation levels
       def supports_transaction_isolation_levels?
         true
@@ -241,9 +241,9 @@ module Sequel
       def views(opts=OPTS)
         information_schema_tables('VIEW', opts)
       end
-      
+
       private
-      
+
       # Add dropping of the default constraint to the list of SQL queries.
       # This is necessary before dropping the column or changing its type.
       def add_drop_default_constraint_sql(sqls, table, column)
@@ -256,7 +256,7 @@ module Sequel
       def auto_increment_sql
         'IDENTITY(1,1)'
       end
-      
+
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -295,7 +295,7 @@ module Sequel
           super(table, op)
         end
       end
-      
+
       def begin_savepoint_sql(depth)
         "SAVE TRANSACTION autopoint_#{depth}"
       end
@@ -325,14 +325,14 @@ module Sequel
       def commit_transaction_sql
         "COMMIT TRANSACTION"
       end
-        
+
       # MSSQL uses the name of the table to decide the difference between
       # a regular and temporary table, with temporary table names starting with
       # a #.
       def create_table_prefix_sql(name, options)
         "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)}"
       end
-      
+
       # MSSQL doesn't support CREATE TABLE AS, it only supports SELECT INTO.
       # Emulating CREATE TABLE AS using SELECT INTO is only possible if a dataset
       # is given as the argument, it can't work with a string, so raise an
@@ -341,7 +341,7 @@ module Sequel
         raise(Error, "must provide dataset instance as value of create_table :as option on MSSQL") unless ds.is_a?(Sequel::Dataset)
         run(ds.into(name).sql)
       end
-    
+
       DATABASE_ERROR_REGEXPS = {
         /Violation of UNIQUE KEY constraint|(Violation of PRIMARY KEY constraint.+)?Cannot insert duplicate key/ => UniqueConstraintViolation,
         /conflicted with the (FOREIGN KEY.*|REFERENCE) constraint/ => ForeignKeyConstraintViolation,
@@ -369,7 +369,7 @@ module Sequel
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
-      
+
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         raise Error, "Partial indexes are not supported for this database" if index[:where] && !supports_partial_indexes?
@@ -393,20 +393,20 @@ module Sequel
       def _metadata_dataset
         super.with_quote_identifiers(true)
       end
-      
+
       # Use sp_rename to rename the table
       def rename_table_sql(name, new_name)
         "sp_rename #{literal(quote_schema_table(name))}, #{quote_identifier(schema_and_table(new_name).pop)}"
       end
-      
+
       def rollback_savepoint_sql(depth)
         "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_#{depth}"
       end
-      
+
       def rollback_transaction_sql
         "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION"
       end
-      
+
       def schema_column_type(db_type)
         case db_type
         when /\A(?:bit)\z/io
@@ -474,7 +474,7 @@ module Sequel
       def set_mssql_unicode_strings
         @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
       end
-      
+
       # MSSQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_datetime(column)
@@ -485,18 +485,18 @@ module Sequel
       def type_literal_generic_trueclass(column)
         :bit
       end
-      
+
       # MSSQL uses varbinary(max) type for blobs
       def type_literal_generic_file(column)
         :'varbinary(max)'
       end
-      
+
       # MSSQL supports views with check option, but not local.
       def view_with_check_option_support
         true
       end
     end
-  
+
     module DatasetMethods
       include(Module.new do
         Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from lock join where group having compounds order')
@@ -551,7 +551,7 @@ module Sequel
           super
         end
       end
-      
+
       # MSSQL doesn't support the SQL standard CURRENT_DATE or CURRENT_TIME
       def constant_sql_append(sql, constant)
         if c = CONSTANT_MAP[constant]
@@ -560,7 +560,7 @@ module Sequel
           super
         end
       end
-      
+
       # Uses CROSS APPLY to join the given table into the current dataset.
       def cross_apply(table)
         join_table(:cross_apply, table)
@@ -575,7 +575,7 @@ module Sequel
       def escape_like(string)
         string.gsub(/[\\%_\[\]]/){|m| "\\#{m}"}
       end
-   
+
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = OPTS)
         terms = "\"#{terms.join('" OR "')}\"" if terms.is_a?(Array)
@@ -698,12 +698,12 @@ module Sequel
       def supports_intersect_except?
         is_2005_or_later?
       end
-      
+
       # MSSQL does not support IS TRUE
       def supports_is_true?
         false
       end
-      
+
       # MSSQL doesn't support JOIN USING
       def supports_join_using?
         false
@@ -718,7 +718,7 @@ module Sequel
       def supports_multiple_column_in?
         false
       end
-      
+
       # MSSQL supports NOWAIT.
       def supports_nowait?
         true
@@ -753,9 +753,9 @@ module Sequel
       def supports_where_true?
         false
       end
-      
+
       protected
-      
+
       # If returned primary keys are requested, use OUTPUT unless already set on the
       # dataset.  If OUTPUT is already set, use existing returning values.  If OUTPUT
       # is only set to return a single columns, return an array of just that column.
@@ -778,7 +778,7 @@ module Sequel
         (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
       end
 
-      # If the dataset using a order without a limit or offset or custom SQL, 
+      # If the dataset using a order without a limit or offset or custom SQL,
       # remove the order.  Compounds on Microsoft SQL Server have undefined
       # order unless the result is specifically ordered.  Applying the current
       # order before the compound doesn't work in all cases, such as when
@@ -861,12 +861,12 @@ module Sequel
           literal_append(sql, SQL::Function.new(:ltrim, SQL::Function.new(:rtrim, f.args.first)))
         end
       end
-      
+
       # Microsoft SQL Server 2012+ has native support for offsets, but only for ordered datasets.
       def emulate_offset_with_row_number?
         super && !(is_2012_or_later? && @opts[:order])
       end
-      
+
       # Return the first primary key for the current table.  If this table has
       # multiple primary keys, this will only return one of them.  Used by #_import.
       def first_primary_key
@@ -894,7 +894,7 @@ module Sequel
       def literal_blob_append(sql, v)
         sql << '0x' << v.unpack("H*").first
       end
-      
+
       # Use YYYYmmdd format, since that's the only format that is
       # multilanguage and not DATEFORMAT dependent.
       def literal_date(v)
@@ -912,12 +912,12 @@ module Sequel
         sql << (mssql_unicode_strings ? "N'" : "'")
         sql << v.gsub("'", "''").gsub(/\\((?:\r\n)|\n)/, '\\\\\\\\\\1\\1') << "'"
       end
-      
+
       # Use 1 for true on MSSQL
       def literal_true
         '1'
       end
-      
+
       # MSSQL 2008+ supports multiple rows in the VALUES clause, older versions
       # can use UNION.
       def multi_insert_sql_strategy

@@ -30,7 +30,7 @@
 # or you have loaded the core_refinements extension
 # and have activated refinements for the file, you can also use Range#pg_range:
 #
-#   range.pg_range 
+#   range.pg_range
 #
 # You may want to specify a specific range type:
 #
@@ -103,7 +103,7 @@ module Sequel
           exclude_end = matches[6] == ')'
 
           # If the input is quoted, it needs to be unescaped.  Also, quoted input isn't
-          # checked for emptiness, since the empty quoted string is considered an 
+          # checked for emptiness, since the empty quoted string is considered an
           # element that happens to be the empty string, while an unquoted empty string
           # is considered unbounded.
           #
@@ -168,7 +168,7 @@ module Sequel
         # Handle Range and PGRange values in bound variables
         def bound_variable_arg(arg, conn)
           case arg
-          when PGRange 
+          when PGRange
             arg.unquoted_literal(schema_utility_dataset)
           when Range
             PGRange.from_range(arg).unquoted_literal(schema_utility_dataset)
@@ -222,7 +222,7 @@ module Sequel
           end
 
           if soid
-            raise Error, "can't provide both a converter and :subtype_oid option to register" if has_converter 
+            raise Error, "can't provide both a converter and :subtype_oid option to register" if has_converter
             raise Error, "no conversion proc for :subtype_oid=>#{soid.inspect} in conversion_procs" unless converter = conversion_procs[soid]
           end
 
@@ -410,7 +410,7 @@ module Sequel
           true
         else
           if valid_ruby_range?
-            to_range === other 
+            to_range === other
           else
             false
           end
@@ -544,7 +544,7 @@ end
 
 # :nocov:
 if Sequel.core_extensions?
-  class Range 
+  class Range
     # Create a new PGRange using the receiver as the input range,
     # with the given database type.
     def pg_range(db_type=nil)

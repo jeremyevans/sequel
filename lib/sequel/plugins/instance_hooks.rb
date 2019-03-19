@@ -19,7 +19,7 @@ module Sequel
     # hooks will be run the third time you save the object.
     #
     # Validation hooks are not cleared until after a successful save.
-    # 
+    #
     # Usage:
     #
     #   # Add the instance hook methods to all model subclass instances (called before loading subclasses)
@@ -28,7 +28,7 @@ module Sequel
     #   # Add the instance hook methods just to Album instances
     #   Album.plugin :instance_hooks
     module InstanceHooks
-      module InstanceMethods 
+      module InstanceMethods
         Sequel::Model::HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
           def #{h}_hook(&block)
             raise Sequel::Error, "can't add hooks to frozen object" if frozen?
@@ -36,7 +36,7 @@ module Sequel
             self
           end
         END
-        
+
         [:before_create, :before_update, :before_validation].each{|h| class_eval("def #{h}; run_before_instance_hooks(:#{h}) if @instance_hooks; super end", __FILE__, __LINE__)}
         [:after_create, :after_update].each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
           def #{h}
@@ -63,7 +63,7 @@ module Sequel
           return unless @instance_hooks
           run_after_instance_hooks(:after_validation)
         end
-        
+
         # Run after save instance hooks.
         def after_save
           super
@@ -88,22 +88,22 @@ module Sequel
           run_before_instance_hooks(:before_save)
           super
         end
-        
+
         private
-        
+
         # Add the block as an instance level hook.  For before hooks, add it to
         # the beginning of the instance hook's array.  For after hooks, add it
         # to the end.
         def add_instance_hook(hook, &block)
           instance_hooks(hook).public_send(hook.to_s.start_with?('before') ? :unshift : :push, block)
         end
-        
+
         # An array of instance level hook blocks for the given hook type.
         def instance_hooks(hook)
           @instance_hooks ||= {}
           @instance_hooks[hook] ||= []
         end
-        
+
         # Run all hook blocks of the given hook type.
         def run_after_instance_hooks(hook)
           instance_hooks(hook).each(&:call)

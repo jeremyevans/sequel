@@ -20,19 +20,19 @@ module Sequel
       def initialize(db)
         @db = db
       end
-      
+
       # Return blobs as instances of Sequel::SQL::Blob instead of
       # Amalgamite::Blob
       def blob(s)
         SQL::Blob.new(s)
       end
-      
+
       # Return numeric/decimal types as instances of BigDecimal
       # instead of Float
       def decimal(s)
         BigDecimal(s)
       end
-      
+
       # Return datetime types as instances of Sequel.datetime_class
       def datetime(s)
         @db.to_application_timestamp(s)
@@ -41,7 +41,7 @@ module Sequel
       def time(s)
         Sequel.string_to_time(s)
       end
-      
+
       # Don't raise an error if the value is a string and the declared
       # type doesn't match a known type, just return the value.
       def result_value_of(declared_type, value)
@@ -54,19 +54,19 @@ module Sequel
         end
       end
     end
-    
+
     class Database < Sequel::Database
       include ::Sequel::SQLite::DatabaseMethods
-      
+
       set_adapter_scheme :amalgalite
-      
+
       # Mimic the file:// uri, by having 2 preceding slashes specify a relative
       # path, and 3 preceding slashes specify an absolute path.
       def self.uri_to_options(uri) # :nodoc:
         { :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}" }
       end
       private_class_method :uri_to_options
-      
+
       # Connect to the database.  Since SQLite is a file based database,
       # the only options available are :database (to specify the database
       # name), and :timeout, to specify how long to wait for the database to
@@ -80,7 +80,7 @@ module Sequel
         connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
         db
       end
-      
+
       def database_type
         :sqlite
       end
@@ -89,15 +89,15 @@ module Sequel
         _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.execute_batch(sql)}}
         nil
       end
-      
+
       def execute_dui(sql, opts=OPTS)
         _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.execute_batch(sql)}; conn.row_changes}
       end
-      
+
       def execute_insert(sql, opts=OPTS)
         _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.execute_batch(sql)}; conn.last_insert_rowid}
       end
-      
+
       def execute(sql, opts=OPTS)
         _execute(sql, opts) do |conn|
           begin
@@ -107,14 +107,14 @@ module Sequel
           end
         end
       end
-      
+
       # Run the given SQL with the given arguments and return the first value of the first row.
       def single_value(sql, opts=OPTS)
         _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.first_value_from(sql)}}
       end
-      
+
       private
-      
+
       # Yield an available connection.  Rescue
       # any Amalgalite::Errors and turn them into DatabaseErrors.
       def _execute(sql, opts)
@@ -124,7 +124,7 @@ module Sequel
           raise_error(e)
         end
       end
-      
+
       # The Amagalite adapter does not need the pool to convert exceptions.
       # Also, force the max connections to 1 if a memory database is being
       # used, as otherwise each connection gets a separate database.
@@ -135,7 +135,7 @@ module Sequel
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || blank_object?(@opts[:database])
         o
       end
-      
+
       def dataset_class_default
         Dataset
       end
@@ -144,7 +144,7 @@ module Sequel
         [::Amalgalite::Error, ::Amalgalite::SQLite3::Error]
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
 
@@ -161,7 +161,7 @@ module Sequel
       end
 
       private
-      
+
       # Quote the string using the connection instance method.
       def literal_string_append(sql, v)
         db.synchronize(@opts[:server]){|c| sql << c.quote(v)}

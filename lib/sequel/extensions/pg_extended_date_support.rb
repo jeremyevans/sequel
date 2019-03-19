@@ -124,7 +124,7 @@ module Sequel
       end
 
       private
-      
+
       # Return an appropriate value for the given infinite timestamp string.
       def infinite_timestamp_value(value)
         case convert_infinite_timestamps
@@ -138,7 +138,7 @@ module Sequel
           value == 'infinity' ? PLUS_INFINITY : MINUS_INFINITY
         end
       end
-      
+
       # If the value is an infinite value (either an infinite float or a string returned by
       # by PostgreSQL for an infinite date), return it without converting it if
       # convert_infinite_timestamps is set.
@@ -170,7 +170,7 @@ module Sequel
           super
         end
       end
-        
+
       module DatasetMethods
         private
 

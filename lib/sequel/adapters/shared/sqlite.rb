@@ -12,7 +12,7 @@ module Sequel
         @sqlite_version = 30903
       end
     end
-    
+
     # No matter how you connect to SQLite, the following Database options
     # can be used to set PRAGMAs on connections in a thread-safe manner:
     # :auto_vacuum, :foreign_keys, :synchronous, and :temp_store.
@@ -49,7 +49,7 @@ module Sequel
       def database_type
         :sqlite
       end
-      
+
       # Set the integer_booleans option using the passed in :integer_boolean option.
       def set_integer_booleans
         @integer_booleans = @opts.has_key?(:integer_booleans) ? typecast_value_boolean(@opts[:integer_booleans]) : true
@@ -115,12 +115,12 @@ module Sequel
           0
         end
       end
-      
+
       # SQLite supports CREATE TABLE IF NOT EXISTS syntax since 3.3.0.
       def supports_create_table_if_not_exists?
         sqlite_version >= 30300
       end
-      
+
       # SQLite 3.6.19+ supports deferrable foreign key constraints.
       def supports_deferrable_foreign_key_constraints?
         sqlite_version >= 30619
@@ -131,7 +131,7 @@ module Sequel
         sqlite_version >= 30800
       end
 
-      # SQLite 3.6.8+ supports savepoints. 
+      # SQLite 3.6.8+ supports savepoints.
       def supports_savepoints?
         sqlite_version >= 30608
       end
@@ -154,7 +154,7 @@ module Sequel
       def tables(opts=OPTS)
         tables_and_views(Sequel.~(:name=>'sqlite_sequence') & {:type => 'table'}, opts)
       end
-      
+
       # Creates a dataset that uses the VALUES clause:
       #
       #   DB.values([[1, 2], [3, 4]])
@@ -181,7 +181,7 @@ module Sequel
           run "PRAGMA foreign_keys = 0"
           run "PRAGMA legacy_alter_table = 1" if sqlite_version >= 32600
         end
-        transaction do 
+        transaction do
           if ops.length > 1 && ops.all?{|op| op[:op] == :add_constraint || op[:op] == :set_column_null}
             null_ops, ops = ops.partition{|op| op[:op] == :set_column_null}
 
@@ -283,7 +283,7 @@ module Sequel
       def column_definition_default_sql(sql, column)
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
       end
-    
+
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
       # new connections.
       def connection_pragmas
@@ -375,7 +375,7 @@ module Sequel
           if ocp = opts[:old_columns_proc]
             fks.delete_if{|c| ocp.call(c[:columns].dup) != c[:columns]}
           end
-          
+
           # Skip any foreign key columns where a constraint for those
           # foreign keys is being dropped.
           if sfkc = opts[:skip_foreign_key_columns]
@@ -401,7 +401,7 @@ module Sequel
             c[:unique] = true if unique_columns.include?(quote_identifier(c[:name]))
           end
         end
-        
+
         def_columns_str = (def_columns.map{|c| column_definition_sql(c)} + constraints.map{|c| constraint_definition_sql(c)}).join(', ')
         new_columns = old_columns.dup
         opts[:new_columns_proc].call(new_columns) if opts[:new_columns_proc]
@@ -469,7 +469,7 @@ module Sequel
 
         sch
       end
-      
+
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
@@ -478,7 +478,7 @@ module Sequel
           [m.call(row.delete(:name)), row]
         end
       end
-      
+
       # Don't support SQLite error codes for exceptions by default.
       def sqlite_error_code(exception)
         nil
@@ -497,7 +497,7 @@ module Sequel
         column[:auto_increment] ? :integer : super
       end
     end
-    
+
     module DatasetMethods
       include Dataset::Replace
       include UnmodifiedIdentifiers::DatasetMethods
@@ -552,7 +552,7 @@ module Sequel
               exp = exp.abs
               sql << '(1.0 / ('
             end
-            (exp - 1).times do 
+            (exp - 1).times do
               literal_append(sql, arg)
               sql << " * "
             end
@@ -572,7 +572,7 @@ module Sequel
           super
         end
       end
-      
+
       # SQLite has CURRENT_TIMESTAMP and related constants in UTC instead
       # of in localtime, so convert those constants to local time.
       def constant_sql_append(sql, constant)
@@ -582,14 +582,14 @@ module Sequel
           super
         end
       end
-      
+
       # SQLite performs a TRUNCATE style DELETE if no filter is specified.
       # Since we want to always return the count of records, add a condition
       # that is always true and then delete.
       def delete
         @opts[:where] ? super : where(1=>1).delete
       end
-      
+
       # Return an array of strings specifying a query explanation for a SELECT of the
       # current dataset. Currently, the options are ignored, but it accepts options
       # to be compatible with other adapters.
@@ -601,18 +601,18 @@ module Sequel
         rows = ds.all
         Sequel::PrettyTable.string(rows, ds.columns)
       end
-      
+
       # HAVING requires GROUP BY on SQLite
       def having(*cond)
         raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
         super
       end
-      
+
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
         sql << '`' << c.to_s.gsub('`', '``') << '`'
       end
-      
+
       # When a qualified column is selected on SQLite and the qualifier
       # is a subselect, the column name used is the full qualified name
       # (including the qualifier) instead of just the column name.  To
@@ -649,7 +649,7 @@ module Sequel
       #   DB[:table].insert_conflict({}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT DO NOTHING
-      #   
+      #
       #   DB[:table].insert_conflict(target: :a).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO NOTHING
@@ -657,11 +657,11 @@ module Sequel
       #   DB[:table].insert_conflict(target: :a, conflict_where: {c: true}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING
-      #   
+      #
       #   DB[:table].insert_conflict(target: :a, update: {b: Sequel[:excluded][:b]}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
-      #   
+      #
       #   DB[:table].insert_conflict(target: :a,
       #     update: {b: Sequel[:excluded][:b]}, update_where: {Sequel[:table][:status_id] => 1}).insert(a: 1, b: 2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
@@ -713,12 +713,12 @@ module Sequel
       def supports_is_true?
         false
       end
-      
+
       # SQLite does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
       end
-      
+
       # SQLite supports timezones in literal timestamps, since it stores them
       # as text.  But using timezones in timestamps breaks SQLite datetime
       # functions, so we allow the user to override the default per database.
@@ -730,7 +730,7 @@ module Sequel
       def supports_where_true?
         false
       end
-      
+
       # SQLite 3.25+ supports window functions.  However, support is only enabled
       # on SQLite 3.26.0+ because internal Sequel usage of window functions
       # to implement eager loading of limited associations triggers
@@ -738,9 +738,9 @@ module Sequel
       def supports_window_functions?
         db.sqlite_version >= 32600
       end
-    
+
       private
-      
+
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql_append(sql, aliaz, column_aliases=nil)
         raise Error, "sqlite does not support derived column lists" if column_aliases
@@ -775,7 +775,7 @@ module Sequel
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(', ')
       end
-    
+
       # Add OR clauses to SQLite INSERT statements
       def insert_conflict_sql(sql)
         if resolution = @opts[:insert_conflict]
@@ -788,7 +788,7 @@ module Sequel
         if opts = @opts[:insert_on_conflict]
           sql << " ON CONFLICT"
 
-          if target = opts[:constraint] 
+          if target = opts[:constraint]
             sql << " ON CONSTRAINT "
             identifier_append(sql, target)
           elsif target = opts[:target]
@@ -859,7 +859,7 @@ module Sequel
         sql << " LIMIT -1 OFFSET "
         literal_append(sql, @opts[:offset])
       end
-  
+
       # Support VALUES clause instead of the SELECT clause to return rows.
       def select_values_sql(sql)
         sql << "VALUES "

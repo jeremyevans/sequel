@@ -19,8 +19,8 @@ module Sequel
     class DatasetModule < ::Module
       meths = (<<-METHS).split.map(&:to_sym)
         where exclude exclude_having having
-        distinct grep group group_and_count group_append 
-        limit offset order order_append order_prepend reverse 
+        distinct grep group group_and_count group_append
+        limit offset order order_append order_prepend reverse
         select select_all select_append select_group server
       METHS
 

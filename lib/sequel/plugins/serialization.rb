@@ -80,7 +80,7 @@ module Sequel
           @serialization_map = {}
         end
       end
-      
+
       # Automatically call serialize_attributes with the format and columns unless
       # no columns were provided.
       def self.configure(model, format=nil, *columns)
@@ -121,7 +121,7 @@ module Sequel
 
           super
         end
-        
+
         # Create instance level reader that deserializes column values on request,
         # and instance level writer that stores new deserialized values.
         def serialize_attributes(format, *columns)
@@ -134,7 +134,7 @@ module Sequel
           raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
           define_serialized_attribute_accessor(serializer, deserializer, *columns)
         end
-        
+
         private
 
         # Add serializated attribute acessor methods to the serialization_module
@@ -145,7 +145,7 @@ module Sequel
             columns.each do |column|
               m.serialization_map[column] = serializer
               m.deserialization_map[column] = deserializer
-              define_method(column) do 
+              define_method(column) do
                 if deserialized_values.has_key?(column)
                   deserialized_values[column]
                 elsif frozen?
@@ -154,7 +154,7 @@ module Sequel
                   deserialized_values[column] = deserialize_value(column, super())
                 end
               end
-              define_method("#{column}=") do |v| 
+              define_method("#{column}=") do |v|
                 cc = changed_columns
                 if !cc.include?(column) && (new? || get_column_value(column) != v)
                   cc << column
@@ -186,7 +186,7 @@ module Sequel
           serialize_deserialized_values
           super
         end
-        
+
         private
 
         # Clear any cached deserialized values when doing a manual refresh.

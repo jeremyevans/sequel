@@ -7,7 +7,7 @@
 #   Sequel[:column].as(:alias) # column AS alias
 #
 # you can just write:
-#   
+#
 #   :column.as(:alias) # column AS alias
 #
 # To load the extension:

@@ -6,7 +6,7 @@
 # information, the implicit timezone for the Database instance
 # is set to +:utc+, and the timestamps being used include values
 # not valid in the local timezone, such as during a daylight
-# savings time switch.  
+# savings time switch.
 #
 # To load the extension:
 #

@@ -15,7 +15,7 @@ module Sequel
     #
     #   Album.skip_string_stripping :foo
     #   Album.new(foo: ' A ').foo # => ' A '
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances strip strings (called before loading subclasses)

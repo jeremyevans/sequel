@@ -55,7 +55,7 @@ module Sequel
     #    right_primary_key: :album_id
     #
     # Often you don't want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:
-    # 
+    #
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums_artists, :album_id, :artist_id]],
     #     after_load: lambda{|artist, associated_artists| associated_artists.delete(artist)}
     #
@@ -63,10 +63,10 @@ module Sequel
     # that won't work when eagerly loading, which is why the :after_load proc is recommended instead.
     #
     # It's also common to not want duplicate records, in which case the :distinct option can be used:
-    # 
+    #
     #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
     #    distinct: true
-    # 
+    #
     # In addition to many_through_many, this plugin also adds one_through_many, for an association to a single object through multiple join tables.
     # This is useful if there are unique constraints on the foreign keys in the join tables that reference back to the current table, or if you want
     # to set an order on the association and just want the first record.
@@ -163,7 +163,7 @@ module Sequel
             es << {:left_table=>t[:table], :left_key=>t[:right]}
           end
           es.last.merge!(:right_key=>right_primary_key, :right_table=>associated_class.table_name)
-          edges = es.map do |e| 
+          edges = es.map do |e|
             h = {:table=>e[:right_table], :left=>e[:left_key], :right=>e[:right_key], :conditions=>e[:conditions], :join_type=>e[:join_type], :block=>e[:block]}
             h[:only_conditions] = e[:only_conditions] if e.include?(:only_conditions)
             h

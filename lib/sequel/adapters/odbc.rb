@@ -7,7 +7,7 @@ module Sequel
     # Contains procs keyed on subadapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {}
-      
+
     class Database < Sequel::Database
       set_adapter_scheme :odbc
 
@@ -30,7 +30,7 @@ module Sequel
         end
         conn.autocommit = true
         conn
-      end      
+      end
 
       def disconnect_connection(c)
         c.disconnect
@@ -49,7 +49,7 @@ module Sequel
           nil
         end
       end
-      
+
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
@@ -61,7 +61,7 @@ module Sequel
       end
 
       private
-      
+
       def adapter_initialize
         if (db_type = @opts[:db_type]) && (prok = Sequel::Database.load_adapter(db_type.to_sym, :map=>DATABASE_SETUP, :subdir=>'odbc'))
           prok.call(self)
@@ -84,7 +84,7 @@ module Sequel
         super || (e.is_a?(::ODBC::Error) && /\A08S01/.match(e.message))
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       def fetch_rows(sql)
         execute(sql) do |s|
@@ -102,11 +102,11 @@ module Sequel
         end
         self
       end
-      
+
       private
 
       def convert_odbc_value(v, t)
-        # When fetching a result set, the Ruby ODBC driver converts all ODBC 
+        # When fetching a result set, the Ruby ODBC driver converts all ODBC
         # SQL types to an equivalent Ruby type; with the exception of
         # SQL_TYPE_DATE, SQL_TYPE_TIME and SQL_TYPE_TIMESTAMP.
         #
@@ -127,7 +127,7 @@ module Sequel
           end
         end
       end
-      
+
       def default_timestamp_format
         "{ts '%Y-%m-%d %H:%M:%S'}"
       end
@@ -135,11 +135,11 @@ module Sequel
       def literal_date(v)
         v.strftime("{d '%Y-%m-%d'}")
       end
-      
+
       def literal_false
         '0'
       end
-      
+
       def literal_true
         '1'
       end

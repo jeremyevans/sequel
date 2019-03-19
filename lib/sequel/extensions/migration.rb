@@ -16,7 +16,7 @@
 module Sequel
   # Sequel's older migration class, available for backward compatibility.
   # Uses subclasses with up and down instance methods for each migration:
-  # 
+  #
   #   Class.new(Sequel::Migration) do
   #     def up
   #       create_table(:artists) do
@@ -24,7 +24,7 @@ module Sequel
   #         String :name
   #       end
   #     end
-  #     
+  #
   #     def down
   #       drop_table(:artists)
   #     end
@@ -36,7 +36,7 @@ module Sequel
     def initialize(db)
       @db = db
     end
-    
+
     # Applies the migration to the supplied database in the specified
     # direction.
     def self.apply(db, direction)
@@ -48,7 +48,7 @@ module Sequel
     def self.descendants
       @descendants ||= []
     end
-    
+
     # Adds the new migration class to the list of Migration descendants.
     def self.inherited(base)
       descendants << base
@@ -58,11 +58,11 @@ module Sequel
     def self.use_transactions
       nil
     end
-    
+
     # The default down action does nothing
     def down
     end
-    
+
     # Intercepts method calls intended for the database and sends them along.
     def method_missing(method_sym, *args, &block)
       # Allow calling private methods for backwards compatibility
@@ -93,7 +93,7 @@ module Sequel
     # Whether to use transactions for this migration, default depends on the
     # database.
     attr_accessor :use_transactions
-    
+
     # Don't set transaction use by default.
     def initialize
       @use_transactions = nil
@@ -270,7 +270,7 @@ module Sequel
   end
 
   # The preferred method for writing Sequel migrations, using a DSL:
-  # 
+  #
   #   Sequel.migration do
   #     up do
   #       create_table(:artists) do
@@ -278,7 +278,7 @@ module Sequel
   #         String :name
   #       end
   #     end
-  #     
+  #
   #     down do
   #       drop_table(:artists)
   #     end
@@ -289,17 +289,17 @@ module Sequel
     MigrationDSL.create(&block)
   end
 
-  # The +Migrator+ class performs migrations based on migration files in a 
+  # The +Migrator+ class performs migrations based on migration files in a
   # specified directory. The migration files should be named using the
   # following pattern:
-  # 
+  #
   #   <version>_<title>.rb
   #
   # For example, the following files are considered migration files:
-  #   
+  #
   #   001_create_sessions.rb
   #   002_add_data_column.rb
-  #   
+  #
   # You can also use timestamps as version numbers:
   #
   #   1273253850_create_sessions.rb
@@ -318,7 +318,7 @@ module Sequel
   # Migrations are generally run via the sequel command line tool,
   # using the -m and -M switches.  The -m switch specifies the migration
   # directory, and the -M switch specifies the version to which to migrate.
-  # 
+  #
   # You can apply migrations using the Migrator API, as well (this is necessary
   # if you want to specify the version from which to migrate in addition to the version
   # to which to migrate).
@@ -328,7 +328,7 @@ module Sequel
   # automatically creates a table (schema_info for integer migrations and
   # schema_migrations for timestamped migrations). in the database to keep track
   # of the current migration version. If no migration version is stored in the
-  # database, the version is considered to be 0. If no target version is 
+  # database, the version is considered to be 0. If no target version is
   # specified, the database is migrated to the latest version available in the
   # migration directory.
   #
@@ -393,7 +393,7 @@ module Sequel
     #           :schema_migrations for timestamped migrations).
     # :target :: The target version to which to migrate.  If not given, migrates to the maximum version.
     #
-    # Examples: 
+    # Examples:
     #   Sequel::Migrator.run(DB, "migrations")
     #   Sequel::Migrator.run(DB, "migrations", target: 15, current: 10)
     #   Sequel::Migrator.run(DB, "app1/migrations", column: :app2_version)
@@ -416,7 +416,7 @@ module Sequel
         self
       end
     end
-    
+
     # The column to use to hold the migration version number for integer migrations or
     # filename for timestamp migrations (defaults to :version for integer migrations and
     # :filename for timestamp migrations)
@@ -545,7 +545,7 @@ module Sequel
     def is_current?
       current_migration_version == target
     end
-    
+
     # Apply all migrations on the database
     def run
       migrations.zip(version_numbers).each do |m, v|
@@ -557,7 +557,7 @@ module Sequel
         end
         db.log_info("Finished applying migration version #{v}, direction: #{direction}, took #{sprintf('%0.6f', Sequel.elapsed_seconds_since(timer))} seconds")
       end
-      
+
       target
     end
 
@@ -594,19 +594,19 @@ module Sequel
       1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i]} unless @allow_missing_migration_files
       files
     end
-    
+
     # Returns a list of migration classes filtered for the migration range and
     # ordered according to the migration direction.
     def get_migrations
       version_numbers.map{|n| load_migration_file(files[n])}
     end
-    
+
     # Returns the latest version available in the specified directory.
     def latest_migration_version
       l = files.last
       l ? migration_version_from_file(File.basename(l)) : nil
     end
-    
+
     # Returns the dataset for the schema_info table. If no such table
     # exists, it is automatically created.
     def schema_dataset
@@ -620,7 +620,7 @@ module Sequel
       raise(Error, "More than 1 row in migrator table") if ds.count > 1
       ds
     end
-    
+
     # Sets the current migration version stored in the database.
     def set_migration_version(version)
       ds.update(column=>version)
@@ -674,7 +674,7 @@ module Sequel
     def is_current?
       migration_tuples.empty?
     end
-    
+
     # Apply all migration tuples on the database
     def run
       migration_tuples.each do |m, f, direction|
@@ -722,7 +722,7 @@ module Sequel
       raise(Error, "Applied migration files not in file system: #{missing_migration_files.join(', ')}") if missing_migration_files.length > 0 && !@allow_missing_migration_files
       am
     end
-    
+
     # Returns any migration files found in the migrator's directory.
     def get_migration_files
       files = []
@@ -732,7 +732,7 @@ module Sequel
       end
       files.sort_by{|f| MIGRATION_FILE_PATTERN.match(File.basename(f))[1].to_i}
     end
-    
+
     # Returns tuples of migration, filename, and direction
     def get_migration_tuples
       up_mts = []
@@ -754,7 +754,7 @@ module Sequel
       end
       up_mts + down_mts.reverse
     end
-    
+
     # Returns the dataset for the schema_migrations table. If no such table
     # exists, it is automatically created.
     def schema_dataset

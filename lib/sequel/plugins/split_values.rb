@@ -25,7 +25,7 @@ module Sequel
     #   a1 == a2 # => true
     #   a2.values # => {:id=>1, :name=>'Album Name'}
     #   a2.save # Works
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances split values

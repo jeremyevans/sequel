@@ -43,9 +43,9 @@ class Sequel::ConnectionPool
     def get_pool(db, opts = OPTS)
       connection_pool_class(opts).new(db, opts)
     end
-    
+
     private
-    
+
     # Return a connection pool class based on the given options.
     def connection_pool_class(opts)
       if pc = opts[:pool_class]
@@ -101,12 +101,12 @@ class Sequel::ConnectionPool
     @connect_sqls = opts[:connect_sqls]
     @error_classes = db.send(:database_error_classes).dup.freeze
   end
-  
+
   # An array of symbols for all shards/servers, which is a single <tt>:default</tt> by default.
   def servers
     [:default]
   end
-  
+
   private
 
   # Remove the connection from the pool.  For threaded connections, this should be
@@ -119,7 +119,7 @@ class Sequel::ConnectionPool
   def disconnect_error?(exception)
     exception.is_a?(Sequel::DatabaseDisconnectError) || db.send(:disconnect_error?, exception, OPTS)
   end
-  
+
   # Return a new connection by calling the connection proc with the given server name,
   # and checking for connection errors.
   def make_new(server)

@@ -2,8 +2,8 @@
 
 require_relative 'shared/postgres'
 
-begin 
-  require 'pg' 
+begin
+  require 'pg'
 
   Sequel::Postgres::PGError = PG::Error if defined?(PG::Error)
   Sequel::Postgres::PGconn = PG::Connection if defined?(PG::Connection)
@@ -21,13 +21,13 @@ begin
     type_map[FalseClass] = type_map[TrueClass] = PG::TextEncoder::Boolean.new
     type_map[Float] = PG::TextEncoder::Float.new
   end
-rescue LoadError => e 
+rescue LoadError => e
   begin
     require 'postgres-pr/postgres-compat'
     Sequel::Postgres::USES_PG = false
-  rescue LoadError 
-    raise e 
-  end 
+  rescue LoadError
+    raise e
+  end
 end
 
 module Sequel
@@ -49,7 +49,7 @@ module Sequel
         DISCONNECT_ERROR_CLASSES << ::PG::ConnectionBad
       end
       DISCONNECT_ERROR_CLASSES.freeze
-      
+
       disconnect_errors = [
         'ERROR:  cached plan must not change result type',
         'could not receive data from server',
@@ -64,7 +64,7 @@ module Sequel
       # also trying parsing the exception message to look for disconnect
       # errors.
       DISCONNECT_ERROR_RE = /\A#{Regexp.union(disconnect_errors)}/
-      
+
       if USES_PG
         # Hash of prepared statements for this connection.  Keys are
         # string names of the server side prepared statement, and values
@@ -79,7 +79,7 @@ module Sequel
         def escape_bytea(str)
           str.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{sprintf('%o', b.each_byte{|x| break x}).rjust(3, '0')}"}
         end
-        
+
         # Escape strings by doubling apostrophes.  This only works if standard
         # conforming strings are used.
         def escape_string(str)
@@ -105,9 +105,9 @@ module Sequel
           alias ftype type
           alias fname fieldname
           alias cmd_tuples cmdtuples
-        end 
+        end
       end
-      
+
       # Raise a Sequel::DatabaseDisconnectError if a one of the disconnect
       # error classes is raised, or a PGError is raised and the connection
       # status cannot be determined or it is not OK.
@@ -152,7 +152,7 @@ module Sequel
         @db.log_connection_yield(sql, self, args){args ? async_exec(sql, args) : async_exec(sql)}
       end
     end
-    
+
     class Database < Sequel::Database
       include Sequel::Postgres::DatabaseMethods
 
@@ -241,7 +241,7 @@ module Sequel
         connection_configuration_sqls(opts).each{|sql| conn.execute(sql)}
         conn
       end
-      
+
       # Always false, support was moved to pg_extended_date_support extension.
       # Needs to stay defined here so that sequel_pg works.
       def convert_infinite_timestamps
@@ -309,7 +309,7 @@ module Sequel
           }
         end
       end
-      
+
       def execute(sql, opts=OPTS, &block)
         synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
       end
@@ -332,7 +332,7 @@ module Sequel
         #           :options options are ignored.
         # Dataset :: Uses a query instead of a table name when copying.
         # other :: Uses a table name (usually a symbol) when copying.
-        # 
+        #
         # The following options are respected:
         #
         # :format :: The format to use.  text is the default, so this should be :csv or :binary.
@@ -369,10 +369,10 @@ module Sequel
                 raise DatabaseDisconnectError, "disconnecting as a partial COPY may leave the connection in an unusable state"
               end
             end
-          end 
+          end
         end
 
-        # +copy_into+ uses PostgreSQL's +COPY FROM STDIN+ SQL statement to do very fast inserts 
+        # +copy_into+ uses PostgreSQL's +COPY FROM STDIN+ SQL statement to do very fast inserts
         # into a table using input preformatting in either CSV or PostgreSQL text format.
         # This method is only supported if pg 0.14.0+ is the underlying ruby driver.
         # This method should only be called if you want
@@ -421,7 +421,7 @@ module Sequel
                 check_database_errors{res.check}
               end
             end
-          end 
+          end
         end
 
         # Listens on the given channel (or multiple channels if channel is an array), waiting for notifications.
@@ -601,7 +601,7 @@ module Sequel
         super unless conn.transaction_status == 0
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::Postgres::DatasetMethods
 
@@ -609,7 +609,7 @@ module Sequel
         return cursor_fetch_rows(sql){|h| yield h} if @opts[:cursor]
         execute(sql){|res| yield_hash_rows(res, fetch_rows_set_cols(res)){|h| yield h}}
       end
-      
+
       # Use a cursor for paging.
       def paged_each(opts=OPTS, &block)
         unless block_given?
@@ -636,7 +636,7 @@ module Sequel
       #
       #   DB[:huge_table].use_cursor.each{|row| p row}
       #   DB[:huge_table].use_cursor(rows_per_fetch: 10000).each{|row| p row}
-      #   DB[:huge_table].use_cursor(cursor_name: 'my_cursor').each{|row| p row}      
+      #   DB[:huge_table].use_cursor(cursor_name: 'my_cursor').each{|row| p row}
       #
       # This is untested with the prepared statement/bound variable support,
       # and unlikely to work with either.
@@ -658,22 +658,22 @@ module Sequel
 
       if USES_PG
         PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
-        
+
         # PostgreSQL specific argument mapper used for mapping the named
         # argument hash to a array with numbered arguments.  Only used with
         # the pg driver.
         module ArgumentMapper
           include Sequel::Dataset::ArgumentMapper
-          
+
           protected
-          
+
           # An array of bound variable values for this query, in the correct order.
           def map_to_prepared_args(hash)
             prepared_args.map{|k| hash[k.to_sym]}
           end
 
           private
-          
+
           def prepared_arg(k)
             y = k
             if i = prepared_args.index(y)
@@ -688,9 +688,9 @@ module Sequel
 
         BindArgumentMethods = prepared_statements_module(:bind, [ArgumentMapper], %w'execute execute_dui')
         PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods, %w'execute execute_dui')
-        
+
         private
-        
+
         def bound_variable_modules
           [BindArgumentMethods]
         end
@@ -705,9 +705,9 @@ module Sequel
           PREPARED_ARG_PLACEHOLDER
         end
       end
-      
+
       private
-      
+
       # Generate and execute a procedure call.
       def call_procedure(name, args)
         sql = String.new
@@ -725,7 +725,7 @@ module Sequel
         cursor_name = quote_identifier(cursor[:cursor_name] || 'sequel_cursor')
         rows_per_fetch = cursor[:rows_per_fetch].to_i
 
-        db.public_send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 
+        db.public_send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do
           begin
             execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITH#{'OUT' unless hold} HOLD FOR #{sql}", server_opts)
             rows_per_fetch = 1000 if rows_per_fetch <= 0
@@ -755,7 +755,7 @@ module Sequel
           end
         end
       end
-      
+
       # Set the columns based on the result set, and return the array of
       # field numers, type conversion procs, and name symbol arrays.
       def fetch_rows_set_cols(res)
@@ -767,17 +767,17 @@ module Sequel
         self.columns = cols.map{|c| c[1]}
         cols
       end
-      
+
       # Use the driver's escape_bytea
       def literal_blob_append(sql, v)
         sql << "'" << db.synchronize(@opts[:server]){|c| c.escape_bytea(v)} << "'"
       end
-      
+
       # Use the driver's escape_string
       def literal_string_append(sql, v)
         sql << "'" << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << "'"
       end
-      
+
       # For each row in the result set, yield a hash with column name symbol
       # keys and typecasted values.
       def yield_hash_rows(res, cols)
@@ -791,7 +791,7 @@ module Sequel
             type_proc, fieldsym = cols[fieldnum]
             value = res.getvalue(recnum, fieldnum)
             converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
-            fieldnum += 1 
+            fieldnum += 1
           end
           yield converted_rec
           recnum += 1

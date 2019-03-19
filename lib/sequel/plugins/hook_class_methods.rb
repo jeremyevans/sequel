@@ -51,21 +51,21 @@ module Sequel
           @hooks.freeze.each_value(&:freeze)
           super
         end
-    
+
         # Returns true if there are any hook blocks for the given hook.
         def has_hooks?(hook)
           !@hooks[hook].empty?
         end
-    
+
         # Yield every block related to the given hook.
         def hook_blocks(hook)
           @hooks[hook].each{|k,v| yield v}
         end
 
         Plugins.inherited_instance_variables(self, :@hooks=>:hash_dup)
-    
+
         private
-    
+
         # Add a hook block to the list of hook methods.
         # If a non-nil tag is given and it already is in the list of hooks,
         # replace it with the new block.

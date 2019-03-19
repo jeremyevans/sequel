@@ -54,6 +54,6 @@ module Sequel
 END
     end
   end
-  
+
   extend ThreadLocalTimezones
 end

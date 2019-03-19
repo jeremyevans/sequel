@@ -13,7 +13,7 @@ module Sequel
     # Used to identify a jndi connection and to extract the jndi
     # resource name.
     JNDI_URI_REGEXP = /\Ajdbc:jndi:(.+)/
-    
+
     # Contains procs keyed on subadapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {}
@@ -21,7 +21,7 @@ module Sequel
     # Create custom NativeException alias for nicer access, and also so that
     # JRuby 9.2+ so it doesn't use the deprecated ::NativeException
     NativeException = java.lang.Exception
-    
+
     # Default database error classes
     DATABASE_ERROR_CLASSES = [NativeException]
     if JRUBY_VERSION < '9.2'
@@ -147,10 +147,10 @@ module Sequel
 
     class Database < Sequel::Database
       set_adapter_scheme :jdbc
-      
+
       # The Java database driver we are using (should be a Java class)
       attr_reader :driver
-      
+
       # Whether to convert some Java types to ruby types when retrieving rows.
       # True by default, can be set to false to roughly double performance when
       # fetching rows.
@@ -193,7 +193,7 @@ module Sequel
           end
         end
       end
-         
+
       # Connect to the database using JavaSQL::DriverManager.getConnection, and falling back
       # to driver.new.connect if the driver is known.
       def connect(server)
@@ -237,7 +237,7 @@ module Sequel
         @connection_prepared_statements_mutex.synchronize{@connection_prepared_statements.delete(c)}
         c.close
       end
-      
+
       def execute(sql, opts=OPTS, &block)
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
@@ -269,7 +269,7 @@ module Sequel
         opts[:type] = :ddl
         execute(sql, opts)
       end
-      
+
       def execute_insert(sql, opts=OPTS)
         opts = Hash[opts]
         opts[:type] = :insert
@@ -309,23 +309,23 @@ module Sequel
         indexes = {}
         metadata(:getIndexInfo, nil, schema, table, false, true) do |r|
           next unless name = r[:column_name]
-          next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re 
+          next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re
           i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>[false, 0].include?(r[:non_unique])}
           i[:columns] << m.call(name)
         end
         indexes
-      end 
+      end
 
       # Whether or not JNDI is being used for this connection.
       def jndi?
         !!(uri =~ JNDI_URI_REGEXP)
       end
-      
+
       # All tables in this database
       def tables(opts=OPTS)
         get_tables('TABLE', opts)
       end
-      
+
       # The uri for this connection.  You can specify the uri
       # using the :uri, :url, or :database options.  You don't
       # need to worry about this if you use Sequel.connect
@@ -342,7 +342,7 @@ module Sequel
       end
 
       private
-         
+
       # Call the DATABASE_SETUP proc directly after initialization,
       # so the object always uses sub adapter specific code.  Also,
       # raise an error immediately if the connection doesn't have a
@@ -353,7 +353,7 @@ module Sequel
         @fetch_size = @opts[:fetch_size] ? typecast_value_integer(@opts[:fetch_size]) : default_fetch_size
         @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
         raise(Error, "No connection string specified") unless uri
-        
+
         resolved_uri = jndi? ? get_uri_from_jndi : uri
         setup_type_convertor_map_early
 
@@ -361,11 +361,11 @@ module Sequel
           prok.call(self)
         else
           @opts[:driver]
-        end        
+        end
 
         setup_type_convertor_map
       end
-      
+
       # Yield the native prepared statements hash for the given connection
       # to the block in a thread-safe manner.
       def cps_sync(conn, &block)
@@ -466,7 +466,7 @@ module Sequel
       def execute_prepared_statement_insert(stmt)
         stmt.executeUpdate
       end
-      
+
       # Execute the insert SQL using the statement
       def execute_statement_insert(stmt, sql)
         stmt.executeUpdate(sql)
@@ -477,13 +477,13 @@ module Sequel
       def default_fetch_size
         nil
       end
-      
+
       # Gets the connection from JNDI.
       def get_connection_from_jndi
         jndi_name = JNDI_URI_REGEXP.match(uri)[1]
         javax.naming.InitialContext.new.lookup(jndi_name).connection
       end
-            
+
       # Gets the JDBC connection uri from the JNDI resource.
       def get_uri_from_jndi
         conn = get_connection_from_jndi
@@ -491,7 +491,7 @@ module Sequel
       ensure
         conn.close if conn
       end
-      
+
       # Backbone of the tables and views support.
       def get_tables(type, opts)
         ts = []
@@ -520,8 +520,8 @@ module Sequel
         ts = java.sql.Timestamp.new(time.to_i * 1000)
         ts.setNanos(time.nsec)
         ts
-      end 
-      
+      end
+
       def log_connection_execute(conn, sql)
         statement(conn){|s| log_connection_yield(sql, conn){s.execute(sql)}}
       end
@@ -532,7 +532,7 @@ module Sequel
       def last_insert_id(conn, opts)
         nil
       end
-      
+
       # Yield the metadata for this database
       def metadata(*args, &block)
         synchronize do |c|
@@ -554,7 +554,7 @@ module Sequel
         table = im.call(table)
         [schema, table]
       end
-      
+
       # Created a JDBC prepared statement on the connection with the given SQL.
       def prepare_jdbc_statement(conn, sql, opts)
         conn.prepareStatement(sql)
@@ -597,7 +597,7 @@ module Sequel
       def set_ps_arg_nil(cps, i)
         cps.setString(i, nil)
       end
-      
+
       # Return the connection.  Can be overridden in subadapters for database specific setup.
       def setup_connection(conn)
         conn
@@ -620,7 +620,7 @@ module Sequel
           end
         end
       end
-      
+
       def schema_parse_table(table, opts=OPTS)
         m = output_identifier_meth(opts[:dataset])
         schema, table = metadata_schema_and_table(table, opts)
@@ -658,7 +658,7 @@ module Sequel
         end
         ts
       end
-      
+
       # Skip tables in the INFORMATION_SCHEMA when parsing columns.
       def schema_parse_table_skip?(h, schema)
         h[:table_schem] == 'INFORMATION_SCHEMA'
@@ -693,7 +693,7 @@ module Sequel
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include StoredProcedures
 
@@ -711,7 +711,7 @@ module Sequel
             super
           end
       end
-      
+
       StoredProcedureMethods = prepared_statements_module(
         "sql = @opts[:sproc_name]; opts = Hash[opts]; opts[:args] = @opts[:sproc_args]; opts[:sproc] = true",
         Sequel::Dataset::StoredProcedureMethods,
@@ -727,12 +727,12 @@ module Sequel
             super
           end
       end
-      
+
       def fetch_rows(sql, &block)
         execute(sql){|result| process_result_set(result, &block)}
         self
       end
-      
+
       # Set the fetch size on JDBC ResultSets created from the returned dataset.
       def with_fetch_size(size)
         clone(:fetch_size=>size)
@@ -742,7 +742,7 @@ module Sequel
       def with_convert_types(v)
         clone(:convert_types=>v)
       end
-      
+
       private
 
       # Whether we should convert Java types to ruby types for this dataset.

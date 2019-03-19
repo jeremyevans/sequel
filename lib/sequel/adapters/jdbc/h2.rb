@@ -44,19 +44,19 @@ module Sequel
         def supports_create_table_if_not_exists?
           true
         end
-      
+
         # H2 supports prepared transactions
         def supports_prepared_transactions?
           true
         end
-        
+
         # H2 supports savepoints
         def supports_savepoints?
           true
         end
-        
+
         private
-        
+
         # H2 does not allow adding primary key constraints to NULLable columns.
         def can_add_primary_key_constraint_on_nullable_columns?
           false
@@ -122,13 +122,13 @@ module Sequel
             super(table, op)
           end
         end
-        
+
         # Default to a single connection for a memory database.
         def connection_pool_default_options
           o = super
           uri == 'jdbc:h2:mem:' ? o.merge(:max_connections=>1) : o
         end
-      
+
         DATABASE_ERROR_REGEXPS = {
           /Unique index or primary key violation/ => UniqueConstraintViolation,
           /Referential integrity constraint violation/ => ForeignKeyConstraintViolation,
@@ -149,7 +149,7 @@ module Sequel
             rs.getLong(1)
           end
         end
-        
+
         def primary_key_index_re
           /\Aprimary_key/i
         end
@@ -164,7 +164,7 @@ module Sequel
           column[:identity] ? 'BIGINT IDENTITY' : super
         end
       end
-      
+
       class Dataset < JDBC::Dataset
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
 
@@ -179,7 +179,7 @@ module Sequel
             super
           end
         end
-        
+
         # H2 does not support derived column lists
         def supports_derived_column_lists?
           false
@@ -194,16 +194,16 @@ module Sequel
         def supports_is_true?
           false
         end
-        
+
         # H2 doesn't support JOIN USING
         def supports_join_using?
           false
         end
-        
+
         # H2 doesn't support multiple columns in IN/NOT IN
         def supports_multiple_column_in?
           false
-        end 
+        end
 
         private
 
@@ -211,7 +211,7 @@ module Sequel
         def literal_blob_append(sql, v)
           sql << "'" << v.unpack("H*").first << "'"
         end
-        
+
         # H2 handles fractional seconds in timestamps, but not in times
         def literal_sqltime(v)
           v.strftime("'%H:%M:%S'")

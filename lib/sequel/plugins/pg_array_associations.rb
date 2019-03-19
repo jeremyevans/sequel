@@ -104,7 +104,7 @@ module Sequel
         def default_key
           :"#{underscore(demodulize(self[:model].name))}_ids"
         end
-        
+
         # Always use the ruby eager_graph limit strategy if association is limited.
         def eager_graph_limit_strategy(_)
           :ruby if self[:limit]
@@ -138,7 +138,7 @@ module Sequel
         def predicate_key
           cached_fetch(:predicate_key){qualify_assoc(self[:key_column])}
         end
-    
+
         # The column in the current table that the keys in the array column in the
         # associated table reference.
         def primary_key
@@ -150,9 +150,9 @@ module Sequel
         def remove_before_destroy?
           false
         end
-    
+
         private
-    
+
         # The predicate condition to use for the eager_loader.
         def eager_loading_predicate_condition(keys)
           Sequel.pg_array_op(predicate_key).overlaps(Sequel.pg_array(keys, array_type))
@@ -162,7 +162,7 @@ module Sequel
           key = qualify(associated_class.table_name, self[:key])
           ds.cross_join(Sequel.function(:unnest, key).as(:_smtopgaa_, [:_smtopgaa_key_])).exclude(key=>nil).select(:_smtopgaa_key_)
         end
-        
+
         def filter_by_associations_conditions_key
           qualify(self[:model].table_name, primary_key)
         end
@@ -255,7 +255,7 @@ module Sequel
         def predicate_key
           cached_fetch(:predicate_key){qualify_assoc(primary_key)}
         end
-    
+
         # The primary key of the associated model.
         def primary_key
           cached_fetch(:primary_key){associated_class.primary_key || raise(Error, "no primary key specified for #{associated_class.inspect}")}
@@ -272,12 +272,12 @@ module Sequel
         end
 
         private
-    
+
         def filter_by_associations_add_conditions_dataset_filter(ds)
           pk = qualify(associated_class.table_name, primary_key)
           ds.select{array_agg(pk)}.exclude(pk=>nil)
         end
-        
+
         def filter_by_associations_conditions_key
           qualify(self[:model].table_name, self[:key])
         end
@@ -342,7 +342,7 @@ module Sequel
               if pks ||= assoc_record.get_column_value(key)
                 pks.each do |pkv|
                   next unless objects = id_map[pkv]
-                  objects.each do |object| 
+                  objects.each do |object|
                     object.associations[name].push(assoc_record)
                   end
                 end
@@ -391,7 +391,7 @@ module Sequel
             end
             o.save(save_opts)
           end
-  
+
           opts[:remover] ||= proc do |o|
             if (array = o.get_column_value(key)) && !array.empty?
               array.delete(get_column_value(pk))
@@ -435,7 +435,7 @@ module Sequel
 
             eager_load_results(opts, Hash[eo].merge!(:id_map=>id_map)) do |assoc_record|
               if objects = id_map[assoc_record.get_column_value(pkm)]
-                objects.each do |object| 
+                objects.each do |object|
                   object.associations[name].push(assoc_record)
                 end
               end
@@ -482,7 +482,7 @@ module Sequel
           end
 
           opts[:adder] ||= proc do |o|
-            opk = o.get_column_value(opts.primary_key) 
+            opk = o.get_column_value(opts.primary_key)
             if array = get_column_value(key)
               modified!(key)
               array << opk
@@ -491,7 +491,7 @@ module Sequel
             end
             save_after_modify.call(self) if save_after_modify
           end
-  
+
           opts[:remover] ||= proc do |o|
             if (array = get_column_value(key)) && !array.empty?
               modified!(key)

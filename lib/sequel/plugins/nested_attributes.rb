@@ -90,7 +90,7 @@ module Sequel
       def self.apply(model)
         model.plugin(:validate_associated)
       end
-      
+
       module ClassMethods
         # Freeze nested_attributes_module when freezing model class.
         def freeze
@@ -134,9 +134,9 @@ module Sequel
             def_nested_attribute_method(r)
           end
         end
-        
+
         private
-        
+
         # Add a nested attribute setter method to a module included in the
         # class.
         def def_nested_attribute_method(reflection)
@@ -147,7 +147,7 @@ module Sequel
           end
         end
       end
-      
+
       module InstanceMethods
         # Set the nested attributes for the given association.  obj should be an enumerable of multiple objects
         # for plural associations.  The opts hash can be used to override any of the default options set by
@@ -165,7 +165,7 @@ module Sequel
         end
 
         private
-        
+
         # Check that the keys related to the association are not modified inside the block.  Does
         # not use an ensure block, so callers should be careful.
         def nested_attributes_check_key_modifications(meta, obj)
@@ -176,7 +176,7 @@ module Sequel
             raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed")
           end
         end
-        
+
         # Create a new associated object with the given attributes, validate
         # it when the parent is validated, and save it when the object is saved.
         # Returns the object created.
@@ -199,7 +199,7 @@ module Sequel
 
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
-            if reflection[:type] == :many_to_one 
+            if reflection[:type] == :many_to_one
               before_save_hook{public_send(reflection[:setter_method], obj.save(:validate=>false))}
             else
               after_save_hook do
@@ -211,7 +211,7 @@ module Sequel
           add_reciprocal_object(reflection, obj)
           obj
         end
-        
+
         # Take an array or hash of attribute hashes and set each one individually.
         # If a hash is provided it, sort it by key and then use the values.
         # If there is a limit on the nested attributes for this association,
@@ -223,7 +223,7 @@ module Sequel
           end
           attributes_list.each{|a| nested_attributes_setter(meta, a)}
         end
-        
+
         # Remove the given associated object from the current object. If the
         # :destroy option is given, destroy the object after disassociating it
         # (unless destroying the object would automatically disassociate it).
@@ -245,7 +245,7 @@ module Sequel
           end
           obj
         end
-        
+
         # Set the fields in the obj based on the association, only allowing
         # specific :fields if configured.
         def nested_attributes_set_attributes(meta, obj, attributes)
@@ -298,7 +298,7 @@ module Sequel
             nested_attributes_create(meta, attributes)
           end
         end
-        
+
         # Update the given object with the attributes, validating it when the
         # parent object is validated and saving it when the parent is saved.
         # Returns the object updated.

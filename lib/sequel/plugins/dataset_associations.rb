@@ -17,7 +17,7 @@ module Sequel
     #   # WHERE (albums.artist_id IN (
     #   #   SELECT id FROM artists
     #   #   WHERE ((id >= 1) AND (id <= 100))))
-    # 
+    #
     # This works for all of the association types that ship with Sequel,
     # including ones implemented in other plugins.  Most association options that
     # are supported when eager loading are supported when using a
@@ -47,7 +47,7 @@ module Sequel
     # option in the association, which will make sure the datasets returned by the dataset
     # association methods also use JOINs, allowing such dataset association methods to work
     # correctly.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses create association methods for datasets

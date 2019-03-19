@@ -78,7 +78,7 @@ module Sequel
     module StringMethods
       # Create a +EscapedLikeExpression+ case insensitive pattern match of the receiver
       # with the patterns, interpolated escaped values for each +?+ placeholder in the
-      # pattern. 
+      # pattern.
       #
       #   Sequel[:a].escaped_ilike('?%', 'A') # "a" ILIKE 'A%' ESCAPE '\'
       #   Sequel[:a].escaped_ilike('?%', '%A') # "a" ILIKE '\%A%' ESCAPE '\'
@@ -88,7 +88,7 @@ module Sequel
 
       # Create a +EscapedLikeExpression+ case sensitive pattern match of the receiver
       # with the patterns, interpolated escaped values for each +?+ placeholder in the
-      # pattern. 
+      # pattern.
       #
       #   Sequel[:a].escaped_like('?%', 'A') # "a" LIKE 'A%' ESCAPE '\'
       #   Sequel[:a].escaped_like('?%', '%A') # "a" LIKE '\%A%' ESCAPE '\'

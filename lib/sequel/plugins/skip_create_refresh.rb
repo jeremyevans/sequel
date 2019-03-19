@@ -15,7 +15,7 @@ module Sequel
     # Note that Sequel by default does not attempt to refresh records when
     # updating existing model objects, only when inserting new
     # model objects.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances skip refreshes when saving

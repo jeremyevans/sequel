@@ -151,7 +151,7 @@ module Sequel
         freeze
       end
 
-      # Whether the current expression uses distinct expressions 
+      # Whether the current expression uses distinct expressions
       def is_distinct?
         @distinct == true
       end

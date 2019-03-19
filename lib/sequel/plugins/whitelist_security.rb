@@ -10,7 +10,7 @@ module Sequel
     #
     # Usage:
     #
-    #   # Make all model subclasses support allowed_columns 
+    #   # Make all model subclasses support allowed_columns
     #   Sequel::Model.plugin :whitelist_security
     #
     #   # Make the Album class support allowed_columns
@@ -20,7 +20,7 @@ module Sequel
         # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
         # (default: not set, so all columns not otherwise restricted are allowed).
         attr_reader :allowed_columns
-  
+
         Plugins.inherited_instance_variables(self, :@allowed_columns=>:dup)
 
         # Freeze allowed columns when freezing model class.
@@ -44,7 +44,7 @@ module Sequel
           clear_setter_methods_cache
           @allowed_columns = cols
         end
-  
+
         private
 
         # If allowed_columns is set, only allow those columns.
@@ -67,7 +67,7 @@ module Sequel
         def set_all(hash)
           set_restricted(hash, :all)
         end
-  
+
         # Set the values using the entries in the hash, only if the key
         # is included in only.  It may be a better idea to use +set_fields+
         # instead of this method.
@@ -79,7 +79,7 @@ module Sequel
         def set_only(hash, *only)
           set_restricted(hash, only.flatten)
         end
-  
+
         # Update all values using the entries in the hash, ignoring any setting of
         # +allowed_columns+ in the model.
         #
@@ -88,7 +88,7 @@ module Sequel
         def update_all(hash)
           update_restricted(hash, :all)
         end
-  
+
         # Update the values using the entries in the hash, only if the key
         # is included in only.  It may be a better idea to use +update_fields+
         # instead of this method.
@@ -100,7 +100,7 @@ module Sequel
         def update_only(hash, *only)
           update_restricted(hash, only.flatten)
         end
-      
+
         private
 
         # If allowed_columns is set and set/update is called, only allow those columns.

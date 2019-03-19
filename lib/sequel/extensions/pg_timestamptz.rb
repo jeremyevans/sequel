@@ -4,7 +4,7 @@
 # type for the database to be +timestamptz+ (+timestamp with time zone+)
 # instead of +timestamp+ (+timestamp without time zone+).  This is
 # recommended if you are dealing with multiple timezones in your application.
-# 
+#
 # To load the extension into the database:
 #
 #   DB.extension :pg_timestamptz

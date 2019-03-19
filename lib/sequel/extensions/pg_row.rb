@@ -24,7 +24,7 @@
 #
 # If you plan to use arrays of composite types, make sure you load the
 # pg_array extension first:
-# 
+#
 #   DB.extension :pg_array, :pg_row
 #
 # You can create an anonymous row type by calling the Sequel.pg_row with
@@ -78,7 +78,7 @@
 #
 #   DB.conversion_procs.select{|k,v| v.is_a?(Sequel::Postgres::PGRow::Parser) && \
 #     v.converter && (v.converter.name.nil? || v.converter.name == '') }.map{|k,v| v}
-# 
+#
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using row type columns in CREATE/ALTER TABLE statements.
 #
@@ -171,7 +171,7 @@ module Sequel
 
         # Sets the columns associated with this instance.  This is
         # used to override the class's default columns.
-        attr_writer :columns 
+        attr_writer :columns
 
         # Sets the database type associated with this instance.  This is
         # used to override the class's default database type.
@@ -300,9 +300,9 @@ module Sequel
         # Typecast the given object to the appropriate type using the
         # typecaster.  Note that this does not conversion for the members
         # of the composite type, since those conversion expect strings and
-        # strings may not be provided.  
+        # strings may not be provided.
         def typecast(obj)
-          case obj 
+          case obj
           when Array
             _typecast(convert_format(obj))
           when Hash
@@ -334,7 +334,7 @@ module Sequel
           if ccs = @column_converters
             arr.zip(ccs).map{|v, pr| (v && pr) ? pr.call(v) : v}
           else
-            arr 
+            arr
           end
         end
 
@@ -426,7 +426,7 @@ module Sequel
             where([[:typtype, 'c'], [:typname, type_name.to_s]])
           if type_schema
             ds = ds.join(:pg_namespace, [[:oid, :typnamespace], [:nspname, type_schema.to_s]])
-            schema_type_symbol = :"pg_row_#{type_schema}__#{type_name}" 
+            schema_type_symbol = :"pg_row_#{type_schema}__#{type_name}"
           else
             schema_type_symbol = :"pg_row_#{type_name}"
           end
@@ -473,7 +473,7 @@ module Sequel
           end
 
           @row_types[literal(db_type)] = opts.merge(:parser=>parser, :type=>db_type)
-          @row_schema_types[schema_type_string] = schema_type_symbol 
+          @row_schema_types[schema_type_string] = schema_type_symbol
           @schema_type_classes[schema_type_symbol] = ROW_TYPE_CLASSES
           @row_type_method_module.class_eval do
             meth = :"typecast_value_#{schema_type_symbol}"
@@ -505,7 +505,7 @@ module Sequel
               obj
             end
           when Hash
-            if parser 
+            if parser
               parser.typecast(obj)
             else
               raise InvalidValue, "Database#row_type requires the #{db_type.inspect} type have a registered parser and typecaster when called with a hash"

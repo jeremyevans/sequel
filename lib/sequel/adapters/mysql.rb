@@ -33,7 +33,7 @@ module Sequel
       include Sequel::MySQL::DatabaseMethods
       include Sequel::MySQL::MysqlMysql2::DatabaseMethods
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
-      
+
       set_adapter_scheme :mysql
 
       # Hash of conversion procs for the current database
@@ -47,7 +47,7 @@ module Sequel
       # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
       # it returns the strings as is.
       attr_reader :convert_invalid_date_time
-      
+
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
@@ -110,19 +110,19 @@ module Sequel
         add_prepared_statements_cache(conn)
         conn
       end
-      
+
       def disconnect_connection(c)
         c.close
       rescue Mysql::Error
         nil
       end
-      
+
       # Modify the type translators for the date, time, and timestamp types
       # depending on the value given.
       def convert_invalid_date_time=(v)
         m0 = ::Sequel.method(:string_to_time)
         @conversion_procs[11] = (v != false) ?  lambda{|val| convert_date_time(val, &m0)} : m0
-        m1 = ::Sequel.method(:string_to_date) 
+        m1 = ::Sequel.method(:string_to_date)
         m = (v != false) ? lambda{|val| convert_date_time(val, &m1)} : m1
         [10, 14].each{|i| @conversion_procs[i] = m}
         m2 = method(:to_application_timestamp)
@@ -158,7 +158,7 @@ module Sequel
       end
 
       private
-      
+
       # Execute the given SQL on the given connection.  If the :type
       # option is :select, yield the result of the query, otherwise
       # yield the connection if a block is given.
@@ -205,7 +205,7 @@ module Sequel
           end
         end
       end
-      
+
       def adapter_initialize
         @conversion_procs = MYSQL_TYPES.dup
         self.convert_tinyint_to_bool = true
@@ -228,7 +228,7 @@ module Sequel
       def connection_execute_method
         :query
       end
-      
+
       # If convert_invalid_date_time is nil, :nil, or :string and
       # the conversion raises an InvalidValue exception, return v
       # if :string and nil otherwise.
@@ -241,12 +241,12 @@ module Sequel
             nil
           when :string
             v
-          else 
+          else
             raise
           end
         end
       end
-    
+
       def database_error_classes
         [Mysql::Error]
       end
@@ -262,13 +262,13 @@ module Sequel
       def disconnect_error?(e, opts)
         super || (e.is_a?(::Mysql::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
       end
-      
+
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
         convert_tinyint_to_bool && db_type =~ /\Atinyint\(1\)/ ? :boolean : super
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
       include Sequel::MySQL::MysqlMysql2::DatasetMethods
@@ -281,7 +281,7 @@ module Sequel
         execute(sql) do |r|
           i = -1
           cps = db.conversion_procs
-          cols = r.fetch_fields.map do |f| 
+          cols = r.fetch_fields.map do |f|
             # Pretend tinyint is another integer type if its length is not 1, to
             # avoid casting to boolean if convert_tinyint_to_bool is set.
             type_proc = f.type == 1 && cast_tinyint_integer?(f) ? cps[2] : cps[f.type]
@@ -298,13 +298,13 @@ module Sequel
         end
         self
       end
-      
+
       # Don't allow graphing a dataset that splits multiple statements
       def graph(*)
         raise(Error, "Can't graph a dataset that splits multiple result sets") if opts[:split_multiple_result_sets]
         super
       end
-      
+
       # Makes each yield arrays of rows, with each array containing the rows
       # for a given result set.  Does not work with graphing.  So you can submit
       # SQL with multiple statements and easily determine which statement
@@ -320,7 +320,7 @@ module Sequel
         ds = ds.with_row_proc(proc{|x| x.map{|h| row_proc.call(h)}}) if row_proc
         ds
       end
-      
+
       private
 
       # Whether a tinyint field should be casted as an integer.  By default,
@@ -329,18 +329,18 @@ module Sequel
       def cast_tinyint_integer?(field)
         field.length != 1
       end
-      
+
       def execute(sql, opts=OPTS)
         opts = Hash[opts]
         opts[:type] = :select
         super
       end
-      
+
       # Handle correct quoting of strings using ::MySQL.quote.
       def literal_string_append(sql, v)
         sql << "'" << ::Mysql.quote(v) << "'"
       end
-      
+
       # Yield each row of the given result set r with columns cols
       # as a hash with symbol keys
       def yield_rows(r, cols)

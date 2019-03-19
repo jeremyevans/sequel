@@ -18,7 +18,7 @@ module Sequel
       include Sequel::MySQL::PreparedStatements::DatabaseMethods unless NativePreparedStatements
 
       set_adapter_scheme :mysql2
-      
+
       # Whether to convert tinyint columns to bool for this database
       attr_accessor :convert_tinyint_to_bool
 
@@ -43,7 +43,7 @@ module Sequel
         opts[:encoding] ||= opts[:charset]
         conn = ::Mysql2::Client.new(opts)
         conn.query_options.merge!(:symbolize_keys=>true, :cache_rows=>false)
-          
+
         if NativePreparedStatements
           conn.instance_variable_set(:@sequel_default_query_options, conn.query_options.dup)
         end

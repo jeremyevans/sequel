@@ -13,7 +13,7 @@ module Sequel
       def database_type
         :db2
       end
-      
+
       # Return the database version as a string.  Don't rely on this,
       # it may return an integer in the future.
       def db2_version
@@ -33,7 +33,7 @@ module Sequel
         m = output_identifier_meth(opts[:dataset])
         im = input_identifier_meth(opts[:dataset])
         metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{literal(im.call(table))} ORDER BY COLNO").
-          collect do |column| 
+          collect do |column|
             column[:db_type] = column.delete(:typename)
             if column[:db_type] =~ /\A(VAR)?CHAR\z/
               column[:db_type] << "(#{column[:length]})"
@@ -111,7 +111,7 @@ module Sequel
           # table probably needs reorg
           reorg(name)
           v = true
-          retry 
+          retry
         end
         false
       end
@@ -175,7 +175,7 @@ module Sequel
       # primary key or unique constraint
       def column_list_sql(g)
         ks = []
-        g.constraints.each{|c| ks = c[:columns] if [:primary_key, :unique].include?(c[:type])} 
+        g.constraints.each{|c| ks = c[:columns] if [:primary_key, :unique].include?(c[:type])}
         g.columns.each{|c| c[:null] = false if ks.include?(c[:name]) }
         super
       end
@@ -247,7 +247,7 @@ module Sequel
       end
 
       # We uses the clob type by default for Files.
-      # Note: if user select to use blob, then insert statement should use 
+      # Note: if user select to use blob, then insert statement should use
       # use this for blob value:
       #     cast(X'fffefdfcfbfa' as blob(2G))
       def type_literal_generic_file(column)
@@ -335,7 +335,7 @@ module Sequel
       def supports_lateral_subqueries?
         true
       end
-      
+
       # DB2 does not support multiple columns in IN.
       def supports_multiple_column_in?
         false
@@ -430,7 +430,7 @@ module Sequel
         strategy = db.offset_strategy
         return super if strategy == :limit_offset
 
-        if strategy == :offset_fetch && (o = @opts[:offset]) 
+        if strategy == :offset_fetch && (o = @opts[:offset])
           sql << " OFFSET "
           literal_append(sql, o)
           sql << " ROWS"
@@ -446,7 +446,7 @@ module Sequel
           end
         end
       end
-      
+
       # DB2 supports quoted function names.
       def supports_quoted_function_names?
         true

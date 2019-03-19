@@ -6,7 +6,7 @@ module Sequel
     # :section: 7 - Miscellaneous methods
     # These methods don't fit neatly into another category.
     # ---------------------
-    
+
     # Hash of extension name symbols to callable objects to load the extension
     # into the Database object (usually by extending it with a module defined
     # in the extension).
@@ -70,7 +70,7 @@ module Sequel
     end
 
     # Converts a uri to an options hash. These options are then passed
-    # to a newly created database object. 
+    # to a newly created database object.
     def self.uri_to_options(uri)
       {
         :user => uri.user,
@@ -84,10 +84,10 @@ module Sequel
 
     # The options hash for this database
     attr_reader :opts
-    
+
     # Set the timezone to use for this database, overridding <tt>Sequel.database_timezone</tt>.
     attr_writer :timezone
-    
+
     # The specific default size of string columns for this Sequel::Database, usually 255 by default.
     attr_accessor :default_string_column_size
 
@@ -266,7 +266,7 @@ module Sequel
     def schema_type_class(type)
       @schema_type_classes[type]
     end
-    
+
     # Default serial primary key options, used by the table creation code.
     def serial_primary_key_options
       {:primary_key => true, :type => Integer, :auto_increment => true}
@@ -310,20 +310,20 @@ module Sequel
         raise Sequel.convert_exception_class(e, InvalidValue)
       end
     end
-    
+
     # Returns the URI use to connect to the database.  If a URI
     # was not used when connecting, returns nil.
     def uri
       opts[:uri]
     end
-    
+
     # Explicit alias of uri for easier subclassing.
     def url
       uri
     end
-    
+
     private
-    
+
     # Per adapter initialization method, empty by default.
     def adapter_initialize
     end
@@ -358,7 +358,7 @@ module Sequel
     def database_error_class(exception, opts)
       database_specific_error_class(exception, opts) || DatabaseError
     end
-    
+
     # Return the SQLState for the given exception, if one can be determined
     def database_exception_sqlstate(exception, opts)
       nil
@@ -382,7 +382,7 @@ module Sequel
 
       nil
     end
-    
+
     NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each(&:freeze)
     FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23506 23504'.freeze.each(&:freeze)
     UNIQUE_CONSTRAINT_SQLSTATES = %w'23505'.freeze.each(&:freeze)
@@ -403,12 +403,12 @@ module Sequel
         SerializationFailure
       end
     end
-    
+
     # Return true if exception represents a disconnect error, false otherwise.
     def disconnect_error?(exception, opts)
       opts[:disconnect]
     end
-    
+
     # Load extensions during initialization from the given key in opts.
     def initialize_load_extensions(key)
       case exts = @opts[key]
@@ -470,7 +470,7 @@ module Sequel
     def typecast_value_datetime(value)
       Sequel.typecast_to_application_timestamp(value)
     end
-    
+
     if RUBY_VERSION >= '2.4'
       # Typecast a string to a BigDecimal
       alias _typecast_value_string_to_decimal BigDecimal

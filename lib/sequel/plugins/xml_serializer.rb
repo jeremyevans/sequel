@@ -43,7 +43,7 @@ module Sequel
     #   #     <name>YJM</name>
     #   #   </artist>
     #   # </album>
-    # 
+    #
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
@@ -131,7 +131,7 @@ module Sequel
         # the provided XML.
         def array_from_xml(xml, opts=OPTS)
           node = Nokogiri::XML(xml).children.first
-          unless node 
+          unless node
             raise Error, "Malformed XML used"
           end
           node.children.reject{|c| c.is_a?(Nokogiri::XML::Text)}.map{|c| from_xml_node(c, opts)}
@@ -212,10 +212,10 @@ module Sequel
           from_xml_node(Nokogiri::XML(xml).children.first, opts)
         end
 
-        # Update the contents of this instance based on the given 
+        # Update the contents of this instance based on the given
         # XML node, which should be a Nokogiri::XML::Node instance.
         # By default, just calls set with a hash created from the content of the node.
-        # 
+        #
         # Options:
         # :associations :: Indicates that the associations cache should be updated by creating
         #                  a new associated object using data from the hash.  Should be a Symbol

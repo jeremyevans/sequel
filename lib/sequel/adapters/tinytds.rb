@@ -20,10 +20,10 @@ module Sequel
           sql = "SET TEXTSIZE #{typecast_value_integer(ts)}"
           log_connection_yield(sql, c){c.execute(sql)}
         end
-      
+
         c
       end
-      
+
       # Execute the given +sql+ on the server.  If the :return option
       # is present, its value should be a method symbol that is called
       # on the TinyTds::Result object returned from executing the
@@ -96,13 +96,13 @@ module Sequel
       def adapter_initialize
         set_mssql_unicode_strings
       end
-      
+
       # For some reason, unless you specify a column can be
       # NULL, it assumes NOT NULL, so turn NULL on by default unless
       # the column is a primary key column.
       def column_list_sql(g)
         pks = []
-        g.constraints.each{|c| pks = c[:columns] if c[:type] == :primary_key} 
+        g.constraints.each{|c| pks = c[:columns] if c[:type] == :primary_key}
         g.columns.each{|c| c[:null] = true if !pks.include?(c[:name]) && !c[:primary_key] && !c.has_key?(:null) && !c.has_key?(:allow_null)}
         super
       end
@@ -174,30 +174,30 @@ module Sequel
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::MSSQL::DatasetMethods
 
       module ArgumentMapper
         include Sequel::Dataset::ArgumentMapper
-        
+
         protected
-        
+
         def map_to_prepared_args(hash)
           args = {}
           hash.each{|k,v| args[k.to_s.gsub('.', '__')] = v}
           args
         end
-        
+
         private
-        
+
         def prepared_arg(k)
           LiteralString.new("@#{k.to_s.gsub('.', '__')}")
         end
       end
-      
+
       PreparedStatementMethods = prepared_statements_module("sql = prepared_sql; opts = Hash[opts]; opts[:arguments] = bind_arguments", ArgumentMapper)
-    
+
       def fetch_rows(sql)
         execute(sql) do |result|
           # Mutating an array in the result is questionable, but supported
@@ -229,9 +229,9 @@ module Sequel
         end
         self
       end
-      
+
       private
-      
+
       # Properly escape the given string
       def literal_string_append(sql, v)
         sql << (mssql_unicode_strings ? "N'" : "'")

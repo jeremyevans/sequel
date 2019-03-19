@@ -40,14 +40,14 @@ module Sequel
             $1.to_i * 10000 + $2.to_i * 100 + $3.to_i
           end
         end
-        
+
         # HSQLDB supports DROP TABLE IF EXISTS
         def supports_drop_table_if_exists?
           true
         end
 
         private
-        
+
         def alter_table_sql(table, op)
           case op[:op]
           when :add_column
@@ -88,7 +88,7 @@ module Sequel
         def drop_table_sql(name, options)
           "DROP TABLE #{quote_schema_table(name)}#{' IF EXISTS' if options[:if_exists]}#{' CASCADE' if options[:cascade]}"
         end
-        
+
         # IF EXISTS comes after view name on HSQLDB
         def drop_view_sql(name, options)
           "DROP VIEW #{quote_schema_table(name)}#{' IF EXISTS' if options[:if_exists]}#{' CASCADE' if options[:cascade]}"
@@ -103,7 +103,7 @@ module Sequel
             rs.getLong(1)
           end
         end
-        
+
         # Primary key indexes appear to start with sys_idx_sys_pk_ on HSQLDB
         def primary_key_index_re
           /\Asys_idx_sys_pk_/i
@@ -136,7 +136,7 @@ module Sequel
           :local
         end
       end
-      
+
       class Dataset < JDBC::Dataset
         # Handle HSQLDB specific case insensitive LIKE and bitwise operator support.
         def complex_expression_sql_append(sql, op, args)
@@ -184,7 +184,7 @@ module Sequel
         def empty_from_sql
           " FROM (VALUES (0))"
         end
-        
+
         # Use string in hex format for blob data.
         def literal_blob_append(sql, v)
           sql << "X'" << v.unpack("H*").first << "'"

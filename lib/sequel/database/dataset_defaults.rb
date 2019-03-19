@@ -40,7 +40,7 @@ module Sequel
     #
     #   # Introspect columns for all of DB's datasets
     #   DB.extend_datasets(Sequel::ColumnsIntrospection)
-    #   
+    #
     #   # Trace all SELECT queries by printing the SQL and the full backtrace
     #   DB.extend_datasets do
     #     def fetch_rows(sql)
@@ -73,7 +73,7 @@ module Sequel
     end
 
     private
-    
+
     # The default dataset class to use for the database
     def dataset_class_default
       Sequel::Dataset

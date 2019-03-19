@@ -26,7 +26,7 @@ module Sequel
     # * Model.with_pk!
     # * Model.[] # when argument is not hash or nil
     # * many_to_one association method # without dynamic callback, when primary key matches
-    # 
+    #
     # Usage:
     #
     #   # Make all subclasses use the same cache (called before loading subclasses)
@@ -52,11 +52,11 @@ module Sequel
       module ClassMethods
         # If true, ignores exceptions when gettings cached records (the memcached API).
         attr_reader :cache_ignore_exceptions
-        
+
         # The cache store object for the model, which should implement the
         # Ruby-Memcache (or memcached) API
         attr_reader :cache_store
-        
+
         # The time to live for the cache store, in seconds.
         attr_reader :cache_ttl
 
@@ -81,16 +81,16 @@ module Sequel
           raise(Error, 'no primary key for this record') unless pk.is_a?(Array) ? pk.all? : pk
           "#{cache_key_prefix}:#{Array(pk).join(',')}"
         end
-        
+
         Plugins.inherited_instance_variables(self, :@cache_store=>nil, :@cache_ttl=>nil, :@cache_ignore_exceptions=>nil)
 
         # Set the time to live for the cache store, in seconds (default is 3600, # so 1 hour).
         def set_cache_ttl(ttl)
           @cache_ttl = ttl
         end
-        
+
         private
-    
+
         # Access the cache using the given method and key, rescuing exceptions if necessary.
         def cache_op(meth, ck)
           if @cache_ignore_exceptions
@@ -99,13 +99,13 @@ module Sequel
             @cache_store.public_send(meth, ck)
           end
         end
-    
+
         # Delete the entry with the matching key from the cache
         def cache_delete(ck)
           cache_op(:delete, ck)
           nil
         end
-        
+
         # Returned the cached object, or nil if the object was not
         # in the cached
         def cache_get(ck)
@@ -116,7 +116,7 @@ module Sequel
         def cache_set(ck, obj)
           @cache_store.set(ck, obj, @cache_ttl)
         end
-        
+
         # Check the cache before a database lookup unless a hash is supplied.
         def primary_key_lookup(pk)
           ck = cache_key(pk)
@@ -124,7 +124,7 @@ module Sequel
             if obj = super(pk)
               cache_set(ck, obj)
             end
-          end 
+          end
           obj
         end
       end
@@ -142,7 +142,7 @@ module Sequel
         def cache_key
           model.cache_key(pk)
         end
-    
+
         # Remove the object from the cache when deleting
         def delete
           cache_delete
@@ -150,7 +150,7 @@ module Sequel
         end
 
         private
-    
+
         # Delete this object from the cache
         def cache_delete
           model.cache_delete_pk(pk)

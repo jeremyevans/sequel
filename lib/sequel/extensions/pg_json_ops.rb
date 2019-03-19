@@ -394,7 +394,7 @@ module Sequel
 
       # Wrap argument in a PGArray if it is an array
       def wrap_input_array(obj)
-        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array) 
+        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array)
           Sequel.pg_array(obj)
         else
           obj

@@ -62,7 +62,7 @@ module Sequel
     class Query < Sequel::BasicObject
       # The current dataset in the query.  This changes on each method call.
       attr_reader :dataset
-     
+
       def initialize(dataset)
         @dataset = dataset
       end

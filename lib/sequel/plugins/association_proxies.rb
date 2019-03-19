@@ -7,7 +7,7 @@ module Sequel
     # method returns a dataset.  This plugin makes the association method return a proxy
     # that will load the association and call a method on the association array if sent
     # an array method, and otherwise send the method to the association's dataset.
-    # 
+    #
     # You can override which methods to forward to the dataset by passing a block to the plugin:
     #
     #   plugin :association_proxies do |opts|
@@ -25,7 +25,7 @@ module Sequel
     # :reflection :: The reflection for the association related to the call
     # :proxy_argument :: The argument given to the association method call
     # :proxy_block :: The block given to the association method call
-    # 
+    #
     # For example, in a call like:
     #
     #   artist.albums(1){|ds| ds}.foo(2){|x| 3}

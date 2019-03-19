@@ -16,9 +16,9 @@ module Sequel
     module MySQL
       module DatabaseMethods
         include Sequel::MySQL::DatabaseMethods
-        
+
         private
-        
+
         # MySQL exception handling with SQLState is less accurate than with regexps.
         def database_exception_use_sqlstates?
           false
@@ -66,7 +66,7 @@ module Sequel
         def schema_column_type(db_type)
           db_type =~ /\Atinyint\(1\)/ ? :boolean : super
         end
-      
+
         # Run the default connection setting SQL statements.
         # Apply the connectiong setting SQLs for every new connection.
         def setup_connection(conn)

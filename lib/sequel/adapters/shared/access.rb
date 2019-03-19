@@ -18,7 +18,7 @@ module Sequel
       #def tables
       #  from(:MSysObjects).where(:Type=>1, :Flags=>0).select_map(:Name).map(&:to_sym)
       #end
-      
+
       # Access doesn't support renaming tables from an SQL query,
       # so create a copy of the table and then drop the from table.
       def rename_table(from_table, to_table)
@@ -45,7 +45,7 @@ module Sequel
         raise(Error, "must provide dataset instance as value of create_table :as option on Access") unless ds.is_a?(Sequel::Dataset)
         run(ds.into(name).sql)
       end
-    
+
       DATABASE_ERROR_REGEXPS = {
         /The changes you requested to the table were not successful because they would create duplicate values in the index, primary key, or relationship/ => UniqueConstraintViolation,
         /You cannot add or change a record because a related record is required|The record cannot be deleted or changed because table/ => ForeignKeyConstraintViolation,
@@ -59,7 +59,7 @@ module Sequel
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
-      
+
       # Access doesn't have a 64-bit integer type, so use integer and hope
       # the user isn't using more than 32 bits.
       def type_literal_generic_bignum_symbol(column)
@@ -70,13 +70,13 @@ module Sequel
       def type_literal_generic_trueclass(column)
         :bit
       end
-      
+
       # Access uses image type for blobs
       def type_literal_generic_file(column)
         :image
       end
     end
-  
+
     module DatasetMethods
       include(Module.new do
         Dataset.def_sql_method(self, :select, %w'select distinct limit columns into from join where group order having compounds')
@@ -165,7 +165,7 @@ module Sequel
       def escape_like(string)
         string.gsub(/[\\*#?\[]/){|m| "[#{m}]"}
       end
-   
+
       # Specify a table for a SELECT ... INTO query.
       def into(table)
         clone(:into => table)
@@ -185,7 +185,7 @@ module Sequel
       def supports_is_true?
         false
       end
-      
+
       # Access doesn't support JOIN USING
       def supports_join_using?
         false
@@ -201,7 +201,7 @@ module Sequel
         delete
         nil
       end
-      
+
       private
 
       # Access uses # to quote dates

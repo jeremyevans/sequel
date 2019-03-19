@@ -25,7 +25,7 @@ module Sequel
 
       # Delegate to the db's #_execute method.
       def execute(sql)
-        @db.send(:_execute, self, sql, :log=>false) 
+        @db.send(:_execute, self, sql, :log=>false)
       end
     end
 
@@ -109,7 +109,7 @@ module Sequel
       # the appropriate value using either the #autoid, #fetch, or
       # #numrows methods.
       def execute(sql, opts=OPTS, &block)
-        synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)} 
+        synchronize(opts[:server]){|c| _execute(c, sql, opts, &block)}
       end
       alias execute_ddl execute
 
@@ -241,7 +241,7 @@ module Sequel
         @sqls = opts[:sqls] || []
         @shared_adapter = false
 
-        case db_type = opts[:host] 
+        case db_type = opts[:host]
         when String, Symbol
           db_type = db_type.to_sym
           unless mod = Sequel.synchronize{SHARED_ADAPTER_MAP[db_type]}

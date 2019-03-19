@@ -47,20 +47,20 @@ module Sequel
             $1.to_i
           end
         end
-        
+
         # Derby supports transactional DDL statements.
         def supports_transactional_ddl?
           true
         end
 
         private
-        
+
         # Derby optimizes away Sequel's default check of SELECT NULL FROM table,
         # so use a SELECT * FROM table there.
         def _table_exists?(ds)
           ds.first
         end
-    
+
         def alter_table_sql(table, op)
           case op[:op]
           when :rename_column
@@ -90,7 +90,7 @@ module Sequel
           null = column.fetch(:null, column[:allow_null])
           sql << " NOT NULL" if null == false || (null.nil? && column[:primary_key])
         end
-    
+
         # Add NOT LOGGED for temporary tables to improve performance.
         def create_table_sql(name, generator, options)
           s = super
@@ -145,7 +145,7 @@ module Sequel
         def set_ps_arg_nil(cps, i)
           cps.setNull(i, cps.getParameterMetaData.getParameterType(i))
         end
-      
+
         # Derby uses RENAME TABLE syntax to rename tables.
         def rename_table_sql(name, new_name)
           "RENAME TABLE #{quote_schema_table(name)} TO #{quote_schema_table(new_name)}"
@@ -180,7 +180,7 @@ module Sequel
           @valid_connection_sql ||= select(1).sql
         end
       end
-      
+
       class Dataset < JDBC::Dataset
         # Derby doesn't support an expression between CASE and WHEN,
         # so remove conditions.

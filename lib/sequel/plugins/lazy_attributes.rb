@@ -29,14 +29,14 @@ module Sequel
     module LazyAttributes
       # Lazy attributes requires the tactical_eager_loading plugin
       def self.apply(model, *attrs)
-        model.plugin :tactical_eager_loading  
+        model.plugin :tactical_eager_loading
       end
-      
+
       # Set the attributes given as lazy attributes
       def self.configure(model, *attrs)
         model.lazy_attributes(*attrs) unless attrs.empty?
       end
-      
+
       module ClassMethods
         # Freeze lazy attributes module when freezing model class.
         def freeze
@@ -55,7 +55,7 @@ module Sequel
           set_dataset(dataset.select(*select.reject{|c| attrs.include?(dataset.send(:_hash_key_symbol, c))}))
           attrs.each{|a| define_lazy_attribute_getter(a)}
         end
-        
+
         private
 
         # Add a lazy attribute getter method to the lazy_attributes_module. Options:

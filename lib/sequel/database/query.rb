@@ -12,12 +12,12 @@ module Sequel
 
     # The prepared statement object hash for this database, keyed by name symbol
     attr_reader :prepared_statements
-    
+
     # Whether the schema should be cached for this database.  True by default
     # for performance, can be set to false to always issue a database query to
     # get the schema.
     attr_accessor :cache_schema
-    
+
     # Runs the supplied SQL statement string on the database server.
     # Returns self so it can be safely chained:
     #
@@ -26,7 +26,7 @@ module Sequel
       run(sql)
       self
     end
-    
+
     # Call the prepared statement with the given name with the given hash
     # of arguments.
     #
@@ -35,7 +35,7 @@ module Sequel
     def call(ps_name, hash=OPTS, &block)
       prepared_statement(ps_name).call(hash, &block)
     end
-    
+
     # Method that should be used when submitting any DDL (Data Definition
     # Language) SQL, such as +create_table+.  By default, calls +execute_dui+.
     # This method should not be called directly by user code.
@@ -65,7 +65,7 @@ module Sequel
     def get(*args, &block)
       @default_dataset.get(*args, &block)
     end
-    
+
     # Runs the supplied SQL statement string on the database server. Returns nil.
     # Options:
     # :server :: The server to run the SQL on.
@@ -76,7 +76,7 @@ module Sequel
       execute_ddl(sql, opts)
       nil
     end
-    
+
     # Returns the schema for the given table as an array with all members being arrays of length 2,
     # the first member being the column name, and the second member being a hash of column information.
     # The table argument can also be a dataset, as long as it only has one table.
@@ -201,13 +201,13 @@ module Sequel
     end
 
     private
-    
+
     # Should raise an error if the table doesn't not exist,
     # and not raise an error if the table does exist.
     def _table_exists?(ds)
       ds.get(SQL::AliasedExpression.new(Sequel::NULL, :nil))
     end
-    
+
     # Whether the type should be treated as a string type when parsing the
     # column schema default value.
     def column_schema_default_string_type?(type)
@@ -219,7 +219,7 @@ module Sequel
     def column_schema_default_to_ruby_value(default, type)
       case type
       when :boolean
-        case default 
+        case default
         when /[f0]/i
           false
         when /[t1]/i
@@ -243,7 +243,7 @@ module Sequel
         BigDecimal(default)
       end
     end
-   
+
     # Normalize the default value string for the given type
     # and return the normalized value.
     def column_schema_normalize_default(default, type)
@@ -286,7 +286,7 @@ module Sequel
     def input_identifier_meth(ds=nil)
       (ds || dataset).method(:input_identifier)
     end
-    
+
     # Uncached version of metadata_dataset, designed for overriding.
     def _metadata_dataset
       dataset
@@ -313,7 +313,7 @@ module Sequel
       k = quote_schema_table(table)
       Sequel.synchronize{@schemas.delete(k)}
     end
-    
+
     # Match the database's column type to a ruby type via a
     # regular expression, and return the ruby type as a symbol
     # such as :integer or :string.
@@ -342,7 +342,7 @@ module Sequel
       end
     end
 
-    # Post process the schema values.  
+    # Post process the schema values.
     def schema_post_process(cols)
       if RUBY_VERSION >= '2.5'
         cols.each do |_, h|

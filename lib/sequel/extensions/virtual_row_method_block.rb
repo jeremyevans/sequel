@@ -4,7 +4,7 @@
 # when calling a method to change the behavior.  It only exists
 # for backwards compatibility with previous Sequel versions, and
 # is not recommended for new applications.
-# 
+#
 # To load the extension:
 #
 #   Sequel.extension :virtual_row_method_block

@@ -21,7 +21,7 @@ module Sequel
     def [](*args)
       args.first.is_a?(String) ? fetch(*args) : from(*args)
     end
-    
+
     # Returns a blank dataset for this database.
     #
     #   DB.dataset # SELECT *
@@ -51,7 +51,7 @@ module Sequel
       ds.each(&block) if block
       ds
     end
-    
+
     # Returns a new dataset with the +from+ method invoked. If a block is given,
     # it acts as a virtual row block
     #
@@ -66,7 +66,7 @@ module Sequel
         @default_dataset.from(*args)
       end
     end
-    
+
     # Returns a new dataset with the select method invoked.
     #
     #   DB.select(1) # SELECT 1

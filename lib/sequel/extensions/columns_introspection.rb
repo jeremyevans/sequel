@@ -7,7 +7,7 @@
 #
 # This method is not fool-proof, it's possible that some databases
 # will use column names that Sequel does not expect.  Also, it
-# may not correctly handle all cases. 
+# may not correctly handle all cases.
 #
 # To attempt to introspect columns for a single dataset:
 #
@@ -50,7 +50,7 @@ module Sequel
         if from.is_a?(SQL::AliasedExpression)
           from = from.expression
         end
-        
+
         case from
         when Dataset
           from.probable_columns

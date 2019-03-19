@@ -6,7 +6,7 @@ module Sequel
     # :section: 6 - Miscellaneous methods
     # These methods don't fit cleanly into another section.
     # ---------------------
-    
+
     # The database related to this dataset.  This is the Database instance that
     # will execute all of this dataset's queries.
     attr_reader :db
@@ -14,7 +14,7 @@ module Sequel
     # The hash of options for this dataset, keys are symbols.
     attr_reader :opts
 
-    # Constructs a new Dataset instance with an associated database and 
+    # Constructs a new Dataset instance with an associated database and
     # options. Datasets are usually constructed by invoking the Database#[] method:
     #
     #   DB[:posts]
@@ -50,7 +50,7 @@ module Sequel
     def dup
       self
     end
-    
+
     # Yield a dataset for each server in the connection pool that is tied to that server.
     # Intended for use in sharded environments where all servers need to be modified
     # with the same data:
@@ -86,7 +86,7 @@ module Sequel
       end
       # :nocov:
     end
-   
+
     # Alias of +first_source_alias+
     def first_source
       first_source_alias
@@ -115,7 +115,7 @@ module Sequel
         s
       end
     end
-    
+
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the original
     # table, not the alias
@@ -146,13 +146,13 @@ module Sequel
     def hash
       [self.class, db, opts].hash
     end
-    
-    # Returns a string representation of the dataset including the class name 
+
+    # Returns a string representation of the dataset including the class name
     # and the corresponding SQL select statement.
     def inspect
       "#<#{visible_class_name}: #{sql.inspect}>"
     end
-    
+
     # Whether this dataset is a joined dataset (multiple FROM tables or any JOINs).
     def joined_dataset?
      !!((opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join])
@@ -169,7 +169,7 @@ module Sequel
     def row_proc
       @opts[:row_proc]
     end
-    
+
     # Splits a possible implicit alias in +c+, handling both SQL::AliasedExpressions
     # and Symbols.  Returns an array of two elements, with the first being the
     # main expression, and the second being the alias.
@@ -229,7 +229,7 @@ module Sequel
         while true
           ta = :"#{table_alias}_#{i}"
           return ta unless used_aliases.include?(ta)
-          i += 1 
+          i += 1
         end
       else
         table_alias
@@ -240,7 +240,7 @@ module Sequel
     def with_quote_identifiers(v)
       clone(:quote_identifiers=>v, :skip_symbol_cache=>true)
     end
-      
+
     protected
 
     # Access the cache for the current dataset.  Should be used with caution,

@@ -1,13 +1,13 @@
 # frozen-string-literal: true
 
-module Sequel 
+module Sequel
   class Dataset
     # ---------------------
     # :section: 8 - Methods related to prepared statements or bound variables
     # On some adapters, these use native prepared statements and bound variables, on others
     # support is emulated.  For details, see the {"Prepared Statements/Bound Variables" guide}[rdoc-ref:doc/prepared_statements.rdoc].
     # ---------------------
-    
+
     PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze
 
     DEFAULT_PREPARED_STATEMENT_MODULE_METHODS = %w'execute execute_dui execute_insert'.freeze.each(&:freeze)
@@ -58,7 +58,7 @@ module Sequel
         ps = bind(bind_vars)
         ps.clone(:bind_arguments=>ps.map_to_prepared_args(ps.opts[:bind_vars]), :sql=>sql, :prepared_sql=>sql).run(&block)
       end
-        
+
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
@@ -89,23 +89,23 @@ module Sequel
       def log_sql
         @opts[:log_sql]
       end
-      
+
       # The type of prepared statement, should be one of :select, :first,
       # :insert, :update, :delete, or :single_value
       def prepared_type
         @opts[:prepared_type]
       end
-      
+
       # The array/hash of bound variable placeholder names.
       def prepared_args
         @opts[:prepared_args]
       end
-      
+
       # The dataset that created this prepared statement.
       def orig_dataset
         @opts[:orig_dataset]
       end
-      
+
       # The argument to supply to insert and update, which may use
       # placeholders specified by prepared_args
       def prepared_modify_values
@@ -130,7 +130,7 @@ module Sequel
       def columns
         orig_dataset.columns
       end
-      
+
       # Disallow use of delayed evaluations in prepared statements.
       def delayed_evaluation_sql_append(sql, delay)
         raise Error, "delayed evaluations cannot be used in prepared statements" if @opts[:no_delayed_evaluations]
@@ -158,7 +158,7 @@ module Sequel
           select_sql
         end
       end
-      
+
       # Changes the values of symbols if they start with $ and
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
@@ -169,16 +169,16 @@ module Sequel
           super
         end
       end
-      
+
       # Programmer friendly string showing this is a prepared statement,
       # with the prepared SQL it represents (which in general won't have
       # substituted variables).
       def inspect
         "<#{visible_class_name}/PreparedStatement #{prepared_sql.inspect}>"
       end
-      
+
       protected
-      
+
       # Run the method based on the type of prepared statement.
       def run(&block)
         case prepared_type
@@ -203,7 +203,7 @@ module Sequel
         when Array
           case prepared_type[0]
           when :map, :as_hash, :to_hash, :to_hash_groups
-            public_send(*prepared_type, &block) 
+            public_send(*prepared_type, &block)
           end
         when :single_value
           single_value
@@ -211,9 +211,9 @@ module Sequel
           raise Error, "unsupported prepared statement type used: #{prepared_type.inspect}"
         end
       end
-      
+
       private
-      
+
       # Returns the value of the prepared_args hash for the given key.
       def prepared_arg(k)
         @opts[:bind_vars][k]
@@ -236,25 +236,25 @@ module Sequel
           send(:to_prepared_statement, :select, nil, :extend=>prepared_statement_modules)
       end
     end
-    
+
     # Default implementation for an argument mapper that uses
     # unnumbered SQL placeholder arguments.  Keeps track of which
     # arguments have been used, and allows arguments to
     # be used more than once.
     module UnnumberedArgumentMapper
       include ArgumentMapper
-      
+
       protected
-      
+
       # Returns a single output array mapping the values of the input hash.
       # Keys in the input hash that are used more than once in the query
       # have multiple entries in the output array.
       def map_to_prepared_args(bind_vars)
         prepared_args.map{|v| bind_vars[v]}
       end
-      
+
       private
-      
+
       # Associates the argument with name k with the next position in
       # the output array.
       def prepared_arg(k)
@@ -262,7 +262,7 @@ module Sequel
         prepared_arg_placeholder
       end
     end
-    
+
     # Prepared statements emulation support for adapters that don't
     # support native prepared statements.  Uses a placeholder
     # literalizer to hold the prepared sql with the ability to
@@ -280,13 +280,13 @@ module Sequel
       end
 
       private
-      
+
       # Turn emulation of prepared statements back on, since ArgumentMapper
       # turns it off.
       def emulate_prepared_statements?
         true
       end
-        
+
       def emulated_prepared_statement(type, name, values)
         prepared_sql, frags = Sequel::Dataset::PlaceholderLiteralizer::Recorder.new.send(:prepared_sql_and_frags, self, prepared_args) do |pl, ds|
           ds = ds.clone(:recorder=>pl)
@@ -319,7 +319,7 @@ module Sequel
           with_extend(EmulatePreparedStatementMethods)
       end
     end
-    
+
     # Set the bind variables to use for the call.  If bind variables have
     # already been set for this dataset, they are updated with the contents
     # of bind_vars.
@@ -340,7 +340,7 @@ module Sequel
 
       clone(:bind_vars=>bind_vars)
     end
-    
+
     # For the given type (:select, :first, :insert, :insert_select, :update, :delete, or :single_value),
     # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
     # insert or update (if one of those types is used), which may contain placeholders.
@@ -351,7 +351,7 @@ module Sequel
     def call(type, bind_variables=OPTS, *values, &block)
       to_prepared_statement(type, values, :extend=>bound_variable_modules).call(bind_variables, &block)
     end
-    
+
     # Prepare an SQL statement for later execution.  Takes a type similar to #call,
     # and the +name+ symbol of the prepared statement.
     #
@@ -383,9 +383,9 @@ module Sequel
       db.set_prepared_statement(name, ps)
       ps
     end
-    
+
     protected
-    
+
     # Return a cloned copy of the current dataset extended with
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil, opts=OPTS)
@@ -398,7 +398,7 @@ module Sequel
     end
 
     private
-    
+
     # Don't allow preparing prepared statements by default.
     def allow_preparing_prepared_statements?
       false

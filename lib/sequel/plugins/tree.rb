@@ -2,10 +2,10 @@
 
 module Sequel
   module Plugins
-    # The tree plugin adds additional associations and methods that allow you to 
-    # treat a Model as a tree.  
+    # The tree plugin adds additional associations and methods that allow you to
+    # treat a Model as a tree.
     #
-    # A column for holding the parent key is required and is :parent_id by default.  
+    # A column for holding the parent key is required and is :parent_id by default.
     # This may be overridden by passing column name via :key.
     #
     # Optionally, a column to control order of nodes returned can be specified
@@ -13,13 +13,13 @@ module Sequel
     #
     # If you pass true for the :single_root option, the class will ensure there is
     # only ever one root in the tree.
-    # 
+    #
     # Examples:
     #
     #   class Node < Sequel::Model
     #     plugin :tree
     #   end
-    #  
+    #
     #   class Node < Sequel::Model
     #     plugin :tree, key: :parentid, order: :position
     #   end
@@ -36,7 +36,7 @@ module Sequel
 
         par = opts.merge(opts.fetch(:parent, OPTS))
         parent = par.fetch(:name, :parent)
-        
+
         chi = opts.merge(opts.fetch(:children, OPTS))
         children = chi.fetch(:name, :children)
 
@@ -54,11 +54,11 @@ module Sequel
           plugin SingleRoot if opts[:single_root]
         end
       end
-      
+
       module ClassMethods
         # The column symbol or array of column symbols on which to order the tree.
         attr_accessor :tree_order
-        
+
         # The symbol for the column containing the value pointing to the
         # parent of the leaf.
         attr_accessor :parent_column
@@ -75,11 +75,11 @@ module Sequel
         # Should freeze tree order if it is an array when freezing the model class.
         def freeze
           @tree_order.freeze if @tree_order.is_a?(Array)
-        
+
           super
         end
       end
-      
+
       module InstanceMethods
         # Returns list of ancestors, starting from parent until root.
         #
@@ -99,7 +99,7 @@ module Sequel
         def descendants
           nodes = send(model.children_association_name).dup
           send(model.children_association_name).each{|child| nodes.concat(child.descendants)}
-          nodes 
+          nodes
         end
 
         # Returns the root node of the tree that this node descends from.

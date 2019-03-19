@@ -15,8 +15,8 @@ module Sequel
         wrapped_exception || super
       end
     end
-  end  
-    
+  end
+
   (
   # Error raised when the adapter requested doesn't exist or can't be loaded.
   AdapterNotFound = Class.new(Error)
@@ -28,7 +28,7 @@ module Sequel
   # because incorrect SQL syntax is used.
   DatabaseError = Class.new(Error)
   ).name
-  
+
   (
   # Error raised when the Sequel is unable to connect to the database with the
   # connection parameters it was given.
@@ -37,7 +37,7 @@ module Sequel
 
   (
   # Error raised by adapters when they determine that the connection
-  # to the database has been lost.  Instructs the connection pool code to 
+  # to the database has been lost.  Instructs the connection pool code to
   # remove that connection from the pool so that other connections can be acquired
   # automatically.
   DatabaseDisconnectError = Class.new(DatabaseError)

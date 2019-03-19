@@ -15,14 +15,14 @@ module Sequel
     #
     # Let's say you also wanted to eagerly load the tracks for each album. You could
     # just add them to the eager_graph call:
-    #  
+    #
     #   Band.eager_graph(albums: :tracks).order{albums[:name]}
     #
     # However, the bloats the result set, and you aren't ordering by the track
     # information, so a join is not required.  The eager_graph_eager plugin allows
     # you to specify that the tracks be eagerly loaded in a separate query after
     # the eager_graph load of albums:
-    # 
+    #
     #   Band.eager_graph(:albums).eager_graph_eager([:albums], :tracks).order{albums[:name]}
     #
     # <tt>Dataset#eager_graph_eager</tt>'s first argument is a dependency chain, specified

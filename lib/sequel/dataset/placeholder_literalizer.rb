@@ -30,7 +30,7 @@ module Sequel
     #     ds.join(pl.arg, item_id: :id)
     #   end
     #   loader.all(:cart_items)
-    #  
+    #
     # Will not qualify the item_id column with cart_items.  In this type of situation it's
     # best to add a table alias when joining:
     #
@@ -102,7 +102,7 @@ module Sequel
         # Return an array with two elements, the first being an
         # SQL string with interpolated prepared argument placeholders
         # (suitable for inspect), the the second being an array of
-        # SQL fragments suitable for using for creating a 
+        # SQL fragments suitable for using for creating a
         # Sequel::SQL::PlaceholderLiteralString. Designed for use with
         # emulated prepared statements.
         def prepared_sql_and_frags(dataset, prepared_args, &block)

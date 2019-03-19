@@ -15,7 +15,7 @@ module Sequel
 
     # Emulate OFFSET support using reverse order in a subselect, requiring
     # a count of the number of rows.
-    # 
+    #
     # If offset is used, an order must be provided, since it needs to be
     # reversed in the subselect.  Note that the order needs to be unambiguous
     # to work correctly, and you must select all columns that you are ordering on.

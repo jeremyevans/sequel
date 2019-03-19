@@ -7,19 +7,19 @@ module Sequel
     # These methods all return booleans, with most describing whether or not the
     # dataset supports a feature.
     # ---------------------
-    
+
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
       @opts.fetch(:quote_identifiers, true)
     end
-    
+
     # Whether this dataset will provide accurate number of rows matched for
     # delete and update statements, true by default.  Accurate in this case is the number of
     # rows matched by the dataset's filter.
     def provides_accurate_rows_matched?
       true
     end
-    
+
     # Whether you must use a column alias list for recursive CTEs, false by default.
     def recursive_cte_requires_column_aliases?
       false
@@ -98,13 +98,13 @@ module Sequel
     def supports_is_true?
       true
     end
-    
+
     # Whether the dataset supports the JOIN table USING (column1, ...) syntax, true by default.
     # If false, support is emulated using JOIN table ON (table.column1 = other_table.column1).
     def supports_join_using?
       true
     end
-    
+
     # Whether the dataset supports LATERAL for subqueries in the FROM or JOIN clauses, false by default.
     def supports_lateral_subqueries?
       false
@@ -114,7 +114,7 @@ module Sequel
     def supports_limits_in_correlated_subqueries?
       true
     end
-    
+
     # Whether the dataset supports skipping raising an error instead of waiting for locked rows when returning data, false by default.
     def supports_nowait?
       false
@@ -124,7 +124,7 @@ module Sequel
     def supports_modifying_joins?
       false
     end
-    
+
     # Whether the IN/NOT IN operators support multiple columns when an
     # array of values is given, true by default.
     def supports_multiple_column_in?
@@ -141,7 +141,7 @@ module Sequel
     def supports_ordered_distinct_on?
       supports_distinct_on?
     end
-    
+
     # Whether the dataset supports pattern matching by regular expressions, false by default.
     def supports_regexp?
       false
@@ -172,12 +172,12 @@ module Sequel
     def supports_timestamp_timezones?
       false
     end
-    
+
     # Whether the dataset supports fractional seconds in literal timestamps, true by default.
     def supports_timestamp_usecs?
       true
     end
-    
+
     # Whether the dataset supports the WINDOW clause to define windows used by multiple
     # window functions, false by default.
     def supports_window_clause?
@@ -188,7 +188,7 @@ module Sequel
     def supports_window_functions?
       false
     end
-    
+
     # Whether the dataset supports the given window function option.  True by default.
     # This should only be called if supports_window_functions? is true. Possible options
     # are :rows, :range, :groups, :offset, :exclude.
@@ -200,7 +200,7 @@ module Sequel
         false
       end
     end
-    
+
     # Whether the dataset supports WHERE TRUE (or WHERE 1 for databases that
     # that use 1 for true), true by default.
     def supports_where_true?
@@ -240,7 +240,7 @@ module Sequel
     def uses_returning?(type)
       opts[:returning] && !@opts[:sql] && supports_returning?(type)
     end
-    
+
     # Whether the dataset uses WITH ROLLUP/CUBE instead of ROLLUP()/CUBE().
     def uses_with_rollup?
       false

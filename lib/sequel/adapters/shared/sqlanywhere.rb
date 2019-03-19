@@ -131,7 +131,7 @@ module Sequel
       def auto_increment_sql
         'IDENTITY'
       end
-      
+
       # Sybase does not allow adding primary key constraints to NULLable columns.
       def can_add_primary_key_constraint_on_nullable_columns?
         false
@@ -224,7 +224,7 @@ module Sequel
           select_map{a[:name]}.
           map{|n| m.call(n)}
       end
-      
+
       # SQLAnywhere supports views with check option, but not local.
       def view_with_check_option_support
         true
@@ -421,7 +421,7 @@ module Sequel
             sql << " TOP 2147483647"
           end
 
-          if o 
+          if o
             sql << " START AT ("
             literal_append(sql, o)
             sql << " + 1)"

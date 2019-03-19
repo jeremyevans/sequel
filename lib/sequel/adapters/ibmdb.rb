@@ -23,7 +23,7 @@ module Sequel
     # Wraps an underlying connection to DB2 using IBM_DB, to provide a more
     # rubyish API.
     class Connection
-      # A hash with prepared statement name symbol keys, where each value is 
+      # A hash with prepared statement name symbol keys, where each value is
       # a two element array with an sql string and cached Statement value.
       attr_reader :prepared_statements
 
@@ -41,7 +41,7 @@ module Sequel
       def initialize(connection_param)
         @conn = if connection_param.class == String
           IBM_DB.connect(connection_param, '', '')
-        else  # connect using catalog 
+        else  # connect using catalog
           IBM_DB.connect(*connection_param)
         end
 
@@ -183,7 +183,7 @@ module Sequel
 
       # Whether to convert smallint values to bool for this Database instance
       attr_accessor :convert_smallint_to_bool
-    
+
       # Create a new connection object for the given server.
       def connect(server)
         opts = server_opts(server)
@@ -200,7 +200,7 @@ module Sequel
           'Protocol=TCPIP;' \
           "Uid=#{opts[:user]};" \
           "Pwd=#{opts[:password]};" \
-        end 
+        end
 
         Connection.new(connection_params)
       end
@@ -248,7 +248,7 @@ module Sequel
             stmt = log_connection_yield(log_sql, conn, args){conn.execute_prepared(ps_name, *args)}
             if block_given?
               yield(stmt)
-            else  
+            else
               stmt.affected
             end
           ensure
@@ -270,7 +270,7 @@ module Sequel
         stmt = log_connection_yield(sql, conn){conn.execute(sql)}
         if block_given?
           yield(stmt)
-        else  
+        else
           stmt.affected
         end
       ensure
@@ -295,7 +295,7 @@ module Sequel
       def commit_transaction(conn, opts=OPTS)
         log_connection_yield('Transaction.commit', conn){conn.commit}
       end
-    
+
       def database_error_classes
         [Connection::Error]
       end
@@ -344,14 +344,14 @@ module Sequel
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true
       def schema_column_type(db_type)
-        if convert_smallint_to_bool && db_type =~ /smallint/i 
+        if convert_smallint_to_bool && db_type =~ /smallint/i
           :boolean
         else
           super
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       include Sequel::DB2::DatasetMethods
 
@@ -366,7 +366,7 @@ module Sequel
           ps.prepared_sql
         end
       end
-      
+
       PreparedStatementMethods = prepared_statements_module(:prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)
 
       # Whether to convert smallint to boolean arguments for this dataset.

@@ -71,7 +71,7 @@ module Sequel
         end
         ds
       end
-      
+
       # MSSQL can emulate lateral subqueries via CROSS/OUTER APPLY
       # when using this extension.
       def supports_lateral_subqueries?

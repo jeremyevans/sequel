@@ -22,7 +22,7 @@ module Sequel
     #   errors.on(:artist_id)
     #
     # would not return the uniqueness error.
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclass instances split errors (called before loading subclasses)

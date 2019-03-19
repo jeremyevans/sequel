@@ -18,12 +18,12 @@ module Sequel
       def count
         values.inject(0){|m, v| m + v.length}
       end
-       
+
       # Return true if there are no error messages, false otherwise.
       def empty?
         count == 0
       end
-      
+
       # Returns an array of fully-formatted error messages.
       #
       #   errors.full_messages
@@ -36,13 +36,13 @@ module Sequel
       #   errors.full_messages
       #   # => ['Album name is not valid']
       def full_messages
-        inject([]) do |m, kv| 
+        inject([]) do |m, kv|
           att, errors = *kv
           errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(' and ')} #{e}")}
           m
         end
       end
-      
+
       # Returns the array of errors for the given attribute, or nil
       # if there are no errors for the attribute.
       #

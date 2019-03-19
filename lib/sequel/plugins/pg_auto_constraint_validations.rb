@@ -37,7 +37,7 @@ module Sequel
     #   rescue Sequel::ValidationFailed
     #     album.errors.on(:artist_id) # ['is invalid']
     #   end
-    # 
+    #
     # Usage:
     #
     #   # Make all model subclasses automatically convert constraint violations
@@ -99,7 +99,7 @@ module Sequel
 
           unless convert_errors
             # Might be a table returning function or subquery, skip handling those.
-            # Might have db not support error_info, skip handling that. 
+            # Might have db not support error_info, skip handling that.
             @pg_auto_constraint_validations = nil
             return
           end
@@ -203,7 +203,7 @@ module Sequel
             raise e
           else
             unless skip_schema_table_check
-              # The constraint violation could be caused by a trigger modifying 
+              # The constraint violation could be caused by a trigger modifying
               # a different table.  Check that the error schema and table
               # match the model's schema and table, or clear the validation error
               # that was set above.
@@ -235,7 +235,7 @@ module Sequel
         # If there is a single column instead of an array of columns, add the error
         # for the column, otherwise add the error for the array of columns.
         def add_pg_constraint_validation_error(column, message)
-          column = column.first if column.length == 1 
+          column = column.first if column.length == 1
           errors.add(column, message)
         end
 

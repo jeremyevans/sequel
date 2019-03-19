@@ -9,7 +9,7 @@
 #   # folds unquoted identifiers to uppercase.
 #   DB.identifier_input_method = :upcase
 #   DB.identifier_output_method = :downcase
-#   
+#
 #   # Don't modify identifiers.
 #   # Default behavior of Sequel on PostgreSQL, MySQL, SQLite,
 #   # as they fold unquoted identifiers to lowercase.
@@ -20,10 +20,10 @@
 #
 #   # Quote identifiers.  Sequel's default behavior.
 #   DB.quote_identifiers = true
-# 
+#
 #   # Don't quote identifiers.  Sequel's default behavior on DB2.
 #   DB.quote_identifiers = false
-#   
+#
 # To modify the identifiers on a per-dataset basis:
 #
 #   ds = DB[:a].with_input_indentifier(:upcase).
@@ -66,7 +66,7 @@ module Sequel
         reset_default_dataset
         @identifier_input_method = v
       end
-      
+
       # Set the method to call on identifiers coming from the database:
       #
       #   DB[:items].first # {:id=>1, :name=>'foo'}
@@ -86,7 +86,7 @@ module Sequel
         reset_default_dataset
         @quote_identifiers = v
       end
-      
+
       # Returns true if the database quotes identifiers.
       def quote_identifiers?
         @quote_identifiers
@@ -133,13 +133,13 @@ module Sequel
       def identifier_input_method
         @opts.fetch(:identifier_input_method, db.identifier_input_method)
       end
-      
+
       # The String instance method to call on identifiers before sending them to
       # the database.
       def identifier_output_method
         @opts.fetch(:identifier_output_method, db.identifier_output_method)
       end
-    
+
       # Check with the database to see if identifier quoting is enabled
       def quote_identifiers?
         @opts.fetch(:quote_identifiers, db.quote_identifiers?)
@@ -149,7 +149,7 @@ module Sequel
       def with_identifier_input_method(meth)
         clone(:identifier_input_method=>meth, :skip_symbol_cache=>true)
       end
-      
+
       # Return a modified dataset with identifier_output_method set.
       def with_identifier_output_method(meth)
         clone(:identifier_output_method=>meth)
