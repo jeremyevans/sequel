@@ -323,7 +323,7 @@ module Sequel
         case sqlite_error_code(exception)
         when 1299
           NotNullConstraintViolation
-        when 2067
+        when 1555, 2067, 2579
           UniqueConstraintViolation
         when 787
           ForeignKeyConstraintViolation
@@ -331,6 +331,8 @@ module Sequel
           CheckConstraintViolation
         when 19
           ConstraintViolation
+        when 517
+          SerializationFailure
         else
           super
         end

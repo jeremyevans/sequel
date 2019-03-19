@@ -1,5 +1,7 @@
 === master
 
+* Recognize additional SQLite extended result codes in the shared sqlite adapter (jeremyevans)
+
 * Add Database#rename_enum_value to the pg_enum extension (AlexWayfer) (#1603)
 
 * Make Database#drop_table delete constraint validations metadata for that table if using the constraint_validations extension (jeremyevans)
