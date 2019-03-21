@@ -187,9 +187,8 @@ For Derby, H2, HSQLDB, JTDS, MySQL, Postgres, SQLite3
 the adapters can use the `jdbc-*` gem, for the others you need to have the `.jar` in your CLASSPATH
 or load the Java class manually before calling Sequel.connect.
 
-
 Note that when using a JDBC adapter, the best way to use Sequel
-is via Sequel.connect, NOT Sequel.jdbc.  Use the JDBC connection
+is via Sequel.connect using a connection string, NOT Sequel.jdbc.  Use the JDBC connection
 string when connecting, which will be in a different format than
 the native connection string.  The connection string should start
 with 'jdbc:'.  For PostgreSQL, use 'jdbc:postgresql:', and for
@@ -200,6 +199,10 @@ slash for an absolute path).
 Sequel does no preprocessing of JDBC connection strings, it passes them directly to JDBC.
 So if you have problems getting a connection string to work, look up the 
 documentation for the JDBC driver.
+
+The jdbc adapter does not handle common options such as +:host+,
++:user+, and +:port+.  If you must use a hash of options when connecting,
+provide the full JDBC connection string as the :uri option.
 
 Example connection strings:
 
