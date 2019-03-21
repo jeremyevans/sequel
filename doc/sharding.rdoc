@@ -268,3 +268,15 @@ the Database, just remove that option.  If you are setting:
   Sequel.single_threaded = true 
 
 just remove or comment out that code.
+
+== JDBC
+
+If you are using the jdbc adapter, note that it does not handle separate
+options such as +:host+, +:user+, and +:port+.  If you would like to use
+the +:servers+ option when connecting to a JDBC database, each hash value in
+the +servers+ option should contain a +:uri+ key with a JDBC connection string
+for that shard as the value.  Example:
+
+  DB=Sequel.connect('jdbc:postgresql://primary_server/database', 
+    servers: {read_only: {uri: 'jdbc:postgresql://replica_server/database'}})
+
