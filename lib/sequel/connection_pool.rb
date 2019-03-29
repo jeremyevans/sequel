@@ -90,11 +90,6 @@ class Sequel::ConnectionPool
   #                   connection object (and server argument if the callable accepts 2 arguments),
   #                   useful for customizations that you want to apply to all connections.
   # :connect_sqls :: An array of sql strings to execute on each new connection, after :after_connect runs.
-  # :preconnect :: Automatically create the maximum number of connections, so that they don't
-  #                need to be created as needed.  This is useful when connecting takes a long time
-  #                and you want to avoid possible latency during runtime.
-  #                Set to :concurrently to create the connections in separate threads. Otherwise
-  #                they'll be created sequentially.
   def initialize(db, opts=OPTS)
     @db = db
     @after_connect = opts[:after_connect]
