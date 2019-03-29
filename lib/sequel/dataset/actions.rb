@@ -18,7 +18,7 @@ module Sequel
       where_all where_each where_single_value
     METHS
 
-    # The clone options to use when retriveing columns for a dataset.
+    # The clone options to use when retrieving columns for a dataset.
     COLUMNS_CLONE_OPTIONS = {:distinct => nil, :limit => 1, :offset=>nil, :where=>nil, :having=>nil, :order=>nil, :row_proc=>nil, :graph=>nil, :eager_graph=>nil}.freeze
 
     # Inserts the given argument into the database.  Returns self so it
@@ -358,7 +358,7 @@ module Sequel
 
     # Inserts values into the associated table.  The returned value is generally
     # the value of the autoincremented primary key for the inserted row, assuming that
-    # the a single row is inserted and the table has an autoincrementing primary key.
+    # a single row is inserted and the table has an autoincrementing primary key.
     #
     # +insert+ handles a number of different argument formats:
     # no arguments or single empty hash :: Uses DEFAULT VALUES
@@ -486,7 +486,7 @@ module Sequel
       import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
     end
 
-    # Yields each row in the dataset, but interally uses multiple queries as needed to
+    # Yields each row in the dataset, but internally uses multiple queries as needed to
     # process the entire result set without keeping all rows in the dataset in memory,
     # even if the underlying driver buffers all query results in memory.
     #
@@ -512,7 +512,7 @@ module Sequel
     #              NULLs.  Note that some Sequel adapters have optimized implementations that will
     #              use cursors or streaming regardless of the :strategy option used.
     # :filter_values :: If the strategy: :filter option is used, this option should be a proc
-    #                   that accepts the last retreived row for the previous page and an array of
+    #                   that accepts the last retrieved row for the previous page and an array of
     #                   ORDER BY expressions, and returns an array of values relating to those
     #                   expressions for the last retrieved row.  You will need to use this option
     #                   if your ORDER BY expressions are not simple columns, if they contain
