@@ -30,7 +30,7 @@ doc/sharding.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-09-14 07:48:03 -0700</span>
+<span class='datetime'>2019-03-21 08:28:45 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -159,6 +159,12 @@ Last Update:
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span> = <span class="ruby-keyword">true</span></pre>
 
 <p>just remove or comment out that code.</p>
+
+<h2 id="label-JDBC">JDBC<span><a href="#label-JDBC">&para;</a> <a href="#top">&uarr;</a></span></h2>
+
+<p>If you are using the jdbc adapter, note that it does not handle separate options such as <code>:host</code>, <code>:user</code>, and <code>:port</code>.  If you would like to use the <code>:servers</code> option when connecting to a JDBC database, each hash value in the <code>servers</code> option should contain a <code>:uri</code> key with a JDBC connection string for that shard as the value.  Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;jdbc:postgresql://primary_server/database&#39;</span>, &#x000A;  <span class="ruby-value">servers:</span> {<span class="ruby-value">read_only:</span> {<span class="ruby-value">uri:</span> <span class="ruby-string">&#39;jdbc:postgresql://replica_server/database&#39;</span>}})</pre>
 </div>
 <div id='context'>
 </div>

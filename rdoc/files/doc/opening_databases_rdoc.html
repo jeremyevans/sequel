@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-01-21 20:58:02 -0800</span>
+<span class='datetime'>2019-03-21 08:28:45 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -195,9 +195,11 @@ Last Update:
 
 <p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for individual database types is done using subadapters. There are currently subadapters for DB2, Derby, H2, HSQLDB, JTDS, MySQL, Oracle, PostgreSQL, SQLAnywhere, SQLite, and SQL Server. For Derby, H2, HSQLDB, JTDS, MySQL, Postgres, SQLite3 the adapters can use the `jdbc-*` gem, for the others you need to have the `.jar` in your CLASSPATH or load the Java class manually before calling <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>.</p>
 
-<p>Note that when using a JDBC adapter, the best way to use <a href="../../classes/Sequel.html"><code>Sequel</code></a> is via <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>, NOT Sequel.jdbc.  Use the JDBC connection string when connecting, which will be in a different format than the native connection string.  The connection string should start with &#39;jdbc:&#39;.  For PostgreSQL, use &#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding slashes for the database name (use no preceding slashes for a relative path, and one preceding slash for an absolute path).</p>
+<p>Note that when using a JDBC adapter, the best way to use <a href="../../classes/Sequel.html"><code>Sequel</code></a> is via <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> using a connection string, NOT Sequel.jdbc.  Use the JDBC connection string when connecting, which will be in a different format than the native connection string.  The connection string should start with &#39;jdbc:&#39;.  For PostgreSQL, use &#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding slashes for the database name (use no preceding slashes for a relative path, and one preceding slash for an absolute path).</p>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> does no preprocessing of JDBC connection strings, it passes them directly to JDBC. So if you have problems getting a connection string to work, look up the  documentation for the JDBC driver.</p>
+
+<p>The jdbc adapter does not handle common options such as <code>:host</code>, <code>:user</code>, and <code>:port</code>.  If you must use a hash of options when connecting, provide the full JDBC connection string as the :uri option.</p>
 
 <p>Example connection strings:</p>
 

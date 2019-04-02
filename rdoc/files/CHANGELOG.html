@@ -30,12 +30,29 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-03-01 05:59:39 -0800</span>
+<span class='datetime'>2019-04-02 09:28:47 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.19.0+-282019-04-02-29">5.19.0 (2019-04-02)<span><a href="#label-5.19.0+-282019-04-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Use more optimized approach to merging hashes in ruby 2.5+ (jeremyevans)</p>
+</li><li>
+<p>Use SQLite extended result codes when using ruby-sqlite3 1.4.0+ (jeremyevans)</p>
+</li><li>
+<p>Recognize additional SQLite extended result codes in the shared sqlite adapter (jeremyevans)</p>
+</li><li>
+<p>Add Database#rename_enum_value to the pg_enum extension (AlexWayfer) (#1603)</p>
+</li><li>
+<p>Make Database#drop_table delete constraint validations metadata for that table if using the constraint_validations extension (jeremyevans)</p>
+</li><li>
+<p>Speed up row fetching in the sqlite adapter (jeremyevans)</p>
+</li><li>
+<p>Speed up row fetching and type conversion in the sqlanywhere adapter (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.18.0+-282019-03-01-29">5.18.0 (2019-03-01)<span><a href="#label-5.18.0+-282019-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Use singleton .call methods on plain objects instead of procs/methods for faster type conversion (jeremyevans)</p>

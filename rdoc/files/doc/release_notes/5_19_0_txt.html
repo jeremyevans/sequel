@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.19.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.19.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.19.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-04-02 09:28:47 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A Database#rename_enum_value method has been added to the pg_enum extension. It is supported on PostgreSQL 10+:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_enum_value</span>(<span class="ruby-value">:enum_type</span>, <span class="ruby-string">&#39;old_name&#39;</span>, <span class="ruby-string">&#39;new_name&#39;</span>)</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The performance of row fetching and type conversion in the sqlanywhere adapter has been improved.</p>
+</li><li>
+<p>The performance of row fetching in the sqlite adapter has been improved.</p>
+</li><li>
+<p>Calling Database#drop_table now drops any constraint validations metadata for the table if using the constraint_validations extension.  However, modifying the table using Database#alter_table does not affect the constraint validations metadata.</p>
+</li><li>
+<p>The sqlite adapter when used with ruby-sqlite3 1.4.0+ now uses SQLite extended result codes for a more accurate determination of specific database errors types.</p>
+</li><li>
+<p>Performance for typecasting to decimal and floats has been improved slightly.</p>
+</li><li>
+<p>Performance when merging hashes has been improved slightly.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

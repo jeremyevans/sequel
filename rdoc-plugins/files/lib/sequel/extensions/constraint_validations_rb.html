@@ -30,7 +30,7 @@ lib/sequel/extensions/constraint_validations.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-10-09 13:05:50 -0700</span>
+<span class='datetime'>2019-03-12 12:02:25 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -132,6 +132,8 @@ Last Update:
 </li><li>
 <p>On SQLite, adding constraints to a table is not supported, so it must be emulated by dropping the table and recreating it with the constraints. If you want to use this plugin on SQLite with an alter_table block, you should drop all constraint validation metadata using <code>drop_constraint_validations_for(:table=&gt;&#39;table&#39;)</code>, and then readd all constraints you want to use inside the alter table block, making no other changes inside the alter_table block.</p>
 </li></ul>
+
+<p>Dropping a table will automatically delete all constraint validations for that table.  However, altering a table (e.g. to drop a column) will not currently make any changes to the constraint validations metadata.</p>
 
 <p>Related module: <a href="../../../../classes/Sequel/ConstraintValidations.html"><code>Sequel::ConstraintValidations</code></a></p>
 </div>
