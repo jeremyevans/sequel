@@ -161,4 +161,12 @@ describe "pg_auto_constraint_validations plugin" do
     proc{o.save}.must_raise Sequel::ValidationFailed
     o.errors.must_equal(:i=>['is invalid'], :id=>['is invalid'])
   end
+
+  it "should handle overridden constraint failures as validation errors when updating" do
+    o = @c.load(:i=>3)
+    @c.pg_auto_constraint_validation_override(:items_i_ocheck, :i, "foo bar")
+    @set_error[Sequel::CheckConstraintViolation, :constraint=>'items_i_ocheck']
+    proc{o.update(:i=>12)}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['foo bar'])
+  end
 end

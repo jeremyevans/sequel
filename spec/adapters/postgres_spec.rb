@@ -4006,6 +4006,10 @@ describe "pg_auto_constraint_validations plugin" do
       constraint :valid_i, Sequel[:i] < 10
       constraint(:valid_i_id, Sequel[:i] + Sequel[:id] < 20)
     end
+    @db.run "CREATE OR REPLACE FUNCTION valid_test1(t1 test1) RETURNS boolean AS 'SELECT t1.i != -100' LANGUAGE SQL;"
+    @db.alter_table(:test1) do
+      add_constraint(:valid_test1, Sequel.function(:valid_test1, :test1))
+    end
     @db.create_table!(:test2) do
       Integer :test2_id, :primary_key=>true
       foreign_key :test1_id, :test1
@@ -4026,6 +4030,8 @@ describe "pg_auto_constraint_validations plugin" do
     @c2.insert(:test2_id=>3, :test1_id=>1)
   end
   after(:all) do
+    @db.run "ALTER TABLE test1 DROP CONSTRAINT IF EXISTS valid_test1"
+    @db.run "DROP FUNCTION IF EXISTS valid_test1(test1)"
     @db.drop_table?(:test2, :test1)
   end
 
@@ -4033,6 +4039,14 @@ describe "pg_auto_constraint_validations plugin" do
     o = @c1.new(:id=>5, :i=>12)
     proc{o.save}.must_raise Sequel::ValidationFailed
     o.errors.must_equal(:i=>['is invalid'])
+  end
+
+  it "should handle check constraint failures where the columns are unknown, if columns are explicitly specified" do
+    o = @c1.new(:id=>5, :i=>-100)
+    proc{o.save}.must_raise Sequel::CheckConstraintViolation
+    @c1.pg_auto_constraint_validation_override(:valid_test1, :i, "should not be -100")
+    proc{o.save}.must_raise Sequel::ValidationFailed
+    o.errors.must_equal(:i=>['should not be -100'])
   end
 
   it "should handle check constraint failures as validation errors when updating" do

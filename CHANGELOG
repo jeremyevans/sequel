@@ -1,5 +1,7 @@
 === master
 
+* Add pg_auto_constraint_validation_override to the pg_auto_constraint_validations plugin, for customizing columns and error message per constraint (jeremyevans)
+
 * Make Database#check_constraints on PostgreSQL also include constraints where the related columns are not known (jeremyevans)
 
 === 5.19.0 (2019-04-02)
