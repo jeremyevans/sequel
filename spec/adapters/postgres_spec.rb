@@ -104,6 +104,24 @@ describe "PostgreSQL", '#create_table' do
     @db.check_constraints(:tmp_dolls).must_equal(:ic=>{:definition=>"CHECK ((i > 2))", :columns=>[:i]}, :jc=>{:definition=>"CHECK ((j > 2))", :columns=>[:j]}, :ijc=>{:definition=>"CHECK (((i - j) > 2))", :columns=>[:i, :j]})
   end
 
+  it "should have #check_constraints return check constraints where columns are unknown" do
+    begin
+      @db.create_table(:tmp_dolls) do
+        Integer :i
+        Integer :j
+      end
+      @db.run "CREATE OR REPLACE FUNCTION valid_tmp_dolls(t1 tmp_dolls) RETURNS boolean AS 'SELECT false' LANGUAGE SQL;"
+      @db.alter_table(:tmp_dolls) do
+        add_constraint(:valid_tmp_dolls, Sequel.function(:valid_tmp_dolls, :tmp_dolls))
+      end
+
+      @db.check_constraints(:tmp_dolls).must_equal(:valid_tmp_dolls=>{:definition=>"CHECK (valid_tmp_dolls(tmp_dolls.*))", :columns=>[]})
+    ensure
+      @db.run "ALTER TABLE tmp_dolls DROP CONSTRAINT IF EXISTS valid_tmp_dolls"
+      @db.run "DROP FUNCTION IF EXISTS valid_tmp_dolls(tmp_dolls)"
+    end
+  end if DB.server_version >= 90000
+
   it "should not allow to pass both :temp and :unlogged" do
     proc do
       @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}

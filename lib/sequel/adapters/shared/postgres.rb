@@ -220,24 +220,22 @@ module Sequel
       # A hash of metadata for CHECK constraints on the table.
       # Keys are CHECK constraint name symbols.  Values are hashes with the following keys:
       # :definition :: An SQL fragment for the definition of the constraint
-      # :columns :: An array of column symbols for the columns referenced in the constraint
+      # :columns :: An array of column symbols for the columns referenced in the constraint,
+      #             can be an empty array if the database cannot deteremine the column symbols.
       def check_constraints(table)
         m = output_identifier_meth
 
         rows = metadata_dataset.
           from{pg_constraint.as(:co)}.
-          join(Sequel[:pg_attribute].as(:att), :attrelid=>:conrelid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+          left_join(Sequel[:pg_attribute].as(:att), :attrelid=>:conrelid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
           where(:conrelid=>regclass_oid(table), :contype=>'c').
           select{[co[:conname].as(:constraint), att[:attname].as(:column), pg_get_constraintdef(co[:oid]).as(:definition)]}
 
         hash = {}
         rows.each do |row|
           constraint = m.call(row[:constraint])
-          if entry = hash[constraint]
-            entry[:columns] << m.call(row[:column])
-          else
-            hash[constraint] = {:definition=>row[:definition], :columns=>[m.call(row[:column])]}
-          end
+          entry = hash[constraint] ||= {:definition=>row[:definition], :columns=>[]}
+          entry[:columns] << m.call(row[:column]) if row[:column]
         end
         
         hash

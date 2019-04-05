@@ -1,3 +1,7 @@
+=== master
+
+* Make Database#check_constraints on PostgreSQL also include constraints where the related columns are not known (jeremyevans)
+
 === 5.19.0 (2019-04-02)
 
 * Use more optimized approach to merging hashes in ruby 2.5+ (jeremyevans)
