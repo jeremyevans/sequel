@@ -1140,13 +1140,84 @@ describe "Database#transaction with savepoint support" do
   end
 
   it "should support after_rollback inside savepoints" do
-    @db.transaction do
+    @db.transaction(:rollback=>:always) do
       @db.after_rollback{@db.execute('foo')}
       @db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('bar')}}
       @db.after_rollback{@db.execute('baz')}
-      raise Sequel::Rollback
     end
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
+  end
+
+  it "should run after_commit if savepoint rolled back" do
+    @db.transaction do
+      @db.after_commit{@db.execute('foo')}
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.after_commit{@db.execute('bar')}}
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT', 'foo', 'bar']
+  end
+
+  it "should not run after_commit if savepoint rolled back and :savepoint option used" do
+    @db.transaction do
+      @db.after_commit{@db.execute('foo')}
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.after_commit(:savepoint=>true){@db.execute('bar')}}
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'COMMIT', 'foo']
+  end
+
+  it "should not run after_commit if higher-level savepoint rolled back and :savepoint option used" do
+    @db.transaction do
+      @db.after_commit{@db.execute('foo')}
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.transaction(:savepoint=>true){@db.after_commit(:savepoint=>true){@db.execute('bar')}}}
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SAVEPOINT autopoint_2", "RELEASE SAVEPOINT autopoint_2", "ROLLBACK TO SAVEPOINT autopoint_1", "COMMIT", "foo"]
+  end
+
+  it "should not run after_commit if transaction rolled back and :savepoint option used" do
+    @db.transaction(:rollback=>:always) do
+      @db.after_commit{@db.execute('foo')}
+      @db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.after_commit(:savepoint=>true){@db.execute('bar')}}}
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SAVEPOINT autopoint_2", "RELEASE SAVEPOINT autopoint_2", "RELEASE SAVEPOINT autopoint_1", "ROLLBACK"]
+  end
+
+  it "should run after_rollback if savepoint rolls back" do
+    @db.transaction(:rollback=>:always) do
+      @db.after_rollback{@db.execute('foo')}
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.after_rollback{@db.execute('bar')}}
+      @db.after_rollback{@db.execute('baz')}
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
+  end
+
+  it "should run after_rollback when savepoint rolls back if :savepoint option used" do
+    @db.transaction(:rollback=>:always) do
+      @db.after_rollback{@db.execute('foo')}
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.after_rollback(:savepoint=>true){@db.execute('bar')}}
+      @db.after_rollback{@db.execute('baz')}
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'bar', 'ROLLBACK', 'foo', 'baz']
+  end
+
+  it "should run after_rollback if savepoint rolled back and :savepoint option used, even if transaction commits" do
+    @db.transaction do
+      @db.after_commit{@db.execute('foo')}
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.after_rollback(:savepoint=>true){@db.execute('bar')}}
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'bar', 'COMMIT', 'foo']
+  end
+
+  it "should run after_rollback if higher-level savepoint rolled back and :savepoint option used" do
+    @db.transaction do
+      @db.transaction(:savepoint=>true, :rollback=>:always){@db.transaction(:savepoint=>true){@db.after_rollback(:savepoint=>true){@db.execute('bar')}}}
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SAVEPOINT autopoint_2", "RELEASE SAVEPOINT autopoint_2", "ROLLBACK TO SAVEPOINT autopoint_1", "bar", "COMMIT"]
+  end
+
+  it "should run after_rollback if transaction rolled back and :savepoint option used" do
+    @db.transaction(:rollback=>:always) do
+      @db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.after_rollback(:savepoint=>true){@db.execute('bar')}}}
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SAVEPOINT autopoint_2", "RELEASE SAVEPOINT autopoint_2", "RELEASE SAVEPOINT autopoint_1", "ROLLBACK", "bar"]
   end
 
   it "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do

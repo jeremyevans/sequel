@@ -169,6 +169,44 @@ If you want the current savepoint and potentially enclosing savepoints to be rol
     end # ROLLBACK TO SAVEPOINT
   end # ROLLBACK
 
+=== Savepoint Hooks
+
+When using savepoints, you can use the +:savepoint+ option to +after_commit+ or +after_rollback+ to use a savepoint hook.  For +after_commit+, this will only run the hook after transaction commit if all enclosing savepoints are released (not rolled back). For +after_rollback+, this will run the hook after any enclosing savepoint is rolled back (before transaction commit), or after the transaction is rolled back if all enclosing savepoints are released:
+
+  x = nil
+  DB.transaction do # BEGIN
+    DB.transaction(savepoint: true) do # SAVEPOINT
+      DB.after_commit(savepoint: true){x = 1}
+      DB.after_rollback(savepoint: true){x = 2}
+      x # nil
+    end # RELEASE SAVEPOINT
+    x # nil
+  end # COMMIT
+  x # 1
+  
+  x = nil
+  DB.transaction do  # BEGIN
+    DB.transaction(savepoint: true) do # SAVEPOINT
+      DB.after_commit(savepoint: true){x = 1}
+      DB.after_rollback(savepoint: true){x = 2}
+      x # nil
+      raise Sequel::Rollback
+    end # ROLLBACK TO SAVEPOINT
+    x # 2
+  end # COMMIT
+  x # 2
+  
+  x = nil
+  DB.transaction do # BEGIN
+    DB.transaction(savepoint: true) do # SAVEPOINT
+      DB.after_commit(savepoint: true){x = 1}
+      DB.after_rollback(savepoint: true){x = 2}
+    end # RELEASE SAVEPOINT
+    x # nil
+    raise Sequel::Rollback
+  end
+  x # 2
+
 == Prepared Transactions / Two-Phase Commit
 
 Sequel supports database prepared transactions on PostgreSQL, MySQL, and H2.  With prepared transactions, at the end of the transaction, the transaction is not immediately committed (it acts like a rollback).  Later, you can call +commit_prepared_transaction+ to commit the transaction or +rollback_prepared_transaction+ to roll the transaction back.  Prepared transactions are usually used with distributed databases to make sure all databases commit the same transaction or none of them do.

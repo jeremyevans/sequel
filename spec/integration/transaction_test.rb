@@ -496,6 +496,56 @@ describe "Database transactions" do
       @db.transaction{@db.transaction(:savepoint=>true){@db.after_rollback{c = 1}}; c.must_be_nil; raise Sequel::Rollback}
       c.must_equal 1
     end
+
+    it "should support after_commit inside savepoints with :savepoint_option" do
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_commit(:savepoint=>true){c = 1}}; c.must_be_nil}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.after_commit(:savepoint=>true){c = 1}}}; c.must_be_nil}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true, :rollback=>:always){@db.after_commit(:savepoint=>true){c = 1}}}
+      c.must_be_nil
+
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true){@db.after_commit(:savepoint=>true){c = 1}}}
+      c.must_be_nil
+
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.after_commit(:savepoint=>true){c = 1}}}}
+      c.must_be_nil
+    end
+
+    it "should support after_rollback inside savepoints with :savepoint_option" do
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true, :rollback=>:always){@db.after_rollback(:savepoint=>true){c = 1}; c.must_be_nil}; c.must_equal 1}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true){@db.after_rollback(:savepoint=>true){c = 1}}; c.must_be_nil}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true, :rollback=>:always){@db.after_rollback(:savepoint=>true){c = 1}; c.must_be_nil}; c.must_equal 1}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true){@db.after_rollback(:savepoint=>true){c = 1}}; c.must_be_nil}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true){@db.after_rollback(:savepoint=>true){c = 1}}; c.must_be_nil}}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction(:rollback=>:always){@db.transaction(:savepoint=>true){@db.transaction(:savepoint=>true, :rollback=>:always){@db.after_rollback(:savepoint=>true){c = 1}; c.must_be_nil}; c.must_equal 1}}
+      c.must_equal 1
+
+      c = nil
+      @db.transaction{@db.transaction(:savepoint=>true, :rollback=>:always){@db.transaction(:savepoint=>true){@db.after_rollback(:savepoint=>true){c = 1}}; c.must_be_nil}; c.must_equal 1}
+      c.must_equal 1
+    end
   end
 
   if DB.supports_prepared_transactions?

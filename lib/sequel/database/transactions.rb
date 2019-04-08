@@ -25,13 +25,19 @@ module Sequel
     # Otherwise, add the block to the list of blocks to call after the currently
     # in progress transaction commits (and only if it commits).
     # Options:
+    # :savepoint :: If currently inside a savepoint, only run this hook on transaction
+    #               commit if all enclosing savepoints have been released.
     # :server :: The server/shard to use.
     def after_commit(opts=OPTS, &block)
       raise Error, "must provide block to after_commit" unless block
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
           raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
-          add_transaction_hook(conn, :after_commit, block)
+          if opts[:savepoint] && in_savepoint?(conn)
+            add_savepoint_hook(conn, :after_commit, block)
+          else
+            add_transaction_hook(conn, :after_commit, block)
+          end
         else
           yield
         end
@@ -42,13 +48,20 @@ module Sequel
     # Otherwise, add the block to the list of the blocks to call after the currently
     # in progress transaction rolls back (and only if it rolls back).
     # Options:
+    # :savepoint :: If currently inside a savepoint, run this hook immediately when
+    #               any enclosing savepoint is rolled back, which may be before the transaction
+    #               commits or rollsback.
     # :server :: The server/shard to use.
     def after_rollback(opts=OPTS, &block)
       raise Error, "must provide block to after_rollback" unless block
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
           raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
-          add_transaction_hook(conn, :after_rollback, block)
+          if opts[:savepoint] && in_savepoint?(conn)
+            add_savepoint_hook(conn, :after_rollback, block)
+          else
+            add_transaction_hook(conn, :after_rollback, block)
+          end
         end
       end
     end
@@ -300,6 +313,13 @@ module Sequel
 
     # Set the given callable as a hook to be called. Type should be either
     # :after_commit or :after_rollback.
+    def add_savepoint_hook(conn, type, block)
+      savepoint = _trans(conn)[:savepoints].last
+      (savepoint[type] ||= []) << block
+    end
+
+    # Set the given callable as a hook to be called. Type should be either
+    # :after_commit or :after_rollback.
     def add_transaction_hook(conn, type, block)
       hooks = _trans(conn)[type] ||= []
       hooks << block
@@ -401,6 +421,14 @@ module Sequel
       supports_savepoints? && savepoint_level(conn) > 1
     end
 
+    # Retrieve the savepoint hooks that should be run for the given
+    # connection and commit status.
+    def savepoint_hooks(conn, committed)
+      if in_savepoint?(conn)
+        _trans(conn)[:savepoints].last[committed ? :after_commit : :after_rollback]
+      end
+    end
+
     # Retrieve the transaction hooks that should be run for the given
     # connection and commit status.
     def transaction_hooks(conn, committed)
@@ -411,16 +439,40 @@ module Sequel
 
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
-      callbacks = transaction_hooks(conn, committed)
+      if in_savepoint?(conn)
+        savepoint_callbacks = savepoint_hooks(conn, committed)
+        if committed
+          savepoint_rollback_callbacks = savepoint_hooks(conn, false)
+        end
+      else
+        callbacks = transaction_hooks(conn, committed)
+      end
 
       if transaction_finished?(conn)
         h = _trans(conn)
         rolled_back = !committed
         Sequel.synchronize{h[:rolled_back] = rolled_back}
         Sequel.synchronize{@transactions.delete(conn)}
-      end
+        callbacks.each(&:call) if callbacks
+      elsif savepoint_callbacks || savepoint_rollback_callbacks
+        if committed
+          meth = in_savepoint?(conn) ? :add_savepoint_hook : :add_transaction_hook 
 
-      callbacks.each(&:call) if callbacks
+          if savepoint_callbacks
+            savepoint_callbacks.each do |block|
+              send(meth, conn, :after_commit, block)
+            end
+          end
+          
+          if savepoint_rollback_callbacks
+            savepoint_rollback_callbacks.each do |block|
+              send(meth, conn, :after_rollback, block)
+            end
+          end
+        else
+          savepoint_callbacks.each(&:call)
+        end
+      end
     end
 
     # SQL to rollback to a savepoint

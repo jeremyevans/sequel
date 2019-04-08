@@ -1,5 +1,7 @@
 === master
 
+* Support :savepoint options to Database#{after_commit,after_rollback} for making the hooks handle savepoints (jeremyevans)
+
 * Avoid use of instance_exec in association_dependencies plugin (jeremyevans)
 
 * Add pg_auto_constraint_validation_override to the pg_auto_constraint_validations plugin, for customizing columns and error message per constraint (jeremyevans)
