@@ -60,9 +60,9 @@ module Sequel
             association_dependencies[:"#{time}_#{action}"] << if action == :nullify
               case type
               when :one_to_many , :many_to_many
-                proc{public_send(r[:remove_all_method])}
+                [r[:remove_all_method]]
               when :one_to_one
-                proc{public_send(r[:setter_method], nil)}
+                [r[:setter_method], nil]
               else
                 raise(Error, "Can't nullify many_to_one associated objects: association: #{association}")
               end
@@ -97,7 +97,7 @@ module Sequel
         def before_destroy
           model.association_dependencies[:before_delete].each{|m| public_send(m).delete}
           model.association_dependencies[:before_destroy].each{|m| public_send(m).destroy}
-          model.association_dependencies[:before_nullify].each{|p| instance_exec(&p)}
+          model.association_dependencies[:before_nullify].each{|args| public_send(*args)}
           super
         end
       end
