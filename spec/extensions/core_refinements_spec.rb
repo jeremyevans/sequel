@@ -1,6 +1,6 @@
 require_relative "spec_helper"
 
-if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') # || (RUBY_VERSION >= '2.3.0' && RUBY_ENGINE == 'jruby')
+if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_ENGINE == 'jruby' && (JRUBY_VERSION >= '9.3' || (JRUBY_VERSION.match(/\A9\.2\.(\d+)/) && $1.to_i >= 7)))
 Sequel.extension :core_refinements, :pg_array, :pg_hstore, :pg_row, :pg_range, :pg_row_ops, :pg_range_ops, :pg_array_ops, :pg_hstore_ops, :pg_json, :pg_json_ops
 using Sequel::CoreRefinements
 

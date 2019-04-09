@@ -29,7 +29,7 @@ describe "s extension as refinement" do
 end
 
 
-if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') # || (RUBY_VERSION >= '2.3.0' && RUBY_ENGINE == 'jruby')
+if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_ENGINE == 'jruby' && (JRUBY_VERSION >= '9.3' || (JRUBY_VERSION.match(/\A9\.2\.(\d+)/) && $1.to_i >= 7)))
 using Sequel::S
 
 describe "s extension as refinement" do
