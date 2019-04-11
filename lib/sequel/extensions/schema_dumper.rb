@@ -37,7 +37,7 @@ module Sequel
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/
         {:type=>:Bignum}
-      when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/
+      when /\A(?:real|float(?: unsigned)?|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/
         {:type=>Float}
       when 'boolean', 'bit', 'bool'
         {:type=>TrueClass}
