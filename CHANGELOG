@@ -1,5 +1,7 @@
 === master
 
+* Recognize float unsigned database types as float (keeguon, jeremyevans) (#1609)
+
 * Support :savepoint options to Database#{after_commit,after_rollback} for making the hooks handle savepoints (jeremyevans)
 
 * Avoid use of instance_exec in association_dependencies plugin (jeremyevans)

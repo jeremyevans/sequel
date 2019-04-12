@@ -331,7 +331,7 @@ module Sequel
         :time
       when /\A(bool(ean)?)\z/io
         :boolean
-      when /\A(real|float|double( precision)?|double\(\d+,\d+\)( unsigned)?)\z/io
+      when /\A(real|float( unsigned)?|double( precision)?|double\(\d+,\d+\)( unsigned)?)\z/io
         :float
       when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(\d+|false|true)\))?))\z/io
         $1 && ['0', 'false'].include?($1) ? :integer : :decimal
