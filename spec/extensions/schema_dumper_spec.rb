@@ -808,7 +808,8 @@ create_table(:x) do
   Float :c2
   Float :c3
   
-  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c2), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c1), 0)
+  check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c3), 0)
 end
 END_MIG
   end
