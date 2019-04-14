@@ -26,8 +26,8 @@ module Sequel
     #   Album.where(Album.published_conditions | {ready: true}).sql
     #   # SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))
     module SubsetConditions
-      def self.apply(mod, &block)
-        mod.instance_exec do
+      def self.apply(model, &block)
+        model.instance_exec do
           @dataset_module_class = Class.new(@dataset_module_class) do
             include DatasetModuleMethods
           end

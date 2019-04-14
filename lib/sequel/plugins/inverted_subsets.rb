@@ -29,8 +29,8 @@ module Sequel
     #   # SELECT * FROM albums WHERE (published IS NOT TRUE)
     #
     module InvertedSubsets
-      def self.apply(mod, &block)
-        mod.instance_exec do
+      def self.apply(model, &block)
+        model.instance_exec do
           @dataset_module_class = Class.new(@dataset_module_class) do
             include DatasetModuleMethods
             if block

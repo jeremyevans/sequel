@@ -35,8 +35,8 @@ module Sequel
     module Finder
       FINDER_TYPES = [:first, :all, :each, :get].freeze
 
-      def self.apply(mod)
-        mod.instance_exec do
+      def self.apply(model)
+        model.instance_exec do
           @finders ||= {}
           @finder_loaders ||= {}
         end
