@@ -1909,7 +1909,7 @@ module Sequel
         # can be easily overridden in the class itself while allowing for
         # super to be called.
         def association_module_def(name, opts=OPTS, &block)
-          association_module(opts).module_eval{define_method(name, &block)}
+          association_module(opts).send(:define_method, name, &block)
         end
       
         # Add a private method to the module included in the class.
