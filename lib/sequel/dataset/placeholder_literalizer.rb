@@ -170,7 +170,10 @@ module Sequel
       # receiver's dataset to the block, and the block should return the new dataset
       # to use.
       def with_dataset
-        dup.instance_exec{@dataset = yield @dataset; self}.freeze
+        dataset = yield @dataset
+        other = dup
+        other.instance_variable_set(:@dataset, dataset)
+        other.freeze
       end
 
       # Return an array of all objects by running the SQL query for the given arguments.
