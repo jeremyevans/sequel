@@ -1091,7 +1091,7 @@ module Sequel
     #   #   SELECT i1.id, i1.parent_id FROM i1 INNER JOIN t ON (t.id = i1.parent_id)
     #   # ) SELECT * FROM t
     def with_recursive(name, nonrecursive, recursive, opts=OPTS)
-      raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
+      raise(Error, 'This dataset does not support common table expressions') unless supports_cte?
       if hoist_cte?(nonrecursive)
         s, ds = hoist_cte(nonrecursive)
         s.with_recursive(name, ds, recursive, opts)
