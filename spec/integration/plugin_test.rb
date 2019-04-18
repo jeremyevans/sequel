@@ -30,6 +30,7 @@ describe "Class Table Inheritance Plugin" do
     end 
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff
+      one_to_one :first_staff_member, :clone=>:staff_members, :order=>:id
     end 
     class ::Executive < Manager
     end 
@@ -150,6 +151,8 @@ describe "Class Table Inheritance Plugin" do
     m = Staff.first.manager
     m.must_equal Manager[@i4]
     m.must_be_kind_of(Executive)
+    Staff.first.update(:manager => Manager[@i3])
+    Staff.first.manager.must_equal Manager[@i3]
   end
   
   it "should handle eagerly loading many_to_one relationships" do
@@ -164,6 +167,18 @@ describe "Class Table Inheritance Plugin" do
   
   it "should handle one_to_many relationships" do
     Executive.first(:name=>'Ex').staff_members.must_equal [Staff[@i2]]
+    i6 = @db[:employees].insert(:name=>'S2', :kind=>'Staff')
+    @db[:staff].insert(:id=>i6, :manager_id=>@i4)
+    Executive.first(:name=>'Ex').add_staff_member(i6)
+    Executive.first(:name=>'Ex').staff_members{|ds| ds.order(:id)}.must_equal [Staff[@i2], Staff[i6]]
+  end
+  
+  it "should handle one_to_many relationships" do
+    Executive.first(:name=>'Ex').first_staff_member.must_equal Staff[@i2]
+    i6 = @db[:employees].insert(:name=>'S2', :kind=>'Staff')
+    @db[:staff].insert(:id=>i6, :manager_id=>@i4)
+    Executive.first(:name=>'Ex').first_staff_member = Staff[i6]
+    Executive.first(:name=>'Ex').staff_members.must_equal [Staff[i6]]
   end
   
   it "should handle eagerly loading one_to_many relationships" do

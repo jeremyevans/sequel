@@ -861,6 +861,50 @@ describe Sequel::Model, "one_to_one" do
       "UPDATE attributes SET y = 5, node_id = 1234 WHERE (id = 3)"]
   end
 
+  it "should have setter method handle associations to models with joined datasets" do
+    db = Sequel.mock
+    c = Class.new(Sequel::Model(db)) do
+      set_dataset(db[:attributes].join(:foo, :attribute_id=>:id))
+      def _insert_dataset
+        db[:attributes]
+      end
+      def _update_dataset
+        db[:attributes].where(pk_hash)
+      end
+      @instance_dataset = dataset.limit(1).naked.skip_limit_check
+      unrestrict_primary_key
+      columns :id, :node_id, :y
+    end
+
+    @c2.one_to_one :attribute, :class => c
+    attrib = c.new(:id=>3)
+
+    db.fetch = [[], {:id=>3}]
+    @c2.load(:id => 1234).attribute = attrib
+    DB.sqls.must_equal []
+    db.sqls.must_equal [
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes LIMIT 1",
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (node_id = 1234) LIMIT 1",
+      "INSERT INTO attributes (id, node_id) VALUES (3, 1234)",
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (id = 3) LIMIT 1"]
+
+    db.fetch = [[{:id=>4}], {:id=>3, :node_id=>1234}]
+    db.numrows = 1
+    @c2.load(:id => 1234).attribute = c.load(:id=>3)
+    db.sqls.must_equal [
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (node_id = 1234) LIMIT 1",
+      "UPDATE attributes SET node_id = NULL WHERE (id = 4)",
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
+
+    db.fetch = [[{:id=>4}], {:id=>3, :node_id=>1234}]
+    @c2.load(:id => 1234).attribute = c.new(:id=>3)
+    db.sqls.must_equal [
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (node_id = 1234) LIMIT 1",
+      "UPDATE attributes SET node_id = NULL WHERE (id = 4)",
+      "INSERT INTO attributes (id, node_id) VALUES (3, 1234)",
+      "SELECT * FROM (SELECT * FROM attributes INNER JOIN foo ON (foo.attribute_id = attributes.id)) AS attributes WHERE (id = 3) LIMIT 1"]
+  end
+
   it "should use implicit key if omitted" do
     @c2.dataset = @c2.dataset.with_fetch({})
     @c2.one_to_one :parent, :class => @c2

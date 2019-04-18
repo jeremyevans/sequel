@@ -2204,12 +2204,28 @@ module Sequel
           if one_to_one
             opts[:setter] ||= proc do |o|
               up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)})))
+
+              if (froms = up_ds.opts[:from]) && (from = froms[0]) && (from.is_a?(Sequel::Dataset) || (from.is_a?(Sequel::SQL::AliasedExpression) && from.expression.is_a?(Sequel::Dataset)))
+                if old = up_ds.first
+                  cks.each{|k| old.set_column_value(:"#{k}=", nil)}
+                end
+                save_old = true
+              end
+
               if o
-                up_ds = up_ds.exclude(o.pk_hash) unless o.new?
+                if !o.new? && !save_old
+                  up_ds = up_ds.exclude(o.pk_hash)
+                end
                 cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
               end
+
               checked_transaction do
-                up_ds.skip_limit_check.update(ck_nil_hash)
+                if save_old
+                  old.save(save_opts) || raise(Sequel::Error, "invalid previously associated object, cannot save") if old
+                else
+                  up_ds.skip_limit_check.update(ck_nil_hash)
+                end
+
                 o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
               end
             end

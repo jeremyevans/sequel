@@ -1,5 +1,7 @@
 === master
 
+* Make one_to_one setter method handle models that use joined datasets (jeremyevans) (#1612)
+
 * Make auto_validations plugin work with the class_table_inheritance plugin (jeremyevans) (#1611)
 
 * Avoid use of instance_exec for PlaceholderLiteralString#with_dataset (jeremyevans)
