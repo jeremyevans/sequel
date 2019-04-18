@@ -5,8 +5,8 @@ describe "class_table_inheritance plugin" do
     @db = Sequel.mock(:numrows=>1, :autoid=>proc{|sql| 1})
     def @db.supports_schema_parsing?() true end
     def @db.schema(table, opts={})
-      {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
-       :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}] ],
+      {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string, :allow_null=>false}], [:kind, {:type=>:string}]],
+       :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer, :allow_null=>false}] ],
        :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
        :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
        }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
@@ -23,7 +23,9 @@ describe "class_table_inheritance plugin" do
         }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
       end
     end
-    class ::Employee < Sequel::Model(@db)
+    base = Sequel::Model(@db)
+    base.plugin :auto_validations if @use_auto_validations
+    class ::Employee < base
       def _save_refresh; @values[:id] = 1 end
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
@@ -114,6 +116,26 @@ describe "class_table_inheritance plugin" do
       "SELECT * FROM (SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (employees.kind IN ('Ceo'))) AS employees WHERE (id = 1) LIMIT 1"]
   end
   
+  describe "with auto_validations plugin" do
+    before(:all) do
+      @use_auto_validations = true
+    end
+
+    it "should work" do
+      e = Employee.new
+      e.valid?.must_equal false
+      e.errors.must_equal(:name=>["is not present"])
+
+      e = Manager.new
+      e.valid?.must_equal false
+      e.errors.must_equal(:name=>["is not present"], :num_staff=>["is not present"])
+
+      e = Executive.new
+      e.valid?.must_equal false
+      e.errors.must_equal(:name=>["is not present"], :num_staff=>["is not present"])
+    end
+  end
+    
   it "should return rows with the current class if sti_key is nil" do
     Employee.plugin :class_table_inheritance
     Employee.dataset.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}, {:kind=>'Intern'}]).all.map{|x| x.class}.must_equal [Employee, Employee, Employee, Employee, Employee, Employee]
@@ -232,11 +254,11 @@ describe "class_table_inheritance plugin" do
   end
   
   it "should include schema for columns for tables for ancestor classes" do
-    Employee.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string})
-    Manager.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer})
-    Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer}, :num_managers=>{:type=>:integer})
-    Staff.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :manager_id=>{:type=>:integer})
-    Intern.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string})
+    Employee.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string, :allow_null=>false}, :kind=>{:type=>:string})
+    Manager.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string, :allow_null=>false}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer, :allow_null=>false})
+    Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string, :allow_null=>false}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer, :allow_null=>false}, :num_managers=>{:type=>:integer})
+    Staff.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string, :allow_null=>false}, :kind=>{:type=>:string}, :manager_id=>{:type=>:integer})
+    Intern.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string, :allow_null=>false}, :kind=>{:type=>:string})
   end
 
   it "should use the correct primary key (which should have the same name in all subclasses)" do

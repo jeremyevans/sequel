@@ -326,6 +326,7 @@ module Sequel
             cti_tables.reverse_each do |ct|
               db.schema(ct).each{|sk,v| db_schema[sk] = v}
             end
+            setup_auto_validations if respond_to?(:setup_auto_validations, true)
           end
         end
 
