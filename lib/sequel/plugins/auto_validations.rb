@@ -164,6 +164,12 @@ module Sequel
 
         # Parse the database schema and indexes and record the columns to automatically validate.
         def setup_auto_validations
+          if !db_schema.empty? && db_schema.values.all?(&:empty?)
+            # If all values in the schema are empty, do not make any changes to the auto validations.
+            # This fixes cases where other plugins are used, such as class_table_inheritance.
+            return
+          end
+
           not_null_cols, explicit_not_null_cols = db_schema.select{|col, sch| sch[:allow_null] == false}.partition{|col, sch| sch[:default].nil?}.map{|cs| cs.map{|col, sch| col}}
           @auto_validate_not_null_columns = not_null_cols - Array(primary_key)
           explicit_not_null_cols += Array(primary_key)

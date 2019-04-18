@@ -48,6 +48,15 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
+  it "should not remove auto validations if db_schema has all empty values" do
+    def (@c.db).schema(t, *)
+      [:id, :name, :num, :d, :nnd].map{|c| [c, {}]}
+    end
+    @c.set_dataset(@c.dataset)
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"])
+  end
+
   it "should handle simple unique indexes correctly" do
     def (@c.db).indexes(t, *)
       raise if t.is_a?(Sequel::Dataset)

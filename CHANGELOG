@@ -1,5 +1,7 @@
 === master
 
+* Make auto_validations plugin work with the class_table_inheritance plugin (jeremyevans) (#1611)
+
 * Avoid use of instance_exec for PlaceholderLiteralString#with_dataset (jeremyevans)
 
 * Recognize float unsigned database types as float (keeguon, jeremyevans) (#1609)
