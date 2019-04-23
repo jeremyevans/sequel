@@ -60,8 +60,15 @@ module Sequel
 
         # Define a association_pks method using the block for the association reflection 
         def def_association_pks_methods(opts)
+          opts[:pks_getter_method] = :"#{singularize(opts[:name])}_pks_getter"
+          association_module_def(opts[:pks_getter_method], &opts[:pks_getter])
           association_module_def(:"#{singularize(opts[:name])}_pks", opts){_association_pks_getter(opts)}
-          association_module_def(:"#{singularize(opts[:name])}_pks=", opts){|pks| _association_pks_setter(opts, pks)} if opts[:pks_setter]
+
+          if opts[:pks_setter]
+            opts[:pks_setter_method] = :"#{singularize(opts[:name])}_pks_setter"
+            association_module_def(opts[:pks_setter_method], &opts[:pks_setter])
+            association_module_def(:"#{singularize(opts[:name])}_pks=", opts){|pks| _association_pks_setter(opts, pks)}
+          end
         end
 
         # Add a getter that checks the join table for matching records and
@@ -181,7 +188,8 @@ module Sequel
         def after_save
           if assoc_pks = @_association_pks
             assoc_pks.each do |name, pks|
-              instance_exec(pks, &model.association_reflection(name)[:pks_setter])
+             # pks_setter_method is private
+              send(model.association_reflection(name)[:pks_setter_method], pks)
             end
             @_association_pks = nil
           end
@@ -206,7 +214,8 @@ module Sequel
           elsif delay && @_association_pks && (objs = @_association_pks[opts[:name]])
             objs
           else
-            instance_exec(&opts[:pks_getter])
+           # pks_getter_method is private
+            send(opts[:pks_getter_method])
           end
         end
 
@@ -231,7 +240,8 @@ module Sequel
             modified!
             (@_association_pks ||= {})[opts[:name]] = pks
           else
-            instance_exec(pks, &opts[:pks_setter])
+            # pks_setter_method is private
+            send(opts[:pks_setter_method], pks)
           end
         end
 

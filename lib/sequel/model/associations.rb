@@ -1617,9 +1617,10 @@ module Sequel
         #                is hash or array of two element arrays.  Consider also specifying the :graph_block
         #                option if the value for this option is not a hash or array of two element arrays
         #                and you plan to use this association in eager_graph or association_join.
-        # :dataset :: A proc that is instance_execed to get the base dataset to use (before the other
+        # :dataset :: A proc that is used to define the method to get the base dataset to use (before the other
         #             options are applied).  If the proc accepts an argument, it is passed the related
-        #             association reflection.
+        #             association reflection.  It is a best practice to always have the dataset accept an argument
+        #             and use the argument to return the appropriate dataset.
         # :distinct :: Use the DISTINCT clause when selecting associating object, both when
         #              lazy loading and eager loading via .eager (but not when using .eager_graph).
         # :eager :: The associations to eagerly load via +eager+ when loading the associated object(s).
@@ -1944,6 +1945,13 @@ module Sequel
           end
 
           association_module_def(opts.dataset_method, opts){_dataset(opts)}
+          if opts[:block]
+            opts[:block_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_block", 1, &opts[:block])
+          end
+          if opts[:dataset]
+            opts[:dataset_opt_arity] = opts[:dataset].arity == 0 ? 0 : 1
+            opts[:dataset_opt_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_dataset_opt", opts[:dataset_opt_arity], &opts[:dataset])
+          end
           def_association_method(opts)
 
           return if opts[:read_only]
@@ -2303,7 +2311,8 @@ module Sequel
           end
           ds = ds.clone(:model_object => self)
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
-          ds = instance_exec(ds, &opts[:block]) if opts[:block]
+          # block method is private
+          ds = send(opts[:block_method], ds) if opts[:block_method]
           ds
         end
 
@@ -2326,10 +2335,11 @@ module Sequel
         # Return an association dataset for the given association reflection
         def _dataset(opts)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
-          ds = if opts[:dataset].arity == 1
-            instance_exec(opts, &opts[:dataset])
+          ds = if opts[:dataset_opt_arity] == 1
+            # dataset_opt_method is private
+            send(opts[:dataset_opt_method], opts)
           else
-            instance_exec(&opts[:dataset])
+            send(opts[:dataset_opt_method])
           end
           _apply_association_options(opts, ds)
         end

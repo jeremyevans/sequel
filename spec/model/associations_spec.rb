@@ -99,13 +99,13 @@ describe Sequel::Model, "associate" do
       class ::ParParent < Sequel::Model; end
       klass = Class.new(Sequel::Model(:nodes))
       
-      klass.many_to_one(:par_parent, :order=>:a){1}
-      klass.one_to_many(:par_parent1s, :class=>'ParParent', :limit=>12){4}
-      klass.many_to_many(:par_parent2s, :class=>:ParParent, :uniq=>true){2}
+      klass.many_to_one(:par_parent, :order=>:a){|ds| 1}
+      klass.one_to_many(:par_parent1s, :class=>'ParParent', :limit=>12){|ds| 4}
+      klass.many_to_many(:par_parent2s, :class=>:ParParent, :uniq=>true){|ds| 2}
 
       klass.many_to_one :par, :clone=>:par_parent, :select=>:b
       klass.one_to_many :par1s, :clone=>:par_parent1s, :order=>:b, :limit=>10, :block=>nil
-      klass.many_to_many(:par2s, :clone=>:par_parent2s, :order=>:c){3}
+      klass.many_to_many(:par2s, :clone=>:par_parent2s, :order=>:c){|ds| 3}
       klass.many_to_one :par3, :clone=>:par
       
       klass.association_reflection(:par).associated_class.must_equal ParParent
@@ -1000,6 +1000,42 @@ describe Sequel::Model, "one_to_one" do
     end
     @c2.load(:id => 100).child_20
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
+  end
+
+  it "should support :dataset options with different types of arity" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{model.filter(:parent_id=>pk)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100) LIMIT 1"]
+
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{|_| model.filter(:parent_id=>pk)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100) LIMIT 1"]
+
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{|_, *| model.filter(:parent_id=>pk)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100) LIMIT 1"]
+
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{|*| model.filter(:parent_id=>pk)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100) LIMIT 1"]
+  end
+
+  deprecated "should support :dataset option that requires multiple arguments" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{|_, _| model.filter(:parent_id=>pk)}
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100) LIMIT 1"]
+  end
+
+  deprecated "should support association block requires no arguments" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id do model.filter(:parent_id=>pk) end
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100)"]
+  end
+
+  deprecated "should support association block requires multiple arguments" do
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id do |_, _| model.filter(:parent_id=>pk) end
+    @c2.load(:id => 100).child_20
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE (parent_id = 100)"]
   end
 
   it "should return nil if primary_key value is nil" do

@@ -1,5 +1,7 @@
 === master
 
+* Switch from using instance_exec to define_method for model associations and in some plugins (jeremyevans)
+
 * Fix Database#server_version when using mysql2 adapter with mysql driver on MariaDB 10+ database (v-kolesnikov) (#1614)
 
 * Make one_to_one setter method handle models that use joined datasets (jeremyevans) (#1612)

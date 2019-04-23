@@ -32,9 +32,10 @@ module Sequel
     #
     # The :mapping option is just a shortcut that works in particular
     # cases.  To handle any case, you can define a custom :composer
-    # and :decomposer procs.  The :composer proc will be instance_execed
-    # the first time the getter is called, and the :decomposer proc
-    # will be instance_execed before saving.  The above example could
+    # and :decomposer procs.  The :composer and :decomposer procs will
+    # be used to define instance methods.  The :composer will be called
+    # the first time the getter is called, and the :decomposer 
+    # will be called before saving.  The above example could
     # also be implemented as:
     #
     #   Album.composition :date,
@@ -74,9 +75,9 @@ module Sequel
         #
         # Options:
         # :class :: if using the :mapping option, the class to use, as a Class, String or Symbol.
-        # :composer :: A proc that is instance_execed when the composition getter method is called
+        # :composer :: A proc used to define the method that the composition getter method will call 
         #              to create the composition.
-        # :decomposer :: A proc that is instance_execed before saving the model object,
+        # :decomposer :: A proc used to define the method called before saving the model object,
         #                if the composition object exists, which sets the columns in the model object
         #                based on the value of the composition object.
         # :mapping :: An array where each element is either a symbol or an array of two symbols.
@@ -129,15 +130,17 @@ module Sequel
         
         # Define getter and setter methods for the composition object.
         def define_composition_accessor(name, opts=OPTS)
-          composer = opts[:composer]
+          composer_meth = opts[:composer_method] = Plugins.def_sequel_method(@composition_module, "#{name}_composer", 0, &opts[:composer])
+          opts[:decomposer_method] = Plugins.def_sequel_method(@composition_module, "#{name}_decomposer", 0, &opts[:decomposer])
           @composition_module.class_eval do
             define_method(name) do 
               if compositions.has_key?(name)
                 compositions[name]
               elsif frozen?
-                instance_exec(&composer)
+                # composer_meth is private
+                send(composer_meth)
               else
-                compositions[name] = instance_exec(&composer)
+                compositions[name] = send(composer_meth)
               end
             end
             define_method("#{name}=") do |v|
@@ -171,7 +174,8 @@ module Sequel
         # For each composition, set the columns in the model class based
         # on the composition object.
         def before_validation
-          @compositions.keys.each{|n| instance_exec(&model.compositions[n][:decomposer])} if @compositions
+          # decomposer_method is private
+          @compositions.keys.each{|n| send(model.compositions[n][:decomposer_method])} if @compositions
           super
         end
         

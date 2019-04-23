@@ -59,7 +59,14 @@ module Sequel
     
         # Yield every block related to the given hook.
         def hook_blocks(hook)
-          @hooks[hook].each{|k,v| yield v}
+          # SEQUEL6: Remove
+          Sequel::Deprecation.deprecate("The hook_blocks class method in the hook_class_methods plugin is deprecated and will be removed in Sequel 6.")
+          @hooks[hook].each{|_,v,_| yield v}
+        end
+
+        # Yield every method related to the given hook.
+        def hook_methods_for(hook)
+          @hooks[hook].each{|_,_,m| yield m}
         end
 
         Plugins.inherited_instance_variables(self, :@hooks=>:hash_dup)
@@ -75,23 +82,28 @@ module Sequel
             # Allow calling private hook methods
             block = proc {send(tag)}
           end
+
           h = @hooks[hook]
+
           if tag && (old = h.find{|x| x[0] == tag})
             old[1] = block
+            Plugins.def_sequel_method(self, old[2], 0, &block)
           else
+            meth = Plugins.def_sequel_method(self, "validation_class_methods_#{hook}", 0, &block)
             if hook.to_s =~ /^before/
-              h.unshift([tag,block])
+              h.unshift([tag, block, meth])
             else
-              h << [tag, block]
+              h << [tag, block, meth]
             end
           end
         end
       end
 
       module InstanceMethods
-        [:before_create, :before_update, :before_validation, :before_save, :before_destroy].each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| instance_exec(&b)}; super end", __FILE__, __LINE__)}
+        # hook methods are private
+        [:before_create, :before_update, :before_validation, :before_save, :before_destroy].each{|h| class_eval("def #{h}; model.hook_methods_for(:#{h}){|m| send(m)}; super end", __FILE__, __LINE__)}
 
-        [:after_create, :after_update, :after_validation, :after_save, :after_destroy].each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_exec(&b)}; end", __FILE__, __LINE__)}
+        [:after_create, :after_update, :after_validation, :after_save, :after_destroy].each{|h| class_eval("def #{h}; super; model.hook_methods_for(:#{h}){|m| send(m)}; end", __FILE__, __LINE__)}
       end
     end
   end

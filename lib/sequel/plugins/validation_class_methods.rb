@@ -188,13 +188,17 @@ module Sequel
         #                   Sequel will attempt to insert a NULL value into the database, instead of using the
         #                   database's default.
         # :allow_nil :: Whether to skip the validation if the value is nil.
-        # :if :: A symbol (indicating an instance_method) or proc (which is instance_execed)
+        # :if :: A symbol (indicating an instance_method) or proc (which is used to define an instance method)
         #        skipping this validation if it returns nil or false.
         # :tag :: The tag to use for this validation.
         def validates_each(*atts, &block)
           opts = extract_options!(atts)
           blank_meth = db.method(:blank_object?).to_proc
           blk = if (i = opts[:if]) || (am = opts[:allow_missing]) || (an = opts[:allow_nil]) || (ab = opts[:allow_blank])
+            if i.is_a?(Proc)
+              i = Plugins.def_sequel_method(self, "validation_class_methods_if", 0, &i)
+            end
+
             proc do |o,a,v|
               next if i && !validation_if_proc(o, i)
               next if an && Array(v).all?(&:nil?)
@@ -434,8 +438,6 @@ module Sequel
           case i
           when Symbol
             o.get_column_value(i)
-          when Proc
-            o.instance_exec(&i)
           else
             raise(::Sequel::Error, "invalid value for :if validation option")
           end

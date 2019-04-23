@@ -22,6 +22,28 @@ describe Sequel::Model, "hook_class_methods plugin" do
     hooks.values.all?(&:frozen?).must_equal true
   end
 
+  deprecated ".hook_blocks method should yield each hook block" do
+    c = model_class.call Sequel::Model
+    a = []
+    c.hook_blocks(:before_save){|b| a << b}
+    a.must_equal []
+
+    pr = proc{adds << 'hi'}
+    c.before_save(&pr)
+    a = []
+    c.hook_blocks(:before_save){|b| a << b}
+    a.must_equal [pr]
+
+    c.before_save(&pr)
+    a = []
+    c.hook_blocks(:before_save){|b| a << b}
+    a.must_equal [pr, pr]
+
+    a = []
+    c.hook_blocks(:after_save){|b| a << b}
+    a.must_equal []
+  end
+
   it "should be definable using a block" do
     adds = []
     c = model_class.call Sequel::Model do

@@ -316,3 +316,114 @@ describe "Sequel::Model.plugin" do
     a.must_equal ['sequel/plugins/something_or_other']
   end
 end
+
+describe "Sequel::Plugins.def_sequel_method" do
+  before do
+    @m = Class.new
+    @scope = @m.new
+  end
+
+  it "should define methods using block" do
+    m0 = Sequel::Plugins.def_sequel_method(@m, "x", 0){1}
+    m0.must_be_kind_of Symbol
+    m0.must_match /\A_sequel_x_\d+\z/
+    @scope.send(m0).must_equal 1
+
+    m1 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|x| [x, 2]}
+    m1.must_be_kind_of Symbol
+    m1.must_match /\A_sequel_x_\d+\z/
+    @scope.send(m1, 3).must_equal [3, 2]
+  end
+
+  it "should define public methods" do
+    proc{@scope.public_send(Sequel::Plugins.def_sequel_method(@m, "x", 0){1})}.must_raise NoMethodError
+  end
+
+  it "should accept symbols as method name and return the same symbol" do
+    m0 = Sequel::Plugins.def_sequel_method(@m, :_roda_foo, 0){1}
+    m0.must_equal :_roda_foo
+    @scope.send(m0).must_equal 1
+  end
+
+  it "should handle optional arguments and splats for expected_arity 0" do
+    m2 = Sequel::Plugins.def_sequel_method(@m, "x", 0){|*x| [x, 3]}
+    @scope.send(m2).must_equal [[], 3]
+
+    m3 = Sequel::Plugins.def_sequel_method(@m, "x", 0){|x=5| [x, 4]}
+    @scope.send(m3).must_equal [5, 4]
+
+    m4 = Sequel::Plugins.def_sequel_method(@m, "x", 0){|x=6, *y| [x, y, 5]}
+    @scope.send(m4).must_equal [6, [], 5]
+  end
+
+  it "should should optional arguments and splats for expected_arity 1" do
+    m2 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|y, *x| [y, x, 3]}
+    @scope.send(m2, :a).must_equal [:a, [], 3]
+
+    m3 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|y, x=5| [y, x, 4]}
+    @scope.send(m3, :b).must_equal [:b, 5, 4]
+
+    m4 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|y, x=6, *z| [y, x, z, 5]}
+    @scope.send(m4, :c).must_equal [:c, 6, [], 5]
+  end
+
+  deprecated "should handle differences in arity" do
+    m0 = Sequel::Plugins.def_sequel_method(@m, "x", 0){|x| [x, 1]}
+    @scope.send(m0).must_equal [nil, 1]
+
+    m1 = Sequel::Plugins.def_sequel_method(@m, "x", 1){2}
+    @scope.send(m1, 3).must_equal 2
+
+    m1 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|x, y| [x, y]}
+    @scope.send(m1, 4).must_equal [4, nil]
+  end
+
+  it "should raise for unexpected expected_arity" do
+    proc{Sequel::Plugins.def_sequel_method(@m, "x", 2){|x|}}.must_raise Sequel::Error
+  end
+
+  it "should fail if a lambda with invalid arity is passed" do
+    m0 = Sequel::Plugins.def_sequel_method(@m, "x", 0, &lambda{|x| [x, 1]})
+    proc{@scope.send(m0)}.must_raise ArgumentError
+
+    m1 = Sequel::Plugins.def_sequel_method(@m, "x", 1, &lambda{2})
+    proc{@scope.send(m1, 1)}.must_raise ArgumentError
+  end
+
+  if RUBY_VERSION > '2.1'
+    it "should raise for required keyword arguments for expected_arity 0 or 1" do
+      proc{eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|b:| [b, 1]}", binding)}.must_raise Sequel::Error
+      proc{eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|c=1, b:| [c, b, 1]}", binding)}.must_raise Sequel::Error
+      proc{eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|x, b:| [b, 1]}", binding)}.must_raise Sequel::Error
+      proc{eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|x, c=1, b:| [c, b, 1]}", binding)}.must_raise Sequel::Error
+    end
+
+    it "should ignore keyword arguments for expected_arity 0" do
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|b:2| [b, 1]}", binding)).must_equal [2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|**b| [b, 1]}", binding)).must_equal [{}, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|c=1, b:2| [c, b, 1]}", binding)).must_equal [1, 2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|c=1, **b| [c, b, 1]}", binding)).must_equal [1, {}, 1]
+    end
+
+    deprecated "should ignore keyword arguments for expected_arity 0 with invalid arity" do
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|x, b:2| [x, b, 1]}", binding)).must_equal [nil, 2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|x, **b| [x, b, 1]}", binding)).must_equal [nil, {}, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|x, c=1, b:2| [x, c, b, 1]}", binding)).must_equal [nil, 1, 2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 0){|x, c=1, **b| [x, c, b, 1]}", binding)).must_equal [nil, 1, {}, 1]
+    end
+
+    deprecated "should ignore keyword arguments for expected_arity 1 with invalid arity" do
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|b:2| [b, 1]}", binding), 3).must_equal [2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|**b| [b, 1]}", binding), 3).must_equal [{}, 1]
+    end
+
+    it "should ignore keyword arguments for expected_arity 1" do
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|c=1, b:2| [c, b, 1]}", binding), 3).must_equal [3, 2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|c=1, **b| [c, b, 1]}", binding), 3).must_equal [3, {}, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|x, b:2| [x, b, 1]}", binding), 3).must_equal [3, 2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|x, **b| [x, b, 1]}", binding), 3).must_equal [3, {}, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|x, c=1, b:2| [x, c, b, 1]}", binding), 3).must_equal [3, 1, 2, 1]
+      @scope.send(eval("Sequel::Plugins.def_sequel_method(@m, 'x', 1){|x, c=1, **b| [x, c, b, 1]}", binding), 3).must_equal [3, 1, {}, 1]
+    end
+  end
+end
