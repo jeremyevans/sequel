@@ -1,5 +1,7 @@
 === master
 
+* Fix Database#server_version when using mysql2 adapter with mysql driver on MariaDB 10+ database (v-kolesnikov) (#1614)
+
 * Make one_to_one setter method handle models that use joined datasets (jeremyevans) (#1612)
 
 * Make auto_validations plugin work with the class_table_inheritance plugin (jeremyevans) (#1611)
