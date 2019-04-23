@@ -78,8 +78,8 @@ module Sequel
       end
 
       # Return the version of the MySQL server to which we are connecting.
-      def server_version(server=nil)
-        @server_version ||= (synchronize(server){|conn| conn.server_info[:id]} || super)
+      def server_version(_server=nil)
+        @server_version ||= super()
       end
 
       private
