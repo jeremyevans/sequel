@@ -634,7 +634,7 @@ module Sequel
 
       # Drop a composite foreign key constraint
       def drop_composite_foreign_key(columns, opts)
-        @operations << {:op => :drop_constraint, :type => :foreign_key, :columns => columns}.merge!(opts)
+        @operations << opts.merge(:op => :drop_constraint, :type => :foreign_key, :columns => columns)
         nil
       end
     end

@@ -195,6 +195,19 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:drop_table, :a, {:foo=>:bar}]]
   end
   
+  it "should reverse add_foreign_key with :type option" do
+    Sequel.migration{change{alter_table(:t){add_foreign_key :b, :c, :type=>:f}}}.apply(@db, :down)
+    actions = @db.actions
+    actions.must_equal [[:alter_table, [[:drop_foreign_key, :b, {:type=>:f}]]]]
+    @db.sqls
+    db = Sequel.mock
+    args = nil
+    db.define_singleton_method(:foreign_key_list){|*a| args = a; [{:name=>:fbc, :columns=>[:b]}]}
+    db.alter_table(:t){send(*actions[0][1][0])}
+    db.sqls.must_equal ["ALTER TABLE t DROP CONSTRAINT fbc", "ALTER TABLE t DROP COLUMN b"]
+    args.must_equal [:t]
+  end
+  
   it "should reverse add_foreign_key with :foreign_key_constraint_name option" do
     Sequel.migration{change{alter_table(:t){add_foreign_key :b, :c, :foreign_key_constraint_name=>:f}}}.apply(@db, :down)
     actions = @db.actions
