@@ -1,4 +1,4 @@
-=== master
+=== 5.20.0 (2019-05-01)
 
 * Fix reversing of alter_table add_foreign_key when :type option is used (jeremyevans) (#1615)
 
