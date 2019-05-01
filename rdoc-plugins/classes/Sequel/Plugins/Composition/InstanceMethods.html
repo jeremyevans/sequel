@@ -65,7 +65,7 @@ Sequel::Plugins::Composition::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-before_validation-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/composition.rb</span>&#x000A;<span class="line-num">173</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;<span class="line-num">174</span>   <span class="ruby-ivar">@compositions</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">n</span>][<span class="ruby-value">:decomposer</span>])} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@compositions</span>&#x000A;<span class="line-num">175</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">176</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-before_validation-source'>    <span class="ruby-comment"># File lib/sequel/plugins/composition.rb</span>&#x000A;<span class="line-num">176</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">before_validation</span>&#x000A;<span class="line-num">177</span>   <span class="ruby-comment"># decomposer_method is private</span>&#x000A;<span class="line-num">178</span>   <span class="ruby-ivar">@compositions</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">n</span>][<span class="ruby-value">:decomposer_method</span>])} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@compositions</span>&#x000A;<span class="line-num">179</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-compositions'>
@@ -84,7 +84,7 @@ Sequel::Plugins::Composition::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-compositions-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-compositions-source'>    <span class="ruby-comment"># File lib/sequel/plugins/composition.rb</span>&#x000A;<span class="line-num">161</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">compositions</span>&#x000A;<span class="line-num">162</span>   <span class="ruby-ivar">@compositions</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">163</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-compositions-source'>    <span class="ruby-comment"># File lib/sequel/plugins/composition.rb</span>&#x000A;<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">compositions</span>&#x000A;<span class="line-num">165</span>   <span class="ruby-ivar">@compositions</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -103,7 +103,7 @@ Sequel::Plugins::Composition::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/composition.rb</span>&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">167</span>   <span class="ruby-identifier">compositions</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">168</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">169</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>    <span class="ruby-comment"># File lib/sequel/plugins/composition.rb</span>&#x000A;<span class="line-num">169</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">170</span>   <span class="ruby-identifier">compositions</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">171</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

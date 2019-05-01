@@ -89,7 +89,7 @@ Sequel::Plugins::Finder
 <a name='method-c-apply'></a>
 <div class='synopsis'>
 <span class='name'>apply</span>
-<span class='arguments'>(mod)</span>
+<span class='arguments'>(model)</span>
 
 </div>
 <div class='description'>
@@ -99,7 +99,7 @@ Sequel::Plugins::Finder
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/finder.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">41</span>     <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">42</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/finder.rb</span>&#x000A;<span class="line-num">38</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;<span class="line-num">39</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">40</span>     <span class="ruby-ivar">@finders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">41</span>     <span class="ruby-ivar">@finder_loaders</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="line-num">42</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

@@ -42,6 +42,7 @@ Sequel::Plugins::HookClassMethods::ClassMethods
 <li><a href="#method-i-freeze">freeze</a></li>
 <li><a href="#method-i-has_hooks-3F">has_hooks?</a></li>
 <li><a href="#method-i-hook_blocks">hook_blocks</a></li>
+<li><a href="#method-i-hook_methods_for">hook_methods_for</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -103,7 +104,26 @@ Sequel::Plugins::HookClassMethods::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hook_blocks-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-hook_blocks-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;<span class="line-num">62</span>   <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">63</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-hook_blocks-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">61</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hook_blocks</span>(<span class="ruby-identifier">hook</span>)&#x000A;<span class="line-num">62</span>   <span class="ruby-comment"># SEQUEL6: Remove</span>&#x000A;<span class="line-num">63</span>   <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;The hook_blocks class method in the hook_class_methods plugin is deprecated and will be removed in Sequel 6.&quot;</span>)&#x000A;<span class="line-num">64</span>   <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>,<span class="ruby-identifier">v</span>,<span class="ruby-identifier">_</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">65</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-hook_methods_for'>
+<a name='method-i-hook_methods_for'></a>
+<div class='synopsis'>
+<span class='name'>hook_methods_for</span>
+<span class='arguments'>(hook)</span>
+
+</div>
+<div class='description'>
+
+<p>Yield every method related to the given hook.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hook_methods_for-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-hook_methods_for-source'>   <span class="ruby-comment"># File lib/sequel/plugins/hook_class_methods.rb</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hook_methods_for</span>(<span class="ruby-identifier">hook</span>)&#x000A;<span class="line-num">69</span>   <span class="ruby-ivar">@hooks</span>[<span class="ruby-identifier">hook</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">_</span>,<span class="ruby-identifier">_</span>,<span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">m</span>}&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

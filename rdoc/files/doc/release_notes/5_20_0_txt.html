@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.20.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.20.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.20.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-05-01 08:24:04 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#after_commit and after_rollback transaction hook methods now support a :savepoint option.  Using the :savepoint option makes the hooks savepoint-aware, so after_commit will only be called if all enclosing savepoints and the transaction are committed, and after_rollback will be called when any of the enclosing savepoints are rolled back (which may be before transaction commit/rollback). Examples:</p>
+
+<pre class="ruby"><span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;    <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 1</span>&#x000A;&#x000A;<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>  <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;    <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span>&#x000A;&#x000A;<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>(<span class="ruby-value">savepoint:</span> <span class="ruby-keyword">true</span>){<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span></pre>
+</li><li>
+<p>The pg_auto_constraint_validations plugin now supports a pg_auto_constraint_validation_override method for overriding the columns and message for a specific constraint.  This is useful if the database cannot determine the columns (due to the constraint containing a database function call), or if you would like to customize the message per constraint.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The one_to_one association setter now works with models that use joined datasets, such as child models when using the class_table_inheritance plugin.</p>
+</li><li>
+<p>Database#check_constraints on PostgreSQL now also includes CHECK constraints where the related columns are not known.  The :columns entry in the hash will be an empty array in such cases.  The exclusion of such constraints in previous versions was not intentional, and the documentation implied that all CHECK constraints were returned.</p>
+</li><li>
+<p>Many cases where instance_exec was previously used on model instances have been changed so that instance methods are defined and called instead.  This avoids the creation of singleton classes for model instances, and can significantly improve performance in some cases.  This affects all associations as well as the following plugins:</p>
+<ul><li>
+<p>composition</p>
+</li><li>
+<p>hook_class_methods</p>
+</li><li>
+<p>validation_class_methods</p>
+</li></ul>
+
+<p>Other cases where instance_exec is now avoided and a different approach is used:</p>
+<ul><li>
+<p>association_dependencies plugin</p>
+</li><li>
+<p>PlaceholderLiteralString#with_dataset</p>
+</li></ul>
+</li><li>
+<p>The auto_validations plugin now works with child models when using the class_table_inheritance plugin.</p>
+</li><li>
+<p>Database#server_version now works correctly in the mysql2 adapter when using the MySQL driver with MariaDB 10+.</p>
+</li><li>
+<p>The float unsigned type is now recognized and supported in the schema parser and schema_dumper extension.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

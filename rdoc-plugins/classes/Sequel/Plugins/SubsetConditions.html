@@ -69,7 +69,7 @@ Sequel::Plugins::SubsetConditions
 <a name='method-c-apply'></a>
 <div class='synopsis'>
 <span class='name'>apply</span>
-<span class='arguments'>(mod, &block)</span>
+<span class='arguments'>(model, &block)</span>
 
 </div>
 <div class='description'>
@@ -79,7 +79,7 @@ Sequel::Plugins::SubsetConditions
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-apply-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">30</span>   <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">31</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">32</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;<span class="line-num">33</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-apply-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subset_conditions.rb</span>&#x000A;<span class="line-num">29</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">30</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">31</span>     <span class="ruby-ivar">@dataset_module_class</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@dataset_module_class</span>) <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">32</span>       <span class="ruby-identifier">include</span> <span class="ruby-constant">DatasetModuleMethods</span>&#x000A;<span class="line-num">33</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">34</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">35</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

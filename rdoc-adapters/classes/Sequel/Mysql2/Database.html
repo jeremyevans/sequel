@@ -162,7 +162,7 @@ Superclass:
 <a name='method-i-server_version'></a>
 <div class='synopsis'>
 <span class='name'>server_version</span>
-<span class='arguments'>(server=nil)</span>
+<span class='arguments'>(_server=nil)</span>
 
 </div>
 <div class='description'>
@@ -174,7 +174,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-server_version-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-server_version-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">82</span>   <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_info</span>[<span class="ruby-value">:id</span>]} <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>)&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-server_version-source'>   <span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb</span>&#x000A;<span class="line-num">81</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server_version</span>(<span class="ruby-identifier">_server</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">82</span>   <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">super</span>()&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

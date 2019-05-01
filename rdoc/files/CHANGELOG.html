@@ -30,12 +30,37 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-04-02 09:28:47 -0700</span>
+<span class='datetime'>2019-05-01 08:24:04 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.20.0+-282019-05-01-29">5.20.0 (2019-05-01)<span><a href="#label-5.20.0+-282019-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Fix reversing of alter_table add_foreign_key when :type option is used (jeremyevans) (#1615)</p>
+</li><li>
+<p>Switch from using instance_exec to define_method for model associations and in some plugins (jeremyevans)</p>
+</li><li>
+<p>Fix Database#server_version when using mysql2 adapter with mysql driver on MariaDB 10+ database (v-kolesnikov) (#1614)</p>
+</li><li>
+<p>Make one_to_one setter method handle models that use joined datasets (jeremyevans) (#1612)</p>
+</li><li>
+<p>Make auto_validations plugin work with the class_table_inheritance plugin (jeremyevans) (#1611)</p>
+</li><li>
+<p>Avoid use of instance_exec for PlaceholderLiteralString#with_dataset (jeremyevans)</p>
+</li><li>
+<p>Recognize float unsigned database types as float (keeguon, jeremyevans) (#1609)</p>
+</li><li>
+<p>Support :savepoint options to Database#{after_commit,after_rollback} for making the hooks handle savepoints (jeremyevans)</p>
+</li><li>
+<p>Avoid use of instance_exec in association_dependencies plugin (jeremyevans)</p>
+</li><li>
+<p>Add pg_auto_constraint_validation_override to the pg_auto_constraint_validations plugin, for customizing columns and error message per constraint (jeremyevans)</p>
+</li><li>
+<p>Make Database#check_constraints on PostgreSQL also include constraints where the related columns are not known (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.19.0+-282019-04-02-29">5.19.0 (2019-04-02)<span><a href="#label-5.19.0+-282019-04-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Use more optimized approach to merging hashes in ruby 2.5+ (jeremyevans)</p>
