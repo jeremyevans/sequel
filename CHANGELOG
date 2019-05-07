@@ -1,5 +1,7 @@
 === master
 
+* Improve performance in ado adapter using faster callables for type conversion (jeremyevans)
+
 * Fix handling of decimal values in the ado adapter when using locales where the decimal separator is , and not . (jeremyevans) (#1619)
 
 === 5.20.0 (2019-05-01)
