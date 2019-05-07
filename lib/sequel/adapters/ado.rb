@@ -233,7 +233,6 @@ module Sequel
           cols = []
           conversion_procs = db.conversion_procs
 
-          i = -1
           ts_cp = nil
           recordset.Fields.each do |field|
             type = field.Type
@@ -250,17 +249,20 @@ module Sequel
             else
               conversion_procs[type]
             end
-            cols << [output_identifier(field.Name), cp, i+=1]
+            cols << [output_identifier(field.Name), cp]
           end
 
           self.columns = cols.map(&:first)
           return if recordset.EOF
+          max = cols.length
 
           recordset.GetRows.transpose.each do |field_values|
             h = {}
 
-            cols.each do |name, cp, index|
-              h[name] = if (v = field_values[index]) && cp
+            i = -1
+            while (i += 1) < max
+              name, cp = cols[i]
+              h[name] = if (v = field_values[i]) && cp
                 cp.call(v)
               else
                 v
