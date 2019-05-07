@@ -54,7 +54,11 @@ module Sequel
     end
 
     def cp.numeric(v)
-      BigDecimal(v)
+      if v.include?(',')
+        BigDecimal(v.tr(',', '.'))
+      else
+        BigDecimal(v)
+      end
     end
 
     def cp.binary(v)

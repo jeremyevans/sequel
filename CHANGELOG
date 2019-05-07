@@ -1,3 +1,7 @@
+=== master
+
+* Fix handling of decimal values in the ado adapter when using locales where the decimal separator is , and not . (jeremyevans) (#1619)
+
 === 5.20.0 (2019-05-01)
 
 * Fix reversing of alter_table add_foreign_key when :type option is used (jeremyevans) (#1615)

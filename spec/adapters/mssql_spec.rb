@@ -40,6 +40,30 @@ describe "A MSSQL database" do
   end
 end
 
+describe "MSSQL decimal locale handling" do
+  before do
+    @locale = WIN32OLE.locale
+    @decimal = BigDecimal('1234.56')
+  end
+  after do
+    WIN32OLE.locale = @locale
+  end
+
+  it "should work with current locale" do
+    DB.get(Sequel.cast(@decimal, 'decimal(16,4)').as(:v)).must_equal @decimal
+  end
+
+  it "should work with 1031 locale" do
+    WIN32OLE.locale = 1031
+    DB.get(Sequel.cast(@decimal, 'decimal(16,4)').as(:v)).must_equal @decimal
+  end
+
+  it "should work with 1033 locale" do
+    WIN32OLE.locale = 1033
+    DB.get(Sequel.cast(@decimal, 'decimal(16,4)').as(:v)).must_equal @decimal
+  end
+end if DB.adapter_scheme == :ado
+
 describe "MSSQL" do
   before(:all) do
     @db = DB
