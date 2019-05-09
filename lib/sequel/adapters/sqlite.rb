@@ -112,7 +112,7 @@ module Sequel
         sqlite3_opts = {}
         sqlite3_opts[:readonly] = typecast_value_boolean(opts[:readonly]) if opts.has_key?(:readonly)
         db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
-        db.busy_timeout(opts.fetch(:timeout, 5000))
+        db.busy_timeout(typecast_value_integer(opts.fetch(:timeout, 5000)))
 
         if USE_EXTENDED_RESULT_CODES
           db.extended_result_codes = true

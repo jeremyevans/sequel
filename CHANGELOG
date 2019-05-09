@@ -1,5 +1,7 @@
 === master
 
+* Convert the Database :timeout option to an integer in the sqlite adapter (jeremyevans) (#1620)
+
 * Improve performance in ado adapter using more efficient inner loop (jeremyevans)
 
 * Improve performance in ado adapter using faster callables for type conversion (jeremyevans)
