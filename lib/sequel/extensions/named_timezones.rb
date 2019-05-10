@@ -66,6 +66,7 @@ module Sequel
     # Handle both TZInfo 1 and TZInfo 2
     if defined?(TZInfo::VERSION) && TZInfo::VERSION > '2'
       # :nodoc:
+      # :nocov:
       def convert_input_datetime_other(v, input_timezone)
         local_offset = Rational(input_timezone.period_for_local(v, &tzinfo_disambiguator_for(v)).utc_total_offset, 86400)
         (v - local_offset).new_offset(local_offset)
@@ -78,6 +79,7 @@ module Sequel
         DateTime.jd(v.jd, v.hour, v.minute, v.second + v.sec_fraction, v.offset, v.start)
       end
       # :nodoc:
+      # :nocov:
     else
       # Assume the given DateTime has a correct time but a wrong timezone.  It is
       # currently in UTC timezone, but it should be converted to the input_timezone.
