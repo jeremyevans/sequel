@@ -3,6 +3,8 @@ require_relative "spec_helper"
 Sequel.extension :pg_array, :pg_json
 
 describe "pg_json extension" do
+  integer_class = RUBY_VERSION >= '2.4' ? Integer : Fixnum
+
   before(:all) do
     m = Sequel::Postgres
     @m = m::JSONDatabaseMethods
@@ -29,7 +31,7 @@ describe "pg_json extension" do
     cp[3807].call("{[]}").must_equal [@bac.new([])]
   end
 
-  it "should parse json strings correctly" do
+  deprecated "should parse json strings correctly" do
     @m.parse_json('[]').class.must_equal(@ac)
     @m.parse_json('[]').to_a.must_equal []
     @m.parse_json('[1]').to_a.must_equal [1]
@@ -40,27 +42,7 @@ describe "pg_json extension" do
     @m.parse_json('{"a": "b"}').to_hash.must_equal('a'=>'b')
     @m.parse_json('{"a": "b", "c": [1, 2, 3]}').to_hash.must_equal('a'=>'b', 'c'=>[1, 2, 3])
     @m.parse_json('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
-  end
-
-  it "should parse json and non-json plain strings, integers, and floats correctly in db_parse_json" do
-    @m.db_parse_json('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
-    @m.db_parse_json('[1, [2], {"a": "b"}]').to_a.must_equal [1, [2], {'a'=>'b'}]
-    @m.db_parse_json('1').must_equal 1
-    @m.db_parse_json('"b"').must_equal 'b'
-    @m.db_parse_json('1.1').must_equal 1.1
-  end
-
-  it "should parse json and non-json plain strings, integers, and floats correctly in db_parse_jsonb" do
-    @m.db_parse_jsonb('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
-    @m.db_parse_jsonb('[1, [2], {"a": "b"}]').to_a.must_equal [1, [2], {'a'=>'b'}]
-    @m.db_parse_jsonb('1').must_equal 1
-    @m.db_parse_jsonb('"b"').must_equal 'b'
-    @m.db_parse_jsonb('1.1').must_equal 1.1
-  end
-
-  it "should raise an error when attempting to parse invalid json" do
-    proc{@m.parse_json('')}.must_raise(Sequel::InvalidValue)
-    proc{@m.parse_json('a')}.must_raise(Sequel::InvalidValue)
+    proc{@m.parse_json("a")}.must_raise Sequel::InvalidValue
 
     begin
       Sequel.instance_eval do
@@ -69,17 +51,73 @@ describe "pg_json extension" do
           {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new, '[one]'=>[1]}.fetch(v){pj(v)}
         end
       end
-      @m.parse_json('1').must_equal 1
-      @m.parse_json("'a'").must_equal 'a'
-      @m.parse_json('true').must_equal true
-      @m.parse_json('false').must_equal false
-      @m.parse_json('null').must_be_nil
       proc{@m.parse_json('o')}.must_raise(Sequel::InvalidValue)
-      @m.db_parse_json('one').must_equal 1
-      @m.db_parse_jsonb('one').must_equal 1
     ensure
       Sequel.instance_eval do
         alias parse_json pj
+      end
+    end
+  end
+
+  deprecated "should parse json and non-json plain strings, integers, and floats correctly in db_parse_json" do
+    @m.db_parse_json('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
+    @m.db_parse_json('[1, [2], {"a": "b"}]').to_a.must_equal [1, [2], {'a'=>'b'}]
+    @m.db_parse_json('1').must_equal 1
+    @m.db_parse_json('"b"').must_equal 'b'
+    @m.db_parse_json('1.1').must_equal 1.1
+    proc{@m.db_parse_json("a")}.must_raise Sequel::InvalidValue
+  end
+
+  deprecated "should parse jsonb and non-jsonb plain strings, integers, and floats correctly in db_parse_jsonb" do
+    @m.db_parse_jsonb('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
+    @m.db_parse_jsonb('[1, [2], {"a": "b"}]').to_a.must_equal [1, [2], {'a'=>'b'}]
+    @m.db_parse_jsonb('1').must_equal 1
+    @m.db_parse_jsonb('"b"').must_equal 'b'
+    @m.db_parse_jsonb('1.1').must_equal 1.1
+    proc{@m.db_parse_jsonb("a")}.must_raise Sequel::InvalidValue
+  end
+
+  it "should parse json and non-json plain strings, integers, and floats correctly in conversion_proc" do
+    cp = @db.conversion_procs[114]
+    cp.call('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
+    cp.call('[1, [2], {"a": "b"}]').to_a.must_equal [1, [2], {'a'=>'b'}]
+    cp.call('1').must_equal 1
+    cp.call('"b"').must_equal 'b'
+    cp.call('1.1').must_equal 1.1
+  end
+
+  it "should parse jsonb and non-jsonb plain strings, integers, and floats correctly in conversion_proc" do
+    cp = @db.conversion_procs[3802]
+    cp.call('{"a": "b", "c": {"d": "e"}}').to_hash.must_equal('a'=>'b', 'c'=>{'d'=>'e'})
+    cp.call('[1, [2], {"a": "b"}]').to_a.must_equal [1, [2], {'a'=>'b'}]
+    cp.call('1').must_equal 1
+    cp.call('"b"').must_equal 'b'
+    cp.call('1.1').must_equal 1.1
+  end
+
+  it "should raise an error when attempting to parse invalid json" do
+    [114, 3802].each do |oid|
+      cp = @db.conversion_procs[oid]
+      proc{cp.call('a')}.must_raise(Sequel::InvalidValue)
+
+      begin
+        Sequel.instance_eval do
+          alias pj parse_json
+          def parse_json(v)
+            {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new, '[one]'=>[1]}.fetch(v){pj(v)}
+          end
+        end
+        cp.call('1').must_equal 1
+        cp.call("'a'").must_equal 'a'
+        cp.call('true').must_equal true
+        cp.call('false').must_equal false
+        cp.call('null').must_be_nil
+        proc{cp.call('o')}.must_raise(Sequel::InvalidValue)
+        cp.call('one').must_equal 1
+      ensure
+        Sequel.instance_eval do
+          alias parse_json pj
+        end
       end
     end
   end
@@ -173,6 +211,117 @@ describe "pg_json extension" do
     @db.bound_variable_arg(Sequel.pg_array([Sequel.pg_jsonb([{"a"=>1}]), Sequel.pg_jsonb("b"=>[1, 2])]), nil).must_equal '{"[{\\"a\\":1}]","{\\"b\\":[1,2]}"}'
   end
 
+  it "should support using wrapped JSON and JSONB primitives as bound variables" do
+    @db.bound_variable_arg(Sequel.pg_json_wrap(1), nil).must_equal '1'
+    @db.bound_variable_arg(Sequel.pg_json_wrap(2.5), nil).must_equal '2.5'
+    @db.bound_variable_arg(Sequel.pg_json_wrap('a'), nil).must_equal '"a"'
+    @db.bound_variable_arg(Sequel.pg_json_wrap(true), nil).must_equal 'true'
+    @db.bound_variable_arg(Sequel.pg_json_wrap(false), nil).must_equal 'false'
+    @db.bound_variable_arg(Sequel.pg_json_wrap(nil), nil).must_equal 'null'
+  end
+
+  it "should support using json[] and jsonb[] types in bound variables with ruby primitives" do
+    @db.bound_variable_arg(Sequel.pg_array([1, 2.5, 'a', true, false, nil].map{|v| Sequel.pg_json_wrap(v)}), nil).must_equal '{"1","2.5","\"a\"","true","false","null"}'
+  end
+
+  it "Sequel.pg_json_wrap should wrap Ruby primitives in JSON wrappers" do
+    Sequel.pg_json_wrap({}).class.must_equal Sequel::Postgres::JSONHash
+    Sequel.pg_json_wrap({}).must_equal({})
+    Sequel.pg_json_wrap([]).class.must_equal Sequel::Postgres::JSONArray
+    Sequel.pg_json_wrap([]).must_equal []
+    Sequel.pg_json_wrap('a').class.must_equal Sequel::Postgres::JSONString
+    Sequel.pg_json_wrap('a').must_equal 'a'
+    Sequel.pg_json_wrap(1).class.must_equal Sequel::Postgres::JSONInteger
+    Sequel.pg_json_wrap(1).must_equal 1
+    Sequel.pg_json_wrap(2.5).class.must_equal Sequel::Postgres::JSONFloat
+    Sequel.pg_json_wrap(2.5).must_equal 2.5
+    Sequel.pg_json_wrap(true).class.must_equal Sequel::Postgres::JSONTrue
+    Sequel.pg_json_wrap(true).must_equal true
+    Sequel.pg_json_wrap(false).class.must_equal Sequel::Postgres::JSONFalse
+    Sequel.pg_json_wrap(false).must_equal false
+    Sequel.pg_json_wrap(nil).class.must_equal Sequel::Postgres::JSONNull
+    Sequel.pg_json_wrap(nil).must_be_nil
+  end
+
+  it "Sequel.pg_json_wrap should fail when passed an unsupported object" do
+    proc{Sequel.pg_json_wrap(Object.new)}.must_raise Sequel::Error
+  end
+
+  it "Sequel.pg_jsonb_wrap should wrap Ruby primitives in JSONB wrappers" do
+    Sequel.pg_jsonb_wrap({}).class.must_equal Sequel::Postgres::JSONBHash
+    Sequel.pg_jsonb_wrap({}).must_equal({})
+    Sequel.pg_jsonb_wrap([]).class.must_equal Sequel::Postgres::JSONBArray
+    Sequel.pg_jsonb_wrap([]).must_equal []
+    Sequel.pg_jsonb_wrap('a').class.must_equal Sequel::Postgres::JSONBString
+    Sequel.pg_jsonb_wrap('a').must_equal 'a'
+    Sequel.pg_jsonb_wrap(1).class.must_equal Sequel::Postgres::JSONBInteger
+    Sequel.pg_jsonb_wrap(1).must_equal 1
+    Sequel.pg_jsonb_wrap(2.5).class.must_equal Sequel::Postgres::JSONBFloat
+    Sequel.pg_jsonb_wrap(2.5).must_equal 2.5
+    Sequel.pg_jsonb_wrap(true).class.must_equal Sequel::Postgres::JSONBTrue
+    Sequel.pg_jsonb_wrap(true).must_equal true
+    Sequel.pg_jsonb_wrap(false).class.must_equal Sequel::Postgres::JSONBFalse
+    Sequel.pg_jsonb_wrap(false).must_equal false
+    Sequel.pg_jsonb_wrap(nil).class.must_equal Sequel::Postgres::JSONBNull
+    Sequel.pg_jsonb_wrap(nil).must_be_nil
+  end
+
+  it "Sequel.pg_jsonb_wrap should fail when passed an unsupported object" do
+    proc{Sequel.pg_jsonb_wrap(Object.new)}.must_raise Sequel::Error
+  end
+
+  it "should not wrap JSON primitives in json and jsonb conversion_proc when not setting wrap_json_primitives" do
+    [114, 3802].each do |oid|
+      cp = @db.conversion_procs[oid]
+      cp.call('1').class.must_equal(integer_class)
+      cp.call('1').must_equal 1
+      cp.call('2.5').class.must_equal Float
+      cp.call('2.5').must_equal 2.5
+      cp.call('"a"').class.must_equal String
+      cp.call('"a"').must_equal 'a'
+      cp.call('true').class.must_equal TrueClass
+      cp.call('true').must_equal true
+      cp.call('false').class.must_equal FalseClass
+      cp.call('false').must_equal false
+      cp.call('null').class.must_equal NilClass
+      cp.call('null').must_be_nil
+    end
+  end
+
+  it "should wrap JSON primitives in json conversion_proc when setting wrap_json_primitives" do
+    cp = @db.conversion_procs[114]
+    @db.wrap_json_primitives = true
+    cp.call('1').class.must_equal Sequel::Postgres::JSONInteger
+    cp.call('1').must_equal 1
+    cp.call('2.5').class.must_equal Sequel::Postgres::JSONFloat
+    cp.call('2.5').must_equal 2.5
+    cp.call('"a"').class.must_equal Sequel::Postgres::JSONString
+    cp.call('"a"').must_equal "a"
+    cp.call('true').class.must_equal Sequel::Postgres::JSONTrue
+    cp.call('true').must_equal true
+    cp.call('false').class.must_equal Sequel::Postgres::JSONFalse
+    cp.call('false').must_equal false
+    cp.call('null').class.must_equal Sequel::Postgres::JSONNull
+    cp.call('null').must_be_nil
+  end
+
+  it "should wrap JSON primitives in jsonb conversion_proc when setting wrap_json_primitives" do
+    cp = @db.conversion_procs[3802]
+    @db.wrap_json_primitives = true
+    cp.call('1').class.must_equal Sequel::Postgres::JSONBInteger
+    cp.call('1').must_equal 1
+    cp.call('2.5').class.must_equal Sequel::Postgres::JSONBFloat
+    cp.call('2.5').must_equal 2.5
+    cp.call('"a"').class.must_equal Sequel::Postgres::JSONBString
+    cp.call('"a"').must_equal "a"
+    cp.call('true').class.must_equal Sequel::Postgres::JSONBTrue
+    cp.call('true').must_equal true
+    cp.call('false').class.must_equal Sequel::Postgres::JSONBFalse
+    cp.call('false').must_equal false
+    cp.call('null').class.must_equal Sequel::Postgres::JSONBNull
+    cp.call('null').must_be_nil
+  end
+
   it "should parse json type from the schema correctly" do
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'json'}]
     @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :json]
@@ -229,8 +378,22 @@ describe "pg_json extension" do
     @db.typecast_value(:json, '[]').class.must_equal(@ac)
     @db.typecast_value(:json, '{"a": "b"}').must_equal Sequel.pg_json("a"=>"b")
     @db.typecast_value(:json, '{"a": "b"}').class.must_equal(@hc)
-    proc{@db.typecast_value(:json, '')}.must_raise(Sequel::InvalidValue)
-    proc{@db.typecast_value(:json, 1)}.must_raise(Sequel::InvalidValue)
+    @db.typecast_value(:json, 1).class.must_equal Sequel::Postgres::JSONInteger
+    @db.typecast_value(:json, 1).must_equal 1
+    @db.typecast_value(:json, 2.5).class.must_equal Sequel::Postgres::JSONFloat
+    @db.typecast_value(:json, 2.5).must_equal 2.5
+    @db.typecast_value(:json, true).class.must_equal Sequel::Postgres::JSONTrue
+    @db.typecast_value(:json, true).must_equal true
+    @db.typecast_value(:json, false).class.must_equal Sequel::Postgres::JSONFalse
+    @db.typecast_value(:json, false).must_equal false
+    @db.typecast_value(:json, nil).class.must_equal NilClass
+    @db.typecast_value(:json, nil).must_be_nil
+    proc{@db.typecast_value(:json, 'a')}.must_raise(Sequel::InvalidValue)
+    proc{@db.typecast_value(:json, Object.new)}.must_raise(Sequel::InvalidValue)
+
+    @db.typecast_json_strings = true
+    @db.typecast_value(:json, '[]').class.must_equal(Sequel::Postgres::JSONString)
+    @db.typecast_value(:json, '[]').must_equal '[]'
   end
 
   it "should support typecasting for the jsonb type" do
@@ -250,13 +413,27 @@ describe "pg_json extension" do
     @db.typecast_value(:jsonb, '[]').class.must_equal(@bac)
     @db.typecast_value(:jsonb, '{"a": "b"}').must_equal Sequel.pg_jsonb("a"=>"b")
     @db.typecast_value(:jsonb, '{"a": "b"}').class.must_equal(@bhc)
-    proc{@db.typecast_value(:jsonb, '')}.must_raise(Sequel::InvalidValue)
-    proc{@db.typecast_value(:jsonb, 1)}.must_raise(Sequel::InvalidValue)
+    @db.typecast_value(:jsonb, 1).class.must_equal Sequel::Postgres::JSONBInteger
+    @db.typecast_value(:jsonb, 1).must_equal 1
+    @db.typecast_value(:jsonb, 2.5).class.must_equal Sequel::Postgres::JSONBFloat
+    @db.typecast_value(:jsonb, 2.5).must_equal 2.5
+    @db.typecast_value(:jsonb, true).class.must_equal Sequel::Postgres::JSONBTrue
+    @db.typecast_value(:jsonb, true).must_equal true
+    @db.typecast_value(:jsonb, false).class.must_equal Sequel::Postgres::JSONBFalse
+    @db.typecast_value(:jsonb, false).must_equal false
+    @db.typecast_value(:jsonb, nil).class.must_equal NilClass
+    @db.typecast_value(:jsonb, nil).must_be_nil
+    proc{@db.typecast_value(:jsonb, 'a')}.must_raise(Sequel::InvalidValue)
+    proc{@db.typecast_value(:jsonb, Object.new)}.must_raise(Sequel::InvalidValue)
+
+    @db.typecast_json_strings = true
+    @db.typecast_value(:jsonb, '[]').class.must_equal(Sequel::Postgres::JSONBString)
+    @db.typecast_value(:jsonb, '[]').must_equal '[]'
   end
 
   it "should return correct results for Database#schema_type_class" do
-    @db.schema_type_class(:json).must_equal [Sequel::Postgres::JSONHash, Sequel::Postgres::JSONArray]
-    @db.schema_type_class(:jsonb).must_equal [Sequel::Postgres::JSONBHash, Sequel::Postgres::JSONBArray]
+    @db.schema_type_class(:json).must_equal [Sequel::Postgres::JSONObject]
+    @db.schema_type_class(:jsonb).must_equal [Sequel::Postgres::JSONBObject]
     @db.schema_type_class(:integer).must_equal Integer
   end
 end

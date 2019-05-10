@@ -1,44 +1,99 @@
 # frozen-string-literal: true
 #
 # The pg_json extension adds support for Sequel to handle
-# PostgreSQL's json and jsonb types.  It is slightly more strict than the
-# PostgreSQL json types in that the object returned should be an
-# array or object (PostgreSQL's json type considers plain numbers
-# strings, true, false, and null as valid).  Sequel will work with
-# PostgreSQL json values that are not arrays or objects, but support
-# is fairly limited and the values do not roundtrip.
+# PostgreSQL's json and jsonb types.  By default, it wraps
+# JSON arrays and JSON objects with ruby array-like and
+# hash-like objects.  If you would like to wrap JSON primitives
+# (numbers, strings, +null+, +true+, and +false+), you need to
+# use the +wrap_json_primitives+ setter:
 #
-# This extension integrates with Sequel's native postgres and jdbc/postgresql adapters, so
-# that when json fields are retrieved, they are parsed and returned
-# as instances of Sequel::Postgres::JSONArray or
-# Sequel::Postgres::JSONHash (or JSONBArray or JSONBHash for jsonb
-# columns).  JSONArray and JSONHash are
-# DelegateClasses of Array and Hash, so they mostly act the same, but
-# not completely (json_array.is_a?(Array) is false).  If you want
-# the actual array for a JSONArray, call JSONArray#to_a.  If you want
-# the actual hash for a JSONHash, call JSONHash#to_hash.
-# This is done so that Sequel does not treat JSONArray and JSONHash
-# like Array and Hash by default, which would cause issues.
+#   DB.extension :pg_json
+#   DB.wrap_json_primitives = true
 #
-# To turn an existing Array or Hash into a JSONArray or JSONHash,
-# use Sequel.pg_json:
+# Note that wrapping JSON primitives changes the behavior for
+# JSON false and null values.  Because only +false+ and +nil+
+# in Ruby are considered falesy, wrapping these objects results
+# in unexpected behavior if you use the values directly in
+# conditionals:
 #
-#   Sequel.pg_json(array) # or Sequel.pg_jsonb(array) for jsonb type
-#   Sequel.pg_json(hash)  # or Sequel.pg_jsonb(hash) for jsonb type
+#   if DB[:table].get(:json_column)
+#     # called if the value of json_column is null/false
+#     # if you are wrapping primitives
+#   end
 #
-# If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
-# or you have loaded the core_refinements extension
-# and have activated refinements for the file, you can also use Array#pg_json and Hash#pg_json:
+# To extract the Ruby primitive object from the wrapper object,
+# you can use +__getobj__+ (this comes from Ruby's delegate library).
 #
-#   array.pg_json # or array.pg_jsonb for jsonb type
-#   hash.pg_json  # or hash.pg_jsonb for jsonb type
+# To wrap an existing Ruby array, hash, string, integer, float,
+# +nil+, +true+, or +false+, use +Sequel.pg_json_wrap+ or +Sequel.pg_jsonb_wrap+:
+#
+#   Sequel.pg_json_wrap(object)  # json type
+#   Sequel.pg_jsonb_wrap(object) # jsonb type
 #
 # So if you want to insert an array or hash into an json database column:
 #
-#   DB[:table].insert(column: Sequel.pg_json([1, 2, 3]))
-#   DB[:table].insert(column: Sequel.pg_json({'a'=>1, 'b'=>2}))
+#   DB[:table].insert(column: Sequel.pg_json_wrap([1, 2, 3]))
+#   DB[:table].insert(column: Sequel.pg_json_wrap({'a'=>1, 'b'=>2}))
 #
-# To use this extension, please load it into the Database instance:
+# Note that the +pg_json_wrap+ and +pg_jsonb_wrap+ methods only handle Ruby primitives,
+# they do not handle already wrapped objects.
+#
+# If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
+# or you have loaded the core_refinements extension
+# and have activated refinements for the file, you can also use the
+# +pg_json+ and +pg_jsonb+ methods directly on Array or Hash:
+#
+#   array.pg_json  # json type
+#   array.pg_jsonb # jsonb type
+#
+#   hash.pg_json   # json type
+#   hash.pg_jsonb  # jsonb type
+#
+# Model classes that use json or jsonb columns will have typecasting automatically
+# setup, so you can assign Ruby primitives to model columns and have the wrapped
+# objects automatically created.  However, for backwards compatibility, passing
+# a string object will parse the string as JSON, not create a JSON string object.
+# 
+#   obj = Model.new
+#   obj.json_column = {'a'=>'b'}
+#   obj.json_column.class
+#   # => Sequel::Postgres::JSONHash
+#   obj.json_column['a']
+#   # => 'b'
+#
+#   obj.json_column = '{"a": "b"}'
+#   obj.json_column.class
+#   # => Sequel::Postgres::JSONHash
+#   obj.json_column['a']
+#   # => 'b'
+#
+# You can change the handling of string typecasting by using +typecast_json_strings+:
+#
+#   DB.typecast_json_strings = true
+#   obj.json_column = '{"a": "b"}'
+#   obj.json_column.class
+#   # => Sequel::Postgres::JSONString
+#   obj.json_column
+#   # => '{"a": "b"}'
+#
+# Note that +nil+ values are never automatically wrapped:
+#
+#   obj.json_column = nil
+#   obj.json_column.class
+#   # => NilClass
+#   obj.json_column
+#   # => nil
+#
+# If you want to set a JSON null value when using a model, you must wrap it
+# explicitly:
+#
+#   obj.json_column = Sequel.pg_json_wrap(nil)
+#   obj.json_column.class
+#   # => Sequel::Postgres::JSONNull
+#   obj.json_column
+#   # => nil
+#
+# To use this extension, load it into the Database instance:
 #
 #   DB.extension :pg_json
 #
@@ -46,7 +101,7 @@
 # for details on using json columns in CREATE/ALTER TABLE statements.
 #
 # This extension integrates with the pg_array extension.  If you plan
-# to use the json[] type, load the pg_array extension before the
+# to use the json[] or jsonb[] types, load the pg_array extension before the
 # pg_json extension:
 #
 #   DB.extension :pg_array, :pg_json
@@ -54,114 +109,148 @@
 # Note that when accessing json hashes, you should always use strings for keys.
 # Attempting to use other values (such as symbols) will not work correctly.
 #
-# This extension requires both the json and delegate libraries.
+# This extension requires both the json and delegate libraries.  However, you
+# can override +Sequel.parse_json+, +Sequel.object_to_json+, and
+# +Sequel.json_parser_error_class+ to use an alternative JSON implementation.
 #
-# Related modules: Sequel::Postgres::JSONArrayBase, Sequel::Postgres::JSONArray,
-# Sequel::Postgres::JSONArray, Sequel::Postgres::JSONBArray, Sequel::Postgres::JSONHashBase,
-# Sequel::Postgres::JSONHash, Sequel::Postgres::JSONBHash, Sequel::Postgres::JSONDatabaseMethods
+# Related modules: Sequel::Postgres::JSONDatabaseMethods
 
 require 'delegate'
 require 'json'
 
 module Sequel
   module Postgres
-    # Class representing PostgreSQL JSON/JSONB column array values.
-    class JSONArrayBase < DelegateClass(Array)
-      include Sequel::SQL::AliasMethods
-      include Sequel::SQL::CastMethods
-
-      # Convert the array to a json string and append a
-      # literalized version of the string to the sql.
-      def sql_literal_append(ds, sql)
-        ds.literal_append(sql, Sequel.object_to_json(self))
-      end
+    # A module included in all of the JSON wrapper classes.
+    module JSONObject
     end
 
-    class JSONArray < JSONArrayBase
-      # Cast as json
-      def sql_literal_append(ds, sql)
-        super
-        sql << '::json'
-      end
+    # A module included in all of the JSONB wrapper classes.
+    module JSONBObject
     end
 
-    class JSONBArray < JSONArrayBase
-      # Cast as jsonb
-      def sql_literal_append(ds, sql)
-        super
-        sql << '::jsonb'
-      end
-    end
-
-    # Class representing PostgreSQL JSON/JSONB column hash/object values.
-    class JSONHashBase < DelegateClass(Hash)
-      include Sequel::SQL::AliasMethods
-      include Sequel::SQL::CastMethods
-
-      # Convert the hash to a json string and append a
-      # literalized version of the string to the sql.
-      def sql_literal_append(ds, sql)
-        ds.literal_append(sql, Sequel.object_to_json(self))
+    create_delegate_class = lambda do |name, delegate_class|
+      base_class = DelegateClass(delegate_class)
+      base_class.class_eval do
+        include Sequel::SQL::AliasMethods
+        include Sequel::SQL::CastMethods
       end
 
-      # Return the object being delegated to.
-      alias to_hash __getobj__
+      json_class = Class.new(base_class) do
+        include JSONObject
+
+        def sql_literal_append(ds, sql)
+          ds.literal_append(sql, Sequel.object_to_json(self))
+          sql << '::json'
+        end
+      end
+
+      jsonb_class = Class.new(base_class) do
+        include JSONBObject
+
+        def sql_literal_append(ds, sql)
+          ds.literal_append(sql, Sequel.object_to_json(self))
+          sql << '::jsonb'
+        end
+      end
+
+      const_set(:"JSON#{name}Base", base_class)
+      const_set(:"JSON#{name}", json_class)
+      const_set(:"JSONB#{name}", jsonb_class)
     end
 
-    class JSONHash < JSONHashBase
-      # Cast as json
-      def sql_literal_append(ds, sql)
-        super
-        sql << '::json'
-      end
+    create_delegate_class.call(:Array, Array)
+    create_delegate_class.call(:Hash, Hash)
+    create_delegate_class.call(:String, String)
+    create_delegate_class.call(:Integer, Integer)
+    create_delegate_class.call(:Float, Float)
+    create_delegate_class.call(:Null, NilClass)
+    create_delegate_class.call(:True, TrueClass)
+    create_delegate_class.call(:False, FalseClass)
+
+    JSON_WRAPPER_MAPPING = {
+      ::Array => JSONArray,
+      ::Hash => JSONHash,
+    }.freeze
+
+    JSONB_WRAPPER_MAPPING = {
+      ::Array => JSONBArray,
+      ::Hash => JSONBHash,
+    }.freeze
+
+    JSON_PRIMITIVE_WRAPPER_MAPPING = {
+      ::String => JSONString,
+      ::Integer => JSONInteger,
+      ::Float => JSONFloat,
+      ::NilClass => JSONNull,
+      ::TrueClass => JSONTrue,
+      ::FalseClass => JSONFalse,
+    }
+
+    JSONB_PRIMITIVE_WRAPPER_MAPPING = {
+      ::String => JSONBString,
+      ::Integer => JSONBInteger,
+      ::Float => JSONBFloat,
+      ::NilClass => JSONBNull,
+      ::TrueClass => JSONBTrue,
+      ::FalseClass => JSONBFalse,
+    }
+
+    if RUBY_VERSION < '2.4'
+      # :nocov:
+      JSON_PRIMITIVE_WRAPPER_MAPPING[Fixnum] = JSONInteger
+      JSON_PRIMITIVE_WRAPPER_MAPPING[Bignum] = JSONInteger
+      JSONB_PRIMITIVE_WRAPPER_MAPPING[Fixnum] = JSONBInteger
+      JSONB_PRIMITIVE_WRAPPER_MAPPING[Bignum] = JSONBInteger
+      # :nocov:
     end
 
-    class JSONBHash < JSONHashBase
-      # Cast as jsonb
-      def sql_literal_append(ds, sql)
-        super
-        sql << '::jsonb'
-      end
-    end
+    JSON_PRIMITIVE_WRAPPER_MAPPING.freeze
+    JSONB_PRIMITIVE_WRAPPER_MAPPING.freeze
+
+    JSON_COMBINED_WRAPPER_MAPPING =JSON_WRAPPER_MAPPING.merge(JSON_PRIMITIVE_WRAPPER_MAPPING).freeze
+    JSON_WRAP_CLASSES = JSON_COMBINED_WRAPPER_MAPPING.keys.freeze
+
+    JSONB_COMBINED_WRAPPER_MAPPING =JSONB_WRAPPER_MAPPING.merge(JSONB_PRIMITIVE_WRAPPER_MAPPING).freeze
+    JSONB_WRAP_CLASSES = JSONB_COMBINED_WRAPPER_MAPPING.keys.freeze
 
     # Methods enabling Database object integration with the json type.
     module JSONDatabaseMethods
       def self.extended(db)
         db.instance_exec do
-          add_conversion_proc(114, JSONDatabaseMethods.method(:db_parse_json))
-          add_conversion_proc(3802, JSONDatabaseMethods.method(:db_parse_jsonb))
+          add_conversion_proc(114, method(:_db_parse_json))
+          add_conversion_proc(3802, method(:_db_parse_jsonb))
           if respond_to?(:register_array_type)
             register_array_type('json', :oid=>199, :scalar_oid=>114)
             register_array_type('jsonb', :oid=>3807, :scalar_oid=>3802)
           end
-          @schema_type_classes[:json] = [JSONHash, JSONArray]
-          @schema_type_classes[:jsonb] = [JSONBHash, JSONBArray]
+          @schema_type_classes[:json] = [JSONObject]
+          @schema_type_classes[:jsonb] = [JSONBObject]
         end
       end
 
-      # Parse JSON data coming from the database.  Since PostgreSQL allows
-      # non JSON data in JSON fields (such as plain numbers and strings),
-      # we don't want to raise an exception for that.
+
+      # Deprecated
       def self.db_parse_json(s)
+        # SEQUEL6: Remove
         parse_json(s)
       rescue Sequel::InvalidValue
         raise unless s.is_a?(String)
         parse_json("[#{s}]").first
       end
 
-      # Same as db_parse_json, but consider the input as jsonb.
+      # Deprecated
       def self.db_parse_jsonb(s)
+        # SEQUEL6: Remove
         parse_json(s, true)
       rescue Sequel::InvalidValue
         raise unless s.is_a?(String)
         parse_json("[#{s}]").first
       end
 
-      # Parse the given string as json, returning either a JSONArray
-      # or JSONHash instance (or JSONBArray or JSONBHash instance if jsonb
-      # argument is true), or a String, Numeric, true, false, or nil
-      # if the json library used supports that.
+      # Deprecated
       def self.parse_json(s, jsonb=false)
+        # SEQUEL6: Remove
+        Sequel::Deprecation.deprecate("Sequel::Postgres::JSONDatabaseMethods.{parse_json,db_parse_json,db_parse_jsonb} are deprecated and will be removed in Sequel 6.")
         begin
           value = Sequel.parse_json(s)
         rescue Sequel.json_parser_error_class => e
@@ -180,10 +269,22 @@ module Sequel
         end
       end
 
+      # Whether to wrap JSON primitives instead of using Ruby objects.
+      # Wrapping the primitives allows the primitive values to roundtrip,
+      # but it can cause problems, especially as false/null JSON values
+      # will be treated as truthy in Ruby due to the wrapping.  False by
+      # default.
+      attr_accessor :wrap_json_primitives
+
+      # Whether to typecast strings for json/jsonb types as JSON
+      # strings, instead of trying to parse the string as JSON.
+      # False by default.
+      attr_accessor :typecast_json_strings
+
       # Handle json and jsonb types in bound variables
       def bound_variable_arg(arg, conn)
         case arg
-        when JSONArrayBase, JSONHashBase
+        when JSONObject, JSONBObject
           Sequel.object_to_json(arg)
         else
           super
@@ -192,10 +293,72 @@ module Sequel
 
       private
 
+      # Parse JSON data coming from the database.  Since PostgreSQL allows
+      # non JSON data in JSON fields (such as plain numbers and strings),
+      # we don't want to raise an exception for that.
+      def _db_parse_json(s)
+        _wrap_json(_parse_json(s))
+      rescue Sequel::InvalidValue
+        raise unless s.is_a?(String)
+        _wrap_json(_parse_json("[#{s}]").first)
+      end
+
+      # Same as _db_parse_json, but consider the input as jsonb.
+      def _db_parse_jsonb(s)
+        _wrap_jsonb(_parse_json(s))
+      rescue Sequel::InvalidValue
+        raise unless s.is_a?(String)
+        _wrap_jsonb(_parse_json("[#{s}]").first)
+      end
+
+      # Parse the given string as json, returning either a JSONArray
+      # or JSONHash instance (or JSONBArray or JSONBHash instance if jsonb
+      # argument is true), or a String, Numeric, true, false, or nil
+      # if the json library used supports that.
+      def _parse_json(s)
+        begin
+          Sequel.parse_json(s)
+        rescue Sequel.json_parser_error_class => e
+          raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
+        end
+      end
+
+      # Wrap the parsed JSON value in the appropriate JSON wrapper class.
+      # Only wrap primitive values if wrap_json_primitives is set.
+      def _wrap_json(value)
+        if klass = JSON_WRAPPER_MAPPING[value.class]
+          klass.new(value)
+        elsif klass = JSON_PRIMITIVE_WRAPPER_MAPPING[value.class]
+          if wrap_json_primitives
+            klass.new(value)
+          else
+            value
+          end
+        else
+          raise Sequel::InvalidValue, "unhandled json value: #{value.inspect}"
+        end
+      end
+
+      # Wrap the parsed JSON value in the appropriate JSONB wrapper class.
+      # Only wrap primitive values if wrap_json_primitives is set.
+      def _wrap_jsonb(value)
+        if klass = JSONB_WRAPPER_MAPPING[value.class]
+          klass.new(value)
+        elsif klass = JSONB_PRIMITIVE_WRAPPER_MAPPING[value.class]
+          if wrap_json_primitives
+            klass.new(value)
+          else
+            value
+          end
+        else
+          raise Sequel::InvalidValue, "unhandled jsonb value: #{value.inspect}"
+        end
+      end
+
       # Handle json[] and jsonb[] types in bound variables.
       def bound_variable_array(a)
         case a
-        when JSONHashBase, JSONArrayBase
+        when JSONObject, JSONBObject
           "\"#{Sequel.object_to_json(a).gsub('"', '\\"')}\""
         else
           super
@@ -238,41 +401,43 @@ module Sequel
         end
       end
 
-      # Convert the value given to a JSONArray or JSONHash
+      # Convert the value given to a JSON wrapper object.
       def typecast_value_json(value)
         case value
-        when JSONArray, JSONHash
+        when JSONObject
           value
-        when Array
-          JSONArray.new(value)
-        when Hash 
-          JSONHash.new(value)
-        when JSONBArray
-          JSONArray.new(value.to_a)
-        when JSONBHash
-          JSONHash.new(value.to_hash)
         when String
-          JSONDatabaseMethods.parse_json(value)
+          if typecast_json_strings
+            JSONString.new(value)
+          else
+            _wrap_json(_parse_json(value))
+          end
+        when *JSON_WRAP_CLASSES
+          JSON_COMBINED_WRAPPER_MAPPING[value.class].new(value)
+        when JSONBObject
+          value = value.__getobj__
+          JSON_COMBINED_WRAPPER_MAPPING[value.class].new(value)
         else
           raise Sequel::InvalidValue, "invalid value for json: #{value.inspect}"
         end
       end
 
-      # Convert the value given to a JSONBArray or JSONBHash
+      # Convert the value given to a JSONB wrapper object.
       def typecast_value_jsonb(value)
         case value
-        when JSONBArray, JSONBHash
+        when JSONBObject
           value
-        when Array
-          JSONBArray.new(value)
-        when Hash 
-          JSONBHash.new(value)
-        when JSONArray
-          JSONBArray.new(value.to_a)
-        when JSONHash
-          JSONBHash.new(value.to_hash)
         when String
-          JSONDatabaseMethods.parse_json(value, true)
+          if typecast_json_strings
+            JSONBString.new(value)
+          else
+            _wrap_jsonb(_parse_json(value))
+          end
+        when *JSONB_WRAP_CLASSES
+          JSONB_COMBINED_WRAPPER_MAPPING[value.class].new(value)
+        when JSONObject
+          value = value.__getobj__
+          JSONB_COMBINED_WRAPPER_MAPPING[value.class].new(value)
         else
           raise Sequel::InvalidValue, "invalid value for jsonb: #{value.inspect}"
         end
@@ -282,38 +447,66 @@ module Sequel
 
   module SQL::Builders
     # Wrap the array or hash in a Postgres::JSONArray or Postgres::JSONHash.
+    # Also handles Postgres::JSONObject and JSONBObjects.
+    # For other objects, calls +Sequel.pg_json_op+ (which is defined
+    # by the pg_json_ops extension).
     def pg_json(v)
       case v
-      when Postgres::JSONArray, Postgres::JSONHash
+      when Postgres::JSONObject
         v
       when Array
         Postgres::JSONArray.new(v)
       when Hash
         Postgres::JSONHash.new(v)
-      when Postgres::JSONBArray
-        Postgres::JSONArray.new(v.to_a)
-      when Postgres::JSONBHash
-        Postgres::JSONHash.new(v.to_hash)
+      when Postgres::JSONBObject
+        v = v.__getobj__
+        Postgres::JSON_COMBINED_WRAPPER_MAPPING[v.class].new(v)
       else
         Sequel.pg_json_op(v)
       end
     end
 
+    # Wraps Ruby array, hash, string, integer, float, true, false, and nil
+    # values with the appropriate JSON wrapper.  Raises an exception for
+    # other types.
+    def pg_json_wrap(v)
+      case v
+      when *Postgres::JSON_WRAP_CLASSES
+        Postgres::JSON_COMBINED_WRAPPER_MAPPING[v.class].new(v)
+      else
+        raise Error, "invalid value passed to Sequel.pg_json_wrap: #{v.inspect}"
+      end
+    end
+
     # Wrap the array or hash in a Postgres::JSONBArray or Postgres::JSONBHash.
+    # Also handles Postgres::JSONObject and JSONBObjects.
+    # For other objects, calls +Sequel.pg_json_op+ (which is defined
+    # by the pg_json_ops extension).
     def pg_jsonb(v)
       case v
-      when Postgres::JSONBArray, Postgres::JSONBHash
+      when Postgres::JSONBObject
         v
       when Array
         Postgres::JSONBArray.new(v)
       when Hash
         Postgres::JSONBHash.new(v)
-      when Postgres::JSONArray
-        Postgres::JSONBArray.new(v.to_a)
-      when Postgres::JSONHash
-        Postgres::JSONBHash.new(v.to_hash)
+      when Postgres::JSONObject
+        v = v.__getobj__
+        Postgres::JSONB_COMBINED_WRAPPER_MAPPING[v.class].new(v)
       else
         Sequel.pg_jsonb_op(v)
+      end
+    end
+
+    # Wraps Ruby array, hash, string, integer, float, true, false, and nil
+    # values with the appropriate JSONB wrapper.  Raises an exception for
+    # other types.
+    def pg_jsonb_wrap(v)
+      case v
+      when *Postgres::JSONB_WRAP_CLASSES
+        Postgres::JSONB_COMBINED_WRAPPER_MAPPING[v.class].new(v)
+      else
+        raise Error, "invalid value passed to Sequel.pg_jsonb_wrap: #{v.inspect}"
       end
     end
   end

@@ -2944,6 +2944,8 @@ describe 'PostgreSQL json type' do
     @h = {'a'=>'b', '1'=>[3, 4, 5]}
   end
   after do
+    @db.wrap_json_primitives = nil
+    @db.typecast_json_strings = nil
     @db.drop_table?(:items)
   end
 
@@ -2951,9 +2953,12 @@ describe 'PostgreSQL json type' do
   json_types << :jsonb if DB.server_version >= 90400
   json_types.each do |json_type|
     json_array_type = "#{json_type}[]"
-    pg_json = lambda{|v| Sequel.send(:"pg_#{json_type}", v)}
+    pg_json = Sequel.method(:"pg_#{json_type}")
+    pg_json_wrap = Sequel.method(:"pg_#{json_type}_wrap")
     hash_class = json_type == :jsonb ? Sequel::Postgres::JSONBHash : Sequel::Postgres::JSONHash
     array_class = json_type == :jsonb ? Sequel::Postgres::JSONBArray : Sequel::Postgres::JSONArray
+    str_class = json_type == :jsonb ? Sequel::Postgres::JSONBString : Sequel::Postgres::JSONString
+    object_class = json_type == :jsonb ? Sequel::Postgres::JSONBObject : Sequel::Postgres::JSONObject
 
     it 'insert and retrieve json values' do
       @db.create_table!(:items){column :j, json_type}
@@ -2983,6 +2988,44 @@ describe 'PostgreSQL json type' do
       @ds.all.must_equal rs
     end
 
+    it 'insert and retrieve json primitive values' do
+      @db.create_table!(:items){column :j, json_type}
+      ['str', 1, 2.5, nil, true, false].each do |rv|
+        @ds.delete
+        @ds.insert(pg_json_wrap.call(rv))
+        @ds.count.must_equal 1
+        rs = @ds.all
+        v = rs.first[:j]
+        v.class.must_equal(rv.class)
+        if rv.nil?
+          v.must_be_nil
+        else
+          v.must_equal rv
+        end
+      end
+
+      @db.wrap_json_primitives = true
+      ['str', 1, 2.5, nil, true, false].each do |rv|
+        @ds.delete
+        @ds.insert(pg_json_wrap.call(rv))
+        @ds.count.must_equal 1
+        rs = @ds.all
+        v = rs.first[:j]
+        v.class.ancestors.must_include(object_class)
+        v.__getobj__.must_be_kind_of(rv.class)
+        if rv.nil?
+          v.must_be_nil
+          v.__getobj__.must_be_nil
+        else
+          v.must_equal rv
+          v.__getobj__.must_equal rv
+        end
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all[0][:j].must_equal rs[0][:j]
+      end
+    end
+
     it 'insert and retrieve json[] values' do
       @db.create_table!(:items){column :j, json_array_type}
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])])
@@ -2999,14 +3042,120 @@ describe 'PostgreSQL json type' do
       @ds.all.must_equal rs
     end
 
+    it 'insert and retrieve json[] values with json primitives' do
+      @db.create_table!(:items){column :j, json_array_type}
+      raw = ['str', 1, 2.5, nil, true, false]
+      j = Sequel.pg_array(raw.map(&pg_json_wrap), json_type)
+      @ds.insert(j)
+      @ds.count.must_equal 1
+      rs = @ds.all
+      v = rs.first[:j]
+      v.class.must_equal(Sequel::Postgres::PGArray)
+      v.to_a.must_be_kind_of(Array)
+      v.map(&:class).must_equal raw.map(&:class)
+      v.must_equal raw
+      v.to_a.must_equal raw
+
+      @db.wrap_json_primitives = true
+      j = Sequel.pg_array(raw.map(&pg_json_wrap), json_type)
+      @ds.insert(j)
+      rs = @ds.all
+      v = rs.first[:j]
+      v.class.must_equal(Sequel::Postgres::PGArray)
+      v.to_a.must_be_kind_of(Array)
+      v.map(&:class).each{|c| c.ancestors.must_include(object_class)}
+      [v, v.to_a].each do |v0|
+        v0.zip(raw) do |v1, r1|
+          if r1.nil?
+            v1.must_be_nil
+            v1.__getobj__.must_be_nil
+          else
+            v1.must_equal r1
+            v1.__getobj__.must_equal r1
+          end
+        end
+      end
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all[0][:j].zip(rs[0][:j]) do |v1, r1|
+        if v1.__getobj__.nil?
+          v1.must_be_nil
+          v1.__getobj__.must_be_nil
+        else
+          v1.must_equal r1
+          v1.must_equal r1.__getobj__
+          v1.__getobj__.must_equal r1
+          v1.__getobj__.must_equal r1.__getobj__
+        end
+      end
+    end
+
     it 'with models' do
       @db.create_table!(:items) do
         primary_key :id
         column :h, json_type
       end
       c = Class.new(Sequel::Model(@db[:items]))
+      c.create(:h=>@h).h.must_equal @h
+      c.create(:h=>@a).h.must_equal @a
       c.create(:h=>pg_json.call(@h)).h.must_equal @h
       c.create(:h=>pg_json.call(@a)).h.must_equal @a
+    end
+
+    it 'with models with json primitives' do
+      @db.create_table!(:items) do
+        primary_key :id
+        column :h, json_type
+      end
+      c = Class.new(Sequel::Model(@db[:items]))
+
+      ['str', 1, 2.5, nil, true, false].each do |v|
+        @db.wrap_json_primitives = nil
+        cv = c[c.insert(:h=>pg_json_wrap.call(v))]
+        cv.h.class.ancestors.wont_include(object_class)
+        if v.nil?
+          cv.h.must_be_nil
+        else
+          cv.h.must_equal v
+        end
+
+        @db.wrap_json_primitives = true
+        cv.refresh
+        cv.h.class.ancestors.must_include(object_class)
+        cv.save
+        cv.refresh
+        cv.h.class
+
+        if v.nil?
+          cv.h.must_be_nil
+        else
+          cv.h.must_equal v
+        end
+
+        c.new(:h=>cv.h).h.class.ancestors.must_include(object_class)
+      end
+
+      v = c.new(:h=>'{}').h
+      v.class.must_equal hash_class
+      v.must_equal({})
+      @db.typecast_json_strings = true
+      v = c.new(:h=>'{}').h
+      v.class.must_equal str_class
+      v.must_equal '{}'
+
+      c.new(:h=>'str').h.class.ancestors.must_include(object_class)
+      c.new(:h=>'str').h.must_equal 'str'
+      c.new(:h=>1).h.class.ancestors.must_include(object_class)
+      c.new(:h=>1).h.must_equal 1
+      c.new(:h=>2.5).h.class.ancestors.must_include(object_class)
+      c.new(:h=>2.5).h.must_equal 2.5
+      c.new(:h=>true).h.class.ancestors.must_include(object_class)
+      c.new(:h=>true).h.must_equal true
+      c.new(:h=>false).h.class.ancestors.must_include(object_class)
+      c.new(:h=>false).h.must_equal false
+
+      c.new(:h=>nil).h.class.ancestors.wont_include(object_class)
+      c.new(:h=>nil).h.must_be_nil
     end
 
     it 'with empty json default values and defaults_setter plugin' do
@@ -3041,6 +3190,36 @@ describe 'PostgreSQL json type' do
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])], json_type)
       @ds.call(:insert, {:i=>j}, {:i=>:$i})
       @ds.get(:i).must_equal j
+    end if uses_pg_or_jdbc
+
+    it 'use json primitives in bound variables' do
+      @db.create_table!(:items){column :i, json_type}
+      @db.wrap_json_primitives = true
+      raw = ['str', 1, 2.5, nil, true, false]
+      raw.each do |v|
+        @ds.delete
+        @ds.call(:insert, {:i=>@db.get(pg_json_wrap.call(v))}, {:i=>:$i})
+        rv = @ds.get(:i)
+        rv.class.ancestors.must_include(object_class)
+        if v.nil?
+          rv.must_be_nil
+        else
+          rv.must_equal v
+        end
+      end
+
+      @db.create_table!(:items){column :i, json_array_type}
+      j = Sequel.pg_array(raw.map(&pg_json_wrap), json_type)
+      @ds.call(:insert, {:i=>j}, {:i=>:$i})
+      @ds.all[0][:i].zip(raw) do |v1, r1|
+        if v1.__getobj__.nil?
+          v1.must_be_nil
+          v1.__getobj__.must_be_nil
+        else
+          v1.must_equal r1
+          v1.__getobj__.must_equal r1
+        end
+      end
     end if uses_pg_or_jdbc
 
     it 'operations/functions with pg_json_ops' do
