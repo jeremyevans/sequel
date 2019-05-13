@@ -95,3 +95,41 @@ describe "Database#with_server multi threaded" do
   end
 end
 
+describe "Database#with_server with invalid servers" do
+  def sqls(server)
+    @db.with_server(server) do
+      @db[:t].all
+      @db[:t].insert
+      @db[:t].update(:a=>1)
+      @db[:t].delete
+    end
+    @db.sqls
+  end
+
+  it "when single threaded and no servers_hash" do
+    @db = Sequel.mock(:single_threaded=>true, :servers=>{:a=>{}}).extension(:server_block)
+    sqls(:a).must_equal ["SELECT * FROM t -- a", "INSERT INTO t DEFAULT VALUES -- a", "UPDATE t SET a = 1 -- a", "DELETE FROM t -- a"]
+    sqls(:c).must_equal ["SELECT * FROM t", "INSERT INTO t DEFAULT VALUES", "UPDATE t SET a = 1", "DELETE FROM t"]
+  end
+
+  it "when multi-threaded and no servers_hash" do
+    @db = Sequel.mock(:servers=>{:a=>{}}).extension(:server_block)
+    sqls(:a).must_equal ["SELECT * FROM t -- a", "INSERT INTO t DEFAULT VALUES -- a", "UPDATE t SET a = 1 -- a", "DELETE FROM t -- a"]
+    sqls(:c).must_equal ["SELECT * FROM t", "INSERT INTO t DEFAULT VALUES", "UPDATE t SET a = 1", "DELETE FROM t"]
+  end
+
+  it "when single threaded and servers_hash" do
+    @db = Sequel.mock(:single_threaded=>true, :servers=>{:a=>{}, :b=>{}}, :servers_hash=>Hash.new{|_,k| raise}.merge!(:c=>:b)).extension(:server_block)
+    sqls(:a).must_equal ["SELECT * FROM t -- a", "INSERT INTO t DEFAULT VALUES -- a", "UPDATE t SET a = 1 -- a", "DELETE FROM t -- a"]
+    sqls(:c).must_equal ["SELECT * FROM t -- b", "INSERT INTO t DEFAULT VALUES -- b", "UPDATE t SET a = 1 -- b", "DELETE FROM t -- b"]
+    proc{sqls(:d)}.must_raise(RuntimeError)
+  end
+
+  it "when multi-threaded and servers_hash" do
+    @db = Sequel.mock(:servers=>{:a=>{}, :b=>{}}, :servers_hash=>Hash.new{|_,k| raise}.merge!(:c=>:b)).extension(:server_block)
+    sqls(:a).must_equal ["SELECT * FROM t -- a", "INSERT INTO t DEFAULT VALUES -- a", "UPDATE t SET a = 1 -- a", "DELETE FROM t -- a"]
+    sqls(:c).must_equal ["SELECT * FROM t -- b", "INSERT INTO t DEFAULT VALUES -- b", "UPDATE t SET a = 1 -- b", "DELETE FROM t -- b"]
+    proc{sqls(:d)}.must_raise(RuntimeError)
+  end
+end
+

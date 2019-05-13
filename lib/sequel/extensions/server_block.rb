@@ -52,6 +52,12 @@
 #     DB[:a].server(:read_only).delete # Uses shard2
 #   end
 #
+# If you use an invalid server when calling with_server, it will be
+# treated the same way as if you called Dataset#server with an invalid
+# server.  By default, the default server will be used in such cases.
+# If you would like a different server to be used, or an exception to
+# be raised, then use the :servers_hash Database option.
+#
 # Related modules: Sequel::ServerBlock, Sequel::UnthreadedServerBlock,
 # Sequel::ThreadedServerBlock
 
@@ -110,9 +116,9 @@ module Sequel
       else
         case server
         when :default, nil
-          @default_servers[-1][0]
+          @servers[@default_servers[-1][0]]
         when :read_only
-          @default_servers[-1][1]
+          @servers[@default_servers[-1][1]]
         else
           super
         end
@@ -155,11 +161,16 @@ module Sequel
       if !a || a.empty?
         super
       else
+        # Hash handling required to work when loaded after arbitrary servers plugin.
         case server
         when :default, nil
-          a[-1][0]
+          v = a[-1][0]
+          v = @servers[v] unless v.is_a?(Hash)
+          v
         when :read_only
-          a[-1][1]
+          v = a[-1][1]
+          v = @servers[v] unless v.is_a?(Hash)
+          v
         else
           super
         end

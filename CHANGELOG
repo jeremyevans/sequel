@@ -1,5 +1,7 @@
 === master
 
+* Make the server_block extension respect the :servers_hash Database option (jeremyevans)
+
 * Typecast string input for json/jsonb types as JSON strings instead of parsing as JSON in the pg_json extension when Database#typecast_json_strings is set to true (jeremyevans)
 
 * Wrap JSON primitives (string, number, true, false, nil) in the pg_json extension when Database#wrap_json_primitives is set to true (jeremyevans)
