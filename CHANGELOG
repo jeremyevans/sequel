@@ -1,5 +1,7 @@
 === master
 
+* Support window function options :window, :exclude, and :frame :type=>:groups, :start, and :end on SQLite 3.28.0+ (jeremyevans)
+
 * Make the server_block extension respect the :servers_hash Database option (jeremyevans)
 
 * Typecast string input for json/jsonb types as JSON strings instead of parsing as JSON in the pg_json extension when Database#typecast_json_strings is set to true (jeremyevans)

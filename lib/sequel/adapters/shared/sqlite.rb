@@ -513,7 +513,7 @@ module Sequel
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values on_conflict'], ["else", %w'insert conflict into columns values']])
-      Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having compounds order limit lock']])
+      Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having window compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
       def cast_sql_append(sql, expr, type)
@@ -732,6 +732,11 @@ module Sequel
       def supports_where_true?
         false
       end
+
+      # SQLite 3.28+ supports the WINDOW clause.
+      def supports_window_clause?
+        db.sqlite_version >= 32800
+      end
       
       # SQLite 3.25+ supports window functions.  However, support is only enabled
       # on SQLite 3.26.0+ because internal Sequel usage of window functions
@@ -741,6 +746,11 @@ module Sequel
         db.sqlite_version >= 32600
       end
     
+      # SQLite 3.28.0+ supports all window frame options that Sequel supports
+      def supports_window_function_frame_option?(option)
+        db.sqlite_version >= 32800 ? true : super
+      end
+
       private
       
       # SQLite uses string literals instead of identifiers in AS clauses.
