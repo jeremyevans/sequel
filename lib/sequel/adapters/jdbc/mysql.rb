@@ -54,12 +54,12 @@ module Sequel
         # MySQL 5.1.12 JDBC adapter requires generated keys
         # and previous versions don't mind.
         def execute_statement_insert(stmt, sql)
-          stmt.executeUpdate(sql, JavaSQL::Statement.RETURN_GENERATED_KEYS)
+          stmt.executeUpdate(sql, JavaSQL::Statement::RETURN_GENERATED_KEYS)
         end
 
         # Return generated keys for insert statements.
         def prepare_jdbc_statement(conn, sql, opts)
-          opts[:type] == :insert ? conn.prepareStatement(sql, JavaSQL::Statement.RETURN_GENERATED_KEYS) : super
+          opts[:type] == :insert ? conn.prepareStatement(sql, JavaSQL::Statement::RETURN_GENERATED_KEYS) : super
         end
 
         # Convert tinyint(1) type to boolean

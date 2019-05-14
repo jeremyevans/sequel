@@ -1,5 +1,7 @@
 === master
 
+* Make jdbc/mysql adapter work when using JRuby with Java 11 (jeremyevans)
+
 * Support window function options :window, :exclude, and :frame :type=>:groups, :start, and :end on SQLite 3.28.0+ (jeremyevans)
 
 * Make the server_block extension respect the :servers_hash Database option (jeremyevans)
