@@ -33,3 +33,4 @@ addons:
   postgresql: "9.6"
 services:
   - postgresql
+  - mysql
