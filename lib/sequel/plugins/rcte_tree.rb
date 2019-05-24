@@ -126,6 +126,9 @@ module Sequel
         a = opts.merge(opts.fetch(:ancestors, OPTS))
         ancestors = a.fetch(:name, :ancestors)
         a[:read_only] = true unless a.has_key?(:read_only)
+        a[:eager_grapher] = proc do |_|
+          raise Sequel::Error, "the #{ancestors} association for #{self} does not support eager graphing"
+        end
         a[:eager_loader_key] = key
         a[:dataset] ||= proc do
           base_ds = model.where(prkey_array.zip(key_array.map{|k| get_column_value(k)}))
@@ -221,6 +224,9 @@ module Sequel
         d = opts.merge(opts.fetch(:descendants, OPTS))
         descendants = d.fetch(:name, :descendants)
         d[:read_only] = true unless d.has_key?(:read_only)
+        d[:eager_grapher] = proc do |_|
+          raise Sequel::Error, "the #{descendants} association for #{self} does not support eager graphing"
+        end
         la = d[:level_alias] ||= :x_level_x
         d[:dataset] ||= proc do
           base_ds = model.where(key_array.zip(prkey_array.map{|k| get_column_value(k)}))

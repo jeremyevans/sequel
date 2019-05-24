@@ -1,5 +1,7 @@
 === master
 
+* Disallow eager_graph of ancestors and descendants associations when using the rcte_tree plugin (jeremyevans)
+
 * Make jdbc/mysql adapter work when using JRuby with Java 11 (jeremyevans)
 
 * Support window function options :window, :exclude, and :frame :type=>:groups, :start, and :end on SQLite 3.28.0+ (jeremyevans)

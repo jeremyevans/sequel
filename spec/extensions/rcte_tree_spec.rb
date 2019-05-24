@@ -254,6 +254,12 @@ describe Sequel::Model, "rcte_tree" do
     @db.sqls.must_equal ["SELECT * FROM nodes",
       'WITH t AS (SELECT parent_id AS x_root_x, nodes.* FROM nodes WHERE ((parent_id IN (2, 6, 7)) AND (i = 1)) UNION ALL SELECT t.x_root_x, nodes.* FROM nodes INNER JOIN t ON (t.id = nodes.parent_id) WHERE (i = 1)) SELECT * FROM t AS nodes WHERE (i = 1)']
   end
+
+  it "should disallow eager graphing of ancestors and descendants" do
+    @c.plugin :rcte_tree
+    proc{@c.eager_graph(:ancestors)}.must_raise Sequel::Error
+    proc{@c.eager_graph(:descendants)}.must_raise Sequel::Error
+  end
 end
 
 describe Sequel::Model, "rcte_tree with composite keys" do
