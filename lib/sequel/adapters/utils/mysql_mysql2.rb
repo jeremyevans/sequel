@@ -59,6 +59,8 @@ module Sequel
             ForeignKeyConstraintViolation
           when 4025
             CheckConstraintViolation
+          when 1205
+            DatabaseLockTimeout
           else
             super
           end

@@ -1,5 +1,7 @@
 === master
 
+* Recognize additional DatabaseLockTimeout errors in mysql and mysql2 adapters (jeremyevans)
+
 * Disallow eager_graph of ancestors and descendants associations when using the rcte_tree plugin (jeremyevans)
 
 * Make jdbc/mysql adapter work when using JRuby with Java 11 (jeremyevans)
