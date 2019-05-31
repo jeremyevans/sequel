@@ -264,7 +264,8 @@ The following additional options are supported:
              or an array of symbols or strings (e.g. <tt>:sql_mode=>[:no_zero_date, :pipes_as_concat]</tt>).
 :timeout :: Sets the wait_timeout for the connection, defaults to 1 month.
 :read_timeout :: Set the timeout in seconds for reading back results to a query.
-:connect_timeout :: Set the timeout in seconds before a connection attempt is abandoned.
+:connect_timeout :: Set the timeout in seconds before a connection attempt is abandoned
+                    (may not be supported when using MariaDB 10.2+ client libraries).
 
 The :sslkey, :sslcert, :sslca, :sslcapath, and :sslca options (in that order) are passed to Mysql#ssl_set method
 if either the :sslca or :sslkey option is given.

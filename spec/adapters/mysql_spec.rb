@@ -551,11 +551,6 @@ describe "A MySQL database" do
     db = Sequel.connect(DB.opts.merge(:read_timeout=>22342))
     db.test_connection
   end
-
-  it "should accept a connect_timeout option when connecting" do
-    db = Sequel.connect(DB.opts.merge(:connect_timeout=>22342))
-    db.test_connection
-  end
 end
 
 describe "MySQL foreign key support" do
