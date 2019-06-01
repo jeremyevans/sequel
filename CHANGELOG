@@ -1,4 +1,4 @@
-=== master
+=== 5.21.0 (2019-06-01)
 
 * Recognize additional DatabaseLockTimeout errors in mysql and mysql2 adapters (jeremyevans)
 
