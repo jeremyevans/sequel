@@ -28,18 +28,12 @@ Sequel::Postgres::JSONBArray
 </h1>
 <ol class='paths'>
 <li>
-<a href="../../../files/lib/sequel/extensions/pg_json_rb.html">lib/sequel/extensions/pg_json.rb</a>
-</li>
-<li class='other'>
 <a href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
-</li>
-<li>
-<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
 </li>
 </ol>
 <div class='parent'>
 Superclass:
-<strong><a href="JSONArrayBase.html">JSONArrayBase</a></strong>
+<strong><a href="../../Object.html">Object</a></strong>
 </div>
 </div>
 <div id='content'>
@@ -50,7 +44,6 @@ Superclass:
 <h3>Public Instance</h3>
 <ol>
 <li><a href="#method-i-op">op</a></li>
-<li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -75,25 +68,6 @@ Superclass:
 [show source]
 </a>
 <pre id='method-i-op-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb</span>&#x000A;<span class="line-num">453</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">op</span>&#x000A;<span class="line-num">454</span>   <span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">455</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-sql_literal_append'>
-<a name='method-i-sql_literal_append'></a>
-<div class='synopsis'>
-<span class='name'>sql_literal_append</span>
-<span class='arguments'>(ds, sql)</span>
-
-</div>
-<div class='description'>
-
-<p>Cast as jsonb</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-sql_literal_append-source'>   <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">91</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">92</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::jsonb&#39;</span>&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

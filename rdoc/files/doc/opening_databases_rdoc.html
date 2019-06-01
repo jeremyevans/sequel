@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-03-21 08:28:45 -0700</span>
+<span class='datetime'>2019-05-31 08:26:21 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -255,7 +255,7 @@ Last Update:
 </td></tr><tr><td class='label'>:read_timeout </td><td>
 <p>Set the timeout in seconds for reading back results to a query.</p>
 </td></tr><tr><td class='label'>:connect_timeout </td><td>
-<p>Set the timeout in seconds before a connection attempt is abandoned.</p>
+<p>Set the timeout in seconds before a connection attempt is abandoned (may not be supported when using MariaDB 10.2+ client libraries).</p>
 </td></tr></tbody></table>
 
 <p>The :sslkey, :sslcert, :sslca, :sslcapath, and :sslca options (in that order) are passed to Mysql#ssl_set method if either the :sslca or :sslkey option is given.</p>

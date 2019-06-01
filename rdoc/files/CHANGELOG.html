@@ -30,12 +30,37 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-05-01 08:24:04 -0700</span>
+<span class='datetime'>2019-06-01 10:23:00 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.21.0+-282019-06-01-29">5.21.0 (2019-06-01)<span><a href="#label-5.21.0+-282019-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize additional DatabaseLockTimeout errors in mysql and mysql2 adapters (jeremyevans)</p>
+</li><li>
+<p>Disallow eager_graph of ancestors and descendants associations when using the rcte_tree plugin (jeremyevans)</p>
+</li><li>
+<p>Make jdbc/mysql adapter work when using JRuby with Java 11 (jeremyevans)</p>
+</li><li>
+<p>Support window function options :window, :exclude, and :frame :type=&gt;:groups, :start, and :end on SQLite 3.28.0+ (jeremyevans)</p>
+</li><li>
+<p>Make the server_block extension respect the :servers_hash Database option (jeremyevans)</p>
+</li><li>
+<p>Typecast string input for json/jsonb types as JSON strings instead of parsing as JSON in the pg_json extension when Database#typecast_json_strings is set to true (jeremyevans)</p>
+</li><li>
+<p>Wrap JSON primitives (string, number, true, false, nil) in the pg_json extension when Database#wrap_json_primitives is set to true (jeremyevans)</p>
+</li><li>
+<p>Convert the Database :timeout option to an integer in the sqlite adapter (jeremyevans) (#1620)</p>
+</li><li>
+<p>Improve performance in ado adapter using more efficient inner loop (jeremyevans)</p>
+</li><li>
+<p>Improve performance in ado adapter using faster callables for type conversion (jeremyevans)</p>
+</li><li>
+<p>Fix handling of decimal values in the ado adapter when using locales where the decimal separator is , and not . (jeremyevans) (#1619)</p>
+</li></ul>
+
 <h3 id="label-5.20.0+-282019-05-01-29">5.20.0 (2019-05-01)<span><a href="#label-5.20.0+-282019-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Fix reversing of alter_table add_foreign_key when :type option is used (jeremyevans) (#1615)</p>

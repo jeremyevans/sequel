@@ -89,7 +89,23 @@ Sequel::Postgres
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-sql_literal_append">sql_literal_append</a></li>
+</ol>
+</div>
 <div id='context'>
+<div id='includes'>
+<h2>Included modules</h2>
+<ol>
+<li>Sequel::SQL::AliasMethods</li>
+<li>Sequel::SQL::CastMethods</li>
+<li><a href="Postgres/JSONObject.html">JSONObject</a></li>
+<li><a href="Postgres/JSONBObject.html">JSONBObject</a></li>
+</ol>
+</div>
 </div>
 <div id='class-list'>
 <h2>Classes and Modules</h2>
@@ -103,7 +119,9 @@ Sequel::Postgres
 <li><a href="Postgres/InetOpMethods.html">Sequel::Postgres::InetOpMethods</a></li>
 <li><a href="Postgres/IntervalDatabaseMethods.html">Sequel::Postgres::IntervalDatabaseMethods</a></li>
 <li><a href="Postgres/IntervalDatasetMethods.html">Sequel::Postgres::IntervalDatasetMethods</a></li>
+<li><a href="Postgres/JSONBObject.html">Sequel::Postgres::JSONBObject</a></li>
 <li><a href="Postgres/JSONDatabaseMethods.html">Sequel::Postgres::JSONDatabaseMethods</a></li>
+<li><a href="Postgres/JSONObject.html">Sequel::Postgres::JSONObject</a></li>
 <li><a href="Postgres/JSONOpMethods.html">Sequel::Postgres::JSONOpMethods</a></li>
 <li><a href="Postgres/LooseCount.html">Sequel::Postgres::LooseCount</a></li>
 <li><a href="Postgres/PGRow.html">Sequel::Postgres::PGRow</a></li>
@@ -115,13 +133,11 @@ Sequel::Postgres
 <li><a href="Postgres/HStoreOp.html">Sequel::Postgres::HStoreOp</a></li>
 <li><a href="Postgres/InetOp.html">Sequel::Postgres::InetOp</a></li>
 <li><a href="Postgres/JSONArray.html">Sequel::Postgres::JSONArray</a></li>
-<li><a href="Postgres/JSONArrayBase.html">Sequel::Postgres::JSONArrayBase</a></li>
 <li><a href="Postgres/JSONBArray.html">Sequel::Postgres::JSONBArray</a></li>
 <li><a href="Postgres/JSONBHash.html">Sequel::Postgres::JSONBHash</a></li>
 <li><a href="Postgres/JSONBOp.html">Sequel::Postgres::JSONBOp</a></li>
 <li><a href="Postgres/JSONBaseOp.html">Sequel::Postgres::JSONBaseOp</a></li>
 <li><a href="Postgres/JSONHash.html">Sequel::Postgres::JSONHash</a></li>
-<li><a href="Postgres/JSONHashBase.html">Sequel::Postgres::JSONHashBase</a></li>
 <li><a href="Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a></li>
 <li><a href="Postgres/PGArray.html">Sequel::Postgres::PGArray</a></li>
 <li><a href="Postgres/PGRange.html">Sequel::Postgres::PGRange</a></li>
@@ -130,6 +146,109 @@ Sequel::Postgres
 </ol>
 </div>
 <div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSONB_COMBINED_WRAPPER_MAPPING</td>
+<td>=</td>
+<td class='context-item-value'>JSONB_WRAPPER_MAPPING.merge(JSONB_PRIMITIVE_WRAPPER_MAPPING).freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSONB_PRIMITIVE_WRAPPER_MAPPING</td>
+<td>=</td>
+<td class='context-item-value'>{
+::String => JSONBString,
+::Integer => JSONBInteger,
+::Float => JSONBFloat,
+::NilClass => JSONBNull,
+::TrueClass => JSONBTrue,
+::FalseClass => JSONBFalse,
+}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSONB_WRAPPER_MAPPING</td>
+<td>=</td>
+<td class='context-item-value'>{
+::Array => JSONBArray,
+::Hash => JSONBHash,
+}.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSONB_WRAP_CLASSES</td>
+<td>=</td>
+<td class='context-item-value'>JSONB_COMBINED_WRAPPER_MAPPING.keys.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSON_COMBINED_WRAPPER_MAPPING</td>
+<td>=</td>
+<td class='context-item-value'>JSON_WRAPPER_MAPPING.merge(JSON_PRIMITIVE_WRAPPER_MAPPING).freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSON_PRIMITIVE_WRAPPER_MAPPING</td>
+<td>=</td>
+<td class='context-item-value'>{
+::String => JSONString,
+::Integer => JSONInteger,
+::Float => JSONFloat,
+::NilClass => JSONNull,
+::TrueClass => JSONTrue,
+::FalseClass => JSONFalse,
+}</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSON_WRAPPER_MAPPING</td>
+<td>=</td>
+<td class='context-item-value'>{
+::Array => JSONArray,
+::Hash => JSONHash,
+}.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>JSON_WRAP_CLASSES</td>
+<td>=</td>
+<td class='context-item-value'>JSON_COMBINED_WRAPPER_MAPPING.keys.freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-sql_literal_append'>
+<a name='method-i-sql_literal_append'></a>
+<div class='synopsis'>
+<span class='name'>sql_literal_append</span>
+<span class='arguments'>(ds, sql)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-sql_literal_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-sql_literal_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb</span>&#x000A;<span class="line-num">141</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;<span class="line-num">142</span>   <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">object_to_json</span>(<span class="ruby-keyword">self</span>))&#x000A;<span class="line-num">143</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;::json&#39;</span>&#x000A;<span class="line-num">144</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
 </div>
 
 </div>

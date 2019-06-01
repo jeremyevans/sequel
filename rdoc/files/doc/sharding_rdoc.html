@@ -30,7 +30,7 @@ doc/sharding.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-03-21 08:28:45 -0700</span>
+<span class='datetime'>2019-05-13 11:09:07 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -99,6 +99,8 @@ Last Update:
 <p>Rainbow tables are generally used to find specific hashes, so to save some work, you might want to add a method to the dataset that automatically sets the shard to use.  This is fairly easy using a Sequel::Model:</p>
 
 <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Rainbow</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-value">:hashes</span>)&#x000A;  <span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">plaintext_for_hash</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-string">&#39;Invalid SHA-1 Hash&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-regexp">/\A[0-9a-f]{40}\z/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">server</span>(<span class="ruby-identifier">hash</span>[<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-value">1</span>].<span class="ruby-identifier">to_sym</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">hash:</span> <span class="ruby-identifier">hash</span>).<span class="ruby-identifier">get</span>(<span class="ruby-value">:plaintext</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Rainbow</span>.<span class="ruby-identifier">plaintext_for_hash</span>(<span class="ruby-string">&quot;e580726d31f6e1ad216ffd87279e536d1f74e606&quot;</span>)</pre>
+
+<h3 id="label-3Aservers_hash+Option">:servers_hash Option<span><a href="#label-3Aservers_hash+Option">&para;</a> <a href="#top">&uarr;</a></span></h3>
 
 <p>The connection pool can be further controlled to change how it handles attempts to access shards that haven&#39;t been configured.  The default is to assume the :default shard.  However, you can specify a different shard using the :servers_hash option when connecting to the database:</p>
 

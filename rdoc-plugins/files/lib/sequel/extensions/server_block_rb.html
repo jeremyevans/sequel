@@ -30,7 +30,7 @@ lib/sequel/extensions/server_block.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-05-16 17:16:37 -0700</span>
+<span class='datetime'>2019-05-13 11:09:07 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -57,6 +57,8 @@ Last Update:
 <p>If you pass two separate shards to with_server, the second shard will be used instead of the :read_only shard, and the first shard will be used instead of the :default shard:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-value">:shard1</span>, <span class="ruby-value">:shard2</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:shard3</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard3</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:shard3</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard3</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:default</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-value">:read_only</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>If you use an invalid server when calling with_server, it will be treated the same way as if you called Dataset#server with an invalid server.  By default, the default server will be used in such cases. If you would like a different server to be used, or an exception to be raised, then use the :servers_hash Database option.</p>
 
 <p>Related modules: <a href="../../../../classes/Sequel/ServerBlock.html"><code>Sequel::ServerBlock</code></a>, <a href="../../../../classes/Sequel/UnthreadedServerBlock.html"><code>Sequel::UnthreadedServerBlock</code></a>, <a href="../../../../classes/Sequel/ThreadedServerBlock.html"><code>Sequel::ThreadedServerBlock</code></a></p>
 </div>

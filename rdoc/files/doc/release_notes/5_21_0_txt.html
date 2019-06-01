@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.21.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.21.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.21.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-06-01 10:23:00 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The pg_json extension now adds a Database#wrap_json_primitives accessor.  When set to true, JSON primitive values (string, number, true, false, and null) will be wrapped by delegate Ruby objects instead of using Ruby primitives.  This allows the values to round trip, so the following code will work even for primitive values in json_column:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_json</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">wrap_json_primitives</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">value</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:other_table</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">json_column:</span> <span class="ruby-identifier">value</span>)</pre>
+
+<p>This should be enabled with care, especially in cases where false and null JSON values are used, as the behavior will change if the objects are used in a boolean context in Ruby, as only false and nil in Ruby are treated as false:</p>
+
+<pre class="ruby"><span class="ruby-comment"># assume JSON false or null value</span>&#x000A;<span class="ruby-identifier">value</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-value">:json_column</span>)&#x000A;&#x000A;<span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-comment"># executed if wrap_json_primitives is true</span>&#x000A;<span class="ruby-keyword">else</span>&#x000A;  <span class="ruby-comment"># executed by default</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>When typecasting input in model objects to a JSON type, string input will still be parsed as JSON.  However, you can set the Database#typecast_json_strings accessor to true, and then string input will be considered as a JSON string instead of parsing the string as JSON.</p>
+
+<p>To prevent backwards compatibility issues, Sequel.pg_json/pg_jsonb behavior has not changed.  To support wrapping Ruby primitives in the delegate objects, new Sequel.pg_json_wrap/pg_jsonb_wrap methods have been added.  These methods only handle the Ruby primitives, they cannot be used if the existing object is already a delegate object.</p>
+
+<p>As model objects always consider a nil value as SQL NULL and do not typecast it, if you want to explicitly set a JSON null value, you need to wrap it explicitly:</p>
+
+<pre class="ruby"><span class="ruby-identifier">model_object</span>.<span class="ruby-identifier">json_column</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_wrap</span>(<span class="ruby-keyword">nil</span>)</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports window function options :window, :exclude, and :frame :type=&gt;:groups, :start, and :end on SQLite 3.28.0+.</p>
+</li><li>
+<p>The server_block extension now respects the :servers_hash Database option.  This makes it more similar to Sequel&#39;s default behavior. However, that means by default, the server_block extension will default to handling unknown shards as the default shard, instead of raising an error for them.</p>
+</li><li>
+<p>The rcte_tree plugin now disallows eager graphing of the ancestors and descendants associations.  Previously, eager graphing of these associations generated incorrect results.  It is not possible to eager graph these extensions, but normal eager loading does work.</p>
+</li><li>
+<p>The ado adapter&#39;s performance has been improved by using faster callables for type conversion and a more efficient inner loop.</p>
+</li><li>
+<p>The sqlite adapter now converts a :timeout option given as a string to an integer.  This allows you to use the option inside of a connection string.</p>
+</li><li>
+<p>The mysql and mysql2 adapters now recognize an additional DatabaseLockTimeout error.</p>
+</li><li>
+<p>The jdbc/mysql adapter now works correctly when using JRuby with Java 11.</p>
+</li><li>
+<p>The ado adapter now handles numeric values when using locales that use comma instead of period as the decimal separator.</p>
+</li></ul>
+
+<h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>In the pg_json extension, the following singleton methods of Sequel::Postgres::JSONDatabaseMethods are now deprecated:</p>
+<ul><li>
+<p>parse_json</p>
+</li><li>
+<p>db_parse_json</p>
+</li><li>
+<p>db_parse_jsonb</p>
+</li></ul>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
