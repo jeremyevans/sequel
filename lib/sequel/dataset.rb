@@ -20,8 +20,10 @@ module Sequel
   #   old_posts = posts.where{stamp < Date.today - 7}
   #   davids_old_posts = davids_posts.where{stamp < Date.today - 7}
   #
-  # Datasets are Enumerable objects, so they can be manipulated using any
-  # of the Enumerable methods, such as map, inject, etc.
+  # Datasets are Enumerable objects, so they can be manipulated using many
+  # of the Enumerable methods, such as +map+ and +inject+.  Note that there are some methods
+  # that Dataset defines that override methods defined in Enumerable and result in different
+  # behavior, such as +select+ and +group_by+.
   #
   # For more information, see the {"Dataset Basics" guide}[rdoc-ref:doc/dataset_basics.rdoc].
   class Dataset
