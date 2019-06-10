@@ -1,3 +1,9 @@
+=== master
+
+* Support ruby 2.7+ startless, endless ranges in filters, using an always tree condition for them (jeremyevans)
+
+* Support ruby 2.7+ startless ranges in filters, using just a <= or < operator for them (jeremyevans)
+
 === 5.21.0 (2019-06-01)
 
 * Recognize additional DatabaseLockTimeout errors in mysql and mysql2 adapters (jeremyevans)

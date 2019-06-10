@@ -1086,11 +1086,23 @@ module Sequel
       def self.from_value_pair(l, r)
         case r
         when Range
-          expr = new(:>=, l, r.begin)
-          unless r.end.nil?
-            expr = new(:AND, expr, new(r.exclude_end? ? :< : :<=, l, r.end))
+          unless r.begin.nil?
+            begin_expr = new(:>=, l, r.begin)
           end
-          expr
+          unless r.end.nil?
+            end_expr = new(r.exclude_end? ? :< : :<=, l, r.end)
+          end
+          if begin_expr
+            if end_expr
+              new(:AND, begin_expr, end_expr)
+            else
+              begin_expr
+            end
+          elsif end_expr
+            end_expr
+          else
+            new(:'=', 1, 1)
+          end
         when ::Array
           r = r.dup.freeze unless r.frozen?
           new(:IN, l, r)

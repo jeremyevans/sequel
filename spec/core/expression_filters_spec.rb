@@ -526,11 +526,35 @@ describe "Blockless Ruby Filters" do
     dsc.new(@d.db).literal(Sequel.trim(:a)).must_equal 'trimFOO(lower(a))'
   end
 
-  it "should endless ranges" do
+  it "should handle endless ranges" do
     endless = eval('1..')
     @d.l{x =~ endless}.must_equal '(x >= 1)'
     @d.l(:x => endless).must_equal '(x >= 1)'
+
+    endless = eval('1...')
+    @d.l{x =~ endless}.must_equal '(x >= 1)'
+    @d.l(:x => endless).must_equal '(x >= 1)'
   end if RUBY_VERSION >= '2.6'
+
+  it "should handle startless ranges" do
+    endless = eval('..1')
+    @d.l{x =~ endless}.must_equal '(x <= 1)'
+    @d.l(:x => endless).must_equal '(x <= 1)'
+
+    endless = eval('...1')
+    @d.l{x =~ endless}.must_equal '(x < 1)'
+    @d.l(:x => endless).must_equal '(x < 1)'
+  end if RUBY_VERSION >= '2.7'
+
+  it "should handle startless, endless ranges" do
+    endless = eval('nil..nil')
+    @d.l{x =~ endless}.must_equal '(1 = 1)'
+    @d.l(:x => endless).must_equal '(1 = 1)'
+
+    endless = eval('nil...nil')
+    @d.l{x =~ endless}.must_equal '(1 = 1)'
+    @d.l(:x => endless).must_equal '(1 = 1)'
+  end if RUBY_VERSION >= '2.7'
 end
 
 describe Sequel::SQL::VirtualRow do

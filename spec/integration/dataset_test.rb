@@ -1545,15 +1545,25 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude(:a=>[20, 10]).all.must_equal []
   end
   
-  it "should work with ranges as hash values" do
+  it "should work with endless ranges as hash values" do
     @ds.insert(20, 10)
-    @ds.filter(:a=>(10..30)).all.must_equal [{:a=>20, :b=>10}]
-    @ds.filter(:a=>(25..30)).all.must_equal []
-    @ds.filter(:a=>(10..15)).all.must_equal []
-    @ds.exclude(:a=>(10..30)).all.must_equal []
-    @ds.exclude(:a=>(25..30)).all.must_equal [{:a=>20, :b=>10}]
-    @ds.exclude(:a=>(10..15)).all.must_equal [{:a=>20, :b=>10}]
-  end
+    @ds.filter(:a=>eval('30..')).all.must_equal []
+    @ds.filter(:a=>eval('20...')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('20..')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('10..')).all.must_equal [{:a=>20, :b=>10}]
+  end if RUBY_VERSION >= '2.6'
+  
+  it "should work with startless ranges as hash values" do
+    @ds.insert(20, 10)
+    @ds.filter(:a=>eval('..30')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('...30')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('..20')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('...20')).all.must_equal []
+    @ds.filter(:a=>eval('..10')).all.must_equal []
+    @ds.filter(:a=>eval('...10')).all.must_equal []
+
+    @ds.filter(:a=>eval('nil..nil')).all.must_equal [{:a=>20, :b=>10}]
+  end if RUBY_VERSION >= '2.7'
   
   it "should work with CASE statements" do
     @ds.insert(20, 10)
