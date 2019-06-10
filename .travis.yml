@@ -1,6 +1,5 @@
 language: ruby
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.1
   - 2.2
@@ -17,6 +16,7 @@ rvm:
   - truffleruby
 matrix:
   allow_failures:
+    - rvm: 1.9.3
     - rvm: jruby-head
     - rvm: ruby-head
     - rvm: jruby-19mode
