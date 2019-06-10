@@ -453,13 +453,14 @@ module Sequel
       end
 
       ENDLESS_RANGE_NOT_SUPPORTED = RUBY_VERSION < '2.6'
+      STARTLESS_RANGE_NOT_SUPPORTED = RUBY_VERSION < '2.7'
 
       # Return a ruby Range object for this instance, if one can be created.
       def to_range
         return @range if @range
         raise(Error, "cannot create ruby range for an empty PostgreSQL range") if empty?
         raise(Error, "cannot create ruby range when PostgreSQL range excludes beginning element") if exclude_begin?
-        raise(Error, "cannot create ruby range when PostgreSQL range has unbounded beginning") unless self.begin
+        raise(Error, "cannot create ruby range when PostgreSQL range has unbounded beginning") if STARTLESS_RANGE_NOT_SUPPORTED && !self.begin
         raise(Error, "cannot create ruby range when PostgreSQL range has unbounded ending") if ENDLESS_RANGE_NOT_SUPPORTED && !self.end
         @range = Range.new(self.begin, self.end, exclude_end?)
       end
@@ -468,7 +469,7 @@ module Sequel
       # it must have a beginning and an ending (no unbounded ranges), and it cannot exclude
       # the beginning element.
       def valid_ruby_range?
-        !(empty? || exclude_begin? || !self.begin || (ENDLESS_RANGE_NOT_SUPPORTED && !self.end))
+        !(empty? || exclude_begin? || (STARTLESS_RANGE_NOT_SUPPORTED && !self.begin) || (ENDLESS_RANGE_NOT_SUPPORTED && !self.end))
       end
 
       # Whether the beginning of the range is unbounded.

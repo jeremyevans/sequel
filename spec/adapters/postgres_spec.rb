@@ -3581,6 +3581,30 @@ describe 'PostgreSQL range types' do
     @ds.filter(h).call(:delete, @ra).must_equal 1
   end if uses_pg_or_jdbc
 
+  it 'handle endless ranges' do
+    @db.get(Sequel.cast(eval('1...'), :int4range)).must_be :==, eval('1...')
+    @db.get(Sequel.cast(eval('1...'), :int4range)).wont_be :==, eval('2...')
+    @db.get(Sequel.cast(eval('1...'), :int4range)).wont_be :==, eval('1..')
+    @db.get(Sequel.cast(eval('2...'), :int4range)).must_be :==, eval('2...')
+    @db.get(Sequel.cast(eval('2...'), :int4range)).wont_be :==, eval('2..')
+    @db.get(Sequel.cast(eval('2...'), :int4range)).wont_be :==, eval('1...')
+  end if RUBY_VERSION >= '2.6'
+
+  it 'handle startless ranges' do
+    @db.get(Sequel.cast(eval('...1'), :int4range)).must_be :==, Sequel::Postgres::PGRange.new(nil, 1, :exclude_begin=>true, :exclude_end=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('...1'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, 2, :exclude_begin=>true, :exclude_end=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('...1'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, 1, :exclude_end=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('...1'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, 1, :exclude_begin=>true, :db_type=>"int4range")
+  end if RUBY_VERSION >= '2.7'
+
+  it 'handle startless ranges' do
+    @db.get(Sequel.cast(eval('nil...nil'), :int4range)).must_be :==, Sequel::Postgres::PGRange.new(nil, nil, :exclude_begin=>true, :exclude_end=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, nil, :exclude_begin=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, nil, :exclude_end=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(1, nil, :exclude_begin=>true, :db_type=>"int4range")
+    @db.get(Sequel.cast(eval('nil...nil'), :int4range)).wont_be :==, Sequel::Postgres::PGRange.new(nil, 1, :exclude_begin=>true, :db_type=>"int4range")
+  end if RUBY_VERSION >= '2.7'
+
   it 'parse default values for schema' do
     @db.create_table!(:items) do
       Integer :j

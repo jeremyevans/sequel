@@ -17,6 +17,7 @@ describe "pg_range extension" do
   end
 
   endless_range_support = RUBY_VERSION >= '2.6'
+  startless_range_support = RUBY_VERSION >= '2.7'
 
   it "should set up conversion procs correctly" do
     cp = @db.conversion_procs
@@ -52,7 +53,18 @@ describe "pg_range extension" do
 
   it "should literalize endless Range instances to strings correctly" do
     @db.literal(eval('1..')).must_equal "'[1,]'"
+    @db.literal(eval('1...')).must_equal "'[1,)'"
   end if endless_range_support
+
+  it "should literalize startless Range instances to strings correctly" do
+    @db.literal(eval('..1')).must_equal "'[,1]'"
+    @db.literal(eval('...1')).must_equal "'[,1)'"
+  end if startless_range_support
+
+  it "should literalize startless, endless Range instances to strings correctly" do
+    @db.literal(eval('nil..nil')).must_equal "'[,]'"
+    @db.literal(eval('nil...nil')).must_equal "'[,)'"
+  end if startless_range_support
 
   it "should literalize PGRange instances to strings correctly" do
     @db.literal(@R.new(1, 2)).must_equal "'[1,2]'"
@@ -79,7 +91,18 @@ describe "pg_range extension" do
 
   it "should support using endless Range instances as bound variables" do
     @db.bound_variable_arg(eval('1..'), nil).must_equal "[1,]"
+    @db.bound_variable_arg(eval('1...'), nil).must_equal "[1,)"
   end if endless_range_support
+
+  it "should support using startless Range instances as bound variables" do
+    @db.bound_variable_arg(eval('..1'), nil).must_equal "[,1]"
+    @db.bound_variable_arg(eval('...1'), nil).must_equal "[,1)"
+  end if startless_range_support
+
+  it "should support using startless, endless Range instances as bound variables" do
+    @db.bound_variable_arg(eval('nil..nil'), nil).must_equal "[,]"
+    @db.bound_variable_arg(eval('nil...nil'), nil).must_equal "[,)"
+  end if startless_range_support
 
   it "should support using PGRange instances as bound variables" do
     @db.bound_variable_arg(@R.new(1, 2), nil).must_equal "[1,2]"
@@ -431,11 +454,31 @@ describe "pg_range extension" do
 
     it "should consider PGRanges equal with a endless Range they represent" do
       @R.new(1, nil).must_be :==, eval('1..')
+      @R.new(1, nil, :exclude_end=>true).must_be :==, eval('1...')
+      @R.new(1, nil).wont_be :==, eval('1...')
+      @R.new(1, nil, :exclude_end=>true).wont_be :==, eval('1..')
+      @R.new(1, nil).wont_be :==, eval('2..')
+      @R.new(1, nil, :exclude_end=>true).wont_be :==, eval('2...')
     end if endless_range_support
 
-    it "should not consider a PGRange equal with a Range if it can't be expressed as a range" do
-      @R.new(1, nil).wont_be :==, eval('2..')
-    end if endless_range_support
+    it "should consider PGRanges equal with a startless Range they represent" do
+      @R.new(nil, 1).must_be :==, eval('..1')
+      @R.new(nil, 1, :exclude_end=>true).must_be :==, eval('...1')
+      @R.new(nil, 1).wont_be :==, eval('...1')
+      @R.new(nil, 1, :exclude_end=>true).wont_be :==, eval('..1')
+      @R.new(nil, 1).wont_be :==, eval('..2')
+      @R.new(nil, 1, :exclude_end=>true).wont_be :==, eval('...2')
+    end if startless_range_support
+
+    it "should consider PGRanges equal with a startless, endless Range they represent" do
+      @R.new(nil, nil).must_be :==, eval('nil..nil')
+      @R.new(nil, nil, :exclude_end=>true).must_be :==, eval('nil...nil')
+      @R.new(nil, nil).wont_be :==, eval('nil...nil')
+      @R.new(nil, nil, :exclude_end=>true).wont_be :==, eval('nil..nil')
+      @R.new(nil, nil).wont_be :==, eval('nil..1')
+      @R.new(nil, nil).wont_be :==, eval('1..nil')
+      @R.new(1, nil).wont_be :==, eval('nil..nil')
+    end if startless_range_support
 
     it "should not consider a PGRange equal to other objects" do
       @R.new(nil, nil).wont_equal 1
@@ -444,7 +487,6 @@ describe "pg_range extension" do
     it "should have #=== be true if given an equal PGRange" do
       @R.new(1, 2).must_be :===, @R.new(1, 2)
       @R.new(1, 2).wont_be :===, @R.new(1, 3)
-
     end
 
     it "should have #=== be true if it would be true for the Range represented by the PGRange" do
@@ -453,7 +495,7 @@ describe "pg_range extension" do
     end
 
     it "should have #=== be false if the PGRange cannot be represented by a Range" do
-      @R.new(nil, nil).wont_be :===, 1.5
+      @R.new(1, 2, :exclude_begin=>true).wont_be :===, 1.5
     end
 
     it "should have #empty? indicate whether the range is empty" do
@@ -471,7 +513,6 @@ describe "pg_range extension" do
     end
 
     it "should have #to_range raise an exception if the PGRange cannot be represented by a Range" do
-      proc{@R.new(nil, 1).to_range}.must_raise(Sequel::Error)
       proc{@R.new(0, 1, :exclude_begin=>true).to_range}.must_raise(Sequel::Error)
       proc{@R.empty.to_range}.must_raise(Sequel::Error)
     end
@@ -487,6 +528,22 @@ describe "pg_range extension" do
     it "should have #to_range raise an exception for endless ranges" do
       proc{@R.new(1, nil).to_range}.must_raise(Sequel::Error)
     end unless endless_range_support
+
+    it "should have #to_range return the represented range for startless ranges" do
+      @R.new(nil, 1).to_range.must_be :==, eval('..1')
+    end if startless_range_support
+
+    it "should have #to_range raise an exception for startless ranges" do
+      proc{@R.new(nil, 1).to_range}.must_raise(Sequel::Error)
+    end unless startless_range_support
+
+    it "should have #to_range return the represented range for startless, endless ranges" do
+      @R.new(nil, nil).to_range.must_be :==, eval('nil..nil')
+    end if startless_range_support
+
+    it "should have #to_range raise an exception for startless, endless ranges" do
+      proc{@R.new(nil, nil).to_range}.must_raise(Sequel::Error)
+    end unless startless_range_support
 
     it "should have #to_range cache the returned value" do
       @r1.to_range.must_be_same_as(@r1.to_range)
@@ -507,13 +564,20 @@ describe "pg_range extension" do
     end
 
     it "should have #valid_ruby_range? return false if the PGRange cannot be represented as a Range" do
-      @R.new(nil, 1).valid_ruby_range?.must_equal false
       @R.new(0, 1, :exclude_begin=>true).valid_ruby_range?.must_equal false
       @R.empty.valid_ruby_range?.must_equal false
     end
 
    it "should have #valid_ruby_range return #{endless_range_support} for endless ranges" do
       @R.new(1, nil).valid_ruby_range?.must_equal(endless_range_support)
+    end
+
+   it "should have #valid_ruby_range return #{startless_range_support} for endless ranges" do
+      @R.new(nil, 1).valid_ruby_range?.must_equal(startless_range_support)
+    end
+
+   it "should have #valid_ruby_range return #{startless_range_support} for startless, endless ranges" do
+      @R.new(nil, nil).valid_ruby_range?.must_equal(startless_range_support)
     end
   end
 end
