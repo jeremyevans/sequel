@@ -15,6 +15,9 @@ rvm:
   - ruby-head
   - truffleruby
 matrix:
+  include:
+    - rvm: 1.9.3
+      dist: trusty
   allow_failures:
     - rvm: jruby-head
     - rvm: ruby-head
