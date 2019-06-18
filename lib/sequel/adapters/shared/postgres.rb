@@ -147,10 +147,10 @@ module Sequel
       SELECT_CUSTOM_SEQUENCE_SQL = (<<-end_sql
         SELECT name.nspname AS "schema",
             CASE
-            WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN
-              substr(split_part(def.adsrc, '''', 2),
-                     strpos(split_part(def.adsrc, '''', 2), '.')+1)
-            ELSE split_part(def.adsrc, '''', 2)
+            WHEN split_part(pg_get_expr(def.adbin, attr.attrelid), '''', 2) ~ '.' THEN
+              substr(split_part(pg_get_expr(def.adbin, attr.attrelid), '''', 2),
+                     strpos(split_part(pg_get_expr(def.adbin, attr.attrelid), '''', 2), '.')+1)
+            ELSE split_part(pg_get_expr(def.adbin, attr.attrelid), '''', 2)
           END AS "sequence"
         FROM pg_class t
         JOIN pg_namespace  name ON (t.relnamespace = name.oid)
@@ -158,7 +158,7 @@ module Sequel
         JOIN pg_attrdef    def  ON (adrelid = attrelid AND adnum = attnum)
         JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
         WHERE cons.contype = 'p'
-          AND def.adsrc ~* 'nextval'
+          AND pg_get_expr(def.adbin, attr.attrelid) ~* 'nextval'
       end_sql
       ).strip.gsub(/\s+/, ' ').freeze
 
