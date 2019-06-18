@@ -1920,6 +1920,18 @@ module Sequel
         opts[:with].any?{|w| w[:recursive]} ? "WITH RECURSIVE " : super
       end
 
+      # Support WITH AS [NOT] MATERIALIZED if :materialized option is used.
+      def select_with_sql_prefix(sql, w)
+        super
+
+        case w[:materialized]
+        when true
+          sql << "MATERIALIZED "
+        when false
+          sql << "NOT MATERIALIZED "
+        end
+      end
+
       # The version of the database server
       def server_version
         db.server_version(@opts[:server])

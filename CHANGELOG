@@ -1,5 +1,7 @@
 === master
 
+* Support Dataset#with :materialized option on PostgreSQL 12 for [NOT] MATERIALIZED (jeremyevans)
+
 * Make Database#primary_key_sequence work on tables without serial sequences on PostgreSQL 12 (jeremyevans)
 
 * Support ruby 2.7+ startless ranges in the pg_range extension (jeremyevans)

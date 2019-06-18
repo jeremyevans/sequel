@@ -1510,13 +1510,7 @@ module Sequel
       comma = ', '
       ws.each do |w|
         sql << comma if c
-        quote_identifier_append(sql, w[:name])
-        if args = w[:args]
-         sql << '('
-         identifier_list_append(sql, args)
-         sql << ')'
-        end
-        sql << ' AS '
+        select_with_sql_prefix(sql, w)
         literal_dataset_append(sql, w[:dataset])
         c ||= true
       end
@@ -1528,6 +1522,16 @@ module Sequel
     
     def select_with_sql_base
       "WITH "
+    end
+
+    def select_with_sql_prefix(sql, w)
+      quote_identifier_append(sql, w[:name])
+      if args = w[:args]
+       sql << '('
+       identifier_list_append(sql, args)
+       sql << ')'
+      end
+      sql << ' AS '
     end
 
     # Whether the symbol cache should be skipped when literalizing the dataset
