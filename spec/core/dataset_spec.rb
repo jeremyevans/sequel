@@ -3434,6 +3434,16 @@ describe "Dataset#multi_insert" do
       'COMMIT']
   end
   
+  it "should handle :return=>:primary_key option if dataset has a row_proc" do
+    @db.autoid = 1
+    @ds.with_row_proc(lambda{|h| Object.new}).multi_insert(@list, :return=>:primary_key).must_equal [1, 2, 3]
+    @db.sqls.must_equal ['BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT']
+  end
+  
   with_symbol_splitting "should handle splittable symbols for tables" do
     @ds = @ds.from(:sch__tab)
     @ds.multi_insert(@list)

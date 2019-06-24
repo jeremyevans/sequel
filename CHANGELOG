@@ -1,5 +1,7 @@
 === master
 
+* Fix Dataset#multi_insert and #import with return: :primary_key on MSSQL when the dataset has a row_proc (jeremyevans) (#1627)
+
 * Support Dataset#with :materialized option on PostgreSQL 12 for [NOT] MATERIALIZED (jeremyevans)
 
 * Make Database#primary_key_sequence work on tables without serial sequences on PostgreSQL 12 (jeremyevans)

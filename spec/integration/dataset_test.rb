@@ -1109,6 +1109,12 @@ describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key " do
     @ds.order(:id).map([:id, :i]).must_equal [[1, 10], [2, 20], [3, 30], [4, 40], [5, 50], [6, 60]]
   end
 
+  it "should handle dataset with row_proc" do
+    ds = @ds.with_row_proc(lambda{|h| Object.new})
+    ds.multi_insert([{:i=>10}, {:i=>20}, {:i=>30}], :return=>:primary_key).must_equal [1, 2, 3]
+    ds.import([:i], [[40], [50], [60]], :return=>:primary_key).must_equal [4, 5, 6]
+  end
+  
   it "should return primary key values when :slice is used" do
     @ds.multi_insert([{:i=>10}, {:i=>20}, {:i=>30}], :return=>:primary_key, :slice=>2).must_equal [1, 2, 3]
     @ds.import([:i], [[40], [50], [60]], :return=>:primary_key, :slice=>2).must_equal [4, 5, 6]

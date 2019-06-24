@@ -765,8 +765,9 @@ module Sequel
           output(nil, [SQL::QualifiedIdentifier.new(:inserted, first_primary_key)])._import(columns, values, opts)
         elsif @opts[:output]
           statements = multi_insert_sql(columns, values)
+          ds = naked
           @db.transaction(opts.merge(:server=>@opts[:server])) do
-            statements.map{|st| with_sql(st)}
+            statements.map{|st| ds.with_sql(st)}
           end.first.map{|v| v.length == 1 ? v.values.first : v}
         else
           super
