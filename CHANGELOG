@@ -8,7 +8,7 @@
 
 * Support ruby 2.7+ startless ranges in the pg_range extension (jeremyevans)
 
-* Support ruby 2.7+ startless, endless ranges in filters, using an always tree condition for them (jeremyevans)
+* Support ruby 2.7+ startless, endless ranges in filters, using an always true condition for them (jeremyevans)
 
 * Support ruby 2.7+ startless ranges in filters, using just a <= or < operator for them (jeremyevans)
 
