@@ -1,4 +1,4 @@
-=== master
+=== 5.22.0 (2019-07-01)
 
 * Fix Dataset#multi_insert and #import with return: :primary_key on MSSQL when the dataset has a row_proc (jeremyevans) (#1627)
 
