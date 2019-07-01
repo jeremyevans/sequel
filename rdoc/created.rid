@@ -1,6 +1,6 @@
-Sat, 01 Jun 2019 10:33:41 -0700
+Mon, 01 Jul 2019 07:21:58 -0700
 README.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
-CHANGELOG	Sat, 01 Jun 2019 10:23:00 -0700
+CHANGELOG	Mon, 01 Jul 2019 07:14:49 -0700
 doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
 MIT-LICENSE	Sat, 23 Feb 2019 12:14:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -8,13 +8,13 @@ lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/connection_pool.rb	Fri, 29 Mar 2019 13:22:52 -0700
 lib/sequel/core.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/database.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/dataset.rb	Mon, 03 Jun 2019 11:44:00 -0700
 lib/sequel/deprecated.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/sql.rb	Tue, 19 Mar 2019 16:51:03 -0700
+lib/sequel/sql.rb	Mon, 10 Jun 2019 12:48:41 -0700
 lib/sequel/timezones.rb	Wed, 18 Oct 2017 14:33:31 -0700
-lib/sequel/version.rb	Sat, 01 Jun 2019 10:23:00 -0700
+lib/sequel/version.rb	Mon, 01 Jul 2019 07:14:49 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -36,8 +36,8 @@ lib/sequel/dataset/graph.rb	Tue, 19 Mar 2019 16:51:03 -0700
 lib/sequel/dataset/misc.rb	Thu, 14 Jun 2018 08:10:55 -0700
 lib/sequel/dataset/placeholder_literalizer.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/dataset/prepared_statements.rb	Tue, 19 Mar 2019 16:51:03 -0700
-lib/sequel/dataset/query.rb	Mon, 15 Apr 2019 07:00:47 -0700
-lib/sequel/dataset/sql.rb	Sat, 01 Dec 2018 17:38:41 -0800
+lib/sequel/dataset/query.rb	Tue, 18 Jun 2019 16:10:51 -0700
+lib/sequel/dataset/sql.rb	Tue, 18 Jun 2019 16:10:51 -0700
 lib/sequel/model/associations.rb	Tue, 23 Apr 2019 16:34:31 -0700
 lib/sequel/model/base.rb	Tue, 19 Mar 2019 16:51:03 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
@@ -208,6 +208,7 @@ doc/release_notes/5.19.0.txt	Tue, 02 Apr 2019 09:28:47 -0700
 doc/release_notes/5.2.0.txt	Fri, 27 Oct 2017 08:36:52 -0700
 doc/release_notes/5.20.0.txt	Wed, 01 May 2019 08:24:04 -0700
 doc/release_notes/5.21.0.txt	Sat, 01 Jun 2019 10:23:00 -0700
+doc/release_notes/5.22.0.txt	Mon, 01 Jul 2019 07:14:49 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800

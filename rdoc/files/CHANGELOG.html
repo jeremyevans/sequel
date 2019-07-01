@@ -30,12 +30,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-06-01 10:23:00 -0700</span>
+<span class='datetime'>2019-07-01 07:14:49 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.22.0+-282019-07-01-29">5.22.0 (2019-07-01)<span><a href="#label-5.22.0+-282019-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Fix Dataset#multi_insert and import with return: :primary_key on MSSQL when the dataset has a row_proc (jeremyevans) (#1627)</p>
+</li><li>
+<p>Support Dataset#with :materialized option on PostgreSQL 12 for [NOT] MATERIALIZED (jeremyevans)</p>
+</li><li>
+<p>Make Database#primary_key_sequence work on tables without serial sequences on PostgreSQL 12 (jeremyevans)</p>
+</li><li>
+<p>Support ruby 2.7+ startless ranges in the pg_range extension (jeremyevans)</p>
+</li><li>
+<p>Support ruby 2.7+ startless, endless ranges in filters, using an always true condition for them (jeremyevans)</p>
+</li><li>
+<p>Support ruby 2.7+ startless ranges in filters, using just a &lt;= or &lt; operator for them (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.21.0+-282019-06-01-29">5.21.0 (2019-06-01)<span><a href="#label-5.21.0+-282019-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Recognize additional DatabaseLockTimeout errors in mysql and mysql2 adapters (jeremyevans)</p>

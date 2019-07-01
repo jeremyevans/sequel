@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.22.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.22.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.22.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-07-01 07:14:49 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports Ruby 2.7+ startless ranges in filters:</p>
+
+<pre>DB[:table].where(:column=&gt;(..10))&#x000A;# SELECT * FROM table WHERE (column &lt;= 10)&#x000A;DB[:table].where(:column=&gt;(...10))&#x000A;# SELECT * FROM table WHERE (column &lt; 10)</pre>
+
+<p>It also supports startless, endless ranges in filters, using a condition that is always true:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-value">:column</span><span class="ruby-operator">=&gt;</span>(<span class="ruby-keyword">nil</span><span class="ruby-operator">..</span><span class="ruby-keyword">nil</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (1 = 1)</span></pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports startless ranges in the pg_range extension:</p>
+
+<pre>DB.extension :pg_range&#x000A;DB[:table].insert(:column=&gt;(..10))&#x000A;# INSERT INTO &quot;table&quot; (&quot;column&quot;) VALUES (&#39;[,10]&#39;) RETURNING &quot;id&quot;&#x000A;&#x000A;DB[:table].insert(:column=&gt;(...10))&#x000A;# INSERT INTO &quot;table&quot; (&quot;column&quot;) VALUES (&#39;[,10)&#39;) RETURNING &quot;id&quot;&#x000A;&#x000A;DB[:table].insert(:column=&gt;(nil..nil))&#x000A;# INSERT INTO &quot;table&quot; (&quot;column&quot;) VALUES (&#39;[,]&#39;) RETURNING &quot;id&quot;</pre>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now supports a :materialized option in Dataset#with on PostgreSQL 12+, to control the inlining of common table expressions:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">with</span>(<span class="ruby-value">:t</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:t2</span>], <span class="ruby-value">:materialized</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-comment"># WITH &quot;t&quot; AS NOT MATERIALIZED (SELECT * FROM &quot;t2&quot;)</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;t&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:t</span>].<span class="ruby-identifier">with</span>(<span class="ruby-value">:t</span>, <span class="ruby-constant">DB</span>[<span class="ruby-value">:t2</span>], <span class="ruby-value">:materialized</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># WITH &quot;t&quot; AS MATERIALIZED (SELECT * FROM &quot;t2&quot;)</span>&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;t&quot;</span></pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#primary_key_sequence now works for tables without serial sequences on PostgreSQL 12+.</p>
+</li><li>
+<p>Dataset#multi_insert and import with return: :primary_key option on Microsoft SQL Server now work correctly if the dataset uses a row_proc (e.g. for model datasets).</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

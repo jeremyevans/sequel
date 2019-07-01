@@ -1,4 +1,4 @@
-Sat, 01 Jun 2019 10:35:05 -0700
+Mon, 01 Jul 2019 07:23:33 -0700
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -49,7 +49,7 @@ lib/sequel/extensions/pg_interval.rb	Sun, 25 Feb 2018 09:05:42 -0800
 lib/sequel/extensions/pg_json.rb	Fri, 10 May 2019 14:25:29 -0700
 lib/sequel/extensions/pg_json_ops.rb	Wed, 21 Jun 2017 13:54:47 -0700
 lib/sequel/extensions/pg_loose_count.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/extensions/pg_range.rb	Mon, 04 Jun 2018 10:04:25 -0700
+lib/sequel/extensions/pg_range.rb	Mon, 10 Jun 2019 12:48:41 -0700
 lib/sequel/extensions/pg_range_ops.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/pg_row_ops.rb	Tue, 01 Aug 2017 08:12:00 -0700
