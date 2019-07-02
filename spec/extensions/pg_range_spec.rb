@@ -429,12 +429,12 @@ describe "pg_range extension" do
       @R.new(nil, nil).wont_equal @R.new(nil, nil, :empty=>true)
     end
 
-    it "should only consider empty PGRanges equal if they have the same bounds" do
+    it "should only consider PGRanges equal if they have the same bounds" do
       @R.new(1, 2).must_equal @R.new(1, 2)
       @R.new(1, 2).wont_equal @R.new(1, 3)
     end
 
-    it "should only consider empty PGRanges equal if they have the same bound exclusions" do
+    it "should only consider PGRanges equal if they have the same bound exclusions" do
       @R.new(1, 2, :exclude_begin=>true).must_equal @R.new(1, 2, :exclude_begin=>true)
       @R.new(1, 2, :exclude_end=>true).must_equal @R.new(1, 2, :exclude_end=>true)
       @R.new(1, 2, :exclude_begin=>true).wont_equal @R.new(1, 2, :exclude_end=>true)
@@ -450,6 +450,9 @@ describe "pg_range extension" do
 
     it "should not consider a PGRange equal with a Range if it can't be expressed as a range" do
       @R.new(nil, nil).wont_be :==, (1..2)
+      if startless_range_support
+        @R.new(nil, nil, :exclude_begin=>true).wont_be :==, eval('nil..nil')
+      end
     end
 
     it "should consider PGRanges equal with a endless Range they represent" do
