@@ -237,10 +237,13 @@ module Sequel
 
     # Caches offset conversions to avoid excess Rational math.
     def time_offset_to_datetime_offset(offset_secs)
-      @local_offsets ||= {}
-      @local_offsets[offset_secs] ||= Rational(offset_secs, 86400)
+      if offset = Sequel.synchronize{@local_offsets[offset_secs]}
+        return offset
+      end
+      Sequel.synchronize{@local_offsets[offset_secs] = Rational(offset_secs, 86400)}
     end
   end
 
+  @local_offsets = {}
   extend Timezones
 end
