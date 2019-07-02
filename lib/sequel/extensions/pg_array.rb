@@ -340,14 +340,18 @@ module Sequel
             raise Sequel::Error, "invalid array, empty string" if eos?
             raise Sequel::Error, "invalid array, doesn't start with {" unless scan(/((\[\d+:\d+\])+=)?\{/)
 
+            # :nocov:
             while !eos?
+            # :nocov:
               char = scan(/[{}",]|[^{}",]+/)
               if char == ','
                 # Comma outside quoted string indicates end of current entry
                 new_entry
               elsif char == '"'
                 raise Sequel::Error, "invalid array, opening quote with existing recorded data" unless @recorded.empty?
+                # :nocov:
                 while true
+                # :nocov:
                   char = scan(/["\\]|[^"\\]+/)
                   if char == '\\'
                     @recorded << getch

@@ -228,7 +228,9 @@ module Sequel
           if skip(/\)/)
             values << nil
           else
+            # :nocov:
             until eos?
+            # :nocov:
               if skip(/"/)
                 values << scan(/(\\.|""|[^"])*/).gsub(/\\(.)|"(")/, '\1\2')
                 skip(/"[,)]/)
