@@ -16,6 +16,11 @@ require_relative "../../lib/sequel"
 
 require_relative '../deprecation_helper'
 
+if ENV['SEQUEL_TZINFO_VERSION']
+  # Allow forcing specific TZInfo versions, useful when testing
+  gem 'tzinfo', ENV['SEQUEL_TZINFO_VERSION']
+end
+
 begin
   # Attempt to load ActiveSupport blank extension and inflector first, so Sequel
   # can override them.

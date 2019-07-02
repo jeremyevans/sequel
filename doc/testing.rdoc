@@ -169,3 +169,4 @@ SEQUEL_NO_PENDING :: Don't skip any specs, try running all specs (note, can caus
 SEQUEL_PG_TIMESTAMPTZ :: Use the pg_timestamptz extension when running the postgres specs
 SEQUEL_SPLIT_SYMBOLS :: Turn on symbol splitting when running the adapter and integration specs
 SEQUEL_SYNCHRONIZE_SQL :: Use the synchronize_sql extension when running the specs
+SEQUEL_TZINFO_VERSION :: Force the given tzinfo version when running the specs (e.g. '>=2')
