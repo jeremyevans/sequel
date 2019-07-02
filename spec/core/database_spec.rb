@@ -2316,6 +2316,10 @@ describe "Database#typecast_value" do
       @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000).must_equal Time.local(2011, 10, 11, 12, 13, 14, 500000)
       @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14).must_equal Time.local(2011, 10, 11, 12, 13, 14)
       @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000).must_equal Time.local(2011, 10, 11, 12, 13, 14, 500000)
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :offset=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14, 43200)
+      @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000, :offset=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14.5, 43200)
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'offset'=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14, 43200)
+      @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000, 'offset'=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14.5, 43200)
 
       Sequel.datetime_class = DateTime
       @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14).must_equal DateTime.civil(2011, 10, 11, 12, 13, 14)

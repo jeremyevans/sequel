@@ -54,7 +54,14 @@ module Sequel
             convert_output_datetime_other(v, output_timezone)
           end
         else
-          v.public_send(output_timezone == :utc ? :getutc : :getlocal)
+          case output_timezone
+          when :utc
+            v.getutc
+          when :local
+            v.getlocal
+          else
+            convert_output_time_other(v, output_timezone)
+          end
         end
       else
         v
@@ -110,7 +117,7 @@ module Sequel
     # same time and just modifying the timezone.
     def convert_input_datetime_no_offset(v, input_timezone)
       case input_timezone
-      when :utc, nil
+      when nil, :utc
         v # DateTime assumes UTC if no offset is given
       when :local
         offset = local_offset_for_datetime(v)
@@ -119,11 +126,18 @@ module Sequel
         convert_input_datetime_other(v, input_timezone)
       end
     end
-    
+
     # Convert the given +DateTime+ to the given input_timezone that is not supported
     # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
     # Can be overridden in extensions.
     def convert_input_datetime_other(v, input_timezone)
+      raise InvalidValue, "Invalid input_timezone: #{input_timezone.inspect}"
+    end
+    
+    # Convert the given +Time+ to the given input_timezone that is not supported
+    # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
+    # Can be overridden in extensions.
+    def convert_input_time_other(v, input_timezone)
       raise InvalidValue, "Invalid input_timezone: #{input_timezone.inspect}"
     end
     
@@ -139,12 +153,17 @@ module Sequel
         else
           # Correct for potentially wrong offset if string doesn't include offset
           if v2.is_a?(DateTime)
-            v2 = convert_input_datetime_no_offset(v2, input_timezone)
+            convert_input_datetime_no_offset(v2, input_timezone)
           else
-            # Time assumes local time if no offset is given
-            v2 = v2.getutc + v2.utc_offset if input_timezone == :utc
+            case input_timezone
+            when nil, :local
+              v2
+            when :utc
+              (v2 + v2.utc_offset).utc
+            else
+              convert_input_time_other((v2 + v2.utc_offset).utc, input_timezone)
+            end
           end
-          v2
         end
       when Array
         y, mo, d, h, mi, s, ns, off = v
@@ -155,8 +174,18 @@ module Sequel
           else
             convert_input_datetime_no_offset(DateTime.civil(y, mo, d, h, mi, s), input_timezone)
           end
+        elsif off
+          s += Rational(ns, 1000000000) if ns
+          Time.new(y, mo, d, h, mi, s, (off*86400).to_i)
         else
-          Time.public_send(input_timezone == :utc ? :utc : :local, y, mo, d, h, mi, s, (ns ? ns / 1000.0 : 0))
+          case input_timezone
+          when nil, :local
+            Time.local(y, mo, d, h, mi, s, (ns ? ns / 1000.0 : 0))
+          when :utc
+            Time.utc(y, mo, d, h, mi, s, (ns ? ns / 1000.0 : 0))
+          else
+            convert_input_time_other(Time.utc(y, mo, d, h, mi, s, (ns ? ns / 1000.0 : 0)), input_timezone)
+          end
         end
       when Hash
         ary = [:year, :month, :day, :hour, :minute, :second, :nanos].map{|x| (v[x] || v[x.to_s]).to_i}
@@ -188,13 +217,20 @@ module Sequel
       raise InvalidValue, "Invalid output_timezone: #{output_timezone.inspect}"
     end
     
+    # Convert the given +Time+ to the given output_timezone that is not supported
+    # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
+    # Can be overridden in extensions.
+    def convert_output_time_other(v, output_timezone)
+      raise InvalidValue, "Invalid output_timezone: #{output_timezone.inspect}"
+    end
+    
     # Convert the timezone setter argument.  Returns argument given by default,
     # exists for easier overriding in extensions.
     def convert_timezone_setter_arg(tz)
       tz
     end
 
-    # Takes a DateTime dt, and returns the correct local offset for that dt, daylight savings included.
+    # Takes a DateTime dt, and returns the correct local offset for that dt, daylight savings included, in fraction of a day.
     def local_offset_for_datetime(dt)
       time_offset_to_datetime_offset Time.local(dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec).utc_offset
     end

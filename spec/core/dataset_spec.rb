@@ -4493,6 +4493,16 @@ describe "Sequel timezone support" do
     proc{Sequel.database_to_application_timestamp(Object.new)}.must_raise(Sequel::InvalidValue)
   end
 
+  it "should raise an InvalidValue error when the Time class is used and when a bad application timezone is used when attempting to convert timestamps" do
+    Sequel.application_timezone = :blah
+    proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.must_raise(Sequel::InvalidValue)
+  end
+  
+  it "should raise an InvalidValue error when the Time class is used and when a bad database timezone is used when attempting to convert timestamps" do
+    Sequel.database_timezone = :blah
+    proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.must_raise(Sequel::InvalidValue)
+  end
+
   it "should raise an InvalidValue error when the DateTime class is used and when a bad application timezone is used when attempting to convert timestamps" do
     Sequel.application_timezone = :blah
     Sequel.datetime_class = DateTime
