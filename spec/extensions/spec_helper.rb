@@ -31,7 +31,9 @@ rescue LoadError
   nil
 end
 
-Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby'
+if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_ENGINE == 'jruby' && (JRUBY_VERSION >= '9.3' || (JRUBY_VERSION.match(/\A9\.2\.(\d+)/) && $1.to_i >= 7)))
+  Sequel.extension :core_refinements
+end
 
 class << Sequel::Model
   attr_writer :db_schema
