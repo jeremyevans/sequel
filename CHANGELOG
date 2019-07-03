@@ -1,5 +1,7 @@
 === master
 
+* Avoid errors when parsing schema in the mock sqlite adapter (jeremyevans)
+
 * Avoid possible thread-safety issue in the timezones support (jeremyevans)
 
 * Handle offsets when typecasting an array or hash to datetime when Sequel.datetime_class = Time (jeremyevans)

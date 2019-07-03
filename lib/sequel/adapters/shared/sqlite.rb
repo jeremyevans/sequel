@@ -10,6 +10,10 @@ module Sequel
     def self.mock_adapter_setup(db)
       db.instance_exec do
         @sqlite_version = 30903
+
+        def schema_parse_table(*)
+          []
+        end
       end
     end
     
