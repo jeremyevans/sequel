@@ -2420,4 +2420,4 @@ describe "insert_conflict plugin" do
     @model.new(:s=>'B', :o=>3).insert_conflict(ic_opts).save
     @model.select_order_map([:s, :o]).must_equal [['A', 2], ['B', 3]]
   end
-end if DB.dataset.respond_to?(:insert_conflict)
+end if (DB.database_type == :postgres && DB.server_version >= 90500) || (DB.database_type == :sqlite && DB.sqlite_version >= 32400)
