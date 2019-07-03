@@ -12,8 +12,8 @@ module Sequel
     #
     #   Album.new(name: 'Foo', copies_sold: 1000).
     #     insert_conflict(
-    #       :target=>:name,
-    #       :update=>{update: {copies_sold: Sequel[:excluded][:b]}
+    #       target: :name,
+    #       update: {copies_sold: Sequel[:excluded][:b]}
     #     ).
     #     save
     #
