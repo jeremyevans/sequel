@@ -1,5 +1,7 @@
 === master
 
+* Add insert_conflict plugin for automatically handling unique constraint conflicts when saving new model instances on PostgreSQL 9.5+ and SQLite 3.24.0+ (jeremyevans)
+
 * Avoid errors when parsing schema in the mock sqlite adapter (jeremyevans)
 
 * Avoid possible thread-safety issue in the timezones support (jeremyevans)

@@ -2394,3 +2394,30 @@ describe "string_agg extension" do
     @ds.select_group(:id).select_append(Sequel.string_agg(:s).order(:s).distinct.as(:v)).map([:id, :v]).must_equal [[1, 'a,b,c'], [2, 'aa,bb']]
   end
 end
+
+describe "insert_conflict plugin" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:ic_test) do
+      primary_key :id
+      String :s, :unique=>true
+      Integer :o
+    end
+    @model = Class.new(Sequel::Model)
+    @model.set_dataset @db[:ic_test]
+    @model.plugin :insert_conflict
+  end
+  after(:all) do
+    @db.drop_table?(:ic_test)
+  end
+
+  it "should allow Model#insert_conflict to work" do
+    ic_opts = {:target=>:s, :update => {:o => Sequel[:excluded][:o]}}
+    @model.new(:s=>'A', :o=>1).insert_conflict(ic_opts).save
+    @model.select_order_map([:s, :o]).must_equal [['A', 1]]
+    @model.new(:s=>'A', :o=>2).insert_conflict(ic_opts).save
+    @model.select_order_map([:s, :o]).must_equal [['A', 2]]
+    @model.new(:s=>'B', :o=>3).insert_conflict(ic_opts).save
+    @model.select_order_map([:s, :o]).must_equal [['A', 2], ['B', 3]]
+  end
+end if DB.dataset.respond_to?(:insert_conflict)
