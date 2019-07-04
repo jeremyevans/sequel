@@ -106,6 +106,21 @@ You can also use placeholders with :placeholder and a hash of placeholder values
   items.where(Sequel.lit('category = :category', category: "ruby")).sql
   # "SELECT * FROM items WHERE category = 'ruby'"
 
+In order to combine AND and OR together, you have a few options:
+
+  items.where(category: nil).or(category: "ruby")
+  # SELECT * FROM items WHERE (category IS NULL) OR (category = 'ruby')
+
+This won't work if you add other conditions:
+
+  items.where(name: "Programming in Ruby").where(category: nil).or(category: 'ruby')
+  # SELECT * FROM items WHERE ((name = 'Programming in Ruby') AND (category IS NULL)) OR (category = 'ruby')
+
+The OR applies globally and not locally. To fix this, use & and |:
+
+  items.where(Sequel[name: "Programming in Ruby"] & (Sequel[category: nil] | Sequel[category: "ruby"]))
+  # SELECT * FROM items WHERE ((name = 'Programming in Ruby') AND ((category IS NULL) OR (category = 'ruby')))
+
 === Specifying SQL functions
 
 Sequel also allows you to specify functions by using the Sequel.function method:
