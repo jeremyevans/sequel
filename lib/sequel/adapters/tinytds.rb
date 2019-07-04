@@ -16,6 +16,18 @@ module Sequel
         c = TinyTds::Client.new(opts)
         c.query_options.merge!(:cache_rows=>false)
 
+        if opts[:ansi]
+          sql = %w(
+            ANSI_NULLS
+            ANSI_PADDING
+            ANSI_WARNINGS
+            ANSI_NULL_DFLT_ON
+            QUOTED_IDENTIFIER
+            CONCAT_NULL_YIELDS_NULL
+          ).map{|v| "SET #{v} ON"}.join(";")
+          log_connection_yield(sql, c){c.execute(sql)}
+        end
+
         if (ts = opts[:textsize])
           sql = "SET TEXTSIZE #{typecast_value_integer(ts)}"
           log_connection_yield(sql, c){c.execute(sql)}

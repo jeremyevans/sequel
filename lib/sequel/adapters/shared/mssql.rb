@@ -427,20 +427,19 @@ module Sequel
         m = output_identifier_meth(opts[:dataset])
         m2 = input_identifier_meth(opts[:dataset])
         tn = m2.call(table_name.to_s)
-        table_id = get(Sequel.function(:object_id, tn))
         info_sch_sch = opts[:information_schema_schema]
         inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel[s]}
-        sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel[s]}
+        table_id = metadata_dataset.from(inf_sch_qual.call(Sequel[:sys][:objects])).where(:name => tn).select_map(:object_id).first
 
-        identity_cols = metadata_dataset.from(Sequel.lit('[sys].[columns]')).
+        identity_cols = metadata_dataset.from(inf_sch_qual.call(Sequel[:sys][:columns])).
           where(:object_id=>table_id, :is_identity=>true).
           select_map(:name)
 
-        pk_index_id = metadata_dataset.from(sys_qual.call(Sequel.lit('sysindexes'))).
+        pk_index_id = metadata_dataset.from(inf_sch_qual.call(Sequel[:sys][:sysindexes])).
           where(:id=>table_id, :indid=>1..254){{(status & 2048)=>2048}}.
           get(:indid)
-        pk_cols = metadata_dataset.from(sys_qual.call(Sequel.lit('sysindexkeys')).as(:sik)).
-          join(sys_qual.call(Sequel.lit('syscolumns')).as(:sc), :id=>:id, :colid=>:colid).
+        pk_cols = metadata_dataset.from(inf_sch_qual.call(Sequel[:sys][:sysindexkeys]).as(:sik)).
+          join(inf_sch_qual.call(Sequel[:sys][:syscolumns]).as(:sc), :id=>:id, :colid=>:colid).
           where{{sik[:id]=>table_id, sik[:indid]=>pk_index_id}}.
           select_order_map{sc[:name]}
 
