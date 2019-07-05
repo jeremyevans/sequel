@@ -241,6 +241,18 @@ describe "pg_json extension" do
     Sequel.pg_json_wrap(false).must_equal false
     Sequel.pg_json_wrap(nil).class.must_equal Sequel::Postgres::JSONNull
     Sequel.pg_json_wrap(nil).must_be_nil
+
+    c = Class.new(Hash).new
+    Sequel.pg_json_wrap(c).class.must_equal Sequel::Postgres::JSONHash
+    Sequel.pg_json_wrap(c).must_equal(c)
+
+    c = Class.new(Array).new
+    Sequel.pg_json_wrap(c).class.must_equal Sequel::Postgres::JSONArray
+    Sequel.pg_json_wrap(c).must_equal c
+
+    c = Class.new(String).new('a')
+    Sequel.pg_json_wrap(c).class.must_equal Sequel::Postgres::JSONString
+    Sequel.pg_json_wrap(c).must_equal c
   end
 
   it "Sequel.pg_json_wrap should fail when passed an unsupported object" do

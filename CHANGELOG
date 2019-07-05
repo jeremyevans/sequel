@@ -1,5 +1,7 @@
 === master
 
+* Handle instances of subclasses of core classes when wrapping objects in the pg_json extension (jeremyevans) (#1631)
+
 * Support :ansi Database option in the tinytds adapter (kenaniah) (#1629)
 
 * Support cross-database and linked servers when parsing schema on Microsoft SQL Server (kenaniah) (#1629)

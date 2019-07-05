@@ -208,10 +208,18 @@ module Sequel
     JSONB_PRIMITIVE_WRAPPER_MAPPING.freeze
 
     JSON_COMBINED_WRAPPER_MAPPING =JSON_WRAPPER_MAPPING.merge(JSON_PRIMITIVE_WRAPPER_MAPPING).freeze
-    JSON_WRAP_CLASSES = JSON_COMBINED_WRAPPER_MAPPING.keys.freeze
-
     JSONB_COMBINED_WRAPPER_MAPPING =JSONB_WRAPPER_MAPPING.merge(JSONB_PRIMITIVE_WRAPPER_MAPPING).freeze
     JSONB_WRAP_CLASSES = JSONB_COMBINED_WRAPPER_MAPPING.keys.freeze
+
+    Sequel::Deprecation.deprecate_constant(self, :JSON_WRAPPER_MAPPING)
+    Sequel::Deprecation.deprecate_constant(self, :JSONB_WRAPPER_MAPPING)
+    Sequel::Deprecation.deprecate_constant(self, :JSON_PRIMITIVE_WRAPPER_MAPPING)
+    Sequel::Deprecation.deprecate_constant(self, :JSONB_PRIMITIVE_WRAPPER_MAPPING)
+    Sequel::Deprecation.deprecate_constant(self, :JSON_COMBINED_WRAPPER_MAPPING)
+    Sequel::Deprecation.deprecate_constant(self, :JSONB_COMBINED_WRAPPER_MAPPING)
+    Sequel::Deprecation.deprecate_constant(self, :JSONB_WRAP_CLASSES)
+
+    JSON_WRAP_CLASSES = [Hash, Array, String, Integer, Float, NilClass, TrueClass, FalseClass].freeze
 
     # Methods enabling Database object integration with the json type.
     module JSONDatabaseMethods
@@ -228,6 +236,69 @@ module Sequel
         end
       end
 
+      # Return the wrapper class for the json type if value is Hash or Array.
+      def self.json_wrapper(value)
+        case value
+        when ::Hash
+          JSONHash
+        when ::Array
+          JSONArray
+        end
+      end
+
+      # Return the wrapper class for the jsonb type if value is Hash or Array.
+      def self.jsonb_wrapper(value)
+        case value
+        when ::Hash
+          JSONBHash
+        when ::Array
+          JSONBArray
+        end
+      end
+
+      # Return the wrapper class for the json type if value is a supported type.
+      def self.json_primitive_wrapper(value)
+        case value
+        when ::Hash
+          JSONHash
+        when ::Array
+          JSONArray
+        when ::String
+          JSONString
+        when ::Integer
+          JSONInteger
+        when ::Float
+          JSONFloat
+        when ::NilClass
+          JSONNull
+        when ::TrueClass
+          JSONTrue
+        when ::FalseClass
+          JSONFalse
+        end
+      end
+
+      # Return the wrapper class for the jsonb type if value is a supported type.
+      def self.jsonb_primitive_wrapper(value)
+        case value
+        when ::Hash
+          JSONBHash
+        when ::Array
+          JSONBArray
+        when ::String
+          JSONBString
+        when ::Integer
+          JSONBInteger
+        when ::Float
+          JSONBFloat
+        when ::NilClass
+          JSONBNull
+        when ::TrueClass
+          JSONBTrue
+        when ::FalseClass
+          JSONBFalse
+        end
+      end
 
       # Deprecated
       def self.db_parse_json(s)
@@ -326,9 +397,9 @@ module Sequel
       # Wrap the parsed JSON value in the appropriate JSON wrapper class.
       # Only wrap primitive values if wrap_json_primitives is set.
       def _wrap_json(value)
-        if klass = JSON_WRAPPER_MAPPING[value.class]
+        if klass = JSONDatabaseMethods.json_wrapper(value)
           klass.new(value)
-        elsif klass = JSON_PRIMITIVE_WRAPPER_MAPPING[value.class]
+        elsif klass = JSONDatabaseMethods.json_primitive_wrapper(value)
           if wrap_json_primitives
             klass.new(value)
           else
@@ -342,9 +413,9 @@ module Sequel
       # Wrap the parsed JSON value in the appropriate JSONB wrapper class.
       # Only wrap primitive values if wrap_json_primitives is set.
       def _wrap_jsonb(value)
-        if klass = JSONB_WRAPPER_MAPPING[value.class]
+        if klass = JSONDatabaseMethods.jsonb_wrapper(value)
           klass.new(value)
-        elsif klass = JSONB_PRIMITIVE_WRAPPER_MAPPING[value.class]
+        elsif klass = JSONDatabaseMethods.jsonb_primitive_wrapper(value)
           if wrap_json_primitives
             klass.new(value)
           else
@@ -413,10 +484,10 @@ module Sequel
             _wrap_json(_parse_json(value))
           end
         when *JSON_WRAP_CLASSES
-          JSON_COMBINED_WRAPPER_MAPPING[value.class].new(value)
+          JSONDatabaseMethods.json_primitive_wrapper(value).new(value)
         when JSONBObject
           value = value.__getobj__
-          JSON_COMBINED_WRAPPER_MAPPING[value.class].new(value)
+          JSONDatabaseMethods.json_primitive_wrapper(value).new(value)
         else
           raise Sequel::InvalidValue, "invalid value for json: #{value.inspect}"
         end
@@ -433,11 +504,11 @@ module Sequel
           else
             _wrap_jsonb(_parse_json(value))
           end
-        when *JSONB_WRAP_CLASSES
-          JSONB_COMBINED_WRAPPER_MAPPING[value.class].new(value)
+        when *JSON_WRAP_CLASSES
+          JSONDatabaseMethods.jsonb_primitive_wrapper(value).new(value)
         when JSONObject
           value = value.__getobj__
-          JSONB_COMBINED_WRAPPER_MAPPING[value.class].new(value)
+          JSONDatabaseMethods.jsonb_primitive_wrapper(value).new(value)
         else
           raise Sequel::InvalidValue, "invalid value for jsonb: #{value.inspect}"
         end
@@ -460,7 +531,7 @@ module Sequel
         Postgres::JSONHash.new(v)
       when Postgres::JSONBObject
         v = v.__getobj__
-        Postgres::JSON_COMBINED_WRAPPER_MAPPING[v.class].new(v)
+        Postgres::JSONDatabaseMethods.json_primitive_wrapper(v).new(v)
       else
         Sequel.pg_json_op(v)
       end
@@ -472,7 +543,7 @@ module Sequel
     def pg_json_wrap(v)
       case v
       when *Postgres::JSON_WRAP_CLASSES
-        Postgres::JSON_COMBINED_WRAPPER_MAPPING[v.class].new(v)
+        Postgres::JSONDatabaseMethods.json_primitive_wrapper(v).new(v)
       else
         raise Error, "invalid value passed to Sequel.pg_json_wrap: #{v.inspect}"
       end
@@ -492,7 +563,7 @@ module Sequel
         Postgres::JSONBHash.new(v)
       when Postgres::JSONObject
         v = v.__getobj__
-        Postgres::JSONB_COMBINED_WRAPPER_MAPPING[v.class].new(v)
+        Postgres::JSONDatabaseMethods.jsonb_primitive_wrapper(v).new(v)
       else
         Sequel.pg_jsonb_op(v)
       end
@@ -503,8 +574,8 @@ module Sequel
     # other types.
     def pg_jsonb_wrap(v)
       case v
-      when *Postgres::JSONB_WRAP_CLASSES
-        Postgres::JSONB_COMBINED_WRAPPER_MAPPING[v.class].new(v)
+      when *Postgres::JSON_WRAP_CLASSES
+        Postgres::JSONDatabaseMethods.jsonb_primitive_wrapper(v).new(v)
       else
         raise Error, "invalid value passed to Sequel.pg_jsonb_wrap: #{v.inspect}"
       end
