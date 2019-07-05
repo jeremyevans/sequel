@@ -1,5 +1,9 @@
 === master
 
+* Support :ansi Database option in the tinytds adapter (kenaniah) (#1629)
+
+* Support cross-database and linked servers when parsing schema on Microsoft SQL Server (kenaniah) (#1629)
+
 * Add insert_conflict plugin for automatically handling unique constraint conflicts when saving new model instances on PostgreSQL 9.5+ and SQLite 3.24.0+ (jeremyevans)
 
 * Avoid errors when parsing schema in the mock sqlite adapter (jeremyevans)

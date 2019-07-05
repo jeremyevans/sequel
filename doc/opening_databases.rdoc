@@ -401,7 +401,9 @@ options that you may want to set are :login_timeout, :timeout, :tds_version, :az
 
 Other Sequel specific options:
 
-:ansi :: Set to true to enable the ANSI compatibility settings when connecting.
+:ansi :: Set to true to enable the ANSI compatibility settings when connecting
+         (ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ANSI_NULL_DFLT_ON, QUOTED_IDENTIFIER,
+         CONCAT_NULL_YIELDS_NULL).
 :server_version :: Override the server version to use (9000000 = SQL Server 2005).
                    This also works on any other adapter that connects to Microsoft
                    SQL Server.
