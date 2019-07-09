@@ -1069,7 +1069,7 @@ module Sequel
 
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
-      if @db.sharded?
+      if @db.sharded? && !opts.has_key?(:server)
         opts = Hash[opts]
         opts[:server] = @opts[:server] || :default
       end
@@ -1080,7 +1080,7 @@ module Sequel
     # :read_only server unless a specific server is set.
     def execute(sql, opts=OPTS, &block)
       db = @db
-      if db.sharded?
+      if db.sharded? && !opts.has_key?(:server)
         opts = Hash[opts]
         opts[:server] = @opts[:server] || (@opts[:lock] ? :default : :read_only)
         opts

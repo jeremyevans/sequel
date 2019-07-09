@@ -1,5 +1,7 @@
 === master
 
+* Make Dataset#execute* private methods respect explicit servers option, fixing Dataset#paged_each in the postgres adapter when sharding (jeremyevans) (#1632)
+
 * Handle instances of subclasses of core classes when wrapping objects in the pg_json extension (jeremyevans) (#1631)
 
 * Support :ansi Database option in the tinytds adapter (kenaniah) (#1629)

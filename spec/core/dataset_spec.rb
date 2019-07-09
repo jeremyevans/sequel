@@ -3725,7 +3725,7 @@ end
 
 describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
   before do
-    @db = Sequel.mock(:servers=>{:read_only=>{}}, :autoid=>1)
+    @db = Sequel.mock(:servers=>{:read_only=>{}, :r1=>{}}, :autoid=>1)
     @ds = @db[:items]
   end
 
@@ -3762,6 +3762,18 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
   it "#execute should execute the SQL on the default database if locking is used" do
     @ds.for_update.send(:execute, 'SELECT 1')
     @db.sqls.must_equal ["SELECT 1"]
+  end
+  
+  [:execute, :execute_dui, :execute_insert, :execute_ddl].each do |meth|
+    it "##{meth} should respect explicit :server option" do
+      @ds.send(meth, 'SELECT 1', :server=>:r1)
+      @db.sqls.must_equal ["SELECT 1 -- r1"]
+    end
+    
+    it "##{meth} should respect dataset's :server option if :server option not given" do
+      @ds.server(:r1).send(meth, 'SELECT 1')
+      @db.sqls.must_equal ["SELECT 1 -- r1"]
+    end
   end
 end
 
