@@ -333,6 +333,7 @@ module Sequel
     #                  after every 50 records.
     # :return :: When this is set to :primary_key, returns an array of
     #            autoincremented primary key values for the rows inserted.
+    #            This does not have an effect if +values+ is a Dataset.
     # :server :: Set the server/shard to use for the transaction and insert
     #            queries.
     # :slice :: Same as :commit_every, :commit_every takes precedence.
