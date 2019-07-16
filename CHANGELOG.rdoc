@@ -2522,4 +2522,4 @@
 
 === Older
 
-See doc/CHANGELOG.old
+See doc/CHANGELOG.old.rdoc
