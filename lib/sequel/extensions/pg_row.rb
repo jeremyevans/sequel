@@ -7,7 +7,7 @@
 # that when composite fields are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::PGRow::(HashRow|ArrayRow), or
 # optionally a custom type.  HashRow and ArrayRow are DelegateClasses of
-# of Hash and Array, so they mostly act like a hash or array, but not
+# Hash and Array, so they mostly act like a hash or array, but not
 # completely (is_a?(Hash) and is_a?(Array) are false).  If you want the
 # actual hash for a HashRow, call HashRow#to_hash, and if you want the
 # actual array for an ArrayRow, call ArrayRow#to_a.  This is done so
