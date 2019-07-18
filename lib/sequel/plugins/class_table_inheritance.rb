@@ -108,6 +108,16 @@ module Sequel
     #   a = Executive.where{{employees[:id]=>1}}.first # works
     #   a = Executive.where{{executives[:id]=>1}}.first # doesn't work
     #
+    # Note that because subclass datasets select from a subquery, you cannot update,
+    # delete, or insert into them directly.  To delete related rows, you need to go
+    # through the related tables and remove the related rows.  Code that does this would
+    # be similar to:
+    #
+    #   pks = Executive.where{num_staff < 10}.select_map(:id)
+    #   Executive.cti_tables.reverse_each do |table|
+    #     DB.from(table).where(:id=>pks).delete
+    #   end
+    #
     # = Usage
     #
     #   # Use the default of storing the class name in the sti_key
