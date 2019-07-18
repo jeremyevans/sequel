@@ -64,7 +64,7 @@ module Sequel
       def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth
         h = {}
-        metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
+        _foreign_key_list_ds(table).each do |row|
           if r = h[row[:id]]
             r[:columns] << m.call(row[:from])
             r[:key] << m.call(row[:to]) if r[:key]
@@ -176,6 +176,16 @@ module Sequel
       end
 
       private
+
+      # Dataset used for parsing foreign key lists
+      def _foreign_key_list_ds(table)
+        metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table))
+      end
+
+      # Dataset used for parsing schema
+      def _parse_pragma_ds(table_name, opts)
+        metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth(opts[:dataset]).call(table_name))
+      end
 
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
@@ -449,7 +459,7 @@ module Sequel
       # Parse the output of the table_info pragma
       def parse_pragma(table_name, opts)
         pks = 0
-        sch = metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth(opts[:dataset]).call(table_name)).map do |row|
+        sch = _parse_pragma_ds(table_name, opts).map do |row|
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)

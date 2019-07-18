@@ -750,10 +750,15 @@ describe "Database schema modifiers" do
     @db.create_table!(:items) do
       primary_key :id
       Integer :i, :default=>20
+      Integer :j, :default=>10
+      String :s, :default=>'a'
     end
-    @ds.insert(:i=>10)
+    @ds.insert(:i=>10, :j=>20, :s=>'b')
     @db.drop_column(:items, :i)
-    @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id]
+    @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id, :j, :s]
+    @ds.first.must_equal(:id=>1, :j=>20, :s=>'b')
+    @ds.insert
+    @ds.first(:id=>2).must_equal(:id=>2, :j=>10, :s=>'a')
   end
 
   it "should remove foreign key columns from tables correctly" do

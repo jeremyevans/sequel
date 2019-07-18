@@ -15,6 +15,24 @@ module Sequel
     end
 
     module SQLite
+      module ForeignKeyListPragmaConvertorFix
+        # For the use of the convertor for String, working around a bug
+        # in jdbc-sqlite3 that reports fields are of type
+        # java.sql.types.NUMERIC even though they contain non-numeric data.
+        def type_convertor(_, _, _, i)
+          i > 2 ? TypeConvertor::CONVERTORS[:String] : super
+        end
+      end
+
+      module TableInfoPragmaConvertorFix
+        # For the use of the convertor for String, working around a bug
+        # in jdbc-sqlite3 that reports dflt_value field is of type
+        # java.sql.types.NUMERIC even though they contain string data.
+        def type_convertor(_, _, _, i)
+          i == 5 ? TypeConvertor::CONVERTORS[:String] : super
+        end
+      end
+
       module DatabaseMethods
         include Sequel::SQLite::DatabaseMethods
         
@@ -37,6 +55,17 @@ module Sequel
         end
 
         private
+
+
+        # Add workaround for bug when running foreign_key_list pragma
+        def _foreign_key_list_ds(_)
+          super.with_extend(ForeignKeyListPragmaConvertorFix)
+        end
+
+        # Add workaround for bug when running table_info pragma
+        def _parse_pragma_ds(_, _)
+          super.with_extend(TableInfoPragmaConvertorFix)
+        end
         
         DATABASE_ERROR_REGEXPS = Sequel::SQLite::DatabaseMethods::DATABASE_ERROR_REGEXPS.merge(/Abort due to constraint violation/ => ConstraintViolation).freeze
         def database_error_regexps

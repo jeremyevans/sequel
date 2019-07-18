@@ -1,5 +1,9 @@
 === master
 
+* Work around a bug on jdbc-sqlite3 3.27.2.1 when parsing schema for tables with columns with default values (jeremyevans)
+
+* Work around a bug in jdbc-sqlite3 3.27.2.1 when in Database#foreign_key_list in the jdbc/sqlite3 adapter (jeremyevans)
+
 * Make Dataset#execute* private methods respect explicit servers option, fixing Dataset#paged_each in the postgres adapter when sharding (jeremyevans) (#1632)
 
 * Handle instances of subclasses of core classes when wrapping objects in the pg_json extension (jeremyevans) (#1631)
