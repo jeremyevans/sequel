@@ -86,7 +86,7 @@ Begin creating indexes
 Finished creating indexes
 Begin adding foreign key constraints
 Finished adding foreign key constraints
-Database copy finished in \\d\\.\\d+ seconds
+Database copy finished in \\d+\\.\\d+ seconds
 END
     DB2.tables.sort_by{|t| t.to_s}.must_equal [:a, :b]
     DB[:a].all.must_equal [{:a=>1, :name=>'foo'}]
