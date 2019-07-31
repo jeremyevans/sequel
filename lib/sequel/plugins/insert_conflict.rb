@@ -63,7 +63,7 @@ module Sequel
         # Disable the use of prepared insert statements, as they are not compatible
         # with this plugin.
         def use_prepared_statements_for?(type)
-          return false if type == :insert
+          return false if type == :insert || type == :insert_select
           super if defined?(super)
         end
       end
