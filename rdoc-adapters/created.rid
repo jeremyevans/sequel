@@ -1,4 +1,4 @@
-Mon, 01 Jul 2019 07:23:21 -0700
+Thu, 01 Aug 2019 09:34:23 -0700
 lib/sequel/adapters/ado.rb	Tue, 07 May 2019 09:37:26 -0700
 lib/sequel/adapters/ado/access.rb	Mon, 28 Jan 2019 08:29:19 -0800
 lib/sequel/adapters/ado/mssql.rb	Mon, 28 Jan 2019 08:29:19 -0800
@@ -15,7 +15,7 @@ lib/sequel/adapters/jdbc/mysql.rb	Tue, 14 May 2019 16:39:50 -0700
 lib/sequel/adapters/jdbc/oracle.rb	Mon, 25 Feb 2019 08:20:33 -0800
 lib/sequel/adapters/jdbc/postgresql.rb	Mon, 25 Feb 2019 08:20:33 -0800
 lib/sequel/adapters/jdbc/sqlanywhere.rb	Mon, 25 Feb 2019 08:20:33 -0800
-lib/sequel/adapters/jdbc/sqlite.rb	Mon, 25 Feb 2019 08:20:33 -0800
+lib/sequel/adapters/jdbc/sqlite.rb	Thu, 18 Jul 2019 16:06:01 -0700
 lib/sequel/adapters/jdbc/sqlserver.rb	Mon, 25 Feb 2019 08:20:33 -0800
 lib/sequel/adapters/jdbc/transactions.rb	Fri, 07 Dec 2018 10:50:17 -0800
 lib/sequel/adapters/mock.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -30,15 +30,15 @@ lib/sequel/adapters/postgres.rb	Mon, 25 Feb 2019 08:20:33 -0800
 lib/sequel/adapters/postgresql.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/shared/access.rb	Wed, 10 Oct 2018 08:22:55 -0700
 lib/sequel/adapters/shared/db2.rb	Thu, 01 Nov 2018 07:32:49 -0700
-lib/sequel/adapters/shared/mssql.rb	Mon, 24 Jun 2019 08:57:13 -0700
+lib/sequel/adapters/shared/mssql.rb	Fri, 05 Jul 2019 09:50:06 -0700
 lib/sequel/adapters/shared/mysql.rb	Wed, 10 Oct 2018 08:22:55 -0700
 lib/sequel/adapters/shared/oracle.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/adapters/shared/postgres.rb	Tue, 18 Jun 2019 16:10:51 -0700
 lib/sequel/adapters/shared/sqlanywhere.rb	Wed, 10 Oct 2018 08:22:55 -0700
-lib/sequel/adapters/shared/sqlite.rb	Tue, 14 May 2019 16:39:50 -0700
+lib/sequel/adapters/shared/sqlite.rb	Thu, 18 Jul 2019 16:06:01 -0700
 lib/sequel/adapters/sqlanywhere.rb	Mon, 04 Mar 2019 09:24:25 -0800
 lib/sequel/adapters/sqlite.rb	Thu, 09 May 2019 16:09:48 -0700
-lib/sequel/adapters/tinytds.rb	Fri, 03 Aug 2018 16:28:24 -0700
+lib/sequel/adapters/tinytds.rb	Fri, 05 Jul 2019 09:50:06 -0700
 lib/sequel/adapters/utils/emulate_offset_with_reverse_and_count.rb	Fri, 03 Aug 2018 16:28:24 -0700
 lib/sequel/adapters/utils/emulate_offset_with_row_number.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/adapters/utils/mysql_mysql2.rb	Fri, 31 May 2019 08:26:21 -0700

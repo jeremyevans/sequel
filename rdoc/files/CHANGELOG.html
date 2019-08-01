@@ -30,12 +30,37 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-07-01 07:14:49 -0700</span>
+<span class='datetime'>2019-08-01 09:22:21 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.23.0+-282019-08-01-29">5.23.0 (2019-08-01)<span><a href="#label-5.23.0+-282019-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Work around a bug on jdbc-sqlite3 3.27.2.1 when parsing schema for tables with columns with default values (jeremyevans)</p>
+</li><li>
+<p>Work around a bug in jdbc-sqlite3 3.27.2.1 when in Database#foreign_key_list in the jdbc/sqlite3 adapter (jeremyevans)</p>
+</li><li>
+<p>Make Dataset#execute* private methods respect explicit servers option, fixing Dataset#paged_each in the postgres adapter when sharding (jeremyevans) (#1632)</p>
+</li><li>
+<p>Handle instances of subclasses of core classes when wrapping objects in the pg_json extension (jeremyevans) (#1631)</p>
+</li><li>
+<p>Support :ansi Database option in the tinytds adapter (kenaniah) (#1629)</p>
+</li><li>
+<p>Support cross-database and linked servers when parsing schema on Microsoft SQL Server (kenaniah) (#1629)</p>
+</li><li>
+<p>Add insert_conflict plugin for automatically handling unique constraint conflicts when saving new model instances on PostgreSQL 9.5+ and SQLite 3.24.0+ (jeremyevans)</p>
+</li><li>
+<p>Avoid errors when parsing schema in the mock sqlite adapter (jeremyevans)</p>
+</li><li>
+<p>Avoid possible thread-safety issue in the timezones support (jeremyevans)</p>
+</li><li>
+<p>Handle offsets when typecasting an array or hash to datetime when <a href="../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time (jeremyevans)</p>
+</li><li>
+<p>Support <a href="../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time when using the named_timezones extension (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.22.0+-282019-07-01-29">5.22.0 (2019-07-01)<span><a href="#label-5.22.0+-282019-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Fix Dataset#multi_insert and import with return: :primary_key on MSSQL when the dataset has a row_proc (jeremyevans) (#1627)</p>

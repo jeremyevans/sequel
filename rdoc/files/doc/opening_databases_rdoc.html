@@ -30,7 +30,7 @@ doc/opening_databases.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-05-31 08:26:21 -0700</span>
+<span class='datetime'>2019-07-05 09:50:06 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -362,7 +362,9 @@ Last Update:
 <p>The connection options are passed directly to tiny_tds, except that the tiny_tds :username option is set to the <a href="../../classes/Sequel.html"><code>Sequel</code></a> :user option.  If you want to use an entry in the freetds.conf file, you should specify the :dataserver option with that name as the value.  Some other options that you may want to set are :login_timeout, :timeout, :tds_version, :azure, :appname, and :encoding, see the tiny_tds <a href="../README_rdoc.html">README</a> for details.</p>
 
 <p>Other <a href="../../classes/Sequel.html"><code>Sequel</code></a> specific options:</p>
-<table class="rdoc-list note-list"><tbody><tr><td class='label'>:server_version </td><td>
+<table class="rdoc-list note-list"><tbody><tr><td class='label'>:ansi </td><td>
+<p>Set to true to enable the ANSI compatibility settings when connecting (ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ANSI_NULL_DFLT_ON, QUOTED_IDENTIFIER, CONCAT_NULL_YIELDS_NULL).</p>
+</td></tr><tr><td class='label'>:server_version </td><td>
 <p>Override the server version to use (9000000 = SQL Server 2005). This also works on any other adapter that connects to Microsoft SQL Server.</p>
 </td></tr><tr><td class='label'>:textsize </td><td>
 <p>Override the default TEXTSIZE setting for this connection.  The FreeTDS default is small (around 64000 bytes), but can be set up to around 2GB. This should be specified as an integer.  If you plan on setting large text or blob values via tinytds, you should use this option or modify your freetds.conf file.</p>

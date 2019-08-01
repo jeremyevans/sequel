@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.23.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.23.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.23.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-08-01 09:22:21 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An insert_conflict plugin has been added for automatically handling constraint conflicts when saving new model instances.  It is supported on PostgreSQL 9.5+ and SQLite 3.24.0+.</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&#39;Foo&#39;</span>, <span class="ruby-value">copies_sold:</span> <span class="ruby-value">1000</span>).&#x000A;  <span class="ruby-identifier">insert_conflict</span>(&#x000A;    <span class="ruby-value">target:</span> <span class="ruby-value">:name</span>,&#x000A;    <span class="ruby-value">update:</span> {<span class="ruby-value">copies_sold:</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">:excluded</span>][<span class="ruby-value">:b</span>]}&#x000A;  ).&#x000A;  <span class="ruby-identifier">save</span></pre>
+</li><li>
+<p>On Microsoft SQL Server, the Database :ansi option has been added, which sets the following ANSI related options:</p>
+<ul><li>
+<p>ANSI_NULLS</p>
+</li><li>
+<p>ANSI_PADDING</p>
+</li><li>
+<p>ANSI_WARNINGS</p>
+</li><li>
+<p>ANSI_NULL_DFLT_ON</p>
+</li><li>
+<p>QUOTED_IDENTIFIER</p>
+</li><li>
+<p>CONCAT_NULL_YIELDS_NULL</p>
+</li></ul>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time is now supported when using the named_timezones extension.  For backwards compatibility, the named_timezones extension still sets <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = DateTime.  When using Ruby 2.6+, the Time instances have the timezone set on them using Ruby 2.6+&#39;s timezone support, but basic support works correctly in earlier versions of Ruby.</p>
+</li><li>
+<p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles parsing schema for tables in another database on the same server or in a database on a linked server.</p>
+</li><li>
+<p>The pg_json extension now correctly handles subclasses of core classes when wrapping objects.  This stopped working in <a href="../../../classes/Sequel.html"><code>Sequel</code></a> 5.21.0, when support for wrapping JSON primitives was added.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now works around a couple bugs in jdbc-sqlite 3.27.2.1, allowing schema parsing and foreign key parsing to work.</p>
+</li><li>
+<p>Dataset#execute* private methods now respect an explicitly given :server option, fixing Dataset#paged_each in the postgres adapter when using sharding.</p>
+</li><li>
+<p>Timezone offsets are now handled correctly when typecasting an array or hash to datetime when <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids errors when parsing schema when using the mock SQLite adapter.</p>
+</li><li>
+<p>A minor thread-safety issue has been fixed in the named_timezones extension.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

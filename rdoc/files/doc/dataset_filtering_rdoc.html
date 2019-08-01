@@ -30,7 +30,7 @@ doc/dataset_filtering.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-12-18 09:44:38 -0800</span>
+<span class='datetime'>2019-07-04 09:17:49 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -107,6 +107,18 @@ Last Update:
 <p>You can also use placeholders with :placeholder and a hash of placeholder values:</p>
 
 <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;category = :category&#39;</span>, <span class="ruby-value">category:</span> <span class="ruby-string">&quot;ruby&quot;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># &quot;SELECT * FROM items WHERE category = &#39;ruby&#39;&quot;</span></pre>
+
+<p>In order to combine AND and OR together, you have a few options:</p>
+
+<pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-keyword">nil</span>).<span class="ruby-identifier">or</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&quot;ruby&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE (category IS NULL) OR (category = &#39;ruby&#39;)</span></pre>
+
+<p>This won&#39;t work if you add other conditions:</p>
+
+<pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">name:</span> <span class="ruby-string">&quot;Programming in Ruby&quot;</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">category:</span> <span class="ruby-keyword">nil</span>).<span class="ruby-identifier">or</span>(<span class="ruby-value">category:</span> <span class="ruby-string">&#39;ruby&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((name = &#39;Programming in Ruby&#39;) AND (category IS NULL)) OR (category = &#39;ruby&#39;)</span></pre>
+
+<p>The OR applies globally and not locally. To fix this, use &amp; and |:</p>
+
+<pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">name:</span> <span class="ruby-string">&quot;Programming in Ruby&quot;</span>] <span class="ruby-operator">&amp;</span> (<span class="ruby-constant">Sequel</span>[<span class="ruby-value">category:</span> <span class="ruby-keyword">nil</span>] <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-value">category:</span> <span class="ruby-string">&quot;ruby&quot;</span>]))&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((name = &#39;Programming in Ruby&#39;) AND ((category IS NULL) OR (category = &#39;ruby&#39;)))</span></pre>
 
 <h3 id="label-Specifying+SQL+functions">Specifying SQL functions<span><a href="#label-Specifying+SQL+functions">&para;</a> <a href="#top">&uarr;</a></span></h3>
 

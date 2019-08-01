@@ -47,6 +47,10 @@ Sequel::SQLite
 <ol>
 <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
 </ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-schema_parse_table">schema_parse_table</a></li>
+</ol>
 </div>
 <div id='context'>
 </div>
@@ -106,7 +110,25 @@ Sequel::SQLite
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-mock_adapter_setup-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>&#x000A;<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">11</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">12</span>     <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-value">30903</span>&#x000A;<span class="line-num">13</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-mock_adapter_setup-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>&#x000A;<span class="line-num">10</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;<span class="line-num">11</span>   <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">12</span>     <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-value">30903</span>&#x000A;<span class="line-num">13</span> &#x000A;<span class="line-num">14</span>     <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_parse_table</span>(<span class="ruby-operator">*</span>)&#x000A;<span class="line-num">15</span>       []&#x000A;<span class="line-num">16</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">17</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">18</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-schema_parse_table'>
+<a name='method-i-schema_parse_table'></a>
+<div class='synopsis'>
+<span class='name'>schema_parse_table</span>
+<span class='arguments'>(*)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-schema_parse_table-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-schema_parse_table-source'>   <span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb</span>&#x000A;<span class="line-num">14</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">schema_parse_table</span>(<span class="ruby-operator">*</span>)&#x000A;<span class="line-num">15</span>   []&#x000A;<span class="line-num">16</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
