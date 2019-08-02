@@ -129,11 +129,15 @@ module Sequel
       #                 be used if you have a single, nonautoincrementing primary key column
       #                 (use the primary_key method in that case).
       # :primary_key_constraint_name :: The name to give the primary key constraint
+      # :primary_key_deferrable :: Similar to :deferrable, but for the primary key constraint
+      #                            if :primary_key is used.
       # :type :: Overrides the type given as the argument.  Generally not used by column
       #          itself, but can be passed as an option to other methods that call column.
       # :unique :: Mark the column as unique, generally has the same effect as
       #            creating a unique index on the column.
       # :unique_constraint_name :: The name to give the unique key constraint
+      # :unique_deferrable :: Similar to :deferrable, but for the unique constraint if :unique
+      #                       is used.
       #
       # PostgreSQL specific options:
       #

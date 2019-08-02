@@ -586,6 +586,7 @@ module Sequel
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
         sql << ' PRIMARY KEY'
+        constraint_deferrable_sql_append(sql, column[:primary_key_deferrable])
       end
     end
     
@@ -606,6 +607,7 @@ module Sequel
           sql << " CONSTRAINT #{quote_identifier(name)}"
         end
         sql << ' UNIQUE'
+        constraint_deferrable_sql_append(sql, column[:unique_deferrable])
       end
     end
     

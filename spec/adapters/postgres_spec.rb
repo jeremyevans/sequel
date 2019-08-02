@@ -233,6 +233,18 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls].select_order_map([:a, :b, :c]).must_equal [[100, 10, 211]]
   end if DB.server_version >= 120000
 
+  it "should support deferred primary key and unique constraints on columns" do
+    @db.create_table(:tmp_dolls){primary_key :id, :primary_key_deferrable=>true; Integer :i, :unique=>true, :unique_deferrable=>true}
+    @db[:tmp_dolls].insert(:i=>10)
+    DB.transaction do
+      @db[:tmp_dolls].insert(:id=>1, :i=>1)
+      @db[:tmp_dolls].insert(:id=>10, :i=>10)
+      @db[:tmp_dolls].where(:i=>1).update(:id=>2)
+      @db[:tmp_dolls].where(:id=>10).update(:i=>2)
+    end
+    @db[:tmp_dolls].select_order_map([:id, :i]).must_equal [[1, 10], [2, 1], [10, 2]]
+  end if DB.server_version >= 90000
+
   it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}

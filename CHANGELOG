@@ -1,5 +1,7 @@
 === master
 
+* Support :unique_deferrable and :primary_key_deferrable column options (jeremyevans)
+
 * Support :generated_always_as column option on PostgreSQL 12+ (jeremyevans)
 
 === 5.23.0 (2019-08-01)

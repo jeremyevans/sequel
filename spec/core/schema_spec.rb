@@ -240,6 +240,24 @@ describe "DB#create_table" do
     @db.sqls.must_equal ["CREATE TABLE cats (id integer, name text, UNIQUE (name) DEFERRABLE INITIALLY IMMEDIATE)"]
   end
   
+  it "should handle deferred unique column constraints" do
+    @db.create_table(:cats) do
+      integer :id, :unique=>true, :unique_deferrable=>true
+      integer :i, :unique=>true, :unique_deferrable=>:immediate
+      integer :j, :unique=>true, :unique_deferrable=>false
+    end
+    @db.sqls.must_equal ["CREATE TABLE cats (id integer UNIQUE DEFERRABLE INITIALLY DEFERRED, i integer UNIQUE DEFERRABLE INITIALLY IMMEDIATE, j integer UNIQUE NOT DEFERRABLE)"]
+  end
+  
+  it "should handle deferred primary key column constraints" do
+    @db.create_table(:cats) do
+      integer :id, :primary_key=>true, :primary_key_deferrable=>true
+      integer :i, :primary_key=>true, :primary_key_deferrable=>:immediate
+      integer :j, :primary_key=>true, :primary_key_deferrable=>false
+    end
+    @db.sqls.must_equal ["CREATE TABLE cats (id integer PRIMARY KEY DEFERRABLE INITIALLY DEFERRED, i integer PRIMARY KEY DEFERRABLE INITIALLY IMMEDIATE, j integer PRIMARY KEY NOT DEFERRABLE)"]
+  end
+  
   it "should accept unsigned definition" do
     @db.create_table(:cats) do
       integer :value, :unsigned => true
