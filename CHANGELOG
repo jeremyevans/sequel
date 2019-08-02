@@ -1,3 +1,7 @@
+=== master
+
+* Support :generated_always_as column option on PostgreSQL 12+ (jeremyevans)
+
 === 5.23.0 (2019-08-01)
 
 * Work around a bug on jdbc-sqlite3 3.27.2.1 when parsing schema for tables with columns with default values (jeremyevans)

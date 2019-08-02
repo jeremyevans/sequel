@@ -227,6 +227,12 @@ describe "PostgreSQL", '#create_table' do
     @db.convert_serial_to_identity(:tmp_dolls, :column=>:id)
   end if DB.server_version >= 100002 && DB.get{current_setting('is_superuser')} == 'on'
 
+  it "should support creating generated columns" do
+    @db.create_table(:tmp_dolls){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1}
+    @db[:tmp_dolls].insert(:a=>100, :b=>10)
+    @db[:tmp_dolls].select_order_map([:a, :b, :c]).must_equal [[100, 10, 211]]
+  end if DB.server_version >= 120000
+
   it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}

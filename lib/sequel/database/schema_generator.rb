@@ -110,6 +110,9 @@ module Sequel
       #                yet exist on referenced table (but will exist before the transaction commits).
       #                Basically it adds DEFERRABLE INITIALLY DEFERRED on key creation.
       #                If you use :immediate as the value, uses DEFERRABLE INITIALLY IMMEDIATE.
+      # :generated_always_as :: Specify a GENERATED ALWAYS AS column expression,
+      #                         if generated columns are supported (PostgreSQL 12+, MariaDB 5.2.0+,
+      #                         and MySQL 5.7.6+).
       # :index :: Create an index on this column.  If given a hash, use the hash as the
       #           options for the index.
       # :key :: For foreign key columns, the column in the associated table
@@ -132,9 +135,11 @@ module Sequel
       #            creating a unique index on the column.
       # :unique_constraint_name :: The name to give the unique key constraint
       #
+      # PostgreSQL specific options:
+      #
+      # :identity :: Create an identity column.
+      #
       # MySQL specific options:
-      # :generated_always_as :: Specify a GENERATED ALWAYS AS column expression,
-      #                         if generated columns are supported.
       # :generated_type :: Set the type of column when using :generated_always_as,
       #                    should be :virtual or :stored to force a type.
       def column(name, type, opts = OPTS)
