@@ -1,5 +1,7 @@
 === master
 
+* Add :cache_file plugin option to pg_auto_constraint_validations plugin, for caching metadata to a file for faster initialization (jeremyevans)
+
 * Support :unique_deferrable and :primary_key_deferrable column options (jeremyevans)
 
 * Support :generated_always_as column option on PostgreSQL 12+ (jeremyevans)

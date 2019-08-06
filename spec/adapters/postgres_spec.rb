@@ -4363,4 +4363,49 @@ describe "pg_auto_constraint_validations plugin" do
     proc{o.save}.must_raise Sequel::ValidationFailed
     o.errors.must_equal(:i=>['is invalid'], :id=>['is invalid'])
   end
+
+  it "should handle dumping cached metadata and loading metadata from cache" do
+    cache_file = "spec/files/pgacv-#{$$}.cache"
+    begin
+      c = Class.new(Sequel::Model)
+      c.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
+      c1 = Class.new(c)
+      def c1.name; 'Foo' end
+      c1.dataset = DB[:test1]
+      c2 = Class.new(c)
+      def c2.name; 'Bar' end
+      c2.dataset = DB[:test2]
+      c1.unrestrict_primary_key
+      c2.unrestrict_primary_key
+
+      o = c1.new(:id=>5, :i=>12)
+      proc{o.save}.must_raise Sequel::ValidationFailed
+      o.errors.must_equal(:i=>['is invalid'])
+      o = c2.new(:test2_id=>4, :test1_id=>2)
+      proc{o.save}.must_raise Sequel::ValidationFailed
+      o.errors.must_equal(:test1_id=>['is invalid'])
+
+      c.dump_pg_auto_constraint_validations_cache
+
+      c = Class.new(Sequel::Model)
+      c.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
+      c1 = Class.new(c)
+      def c1.name; 'Foo' end
+      c1.dataset = DB[:test1]
+      c2 = Class.new(c)
+      def c2.name; 'Bar' end
+      c2.dataset = DB[:test2]
+      c1.unrestrict_primary_key
+      c2.unrestrict_primary_key
+
+      o = c1.new(:id=>5, :i=>12)
+      proc{o.save}.must_raise Sequel::ValidationFailed
+      o.errors.must_equal(:i=>['is invalid'])
+      o = c2.new(:test2_id=>4, :test1_id=>2)
+      proc{o.save}.must_raise Sequel::ValidationFailed
+      o.errors.must_equal(:test1_id=>['is invalid'])
+    ensure
+      File.delete(cache_file) if File.file?(cache_file)
+    end
+  end
 end if DB.respond_to?(:error_info)

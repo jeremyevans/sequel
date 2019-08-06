@@ -45,6 +45,31 @@ module Sequel
     # to be associated to particular column(s), and use a specific error message:
     #
     #   Album.pg_auto_constraint_validation_override(:constraint_name, [:column1], "validation error message")
+    #
+    # Using the pg_auto_constraint_validations plugin requires 5 queries per
+    # model at load time in order to gather the necessary metadata.  For applications
+    # with a large number of models, this can result in a noticeable delay during model
+    # initialization.  To mitigate this issue, you can cache the necessary metadata in
+    # a file with the :cache_file option:
+    #
+    #   Sequel::Model.plugin :pg_auto_constraint_validations, cache_file: 'db/pgacv.cache'
+    #
+    # The file does not have to exist when loading the plugin.  If it exists, the plugin
+    # will load the cache and use the cached results instead of issuing queries if there
+    # is an entry in the cache.  If there is no entry in the cache, it will update the
+    # in-memory cache with the metadata results.  To save the in in-memory cache back to
+    # the cache file, run:
+    #
+    #   Sequel::Model.dump_pg_auto_constraint_validations_cache
+    # 
+    # Note that when using the :cache_file option, it is up to the application to ensure
+    # that the dumped cached metadata reflects the current state of the database.  Sequel
+    # does no checking to ensure this, as checking would take time and the
+    # purpose of this code is to take a shortcut.
+    #
+    # The cached schema is dumped in Marshal format, since it is the fastest
+    # and it handles all ruby objects used in the metadata.  Because of this,
+    # you should not attempt to load the metadata from a untrusted file.
     # 
     # Usage:
     #
@@ -67,13 +92,28 @@ module Sequel
       }.freeze).each_value(&:freeze)
 
       # Setup the constraint violation metadata.  Options:
+      # :cache_file :: File storing cached metadata, to avoid queries for each model
       # :messages :: Override the default error messages for each constraint
       #              violation type (:not_null, :check, :unique, :foreign_key, :referenced_by)
       def self.configure(model, opts=OPTS)
         model.instance_exec do
+          if @pg_auto_constraint_validations_cache_file = opts[:cache_file]
+            @pg_auto_constraint_validations_cache = if ::File.file?(@pg_auto_constraint_validations_cache_file)
+              cache = Marshal.load(File.read(@pg_auto_constraint_validations_cache_file))
+              cache.each_value do |hash|
+                hash.freeze.each_value(&:freeze)
+              end
+            else
+              {}
+            end
+          else
+            @pg_auto_constraint_validations_cache = nil
+          end
+
           setup_pg_auto_constraint_validations
           @pg_auto_constraint_validations_messages = (@pg_auto_constraint_validations_messages || DEFAULT_ERROR_MESSAGES).merge(opts[:messages] || OPTS).freeze
         end
+        nil
       end
 
       module ClassMethods
@@ -85,8 +125,15 @@ module Sequel
         # generated validation failures.
         attr_reader :pg_auto_constraint_validations_messages
 
-        Plugins.inherited_instance_variables(self, :@pg_auto_constraint_validations=>nil, :@pg_auto_constraint_validations_messages=>nil)
+        Plugins.inherited_instance_variables(self, :@pg_auto_constraint_validations=>nil, :@pg_auto_constraint_validations_messages=>nil, :@pg_auto_constraint_validations_cache=>nil, :@pg_auto_constraint_validations_cache_file=>nil)
         Plugins.after_set_dataset(self, :setup_pg_auto_constraint_validations)
+
+        # Dump the in-memory cached metadata to the cache file.
+        def dump_pg_auto_constraint_validations_cache
+          raise Error, "No pg_auto_constraint_validations setup" unless file = @pg_auto_constraint_validations_cache_file
+          File.open(file, 'wb'){|f| f.write(Marshal.dump(@pg_auto_constraint_validations_cache))}
+          nil
+        end
 
         # Override the constraint validation columns and message for a given constraint
         def pg_auto_constraint_validation_override(constraint, columns, message)
@@ -122,39 +169,51 @@ module Sequel
             return
           end
 
-          checks = {}
-          indexes = {}
-          foreign_keys = {}
-          referenced_by = {}
+          cache = @pg_auto_constraint_validations_cache
+          literal_table_name = dataset.literal(table_name)
+          unless cache && (metadata = cache[literal_table_name])
+            checks = {}
+            indexes = {}
+            foreign_keys = {}
+            referenced_by = {}
 
-          db.check_constraints(table_name).each do |k, v|
-            checks[k] = v[:columns].dup.freeze unless v[:columns].empty?
-          end
-          db.indexes(table_name, :include_partial=>true).each do |k, v|
-            if v[:unique]
-              indexes[k] = v[:columns].dup.freeze
+            db.check_constraints(table_name).each do |k, v|
+              checks[k] = v[:columns].dup.freeze unless v[:columns].empty?
+            end
+            db.indexes(table_name, :include_partial=>true).each do |k, v|
+              if v[:unique]
+                indexes[k] = v[:columns].dup.freeze
+              end
+            end
+            db.foreign_key_list(table_name, :schema=>false).each do |fk|
+              foreign_keys[fk[:name]] = fk[:columns].dup.freeze
+            end
+            db.foreign_key_list(table_name, :reverse=>true, :schema=>false).each do |fk|
+              referenced_by[[fk[:schema], fk[:table], fk[:name]].freeze] = fk[:key].dup.freeze
+            end
+
+            schema, table = db[:pg_class].
+              join(:pg_namespace, :oid=>:relnamespace, db.send(:regclass_oid, table_name)=>:oid).
+              get([:nspname, :relname])
+
+            metadata = {
+              :schema=>schema,
+              :table=>table,
+              :check=>checks,
+              :unique=>indexes,
+              :foreign_key=>foreign_keys,
+              :referenced_by=>referenced_by,
+              :overrides=>OPTS
+            }.freeze
+            metadata.each_value(&:freeze)
+
+            if cache
+              cache[literal_table_name] = metadata
             end
           end
-          db.foreign_key_list(table_name, :schema=>false).each do |fk|
-            foreign_keys[fk[:name]] = fk[:columns].dup.freeze
-          end
-          db.foreign_key_list(table_name, :reverse=>true, :schema=>false).each do |fk|
-            referenced_by[[fk[:schema], fk[:table], fk[:name]].freeze] = fk[:key].dup.freeze
-          end
 
-          schema, table = db[:pg_class].
-            join(:pg_namespace, :oid=>:relnamespace, db.send(:regclass_oid, table_name)=>:oid).
-            get([:nspname, :relname])
-
-          (@pg_auto_constraint_validations = {
-            :schema=>schema,
-            :table=>table,
-            :check=>checks,
-            :unique=>indexes,
-            :foreign_key=>foreign_keys,
-            :referenced_by=>referenced_by,
-            :overrides=>OPTS
-          }.freeze).each_value(&:freeze)
+          @pg_auto_constraint_validations = metadata
+          nil
         end
       end
 

@@ -169,4 +169,41 @@ describe "pg_auto_constraint_validations plugin" do
     proc{o.update(:i=>12)}.must_raise Sequel::ValidationFailed
     o.errors.must_equal(:i=>['foo bar'])
   end
+
+  it "should handle dumping cached metadata and loading metadata from cache" do
+    cache_file = "spec/files/pgacv-spec-#{$$}.cache"
+    begin
+      @ds = @db[:items]
+      @ds.send(:columns=, [:id, :i])
+      @db.fetch = @metadata_results.dup
+      c = Sequel::Model(@ds)
+      def c.name; 'Foo' end
+      @db.sqls
+      c.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
+      @db.sqls.length.must_equal 5
+
+      o = c.new(:i=>12)
+      @set_error[Sequel::CheckConstraintViolation, :constraint=>'items_i_id_check']
+      proc{o.save}.must_raise Sequel::ValidationFailed
+
+      c.dump_pg_auto_constraint_validations_cache
+
+      @db.fetch = []
+      c = Sequel::Model(@ds)
+      def c.name; 'Foo' end
+      @db.sqls
+      c.plugin :pg_auto_constraint_validations, :cache_file=>cache_file
+      @db.sqls.must_be_empty
+
+      o = c.new(:i=>12)
+      @set_error[Sequel::CheckConstraintViolation, :constraint=>'items_i_id_check']
+      proc{o.save}.must_raise Sequel::ValidationFailed
+    ensure
+      File.delete(cache_file) if File.file?(cache_file)
+    end
+  end
+
+  it "should raise error if attempting to dump cached metadata when not using caching" do
+    proc{@c.dump_pg_auto_constraint_validations_cache}.must_raise Sequel::Error
+  end
 end
