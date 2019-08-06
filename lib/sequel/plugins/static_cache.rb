@@ -211,17 +211,22 @@ module Sequel
         # Reload the cache for this model by retrieving all of the instances in the dataset
         # freezing them, and populating the cached array and hash.
         def load_cache
-          a = dataset.all
+          @all = load_static_cache_rows
           h = {}
-          a.each do |o|
+          @all.each do |o|
             o.errors.freeze
             h[o.pk.freeze] = o.freeze
           end
-          @all = a.freeze
           @cache = h.freeze
         end
 
         private
+
+        # Load the static cache rows from the database.
+        def load_static_cache_rows
+          ret = super if defined?(super)
+          ret || dataset.all.freeze
+        end
 
         # Return the frozen object with the given pk, or nil if no such object exists
         # in the cache, without issuing a database query.

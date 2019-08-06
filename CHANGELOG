@@ -1,5 +1,7 @@
 === master
 
+* Add static_cache_cache plugin for caching rows for static_cache models to a file to avoid database queries during model initialization (jeremyevans)
+
 * Add :cache_file plugin option to pg_auto_constraint_validations plugin, for caching metadata to a file for faster initialization (jeremyevans)
 
 * Support :unique_deferrable and :primary_key_deferrable column options (jeremyevans)
