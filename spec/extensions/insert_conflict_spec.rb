@@ -74,4 +74,30 @@ describe "insert_conflict plugin" do
     model.db.sqls.must_equal ["INSERT INTO t (s, o) VALUES ('A', 1) ON CONFLICT (s) DO UPDATE SET o = excluded.o",
       "SELECT * FROM t WHERE (id = 2) LIMIT 1"]
   end
+
+  it "should work if the prepared_statements plugin is loaded before" do
+    db = Sequel.mock(:host=>'sqlite', :fetch=>{:id=>1, :s=>2}, :autoid=>1, :numrows=>1)
+    db.extend_datasets{def quote_identifiers?; false end}
+    model = Class.new(Sequel::Model)
+    model.dataset = db[:t]
+    model.columns :id, :s
+    model.plugin :prepared_statements
+    model.plugin :insert_conflict
+    db.sqls
+    model.create(:s=>'a').update(:s=>'b')
+    db.sqls.must_equal ["INSERT INTO t (s) VALUES ('a')", "SELECT * FROM t WHERE (id = 1) LIMIT 1", "UPDATE t SET s = 'b' WHERE (id = 1)"]
+  end
+
+  it "should work if the prepared_statements plugin is loaded after" do
+    db = Sequel.mock(:host=>'postgres', :fetch=>{:id=>1, :s=>2}, :autoid=>1, :numrows=>1)
+    db.extend_datasets{def quote_identifiers?; false end}
+    model = Class.new(Sequel::Model)
+    model.dataset = db[:t]
+    model.columns :id, :s
+    model.plugin :insert_conflict
+    model.plugin :prepared_statements
+    db.sqls
+    model.create(:s=>'a').update(:s=>'b')
+    db.sqls.must_equal ["INSERT INTO t (s) VALUES ('a') RETURNING *", "UPDATE t SET s = 'b' WHERE (id = 1)"]
+  end
 end
