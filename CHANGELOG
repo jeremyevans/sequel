@@ -1,5 +1,7 @@
 === master
 
+* Allow a hostname specified in a defaults_file in the mysql2 adapter, by not explicitly setting :host (sapio-bdeamer) (#1638)
+
 * Convert all database array types to Ruby arrays in the jdbc adapter (jeremyevans)
 
 * Add static_cache_cache plugin for caching rows for static_cache models to a file to avoid database queries during model initialization (jeremyevans)
