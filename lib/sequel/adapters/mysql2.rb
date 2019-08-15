@@ -36,7 +36,6 @@ module Sequel
       # options such as :local_infile.
       def connect(server)
         opts = server_opts(server)
-        opts[:host] ||= 'localhost'
         opts[:username] ||= opts.delete(:user)
         opts[:flags] ||= 0
         opts[:flags] |= ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
