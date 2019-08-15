@@ -102,12 +102,17 @@ module Sequel
           v.getSubString(1, v.length)
         end
       end
+      x = convertors[:RubyArray] = Object.new
+      def x.call(r, i)
+        if v = r.getArray(i)
+          v.array.to_ary
+        end
+      end 
 
       MAP = Hash.new(convertors[:Object])
       types = Java::JavaSQL::Types
 
       {
-        :ARRAY => :Array,
         :BOOLEAN => :Boolean,
         :CHAR => :String,
         :DOUBLE => :Double,
@@ -126,6 +131,7 @@ module Sequel
       BASIC_MAP = MAP.dup
 
       {
+        :ARRAY => :Array,
         :BINARY => :Blob,
         :BLOB => :Blob,
         :CLOB => :Clob,

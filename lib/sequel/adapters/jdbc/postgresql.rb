@@ -195,17 +195,7 @@ module Sequel
 
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
-        PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze
-
-        # Return PostgreSQL array types as ruby Arrays instead of
-        # JDBC PostgreSQL driver-specific array type. Only used if the
-        # database does not have a conversion proc for the type.
-        ARRAY_METHOD = Object.new
-        def ARRAY_METHOD.call(r, i)
-          if v = r.getArray(i)
-            v.array.to_ary
-          end
-        end 
+        PG_SPECIFIC_TYPES = [Java::JavaSQL::Types::ARRAY, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT, Java::JavaSQL::Types::TIME_WITH_TIMEZONE, Java::JavaSQL::Types::TIME].freeze
 
         # Return PostgreSQL hstore types as ruby Hashes instead of
         # Java HashMaps.  Only used if the database does not have a
@@ -223,8 +213,6 @@ module Sequel
             oid = meta.getField(i).getOID
             if pr = db.oid_convertor_proc(oid)
               pr
-            elsif type == ARRAY_TYPE
-              ARRAY_METHOD
             elsif oid == 2950 # UUID
               map[STRING_TYPE]
             elsif meta.getPGType(i) == 'hstore'

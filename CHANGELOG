@@ -1,5 +1,7 @@
 === master
 
+* Convert all database array types to Ruby arrays in the jdbc adapter (jeremyevans)
+
 * Add static_cache_cache plugin for caching rows for static_cache models to a file to avoid database queries during model initialization (jeremyevans)
 
 * Add :cache_file plugin option to pg_auto_constraint_validations plugin, for caching metadata to a file for faster initialization (jeremyevans)
