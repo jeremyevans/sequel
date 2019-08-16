@@ -105,8 +105,8 @@ module Sequel
       # To use a custom operator class, you need to use Sequel.lit with the expression
       # and operator class:
       #
-      #   exclude([[Sequel.lit('col1 inet_opts'), '&&'], [:col2, '=']])
-      #   # EXCLUDE USING gist (col1 inet_opts WITH &&, col2 WITH =)
+      #   exclude([[Sequel.lit('col1 inet_ops'), '&&'], [:col2, '=']])
+      #   # EXCLUDE USING gist (col1 inet_ops WITH &&, col2 WITH =)
       #
       # Options supported:
       #
