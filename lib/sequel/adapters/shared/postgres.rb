@@ -97,12 +97,16 @@ module Sequel
       # Add an exclusion constraint when creating the table. Elements should be
       # an array of 2 element arrays, with the first element being the column or
       # expression the exclusion constraint is applied to, and the second element
-      # being the operator to use for the column/expression to check for exclusion.
-      #
-      # Example:
+      # being the operator to use for the column/expression to check for exclusion:
       #
       #   exclude([[:col1, '&&'], [:col2, '=']])
       #   # EXCLUDE USING gist (col1 WITH &&, col2 WITH =)
+      #
+      # To use a custom operator class, you need to use Sequel.lit with the expression
+      # and operator class:
+      #
+      #   exclude([[Sequel.lit('col1 inet_opts'), '&&'], [:col2, '=']])
+      #   # EXCLUDE USING gist (col1 inet_opts WITH &&, col2 WITH =)
       #
       # Options supported:
       #
