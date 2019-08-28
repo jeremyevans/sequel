@@ -35,7 +35,7 @@ module Sequel
     # Yield to the block, logging any errors at error level to all loggers,
     # and all other queries with the duration at warn or info level.
     def log_connection_yield(sql, conn, args=nil)
-      return yield if @loggers.empty?
+      return yield if skip_logging?
       sql = "#{connection_info(conn) if conn && log_connection_info}#{sql}#{"; #{args.inspect}" if args}"
       timer = Sequel.start_timer
 
@@ -57,6 +57,12 @@ module Sequel
     end
 
     private
+
+    # Determine if logging should be skipped. Defaults to true if no loggers
+    # have been specified.
+    def skip_logging?
+      @loggers.empty?
+    end
 
     # String including information about the connection, for use when logging
     # connection info.
