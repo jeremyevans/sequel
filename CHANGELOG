@@ -1,5 +1,7 @@
 === master
 
+* Add Database#skip_logging? private method designed for extensions to force query timing even if no logger is present (adam12) (#1640)
+
 * Allow a hostname specified in a defaults_file in the mysql2 adapter, by not explicitly setting :host (sapio-bdeamer) (#1638)
 
 * Convert all database array types to Ruby arrays in the jdbc adapter (jeremyevans)
