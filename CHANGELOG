@@ -1,4 +1,4 @@
-=== master
+=== 5.24.0 (2019-09-01)
 
 * Add Database#skip_logging? private method designed for extensions to force query timing even if no logger is present (adam12) (#1640)
 
