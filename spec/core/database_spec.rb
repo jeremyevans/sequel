@@ -264,6 +264,25 @@ describe "Database#log_connection_yield" do
     @o.logs.first.first.must_equal :info
     @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah; \[1, 2\]\z/)
   end
+
+  it "should log without a logger defined by forcing skip_logging? to return false" do
+    @db.logger = nil
+    @db.extend(Module.new do
+      def skip_logging?
+        false
+      end
+
+      def log_duration(*)
+        self.did_log = true
+      end
+
+      attr_accessor :did_log
+    end)
+
+    @db.log_connection_yield('some sql', @conn) {}
+
+    @db.did_log.must_equal true
+  end
 end
 
 describe "Database#uri" do
