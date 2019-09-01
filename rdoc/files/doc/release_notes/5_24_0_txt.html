@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.24.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.24.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.24.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-08-30 10:44:04 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A :cache_file plugin option has been added to the pg_auto_constraint_validations plugin.  This option specifies a file to use to cache the metadata the plugin uses, so the plugin does not need to run 5 queries per model at startup to load the metadata.  This can dramatically improve startup time when using the plugin with a large number of models.</p>
+
+<p>To create the metadata file, load the plugin into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (or whatever class you are using as the base class for your model classes) with the :cache_file option, and after loading all of the subclasses of that class, run:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dump_pg_auto_constraint_validations_cache</span></pre>
+
+<p>As when using the schema_caching and index_caching extensions, it is up to the user to ensure that the cached metadata matches the current database schema.  <a href="../../../classes/Sequel.html"><code>Sequel</code></a> does no checking of this, as checking would take more time, and the point of this plugin is to improve startup performance.</p>
+</li><li>
+<p>A static_cache_cache plugin has been added.  This plugin allows for caching rows for models using the static_cache plugin. This prevents the need to issue a query at model creation time to get the rows.  This plugin should be loaded into <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a> (or whatever class you are using as the base class for your model classes) before loading the models using the static_cache plugin.  To create the metadata file, after all subclasses of that class have been loaded, run:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dump_static_cache_cache</span></pre>
+</li><li>
+<p>:unique_deferrable and :primary_key_deferrable column options are now supported on PostgreSQL 9+ and Oracle. This allows you to created deferrable unique and primary key column constraints.  You could already create deferrable table constraints using the :deferrable option to the primary_key and unique methods.</p>
+</li><li>
+<p>A :generated_always_as column option is now supported on PostgreSQL 12+, for creating generated columns.</p>
+</li><li>
+<p>A Database#skip_logging? private method has been added.  This is designed for use in extensions, to force log timing even when no loggers are configured.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> no longer sets the :host option to localhost by default in the mysql2 adapter.  This prevents <a href="../../../classes/Sequel.html"><code>Sequel</code></a> from overriding a host specified in the defaults_file.</p>
+</li><li>
+<p>All database array types are converted to Ruby arrays in the jdbc adapter.  Previously, this was only done in the jdbc/postgresql subadapter.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

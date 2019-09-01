@@ -39,6 +39,7 @@ Sequel::Plugins::PgAutoConstraintValidations::ClassMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
+<li><a href="#method-i-dump_pg_auto_constraint_validations_cache">dump_pg_auto_constraint_validations_cache</a></li>
 <li><a href="#method-i-pg_auto_constraint_validation_override">pg_auto_constraint_validation_override</a></li>
 <li><a href="#attribute-i-pg_auto_constraint_validations">pg_auto_constraint_validations</a></li>
 <li><a href="#attribute-i-pg_auto_constraint_validations_messages">pg_auto_constraint_validations_messages</a></li>
@@ -74,6 +75,25 @@ Sequel::Plugins::PgAutoConstraintValidations::ClassMethods
 </div>
 <div id='methods'>
 <h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-dump_pg_auto_constraint_validations_cache'>
+<a name='method-i-dump_pg_auto_constraint_validations_cache'></a>
+<div class='synopsis'>
+<span class='name'>dump_pg_auto_constraint_validations_cache</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Dump the in-memory cached metadata to the cache file.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-dump_pg_auto_constraint_validations_cache-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-dump_pg_auto_constraint_validations_cache-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_constraint_validations.rb</span>&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">dump_pg_auto_constraint_validations_cache</span>&#x000A;<span class="line-num">133</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No pg_auto_constraint_validations setup&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">file</span> = <span class="ruby-ivar">@pg_auto_constraint_validations_cache_file</span>&#x000A;<span class="line-num">134</span>   <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-identifier">file</span>, <span class="ruby-string">&#39;wb&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">write</span>(<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-ivar">@pg_auto_constraint_validations_cache</span>))}&#x000A;<span class="line-num">135</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">136</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-pg_auto_constraint_validation_override'>
 <a name='method-i-pg_auto_constraint_validation_override'></a>
 <div class='synopsis'>
@@ -90,7 +110,7 @@ Sequel::Plugins::PgAutoConstraintValidations::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-pg_auto_constraint_validation_override-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-pg_auto_constraint_validation_override-source'>   <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_constraint_validations.rb</span>&#x000A;<span class="line-num">92</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_auto_constraint_validation_override</span>(<span class="ruby-identifier">constraint</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">message</span>)&#x000A;<span class="line-num">93</span>   <span class="ruby-identifier">pgacv</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@pg_auto_constraint_validations</span>]&#x000A;<span class="line-num">94</span>   <span class="ruby-identifier">overrides</span> = <span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>] = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>]]&#x000A;<span class="line-num">95</span>   <span class="ruby-identifier">overrides</span>[<span class="ruby-identifier">constraint</span>] = [<span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-identifier">message</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">96</span>   <span class="ruby-identifier">overrides</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">97</span>   <span class="ruby-ivar">@pg_auto_constraint_validations</span> = <span class="ruby-identifier">pgacv</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">98</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">99</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-pg_auto_constraint_validation_override-source'>    <span class="ruby-comment"># File lib/sequel/plugins/pg_auto_constraint_validations.rb</span>&#x000A;<span class="line-num">139</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">pg_auto_constraint_validation_override</span>(<span class="ruby-identifier">constraint</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">message</span>)&#x000A;<span class="line-num">140</span>   <span class="ruby-identifier">pgacv</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@pg_auto_constraint_validations</span>]&#x000A;<span class="line-num">141</span>   <span class="ruby-identifier">overrides</span> = <span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>] = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">pgacv</span>[<span class="ruby-value">:overrides</span>]]&#x000A;<span class="line-num">142</span>   <span class="ruby-identifier">overrides</span>[<span class="ruby-identifier">constraint</span>] = [<span class="ruby-constant">Array</span>(<span class="ruby-identifier">columns</span>), <span class="ruby-identifier">message</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">143</span>   <span class="ruby-identifier">overrides</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">144</span>   <span class="ruby-ivar">@pg_auto_constraint_validations</span> = <span class="ruby-identifier">pgacv</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">145</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">146</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

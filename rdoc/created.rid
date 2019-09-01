@@ -1,6 +1,6 @@
-Thu, 01 Aug 2019 09:33:01 -0700
+Sun, 01 Sep 2019 09:59:48 -0700
 README.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
-CHANGELOG	Thu, 01 Aug 2019 09:22:21 -0700
+CHANGELOG	Fri, 30 Aug 2019 10:44:04 -0700
 doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
 MIT-LICENSE	Sat, 23 Feb 2019 12:14:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Mon, 10 Jun 2019 12:48:41 -0700
 lib/sequel/timezones.rb	Tue, 02 Jul 2019 15:10:53 -0700
-lib/sequel/version.rb	Thu, 01 Aug 2019 09:22:21 -0700
+lib/sequel/version.rb	Fri, 30 Aug 2019 10:44:04 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -23,11 +23,11 @@ lib/sequel/database/connecting.rb	Thu, 10 May 2018 14:41:34 -0700
 lib/sequel/database/dataset.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/dataset_defaults.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/database/features.rb	Tue, 01 Aug 2017 08:12:00 -0700
-lib/sequel/database/logging.rb	Sun, 01 Apr 2018 19:38:21 -0700
+lib/sequel/database/logging.rb	Fri, 30 Aug 2019 08:15:18 -0700
 lib/sequel/database/misc.rb	Fri, 29 Mar 2019 13:22:52 -0700
 lib/sequel/database/query.rb	Fri, 12 Apr 2019 07:19:11 -0700
-lib/sequel/database/schema_generator.rb	Mon, 29 Apr 2019 18:16:57 -0700
-lib/sequel/database/schema_methods.rb	Thu, 01 Aug 2019 09:15:11 -0700
+lib/sequel/database/schema_generator.rb	Fri, 02 Aug 2019 16:33:09 -0700
+lib/sequel/database/schema_methods.rb	Fri, 02 Aug 2019 16:33:09 -0700
 lib/sequel/database/transactions.rb	Mon, 08 Apr 2019 13:33:12 -0700
 lib/sequel/dataset/actions.rb	Fri, 12 Jul 2019 09:47:14 -0700
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
@@ -210,6 +210,7 @@ doc/release_notes/5.20.0.txt	Wed, 01 May 2019 08:24:04 -0700
 doc/release_notes/5.21.0.txt	Sat, 01 Jun 2019 10:23:00 -0700
 doc/release_notes/5.22.0.txt	Mon, 01 Jul 2019 07:14:49 -0700
 doc/release_notes/5.23.0.txt	Thu, 01 Aug 2019 09:22:21 -0700
+doc/release_notes/5.24.0.txt	Fri, 30 Aug 2019 10:44:04 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800

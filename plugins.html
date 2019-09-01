@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v5.23.0</h2>
+    <h2>Sequel::Model Plugins for v5.24.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -82,6 +82,7 @@
 <li>Caching:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Caching.html">caching</a>: Supports caching primary key lookups of model objects to any object that supports the Ruby-Memcache API.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/StaticCache.html">static_cache</a>: Caches all model instances, improving performance for static models.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/StaticCacheCache.html">static_cache_cache</a>: Support caching rows for static_cache models to a file to avoid database queries during model initialization.</li>
 </ul></li>
 <li>Hooks:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AfterInitialize.html">after_initialize</a>: Adds an after_initialize hook to model objects, called for both new objects and those loaded from the database.</li>
