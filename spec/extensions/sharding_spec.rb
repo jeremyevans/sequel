@@ -186,4 +186,12 @@ describe "sharding plugin" do
     ["UPDATE albums SET artist_id = 2, name = 'RF' WHERE (id = 1) -- s1", "UPDATE albums SET name = 'RF', artist_id = 2 WHERE (id = 1) -- s1"].must_include(sqls.slice!(2))
     sqls.must_equal ["SELECT * FROM albums LIMIT 1 -- s2", "BEGIN -- s1", "COMMIT -- s1"]
   end 
+
+  it "should have objects retrieved from a specific shard using with_server from server_block extension" do
+    album = @db.extension(:server_block).with_server(:s1) do
+      @Album.first
+    end
+    album.update(:name=>'MO')
+    @db.sqls.must_equal ["SELECT * FROM albums LIMIT 1 -- s1", "UPDATE albums SET name = 'MO' WHERE (id = 1) -- s1"]
+  end 
 end

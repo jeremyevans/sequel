@@ -107,12 +107,18 @@ module Sequel
         # previous row_proc, but calls set_server on the output of that row_proc,
         # ensuring that objects retrieved by a specific shard know which shard they
         # are tied to.
-        def server(s)
-          ds = super
-          if rp = row_proc
-            ds = ds.with_row_proc(proc{|r| rp.call(r).set_server(s)})
+        def row_proc
+          rp = super
+          if rp
+            case server = db.pool.send(:pick_server, opts[:server])
+            when nil, :default, :read_only
+              # nothing
+            else
+              old_rp = rp
+              rp = proc{|r| old_rp.call(r).set_server(server)}
+            end
           end
-          ds
+          rp 
         end
       end
     end
