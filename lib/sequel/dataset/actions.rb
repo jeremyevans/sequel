@@ -11,7 +11,7 @@ module Sequel
     
     # Action methods defined by Sequel that execute code on the database.
     ACTION_METHODS = (<<-METHS).split.map(&:to_sym).freeze
-      << [] all as_hash avg count columns columns! delete each
+      << [] all any? as_hash avg count columns columns! delete each
       empty? fetch_rows first first! get import insert last
       map max min multi_insert paged_each select_hash select_hash_groups select_map select_order_map
       single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
@@ -164,6 +164,22 @@ module Sequel
       cached_dataset(:_empty_ds) do
         single_value_ds.unordered.select(EMPTY_SELECT)
       end.single_value!.nil?
+    end
+
+    # Returns true if records exist in the dataset, false otherwise
+    #
+    #   DB[:table].any? # SELECT 1 AS one FROM table LIMIT 1
+    #   # => true
+    def any?
+      !empty?
+    end
+
+    # Returns true if records exist in the dataset, false otherwise
+    #
+    #   DB[:table].include?(id: 1) # SELECT 1 AS one FROM table WHERE (id = 1) LIMIT 1
+    #   # => true
+    def include?(*args)
+      where(*args).any?
     end
 
     # Returns the first matching record if no arguments are given.

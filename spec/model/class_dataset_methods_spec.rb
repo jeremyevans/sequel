@@ -22,6 +22,8 @@ describe Sequel::Model, "class dataset methods"  do
     @c.each_server{|r| r.opts[:server].must_equal :default}
     @c.empty?.must_equal false
     @db.sqls.must_equal ["SELECT 1 AS one FROM items LIMIT 1"]
+    @c.any?.must_equal true
+    @db.sqls.must_equal ["SELECT 1 AS one FROM items LIMIT 1"]
     @c.except(@d, :from_self=>false).sql.must_equal "SELECT * FROM items EXCEPT SELECT * FROM items"
     @c.exclude(:a).sql.must_equal "SELECT * FROM items WHERE NOT a"
     @c.exclude_having(:a).sql.must_equal "SELECT * FROM items HAVING NOT a"

@@ -1020,6 +1020,14 @@ If you just want to know whether the current dataset would return any rows, use 
   # SELECT 1 FROM albums WHERE (id = 0) LIMIT 1
   # => true
 
+  Album.where(id: 0).any?
+  # SELECT 1 FROM albums WHERE (id = 0) LIMIT 1
+  # => false
+
+  Album.include?(id: 0)
+  # SELECT 1 FROM albums WHERE (id = 0) LIMIT 1
+  # => true
+
   Album.where(Sequel.like(:name, 'R%')).empty?
   # SELECT 1 FROM albums WHERE (name LIKE 'R%' ESCAPE '\') LIMIT 1
   # => false

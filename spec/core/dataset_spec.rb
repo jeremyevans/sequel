@@ -2240,6 +2240,37 @@ describe "Dataset#empty?" do
   end
 end
 
+describe "Dataset#any?" do
+  it "should return true if records exist in the dataset" do
+    db = Sequel.mock(fetch: proc { |sql| { 1 => 1 } unless sql =~ /WHERE 'f'/ })
+    db.from(:test).must_be :any?
+    db.sqls.must_equal ['SELECT 1 AS one FROM test LIMIT 1']
+    db.from(:test).filter(false).wont_be :any?
+    db.sqls.must_equal ["SELECT 1 AS one FROM test WHERE 'f' LIMIT 1"]
+  end
+
+  it "should ignore order" do
+    db = Sequel.mock(fetch: { 1 => 1 })
+    db.from(:test).must_be :any?
+    without_order = db.sqls
+    db.from(:test).order(:the_order_column).must_be :any?
+    with_order = db.sqls
+    without_order.must_equal with_order
+  end
+end
+
+describe "Dataset#include?" do
+  it "should return true if records exist in the dataset by Hash" do
+    db = Sequel.mock(fetch: proc do |sql|
+      { id: 1 } unless sql.include?('id = 2')
+    end)
+    db.from(:test).must_include id: 1
+    db.sqls.must_equal ['SELECT 1 AS one FROM test WHERE (id = 1) LIMIT 1']
+    db.from(:test).wont_include id: 2
+    db.sqls.must_equal ['SELECT 1 AS one FROM test WHERE (id = 2) LIMIT 1']
+  end
+end
+
 describe "Dataset#first_source_alias" do
   before do
     @ds = Sequel.mock.dataset
