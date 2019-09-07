@@ -65,13 +65,25 @@ module Sequel
     #   # Add CSV output capability to Album class instances
     #   Album.plugin :csv_serializer
     module CsvSerializer
-      CSV = Object.const_defined?(:CSV) ? ::CSV : ::FasterCSV
-
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values
       def self.configure(model, opts = OPTS)
         model.instance_exec do
           @csv_serializer_opts = (@csv_serializer_opts || OPTS).merge(opts)
+        end
+      end
+
+      # Avoid keyword argument separation warnings on Ruby 2.7, while still
+      # being compatible with 1.9.
+      if RUBY_VERSION >= "2.0"
+        instance_eval(<<-END, __FILE__, __LINE__+1)
+          def self.csv_call(*args, opts, &block)
+            CSV.send(*args, **opts, &block)
+          end
+        END
+      else
+        def self.csv_call(*args, opts, &block)
+          CSV.send(*args, opts, &block)
         end
       end
 
@@ -81,7 +93,7 @@ module Sequel
 
         # Attempt to parse an array of instances from the given CSV string
         def array_from_csv(csv, opts = OPTS)
-          CSV.parse(csv, process_csv_serializer_opts(opts)).map do |row|
+          CsvSerializer.csv_call(:parse, csv, process_csv_serializer_opts(opts)).map do |row|
             row = row.to_hash
             row.delete(nil)
             new(row)
@@ -108,7 +120,8 @@ module Sequel
           opts_cols = opts.delete(:columns)
           opts_include = opts.delete(:include)
           opts_except = opts.delete(:except)
-          opts[:headers] ||= Array(opts.delete(:only) || opts_cols || columns) + Array(opts_include) - Array(opts_except)
+          only = opts.delete(:only) 
+          opts[:headers] ||= Array(only || opts_cols || columns) + Array(opts_include) - Array(opts_except)
           opts
         end
 
@@ -130,7 +143,7 @@ module Sequel
         # :headers :: The headers to use for the CSV line. Use nil for a header
         #             to specify the column should be ignored.
         def from_csv(csv, opts = OPTS)
-          row = CSV.parse_line(csv, model.process_csv_serializer_opts(opts)).to_hash
+          row = CsvSerializer.csv_call(:parse_line, csv, model.process_csv_serializer_opts(opts)).to_hash
           row.delete(nil)
           set(row)
         end
@@ -146,9 +159,10 @@ module Sequel
         #             attributes to include in the CSV output.
         def to_csv(opts = OPTS)
           opts = model.process_csv_serializer_opts(opts)
+          headers = opts[:headers]
 
-          CSV.generate(opts) do |csv|
-            csv << opts[:headers].map{|k| public_send(k)}
+          CsvSerializer.csv_call(:generate, model.process_csv_serializer_opts(opts)) do |csv|
+            csv << headers.map{|k| public_send(k)}
           end
         end
       end
@@ -164,10 +178,11 @@ module Sequel
         def to_csv(opts = OPTS)
           opts = model.process_csv_serializer_opts({:columns=>columns}.merge!(opts))
           items = opts.delete(:array) || self
+          headers = opts[:headers]
 
-          CSV.generate(opts) do |csv|
+          CsvSerializer.csv_call(:generate, opts) do |csv|
             items.each do |object|
-              csv << opts[:headers].map{|header| object.public_send(header) }
+              csv << headers.map{|header| object.public_send(header)}
             end
           end
         end
