@@ -634,6 +634,15 @@ describe "Database schema modifiers" do
     @ds.all.must_equal [{:id=>10}, {:id=>20}]
   end
 
+  it "should set column defaults correctly if column has existing default" do
+    @db.create_table!(:items){Integer :id, :default=>10}
+    @ds.insert
+    @ds.all.must_equal [{:id=>10}]
+    @db.alter_table(:items){set_column_default :id, 20}
+    @ds.insert
+    @ds.all.must_equal [{:id=>10}, {:id=>20}]
+  end
+
   it "should set column defaults to nil correctly" do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)
