@@ -582,6 +582,30 @@ describe "association_multi_add_remove plugin - one_to_many" do
     p.remove_attributes([c1, c2]).must_equal []
     p.attributes.must_equal [c1, c2]
   end
+
+  it "should define a setter that works on existing records" do
+    @c2.one_to_many :attributes, class: @c1
+  
+    n = @c2.load(id: 1234)
+    a1 = @c1.load(id: 2345, node_id: 1234)
+    a2 = @c1.load(id: 3456, node_id: 1234)
+    a3 = @c1.load(id: 4567)
+
+    n.associations[:attributes] = [a1, a2]
+
+    [a2, a3].must_equal(n.attributes = [a2, a3])
+    a1.values.must_equal(node_id: nil, id: 2345)
+    a2.values.must_equal(node_id: 1234, id: 3456)
+    a3.values.must_equal(node_id: 1234, id: 4567)
+    DB.sqls.must_equal [
+      'BEGIN',
+      'SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1',
+      'UPDATE attributes SET node_id = NULL WHERE (id = 2345)',
+      'UPDATE attributes SET node_id = 1234 WHERE (id = 3456)',
+      'UPDATE attributes SET node_id = 1234 WHERE (id = 4567)',
+      'COMMIT'
+    ]
+  end
 end
 
 describe "association_multi_add_remove plugin - many_to_many" do
@@ -951,6 +975,26 @@ describe "association_multi_add_remove plugin - many_to_many" do
     def p.br(o) cancel_action end
     p.remove_attributes([c1, c2]).must_equal []
     p.attributes.must_equal [c1, c2]
+  end
+
+  it "should define a setter that works on existing records" do
+    @c2.many_to_many :attributes, class: @c1
+
+    n = @c2.load(id: 1234)
+    a1 = @c1.load(id: 2345)
+    a2 = @c1.load(id: 3456)
+    a3 = @c1.load(id: 4567)
+
+    n.associations[:attributes] = [a1, a2]
+
+    [a2, a3].must_equal(n.attributes = [a2, a3])
+    DB.sqls.must_equal [
+      'BEGIN',
+      'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))',
+      'INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 3456)',
+      'INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 4567)',
+      'COMMIT'
+    ]
   end
 end
 
