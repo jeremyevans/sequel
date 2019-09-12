@@ -279,7 +279,7 @@ module Sequel
             end
           end
           sqls << "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{column_definition_sql(op)}"
-          sqls << alter_table_sql(table, op.merge(:op=>:set_column_default, :default=>default)) if default
+          sqls << alter_table_sql(table, op.merge(:op=>:set_column_default, :default=>default, :skip_drop_default=>true)) if default
           sqls
         when :set_column_null
           sch = schema(table).find{|k,v| k.to_s == op[:name].to_s}.last
@@ -291,7 +291,7 @@ module Sequel
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(:type=>type)} #{'NOT ' unless op[:null]}NULL"
         when :set_column_default
           sqls = []
-          add_drop_default_constraint_sql(sqls, table, op[:name])
+          add_drop_default_constraint_sql(sqls, table, op[:name]) unless op[:skip_drop_default]
           sqls << "ALTER TABLE #{quote_schema_table(table)} ADD CONSTRAINT #{quote_identifier("sequel_#{table}_#{op[:name]}_def")} DEFAULT #{literal(op[:default])} FOR #{quote_identifier(op[:name])}"
         else
           super(table, op)
