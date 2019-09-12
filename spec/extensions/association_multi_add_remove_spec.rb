@@ -55,6 +55,7 @@ describe "association_multi_add_remove plugin - one_to_many" do
       "SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1",
       'UPDATE attributes SET node_id = NULL WHERE (id = 2345)',
     ]
+    n.respond_to?(:sheep=).must_equal false
   end
 
   it "should support :multi_add_method" do
@@ -601,7 +602,6 @@ describe "association_multi_add_remove plugin - one_to_many" do
       'BEGIN',
       'SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1',
       'UPDATE attributes SET node_id = NULL WHERE (id = 2345)',
-      'UPDATE attributes SET node_id = 1234 WHERE (id = 3456)',
       'UPDATE attributes SET node_id = 1234 WHERE (id = 4567)',
       'COMMIT'
     ]
@@ -991,7 +991,6 @@ describe "association_multi_add_remove plugin - many_to_many" do
     DB.sqls.must_equal [
       'BEGIN',
       'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))',
-      'INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 3456)',
       'INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 4567)',
       'COMMIT'
     ]

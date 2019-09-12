@@ -4,7 +4,7 @@
 
 * Fix keyword argument separation warnings on Ruby master branch in csv_serializer plugin (jeremyevans)
 
-* Add association_multi_add_remove plugin for adding/removing multiple associated objects in a single method call (AlexWayfer, jeremyevans) (#1641)
+* Add association_multi_add_remove plugin for adding/removing multiple associated objects in a single method call (AlexWayfer, jeremyevans) (#1641, #1643)
 
 * Make sharding plugin integrate with server_block extension (jeremyevans)
 

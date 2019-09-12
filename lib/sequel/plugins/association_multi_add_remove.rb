@@ -47,7 +47,8 @@ module Sequel
           if opts[:adder]
             add_method = opts[:add_method]
             multi_add_method = opts[:multi_add_method] || :"add_#{opts[:name]}"
-            if add_method != multi_add_method
+            multi_add_method = nil if add_method == multi_add_method
+            if multi_add_method
               association_module_def(multi_add_method, opts) do |objs, *args|
                 db.transaction(:server=>@server){objs.map{|obj| send(add_method, obj, *args)}.compact}
               end
@@ -57,20 +58,21 @@ module Sequel
           if opts[:remover]
             remove_method = opts[:remove_method]
             multi_remove_method = opts[:multi_remove_method] || :"remove_#{opts[:name]}"
-            if remove_method != multi_remove_method
+            multi_remove_method = nil if remove_method == multi_remove_method
+            if multi_remove_method
               association_module_def(multi_remove_method, opts) do |objs, *args|
                 db.transaction(:server=>@server){objs.map{|obj| send(remove_method, obj, *args)}.compact}
               end
             end
           end
 
-          if opts[:adder] && opts[:remover]
+          if multi_add_method && multi_remove_method
             association_module_def(:"#{opts[:name]}=", opts) do |objs, *args|
               db.transaction(:server=>@server) do
                 existing_objs = send(opts.association_method)
-                send(multi_remove_method, (existing_objs = existing_objs - objs), *args)
-                send(multi_add_method, (existing_objs = objs - existing_objs), *args)
-                existing_objs
+                send(multi_remove_method, (existing_objs - objs), *args)
+                send(multi_add_method, (objs - existing_objs), *args)
+                nil
               end
             end
           end
