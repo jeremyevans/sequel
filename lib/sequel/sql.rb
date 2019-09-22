@@ -788,8 +788,10 @@ module Sequel
       def coerce(other)
         if other.is_a?(Numeric)
           [SQL::NumericExpression.new(:NOOP, other), self]
-        else
+        elsif defined?(super)
           super 
+        else
+          [self, other]
         end
       end
 

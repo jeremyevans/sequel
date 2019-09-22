@@ -214,8 +214,13 @@ describe "Blockless Ruby Filters" do
     @d.lit(1 + Sequel.lit('?', :x)).must_equal '(1 + x)'
   end
 
-  it "should raise a NoMethodError if coerce is called with a non-Numeric" do
-    proc{Sequel.expr(:x).coerce(:a)}.must_raise NoMethodError
+  it "should not break Date/DateTime equality" do
+    (Date.today == Sequel.expr(:x)).must_equal false
+    (DateTime.now == Sequel.expr(:x)).must_equal false
+  end
+
+  it "should have coerce return array if called on a non-numeric" do
+    Sequel.expr(:x).coerce(:a).must_equal [Sequel.expr(:x), :a]
   end
 
   it "should support AND conditions via &" do
