@@ -2,9 +2,9 @@
 
 source 'http://rubygems.org'
 
-gem 'minitest', '>= 5.7.0'
 gem 'minitest-hooks'
 gem 'minitest-shared_description'
+gem 'minitest-global_expectations'
 
 # Plugin/Extension Dependencies
 gem 'tzinfo'
@@ -29,6 +29,13 @@ if RUBY_VERSION < '2.0.0'
 else
   gem 'json'
   gem 'rake'
+end
+
+if RUBY_VERSION < '2.4.0'
+  # Until mintest 5.12.0 is fixed
+  gem 'minitest', '5.11.3'
+else
+  gem 'minitest', '>= 5.7.0'
 end
 
 # MRI Adapter Dependencies

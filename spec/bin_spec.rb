@@ -25,7 +25,7 @@ DB2 = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB2}", :test=>false)
 
 ENV['MT_NO_PLUGINS'] = '1' # Work around stupid autoloading of plugins
 gem 'minitest'
-require 'minitest/autorun'
+require 'minitest/global_expectations/autorun'
 
 describe "bin/sequel" do
   def bin(opts={})
