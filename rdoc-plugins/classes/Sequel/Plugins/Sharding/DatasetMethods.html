@@ -39,7 +39,7 @@ Sequel::Plugins::Sharding::DatasetMethods
 <h2>Methods</h2>
 <h3>Public Instance</h3>
 <ol>
-<li><a href="#method-i-server">server</a></li>
+<li><a href="#method-i-row_proc">row_proc</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -47,23 +47,23 @@ Sequel::Plugins::Sharding::DatasetMethods
 <div id='section'>
 <div id='methods'>
 <h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-server'>
-<a name='method-i-server'></a>
+<div class='method public-instance' id='method-method-i-row_proc'>
+<a name='method-i-row_proc'></a>
 <div class='synopsis'>
-<span class='name'>server</span>
-<span class='arguments'>(s)</span>
+<span class='name'>row_proc</span>
+<span class='arguments'>()</span>
 
 </div>
 <div class='description'>
 
-<p>If a row proc exists on the dataset, replace it with one that calls the previous row_proc, but calls set_server on the output of that row_proc, ensuring that objects retrieved by a specific shard know which shard they are tied to.</p>
+<p>If a row proc exists on the dataset, replace it with one that calls the previous <a href="DatasetMethods.html#method-i-row_proc"><code>row_proc</code></a>, but calls set_server on the output of that <a href="DatasetMethods.html#method-i-row_proc"><code>row_proc</code></a>, ensuring that objects retrieved by a specific shard know which shard they are tied to.</p>
 
 </div>
 <div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-server-source&#39;); return false'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-row_proc-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-server-source'>    <span class="ruby-comment"># File lib/sequel/plugins/sharding.rb</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">server</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="line-num">111</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">112</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">row_proc</span>&#x000A;<span class="line-num">113</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">with_row_proc</span>(<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">s</span>)})&#x000A;<span class="line-num">114</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">115</span>   <span class="ruby-identifier">ds</span>&#x000A;<span class="line-num">116</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-row_proc-source'>    <span class="ruby-comment"># File lib/sequel/plugins/sharding.rb</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">row_proc</span>&#x000A;<span class="line-num">111</span>   <span class="ruby-identifier">rp</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">112</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rp</span>&#x000A;<span class="line-num">113</span>     <span class="ruby-keyword">case</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:pick_server</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>])&#x000A;<span class="line-num">114</span>     <span class="ruby-keyword">when</span> <span class="ruby-keyword">nil</span>, <span class="ruby-value">:default</span>, <span class="ruby-value">:read_only</span>&#x000A;<span class="line-num">115</span>       <span class="ruby-comment"># nothing</span>&#x000A;<span class="line-num">116</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">117</span>       <span class="ruby-identifier">old_rp</span> = <span class="ruby-identifier">rp</span>&#x000A;<span class="line-num">118</span>       <span class="ruby-identifier">rp</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">old_rp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">server</span>)}&#x000A;<span class="line-num">119</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">120</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">121</span>   <span class="ruby-identifier">rp</span> &#x000A;<span class="line-num">122</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

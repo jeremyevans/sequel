@@ -1,6 +1,6 @@
-Sun, 01 Sep 2019 09:59:48 -0700
+Tue, 01 Oct 2019 08:15:22 -0700
 README.rdoc	Fri, 14 Sep 2018 07:48:03 -0700
-CHANGELOG	Fri, 30 Aug 2019 10:44:04 -0700
+CHANGELOG	Tue, 01 Oct 2019 08:03:41 -0700
 doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
 MIT-LICENSE	Sat, 23 Feb 2019 12:14:13 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -12,9 +12,9 @@ lib/sequel/dataset.rb	Mon, 03 Jun 2019 11:44:00 -0700
 lib/sequel/deprecated.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
-lib/sequel/sql.rb	Mon, 10 Jun 2019 12:48:41 -0700
+lib/sequel/sql.rb	Sun, 22 Sep 2019 11:39:31 -0700
 lib/sequel/timezones.rb	Tue, 02 Jul 2019 15:10:53 -0700
-lib/sequel/version.rb	Fri, 30 Aug 2019 10:44:04 -0700
+lib/sequel/version.rb	Tue, 01 Oct 2019 08:03:41 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -211,6 +211,7 @@ doc/release_notes/5.21.0.txt	Sat, 01 Jun 2019 10:23:00 -0700
 doc/release_notes/5.22.0.txt	Mon, 01 Jul 2019 07:14:49 -0700
 doc/release_notes/5.23.0.txt	Thu, 01 Aug 2019 09:22:21 -0700
 doc/release_notes/5.24.0.txt	Fri, 30 Aug 2019 10:44:04 -0700
+doc/release_notes/5.25.0.txt	Tue, 01 Oct 2019 08:03:41 -0700
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800

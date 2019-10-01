@@ -84,7 +84,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inspect-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-inspect-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">2027</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">2028</span>   <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>&#x000A;<span class="line-num">2029</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-inspect-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">2029</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inspect</span>&#x000A;<span class="line-num">2030</span>   <span class="ruby-node">&quot;#&lt;#{self.class} #{super}&gt;&quot;</span>&#x000A;<span class="line-num">2031</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-lit'>
@@ -103,7 +103,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-lit-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-lit-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">2033</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">2034</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">2035</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-lit-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">2035</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">2036</span>   <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">self</span> <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="line-num">2037</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -122,7 +122,7 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to_sequel_blob-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-to_sequel_blob-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">2038</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;<span class="line-num">2039</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">2040</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-to_sequel_blob-source'>     <span class="ruby-comment"># File lib/sequel/sql.rb</span>&#x000A;<span class="line-num">2040</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to_sequel_blob</span>&#x000A;<span class="line-num">2041</span>   <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="line-num">2042</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

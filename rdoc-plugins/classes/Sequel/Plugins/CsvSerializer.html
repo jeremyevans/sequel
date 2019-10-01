@@ -35,13 +35,13 @@ Sequel::Plugins::CsvSerializer
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p>csv_serializer handles serializing entire <a href="../Model.html"><code>Sequel::Model</code></a> objects to <a href="CsvSerializer.html#CSV"><code>CSV</code></a>, as well as support for deserializing <a href="CsvSerializer.html#CSV"><code>CSV</code></a> directly into <a href="../Model.html"><code>Sequel::Model</code></a> objects.  It requires the csv standard library.</p>
+<p>csv_serializer handles serializing entire <a href="../Model.html"><code>Sequel::Model</code></a> objects to CSV, as well as support for deserializing CSV directly into <a href="../Model.html"><code>Sequel::Model</code></a> objects.  It requires the csv standard library.</p>
 
 <p>Basic Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_csv</span>(<span class="ruby-value">write_headers:</span> <span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># =&gt; &quot;id,name,artist_id\n1,RF,2\n&quot;</span></pre>
 
-<p>You can provide options to control the <a href="CsvSerializer.html#CSV"><code>CSV</code></a> output:</p>
+<p>You can provide options to control the CSV output:</p>
 
 <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_csv</span>(<span class="ruby-value">only:</span> <span class="ruby-value">:name</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_csv</span>(<span class="ruby-value">except:</span> [<span class="ruby-value">:id</span>, <span class="ruby-value">:artist_id</span>])&#x000A;<span class="ruby-comment"># =&gt; &quot;RF\n&quot;</span></pre>
 
@@ -49,11 +49,11 @@ Sequel::Plugins::CsvSerializer
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_csv</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">artist_id:</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">to_csv</span></pre>
 
-<p>If you have an existing array of model instances you want to convert to <a href="CsvSerializer.html#CSV"><code>CSV</code></a>, you can call the class to_csv method with the :array option:</p>
+<p>If you have an existing array of model instances you want to convert to CSV, you can call the class to_csv method with the :array option:</p>
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_csv</span>(<span class="ruby-value">array:</span> [<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>], <span class="ruby-constant">Album</span>[<span class="ruby-value">2</span>]])</pre>
 
-<p>In addition to creating <a href="CsvSerializer.html#CSV"><code>CSV</code></a>, this plugin also enables <a href="../Model.html"><code>Sequel::Model</code></a> classes to create instances directly from <a href="CsvSerializer.html#CSV"><code>CSV</code></a> using the from_csv class method:</p>
+<p>In addition to creating CSV, this plugin also enables <a href="../Model.html"><code>Sequel::Model</code></a> classes to create instances directly from CSV using the from_csv class method:</p>
 
 <pre class="ruby"><span class="ruby-identifier">csv</span> = <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_csv</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>)</pre>
 
@@ -78,6 +78,7 @@ Sequel::Plugins::CsvSerializer
 <h3>Public Class</h3>
 <ol>
 <li><a href="#method-c-configure">configure</a></li>
+<li><a href="#method-c-csv_call">csv_call</a></li>
 </ol>
 </div>
 <div id='context'>
@@ -91,20 +92,6 @@ Sequel::Plugins::CsvSerializer
 </ol>
 </div>
 <div id='section'>
-<div id='constants-list'>
-<h2>Constants</h2>
-<div class='name-list'>
-<table summary='Constants'>
-<tr class='top-aligned-row context-row'>
-<td class='context-item-name'>CSV</td>
-<td>=</td>
-<td class='context-item-value'>Object.const_defined?(:CSV) ? ::CSV : ::FasterCSV</td>
-<td>&nbsp;</td>
-<td class='context-item-desc'></td>
-</tr>
-</table>
-</div>
-</div>
 <div id='methods'>
 <h2>Public Class methods</h2>
 <div class='method public-class' id='method-method-c-configure'>
@@ -123,7 +110,24 @@ Sequel::Plugins::CsvSerializer
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-configure-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">73</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">74</span>     <span class="ruby-ivar">@csv_serializer_opts</span> = (<span class="ruby-ivar">@csv_serializer_opts</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">75</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">76</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-configure-source'>   <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;<span class="line-num">71</span>   <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_exec</span> <span class="ruby-keyword">do</span>&#x000A;<span class="line-num">72</span>     <span class="ruby-ivar">@csv_serializer_opts</span> = (<span class="ruby-ivar">@csv_serializer_opts</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="line-num">73</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-class' id='method-method-c-csv_call'>
+<a name='method-c-csv_call'></a>
+<div class='synopsis'>
+<span class='name'>csv_call</span>
+<span class='arguments'>(*args, opts, &block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-csv_call-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-csv_call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb</span>&#x000A;<span class="line-num">85</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">csv_call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">86</span>   <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">87</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
