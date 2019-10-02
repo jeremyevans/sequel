@@ -1,3 +1,7 @@
+=== master
+
+* Add support for SQL/JSON path expressions to the pg_json_ops extension, supported by PostgreSQL 12+ (jeremyevans)
+
 === 5.25.0 (2019-10-01)
 
 * Fix Sequel::SQL::NumericMethods#coerce to not raise NoMethodError if super method is not defined (jeremyevans) (#1645)

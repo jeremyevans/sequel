@@ -3341,6 +3341,65 @@ describe 'PostgreSQL json type' do
       @db.from(jo.each_text).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').must_match(/\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/)
 
+      if DB.server_version >= 120000  && json_type == :jsonb
+        @db.get(jo.path_exists('$.b.d.e')).must_equal true
+        @db.get(jo.path_exists('$.b.d.f')).must_equal false
+
+        @db.get(jo.path_exists!('$.b.d.e')).must_equal true
+        @db.get(jo.path_exists!('$.b.d.f')).must_equal false
+        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal true
+        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal false
+        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', x: 2)).must_equal true
+        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', x: 4)).must_equal false
+        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal true
+        @db.get(jo.path_exists!('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal false
+
+        @db.get(jo.path_match('$.b.d.e')).must_be_nil
+        @db.get(jo.path_match('$.b.d.f')).must_be_nil
+        @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match('$.b.d.e')).must_equal true
+        @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match('$.b.d.e')).must_equal false
+
+        proc{@db.get(jo.path_match!('$.b.d.e'))}.must_raise(Sequel::DatabaseError)
+        proc{@db.get(jo.path_match!('$.b.d.f'))}.must_raise(Sequel::DatabaseError)
+        @db.get(jo.path_match!('$.b.d.e', {}, true)).must_be_nil
+        @db.get(jo.path_match!('$.b.d.f', {}, true)).must_be_nil
+        @db.get(pg_json.call('b'=>{'d'=>{'e'=>true}}).op.path_match!('$.b.d.e')).must_equal true
+        @db.get(pg_json.call('b'=>{'d'=>{'e'=>false}}).op.path_match!('$.b.d.e')).must_equal false
+        @db.get(jo.path_match!('$.b.d.e > $x', '{"x":2}')).must_equal true
+        @db.get(jo.path_match!('$.b.d.e > $x', '{"x":4}')).must_equal false
+        @db.get(jo.path_match!('$.b.d.e > $x', x: 2)).must_equal true
+        @db.get(jo.path_match!('$.b.d.e > $x', x: 4)).must_equal false
+        @db.get(jo.path_match!('$.b.d.e > $x', {x: 2}, false)).must_equal true
+        @db.get(jo.path_match!('$.b.d.e > $x', {x: 4}, true)).must_equal false
+
+        @db.get(jo.path_query_first('$.b.d.e')).must_equal 3
+        @db.get(jo.path_query_first('$.b.d.f')).must_be_nil
+        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal 3
+        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', '{"x":4}')).must_be_nil
+        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', x: 2)).must_equal 3
+        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', x: 4)).must_be_nil
+        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal 3
+        @db.get(jo.path_query_first('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_be_nil
+
+        @db.get(jo.path_query_array('$.b.d.e')).must_equal [3]
+        @db.get(jo.path_query_array('$.b.d.f')).must_equal []
+        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', '{"x":2}')).must_equal [3]
+        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', '{"x":4}')).must_equal []
+        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', x: 2)).must_equal [3]
+        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', x: 4)).must_equal []
+        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', {x: 2}, true)).must_equal [3]
+        @db.get(jo.path_query_array('$.b.d.e ? (@ > $x)', {x: 4}, false)).must_equal []
+
+        @db.from(jo.path_query('$.b.d.e').as(:a, [:b])).get(:b).must_equal 3
+        @db.from(jo.path_query('$.b.d.f').as(:a, [:b])).get(:b).must_be_nil
+        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', '{"x":2}').as(:a, [:b])).get(:b).must_equal 3
+        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', '{"x":4}').as(:a, [:b])).get(:b).must_be_nil
+        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', x: 2).as(:a, [:b])).get(:b).must_equal 3
+        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', x: 4).as(:a, [:b])).get(:b).must_be_nil
+        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', {x: 2}, true).as(:a, [:b])).get(:b).must_equal 3
+        @db.from(jo.path_query('$.b.d.e ? (@ > $x)', {x: 4}, false).as(:a, [:b])).get(:b).must_be_nil
+      end
+
       Sequel.extension :pg_row_ops
       @db.create_table!(:items) do
         Integer :a

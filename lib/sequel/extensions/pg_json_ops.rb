@@ -73,6 +73,23 @@
 #   j.pretty                  # jsonb_pretty(jsonb_column)
 #   j.set(%w'0 a', :h)        # jsonb_set(jsonb_column, ARRAY['0','a'], h, true)
 #
+# On PostgreSQL 12+ SQL/JSON functions and operators are supported:
+#
+#   j.path_exists('$.foo')      # (jsonb_column @? '$.foo')
+#   j.path_match('$.foo')       # (jsonb_column @@ '$.foo')
+#
+#   j.path_exists!('$.foo')     # jsonb_path_exists(jsonb_column, '$.foo')
+#   j.path_match!('$.foo')      # jsonb_path_match(jsonb_column, '$.foo')
+#   j.path_query('$.foo')       # jsonb_path_query(jsonb_column, '$.foo')
+#   j.path_query_array('$.foo') # jsonb_path_query_array(jsonb_column, '$.foo')
+#   j.path_query_first('$.foo') # jsonb_path_query_first(jsonb_column, '$.foo')
+#
+# For the PostgreSQL 12+ SQL/JSON functions, one argument is required (+path+) and
+# two more arguments are optional (+vars+ and +silent+).  +path+ specifies the JSON path.
+# +vars+ specifies a hash or a string in JSON format of named variables to be
+# substituted in +path+. +silent+ specifies whether errors are suppressed. By default,
+# errors are not suppressed.
+#
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
 # JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform json/jsonb operations
@@ -292,6 +309,8 @@ module Sequel
       CONTAINED_BY = ["(".freeze, " <@ ".freeze, ")".freeze].freeze
       DELETE_PATH = ["(".freeze, " #- ".freeze, ")".freeze].freeze
       HAS_KEY = ["(".freeze, " ? ".freeze, ")".freeze].freeze
+      PATH_EXISTS = ["(".freeze, " @? ".freeze, ")".freeze].freeze
+      PATH_MATCH = ["(".freeze, " @@ ".freeze, ")".freeze].freeze
 
       # jsonb expression for deletion of the given argument from the
       # current jsonb.
@@ -362,6 +381,95 @@ module Sequel
         self.class.new(function(:insert, wrap_input_array(path), wrap_input_jsonb(other), insert_after))
       end
 
+      # Returns whether the JSON path returns any item for the json object.
+      #
+      #   json_op.path_exists("$.foo") # (json @? '$.foo')
+      def path_exists(path)
+        bool_op(PATH_EXISTS, path)
+      end
+
+      # Returns whether the JSON path returns any item for the json object.
+      #
+      #   json_op.path_exists!("$.foo")
+      #   # jsonb_path_exists(json, '$.foo')
+      #
+      #   json_op.path_exists!("$.foo ? ($ > $x)", x: 2)
+      #   # jsonb_path_exists(json, '$.foo ? ($ > $x)', '{"x":2}')
+      #
+      #   json_op.path_exists!("$.foo ? ($ > $x)", {x: 2}, true)
+      #   # jsonb_path_exists(json, '$.foo ? ($ > $x)', '{"x":2}', true)
+      def path_exists!(path, vars=nil, silent=nil)
+        Sequel::SQL::BooleanExpression.new(:NOOP, _path_function(:jsonb_path_exists, path, vars, silent))
+      end
+
+      # Returns the first item of the result of JSON path predicate check for the json object.
+      # Returns nil if the first item is not true or false.
+      #
+      #   json_op.path_match("$.foo") # (json @@ '$.foo')
+      def path_match(path)
+        bool_op(PATH_MATCH, path)
+      end
+
+      # Returns the first item of the result of JSON path predicate check for the json object.
+      # Returns nil if the first item is not true or false and silent is true.
+      #
+      #   json_op.path_match!("$.foo")
+      #   # jsonb_path_match(json, '$.foo')
+      #
+      #   json_op.path_match!("$.foo ? ($ > $x)", x: 2)
+      #   # jsonb_path_match(json, '$.foo ? ($ > $x)', '{"x":2}')
+      #
+      #   json_op.path_match!("$.foo ? ($ > $x)", {x: 2}, true)
+      #   # jsonb_path_match(json, '$.foo ? ($ > $x)', '{"x":2}', true)
+      def path_match!(path, vars=nil, silent=nil)
+        Sequel::SQL::BooleanExpression.new(:NOOP, _path_function(:jsonb_path_match, path, vars, silent))
+      end
+
+      # Returns a set of all jsonb values specified by the JSON path
+      # for the json object.
+      #
+      #   json_op.path_query("$.foo")
+      #   # jsonb_path_query(json, '$.foo')
+      #
+      #   json_op.path_query("$.foo ? ($ > $x)", x: 2)
+      #   # jsonb_path_query(json, '$.foo ? ($ > $x)', '{"x":2}')
+      #
+      #   json_op.path_query("$.foo ? ($ > $x)", {x: 2}, true)
+      #   # jsonb_path_query(json, '$.foo ? ($ > $x)', '{"x":2}', true)
+      def path_query(path, vars=nil, silent=nil)
+        _path_function(:jsonb_path_query, path, vars, silent)
+      end
+
+      # Returns a jsonb array of all values specified by the JSON path
+      # for the json object.
+      #
+      #   json_op.path_query_array("$.foo")
+      #   # jsonb_path_query_array(json, '$.foo')
+      #
+      #   json_op.path_query_array("$.foo ? ($ > $x)", x: 2)
+      #   # jsonb_path_query_array(json, '$.foo ? ($ > $x)', '{"x":2}')
+      #
+      #   json_op.path_query_array("$.foo ? ($ > $x)", {x: 2}, true)
+      #   # jsonb_path_query_array(json, '$.foo ? ($ > $x)', '{"x":2}', true)
+      def path_query_array(path, vars=nil, silent=nil)
+        JSONBOp.new(_path_function(:jsonb_path_query_array, path, vars, silent))
+      end
+
+      # Returns the first item of the result specified by the JSON path
+      # for the json object.
+      #
+      #   json_op.path_query_first("$.foo")
+      #   # jsonb_path_query_first(json, '$.foo')
+      #
+      #   json_op.path_query_first("$.foo ? ($ > $x)", x: 2)
+      #   # jsonb_path_query_first(json, '$.foo ? ($ > $x)', '{"x":2}')
+      #
+      #   json_op.path_query_first("$.foo ? ($ > $x)", {x: 2}, true)
+      #   # jsonb_path_query_first(json, '$.foo ? ($ > $x)', '{"x":2}', true)
+      def path_query_first(path, vars=nil, silent=nil)
+        JSONBOp.new(_path_function(:jsonb_path_query_first, path, vars, silent))
+      end
+
       # Return the receiver, since it is already a JSONBOp.
       def pg_jsonb
         self
@@ -385,6 +493,22 @@ module Sequel
       end
 
       private
+
+      # Internals of the jsonb SQL/JSON path functions.
+      def _path_function(func, path, vars, silent)
+        args = []
+        if vars
+          if vars.is_a?(Hash)
+            vars = vars.to_json
+          end
+          args << vars
+
+          unless silent.nil?
+            args << silent
+          end
+        end
+        SQL::Function.new(func, self, path, *args)
+      end
 
       # Return a placeholder literal with the given str and args, wrapped
       # in a boolean expression, used by operators that return booleans.

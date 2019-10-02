@@ -286,4 +286,71 @@ describe "Sequel::Postgres::JSONOp" do
   it "should allow transforming JSONBHash instances into ArrayOp instances" do
     @db.literal(Sequel.pg_jsonb('a'=>1).op['a']).must_equal "('{\"a\":1}'::jsonb -> 'a')"
   end
+
+  it "#path_exists should use the @? operator" do
+    @l[@jb.path_exists('$')].must_equal "(j @? '$')"
+  end
+
+  it "#path_exists result should be a boolean expression" do
+    @jb.path_exists('$').must_be_kind_of Sequel::SQL::BooleanExpression
+  end
+
+  it "#path_match should use the @@ operator" do
+    @l[@jb.path_match('$')].must_equal "(j @@ '$')"
+  end
+
+  it "#path_match result should be a boolean expression" do
+    @jb.path_match('$').must_be_kind_of Sequel::SQL::BooleanExpression
+  end
+
+  it "#path_exists! should use the jsonb_path_exists function" do
+    @l[@jb.path_exists!('$')].must_equal "jsonb_path_exists(j, '$')"
+    @l[@jb.path_exists!('$', '{"x":2}')].must_equal "jsonb_path_exists(j, '$', '{\"x\":2}')"
+    @l[@jb.path_exists!('$', x: 2)].must_equal "jsonb_path_exists(j, '$', '{\"x\":2}')"
+    @l[@jb.path_exists!('$', {x: 2}, true)].must_equal "jsonb_path_exists(j, '$', '{\"x\":2}', true)"
+  end
+
+  it "#path_exists! result should be a boolean expression" do
+    @jb.path_exists!('$').must_be_kind_of Sequel::SQL::BooleanExpression
+  end
+
+  it "#path_match! should use the jsonb_path_match function" do
+    @l[@jb.path_match!('$')].must_equal "jsonb_path_match(j, '$')"
+    @l[@jb.path_match!('$', '{"x":2}')].must_equal "jsonb_path_match(j, '$', '{\"x\":2}')"
+    @l[@jb.path_match!('$', x: 2)].must_equal "jsonb_path_match(j, '$', '{\"x\":2}')"
+    @l[@jb.path_match!('$', {x: 2}, true)].must_equal "jsonb_path_match(j, '$', '{\"x\":2}', true)"
+  end
+
+  it "#path_match! result should be a boolean expression" do
+    @jb.path_match!('$').must_be_kind_of Sequel::SQL::BooleanExpression
+  end
+
+  it "#path_query should use the jsonb_path_query function" do
+    @l[@jb.path_query('$')].must_equal "jsonb_path_query(j, '$')"
+    @l[@jb.path_query('$', '{"x":2}')].must_equal "jsonb_path_query(j, '$', '{\"x\":2}')"
+    @l[@jb.path_query('$', x: 2)].must_equal "jsonb_path_query(j, '$', '{\"x\":2}')"
+    @l[@jb.path_query('$', {x: 2}, true)].must_equal "jsonb_path_query(j, '$', '{\"x\":2}', true)"
+  end
+
+  it "#path_query_array should use the jsonb_path_query_array function" do
+    @l[@jb.path_query_array('$')].must_equal "jsonb_path_query_array(j, '$')"
+    @l[@jb.path_query_array('$', '{"x":2}')].must_equal "jsonb_path_query_array(j, '$', '{\"x\":2}')"
+    @l[@jb.path_query_array('$', x: 2)].must_equal "jsonb_path_query_array(j, '$', '{\"x\":2}')"
+    @l[@jb.path_query_array('$', {x: 2}, true)].must_equal "jsonb_path_query_array(j, '$', '{\"x\":2}', true)"
+  end
+
+  it "#path_query_array result should be a JSONBOp" do
+    @l[@jb.path_query_array('$').path_query_array('$')].must_equal "jsonb_path_query_array(jsonb_path_query_array(j, '$'), '$')"
+  end
+
+  it "#path_query_first should use the jsonb_path_query_first function" do
+    @l[@jb.path_query_first('$')].must_equal "jsonb_path_query_first(j, '$')"
+    @l[@jb.path_query_first('$', '{"x":2}')].must_equal "jsonb_path_query_first(j, '$', '{\"x\":2}')"
+    @l[@jb.path_query_first('$', x: 2)].must_equal "jsonb_path_query_first(j, '$', '{\"x\":2}')"
+    @l[@jb.path_query_first('$', {x: 2}, true)].must_equal "jsonb_path_query_first(j, '$', '{\"x\":2}', true)"
+  end
+
+  it "#path_query_first result should be a JSONBOp" do
+    @l[@jb.path_query_first('$').path_query_first('$')].must_equal "jsonb_path_query_first(jsonb_path_query_first(j, '$'), '$')"
+  end
 end
