@@ -1,5 +1,7 @@
 === master
 
+* Add support for :require_modification option when setting up nested_attributes (jeremyevans)
+
 * Add support for SQL/JSON path expressions to the pg_json_ops extension, supported by PostgreSQL 12+ (jeremyevans)
 
 === 5.25.0 (2019-10-01)

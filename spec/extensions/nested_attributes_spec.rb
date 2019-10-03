@@ -492,6 +492,54 @@ describe "NestedAttributes plugin" do
     @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 10)"]
   end
 
+  it "should raise a NoExistingObject error if object to be updated no longer exists, if the :require_modification=>true option is used" do
+    @Artist.nested_attributes :albums, :require_modification=>true, :destroy=>true
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:albums] = [al]
+    ar.set(:albums_attributes=>[{:id=>10, :name=>'L'}])
+    @db.sqls.must_equal []
+    @db.numrows = [1, 0]
+    proc{ar.save}.must_raise Sequel::NoExistingObject
+    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'L' WHERE (id = 10)"]
+  end
+
+  it "should not raise an Error if object to be updated no longer exists, if the :require_modification=>false option is used" do
+    @Artist.nested_attributes :albums, :require_modification=>false, :destroy=>true
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:albums] = [al]
+    ar.set(:albums_attributes=>[{:id=>10, :name=>'L'}])
+    @db.sqls.must_equal []
+    @db.numrows = [1, 0]
+    ar.save
+    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "UPDATE albums SET name = 'L' WHERE (id = 10)"]
+  end
+
+  it "should raise a NoExistingObject error if object to be deleted no longer exists, if the :require_modification=>true option is used" do
+    @Artist.nested_attributes :albums, :require_modification=>true, :destroy=>true
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:albums] = [al]
+    ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])
+    @db.sqls.must_equal []
+    @db.numrows = [1, 0]
+    proc{ar.save}.must_raise Sequel::NoExistingObject
+    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "DELETE FROM albums WHERE (id = 10)"]
+  end
+
+  it "should not raise an Error if object to be deleted no longer exists, if the :require_modification=>false option is used" do
+    @Artist.nested_attributes :albums, :require_modification=>false, :destroy=>true
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:albums] = [al]
+    ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])
+    @db.sqls.must_equal []
+    @db.numrows = [1, 0]
+    ar.save
+    @db.sqls.must_equal ["UPDATE artists SET name = 'Ar' WHERE (id = 20)", "DELETE FROM albums WHERE (id = 10)"]
+  end
+
   it "should not attempt to validate nested attributes twice for one_to_many associations when creating them" do
     @Artist.nested_attributes :albums
     validated = []

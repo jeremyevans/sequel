@@ -113,6 +113,10 @@ module Sequel
         #               value, the attribute hash is ignored.
         # :remove :: Allow disassociation of nested records (can remove the associated
         #            object from the parent object, but not destroy the associated object).
+        # :require_modification :: Whether to require modification of nested objects when
+        #                          updating or deleting them (checking that a single row was
+        #                          updated).  By default, uses the default require_modification
+        #                          setting for the nested object.
         # :transform :: A proc to transform attribute hashes before they are
         #               passed to associated object. Takes two arguments, the parent object and
         #               the attribute hash. Uses the return value as the new attribute hash.
@@ -282,6 +286,9 @@ module Sequel
             obj = Array(public_send(reflection[:name])).find{|x| Array(x.pk).map(&:to_s) == pk}
           end
           if obj
+            unless (require_modification = meta[:require_modification]).nil?
+              obj.require_modification = require_modification
+            end
             attributes = attributes.dup.delete_if{|k,v| str_keys.include? k.to_s}
             if meta[:destroy] && klass.db.send(:typecast_value_boolean, attributes.delete(:_delete) || attributes.delete('_delete'))
               nested_attributes_remove(meta, obj, :destroy=>true)
