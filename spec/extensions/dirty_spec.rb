@@ -162,6 +162,16 @@ describe "Sequel::Plugins::Dirty" do
       @o.save
       @o.column_changes.must_equal({})
     end
+
+    it "should work with the typecast_on_load plugin" do
+      @c.instance_variable_set(:@db_schema, :initial=>{:type=>:integer})
+      @c.plugin :typecast_on_load, :initial
+      
+      @o = @c.call(:initial=>'1')
+      @o.column_changes.must_equal({})
+      @o.save
+      @o.previous_changes.must_equal({})
+    end
   end
 
   describe "with existing instance" do

@@ -63,7 +63,7 @@ module Sequel
               set_column_value("#{c}=", v)
             end
           end
-          _changed_columns.clear
+          _clear_changed_columns(:initialize)
           self
         end
 

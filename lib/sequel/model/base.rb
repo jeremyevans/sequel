@@ -1069,7 +1069,7 @@ module Sequel
         @new = true
         @modified = true
         initialize_set(values)
-        _changed_columns.clear
+        _clear_changed_columns(:initialize)
         yield self if block_given?
       end
 
@@ -1626,6 +1626,13 @@ module Sequel
       def _changed_columns
         @changed_columns ||= []
       end
+
+      # Clear the changed columns. Reason is the reason for clearing
+      # the columns, and should be one of: :initialize, :refresh, :create
+      # or :update.
+      def _clear_changed_columns(_reason)
+        _changed_columns.clear
+      end
   
       # Do the deletion of the object's dataset, and check that the row
       # was actually deleted.
@@ -1716,7 +1723,7 @@ module Sequel
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
         _refresh_set_values(_refresh_get(dataset) || raise(NoExistingObject, "Record not found"))
-        _changed_columns.clear
+        _clear_changed_columns(:refresh)
       end
 
       # Get the row of column data from the database.
@@ -1754,7 +1761,7 @@ module Sequel
               @this = nil
               @new = false
               @modified = false
-              pk ? _save_refresh : _changed_columns.clear
+              pk ? _save_refresh : _clear_changed_columns(:create)
               after_create
               true
             end
@@ -1771,7 +1778,7 @@ module Sequel
                   cc.clear
                 else
                   columns_updated = _save_update_all_columns_hash
-                  _changed_columns.clear
+                  _clear_changed_columns(:update)
                 end
               else # update only the specified columns
                 columns = Array(columns)
@@ -1798,7 +1805,7 @@ module Sequel
       # can be overridden to avoid the refresh.
       def _save_refresh
         _save_set_values(_refresh_get(this.server?(:default)) || raise(NoExistingObject, "Record not found"))
-        _changed_columns.clear
+        _clear_changed_columns(:create)
       end
 
       # Set values to the provided hash.  Called after a create,
