@@ -41,7 +41,9 @@ module Sequel
         # Typecast values using #load_typecast when the values are retrieved
         # from the database.
         def call(values)
-          super.load_typecast
+          o = super.load_typecast
+          o.send(:_clear_changed_columns, :initialize)
+          o
         end
 
         # Freeze typecast on load columns when freezing model class.
@@ -63,7 +65,6 @@ module Sequel
               set_column_value("#{c}=", v)
             end
           end
-          _clear_changed_columns(:initialize)
           self
         end
 

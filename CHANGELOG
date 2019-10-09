@@ -1,6 +1,6 @@
 === master
 
-* Make dirty plugin work correctly with typecast_on_load plugin (jeremyevans)
+* Make dirty plugin work correctly with typecast_on_load plugin (jeremyevans) (#1647)
 
 * Add support for :require_modification option when setting up nested_attributes (jeremyevans)
 

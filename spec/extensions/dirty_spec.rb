@@ -172,6 +172,29 @@ describe "Sequel::Plugins::Dirty" do
       @o.save
       @o.previous_changes.must_equal({})
     end
+
+    it "should have column_changes work with the typecast_on_load in after hooks" do
+      @c.instance_variable_set(:@db_schema, :initial=>{:type=>:integer})
+      @c.plugin :typecast_on_load, :initial
+      
+      @o = @c.new
+      @o.initial = 1
+      @o.column_changes.must_equal({:initial=>[nil, 1]})
+      column_changes_in_after_save = nil
+      @o.define_singleton_method(:after_save) do
+        column_changes_in_after_save = column_changes
+        super()
+      end
+      @db.fetch = {:initial=>1}
+      @o.save
+      column_changes_in_after_save.must_equal({:initial=>[nil, 1]})
+
+      @o.initial = 2
+      @o.column_changes.must_equal({:initial=>[1, 2]})
+      @o.save
+      column_changes_in_after_save.must_equal({:initial=>[1, 2]})
+      @o.previous_changes.must_equal({:initial=>[1, 2]})
+    end
   end
 
   describe "with existing instance" do

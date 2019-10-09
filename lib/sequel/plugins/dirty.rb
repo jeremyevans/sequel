@@ -161,13 +161,7 @@ module Sequel
 
         # Reset initial values when clearing changed columns
         def _clear_changed_columns(reason)
-          reset_initial_values if reason == :initialize
-          super
-        end
-
-        # Reset the initial values when setting values.
-        def _refresh_set_values(hash)
-          reset_initial_values
+          reset_initial_values if reason == :initialize || reason == :refresh
           super
         end
 
@@ -218,12 +212,6 @@ module Sequel
           @missing_initial_values = other.send(:missing_initial_values).dup
           @previous_changes = Hash[other.previous_changes] if other.previous_changes
           self
-        end
-
-        # Reset the initial values when initializing.
-        def initialize_set(h)
-          super
-          reset_initial_values
         end
 
         # Array holding column symbols that were not present initially.  This is necessary
