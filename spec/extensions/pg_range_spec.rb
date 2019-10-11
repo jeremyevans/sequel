@@ -136,6 +136,20 @@ describe "pg_range extension" do
     s[1][1][:ruby_default].must_equal Sequel::Postgres::PGRange.new(1, 5, :exclude_end=>true, :db_type=>'int4range')
   end
 
+  it "should work correctly in hashes" do
+    h = Hash.new(1)
+    h[@R.new(1, 2)] = 2
+    h[@R.new(nil, nil, :empty => true)] = 3
+    h[@R.new(1, 2)].must_equal 2
+    h[@R.new(1, 3)].must_equal 1
+    h[@R.new(2, 2)].must_equal 1
+    h[@R.new(1, 2, :exclude_begin => true)].must_equal 1
+    h[@R.new(1, 2, :exclude_end => true)].must_equal 1
+    h[@R.new(1, 2, :db_type => :int)].must_equal 1
+    h[@R.new(nil, nil, :empty => true)].must_equal 3
+    h[@R.new(nil, nil, :empty => true, :db_type => :int)].must_equal 1
+  end
+
   describe "database typecasting" do
     before do
       @o = @R.new(1, 2, :db_type=>'int4range')

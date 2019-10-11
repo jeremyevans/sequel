@@ -402,6 +402,15 @@ module Sequel
       end
       alias == eql?
 
+      # Make sure equal ranges have the same hash.
+      def hash
+        if @empty
+          @db_type.hash
+        else
+          [@begin, @end, @exclude_begin, @exclude_end, @db_type].hash
+        end
+      end
+
       # Allow PGRange values in case statements, where they return true if they
       # are equal to each other using eql?, or if this PGRange can be converted
       # to a Range, delegating to that range.

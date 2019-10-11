@@ -1,5 +1,7 @@
 === master
 
+* Implement Sequel::Postgres::PGRange#hash so instances work correctly in hashes (jeremyevans) (#1648)
+
 * Make dirty plugin work correctly with typecast_on_load plugin (jeremyevans) (#1647)
 
 * Add support for :require_modification option when setting up nested_attributes (jeremyevans)
