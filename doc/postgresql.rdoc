@@ -341,7 +341,7 @@ Dataset#overriding_system_value and Dataset#overriding_user_value to use this ne
 syntax:
 
   DB.create_table(:table){primary_key :id}
-  # Ignore the given value for id, using the identity's sequence value
+  # Ignore the given value for id, using the identity's sequence value.
   DB[:table].overriding_user_value.insert(:id=>1)
 
   DB.create_table(:table){primary_key :id, :identity=>:always}
