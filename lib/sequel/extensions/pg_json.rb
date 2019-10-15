@@ -12,7 +12,7 @@
 #
 # Note that wrapping JSON primitives changes the behavior for
 # JSON false and null values.  Because only +false+ and +nil+
-# in Ruby are considered falesy, wrapping these objects results
+# in Ruby are considered falsey, wrapping these objects results
 # in unexpected behavior if you use the values directly in
 # conditionals:
 #

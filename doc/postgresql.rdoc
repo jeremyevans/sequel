@@ -341,12 +341,12 @@ Dataset#overriding_system_value and Dataset#overriding_user_value to use this ne
 syntax:
 
   DB.create_table(:table){primary_key :id}
-  # Ignore the given value for id, using the identity's sequence value
+  # Ignore the given value for id, using the identity's sequence value.
   DB[:table].overriding_user_value.insert(:id=>1)
 
   DB.create_table(:table){primary_key :id, :identity=>:always}
   # Force the use of the given value for id, because otherwise the insert will
-  # raise an error, since GENERATED ALWAYS was using when creating the column.
+  # raise an error, since GENERATED ALWAYS was used when creating the column.
   DB[:table].overriding_system_value.insert(:id=>1)
 
 === Distinct On Specific Columns
