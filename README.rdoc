@@ -578,7 +578,7 @@ A single model instance can also be fetched by specifying a condition:
   post = Post.first(title: 'hello world')
   post = Post.first{num_comments < 10}
 
-The dataset for a model class returns rows a model instances instead of plain hashes:
+The dataset for a model class returns rows of model instances instead of plain hashes:
 
   DB[:posts].first.class # => Hash
   Post.first.class # => Post
