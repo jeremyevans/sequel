@@ -26,6 +26,9 @@ module Sequel
     # * Model.with_pk!
     # * Model.[] # when argument is not hash or nil
     # * many_to_one association method # without dynamic callback, when primary key matches
+    #
+    # You should not use this plugin if you are using sharding and there are different
+    # rows for the same primary key on different shards.
     # 
     # Usage:
     #
