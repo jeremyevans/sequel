@@ -1,5 +1,7 @@
 === master
 
+* Support table aliases for single-table INSERT statements on PostgreSQL 9.5+ (jeremyevans) (#1656)
+
 * Implement Sequel::Postgres::PGRange#hash so instances work correctly in hashes (jeremyevans) (#1648)
 
 * Make dirty plugin work correctly with typecast_on_load plugin (jeremyevans) (#1647)

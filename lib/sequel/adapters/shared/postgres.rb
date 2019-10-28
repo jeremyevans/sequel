@@ -1806,6 +1806,16 @@ module Sequel
         end
       end
 
+      # Include aliases when inserting into a single table on PostgreSQL 9.5+.
+      def insert_into_sql(sql)
+        sql << " INTO "
+        if (f = @opts[:from]) && f.length == 1
+          identifier_append(sql, server_version >= 90500 ? f.first : unaliased_identifier(f.first))
+        else
+          source_list_append(sql, f)
+        end
+      end
+
       # Return the primary key to use for RETURNING in an INSERT statement
       def insert_pk
         if (f = opts[:from]) && !f.empty?

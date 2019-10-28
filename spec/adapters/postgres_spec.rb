@@ -368,6 +368,14 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
   end
+
+  it "Dataset#insert_conflict should support table aliases" do
+    @ds = @db[Sequel[:ic_test].as(:foo)]
+    @ds.insert(1, 2, 5)
+    proc{@ds.insert(1, 3, 4)}.must_raise Sequel::UniqueConstraintViolation
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>Sequel[:foo][:c] + Sequel[:excluded][:c]}).insert(1, 7, 10)
+    @ds.all.must_equal [{:a=>1, :b=>15, :c=>5, :c_is_unique=>false}]
+  end
 end if DB.server_version >= 90500
 
 describe "A PostgreSQL database" do
