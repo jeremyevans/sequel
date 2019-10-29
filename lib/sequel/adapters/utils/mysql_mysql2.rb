@@ -55,7 +55,7 @@ module Sequel
             NotNullConstraintViolation
           when 1062
             UniqueConstraintViolation
-          when 1451, 1452
+          when 1451, 1452, 1216, 1217
             ForeignKeyConstraintViolation
           when 4025
             CheckConstraintViolation
