@@ -9,8 +9,8 @@
 #   #
 #
 # As you can see, this uses single line SQL comments (--) suffixed
-# by a newline.  This # plugin transforms all consecutive
-# whitespace in the comment to # a single string:
+# by a newline.  This plugin transforms all consecutive whitespace
+# in the comment to a single string:
 #
 #   ds = DB[:table].comment("Some\r\nComment     Here").all
 #   # SELECT * FROM table -- Some Comment Here
