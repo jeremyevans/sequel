@@ -1,5 +1,7 @@
 === master
 
+* Recognize two additional foreign key constraint violation codes on MySQL 8.0.13+ (rianmcguire) (#1657)
+
 * Support table aliases for single-table INSERT statements on PostgreSQL 9.5+ (jeremyevans) (#1656)
 
 * Implement Sequel::Postgres::PGRange#hash so instances work correctly in hashes (jeremyevans) (#1648)
