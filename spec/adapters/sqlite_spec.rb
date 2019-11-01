@@ -623,7 +623,7 @@ describe "SQLite", 'INSERT ON CONFLICT' do
     @ds.insert_conflict(:target=>:a).insert(1, 3, 4, false)
     @ds.insert_conflict(:target=>:c, :conflict_where=>:c_is_unique).insert(11, 12, 3, true)
     @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}, {:a=>10, :b=>11, :c=>3, :c_is_unique=>true}]
-  end
+  end unless DB.adapter_scheme == :amalgalite
 
   it "Dataset#insert_ignore and insert_conflict should work with multi_insert/import" do
     @ds.insert(1, 2, 3, false)
