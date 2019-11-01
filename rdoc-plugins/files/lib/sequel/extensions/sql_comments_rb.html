@@ -30,7 +30,7 @@ lib/sequel/extensions/sql_comments.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:01 -0700</span>
+<span class='datetime'>2019-10-30 16:02:05 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -40,7 +40,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some Comment&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment</span>&#x000A;<span class="ruby-comment">#</span></pre>
 
-<p>As you can see, this uses single line SQL comments (–) suffixed by a newline.  This # plugin transforms all consecutive whitespace in the comment to # a single string:</p>
+<p>As you can see, this uses single line SQL comments (–) suffixed by a newline.  This plugin transforms all consecutive whitespace in the comment to a single string:</p>
 
 <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">comment</span>(<span class="ruby-string">&quot;Some\r\nComment     Here&quot;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table -- Some Comment Here</span>&#x000A;<span class="ruby-comment">#</span></pre>
 

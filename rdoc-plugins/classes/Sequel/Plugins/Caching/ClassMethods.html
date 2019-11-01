@@ -104,7 +104,7 @@ Sequel::Plugins::Caching::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_delete_pk-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_delete_pk-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">64</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">65</span>   <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_delete_pk-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">67</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">68</span>   <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_get_pk'>
@@ -123,7 +123,7 @@ Sequel::Plugins::Caching::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_get_pk-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_get_pk-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">70</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">71</span>   <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">72</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_get_pk-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">74</span>   <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_key'>
@@ -142,7 +142,7 @@ Sequel::Plugins::Caching::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_key-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_key-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">81</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;<span class="line-num">82</span>   <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_key-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">83</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;<span class="line-num">84</span>   <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;<span class="line-num">85</span>   <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="line-num">86</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-cache_key_prefix'>
@@ -161,7 +161,7 @@ Sequel::Plugins::Caching::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-cache_key_prefix-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-cache_key_prefix-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">75</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key_prefix</span>&#x000A;<span class="line-num">76</span>   <span class="ruby-identifier">to_s</span>&#x000A;<span class="line-num">77</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-cache_key_prefix-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">78</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">cache_key_prefix</span>&#x000A;<span class="line-num">79</span>   <span class="ruby-identifier">to_s</span>&#x000A;<span class="line-num">80</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-set_cache_ttl'>
@@ -180,7 +180,7 @@ Sequel::Plugins::Caching::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-set_cache_ttl-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-set_cache_ttl-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">88</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;<span class="line-num">89</span>   <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="line-num">90</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-set_cache_ttl-source'>   <span class="ruby-comment"># File lib/sequel/plugins/caching.rb</span>&#x000A;<span class="line-num">91</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;<span class="line-num">92</span>   <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

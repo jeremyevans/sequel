@@ -30,7 +30,7 @@ README.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-09-14 07:48:03 -0700</span>
+<span class='datetime'>2019-10-15 20:03:23 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -458,7 +458,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">title:</span> <span class="ruby-string">&#39;hello world&#39;</span>)&#x000A;<span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">first</span>{<span class="ruby-identifier">num_comments</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">10</span>}</pre>
 
-<p>The dataset for a model class returns rows a model instances instead of plain hashes:</p>
+<p>The dataset for a model class returns rows of model instances instead of plain hashes:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:posts</span>].<span class="ruby-identifier">first</span>.<span class="ruby-identifier">class</span> <span class="ruby-comment"># =&gt; Hash</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">class</span> <span class="ruby-comment"># =&gt; Post</span></pre>
 

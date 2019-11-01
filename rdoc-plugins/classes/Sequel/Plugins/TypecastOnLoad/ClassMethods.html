@@ -101,7 +101,7 @@ Sequel::Plugins::TypecastOnLoad::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-call-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-keyword">super</span>.<span class="ruby-identifier">load_typecast</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-call-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>&#x000A;<span class="line-num">43</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">call</span>(<span class="ruby-identifier">values</span>)&#x000A;<span class="line-num">44</span>   <span class="ruby-identifier">o</span> = <span class="ruby-keyword">super</span>.<span class="ruby-identifier">load_typecast</span>&#x000A;<span class="line-num">45</span>   <span class="ruby-identifier">o</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_clear_changed_columns</span>, <span class="ruby-value">:initialize</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">o</span>&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-freeze'>
@@ -120,7 +120,7 @@ Sequel::Plugins::TypecastOnLoad::ClassMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-freeze-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">49</span>   <span class="ruby-ivar">@typecast_on_load_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">50</span> &#x000A;<span class="line-num">51</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">52</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-freeze-source'>   <span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze</span>&#x000A;<span class="line-num">51</span>   <span class="ruby-ivar">@typecast_on_load_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">52</span> &#x000A;<span class="line-num">53</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

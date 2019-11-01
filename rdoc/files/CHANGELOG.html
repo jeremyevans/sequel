@@ -30,12 +30,27 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-10-01 08:03:41 -0700</span>
+<span class='datetime'>2019-11-01 09:00:43 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.26.0+-282019-11-01-29">5.26.0 (2019-11-01)<span><a href="#label-5.26.0+-282019-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize two additional foreign key constraint violation codes on MySQL 8.0.13+ (rianmcguire) (#1657)</p>
+</li><li>
+<p>Support table aliases for single-table INSERT statements on PostgreSQL 9.5+ (jeremyevans) (#1656)</p>
+</li><li>
+<p>Implement Sequel::Postgres::PGRange#hash so instances work correctly in hashes (jeremyevans) (#1648)</p>
+</li><li>
+<p>Make dirty plugin work correctly with typecast_on_load plugin (jeremyevans) (#1647)</p>
+</li><li>
+<p>Add support for :require_modification option when setting up nested_attributes (jeremyevans)</p>
+</li><li>
+<p>Add support for SQL/JSON path expressions to the pg_json_ops extension, supported by PostgreSQL 12+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.25.0+-282019-10-01-29">5.25.0 (2019-10-01)<span><a href="#label-5.25.0+-282019-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Fix <a href="../classes/Sequel/SQL/NumericMethods.html#method-i-coerce"><code>Sequel::SQL::NumericMethods#coerce</code></a> to not raise NoMethodError if super method is not defined (jeremyevans) (#1645)</p>
