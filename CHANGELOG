@@ -1,3 +1,7 @@
+=== master
+
+* Support ordering by NULLS FIRST/NULLS LAST without emulation on SQLite 3.30+ (jeremyevans)
+
 === 5.26.0 (2019-11-01)
 
 * Recognize two additional foreign key constraint violation codes on MySQL 8.0.13+ (rianmcguire) (#1657)

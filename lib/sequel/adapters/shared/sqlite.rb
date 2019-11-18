@@ -869,9 +869,9 @@ module Sequel
         end
       end
 
-      # SQLite does not natively support NULLS FIRST/LAST.
+      # SQLite supports NULLS FIRST/LAST natively in 3.30+.
       def requires_emulating_nulls_first?
-        true
+        db.sqlite_version < 33000
       end
 
       # SQLite does not support FOR UPDATE, but silently ignore it
