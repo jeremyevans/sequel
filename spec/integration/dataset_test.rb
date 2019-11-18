@@ -443,6 +443,20 @@ describe Sequel::Dataset do
     @d.extension(:sequel_4_dataset_methods).interval(:value).to_i.must_equal 6
   end
 
+  it "should support or emulate filtered aggregate functions" do
+    @d.insert(:name => 'abc', :value => 123)
+    @d.insert(:name => 'abc', :value => 456)
+    @d.insert(:name => 'def', :value => 324)
+    @d.get{count.function.*.filter{value > 100}}.must_equal 3
+    @d.get{count.function.*.filter{value > 200}}.must_equal 2
+    @d.get{count.function.*.filter{value > 400}}.must_equal 1
+    @d.get{count.function.*.filter{value > 500}}.must_equal 0
+    @d.get{count(:value).filter{value > 100}}.must_equal 3
+    @d.get{count(:value).filter{value > 200}}.must_equal 2
+    @d.get{count(:value).filter{value > 400}}.must_equal 1
+    @d.get{count(:value).filter{value > 500}}.must_equal 0
+  end
+
   it "should return the correct records" do
     @d.to_a.must_equal []
     @d.insert(:name => 'abc', :value => 123)

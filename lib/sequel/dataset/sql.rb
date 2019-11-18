@@ -492,11 +492,24 @@ module Sequel
       end
 
       sql << '('
+      if filter = opts[:filter]
+        filter = filter_expr(filter, &opts[:filter_block])
+      end
       if opts[:*]
-        sql << '*'
+        if filter && !supports_filtered_aggregates?
+          literal_append(sql, Sequel.case({filter=>1}, nil))
+          filter = nil
+        else
+          sql <<  '*'
+        end
       else
         sql << "DISTINCT " if opts[:distinct]
-        expression_list_append(sql, f.args)
+        if filter && !supports_filtered_aggregates?
+          expression_list_append(sql, f.args.map{|arg| Sequel.case({filter=>arg}, nil)})
+          filter = nil
+        else
+          expression_list_append(sql, f.args)
+        end
         if order = opts[:order]
           sql << " ORDER BY "
           expression_list_append(sql, order)
@@ -510,9 +523,9 @@ module Sequel
         sql << ')'
       end
 
-      if filter = opts[:filter]
+      if filter
         sql << " FILTER (WHERE "
-        literal_append(sql, filter_expr(filter, &opts[:filter_block]))
+        literal_append(sql, filter)
         sql << ')'
       end
 

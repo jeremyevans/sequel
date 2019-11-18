@@ -741,14 +741,23 @@ describe Sequel::SQL::VirtualRow do
     @d.l{mode.function.within_group(:a, :b)}.must_equal 'mode() WITHIN GROUP (ORDER BY "a", "b")' 
   end
 
+  it "should handle emualted filtered aggregate function calls" do
+    @d.l{count.function.*.filter(Sequel.&(:a, :b))}.must_equal 'count((CASE WHEN ("a" AND "b") THEN 1 ELSE NULL END))' 
+    @d.l{count.function.*.filter(:a=>1)}.must_equal 'count((CASE WHEN ("a" = 1) THEN 1 ELSE NULL END))'
+    @d.l{count(:a).filter{b > 1}}.must_equal 'count((CASE WHEN ("b" > 1) THEN "a" ELSE NULL END))'
+    @d.l{count(:a).filter(:a=>1){b > 1}}.must_equal 'count((CASE WHEN (("a" = 1) AND ("b" > 1)) THEN "a" ELSE NULL END))'
+  end
+
   it "should handle filtered aggregate function calls" do
+    @d = @d.with_extend{def supports_filtered_aggregates?; true end}
     @d.l{count.function.*.filter(Sequel.&(:a, :b))}.must_equal 'count(*) FILTER (WHERE ("a" AND "b"))' 
     @d.l{count.function.*.filter(:a=>1)}.must_equal 'count(*) FILTER (WHERE ("a" = 1))'
     @d.l{count.function.*.filter{b > 1}}.must_equal 'count(*) FILTER (WHERE ("b" > 1))'
     @d.l{count.function.*.filter(:a=>1){b > 1}}.must_equal 'count(*) FILTER (WHERE (("a" = 1) AND ("b" > 1)))'
   end
 
-  it "should handle fitlered ordered-set and hypothetical-set function calls" do
+  it "should handle filtered ordered-set and hypothetical-set function calls" do
+    @d = @d.with_extend{def supports_filtered_aggregates?; true end}
     @d.l{mode.function.within_group(:a).filter(:a=>1)}.must_equal 'mode() WITHIN GROUP (ORDER BY "a") FILTER (WHERE ("a" = 1))' 
   end
 

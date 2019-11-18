@@ -230,6 +230,12 @@ module Sequel
       supports_cte_in_subqueries?
     end
 
+    # Whether the dataset supports the FILTER clause for aggregate functions.
+    # If not, support is emulated using CASE.
+    def supports_filtered_aggregates?
+      false
+    end
+
     # Whether the database supports quoting function names.
     def supports_quoted_function_names?
       false

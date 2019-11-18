@@ -1955,6 +1955,11 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
+      # PostgreSQL 9.4+ supports the FILTER clause for aggregate functions.
+      def supports_filtered_aggregates?
+        server_version >= 90400
+      end
+
       # PostgreSQL supports quoted function names.
       def supports_quoted_function_names?
         true

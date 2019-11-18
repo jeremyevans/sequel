@@ -615,10 +615,6 @@ describe "A PostgreSQL dataset" do
     @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{mode.function.within_group(:a)}.must_equal 1
   end if DB.server_version >= 90400
 
-  it "should support filtered aggregate functions" do
-    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{count(:a).filter(:a=>1)}.must_equal 2
-  end if DB.server_version >= 90400
-
   it "should support functions with ordinality" do
     @d.from{generate_series(1,10,3).with_ordinality}.select_map([:generate_series, :ordinality]).must_equal [[1, 1], [4, 2], [7, 3], [10, 4]]
   end if DB.server_version >= 90400

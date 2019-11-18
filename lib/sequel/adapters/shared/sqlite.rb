@@ -897,6 +897,11 @@ module Sequel
         false
       end
 
+      # SQLite 3.30 supports the FILTER clause for aggregate functions.
+      def supports_filtered_aggregates?
+        db.sqlite_version >= 33000
+      end
+
       # SQLite supports quoted function names.
       def supports_quoted_function_names?
         true
