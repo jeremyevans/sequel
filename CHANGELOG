@@ -1,5 +1,7 @@
 === master
 
+* Make pg_enum extension work correctly on PostgreSQL 8.3-9.0 (jeremyevans)
+
 * Emulate FILTER clause for aggregate functions using CASE on databases not supporting it directly (jeremyevans)
 
 * Support ordering by NULLS FIRST/NULLS LAST without emulation on SQLite 3.30+ (jeremyevans)

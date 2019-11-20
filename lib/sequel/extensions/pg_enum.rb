@@ -133,8 +133,11 @@ module Sequel
       # the pg_type table to get names and array oids for
       # enums.
       def parse_enum_labels
+        order = [:enumtypid]
+        order << :enumsortorder if server_version >= 90100
+
         enum_labels = metadata_dataset.from(:pg_enum).
-          order(:enumtypid, :enumsortorder).
+          order(*order).
           select_hash_groups(Sequel.cast(:enumtypid, Integer).as(:v), :enumlabel).freeze
         enum_labels.each_value(&:freeze)
 
