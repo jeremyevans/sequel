@@ -62,4 +62,10 @@ if ENV['SEQUEL_FREEZE_DATABASE']
   DB.freeze
 end
 
-puts "running #{defined?(SEQUEL_ADAPTER_TEST) ? SEQUEL_ADAPTER_TEST : "integration (database type: #{DB.database_type})"} specs on #{RUBY_ENGINE} #{defined?(JRUBY_VERSION) ? JRUBY_VERSION : RUBY_VERSION} with #{DB.adapter_scheme} adapter"
+version = if DB.respond_to?(:server_version)
+  DB.server_version
+elsif DB.respond_to?(:sqlite_version)
+  DB.sqlite_version
+end
+
+puts "running #{defined?(SEQUEL_ADAPTER_TEST) ? SEQUEL_ADAPTER_TEST : "integration (database type: #{DB.database_type})"} specs on #{RUBY_ENGINE} #{defined?(JRUBY_VERSION) ? JRUBY_VERSION : RUBY_VERSION} with #{DB.adapter_scheme} adapter#{" (database version: #{version})" if version}"
