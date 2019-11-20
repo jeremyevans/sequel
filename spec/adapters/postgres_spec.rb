@@ -70,7 +70,7 @@ describe "PostgreSQL", '#create_table' do
 
   it "should create an unlogged table" do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
-  end
+  end if DB.server_version >= 90100
 
   it "should create a table inheriting from another table" do
     @db.create_table(:unlogged_dolls){text :name}
@@ -4473,4 +4473,4 @@ describe "pg_auto_constraint_validations plugin" do
       File.delete(cache_file) if File.file?(cache_file)
     end
   end
-end if DB.respond_to?(:error_info)
+end if DB.respond_to?(:error_info) && DB.server_version >= 90300

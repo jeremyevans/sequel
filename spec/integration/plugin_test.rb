@@ -2393,7 +2393,7 @@ describe "string_agg extension" do
   cspecify "should have string_agg return aggregated concatenation for distinct values", :mssql, :sqlite, :oracle, :db2, :derby do
     @ds.select_group(:id).select_append(Sequel.string_agg(:s).order(:s).distinct.as(:v)).map([:id, :v]).must_equal [[1, 'a,b,c'], [2, 'aa,bb']]
   end
-end
+end if (DB.database_type != :postgres || DB.server_version >= 90000)
 
 describe "insert_conflict plugin" do
   before(:all) do
