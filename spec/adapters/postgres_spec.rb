@@ -1268,7 +1268,7 @@ describe "A PostgreSQL database" do
   end
 
   it "should support indexes with index type" do
-    @db.create_table(:posts){point :p; index :p, :type => 'gist'}
+    @db.create_table(:posts){box :geom; index :geom, :type => 'gist'}
   end
 
   it "should support unique indexes with index type" do
