@@ -1,5 +1,7 @@
 === master
 
+* Make Postgres::ArrayOp#join in pg_array_ops extension work correctly on PostgreSQL <9.1 (jeremyevans)
+
 * Make pg_enum extension work correctly on PostgreSQL 8.3-9.0 (jeremyevans)
 
 * Emulate FILTER clause for aggregate functions using CASE on databases not supporting it directly (jeremyevans)

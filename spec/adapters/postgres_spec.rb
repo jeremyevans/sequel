@@ -2700,6 +2700,8 @@ describe 'PostgreSQL array handling' do
     if @db.server_version >= 90000
       @ds.get(Sequel.pg_array(:i5).join).must_equal '15'
       @ds.get(Sequel.pg_array(:i5).join(':')).must_equal '1:5'
+    end
+    if @db.server_version >= 90100
       @ds.get(Sequel.pg_array(:i5).join(':', '*')).must_equal '1:*:5'
     end
     if @db.server_version >= 90300

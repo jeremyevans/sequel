@@ -51,8 +51,8 @@
 #   ia.length(2)       # array_length(int_array_column, 2)
 #   ia.lower           # array_lower(int_array_column, 1)
 #   ia.lower(2)        # array_lower(int_array_column, 2)
-#   ia.join            # array_to_string(int_array_column, '', NULL)
-#   ia.join(':')       # array_to_string(int_array_column, ':', NULL)
+#   ia.join            # array_to_string(int_array_column, '')
+#   ia.join(':')       # array_to_string(int_array_column, ':')
 #   ia.join(':', ' ')  # array_to_string(int_array_column, ':', ' ')
 #   ia.unnest          # unnest(int_array_column)
 #   ia.unnest(:b)      # unnest(int_array_column, b)
@@ -217,12 +217,16 @@ module Sequel
 
       # Call the array_to_string method:
       #
-      #   array_op.join           # array_to_string(array, '', NULL)
-      #   array_op.to_string      # array_to_string(array, '', NULL)
-      #   array_op.join(":")      # array_to_string(array, ':', NULL)
+      #   array_op.join           # array_to_string(array, '')
+      #   array_op.to_string      # array_to_string(array, '')
+      #   array_op.join(":")      # array_to_string(array, ':')
       #   array_op.join(":", "*") # array_to_string(array, ':', '*')
       def to_string(joiner="", null=nil)
-        function(:array_to_string, joiner, null)
+        if null.nil?
+          function(:array_to_string, joiner)
+        else
+          function(:array_to_string, joiner, null)
+        end
       end
       alias join to_string
       

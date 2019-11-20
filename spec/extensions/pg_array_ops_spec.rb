@@ -83,9 +83,9 @@ describe "Sequel::Postgres::ArrayOp" do
   end
 
   it "#to_string/join should use the array_to_string function" do
-    @db.literal(@a.to_string).must_equal "array_to_string(a, '', NULL)"
-    @db.literal(@a.join).must_equal "array_to_string(a, '', NULL)"
-    @db.literal(@a.join(':')).must_equal "array_to_string(a, ':', NULL)"
+    @db.literal(@a.to_string).must_equal "array_to_string(a, '')"
+    @db.literal(@a.join).must_equal "array_to_string(a, '')"
+    @db.literal(@a.join(':')).must_equal "array_to_string(a, ':')"
     @db.literal(@a.join(':', '*')).must_equal "array_to_string(a, ':', '*')"
   end
 
