@@ -1317,6 +1317,7 @@ module Sequel
       CURRENT_DATE = Constant.new(:CURRENT_DATE)
       CURRENT_TIME = Constant.new(:CURRENT_TIME)
       CURRENT_TIMESTAMP = Constant.new(:CURRENT_TIMESTAMP)
+      DEFAULT = Constant.new(:DEFAULT)
       SQLTRUE = TRUE = BooleanConstant.new(true)
       SQLFALSE = FALSE = BooleanConstant.new(false)
       NULL = BooleanConstant.new(nil)

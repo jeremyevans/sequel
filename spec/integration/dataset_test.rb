@@ -92,6 +92,17 @@ describe "Simple Dataset operations" do
     @ds.from_self(:alias=>:items).graph(@ds.from_self, {:id=>:id}, :table_alias=>:b).extension(:graph_each).all.must_equal [{:items=>{:id=>1, :number=>10}, :b=>{:id=>1, :number=>10}}]
   end
 
+  cspecify "should have insert and update work with Sequel::DEFAULT", :sqlite do
+    @db.create_table!(:items) do
+      Integer :number, :default=>10
+    end
+    @ds.insert(:number=>Sequel::DEFAULT)
+    @ds.select_map(:number).must_equal [10]
+    @ds.insert(:number=>20)
+    @ds.update(:number=>Sequel::DEFAULT)
+    @ds.select_map(:number).must_equal [10, 10]
+  end
+
   cspecify "should have insert work correctly when inserting a row with all NULL values", :hsqldb do
     @db.create_table!(:items) do
       String :name
