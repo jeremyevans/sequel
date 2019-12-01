@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-11-01 09:00:43 -0700</span>
+<span class='datetime'>2019-11-27 10:45:37 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.27.0+-282019-12-01-29">5.27.0 (2019-12-01)<span><a href="#label-5.27.0+-282019-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Add Sequel::DEFAULT for a DEFAULT expression, useful for assigning to default values (jeremyevans)</p>
+</li><li>
+<p>Make Postgres::ArrayOp#join in pg_array_ops extension work correctly on PostgreSQL &lt;9.1 (jeremyevans)</p>
+</li><li>
+<p>Make pg_enum extension work correctly on PostgreSQL 8.3-9.0 (jeremyevans)</p>
+</li><li>
+<p>Emulate FILTER clause for aggregate functions using CASE on databases not supporting it directly (jeremyevans)</p>
+</li><li>
+<p>Support ordering by NULLS FIRST/NULLS LAST without emulation on SQLite 3.30+ (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.26.0+-282019-11-01-29">5.26.0 (2019-11-01)<span><a href="#label-5.26.0+-282019-11-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Recognize two additional foreign key constraint violation codes on MySQL 8.0.13+ (rianmcguire) (#1657)</p>
