@@ -55,6 +55,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
   dataset.exclude(:active).delete
   dataset.where{price < 100}.update(:active => true)
+  dataset.where(:active).update(:price => Sequel[:price] * 0.90)
 
 == Datasets are Enumerable
 
