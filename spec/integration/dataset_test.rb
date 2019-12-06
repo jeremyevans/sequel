@@ -625,7 +625,7 @@ describe "Simple Dataset operations" do
     @ds.exclude(nil=>:flag).map(:number).must_equal []
   end
 
-  cspecify "should have exclude_or_null work correctly", :mssql, :derby do
+  cspecify "should have exclude_or_null work correctly", :mssql, :derby, :oracle, :db2, :sqlanywhere do
     @ds = @ds.extension(:exclude_or_null)
     @ds.exclude_or_null(true=>:flag).map(:number).must_equal [2, 3]
     @ds.exclude_or_null(false=>:flag).map(:number).must_equal [1, 3]

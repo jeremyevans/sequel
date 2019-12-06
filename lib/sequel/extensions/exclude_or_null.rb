@@ -21,8 +21,9 @@
 #
 #   DB.extension(:exclude_or_null)
 #
-# Note, this extension does not work correctly in most cases on
-# Microsoft SQL Server, due to apparent limitations in its SQL syntax.
+# Note, this extension works correctly on PostgreSQL, SQLite, MySQL,
+# H2, and HSQLDB.  However, it does not work correctly on Microsoft SQL Server,
+# Oracle, DB2, SQLAnywhere, or Derby.
 #
 # Related module: Sequel::ExcludeOrNull
 
