@@ -1,3 +1,7 @@
+=== master
+
+* Add any_not_empty extension, for making Dataset#any? without a block mean !empty? (jeremyevans)
+
 === 5.27.0 (2019-12-01)
 
 * Add Sequel::DEFAULT for a DEFAULT expression, useful for assigning to default values (jeremyevans)
