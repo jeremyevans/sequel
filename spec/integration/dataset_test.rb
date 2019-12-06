@@ -593,28 +593,43 @@ describe Sequel::Dataset do
 end
 
 describe "Simple Dataset operations" do
-  before do
+  before(:all) do
     DB.create_table!(:items) do
       Integer :number
       TrueClass :flag
     end
-    @ds = DB[:items]
+    @ds = DB[:items].order(:number)
+    @ds.insert(:number=>1, :flag=>true)
+    @ds.insert(:number=>2, :flag=>false)
+    @ds.insert(:number=>3, :flag=>nil)
   end
-  after do
+  after(:all) do
     DB.drop_table?(:items)
   end
 
   it "should deal with boolean conditions correctly" do
-    @ds.insert(:number=>1, :flag=>true)
-    @ds.insert(:number=>2, :flag=>false)
-    @ds.insert(:number=>3, :flag=>nil)
-    @ds = @ds.order(:number)
     @ds.filter(:flag=>true).map(:number).must_equal [1]
     @ds.filter(:flag=>false).map(:number).must_equal [2]
     @ds.filter(:flag=>nil).map(:number).must_equal [3]
     @ds.exclude(:flag=>true).map(:number).must_equal [2, 3]
     @ds.exclude(:flag=>false).map(:number).must_equal [1, 3]
     @ds.exclude(:flag=>nil).map(:number).must_equal [1, 2]
+  end
+
+  cspecify "should deal with boolean equality conditions correctly", :derby do
+    @ds.filter(true=>:flag).map(:number).must_equal [1]
+    @ds.filter(false=>:flag).map(:number).must_equal [2]
+    @ds.filter(nil=>:flag).map(:number).must_equal []
+    @ds.exclude(true=>:flag).map(:number).must_equal [2]
+    @ds.exclude(false=>:flag).map(:number).must_equal [1]
+    @ds.exclude(nil=>:flag).map(:number).must_equal []
+  end
+
+  cspecify "should have exclude_or_null work correctly", :mssql, :derby do
+    @ds = @ds.extension(:exclude_or_null)
+    @ds.exclude_or_null(true=>:flag).map(:number).must_equal [2, 3]
+    @ds.exclude_or_null(false=>:flag).map(:number).must_equal [1, 3]
+    @ds.exclude_or_null(nil=>:flag).map(:number).must_equal [1, 2, 3]
   end
 end
 

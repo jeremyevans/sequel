@@ -1237,6 +1237,20 @@ module Sequel
       self
     end
 
+    # If invert is true, invert the condition.
+    def _invert_filter(cond, invert)
+      if invert
+        SQL::BooleanExpression.invert(cond)
+      else
+        cond
+      end
+    end
+
+    # Add the given filter condition. Arguments:
+    # clause :: Symbol or which SQL clause to effect, should be :where or :having
+    # cond :: The filter condition to add
+    # invert :: Whether the condition should be inverted (true or false)
+    # combine :: How to combine the condition with an existing condition, should be :AND or :OR
     def add_filter(clause, cond, invert=false, combine=:AND, &block)
       if cond == EMPTY_ARRAY && !block
         raise Error, "must provide an argument to a filtering method if not passing a block"
@@ -1256,8 +1270,7 @@ module Sequel
           cond = nil
         end
 
-        cond = filter_expr(cond, &block)
-        cond = SQL::BooleanExpression.invert(cond) if invert
+        cond = _invert_filter(filter_expr(cond, &block), invert)
         cond = SQL::BooleanExpression.new(combine, @opts[clause], cond) if @opts[clause]
 
         if cond.nil?

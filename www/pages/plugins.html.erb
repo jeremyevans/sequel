@@ -186,7 +186,7 @@
 <p>Dataset extensions can be loaded into a single Sequel::Database object via Sequel::Dataset#extension, or to all datasets for a given database via Sequel::Database#extension, or all datasets for all databases by using Sequel::Database.extension.</p>
 
 <ul>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/any_not_empty.html">any_not_empty</a>: Make Dataset#any? without block mean !empty?.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/any_not_empty_rb.html">any_not_empty</a>: Make Dataset#any? without block mean !empty?.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/auto_literal_strings_rb.html">auto_literal_strings</a>: Automatically treats string arguments passed to filter methods as literal SQL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/current_datetime_timestamp_rb.html">current_datetime_timestamp</a>: Creates current Time/DateTime objects that are literalized as CURRENT_TIMESTAMP.</li>
@@ -194,6 +194,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/duplicate_columns_handler_rb.html">duplicate_columns_handler</a>: Allows you to raise or warn if the dataset returns multiple columns with the same name when returning the results.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_consider_nulls_rb.html">empty_array_consider_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty array use a NULL expression for NULL column values.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/exclude_or_null_rb.html">exclude_or_null</a>: Add Dataset#exclude_or_null for only including rows where condition is false or NULL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/implicit_subquery_rb.html">implicit_subquery</a>: Makes dataset methods that return datasets with modified SQL use a subquery implicitly if the current dataset uses raw SQL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
