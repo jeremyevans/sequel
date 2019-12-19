@@ -25,7 +25,7 @@ Discussion Forum (sequel-talk Google Group) :: http://groups.google.com/group/se
 IRC Channel (#sequel) :: irc://irc.freenode.net/sequel
 
 If you have questions about how to use Sequel, please ask on the
-sequel-talk Google Group or IRC.  Only use the the bug tracker to report
+sequel-talk Google Group or [IRC](irc://irc.freenode.net/sequel).  Only use the the bug tracker to report
 bugs in Sequel, not to ask for help on using Sequel.
 
 To check out the source code:
