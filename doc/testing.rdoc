@@ -8,17 +8,20 @@ These run each test in its own transaction, the recommended way to test.
 
 === minitest/spec
 
-==== with minitest-hooks
-
+==== with minitest-hooks    
   require 'minitest/hooks/default'
+  
+  DB = Sequel.postgres # change if using sqlite etc
+  
   class Minitest::HooksSpec
     def around
       DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
     end
   end
 
-==== without minitest-hooks
-
+==== without minitest-hooks  
+  DB = Sequel.postgres # change if using sqlite etc
+  
   class Minitest::Spec
     def run(*args, &block)
       DB.transaction(:rollback=>:always, :auto_savepoint=>true){super}
@@ -26,7 +29,8 @@ These run each test in its own transaction, the recommended way to test.
   end
 
 === minitest/test
-
+  DB = Sequel.postgres # change if using sqlite etc
+  
   # Use this class as the base class for your tests
   class SequelTestCase < Minitest::Test
     def run(*args, &block)
@@ -35,7 +39,8 @@ These run each test in its own transaction, the recommended way to test.
   end
 
 === rspec >= 2.8
-
+  DB = Sequel.postgres # change the database if you are using sqlite etc.
+  
   RSpec.configure do |c|
     c.around(:each) do |example|
       DB.transaction(:rollback=>:always, :auto_savepoint=>true){example.run}
