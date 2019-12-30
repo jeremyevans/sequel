@@ -180,6 +180,12 @@ module Sequel
       
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
+
+        # Warn when calling as the fetch size is ignored by the JDBC adapter currently.
+        def with_fetch_size(size)
+          warn("Sequel::JDBC::Postgres::Dataset#with_fetch_size does not currently have an effect.", :uplevel=>1)
+          super
+        end
         
         private
         

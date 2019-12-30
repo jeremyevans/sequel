@@ -1,5 +1,7 @@
 === master
 
+* Warn when calling Sequel::JDBC::Postgres::Dataset#with_fetch_size (jeremyevans) (#1665)
+
 * Add exclude_or_null extension, for filtering datasets where the condition is false or NULL (jeremyevans)
 
 * Add any_not_empty extension, for making Dataset#any? without a block mean !empty? (jeremyevans)
