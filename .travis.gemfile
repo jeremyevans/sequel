@@ -40,17 +40,19 @@ end
 
 # MRI Adapter Dependencies
 platforms :ruby do
+  sequel_pg = RUBY_VERSION.split('.')[1].to_i.send(Time.now.yday.even? ? :even? : :odd?)
+
   gem "sqlite3"
   if RUBY_VERSION < '2.0.0'
     gem "pg", '<0.19.0'
     gem "mysql2", '<0.5'
   else
-    gem "pg"
+    gem "pg", (sequel_pg || RUBY_VERSION < '2.2.0') ? '<1.2.0' : '>0'
     gem "mysql2"
   end
 
   # Test current sequel_pg on half of the MRIs, and pure-ruby on the other half
-  if RUBY_VERSION.split('.')[1].to_i.send(Time.now.yday.even? ? :even? : :odd?)
+  if sequel_pg
     gem 'sequel_pg', github: 'jeremyevans/sequel_pg', require: 'sequel'
   end
 end
