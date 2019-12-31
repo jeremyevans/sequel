@@ -52,13 +52,13 @@ describe "pg_range extension" do
   end
 
   it "should literalize endless Range instances to strings correctly" do
-    @db.literal(eval('1..')).must_equal "'[1,]'"
-    @db.literal(eval('1...')).must_equal "'[1,)'"
+    @db.literal(eval('(1..)')).must_equal "'[1,]'"
+    @db.literal(eval('(1...)')).must_equal "'[1,)'"
   end if endless_range_support
 
   it "should literalize startless Range instances to strings correctly" do
-    @db.literal(eval('..1')).must_equal "'[,1]'"
-    @db.literal(eval('...1')).must_equal "'[,1)'"
+    @db.literal(eval('(..1)')).must_equal "'[,1]'"
+    @db.literal(eval('(...1)')).must_equal "'[,1)'"
   end if startless_range_support
 
   it "should literalize startless, endless Range instances to strings correctly" do
@@ -90,13 +90,13 @@ describe "pg_range extension" do
   end
 
   it "should support using endless Range instances as bound variables" do
-    @db.bound_variable_arg(eval('1..'), nil).must_equal "[1,]"
-    @db.bound_variable_arg(eval('1...'), nil).must_equal "[1,)"
+    @db.bound_variable_arg(eval('(1..)'), nil).must_equal "[1,]"
+    @db.bound_variable_arg(eval('(1...)'), nil).must_equal "[1,)"
   end if endless_range_support
 
   it "should support using startless Range instances as bound variables" do
-    @db.bound_variable_arg(eval('..1'), nil).must_equal "[,1]"
-    @db.bound_variable_arg(eval('...1'), nil).must_equal "[,1)"
+    @db.bound_variable_arg(eval('(..1)'), nil).must_equal "[,1]"
+    @db.bound_variable_arg(eval('(...1)'), nil).must_equal "[,1)"
   end if startless_range_support
 
   it "should support using startless, endless Range instances as bound variables" do
@@ -113,7 +113,7 @@ describe "pg_range extension" do
   end
 
   it "should support using arrays of endless Range instances as bound variables" do
-    @db.bound_variable_arg([eval('1..'), eval('2..')], nil).must_equal '{"[1,]","[2,]"}'
+    @db.bound_variable_arg([eval('(1..)'), eval('(2..)')], nil).must_equal '{"[1,]","[2,]"}'
   end if endless_range_support
 
   it "should support using PGRange instances as bound variables" do
@@ -470,21 +470,21 @@ describe "pg_range extension" do
     end
 
     it "should consider PGRanges equal with a endless Range they represent" do
-      @R.new(1, nil).must_be :==, eval('1..')
-      @R.new(1, nil, :exclude_end=>true).must_be :==, eval('1...')
-      @R.new(1, nil).wont_be :==, eval('1...')
-      @R.new(1, nil, :exclude_end=>true).wont_be :==, eval('1..')
-      @R.new(1, nil).wont_be :==, eval('2..')
-      @R.new(1, nil, :exclude_end=>true).wont_be :==, eval('2...')
+      @R.new(1, nil).must_be :==, eval('(1..)')
+      @R.new(1, nil, :exclude_end=>true).must_be :==, eval('(1...)')
+      @R.new(1, nil).wont_be :==, eval('(1...)')
+      @R.new(1, nil, :exclude_end=>true).wont_be :==, eval('(1..)')
+      @R.new(1, nil).wont_be :==, eval('(2..)')
+      @R.new(1, nil, :exclude_end=>true).wont_be :==, eval('(2...)')
     end if endless_range_support
 
     it "should consider PGRanges equal with a startless Range they represent" do
-      @R.new(nil, 1).must_be :==, eval('..1')
-      @R.new(nil, 1, :exclude_end=>true).must_be :==, eval('...1')
-      @R.new(nil, 1).wont_be :==, eval('...1')
-      @R.new(nil, 1, :exclude_end=>true).wont_be :==, eval('..1')
-      @R.new(nil, 1).wont_be :==, eval('..2')
-      @R.new(nil, 1, :exclude_end=>true).wont_be :==, eval('...2')
+      @R.new(nil, 1).must_be :==, eval('(..1)')
+      @R.new(nil, 1, :exclude_end=>true).must_be :==, eval('(...1)')
+      @R.new(nil, 1).wont_be :==, eval('(...1)')
+      @R.new(nil, 1, :exclude_end=>true).wont_be :==, eval('(..1)')
+      @R.new(nil, 1).wont_be :==, eval('(..2)')
+      @R.new(nil, 1, :exclude_end=>true).wont_be :==, eval('(...2)')
     end if startless_range_support
 
     it "should consider PGRanges equal with a startless, endless Range they represent" do

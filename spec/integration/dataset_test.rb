@@ -1593,20 +1593,20 @@ describe "Sequel::Dataset DSL support" do
   
   it "should work with endless ranges as hash values" do
     @ds.insert(20, 10)
-    @ds.filter(:a=>eval('30..')).all.must_equal []
-    @ds.filter(:a=>eval('20...')).all.must_equal [{:a=>20, :b=>10}]
-    @ds.filter(:a=>eval('20..')).all.must_equal [{:a=>20, :b=>10}]
-    @ds.filter(:a=>eval('10..')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('(30..)')).all.must_equal []
+    @ds.filter(:a=>eval('(20...)')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('(20..)')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('(10..)')).all.must_equal [{:a=>20, :b=>10}]
   end if RUBY_VERSION >= '2.6'
   
   it "should work with startless ranges as hash values" do
     @ds.insert(20, 10)
-    @ds.filter(:a=>eval('..30')).all.must_equal [{:a=>20, :b=>10}]
-    @ds.filter(:a=>eval('...30')).all.must_equal [{:a=>20, :b=>10}]
-    @ds.filter(:a=>eval('..20')).all.must_equal [{:a=>20, :b=>10}]
-    @ds.filter(:a=>eval('...20')).all.must_equal []
-    @ds.filter(:a=>eval('..10')).all.must_equal []
-    @ds.filter(:a=>eval('...10')).all.must_equal []
+    @ds.filter(:a=>eval('(..30)')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('(...30)')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('(..20)')).all.must_equal [{:a=>20, :b=>10}]
+    @ds.filter(:a=>eval('(...20)')).all.must_equal []
+    @ds.filter(:a=>eval('(..10)')).all.must_equal []
+    @ds.filter(:a=>eval('(...10)')).all.must_equal []
 
     @ds.filter(:a=>eval('nil..nil')).all.must_equal [{:a=>20, :b=>10}]
   end if RUBY_VERSION >= '2.7'

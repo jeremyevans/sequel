@@ -537,21 +537,21 @@ describe "Blockless Ruby Filters" do
   end
 
   it "should handle endless ranges" do
-    endless = eval('1..')
+    endless = eval('(1..)')
     @d.l{x =~ endless}.must_equal '(x >= 1)'
     @d.l(:x => endless).must_equal '(x >= 1)'
 
-    endless = eval('1...')
+    endless = eval('(1...)')
     @d.l{x =~ endless}.must_equal '(x >= 1)'
     @d.l(:x => endless).must_equal '(x >= 1)'
   end if RUBY_VERSION >= '2.6'
 
   it "should handle startless ranges" do
-    endless = eval('..1')
+    endless = eval('(..1)')
     @d.l{x =~ endless}.must_equal '(x <= 1)'
     @d.l(:x => endless).must_equal '(x <= 1)'
 
-    endless = eval('...1')
+    endless = eval('(...1)')
     @d.l{x =~ endless}.must_equal '(x < 1)'
     @d.l(:x => endless).must_equal '(x < 1)'
   end if RUBY_VERSION >= '2.7'
