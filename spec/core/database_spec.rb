@@ -2467,7 +2467,7 @@ describe "Database#typecast_value" do
       @db.typecast_value(:date, 'a')
       true.must_equal false
     rescue Sequel::InvalidValue => e
-      e.inspect.must_equal '#<Sequel::InvalidValue: ArgumentError: invalid date>'
+      e.inspect.must_match(/\A#\<Sequel::InvalidValue: (Argument|Date::)Error: invalid date\>\z/)
     end
   end
 end
