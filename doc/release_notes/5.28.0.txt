@@ -1,0 +1,16 @@
+= New Features
+
+* An any_not_empty extension has been added, for making Dataset#any?
+  without a block be the same as !empty?.  This can result in a
+  much faster database query.
+
+* An exclude_or_null extension has been added, adding a
+  Dataset#exclude_or_null method that returns rows where the given
+  expression is false or NULL.  This extension is supported on
+  PostgreSQL, SQLite, MySQL, H2, and HSQLDB.
+
+= Other Improvements
+
+* When using the jdbc/postgresql adapter, calling with_fetch_size
+  on a dataset will emit a warning.  This is because the driver
+  will ignore the setting.
