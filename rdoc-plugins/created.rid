@@ -1,7 +1,8 @@
-Sun, 01 Dec 2019 11:06:19 -0800
+Wed, 01 Jan 2020 10:07:19 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
+lib/sequel/extensions/any_not_empty.rb	Fri, 06 Dec 2019 15:00:19 -0800
 lib/sequel/extensions/arbitrary_servers.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/auto_literal_strings.rb	Wed, 19 Apr 2017 16:07:09 -0700
 lib/sequel/extensions/blank.rb	Mon, 25 Jan 2016 14:10:57 -0800
@@ -22,6 +23,7 @@ lib/sequel/extensions/empty_array_consider_nulls.rb	Tue, 01 Aug 2017 08:12:00 -0
 lib/sequel/extensions/error_sql.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/extensions/escaped_like.rb	Fri, 25 May 2018 14:49:16 -0700
 lib/sequel/extensions/eval_inspect.rb	Thu, 26 Jul 2018 13:43:38 -0700
+lib/sequel/extensions/exclude_or_null.rb	Fri, 06 Dec 2019 15:00:19 -0800
 lib/sequel/extensions/freeze_datasets.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/from_block.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/graph_each.rb	Tue, 01 Aug 2017 08:12:00 -0700

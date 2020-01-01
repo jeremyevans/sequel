@@ -60,7 +60,7 @@ Last Update:
 <p><a target="_top" href="http://github.com/jeremyevans/sequel/issues">github.com/jeremyevans/sequel/issues</a></p>
 </td></tr><tr><td class='label'>Discussion Forum (sequel-talk Google Group) </td><td>
 <p><a target="_top" href="http://groups.google.com/group/sequel-talk">groups.google.com/group/sequel-talk</a></p>
-</td></tr><tr><td class='label'>IRC Channel (#sequel) </td><td>
+</td></tr><tr><td class='label'>IRC Channel (sequel) </td><td>
 <p><a href="irc://irc.freenode.net/sequel">irc.freenode.net/sequel</a></p>
 </td></tr></tbody></table>
 
@@ -422,7 +422,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>)&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
-<p>When a model class is created, it parses the schema in the table from the database, and automatically sets up accessor methods for all of the columns in the table (Sequel::Model implements the active record pattern).</p>
+<p>When a model class is created, it parses the schema in the table from the database, and automatically sets up accessor methods for all of the columns in the table (<a href="../classes/Sequel/Model.html"><code>Sequel::Model</code></a> implements the active record pattern).</p>
 
 <p><a href="../classes/Sequel.html"><code>Sequel</code></a> model classes assume that the table name is an underscored plural of the class name:</p>
 

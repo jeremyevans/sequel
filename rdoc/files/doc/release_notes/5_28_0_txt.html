@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
 <head>
-<title>version.rb</title>
+<title>5.28.0.txt</title>
 <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
 <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
 <script type='text/javascript'>
@@ -23,10 +23,10 @@
 <body class='page'>
 <div class='file' id='wrapper'>
 <div class='header'>
-<h1 class='name'>version.rb
+<h1 class='name'>5.28.0.txt
 </h1>
 <div class='paths'>
-lib/sequel/version.rb
+doc/release_notes/5.28.0.txt
 </div>
 <div class='last-update'>
 Last Update:
@@ -35,7 +35,19 @@ Last Update:
 </div>
 <div id='content'>
 <div id='text'>
-<div id='description'></div>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An any_not_empty extension has been added, for making Dataset#any? without a block be the same as !empty?.  This can result in a much faster database query.</p>
+</li><li>
+<p>An exclude_or_null extension has been added, adding a Dataset#exclude_or_null method that returns rows where the given expression is false or NULL.  This extension is supported on PostgreSQL, SQLite, MySQL, H2, and HSQLDB.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>When using the jdbc/postgresql adapter, calling with_fetch_size on a dataset will emit a warning.  This is because the driver will ignore the setting.</p>
+</li></ul>
+</div>
 <div id='context'>
 </div>
 

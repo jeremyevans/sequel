@@ -39,6 +39,13 @@ Superclass:
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-with_fetch_size">with_fetch_size</a></li>
+</ol>
+</div>
 <div id='context'>
 <div id='includes'>
 <h2>Included modules</h2>
@@ -83,6 +90,28 @@ Superclass:
 <td class='context-item-desc'></td>
 </tr>
 </table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-with_fetch_size'>
+<a name='method-i-with_fetch_size'></a>
+<div class='synopsis'>
+<span class='name'>with_fetch_size</span>
+<span class='arguments'>(size)</span>
+
+</div>
+<div class='description'>
+
+<p>Warn when calling as the fetch size is ignored by the <a href="../../JDBC.html"><code>JDBC</code></a> adapter currently.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-with_fetch_size-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-with_fetch_size-source'>    <span class="ruby-comment"># File lib/sequel/adapters/jdbc/postgresql.rb</span>&#x000A;<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;<span class="line-num">186</span>   <span class="ruby-identifier">warn</span>(<span class="ruby-string">&quot;Sequel::JDBC::Postgres::Dataset#with_fetch_size does not currently have an effect.&quot;</span>, <span class="ruby-value">:uplevel</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="line-num">187</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
+</div>
 </div>
 </div>
 </div>

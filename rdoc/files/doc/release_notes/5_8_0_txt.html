@@ -65,7 +65,7 @@ Last Update:
 </li><li>
 <p>Dataset#nowait has been added, which will make the query fail with a Sequel::DatabaseLockTimeout exception if it encounters a locked row, overriding the default database behavior that would wait until the lock was released. This method is supported on PostgreSQL, Microsoft SQL Server, Oracle, and MySQL 8+.</p>
 </li><li>
-<p>Database#indexes now supports an :include_partial option on PostgreSQL, which will include partial indexes in the output (Sequel by default excludes partial indexes).</p>
+<p>Database#indexes now supports an :include_partial option on PostgreSQL, which will include partial indexes in the output (<a href="../../../classes/Sequel.html"><code>Sequel</code></a> by default excludes partial indexes).</p>
 </li><li>
 <p>Common table expressions and window functions are now supported when using MySQL 8+.</p>
 </li><li>

@@ -44,7 +44,7 @@ Last Update:
 </li><li>
 <p>You can now provide options for check constraints by calling the constraint/add_constraint methods with a hash as the first argument. On PostgreSQL, you can now use the :not_valid option for check constraints, so they are enforced for inserts and updates, but not for existing rows.</p>
 
-<pre>DB.create_table(:table) do&#x000A;  ...&#x000A;  constraint({:name=&gt;:constraint_name, :not_valid=&gt;true}) do&#x000A;    column_name &gt; 10&#x000A;  end&#x000A;end</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-operator">...</span>&#x000A;  <span class="ruby-identifier">constraint</span>({<span class="ruby-value">:name</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:constraint_name</span>, <span class="ruby-value">:not_valid</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">true</span>}) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">column_name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>
 <p>Dataset#stream has been added to the mysql2 adapter, and will have the dataset stream results if used with mysql2 0.3.12+.  This allows you to process large datasets without keeping the entire dataset in memory.</p>
 

@@ -124,7 +124,7 @@ Last Update:
 </li><li>
 <p>You can now setup exclusion constraints on PostgreSQL using the create_table and alter_table schema generators:</p>
 
-<pre>DB.create_table(:t) do&#x000A;  ...&#x000A;  exclude([[:col1, &#39;&amp;&amp;&#39;], [:col2, &#39;=&#39;]])&#x000A;  # EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)&#x000A;end</pre>
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:t</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-operator">...</span>&#x000A;  <span class="ruby-identifier">exclude</span>([[<span class="ruby-value">:col1</span>, <span class="ruby-string">&#39;&amp;&amp;&#39;</span>], [<span class="ruby-value">:col2</span>, <span class="ruby-string">&#39;=&#39;</span>]])&#x000A;  <span class="ruby-comment"># EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)</span>&#x000A;<span class="ruby-keyword">end</span></pre>
 
 <p>One common use for exclusion constraints is to make sure that no two rows have overlapping values/ranges/circles.</p>
 </li><li>

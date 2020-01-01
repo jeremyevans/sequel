@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>exclude_or_null.rb</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>exclude_or_null.rb
+</h1>
+<div class='paths'>
+lib/sequel/extensions/exclude_or_null.rb
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2019-12-06 15:00:19 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The exclude_or_null extension adds Dataset#exclude_or_null and Dataset#exclude_or_null_having.  These methods are similar to Dataset#exclude and Dataset#exclude_having, except that they will also exclude rows where the condition IS NULL.</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">exclude_or_null</span>(<span class="ruby-value">foo:</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE NOT coalesce((foo = 1), false)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>].<span class="ruby-identifier">exclude_or_null</span>{<span class="ruby-identifier">foo</span>(<span class="ruby-identifier">bar</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM table HAVING NOT coalesce((foo(bar) = 1), false))</span></pre>
+
+<p>You can load this extension into specific datasets:</p>
+
+<pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-value">:table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:exclude_or_null</span>)</pre>
+
+<p>Or you can load it into all of a database&#39;s datasets, which is probably the desired behavior if you are using this extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:exclude_or_null</span>)</pre>
+
+<p>Note, this extension works correctly on PostgreSQL, SQLite, MySQL, H2, and HSQLDB.  However, it does not work correctly on Microsoft SQL Server, Oracle, DB2, SQLAnywhere, or Derby.</p>
+
+<p>Related module: <a href="../../../../classes/Sequel/ExcludeOrNull.html"><code>Sequel::ExcludeOrNull</code></a></p>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
