@@ -47,7 +47,7 @@ platforms :ruby do
     gem "pg", '<0.19.0'
     gem "mysql2", '<0.5'
   else
-    gem "pg", (sequel_pg || RUBY_VERSION < '2.2.0') ? '<1.2.0' : '>0'
+    gem "pg", RUBY_VERSION < '2.2.0' ? '<1.2.0' : '>0'
     gem "mysql2"
   end
 
