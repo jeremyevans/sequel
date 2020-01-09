@@ -187,6 +187,16 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.array_from_json(Album.dataset.to_json(:only=>:name)).must_equal [Album.load(:name=>@album.name)]
   end
 
+  it "should support setting json_serializer_opts for datasets" do
+    Album.dataset = Album.dataset.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
+    Album.array_from_json(Album.dataset.json_serializer_opts(:only=>:name).to_json).must_equal [Album.load(:name=>@album.name)]
+    Album.plugin :json_serializer, :only=>:id
+    Album.array_from_json(Album.dataset.json_serializer_opts(:only=>:name).to_json).must_equal [Album.load(:name=>@album.name)]
+    Album.array_from_json(Album.dataset.json_serializer_opts(:only=>:name).to_json(:only=>:artist_id)).must_equal [Album.load(:artist_id=>2)]
+    json = Album.dataset.json_serializer_opts(:only=>:name, :root=>true).to_json(:only=>:artist_id)
+    Album.array_from_json(JSON.parse(json)['albums'].to_json).must_equal [Album.load(:artist_id=>2)]
+  end
+
   it "should have dataset to_json method work with eager_graph datasets" do
     ds = Album.dataset.eager_graph(:artist).with_fetch(:id=>1, :name=>'RF', :artist_id=>2, :artist_id_0=>2, :artist_name=>'YM')
     Sequel.parse_json(ds.to_json(:only=>:name, :include=>{:artist=>{:only=>:name}})).must_equal [{"name"=>"RF", "artist"=>{"name"=>"YM"}}]

@@ -369,6 +369,13 @@ module Sequel
       end
 
       module DatasetMethods
+        # Store default options used when calling to_json on this dataset.
+        # These options take precedence over the class level options,
+        # and can be overridden by passing options directly to to_json.
+        def json_serializer_opts(opts=OPTS)
+          clone(:json_serializer_opts=>opts)
+        end
+
         # Return a JSON string representing an array of all objects in
         # this dataset.  Takes the same options as the instance
         # method, and passes them to every instance.  Additionally,
@@ -386,11 +393,15 @@ module Sequel
         #          object.  If set to a string, wraps the collection in
         #          a root object using the string as the key.  
         def to_json(*a)
-          if opts = a.first.is_a?(Hash)
-            opts = model.json_serializer_opts.merge(a.first)
+          opts = model.json_serializer_opts
+
+          if ds_opts = @opts[:json_serializer_opts]
+            opts = opts.merge(ds_opts)
+          end
+
+          if (arg = a.first).is_a?(Hash)
+            opts = opts.merge(arg)
             a = []
-          else
-            opts = model.json_serializer_opts
           end
 
           case collection_root = opts[:root]

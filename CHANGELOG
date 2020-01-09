@@ -1,3 +1,7 @@
+=== master
+
+* Add Dataset#json_serializer_opts to json_serializer plugin, allowing to set json_serializer options on a per-dataset basis (jeremyevans)
+
 === 5.28.0 (2020-01-01)
 
 * Warn when calling Sequel::JDBC::Postgres::Dataset#with_fetch_size (jeremyevans) (#1665)
