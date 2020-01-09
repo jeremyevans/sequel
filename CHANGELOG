@@ -1,5 +1,7 @@
 === master
 
+* Work correctly on Ruby 2.8+ by supporting second argument for initialize_clone (jeremyevans)
+
 * Add empty_failure_backtraces plugin for empty backtraces for ValidationFailed and HookFailed exceptions, much faster on JRuby (jeremyevans)
 
 * Add Dataset#json_serializer_opts to json_serializer plugin, allowing to set json_serializer options on a per-dataset basis (jeremyevans)

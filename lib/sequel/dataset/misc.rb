@@ -329,7 +329,7 @@ module Sequel
     end
 
     # Set the db, opts, and cache for the copy of the dataset.
-    def initialize_copy(c)
+    def initialize_clone(c, _=nil)
       @db = c.db
       @opts = Hash[c.opts]
       if cols = c.cache_get(:_columns)
@@ -338,7 +338,7 @@ module Sequel
         @cache = {}
       end
     end
-    alias initialize_clone initialize_copy
+    alias initialize_copy initialize_clone
 
     # Internal recursive version of unqualified_column_for, handling Strings inside
     # of other objects.
