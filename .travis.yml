@@ -8,9 +8,6 @@ rvm:
   - 2.5
   - 2.6
   - 2.7
-  - jruby-19mode
-  - jruby-9.0.5.0
-  - jruby-9.1.17.0
   - jruby-9.2.9.0
   - jruby-head
   - ruby-head
@@ -19,11 +16,18 @@ matrix:
   include:
     - rvm: 1.9.3
       dist: trusty
+    - rvm: jruby-19mode
+      dist: trusty
+    - rvm: jruby-9.0.5.0
+      dist: trusty
+    - rvm: jruby-9.1.17.0
+      dist: trusty
   allow_failures:
     - rvm: jruby-head
     - rvm: ruby-head
     - rvm: jruby-19mode
     - rvm: jruby-9.0.5.0
+    - rvm: jruby-9.1.17.0
     - rvm: truffleruby
 before_install:
   - gem install bundler || gem install bundler --version '< 2'
