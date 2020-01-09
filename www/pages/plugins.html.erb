@@ -93,6 +93,7 @@
 <li>Validations:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence/not_null, max length, type, and unique validations based on the model's schema.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations</a>: Setup automatic validations for constraints added via the <a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/EmptyFailureBacktraces.html">empty_failure_backtraces</a>: Uses empty backtraces for ValidationFailed and HookFailed exceptions, for much better performance on JRuby.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter</a>: Splits multi-column errors entries into separate errors, one per column.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgAutoConstraintValidations.html">pg_auto_constraint_validations</a>: Automatically convert constraint violations during INSERT/UPDATE on PostgreSQL to validation failures.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ThrowFailures.html">throw_failures</a>: Throws ValidationFailed and HookFailed exceptions instead of raising them, if a matching catch block is used.</li>
