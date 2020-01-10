@@ -70,6 +70,10 @@ module Sequel
         # string names of the server side prepared statement, and values
         # are SQL strings.
         attr_reader :prepared_statements
+
+        unless public_method_defined?(:async_exec_params)
+          alias async_exec_params async_exec
+        end
       else
         # Make postgres-pr look like pg
         CONNECTION_OK = -1
@@ -149,7 +153,7 @@ module Sequel
 
       # Return the PGResult containing the query results.
       def execute_query(sql, args)
-        @db.log_connection_yield(sql, self, args){args ? async_exec(sql, args) : async_exec(sql)}
+        @db.log_connection_yield(sql, self, args){args ? async_exec_params(sql, args) : async_exec(sql)}
       end
     end
     

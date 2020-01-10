@@ -1,5 +1,7 @@
 === master
 
+* Fix verbose warning in postgres adapter when using prepared statements recent versions of ruby-pg (jeremyevans)
+
 * Work correctly on Ruby 2.8+ by supporting second argument for initialize_clone (jeremyevans)
 
 * Add empty_failure_backtraces plugin for empty backtraces for ValidationFailed and HookFailed exceptions, much faster on JRuby (jeremyevans)
