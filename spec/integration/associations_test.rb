@@ -2131,7 +2131,7 @@ describe "Sequel::Model Simple Associations" do
     a.must_equal [@album, album2]
     a.map(&:artist).must_equal [@artist, @artist]
     a.map(&:artist).map(&:albums).must_equal [[@album, album2], [@album, album2]]
-    a.map(&:artist).map{|a| a.associations[:tags]}.must_equal [[], []]
+    a.map(&:artist).map{|artist| artist.associations[:tags]}.must_equal [[], []]
   end
 
   it "should have remove method raise an error for one_to_many records if the object isn't already associated" do
