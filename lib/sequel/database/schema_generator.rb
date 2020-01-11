@@ -126,7 +126,7 @@ module Sequel
       # :on_update :: Specify the behavior of this column when being updated
       #               (:restrict, :cascade, :set_null, :set_default, :no_action).
       # :primary_key :: Make the column as a single primary key column.  This should not
-      #                 be used if you have a single, nonautoincrementing primary key column
+      #                 be used if you want a single autoincrementing primary key column
       #                 (use the primary_key method in that case).
       # :primary_key_constraint_name :: The name to give the primary key constraint
       # :primary_key_deferrable :: Similar to :deferrable, but for the primary key constraint
