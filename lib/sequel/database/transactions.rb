@@ -439,13 +439,12 @@ module Sequel
 
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
+      callbacks = transaction_hooks(conn, committed)
       if in_savepoint?(conn)
         savepoint_callbacks = savepoint_hooks(conn, committed)
         if committed
           savepoint_rollback_callbacks = savepoint_hooks(conn, false)
         end
-      else
-        callbacks = transaction_hooks(conn, committed)
       end
 
       if transaction_finished?(conn)
@@ -453,7 +452,6 @@ module Sequel
         rolled_back = !committed
         Sequel.synchronize{h[:rolled_back] = rolled_back}
         Sequel.synchronize{@transactions.delete(conn)}
-        callbacks.each(&:call) if callbacks
       elsif savepoint_callbacks || savepoint_rollback_callbacks
         if committed
           meth = in_savepoint?(conn) ? :add_savepoint_hook : :add_transaction_hook 
@@ -473,6 +471,8 @@ module Sequel
           savepoint_callbacks.each(&:call)
         end
       end
+
+      callbacks.each(&:call) if callbacks
     end
 
     # SQL to rollback to a savepoint
