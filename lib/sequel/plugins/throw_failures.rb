@@ -48,7 +48,7 @@ module Sequel
         # nil if there were any.
         def catch_hook_failures
           called = ret = nil
-          caught = catch(HookFailed) do
+          catch(HookFailed) do
             ret = yield
             called = true
           end
