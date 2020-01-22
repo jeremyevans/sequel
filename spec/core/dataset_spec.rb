@@ -3065,7 +3065,6 @@ describe "Dataset#get" do
   end
   
   it "should select the specified column and fetch its value" do
-    @d
     5.times do
       @d.get(:name).must_equal "SELECT name FROM test LIMIT 1"
       @d.get(:abc).must_equal "SELECT abc FROM test LIMIT 1"
@@ -3077,14 +3076,12 @@ describe "Dataset#get" do
   end
   
   it "should work with aliased fields" do
-    @d
     5.times do
       @d.get(Sequel.expr(Sequel[:x][:b]).as(:name)).must_equal "SELECT x.b AS name FROM test LIMIT 1"
     end
   end
   
   it "should work with plain strings" do
-    @d
     5.times do
       @d.get('a').must_equal "SELECT 'a' AS v FROM test LIMIT 1"
     end

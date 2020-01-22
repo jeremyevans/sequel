@@ -42,7 +42,7 @@ describe "caller_logging extension" do
 
   it "should not log caller information if all callers lines are filtered" do
     @db.caller_logging_ignore = /./
-    exec_sql("SELECT * FROM items"); line = __LINE__
+    exec_sql("SELECT * FROM items")
     @log_stream.rewind
     lines = @log_stream.read.split("\n")
     lines.length.must_equal 1

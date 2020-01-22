@@ -326,12 +326,12 @@ describe "Sequel::Plugins.def_sequel_method" do
   it "should define methods using block" do
     m0 = Sequel::Plugins.def_sequel_method(@m, "x", 0){1}
     m0.must_be_kind_of Symbol
-    m0.must_match /\A_sequel_x_\d+\z/
+    m0.must_match(/\A_sequel_x_\d+\z/)
     @scope.send(m0).must_equal 1
 
     m1 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|x| [x, 2]}
     m1.must_be_kind_of Symbol
-    m1.must_match /\A_sequel_x_\d+\z/
+    m1.must_match(/\A_sequel_x_\d+\z/)
     @scope.send(m1, 3).must_equal [3, 2]
   end
 

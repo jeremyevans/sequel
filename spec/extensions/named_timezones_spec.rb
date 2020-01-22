@@ -158,12 +158,12 @@ describe "Sequel named_timezones extension with Time class" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
     dt.must_be_instance_of Time
     dt.must_equal Time.new(2009,6,1,3,20,30,-25200)
-    dt.utc_offset.must_equal -25200
+    dt.utc_offset.must_equal(-25200)
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30+0000')
     dt.must_be_instance_of Time
     dt.must_equal Time.new(2009,6,1,3,20,30,-25200)
-    dt.utc_offset.must_equal -25200
+    dt.utc_offset.must_equal(-25200)
   end
     
   it "should raise an error for ambiguous timezones by default" do
@@ -175,19 +175,19 @@ describe "Sequel named_timezones extension with Time class" do
     Sequel.database_to_application_timestamp('2004-10-31T01:30:00').must_equal Time.new(2004, 10, 30, 22, 30, 0, -25200)
     dt = Sequel.database_to_application_timestamp('2004-10-31T01:30:00')
     dt.must_equal Time.new(2004, 10, 30, 22, 30, 0, -25200)
-    dt.utc_offset.must_equal -25200
+    dt.utc_offset.must_equal(-25200)
   end
 
   it "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30')
     dt.must_be_instance_of Time
     dt.must_equal Time.new(2009,6,1,3,20,30, -25200)
-    dt.utc_offset.must_equal -25200
+    dt.utc_offset.must_equal(-25200)
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30')
     dt.must_be_instance_of Time
     dt.must_equal Time.new(2009,6,1,7,20,30, -25200)
-    dt.utc_offset.must_equal -25200
+    dt.utc_offset.must_equal(-25200)
   end
   
   it "should work with the thread_local_timezones extension" do
