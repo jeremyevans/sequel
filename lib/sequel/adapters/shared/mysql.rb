@@ -691,7 +691,7 @@ module Sequel
       end
       
       # Return the results of an EXPLAIN query as a string. Options:
-      # :extended :: Use EXPLAIN EXPTENDED instead of EXPLAIN if true.
+      # :extended :: Use EXPLAIN EXTENDED instead of EXPLAIN if true.
       def explain(opts=OPTS)
         # Load the PrettyTable class, needed for explain output
         Sequel.extension(:_pretty_table) unless defined?(Sequel::PrettyTable)
