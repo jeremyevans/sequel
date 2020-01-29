@@ -1,6 +1,8 @@
 === master
 
-* Fix verbose warning in postgres adapter when using prepared statements recent versions of ruby-pg (jeremyevans)
+* Recognize another disconnect error in the tinytds adapter (jeremyevans)
+
+* Fix verbose warning in postgres adapter when using prepared statements and recent versions of ruby-pg (jeremyevans)
 
 * Work correctly on Ruby 2.8+ by supporting second argument for initialize_clone (jeremyevans)
 

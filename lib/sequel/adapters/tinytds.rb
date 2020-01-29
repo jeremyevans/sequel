@@ -145,7 +145,7 @@ module Sequel
 
       # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
-        super || (opts[:conn] && !opts[:conn].active?) || ((e.is_a?(::TinyTds::Error) && /\A(Attempt to initiate a new Adaptive Server operation with results pending|The request failed to run because the batch is aborted, this can be caused by abort signal sent from client|Adaptive Server connection timed out)/.match(e.message)))
+        super || (opts[:conn] && !opts[:conn].active?) || ((e.is_a?(::TinyTds::Error) && /\A(Attempt to initiate a new Adaptive Server operation with results pending|The request failed to run because the batch is aborted, this can be caused by abort signal sent from client|Adaptive Server connection timed out|DBPROCESS is dead or not enabled)/.match(e.message)))
       end
 
       # Dispose of any possible results of execution.
