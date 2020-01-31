@@ -1,4 +1,4 @@
-=== master
+=== 5.29.0 (2020-02-01)
 
 * Recognize another disconnect error in the tinytds adapter (jeremyevans)
 

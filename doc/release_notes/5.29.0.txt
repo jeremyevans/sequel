@@ -1,0 +1,22 @@
+= New Features
+
+* An empty_failure_backtraces plugin has been added for using empty
+  backtraces for ValidationFailed and HookFailed exceptions. In many
+  cases, these exceptions are automatically handled (e.g. web form
+  submission handling to display appropriate error pages), and using
+  empty backtraces is 10-15x faster on JRuby 9.2.7.0+.
+
+* Dataset#json_serializer_opts has been added to the json_serializer
+  plugin.  This allows setting default options on a per-Dataset basis
+  for all Dataset#to_json calls.
+
+= Other Improvements
+
+* Another disconnect error is now recognized in the tinytds adapter.
+
+* Using Sequel with the the CRuby master branch (what will be Ruby 3)
+  now works by supporting a second argument for
+  Dataset#initialize_clone.
+
+* Sequel now avoids a warning in verbose mode when using the postgres
+  adapter, a recent version of ruby-pg, and bound variables.
