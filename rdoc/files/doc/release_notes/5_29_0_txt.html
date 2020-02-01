@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.29.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.29.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.29.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-01-31 12:51:36 -0800</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>An empty_failure_backtraces plugin has been added for using empty backtraces for ValidationFailed and HookFailed exceptions. In many cases, these exceptions are automatically handled (e.g. web form submission handling to display appropriate error pages), and using empty backtraces is 10-15x faster on JRuby 9.2.7.0+.</p>
+</li><li>
+<p>Dataset#json_serializer_opts has been added to the json_serializer plugin.  This allows setting default options on a per-Dataset basis for all Dataset#to_json calls.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Another disconnect error is now recognized in the tinytds adapter.</p>
+</li><li>
+<p>Using <a href="../../../classes/Sequel.html"><code>Sequel</code></a> with the the CRuby master branch (what will be Ruby 3) now works by supporting a second argument for Dataset#initialize_clone.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids a warning in verbose mode when using the postgres adapter, a recent version of ruby-pg, and bound variables.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

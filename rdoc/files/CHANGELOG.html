@@ -30,12 +30,25 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2019-12-31 14:23:17 -0800</span>
+<span class='datetime'>2020-01-31 12:51:36 -0800</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.29.0+-282020-02-01-29">5.29.0 (2020-02-01)<span><a href="#label-5.29.0+-282020-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Recognize another disconnect error in the tinytds adapter (jeremyevans)</p>
+</li><li>
+<p>Fix verbose warning in postgres adapter when using prepared statements and recent versions of ruby-pg (jeremyevans)</p>
+</li><li>
+<p>Work correctly on Ruby 2.8+ by supporting second argument for initialize_clone (jeremyevans)</p>
+</li><li>
+<p>Add empty_failure_backtraces plugin for empty backtraces for ValidationFailed and HookFailed exceptions, much faster on JRuby (jeremyevans)</p>
+</li><li>
+<p>Add Dataset#json_serializer_opts to json_serializer plugin, allowing to set json_serializer options on a per-dataset basis (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.28.0+-282020-01-01-29">5.28.0 (2020-01-01)<span><a href="#label-5.28.0+-282020-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Warn when calling Sequel::JDBC::Postgres::Dataset#with_fetch_size (jeremyevans) (#1665)</p>

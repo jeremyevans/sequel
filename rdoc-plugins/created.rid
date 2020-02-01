@@ -1,4 +1,4 @@
-Wed, 01 Jan 2020 10:07:19 -0800
+Sat, 01 Feb 2020 10:39:10 -0800
 lib/sequel/extensions/_model_constraint_validations.rb	Tue, 24 Jan 2017 12:27:29 -0800
 lib/sequel/extensions/_model_pg_row.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -107,6 +107,7 @@ lib/sequel/plugins/delay_add_association.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/dirty.rb	Wed, 09 Oct 2019 08:59:47 -0700
 lib/sequel/plugins/eager_each.rb	Fri, 16 Jun 2017 12:40:57 -0700
 lib/sequel/plugins/eager_graph_eager.rb	Mon, 06 Aug 2018 08:40:06 -0700
+lib/sequel/plugins/empty_failure_backtraces.rb	Wed, 08 Jan 2020 16:27:45 -0800
 lib/sequel/plugins/error_splitter.rb	Mon, 09 Apr 2018 12:34:09 -0700
 lib/sequel/plugins/finder.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/force_encoding.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -117,7 +118,7 @@ lib/sequel/plugins/insert_returning_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_filters.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/instance_hooks.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/inverted_subsets.rb	Sun, 14 Apr 2019 11:06:43 -0700
-lib/sequel/plugins/json_serializer.rb	Tue, 19 Mar 2019 16:51:03 -0700
+lib/sequel/plugins/json_serializer.rb	Wed, 08 Jan 2020 16:27:45 -0800
 lib/sequel/plugins/lazy_attributes.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/list.rb	Mon, 30 Jul 2018 18:58:32 -0700
 lib/sequel/plugins/many_through_many.rb	Fri, 25 May 2018 14:49:16 -0700
@@ -145,7 +146,7 @@ lib/sequel/plugins/subclasses.rb	Sun, 22 Apr 2018 10:50:04 -0700
 lib/sequel/plugins/subset_conditions.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/plugins/table_select.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/tactical_eager_loading.rb	Mon, 03 Sep 2018 12:02:47 -0700
-lib/sequel/plugins/throw_failures.rb	Mon, 11 Feb 2019 16:27:59 -0800
+lib/sequel/plugins/throw_failures.rb	Tue, 21 Jan 2020 16:47:15 -0800
 lib/sequel/plugins/timestamps.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/touch.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/plugins/tree.rb	Thu, 04 Oct 2018 07:42:37 -0700
