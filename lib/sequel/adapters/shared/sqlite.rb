@@ -293,9 +293,15 @@ module Sequel
         false
       end
 
-      # Surround default with parens to appease SQLite
+      # Surround default with parens to appease SQLite.  Add support for GENERATED ALWAYS AS.
       def column_definition_default_sql(sql, column)
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
+        if (generated = column[:generated_always_as])
+          if (generated_type = column[:generated_type]) && (generated_type == :stored || generated_type == :virtual)
+            generated_type = generated_type.to_s.upcase
+          end
+          sql << " GENERATED ALWAYS AS (#{literal(generated)}) #{generated_type}"
+        end
       end
     
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
