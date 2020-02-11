@@ -185,12 +185,7 @@ module Sequel
           transaction(opts, &block)
         rescue *retry_on => e
           num_retries += 1
-          if tot_retries
-            if num_retries <= tot_retries
-              opts[:before_retry].call(num_retries, e) if opts[:before_retry]
-              retry
-            end
-          else
+          if tot_retries.nil? || num_retries <= tot_retries
             opts[:before_retry].call(num_retries, e) if opts[:before_retry]
             retry
           end
