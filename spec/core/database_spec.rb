@@ -795,6 +795,19 @@ DatabaseTransactionSpecs = shared_description do
     calls.must_equal [1, 2]
   end
   
+  it "should support :before_retry option for invoking callback before retrying when doing it indefinitely" do
+    a, errs, calls = [], [], []
+    retryer = proc{|n, err| calls << n; errs << err }
+    @db.transaction(:num_retries => nil, :retry_on=>Sequel::DatabaseDisconnectError, :before_retry => retryer) do
+      a << 1; raise Sequel::DatabaseDisconnectError if a.length < 3
+    end
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK', 'BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
+    a.must_equal [1, 1, 1]
+    errs.count.must_equal 2
+    errs.each { |e| e.class.must_equal Sequel::DatabaseDisconnectError }
+    calls.must_equal [1, 2]
+  end
+
   it "should raise an error if attempting to use :retry_on inside another transaction" do
     proc{@db.transaction{@db.transaction(:retry_on=>Sequel::ConstraintViolation){}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
