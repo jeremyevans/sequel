@@ -1,5 +1,7 @@
 === master
 
+* Remove specs and old release notes from the gem to reduce gem size by over 40% (jeremyevans)
+
 * When using Database#transaction :retry_on, call :before_retry option if retrying even if :num_retries is nil (jcmfernandes) (#1678)
 
 * Support generated columns on SQLite 3.31+ using :generated_always_as and :generated_type options (jeremyevans)
