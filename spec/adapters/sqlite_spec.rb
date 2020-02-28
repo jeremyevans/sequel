@@ -88,9 +88,9 @@ describe "An SQLite database" do
   end
 
   it "should support creating generated columns" do
-    @db.create_table(:tmp_dolls){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1; Integer :d, :generated_always_as=>Sequel[:a] * 2 + :b + 2, :generated_type=>:stored; ; Integer :e, :generated_always_as=>Sequel[:a] * 2 + :b + 3, :generated_type=>:virtual}
-    @db[:tmp_dolls].insert(:a=>100, :b=>10)
-    @db[:tmp_dolls].select_order_map([:a, :b, :c, :d, :e]).must_equal [[100, 10, 211, 212, 213]]
+    @db.create_table!(:fk){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1; Integer :d, :generated_always_as=>Sequel[:a] * 2 + :b + 2, :generated_type=>:stored; ; Integer :e, :generated_always_as=>Sequel[:a] * 2 + :b + 3, :generated_type=>:virtual}
+    @db[:fk].insert(:a=>100, :b=>10)
+    @db[:fk].select_order_map([:a, :b, :c, :d, :e]).must_equal [[100, 10, 211, 212, 213]]
   end if DB.sqlite_version >= 33100
 end
 
