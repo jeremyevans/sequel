@@ -1,0 +1,20 @@
+= New Features
+
+* Sequel now supports generated columns on SQLite 3.31+ using the
+  :generated_always_as and :generated_type options. Example:
+
+    DB.create_table(:table) do
+      primary_key :id
+      Numeric :amount, null: false
+      Numeric :tax, null: false
+      Numeric :total, generated_always_as: (Sequel[:amount] + :tax)
+    end
+
+= Other Improvements
+
+* The Database#transaction :before_retry option is now called before
+  retrying the transaction even when the :num_retries option is set
+  to nil.
+
+* The gem no longer ships with specs and older release notes, reducing
+  the gem size by over 40%.
