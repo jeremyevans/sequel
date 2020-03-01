@@ -1,7 +1,7 @@
-Sat, 01 Feb 2020 10:37:39 -0800
+Sun, 01 Mar 2020 10:30:47 -0800
 README.rdoc	Tue, 15 Oct 2019 20:03:23 -0700
-CHANGELOG	Fri, 31 Jan 2020 12:51:36 -0800
-doc/CHANGELOG.old	Thu, 01 Mar 2018 12:33:07 -0800
+CHANGELOG	Fri, 28 Feb 2020 09:27:25 -0800
+doc/CHANGELOG.old	Fri, 28 Feb 2020 07:58:33 -0800
 MIT-LICENSE	Wed, 08 Jan 2020 19:52:18 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
 lib/sequel/ast_transformer.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Tue, 02 Jul 2019 15:10:53 -0700
-lib/sequel/version.rb	Fri, 31 Jan 2020 12:51:36 -0800
+lib/sequel/version.rb	Fri, 28 Feb 2020 09:27:25 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -28,7 +28,7 @@ lib/sequel/database/misc.rb	Fri, 29 Mar 2019 13:22:52 -0700
 lib/sequel/database/query.rb	Fri, 12 Apr 2019 07:19:11 -0700
 lib/sequel/database/schema_generator.rb	Fri, 10 Jan 2020 18:30:49 -0800
 lib/sequel/database/schema_methods.rb	Fri, 02 Aug 2019 16:33:09 -0700
-lib/sequel/database/transactions.rb	Wed, 15 Jan 2020 08:40:50 -0800
+lib/sequel/database/transactions.rb	Tue, 11 Feb 2020 07:52:54 -0800
 lib/sequel/dataset/actions.rb	Fri, 12 Jul 2019 09:47:14 -0700
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
 lib/sequel/dataset/features.rb	Mon, 18 Nov 2019 11:56:31 -0800
@@ -217,6 +217,7 @@ doc/release_notes/5.27.0.txt	Wed, 27 Nov 2019 10:45:37 -0800
 doc/release_notes/5.28.0.txt	Tue, 31 Dec 2019 14:23:17 -0800
 doc/release_notes/5.29.0.txt	Fri, 31 Jan 2020 12:51:36 -0800
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
+doc/release_notes/5.30.0.txt	Fri, 28 Feb 2020 09:27:25 -0800
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
