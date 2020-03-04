@@ -1,3 +1,7 @@
+=== master
+
+* Add forbid_lazy_load plugin for forbidding lazy loading of associations, to help find N+1 issues (jeremyevans)
+
 === 5.30.0 (2020-03-01)
 
 * Remove specs and old release notes from the gem to reduce gem size by over 40% (jeremyevans)
