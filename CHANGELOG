@@ -1,5 +1,7 @@
 === master
 
+* Add association_lazy_eager_option plugin for supporting :eager option for association method (jeremyevans)
+
 * Add forbid_lazy_load plugin for forbidding lazy loading of associations, to help find N+1 issues (jeremyevans)
 
 === 5.30.0 (2020-03-01)
