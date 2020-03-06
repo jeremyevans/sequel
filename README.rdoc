@@ -894,7 +894,7 @@ in the most current release.
 
 Sequel fully supports the currently supported versions of Ruby (MRI) and JRuby.  It may
 support unsupported versions of Ruby or JRuby, but such support may be dropped in any
-minor version of keeping it becomes a support issue.  The minimum Ruby version
+minor version if keeping it becomes a support issue.  The minimum Ruby version
 required to run the current version of Sequel is 1.9.2.
 
 == Maintainer
