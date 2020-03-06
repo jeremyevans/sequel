@@ -199,12 +199,18 @@ END_MIG
         end
         type = col_opts.delete(:type)
         col_opts.delete(:size) if col_opts[:size].nil?
-        col_opts[:default] = if schema[:ruby_default].nil?
-          column_schema_to_ruby_default_fallback(schema[:default], options)
+        if schema[:generated]
+          if options[:same_db] && database_type == :postgres
+            col_opts[:generated_always_as] = column_schema_to_ruby_default_fallback(schema[:default], options)
+          end
         else
-          schema[:ruby_default]
+          col_opts[:default] = if schema[:ruby_default].nil?
+            column_schema_to_ruby_default_fallback(schema[:default], options)
+          else
+            schema[:ruby_default]
+          end
+          col_opts.delete(:default) if col_opts[:default].nil?
         end
-        col_opts.delete(:default) if col_opts[:default].nil?
         col_opts[:null] = false if schema[:allow_null] == false
         if table = schema[:table]
           [:key, :on_delete, :on_update, :deferrable].each{|f| col_opts[f] = schema[f] if schema[f]}

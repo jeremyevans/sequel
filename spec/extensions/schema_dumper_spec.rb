@@ -89,6 +89,10 @@ describe "Sequel::Database dump methods" do
          [:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true, :allow_null=>false}]]
       when :t5
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
+      when :t6
+        [[:c1, {:db_type=>'integer', :allow_null=>false, :generated=>true, :default=>'1', :ruby_default=>1}]]
+      when :t7
+        [[:c1, {:db_type=>'integer', :allow_null=>true, :generated=>true, :default=>'(a + b)', :ruby_default=>nil}]]
       end
 
       if o.first.is_a?(Hash) && o.first[:schema]
@@ -691,6 +695,22 @@ END_MIG
 
   it "should convert unknown database types to strings" do
     @d.dump_table_schema(:t5).must_equal "create_table(:t5) do\n  String :c1\nend"
+  end
+
+  it "should not include defaults for generated columns even if parsed" do
+    @d.dump_table_schema(:t6).must_equal "create_table(:t6) do\n  Integer :c1, :null=>false\nend"
+    @d.dump_table_schema(:t7).must_equal "create_table(:t7) do\n  Integer :c1\nend"
+  end
+
+  it "should not include defaults for generated columns even if parsed when using :same_db option" do
+    @d.dump_table_schema(:t6, :same_db=>true).must_equal "create_table(:t6) do\n  column :c1, \"integer\", :null=>false\nend"
+    @d.dump_table_schema(:t7, :same_db=>true).must_equal "create_table(:t7) do\n  column :c1, \"integer\"\nend"
+  end
+
+  it "should create generated column when using :same_db option on PostgreSQL" do
+    def @d.database_type; :postgres end
+    @d.dump_table_schema(:t6, :same_db=>true).must_equal "create_table(:t6) do\n  column :c1, \"integer\", :generated_always_as=>Sequel::LiteralString.new(\"1\"), :null=>false\nend"
+    @d.dump_table_schema(:t7, :same_db=>true).must_equal "create_table(:t7) do\n  column :c1, \"integer\", :generated_always_as=>Sequel::LiteralString.new(\"(a + b)\")\nend"
   end
 
   it "should convert many database types to ruby types" do

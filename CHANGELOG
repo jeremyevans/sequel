@@ -1,5 +1,9 @@
 === master
 
+* Dump generated columns as generated columns when using the schema_dumper with :same_db option on PostgreSQL 12+ (jeremyevans) (#1680)
+
+* Ignore defaults for generated columns by default when using the schema dumper (jeremyevans) (#1680)
+
 * Include generated columns in schema on SQLite 3.31+ (jeremyevans)
 
 * Add :generated schema entry on PostgreSQL 12+ and SQLite 3.31+ for whether the columns is generated (jeremyevans)
