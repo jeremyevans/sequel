@@ -190,7 +190,12 @@ END
     Marshal.load(File.read(TMP_FILE)).must_equal({})
     DB.create_table(:a){Integer :a}
     bin(:args=>"-S #{TMP_FILE}").must_equal ''
-    Marshal.load(File.read(TMP_FILE)).must_equal("`a`"=>[[:a, {:type=>:integer, :db_type=>"integer", :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false}]])
+    h = Marshal.load(File.read(TMP_FILE))
+    h.keys.must_equal ['`a`']
+    column, schema = h.values.first.first
+    column.must_equal :a
+    schema.delete(:generated) # May be present on SQLite 3.31+
+    schema.must_equal(:type=>:integer, :db_type=>"integer", :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false)
   end
 
   it "-X should dump the index cache" do

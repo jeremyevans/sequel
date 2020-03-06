@@ -1273,6 +1273,10 @@ module Sequel
 
         if server_version > 100000
           ds = ds.select_append{pg_attribute[:attidentity]}
+
+          if server_version > 120000
+            ds = ds.select_append{Sequel.~(pg_attribute[:attgenerated]=>'').as(:generated)}
+          end
         end
 
         ds.map do |row|

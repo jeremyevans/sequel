@@ -1,5 +1,9 @@
 === master
 
+* Include generated columns in schema on SQLite 3.31+ (jeremyevans)
+
+* Add :generated schema entry on PostgreSQL 12+ and SQLite 3.31+ for whether the columns is generated (jeremyevans)
+
 * Add association_lazy_eager_option plugin for supporting :eager option for association method (jeremyevans)
 
 * Add forbid_lazy_load plugin for forbidding lazy loading of associations, to help find N+1 issues (jeremyevans)

@@ -73,7 +73,7 @@ describe "MySQL", '#create_table' do
   it "should create generated column" do
     skip("generated columns not supported, skipping test") unless @db.supports_generated_columns?
     @db.create_table(:dolls){String :a; String :b, generated_always_as: Sequel.function(:CONCAT, :a, 'plus')}
-    @db.schema(:dolls)[1][1][:generated].must_equal true
+    @db.schema(:dolls).map{|_,v| v[:generated]}.must_equal [false, true]
   end
 end
 

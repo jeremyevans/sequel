@@ -184,7 +184,7 @@ module Sequel
 
       # Dataset used for parsing schema
       def _parse_pragma_ds(table_name, opts)
-        metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth(opts[:dataset]).call(table_name))
+        metadata_dataset.with_sql("PRAGMA table_#{'x' if sqlite_version > 33100}info(?)", input_identifier_meth(opts[:dataset]).call(table_name))
       end
 
       # Run all alter_table commands in a transaction.  This is technically only
@@ -466,6 +466,15 @@ module Sequel
       def parse_pragma(table_name, opts)
         pks = 0
         sch = _parse_pragma_ds(table_name, opts).map do |row|
+          if sqlite_version > 33100
+            # table_xinfo PRAGMA used, remove hidden columns
+            # that are not generated columns
+            if row[:generated] = (row.delete(:hidden) != 0)
+              next unless row[:type].end_with?(' GENERATED ALWAYS')
+              row[:type] = row[:type].sub(' GENERATED ALWAYS', '')
+            end
+          end
+
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
@@ -481,6 +490,8 @@ module Sequel
           row[:type] = schema_column_type(row[:db_type])
           row
         end
+
+        sch.compact!
 
         if pks > 1
           # SQLite does not allow use of auto increment for tables

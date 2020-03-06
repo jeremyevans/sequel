@@ -71,7 +71,9 @@ describe "An SQLite database" do
   
   it "should correctly parse the schema" do
     @db.create_table!(:fk) {timestamp :t}
-    @db.schema(:fk, :reload=>true).must_equal [[:t, {:type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp", :primary_key=>false}]]
+    h = {:generated=>false, :type=>:datetime, :allow_null=>true, :default=>nil, :ruby_default=>nil, :db_type=>"timestamp", :primary_key=>false}
+    h.delete(:generated) if @db.sqlite_version < 33100
+    @db.schema(:fk, :reload=>true).must_equal [[:t, h]]
   end
 
   it "should handle and return BigDecimal values for numeric columns" do
@@ -87,10 +89,12 @@ describe "An SQLite database" do
     DB
   end
 
-  it "should support creating generated columns" do
+  it "should support creating and parsing generated columns" do
     @db.create_table!(:fk){Integer :a; Integer :b; Integer :c, :generated_always_as=>Sequel[:a] * 2 + :b + 1; Integer :d, :generated_always_as=>Sequel[:a] * 2 + :b + 2, :generated_type=>:stored; ; Integer :e, :generated_always_as=>Sequel[:a] * 2 + :b + 3, :generated_type=>:virtual}
     @db[:fk].insert(:a=>100, :b=>10)
     @db[:fk].select_order_map([:a, :b, :c, :d, :e]).must_equal [[100, 10, 211, 212, 213]]
+
+    @db.schema(:fk).map{|_,v| v[:generated]}.must_equal [false, false, true, true, true]
   end if DB.sqlite_version >= 33100
 end
 
