@@ -134,6 +134,96 @@ module Sequel
       end
     end
 
+    # Generator used for creating tables that are partitions of other tables.
+    class CreatePartitionOfTableGenerator
+      MINVALUE = Sequel.lit('MINVALUE').freeze
+      MAXVALUE = Sequel.lit('MAXVALUE').freeze
+
+      def initialize(&block)
+        instance_exec(&block)
+      end
+
+      # The minimum value of the data type used in range partitions, useful
+      # as an argument to #from.
+      def minvalue
+        MINVALUE
+      end
+
+      # The minimum value of the data type used in range partitions, useful
+      # as an argument to #to.
+      def maxvalue
+        MAXVALUE
+      end
+
+      # Assumes range partitioning, sets the inclusive minimum value of the range for
+      # this partition.
+      def from(*v)
+        @from = v
+      end
+
+      # Assumes range partitioning, sets the exclusive maximum value of the range for
+      # this partition.
+      def to(*v)
+        @to = v
+      end
+
+      # Assumes list partitioning, sets the values to be included in this partition.
+      def values_in(*v)
+        @in = v
+      end
+
+      # Assumes hash partitioning, sets the modulus for this parition.
+      def modulus(v)
+        @modulus = v
+      end
+
+      # Assumes hash partitioning, sets the remainder for this parition.
+      def remainder(v)
+        @remainder = v
+      end
+
+      # Sets that this is a default partition, where values not in other partitions
+      # are stored.
+      def default
+        @default = true
+      end
+
+      # The from and to values of this partition for a range partition.
+      def range
+        [@from, @to]
+      end
+
+      # The values to include in this partition for a list partition.
+      def list
+        @in
+      end
+
+      # The modulus and remainder to use for this partition for a hash partition.
+      def hash_values
+        [@modulus, @remainder]
+      end
+
+      # Determine the appropriate partition type for this partition by which methods
+      # were called on it.
+      def partition_type
+        raise Error, "Unable to determine partition type, multiple different partitioning methods called" if [@from || @to, @list, @modulus || @remainder, @default].compact.length > 1
+
+        if @from || @to
+          raise Error, "must call both from and to when creating a partition of a table if calling either" unless @from && @to
+          :range
+        elsif @in
+          :list
+        elsif @modulus || @remainder
+          raise Error, "must call both modulus and remainder when creating a partition of a table if calling either" unless @modulus && @remainder
+          :hash
+        elsif @default
+          :default
+        else
+          raise Error, "unable to determine partition type, no partitioning methods called"
+        end
+      end
+    end
+
     # Error raised when Sequel determines a PostgreSQL exclusion constraint has been violated.
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
 
@@ -357,6 +447,16 @@ module Sequel
       #         :owner :: The owner to set for the schema (defaults to current user if not specified)
       def create_schema(name, opts=OPTS)
         self << create_schema_sql(name, opts)
+      end
+
+      # Support partitions of tables using the :partition_of option.
+      def create_table(name, options=OPTS, &block)
+        if options[:partition_of]
+          create_partition_of_table_from_generator(name, CreatePartitionOfTableGenerator.new(&block), options)
+          return
+        end
+
+        super
       end
 
       # Create a trigger in the database.  Arguments:
@@ -1018,6 +1118,36 @@ module Sequel
         "CREATE#{' OR REPLACE' if opts[:replace] && server_version >= 90000}#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
       end
 
+      # Create a partition of another table, used when the create_table with
+      # the :partition_of option is given.
+      def create_partition_of_table_from_generator(name, generator, options)
+        execute_ddl(create_partition_of_table_sql(name, generator, options))
+      end
+
+      # SQL for creating a partition of another table.
+      def create_partition_of_table_sql(name, generator, options)
+        sql = create_table_prefix_sql(name, options).dup
+
+        sql << " PARTITION OF #{quote_schema_table(options[:partition_of])}"
+
+        case generator.partition_type
+        when :range
+          from, to = generator.range
+          sql << " FOR VALUES FROM #{literal(from)} TO #{literal(to)}"
+        when :list
+          sql << " FOR VALUES IN #{literal(generator.list)}"
+        when :hash
+          mod, remainder = generator.hash_values
+          sql << " FOR VALUES WITH (MODULUS #{literal(mod)}, REMAINDER #{literal(remainder)})"
+        when :default
+          sql << " DEFAULT"
+        end
+
+        sql << create_table_suffix_sql(name, options)
+
+        sql
+      end
+
       # SQL for creating a schema.
       def create_schema_sql(name, opts=OPTS)
         "CREATE SCHEMA #{'IF NOT EXISTS ' if opts[:if_not_exists]}#{quote_identifier(name)}#{" AUTHORIZATION #{literal(opts[:owner])}" if opts[:owner]}"
@@ -1039,25 +1169,36 @@ module Sequel
         "CREATE #{prefix_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
       end
 
+      # SQL for creating a table with PostgreSQL specific options
       def create_table_sql(name, generator, options)
-        sql = super
+        "#{super}#{create_table_suffix_sql(name, options)}"
+      end
+
+      # Handle various PostgreSQl specific table extensions such as inheritance,
+      # partitioning, tablespaces, and foreign tables.
+      def create_table_suffix_sql(name, options)
+        sql = String.new
 
         if inherits = options[:inherits]
-          sql += " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
+          sql << " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
+        end
+
+        if partition_by = options[:partition_by]
+          sql << " PARTITION BY #{options[:partition_type]||'RANGE'} #{literal(Array(partition_by))}"
         end
 
         if on_commit = options[:on_commit]
           raise(Error, "can't provide :on_commit without :temp to create_table") unless options[:temp]
           raise(Error, "unsupported on_commit option: #{on_commit.inspect}") unless ON_COMMIT.has_key?(on_commit)
-          sql += " ON COMMIT #{ON_COMMIT[on_commit]}"
+          sql << " ON COMMIT #{ON_COMMIT[on_commit]}"
         end
 
         if tablespace = options[:tablespace]
-          sql += " TABLESPACE #{quote_identifier(tablespace)}"
+          sql << " TABLESPACE #{quote_identifier(tablespace)}"
         end
 
         if server = options[:foreign]
-          sql += " SERVER #{quote_identifier(server)}"
+          sql << " SERVER #{quote_identifier(server)}"
           if foreign_opts = options[:options]
             sql << " OPTIONS (#{foreign_opts.map{|k, v| "#{k} #{literal(v.to_s)}"}.join(', ')})"
           end

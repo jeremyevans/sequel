@@ -21,6 +21,93 @@ describe "PostgreSQL", '#create_table' do
     @db.drop_table?(:tmp_dolls, :unlogged_dolls)
   end
 
+  it "should support range partitioned tables for single columns with :partition_* options" do
+    @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:range){Integer :id}
+    @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){from 1; to 3}
+    @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){from 3; to 4}
+    @db[:tmp_dolls].insert(1)
+    @db[:tmp_dolls].insert(2)
+    @db[:tmp_dolls].insert(3)
+
+    proc{@db[:tmp_dolls].insert(0)}.must_raise Sequel::DatabaseError
+    proc{@db[:tmp_dolls].insert(5)}.must_raise Sequel::DatabaseError
+
+    @db.create_table(:tmp_dolls_0, :partition_of => :tmp_dolls){from minvalue; to 1}
+    @db.create_table(:tmp_dolls_3, :partition_of => :tmp_dolls){from 4; to maxvalue}
+
+    @db[:tmp_dolls].insert(0)
+    @db[:tmp_dolls].insert(5)
+
+    @db[:tmp_dolls].order(:id).select_order_map(:id).must_equal [0,1,2,3,5]
+    @db[:tmp_dolls_0].order(:id).select_order_map(:id).must_equal [0]
+    @db[:tmp_dolls_1].order(:id).select_order_map(:id).must_equal [1,2]
+    @db[:tmp_dolls_2].order(:id).select_order_map(:id).must_equal [3]
+    @db[:tmp_dolls_3].order(:id).select_order_map(:id).must_equal [5]
+  end if DB.server_version >= 100000 
+
+  it "should support range partitioned tables for multiple columns with :partition_* options" do
+    @db.create_table(:tmp_dolls, :partition_by => [:id, :id2], :partition_type=>:range){Integer :id; Integer :id2}
+    @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){from 1, 1; to 3, 3}
+    @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){from 3, 3; to 4, 4}
+    @db[:tmp_dolls].insert(1, 1)
+    @db[:tmp_dolls].insert(2, 2)
+    @db[:tmp_dolls].insert(3, 3)
+
+    proc{@db[:tmp_dolls].insert(0, 0)}.must_raise Sequel::DatabaseError
+    proc{@db[:tmp_dolls].insert(5, 5)}.must_raise Sequel::DatabaseError
+
+    @db.create_table(:tmp_dolls_0, :partition_of => :tmp_dolls){from minvalue, minvalue; to 1, 1}
+    @db.create_table(:tmp_dolls_3, :partition_of => :tmp_dolls){from 4, 4; to maxvalue, maxvalue}
+
+    @db[:tmp_dolls].insert(0, 0)
+    @db[:tmp_dolls].insert(5, 5)
+
+    @db[:tmp_dolls].order(:id).select_order_map([:id, :id2]).must_equal [0,1,2,3,5].map{|x| [x,x]}
+    @db[:tmp_dolls_0].order(:id).select_order_map([:id, :id2]).must_equal [0].map{|x| [x,x]}
+    @db[:tmp_dolls_1].order(:id).select_order_map([:id, :id2]).must_equal [1,2].map{|x| [x,x]}
+    @db[:tmp_dolls_2].order(:id).select_order_map([:id, :id2]).must_equal [3].map{|x| [x,x]}
+    @db[:tmp_dolls_3].order(:id).select_order_map([:id, :id2]).must_equal [5].map{|x| [x,x]}
+  end if DB.server_version >= 100000 
+
+  it "should support list partitioned tables for single column with :partition_* options" do
+    @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:list){Integer :id}
+    @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){values_in 1, 2}
+    @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){values_in 3}
+    @db[:tmp_dolls].insert(1)
+    @db[:tmp_dolls].insert(2)
+    @db[:tmp_dolls].insert(3)
+
+    proc{@db[:tmp_dolls].insert(0)}.must_raise Sequel::DatabaseError
+    proc{@db[:tmp_dolls].insert(5)}.must_raise Sequel::DatabaseError
+
+    @db.create_table(:tmp_dolls_0, :partition_of => :tmp_dolls){values_in 0}
+    @db.create_table(:tmp_dolls_3, :partition_of => :tmp_dolls){default}
+
+    @db[:tmp_dolls].insert(0)
+    @db[:tmp_dolls].insert(5)
+
+    @db[:tmp_dolls].order(:id).select_order_map(:id).must_equal [0,1,2,3,5]
+    @db[:tmp_dolls_0].order(:id).select_order_map(:id).must_equal [0]
+    @db[:tmp_dolls_1].order(:id).select_order_map(:id).must_equal [1,2]
+    @db[:tmp_dolls_2].order(:id).select_order_map(:id).must_equal [3]
+    @db[:tmp_dolls_3].order(:id).select_order_map(:id).must_equal [5]
+  end if DB.server_version >= 100000 
+
+  it "should support hash partitioned tables for single column with :partition_* options" do
+    @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:hash){Integer :id}
+    @db.create_table(:tmp_dolls_0, :partition_of => :tmp_dolls){modulus 4; remainder 0}
+    @db.create_table(:tmp_dolls_1, :partition_of => :tmp_dolls){modulus 4; remainder 1}
+    @db.create_table(:tmp_dolls_2, :partition_of => :tmp_dolls){modulus 4; remainder 2}
+    @db.create_table(:tmp_dolls_3, :partition_of => :tmp_dolls){modulus 4; remainder 3}
+    @db[:tmp_dolls].insert(1)
+    @db[:tmp_dolls].insert(2)
+    @db[:tmp_dolls].insert(3)
+    @db[:tmp_dolls].insert(4)
+
+    @db[:tmp_dolls].order(:id).select_order_map(:id).must_equal [1,2,3,4]
+    [0,1,2,3].flat_map{|i| @db[:"tmp_dolls_#{i}"].select_order_map(:id)}.sort.must_equal [1,2,3,4]
+  end if DB.server_version >= 110000 
+
   it "should create a temporary table" do
     @db.create_table(:tmp_dolls, :temp => true){text :name}
     @db.table_exists?(:tmp_dolls).must_equal true

@@ -1,5 +1,7 @@
 === master
 
+* Add support for creating partitioned tables in PostgreSQL 10+ using :partition_by and :partition_of options (jeremyevans)
+
 * Dump generated columns as generated columns when using the schema_dumper with :same_db option on PostgreSQL 12+ (jeremyevans) (#1680)
 
 * Ignore defaults for generated columns by default when using the schema dumper (jeremyevans) (#1680)

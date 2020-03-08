@@ -139,6 +139,78 @@ conversion via a USING clause, and Sequel supports this using the <tt>:using</tt
   # ALTER TABLE "table" ALTER COLUMN "unix_time" TYPE timestamp
   #   USING (CAST('epoch' AS timestamp) + (CAST('1 second' AS interval) * "unix_time"))
 
+=== Creating Partitioned Tables
+
+PostgreSQL allows marking tables as partitioned tables, and adding partitions to such tables. Sequel
+offers support for this.  You can create a partitioned table using the +:partition_by+ option and
++:partition_type+ options (the default partition type is range partitioning):
+
+  DB.create_table(:table1, partition_by: :column, partition_type: :range) do
+    Integer :id
+    Date :column
+  end
+
+  DB.create_table(:table2, partition_by: :column, partition_type: :list) do
+    Integer :id
+    String :column
+  end
+
+  DB.create_table(:table3, partition_by: :column, partition_type: :hash) do
+    Integer :id
+    Integer :column
+  end
+
+To add partitions of other tables, you use the +:partition_of+ option.  This option will use
+a custom DSL specific to partitioning other tables. For range partitioning, you can use the
++from+ and +to+ methods to specify the inclusive beginning and exclusive ending of the
+range of the partition.  You can call the +minvalue+ and +maxvalue+ methods to get the minimum
+and maximum values for the column(s) in the range, useful as arguments to +from+ and +to+:
+
+  DB.create_table(:table1a, partition_of: :table1) do
+    from minvalue
+    to 0
+  end
+  DB.create_table(:table1b, partition_of: :table1) do
+    from 0
+    to 100
+  end
+  DB.create_table(:table1c, partition_of: :table1) do
+    from 100
+    to maxvalue
+  end
+
+For list partitioning, you use the +values_in+ method.  You can also use the +default+ method
+to mark a partition as the default partition:
+
+  DB.create_table(:table2a, partition_of: :table2) do
+    values_in 1, 2, 3
+    to 0
+  end
+  DB.create_table(:table2b, partition_of: :table2) do
+    values_in 4, 5, 6
+  end
+  DB.create_table(:table2c, partition_of: :table2) do
+    default
+  end
+
+For hash partitioning, you use the +modulus+ and +remainder+ methods:
+
+  DB.create_table(:table3a, partition_of: :table3) do
+    modules 3
+    remainder 0
+  end
+  DB.create_table(:table3b, partition_of: :table3) do
+    modules 3
+    remainder 1
+  end
+  DB.create_table(:table3c, partition_of: :table3) do
+    modules 3
+    remainder 2
+  end
+
+There is currently no support for using custom column or table constraints in partitions of
+other tables.  Support may be added in the future.
+
 === Creating Unlogged Tables
 
 PostgreSQL allows users to create unlogged tables, which are faster but not crash safe.  Sequel
