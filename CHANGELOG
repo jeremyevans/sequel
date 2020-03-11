@@ -1,5 +1,7 @@
 === master
 
+* Add skip_saving_columns plugin, which supports columns to skip when saving, and skips generated columns by default (joeosburn, jeremyevans) (#1681, #1682)
+
 * Add support for creating partitioned tables in PostgreSQL 10+ using :partition_by and :partition_of options (jeremyevans)
 
 * Dump generated columns as generated columns when using the schema_dumper with :same_db option on PostgreSQL 12+ (jeremyevans) (#1680)

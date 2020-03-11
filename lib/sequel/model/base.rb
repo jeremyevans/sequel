@@ -1772,14 +1772,12 @@ module Sequel
               before_update
               columns = opts[:columns]
               if columns.nil?
-                if opts[:changed]
-                  cc = changed_columns
-                  columns_updated = @values.reject{|k,v| !cc.include?(k)}
-                  cc.clear
+                columns_updated = if opts[:changed]
+                  _save_update_changed_colums_hash
                 else
-                  columns_updated = _save_update_all_columns_hash
-                  _clear_changed_columns(:update)
+                  _save_update_all_columns_hash
                 end
+                _clear_changed_columns(:update)
               else # update only the specified columns
                 columns = Array(columns)
                 columns_updated = @values.reject{|k, v| !columns.include?(k)}
@@ -1825,6 +1823,14 @@ module Sequel
         cc = changed_columns
         Array(primary_key).each{|x| v.delete(x) unless cc.include?(x)}
         v
+      end
+
+      # Return a hash of values used when saving changed columns of an
+      # existing object.  Defaults to all of the objects current values
+      # that are recorded as modified.
+      def _save_update_changed_colums_hash
+        cc = changed_columns
+        @values.reject{|k,v| !cc.include?(k)}
       end
 
       # Validate the object if validating on save. Skips validation
