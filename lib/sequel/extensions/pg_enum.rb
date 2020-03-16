@@ -40,8 +40,11 @@
 #   DB.schema(:table_name)
 #   [[:column_name, {:type=>:enum, :enum_values=>['value1', 'value2']}]]
 #
-# If the pg_array extension is used, arrays of enums are returned as a
-# PGArray:
+# This extension integrates with the pg_array extension.  If you plan
+# to use arrays of enum types, load the pg_array extension before the
+# pg_interval extension:
+#
+#   DB.extension :pg_array, :pg_enum
 #
 #   DB.create_table(:table_name) do
 #     column :column_name, 'enum_type_name[]'
