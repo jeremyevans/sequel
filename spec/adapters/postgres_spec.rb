@@ -1074,14 +1074,16 @@ describe "A PostgreSQL dataset with a timestamp field" do
     [1, 10, 100, -2, -20, -200].each do |year|
       d = Date.new(year, 2, 3)
       @db.get(Sequel.cast(d, Date)).must_equal d
-      d = Time.local(year, 2, 3, 10, 11, 12)
-      @db.get(Sequel.cast(d, Time)).must_equal d
       begin
+        Sequel.default_timezone = :utc
+        d = Time.utc(year, 2, 3, 10, 11, 12)
+        @db.get(Sequel.cast(d, Time)).must_equal d
         Sequel.datetime_class = DateTime
         d = DateTime.new(year, 2, 3, 10, 11, 12)
         @db.get(Sequel.cast(d, Time)).must_equal d
       ensure
         Sequel.datetime_class = Time
+        Sequel.default_timezone = nil
       end
     end
   end
