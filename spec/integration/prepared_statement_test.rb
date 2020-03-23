@@ -333,6 +333,7 @@ describe "Bound Argument Types" do
     @ds.insert(@vs)
   end
   after do
+    Sequel.default_timezone = nil
     Sequel.datetime_class = Time
   end
   after(:all) do
@@ -350,14 +351,11 @@ describe "Bound Argument Types" do
 
   cspecify "should handle datetime type with fractional seconds", [:jdbc, :sqlite], [:jdbc, :mysql], [:oracle] do
     Sequel.datetime_class = DateTime
+    Sequel.default_timezone = :utc
     fract_time = DateTime.parse('2010-10-12 13:14:15.500000')
     @ds.prepare(:update, :ps_datetime_up, :dt=>:$x).call(:x=>fract_time)
     dt = @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]
-    if dt.is_a?(String)
-      @ds.literal(dt).must_equal @ds.literal(fract_time)
-    else
-      dt.must_equal fract_time
-    end
+    @ds.literal(dt).must_equal @ds.literal(fract_time)
   end
 
   cspecify "should handle time type", [:jdbc, :sqlite] do
