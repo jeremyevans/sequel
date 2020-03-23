@@ -352,7 +352,12 @@ describe "Bound Argument Types" do
     Sequel.datetime_class = DateTime
     fract_time = DateTime.parse('2010-10-12 13:14:15.500000')
     @ds.prepare(:update, :ps_datetime_up, :dt=>:$x).call(:x=>fract_time)
-    @ds.literal(@ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]).must_equal @ds.literal(fract_time)
+    dt = @ds.filter(:dt=>:$x).prepare(:first, :ps_datetime).call(:x=>fract_time)[:dt]
+    if dt.is_a?(String)
+      @ds.literal(dt).must_equal @ds.literal(fract_time)
+    else
+      dt.must_equal fract_time
+    end
   end
 
   cspecify "should handle time type", [:jdbc, :sqlite] do
