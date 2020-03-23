@@ -252,7 +252,12 @@ module Sequel
         when :drop_constraint
           case op[:type]
           when :primary_key
-            duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = s[:auto_increment] = nil}}
+            duplicate_table(table) do |columns|
+              columns.each do |s|
+                s[:unique] = false if s[:primary_key]
+                s[:primary_key] = s[:auto_increment] = nil
+              end
+            end
           when :foreign_key
             if op[:columns]
               duplicate_table(table, :skip_foreign_key_columns=>op[:columns])
@@ -420,7 +425,7 @@ module Sequel
         unless unique_columns.empty?
           unique_columns.map!{|c| quote_identifier(c)}
           def_columns.each do |c|
-            c[:unique] = true if unique_columns.include?(quote_identifier(c[:name]))
+            c[:unique] = true if unique_columns.include?(quote_identifier(c[:name])) && c[:unique] != false
           end
         end
         
