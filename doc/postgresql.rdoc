@@ -184,7 +184,6 @@ to mark a partition as the default partition:
 
   DB.create_table(:table2a, partition_of: :table2) do
     values_in 1, 2, 3
-    to 0
   end
   DB.create_table(:table2b, partition_of: :table2) do
     values_in 4, 5, 6
@@ -196,15 +195,15 @@ to mark a partition as the default partition:
 For hash partitioning, you use the +modulus+ and +remainder+ methods:
 
   DB.create_table(:table3a, partition_of: :table3) do
-    modules 3
+    modulus 3
     remainder 0
   end
   DB.create_table(:table3b, partition_of: :table3) do
-    modules 3
+    modulus 3
     remainder 1
   end
   DB.create_table(:table3c, partition_of: :table3) do
-    modules 3
+    modulus 3
     remainder 2
   end
 
