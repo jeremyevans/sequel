@@ -235,6 +235,13 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
     m.apply(@db, :up)
     proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
   end
+
+  it "should raise in the down direction with the name of the source file if migration is irreversible" do
+    m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
+    m.apply(@db, :up)
+    error = proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
+    error.message.must_match /irreversible migration method used in .*spec\/extensions\/migration_spec.rb/
+  end
 end
 
 describe "Sequel::Migrator.migrator_class" do

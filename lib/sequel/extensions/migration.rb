@@ -176,7 +176,7 @@ module Sequel
         just_raise = true
       end
       if just_raise
-        Proc.new{raise Sequel::Error, 'irreversible migration method used, you may need to write your own down method'}
+        Proc.new{raise Sequel::Error, "irreversible migration method used in #{block.source_location.first}, you may need to write your own down method"}
       else
         actions = @actions.reverse
         Proc.new do
