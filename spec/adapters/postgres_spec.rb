@@ -91,7 +91,7 @@ describe "PostgreSQL", '#create_table' do
     @db[:tmp_dolls_1].order(:id).select_order_map(:id).must_equal [1,2]
     @db[:tmp_dolls_2].order(:id).select_order_map(:id).must_equal [3]
     @db[:tmp_dolls_3].order(:id).select_order_map(:id).must_equal [5]
-  end if DB.server_version >= 100000 
+  end if DB.server_version >= 110000 
 
   it "should support hash partitioned tables for single column with :partition_* options" do
     @db.create_table(:tmp_dolls, :partition_by => :id, :partition_type=>:hash){Integer :id}
