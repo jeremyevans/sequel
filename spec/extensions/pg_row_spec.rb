@@ -168,6 +168,7 @@ describe "pg_row extension" do
     p1.oid.must_equal 1
     @db.send(:schema_column_type, 'foo').must_equal :pg_row_foo
     @db.send(:schema_column_type, 'integer').must_equal :integer
+    @db.send(:schema_column_type, 'timestamp(6) without time zone').must_equal :datetime
 
     c = p1.converter
     c.superclass.must_equal @m::HashRow
