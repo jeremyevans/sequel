@@ -30,7 +30,7 @@ lib/sequel/extensions/pg_hstore.rb
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2018-02-25 09:02:27 -0800</span>
+<span class='datetime'>2020-03-16 11:01:23 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -104,6 +104,10 @@ Last Update:
 <p>To use this extension, first load it into your Sequel::Database instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_hstore</span></pre>
+
+<p>This extension integrates with the pg_array extension.  If you plan to use arrays of hstore types, load the pg_array extension before the pg_interval extension:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:pg_array</span>, <span class="ruby-value">:pg_hstore</span></pre>
 
 <p>See the schema modification guide for details on using hstore columns in CREATE/ALTER TABLE statements.</p>
 

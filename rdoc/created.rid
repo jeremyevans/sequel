@@ -1,6 +1,6 @@
-Sun, 01 Mar 2020 10:30:47 -0800
-README.rdoc	Tue, 15 Oct 2019 20:03:23 -0700
-CHANGELOG	Fri, 28 Feb 2020 09:27:25 -0800
+Wed, 01 Apr 2020 08:35:38 -0700
+README.rdoc	Fri, 06 Mar 2020 12:07:27 -0800
+CHANGELOG	Wed, 01 Apr 2020 08:28:09 -0700
 doc/CHANGELOG.old	Fri, 28 Feb 2020 07:58:33 -0800
 MIT-LICENSE	Wed, 08 Jan 2020 19:52:18 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Tue, 02 Jul 2019 15:10:53 -0700
-lib/sequel/version.rb	Fri, 28 Feb 2020 09:27:25 -0800
+lib/sequel/version.rb	Wed, 01 Apr 2020 08:28:09 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 08 Nov 2018 15:41:57 -0800
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -29,7 +29,7 @@ lib/sequel/database/query.rb	Fri, 12 Apr 2019 07:19:11 -0700
 lib/sequel/database/schema_generator.rb	Fri, 10 Jan 2020 18:30:49 -0800
 lib/sequel/database/schema_methods.rb	Fri, 02 Aug 2019 16:33:09 -0700
 lib/sequel/database/transactions.rb	Tue, 11 Feb 2020 07:52:54 -0800
-lib/sequel/dataset/actions.rb	Fri, 12 Jul 2019 09:47:14 -0700
+lib/sequel/dataset/actions.rb	Wed, 04 Mar 2020 13:43:03 -0800
 lib/sequel/dataset/dataset_module.rb	Mon, 20 Nov 2017 16:04:32 -0800
 lib/sequel/dataset/features.rb	Mon, 18 Nov 2019 11:56:31 -0800
 lib/sequel/dataset/graph.rb	Tue, 19 Mar 2019 16:51:03 -0700
@@ -39,7 +39,7 @@ lib/sequel/dataset/prepared_statements.rb	Tue, 19 Mar 2019 16:51:03 -0700
 lib/sequel/dataset/query.rb	Fri, 06 Dec 2019 15:00:19 -0800
 lib/sequel/dataset/sql.rb	Mon, 18 Nov 2019 11:56:31 -0800
 lib/sequel/model/associations.rb	Tue, 23 Apr 2019 16:34:31 -0700
-lib/sequel/model/base.rb	Tue, 08 Oct 2019 11:07:55 -0700
+lib/sequel/model/base.rb	Wed, 11 Mar 2020 16:32:40 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/model/errors.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -63,7 +63,7 @@ doc/model_plugins.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/mssql_stored_procedures.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/object_model.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/opening_databases.rdoc	Fri, 05 Jul 2019 09:50:06 -0700
-doc/postgresql.rdoc	Tue, 15 Oct 2019 07:43:30 -0700
+doc/postgresql.rdoc	Mon, 30 Mar 2020 09:21:48 -0700
 doc/prepared_statements.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/querying.rdoc	Thu, 22 Mar 2018 21:49:57 -0700
 doc/reflection.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
@@ -71,7 +71,7 @@ doc/schema_modification.rdoc	Mon, 30 Oct 2017 13:46:56 -0700
 doc/security.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
 doc/sharding.rdoc	Mon, 13 May 2019 11:09:07 -0700
 doc/sql.rdoc	Mon, 09 Jul 2018 14:34:36 -0700
-doc/testing.rdoc	Mon, 30 Dec 2019 08:39:54 -0800
+doc/testing.rdoc	Mon, 23 Mar 2020 09:19:59 -0700
 doc/thread_safety.rdoc	Tue, 01 Aug 2017 08:12:00 -0700
 doc/transactions.rdoc	Mon, 08 Apr 2019 13:33:12 -0700
 doc/validations.rdoc	Thu, 15 Nov 2018 08:53:33 -0800
@@ -218,10 +218,11 @@ doc/release_notes/5.28.0.txt	Tue, 31 Dec 2019 14:23:17 -0800
 doc/release_notes/5.29.0.txt	Fri, 31 Jan 2020 12:51:36 -0800
 doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.30.0.txt	Fri, 28 Feb 2020 09:27:25 -0800
+doc/release_notes/5.31.0.txt	Wed, 01 Apr 2020 08:28:09 -0700
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
 doc/release_notes/5.7.0.txt	Sun, 01 Apr 2018 19:38:21 -0700
 doc/release_notes/5.8.0.txt	Tue, 01 May 2018 11:42:13 -0700
 doc/release_notes/5.9.0.txt	Fri, 01 Jun 2018 07:49:41 -0700
-lib/sequel/extensions/migration.rb	Sun, 23 Dec 2018 16:52:26 -0800
+lib/sequel/extensions/migration.rb	Mon, 30 Mar 2020 09:21:48 -0700

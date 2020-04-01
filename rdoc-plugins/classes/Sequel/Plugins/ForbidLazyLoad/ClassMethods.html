@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::ForbidLazyLoad::ClassMethods</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::ForbidLazyLoad::ClassMethods
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../../files/lib/sequel/plugins/forbid_lazy_load_rb.html">lib/sequel/plugins/forbid_lazy_load.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'></div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-allow_lazy_load_for_static_cache_associations">allow_lazy_load_for_static_cache_associations</a></li>
+<li><a href="#method-i-finalize_associations">finalize_associations</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='methods'>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-allow_lazy_load_for_static_cache_associations'>
+<a name='method-i-allow_lazy_load_for_static_cache_associations'></a>
+<div class='synopsis'>
+<span class='name'>allow_lazy_load_for_static_cache_associations</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>If the static_cache plugin is used by the associated class for an association, allow lazy loading that association, since the lazy association load will use a hash table lookup and not a query.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-allow_lazy_load_for_static_cache_associations-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-allow_lazy_load_for_static_cache_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">113</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">allow_lazy_load_for_static_cache_associations</span>&#x000A;<span class="line-num">114</span>   <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">StaticCache</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)&#x000A;<span class="line-num">115</span>     <span class="ruby-ivar">@association_reflections</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ref</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">116</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">ref</span>.<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">StaticCache</span><span class="ruby-operator">::</span><span class="ruby-constant">ClassMethods</span>)&#x000A;<span class="line-num">117</span>         <span class="ruby-identifier">ref</span>[<span class="ruby-value">:forbid_lazy_load</span>] = <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">118</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">119</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">120</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">121</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-finalize_associations'>
+<a name='method-i-finalize_associations'></a>
+<div class='synopsis'>
+<span class='name'>finalize_associations</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Allow lazy loading for static cache associations before finalizing.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-finalize_associations-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-finalize_associations-source'>    <span class="ruby-comment"># File lib/sequel/plugins/forbid_lazy_load.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">finalize_associations</span>&#x000A;<span class="line-num">125</span>   <span class="ruby-identifier">allow_lazy_load_for_static_cache_associations</span>&#x000A;<span class="line-num">126</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">127</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -30,12 +30,33 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-02-28 09:27:25 -0800</span>
+<span class='datetime'>2020-04-01 08:28:09 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.31.0+-282020-04-01-29">5.31.0 (2020-04-01)<span><a href="#label-5.31.0+-282020-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Fix alter_table drop_constraint :primary_key option on SQLite for non-integer primary keys (jeremyevans)</p>
+</li><li>
+<p>Add skip_saving_columns plugin, which supports columns to skip when saving, and skips generated columns by default (joeosburn, jeremyevans) (#1681, #1682)</p>
+</li><li>
+<p>Add support for creating partitioned tables in PostgreSQL 10+ using :partition_by and :partition_of options (jeremyevans)</p>
+</li><li>
+<p>Dump generated columns as generated columns when using the schema_dumper with :same_db option on PostgreSQL 12+ (jeremyevans) (#1680)</p>
+</li><li>
+<p>Ignore defaults for generated columns by default when using the schema dumper (jeremyevans) (#1680)</p>
+</li><li>
+<p>Include generated columns in schema on SQLite 3.31+ (jeremyevans)</p>
+</li><li>
+<p>Add :generated schema entry on PostgreSQL 12+ and SQLite 3.31+ for whether the columns is generated (jeremyevans)</p>
+</li><li>
+<p>Add association_lazy_eager_option plugin for supporting :eager option for association method (jeremyevans)</p>
+</li><li>
+<p>Add forbid_lazy_load plugin for forbidding lazy loading of associations, to help find N+1 issues (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.30.0+-282020-03-01-29">5.30.0 (2020-03-01)<span><a href="#label-5.30.0+-282020-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Remove specs and old release notes from the gem to reduce gem size by over 40% (jeremyevans)</p>

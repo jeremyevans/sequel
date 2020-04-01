@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.31.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.31.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.31.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-04-01 08:28:09 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A forbid_lazy_load plugin has been added to forbid the lazy loading of model associations if the current object was retreived with other objects.  This plugin helps detect N+1 query issues.  This plugin will raise an error if a lazy load is detected in such cases:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:forbid_lazy_load</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>&#x000A;  <span class="ruby-comment"># Could be N+1, raises Sequel::Plugins::ForbidLazyLoad::Error</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">tracks</span>&#x000A;<span class="ruby-comment"># Could not be N+1, no error raised</span></pre>
+
+<p>The forbid_lazy_load plugin is designed to be loaded into the base model class (generally <a href="../../../classes/Sequel/Model.html"><code>Sequel::Model</code></a>), and can be loaded only in test mode, or only in certain test mode configurations, so that it does not have any production performance impact.</p>
+
+<p>Note that an alternative approach that <a href="../../../classes/Sequel.html"><code>Sequel</code></a> has supported for many years is the tactical_eager_loading plugin, which automatically eager loads when an N+1 query issue is detected.</p>
+</li><li>
+<p>An association_lazy_eager_option plugin has been added which supports the :eager option for the association method.  If the association has not been loaded, this eagerly loads the associations specified by the :eager option when loading the association.  If the association has already been loaded, this option is ignored, with the assumption that whatever loaded the association already used the correct eager loading.  Example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> <span class="ruby-value">:tracks</span>&#x000A;<span class="ruby-constant">Track</span>.<span class="ruby-identifier">many_to_one</span> <span class="ruby-value">:artist</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>(<span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist</span>)&#x000A;<span class="ruby-comment"># Loads tracks for album, then artist for each track (2 queries)</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">tracks</span>(<span class="ruby-value">:eager</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:artist</span>)&#x000A;<span class="ruby-comment"># No query issued as association is cached</span></pre>
+
+<p>You could previously have similar behavior for uncached associations by passing a block to the association method and calling eager on the yielded dataset.  However, that would ignore any cached association, causing redundant loading of the association in such cases.</p>
+</li><li>
+<p>On PostgreSQL 10+, creating partitioned tables and partitions of other tables is now supported.</p>
+
+<p>To create a partitioned table, use the :partition_by option:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table1</span>, <span class="ruby-value">partition_by:</span> <span class="ruby-value">:date_column</span>,&#x000A;                        <span class="ruby-value">partition_type:</span> <span class="ruby-value">:range</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-constant">Date</span> <span class="ruby-value">:date_column</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table2</span>, <span class="ruby-value">partition_by:</span> <span class="ruby-value">:string_column</span>,&#x000A;                         <span class="ruby-value">partition_type:</span> <span class="ruby-value">:list</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-constant">String</span> <span class="ruby-value">:string_column</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table3</span>, <span class="ruby-value">partition_by:</span> <span class="ruby-value">:int_column</span>,&#x000A;                         <span class="ruby-value">partition_type:</span> <span class="ruby-value">:hash</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> <span class="ruby-value">:id</span>&#x000A;  <span class="ruby-constant">Integer</span> <span class="ruby-value">:int_column</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>To add partitions of other tables, use the :partition_of option. This option will use a custom DSL specific to partitions of other tables.</p>
+
+<p>For range partitioning, you can use the from and to methods to specify the inclusive beginning and exclusive ending of the range of the partition.  You can call the minvalue and maxvalue methods to get the minimum and maximum values for the column(s) in the range, useful as arguments to from and to:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table1a</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">from</span> <span class="ruby-identifier">minvalue</span>&#x000A;  <span class="ruby-identifier">to</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table1b</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">from</span> <span class="ruby-value">0</span>&#x000A;  <span class="ruby-identifier">to</span> <span class="ruby-value">100</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table1c</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">from</span> <span class="ruby-value">100</span>&#x000A;  <span class="ruby-identifier">to</span> <span class="ruby-identifier">maxvalue</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>For list partitioning, you use the values_in method.  You can also use the default method to mark a partition as the default partition:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table2a</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table2</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">values_in</span> <span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table2b</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table2</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">values_in</span> <span class="ruby-value">4</span>, <span class="ruby-value">5</span>, <span class="ruby-value">6</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table2c</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table2</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">default</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>For hash partitioning, you use the modulus and remainder methods:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table3a</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table3</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">modulus</span> <span class="ruby-value">3</span>&#x000A;  <span class="ruby-identifier">remainder</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table3b</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table3</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">modulus</span> <span class="ruby-value">3</span>&#x000A;  <span class="ruby-identifier">remainder</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(<span class="ruby-value">:table3c</span>, <span class="ruby-value">partition_of:</span> <span class="ruby-value">:table3</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">modulus</span> <span class="ruby-value">3</span>&#x000A;  <span class="ruby-identifier">remainder</span> <span class="ruby-value">2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+</li><li>
+<p>On PostgreSQL 12+ and SQLite 3.31+, column schema hashes now have a :generated entry for whether the column is a generated column.</p>
+</li><li>
+<p>The schema_dumper extension now dumps generated columns correctly when using the :same_db option on PostgreSQL 12+.</p>
+</li><li>
+<p>A skip_saving_columns plugin has been added.  This allows skipping saving of specific columns for the model.  By default, it skips saving of generated columns, but you can customize the columns that it skips:</p>
+
+<pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:skip_saving_columns</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">skip_saving_columns</span> = [<span class="ruby-value">:some_column</span>]</pre>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The alter_table drop_constraint :primary_key option on SQLite now works correctly for non-integer primary keys.</p>
+</li><li>
+<p>When an error is raised due to an irreversible migration, the error message now includes the file containing the migration for easier debugging.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Plugins::AssociationLazyEagerOption</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>module</span>
+Sequel::Plugins::AssociationLazyEagerOption
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/plugins/association_lazy_eager_option_rb.html">lib/sequel/plugins/association_lazy_eager_option.rb</a>
+</li>
+</ol>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>The association_lazy_eager_option plugin supports passing an <code>:eager</code> option to an association method.  If the related association is already cached, the cached version will be returned.  If the association is not already cached, it will be loaded, and the value of the <code>:eager</code> option will be used to perform an eager load of the given associations. the plural versions.</p>
+
+<p>With Sequel&#39;s default behavior, you can already perform an eager load when lazy loading using a block:</p>
+
+<pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">association</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-value">:nested_association</span>)}</pre>
+
+<p>However, this will ignore any cached version.  In more complex software, the association may already be cached and have the nested association cached inside of it, and using this callback approach then requires 2 unnecessary queries. This plugin will not perform any queries if the association is already cached, preventing duplicate work. However, you should make sure that an already loaded association has the nested association already eagerly loaded.</p>
+
+<p>Usage:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Make all model subclasses support the :eager association</span>&#x000A;<span class="ruby-comment"># method option (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class support the :eager association</span>&#x000A;<span class="ruby-comment"># method option</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:association_lazy_eager_option</span></pre>
+</div>
+<div id='context'>
+</div>
+<div id='class-list'>
+<h2>Classes and Modules</h2>
+<ol>
+<li><a href="AssociationLazyEagerOption/InstanceMethods.html">Sequel::Plugins::AssociationLazyEagerOption::InstanceMethods</a></li>
+</ol>
+</div>
+<div id='section'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

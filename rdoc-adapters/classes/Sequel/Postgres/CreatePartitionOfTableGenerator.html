@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>Sequel::Postgres::CreatePartitionOfTableGenerator</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='class' id='wrapper'>
+<div class='header'>
+<h1 class='name'><span class='type'>class</span>
+Sequel::Postgres::CreatePartitionOfTableGenerator
+</h1>
+<ol class='paths'>
+<li>
+<a href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+</li>
+</ol>
+<div class='parent'>
+Superclass:
+<strong>Object</strong>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<p>Generator used for creating tables that are partitions of other tables.</p>
+</div>
+<div id='method-list'>
+<h2>Methods</h2>
+<h3>Public Class</h3>
+<ol>
+<li><a href="#method-c-new">new</a></li>
+</ol>
+<h3>Public Instance</h3>
+<ol>
+<li><a href="#method-i-default">default</a></li>
+<li><a href="#method-i-from">from</a></li>
+<li><a href="#method-i-hash_values">hash_values</a></li>
+<li><a href="#method-i-list">list</a></li>
+<li><a href="#method-i-maxvalue">maxvalue</a></li>
+<li><a href="#method-i-minvalue">minvalue</a></li>
+<li><a href="#method-i-modulus">modulus</a></li>
+<li><a href="#method-i-partition_type">partition_type</a></li>
+<li><a href="#method-i-range">range</a></li>
+<li><a href="#method-i-remainder">remainder</a></li>
+<li><a href="#method-i-to">to</a></li>
+<li><a href="#method-i-values_in">values_in</a></li>
+</ol>
+</div>
+<div id='context'>
+</div>
+<div id='section'>
+<div id='constants-list'>
+<h2>Constants</h2>
+<div class='name-list'>
+<table summary='Constants'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MAXVALUE</td>
+<td>=</td>
+<td class='context-item-value'>Sequel.lit('MAXVALUE').freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>MINVALUE</td>
+<td>=</td>
+<td class='context-item-value'>Sequel.lit('MINVALUE').freeze</td>
+<td>&nbsp;</td>
+<td class='context-item-desc'></td>
+</tr>
+</table>
+</div>
+</div>
+<div id='methods'>
+<h2>Public Class methods</h2>
+<div class='method public-class' id='method-method-c-new'>
+<a name='method-c-new'></a>
+<div class='synopsis'>
+<span class='name'>new</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-new-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-c-new-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">142</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">initialize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">143</span>   <span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">144</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<h2>Public Instance methods</h2>
+<div class='method public-instance' id='method-method-i-default'>
+<a name='method-i-default'></a>
+<div class='synopsis'>
+<span class='name'>default</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Sets that this is a default partition, where values not in other partitions are stored.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-default-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-default-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">187</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default</span>&#x000A;<span class="line-num">188</span>   <span class="ruby-ivar">@default</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">189</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-from'>
+<a name='method-i-from'></a>
+<div class='synopsis'>
+<span class='name'>from</span>
+<span class='arguments'>(*v)</span>
+
+</div>
+<div class='description'>
+
+<p>Assumes range partitioning, sets the inclusive minimum value of the range for this partition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-from-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-from-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">161</span>   <span class="ruby-ivar">@from</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">162</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-hash_values'>
+<a name='method-i-hash_values'></a>
+<div class='synopsis'>
+<span class='name'>hash_values</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The modulus and remainder to use for this partition for a hash partition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-hash_values-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-hash_values-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">202</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">hash_values</span>&#x000A;<span class="line-num">203</span>   [<span class="ruby-ivar">@modulus</span>, <span class="ruby-ivar">@remainder</span>]&#x000A;<span class="line-num">204</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-list'>
+<a name='method-i-list'></a>
+<div class='synopsis'>
+<span class='name'>list</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The values to include in this partition for a list partition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-list-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-list-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">197</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">list</span>&#x000A;<span class="line-num">198</span>   <span class="ruby-ivar">@in</span>&#x000A;<span class="line-num">199</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-maxvalue'>
+<a name='method-i-maxvalue'></a>
+<div class='synopsis'>
+<span class='name'>maxvalue</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The minimum value of the data type used in range partitions, useful as an argument to <a href="CreatePartitionOfTableGenerator.html#method-i-to"><code>to</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-maxvalue-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-maxvalue-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">154</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">maxvalue</span>&#x000A;<span class="line-num">155</span>   <span class="ruby-constant">MAXVALUE</span>&#x000A;<span class="line-num">156</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-minvalue'>
+<a name='method-i-minvalue'></a>
+<div class='synopsis'>
+<span class='name'>minvalue</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The minimum value of the data type used in range partitions, useful as an argument to <a href="CreatePartitionOfTableGenerator.html#method-i-from"><code>from</code></a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-minvalue-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-minvalue-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">148</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">minvalue</span>&#x000A;<span class="line-num">149</span>   <span class="ruby-constant">MINVALUE</span>&#x000A;<span class="line-num">150</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-modulus'>
+<a name='method-i-modulus'></a>
+<div class='synopsis'>
+<span class='name'>modulus</span>
+<span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Assumes hash partitioning, sets the modulus for this parition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-modulus-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-modulus-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">176</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">modulus</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">177</span>   <span class="ruby-ivar">@modulus</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-partition_type'>
+<a name='method-i-partition_type'></a>
+<div class='synopsis'>
+<span class='name'>partition_type</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Determine the appropriate partition type for this partition by which methods were called on it.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-partition_type-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-partition_type-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">208</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">partition_type</span>&#x000A;<span class="line-num">209</span>   <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Unable to determine partition type, multiple different partitioning methods called&quot;</span> <span class="ruby-keyword">if</span> [<span class="ruby-ivar">@from</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@to</span>, <span class="ruby-ivar">@list</span>, <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@remainder</span>, <span class="ruby-ivar">@default</span>].<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;<span class="line-num">210</span> &#x000A;<span class="line-num">211</span>   <span class="ruby-keyword">if</span> <span class="ruby-ivar">@from</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@to</span>&#x000A;<span class="line-num">212</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must call both from and to when creating a partition of a table if calling either&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@from</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@to</span>&#x000A;<span class="line-num">213</span>     <span class="ruby-value">:range</span>&#x000A;<span class="line-num">214</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@in</span>&#x000A;<span class="line-num">215</span>     <span class="ruby-value">:list</span>&#x000A;<span class="line-num">216</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@remainder</span>&#x000A;<span class="line-num">217</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;must call both modulus and remainder when creating a partition of a table if calling either&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@modulus</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@remainder</span>&#x000A;<span class="line-num">218</span>     <span class="ruby-value">:hash</span>&#x000A;<span class="line-num">219</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@default</span>&#x000A;<span class="line-num">220</span>     <span class="ruby-value">:default</span>&#x000A;<span class="line-num">221</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">222</span>     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;unable to determine partition type, no partitioning methods called&quot;</span>&#x000A;<span class="line-num">223</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">224</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-range'>
+<a name='method-i-range'></a>
+<div class='synopsis'>
+<span class='name'>range</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The from and to values of this partition for a range partition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-range-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-range-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">192</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">range</span>&#x000A;<span class="line-num">193</span>   [<span class="ruby-ivar">@from</span>, <span class="ruby-ivar">@to</span>]&#x000A;<span class="line-num">194</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-remainder'>
+<a name='method-i-remainder'></a>
+<div class='synopsis'>
+<span class='name'>remainder</span>
+<span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Assumes hash partitioning, sets the remainder for this parition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-remainder-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-remainder-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">remainder</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">182</span>   <span class="ruby-ivar">@remainder</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-to'>
+<a name='method-i-to'></a>
+<div class='synopsis'>
+<span class='name'>to</span>
+<span class='arguments'>(*v)</span>
+
+</div>
+<div class='description'>
+
+<p>Assumes range partitioning, sets the exclusive maximum value of the range for this partition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-to-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-to-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">to</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">167</span>   <span class="ruby-ivar">@to</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">168</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-values_in'>
+<a name='method-i-values_in'></a>
+<div class='synopsis'>
+<span class='name'>values_in</span>
+<span class='arguments'>(*v)</span>
+
+</div>
+<div class='description'>
+
+<p>Assumes list partitioning, sets the values to be included in this partition.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-values_in-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-values_in-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb</span>&#x000A;<span class="line-num">171</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">values_in</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">172</span>   <span class="ruby-ivar">@in</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">173</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>
