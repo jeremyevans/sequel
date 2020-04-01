@@ -1,4 +1,4 @@
-=== master
+=== 5.31.0 (2020-04-01)
 
 * Fix alter_table drop_constraint :primary_key option on SQLite for non-integer primary keys (jeremyevans)
 

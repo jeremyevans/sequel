@@ -1,0 +1,148 @@
+= New Features
+
+* A forbid_lazy_load plugin has been added to forbid the lazy loading
+  of model associations if the current object was retreived with other
+  objects.  This plugin helps detect N+1 query issues.  This plugin
+  will raise an error if a lazy load is detected in such cases:
+
+    Album.plugin :forbid_lazy_load
+    Album.one_to_many :tracks
+
+    Album.each do |album|
+      album.tracks
+      # Could be N+1, raises Sequel::Plugins::ForbidLazyLoad::Error
+    end
+
+    Album.first.tracks
+    # Could not be N+1, no error raised
+
+  The forbid_lazy_load plugin is designed to be loaded into the base
+  model class (generally Sequel::Model), and can be loaded only in
+  test mode, or only in certain test mode configurations, so that it
+  does not have any production performance impact.
+
+  Note that an alternative approach that Sequel has supported for many
+  years is the tactical_eager_loading plugin, which automatically
+  eager loads when an N+1 query issue is detected.
+
+* An association_lazy_eager_option plugin has been added which supports
+  the :eager option for the association method.  If the association has
+  not been loaded, this eagerly loads the associations specified by the
+  :eager option when loading the association.  If the association has
+  already been loaded, this option is ignored, with the assumption that
+  whatever loaded the association already used the correct eager
+  loading.  Example:
+
+    Album.plugin :association_lazy_eager_option
+    Album.one_to_many :tracks
+    Track.many_to_one :artist
+
+    album = Album.first
+    album.tracks(:eager=>:artist)
+    # Loads tracks for album, then artist for each track (2 queries)
+
+    album.tracks(:eager=>:artist)
+    # No query issued as association is cached
+
+  You could previously have similar behavior for uncached associations
+  by passing a block to the association method and calling eager on
+  the yielded dataset.  However, that would ignore any cached
+  association, causing redundant loading of the association in such
+  cases.
+
+* On PostgreSQL 10+, creating partitioned tables and partitions of
+  other tables is now supported.
+
+  To create a partitioned table, use the :partition_by option:
+
+    DB.create_table(:table1, partition_by: :date_column,
+                            partition_type: :range) do
+      Integer :id
+      Date :date_column
+    end
+
+    DB.create_table(:table2, partition_by: :string_column,
+                             partition_type: :list) do
+      Integer :id
+      String :string_column
+    end
+
+    DB.create_table(:table3, partition_by: :int_column,
+                             partition_type: :hash) do
+      Integer :id
+      Integer :int_column
+    end
+
+  To add partitions of other tables, use the :partition_of option.
+  This option will use a custom DSL specific to partitions of other
+  tables.
+  
+  For range partitioning, you can use the from and to methods to
+  specify the inclusive beginning and exclusive ending of the range
+  of the partition.  You can call the minvalue and maxvalue methods
+  to get the minimum and maximum values for the column(s) in the
+  range, useful as arguments to from and to:
+
+    DB.create_table(:table1a, partition_of: :table1) do
+      from minvalue
+      to 0
+    end
+    DB.create_table(:table1b, partition_of: :table1) do
+      from 0
+      to 100
+    end
+    DB.create_table(:table1c, partition_of: :table1) do
+      from 100
+      to maxvalue
+    end
+
+  For list partitioning, you use the values_in method.  You can also
+  use the default method to mark a partition as the default partition:
+
+    DB.create_table(:table2a, partition_of: :table2) do
+      values_in 1, 2, 3
+    end
+    DB.create_table(:table2b, partition_of: :table2) do
+      values_in 4, 5, 6
+    end
+    DB.create_table(:table2c, partition_of: :table2) do
+      default
+    end
+
+  For hash partitioning, you use the modulus and remainder methods:
+
+    DB.create_table(:table3a, partition_of: :table3) do
+      modulus 3
+      remainder 0
+    end
+    DB.create_table(:table3b, partition_of: :table3) do
+      modulus 3
+      remainder 1
+    end
+    DB.create_table(:table3c, partition_of: :table3) do
+      modulus 3
+      remainder 2
+    end
+
+* On PostgreSQL 12+ and SQLite 3.31+, column schema hashes now have
+  a :generated entry for whether the column is a generated column.
+
+* The schema_dumper extension now dumps generated columns correctly
+  when using the :same_db option on PostgreSQL 12+.
+
+* A skip_saving_columns plugin has been added.  This allows skipping
+  saving of specific columns for the model.  By default, it skips
+  saving of generated columns, but you can customize the columns
+  that it skips:
+
+    Album.plugin :skip_saving_columns
+    Album.skip_saving_columns = [:some_column]
+
+= Other Improvements
+
+* The alter_table drop_constraint :primary_key option on SQLite now
+  works correctly for non-integer primary keys.
+
+* When an error is raised due to an irreversible migration, the error
+  message now includes the file containing the migration for easier
+  debugging.
