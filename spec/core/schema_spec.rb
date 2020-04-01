@@ -1799,6 +1799,8 @@ describe "Schema Parser" do
     @db.schema(:timestamp).first.last[:type].must_equal :datetime
     @db.schema(:"timestamp with time zone").first.last[:type].must_equal :datetime
     @db.schema(:"timestamp without time zone").first.last[:type].must_equal :datetime
+    @db.schema(:"timestamp(6)").first.last[:type].must_equal :datetime
+    @db.schema(:"timestamp(6) with time zone").first.last[:type].must_equal :datetime
     @db.schema(:time).first.last[:type].must_equal :time
     @db.schema(:"time with time zone").first.last[:type].must_equal :time
     @db.schema(:"time without time zone").first.last[:type].must_equal :time
