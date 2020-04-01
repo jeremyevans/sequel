@@ -325,7 +325,7 @@ module Sequel
         :integer
       when /\Adate\z/io
         :date
-      when /\A((small)?datetime|timestamp(\(\d\))?( with(out)? time zone)?)(\(\d+\))?\z/io
+      when /\A((small)?datetime|timestamp(\(\d\))?( with(out)? time zone)?)\z/io
         :datetime
       when /\Atime( with(out)? time zone)?\z/io
         :time
