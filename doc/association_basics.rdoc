@@ -113,7 +113,7 @@ many rows in the current table, by using a join table to associate the two table
 The one_through_one association can be thought of as a subset of the many_to_many
 association, but where there can only be 0 or 1 records in the associated table.
 This is useful if there is a unique constraint on the foreign key in the join table
-that refrences the current table.  It's also useful if you want to impose an order
+that references the current table.  It's also useful if you want to impose an order
 on the association and just want the first record returned.  The one_through_one
 association is so named because it sets up a one-to-one association through a
 single join table.
@@ -781,7 +781,7 @@ Sequel is designed to be very flexible.  If the default behavior of the
 association modification methods isn't what you desire, you can override
 the methods in your classes.  However, you should be aware that for each
 of the association modification methods described, there is a private
-method that is preceeded by an underscore that does the actual
+method that is preceded by an underscore that does the actual
 modification.  The public method without the underscore handles caching
 and callbacks, and shouldn't be overridden by the user.
 
@@ -1069,7 +1069,7 @@ option of the first association, it doesn't attempt to merge them.
 In addition to the options hash, the :clone option will copy a block argument
 from the existing situation.  If you want a cloned association to not have the
 same block as the association you are cloning from, specify the block: nil option
-in additon to the :clone option.
+in addition to the :clone option.
 
 ==== :dataset
 

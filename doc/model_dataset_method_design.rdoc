@@ -4,7 +4,7 @@ How you design your model dataset methods can significantly affect the flexibili
 
 == Flexibility: Use Single Method Per Task
 
-In general, it is recommended that you have a single method per task for maximum flexibilty.  For example, let's say you need to retrieve all albums released in a given year, ordered by number of units sold descending, and only care about the id, name and number of units sold.  One way to do this is in your application code (outside the model), you can
+In general, it is recommended that you have a single method per task for maximum flexibility.  For example, let's say you need to retrieve all albums released in a given year, ordered by number of units sold descending, and only care about the id, name and number of units sold.  One way to do this is in your application code (outside the model), you can
 call the dataset methods directly:
 
   Album.

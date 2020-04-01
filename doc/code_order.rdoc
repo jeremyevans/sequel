@@ -7,7 +7,7 @@ this guide will be specific about which are strictly necessary.
 
 == Require Sequel
 
-This is sort of a no brainer, but you need to require the library
+This is sort of a no-brainer, but you need to require the library
 first.  This is a strict requirement, none of the other code can
 be executed unless the library has been required first. Example:
 
@@ -70,7 +70,7 @@ copied into the subclass when model subclasses are created.  Example:
 == Load Model Classes
 
 After you have established a database connection, and configured your
-global model configration and global plugins, you can load your model
+global model configuration and global plugins, you can load your model
 classes.  It's recommended to have a separate file for each model class,
 unless the model classes are very simple.  Example:
 

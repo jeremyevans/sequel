@@ -731,7 +731,7 @@ associations:
     one_to_one :tracks, key: [:disc_number, :number, :album_id], primary_key: [:disc_number, :number, :album_id]
   end
 
-=== Tree - All Ancestors and Descendents
+=== Tree - All Ancestors and Descendants
 
 Let's say you want to store a tree relationship in your database, it's pretty
 simple:
@@ -749,7 +749,7 @@ node.children.  You can even eager load the relationship up to a certain depth:
   # Load parents and grandparents for a group of nodes
   Node.where{id < 10}.eager(parent: :parent).all
 
-What if you want to get all ancestors up to the root node, or all descendents,
+What if you want to get all ancestors up to the root node, or all descendants,
 without knowing the depth of the tree?
 
   class Node < Sequel::Model
@@ -770,7 +770,7 @@ without knowing the depth of the tree?
         id_map = {}
         # Create an map of parent_ids to nodes that have that parent id
         non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) << n}
-        # Doesn't cause an infinte loop, because when only the root node
+        # Doesn't cause an infinite loop, because when only the root node
         # is left, this is not called.
         Node.where(id: id_map.keys).eager(:ancestors).all do |node|
           # Populate the parent association for each node
@@ -879,4 +879,4 @@ associated tickets.
   end
 
 Note that it is often better to use a sum cache instead of this approach.  You can implement
-a sum cache using +after_create+, +after_update+, and +after_delete+ hooks, or preferrably using a database trigger.
+a sum cache using +after_create+, +after_update+, and +after_delete+ hooks, or preferably using a database trigger.
