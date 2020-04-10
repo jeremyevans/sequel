@@ -1,5 +1,7 @@
 === master
 
+* Add run_transaction_hooks Database extension, allowing for running the transaction hooks before commit/rollback, for use with transactional testing (jeremyevans)
+
 * Recognize timestamp(N) with time zone type (isc) (#1684)
 
 === 5.31.0 (2020-04-01)
