@@ -106,17 +106,13 @@ module Sequel
     # and breaks some aspects of the json_serializer plugin.  You can undo the damage
     # done by active_support/json by doing:
     #
-    #   class Array
+    #   module ActiveSupportBrokenJSONFix
     #     def to_json(options = {})
     #       JSON.generate(self)
     #     end
     #   end
-    #
-    #   class Hash
-    #     def to_json(options = {})
-    #       JSON.generate(self)
-    #     end
-    #   end
+    #   Array.send(:prepend, ActiveSupportBrokenJSONFix)
+    #   Hash.send(:prepend, ActiveSupportBrokenJSONFix)
     #
     # Note that this will probably cause active_support/json to no longer work
     # correctly in some cases.
