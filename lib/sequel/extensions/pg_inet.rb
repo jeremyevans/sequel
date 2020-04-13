@@ -40,12 +40,20 @@ module Sequel
       def self.extended(db)
         db.instance_exec do
           extend_datasets(InetDatasetMethods)
-          meth = IPAddr.method(:new)
-          add_conversion_proc(869, meth)
-          add_conversion_proc(650, meth)
+
+          if !defined?(SEQUEL_PG_VERSION_INTEGER) || SEQUEL_PG_VERSION_INTEGER >= 11300
+            # sequel_pg 1.13.0+ will use inet/cidr conversion procs, but doing so is
+            # slower, so don't add the conversion procs if using sequel_pg 1.13.0+.
+            meth = IPAddr.method(:new)
+            add_conversion_proc(869, meth)
+            add_conversion_proc(650, meth)
+            if respond_to?(:register_array_type)
+              register_array_type('inet', :oid=>1041, :scalar_oid=>869)
+              register_array_type('cidr', :oid=>651, :scalar_oid=>650)
+            end
+          end
+
           if respond_to?(:register_array_type)
-            register_array_type('inet', :oid=>1041, :scalar_oid=>869)
-            register_array_type('cidr', :oid=>651, :scalar_oid=>650)
             register_array_type('macaddr', :oid=>1040, :scalar_oid=>829)
           end
           @schema_type_classes[:ipaddr] = IPAddr

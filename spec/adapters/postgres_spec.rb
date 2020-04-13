@@ -3565,6 +3565,20 @@ describe 'PostgreSQL inet/cidr types' do
     end
   end
 
+  it 'allow overridding type conversions of inet/cidr types' do
+    cp = @db.conversion_procs[869]
+    acp = @db.conversion_procs[1041]
+    begin
+      @db.add_conversion_proc(1041, lambda{|s| s})
+      @db.add_conversion_proc(869, lambda{|s| s})
+      @db.get(Sequel.cast('127.0.0.1', :inet)).must_equal '127.0.0.1'
+      @db.get(Sequel.pg_array(['127.0.0.1'], :inet)).must_equal '{127.0.0.1}'
+    ensure
+      @db.add_conversion_proc(869, cp)
+      @db.add_conversion_proc(1041, acp)
+    end
+  end
+
   it 'insert and retrieve inet/cidr/macaddr array values' do
     @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
     @ds.insert(Sequel.pg_array([@ipv4], 'inet'), Sequel.pg_array([@ipv4nm], 'cidr'), Sequel.pg_array(['12:34:56:78:90:ab'], 'macaddr'))
