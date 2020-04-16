@@ -4,6 +4,11 @@ module Sequel
   @application_timezone = nil
   @database_timezone = nil
   @typecast_timezone = nil
+  @local_offsets = {}
+
+  # Backwards compatible alias
+  Timezones = SequelMethods
+  Deprecation.deprecate_constant(self, :Timezones)
   
   # Sequel doesn't pay much attention to timezones by default, but you can set it
   # handle timezones if you want.  There are three separate timezone settings, application_timezone,
@@ -16,7 +21,7 @@ module Sequel
   # on the environment (e.g. current user), you need to use the +named_timezones+ extension (and use
   # +DateTime+ as the +datetime_class+). Sequel also ships with a +thread_local_timezones+ extensions
   # which allows each thread to have its own timezone values for each of the timezones.
-  module Timezones
+  module SequelMethods
     # The timezone you want the application to use.  This is the timezone
     # that incoming times from the database and typecasting are converted to.
     attr_reader :application_timezone
@@ -243,7 +248,4 @@ module Sequel
       Sequel.synchronize{@local_offsets[offset_secs] = Rational(offset_secs, 86400)}
     end
   end
-
-  @local_offsets = {}
-  extend Timezones
 end

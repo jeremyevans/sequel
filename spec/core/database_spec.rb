@@ -2724,8 +2724,6 @@ end
 describe "Database extensions" do
   before(:all) do
     class << Sequel
-      alias _extension extension
-      remove_method :extension
       def extension(*)
       end
     end
@@ -2733,8 +2731,6 @@ describe "Database extensions" do
   after(:all) do
     class << Sequel
       remove_method :extension
-      alias extension _extension
-      remove_method :_extension
     end
   end
   before do

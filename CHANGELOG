@@ -1,5 +1,7 @@
 === master
 
+* Move most Sequel singleton methods into a module that extends Sequel for easier overriding (jeremyevans)
+
 * Fix method visibility issues in model, plugin, extension, and adapter code (jeremyevans)
 
 * Avoid defining conversion procs for PostgreSQL inet/cidr types in pg_inet extension when using sequel_pg 1.13.0+ (jeremyevans)
