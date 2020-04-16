@@ -171,6 +171,12 @@ module Sequel
         clone(:into => table)
       end
 
+      # Access uses [] for quoting identifiers, and can't handle
+      # ] inside identifiers.
+      def quoted_identifier_append(sql, v)
+        sql << '[' << v.to_s << ']'
+      end
+
       # Access does not support derived column lists.
       def supports_derived_column_lists?
         false
@@ -278,12 +284,6 @@ module Sequel
           sql << " TOP "
           literal_append(sql, l)
         end
-      end
-
-      # Access uses [] for quoting identifiers, and can't handle
-      # ] inside identifiers.
-      def quoted_identifier_append(sql, v)
-        sql << '[' << v.to_s << ']'
       end
     end
   end

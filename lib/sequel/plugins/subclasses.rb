@@ -63,6 +63,8 @@ module Sequel
 
         Plugins.inherited_instance_variables(self, :@subclasses=>lambda{|v| []}, :@on_subclass=>nil)
 
+        private
+
         # Add the subclass to this model's current subclasses,
         # and initialize a new subclasses instance variable
         # in the subclass.

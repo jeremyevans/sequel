@@ -15,6 +15,8 @@
 module Sequel
   module Postgres
     module Timestamptz
+      private
+
       # Use timestamptz by default for generic timestamp value.
       def type_literal_generic_datetime(column)
         :timestamptz

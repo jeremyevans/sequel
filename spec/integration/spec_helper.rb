@@ -9,6 +9,8 @@ end
 $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
 require_relative "../../lib/sequel"
 
+require_relative "../visibility_checking" if ENV['CHECK_METHOD_VISIBILITY']
+
 begin
   require_relative "../spec_config" unless defined?(DB)
 rescue LoadError

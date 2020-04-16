@@ -2,6 +2,7 @@ require_relative 'spec_helper'
 
 describe "synchronize_sql extension" do
   module Sync
+    private
     def literal_string_append(sql, v)
       db.synchronize{super}
     end

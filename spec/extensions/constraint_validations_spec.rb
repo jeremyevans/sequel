@@ -176,6 +176,7 @@ describe "constraint_validations extension" do
     @db = Sequel.mock(:host=>'oracle')
     @db.extend_datasets do
       def quote_identifiers?; false end
+      private
       def input_identifier(v) v.to_s end
     end
     @db.extension(:constraint_validations)

@@ -178,6 +178,8 @@ module Sequel
     end
 
     module IntervalDatasetMethods
+      private
+
       # Handle literalization of ActiveSupport::Duration objects, treating them as
       # PostgreSQL intervals.
       def literal_other_append(sql, v)

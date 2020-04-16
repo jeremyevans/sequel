@@ -13,6 +13,7 @@ describe "Sequel::Plugins::Timestamps" do
     @c.class_eval do
       columns :id, :created_at, :updated_at
       plugin :timestamps
+      private
       def _save_refresh(*) end
       db.reset
     end
@@ -85,6 +86,7 @@ describe "Sequel::Plugins::Timestamps" do
     c.class_eval do
       columns :id, :c
       plugin :timestamps, :create=>:c
+      private
       def _save_refresh(*) end
     end
     o = c.create
@@ -110,6 +112,7 @@ describe "Sequel::Plugins::Timestamps" do
       columns :id, :x
       plugin :timestamps
       db.reset
+      private
       def _save_refresh; self end
     end
     c.create(:x=>2)

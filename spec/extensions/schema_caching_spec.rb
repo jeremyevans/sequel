@@ -26,6 +26,7 @@ describe "schema_caching extension" do
     def db.schema_post_process(_)
       super.each{|_, c| c[:callable_default] = lambda{1} if c[:default] == 'call_1'}
     end
+    db.singleton_class.send(:private, :schema_post_process)
     db.load_schema_cache(@filename)
     db.schema(:table)[0][1][:callable_default].call.must_equal 1
   end

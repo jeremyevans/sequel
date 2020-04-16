@@ -116,9 +116,6 @@ describe "NestedAttributes plugin" do
       end
     end
     @Concert.class_eval do
-      define_method :_insert do
-        insert = values.dup
-      end
       def before_create # Have to define the CPK somehow.
         self.tour = 'To'
         self.date = '2004-04-05'
@@ -127,6 +124,10 @@ describe "NestedAttributes plugin" do
       def after_create
         super
         self.artist_id = 3
+      end
+      private
+      define_method :_insert do
+        insert = values.dup
       end
     end
 
@@ -188,13 +189,14 @@ describe "NestedAttributes plugin" do
   it "should support creating new objects with composite primary keys" do
     insert = nil
     @Concert.class_eval do
-      define_method :_insert do
-        insert = values.dup
-      end
       def before_create # Have to define the CPK somehow.
         self.tour = 'To'
         self.date = '2004-04-05'
         super
+      end
+      private
+      define_method :_insert do
+        insert = values.dup
       end
     end
     a = @Artist.new({:name=>'Ar', :concerts_attributes=>[{:playlist=>'Pl'}]})
@@ -209,6 +211,7 @@ describe "NestedAttributes plugin" do
     insert = nil
     @Album.class_eval do
       unrestrict_primary_key
+      private
       define_method :_insert do
         insert = values.dup
       end
@@ -224,6 +227,7 @@ describe "NestedAttributes plugin" do
     insert = nil
     @Artist.nested_attributes :concerts, :unmatched_pk=>:create
     @Concert.class_eval do
+      private
       define_method :_insert do
         insert = values.dup
       end
@@ -702,6 +706,7 @@ describe "NestedAttributes plugin" do
     @Album.nested_attributes :tags, :remove=>true, :unmatched_pk=>:ignore
     objs = []
     @Album.class_eval do
+      private
       define_method(:nested_attributes_create){|*a| objs << [super(*a), :create]}
       define_method(:nested_attributes_remove){|*a| objs << [super(*a), :remove]}
       define_method(:nested_attributes_update){|*a| objs << [super(*a), :update]}

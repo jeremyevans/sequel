@@ -55,9 +55,9 @@ describe "identifier_mangling extension" do
     class Sequel::Database
       @identifier_input_method = nil
     end
-    x = Class.new(Sequel::Database){def dataset_class_default; Sequel::Dataset end; def identifier_input_method_default; :downcase end}
+    x = Class.new(Sequel::Database){private; def dataset_class_default; Sequel::Dataset end; def identifier_input_method_default; :downcase end}
     x.new.extension(:identifier_mangling).identifier_input_method.must_equal :downcase
-    y = Class.new(Sequel::Database){def dataset_class_default; Sequel::Dataset end; def identifier_input_method_default; :camelize end}
+    y = Class.new(Sequel::Database){private; def dataset_class_default; Sequel::Dataset end; def identifier_input_method_default; :camelize end}
     y.new.extension(:identifier_mangling).identifier_input_method.must_equal :camelize
   end
   
@@ -65,9 +65,9 @@ describe "identifier_mangling extension" do
     class Sequel::Database
       @identifier_output_method = nil
     end
-    x = Class.new(Sequel::Database){def dataset_class_default; Sequel::Dataset end; def identifier_output_method_default; :upcase end}
+    x = Class.new(Sequel::Database){private; def dataset_class_default; Sequel::Dataset end; def identifier_output_method_default; :upcase end}
     x.new.extension(:identifier_mangling).identifier_output_method.must_equal :upcase
-    y = Class.new(Sequel::Database){def dataset_class_default; Sequel::Dataset end; def identifier_output_method_default; :underscore end}
+    y = Class.new(Sequel::Database){private; def dataset_class_default; Sequel::Dataset end; def identifier_output_method_default; :underscore end}
     y.new.extension(:identifier_mangling).identifier_output_method.must_equal :underscore
   end
 end

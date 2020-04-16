@@ -278,6 +278,27 @@ module Sequel
 
         Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil, :@cti_alias=>nil, :@cti_ignore_subclass_columns=>nil, :@cti_qualify_tables=>nil)
 
+        # The table name for the current model class's main table.
+        def table_name
+          if cti_tables && cti_tables.length > 1
+            @cti_alias
+          else
+            super
+          end
+        end
+
+        # The name of the most recently joined table.
+        def cti_table_name
+          cti_tables ? cti_tables.last : dataset.first_source_alias
+        end
+
+        # The model class for the given key value.
+        def sti_class_from_key(key)
+          sti_class(sti_model_map[key])
+        end
+
+        private
+
         def inherited(subclass)
           ds = sti_dataset
 
@@ -340,27 +361,6 @@ module Sequel
           end
         end
 
-        # The table name for the current model class's main table.
-        def table_name
-          if cti_tables && cti_tables.length > 1
-            @cti_alias
-          else
-            super
-          end
-        end
-
-        # The name of the most recently joined table.
-        def cti_table_name
-          cti_tables ? cti_tables.last : dataset.first_source_alias
-        end
-
-        # The model class for the given key value.
-        def sti_class_from_key(key)
-          sti_class(sti_model_map[key])
-        end
-
-        private
-
         # If using a subquery for class table inheritance, also use a subquery
         # when setting subclass dataset.
         def sti_subclass_dataset(key)
@@ -381,11 +381,6 @@ module Sequel
             cti_this(m).delete
           end
           self
-        end
-
-        # Don't allow use of prepared statements.
-        def use_prepared_statements_for?(type)
-          false
         end
 
         # Set the sti_key column based on the sti_key_map.
@@ -437,6 +432,11 @@ module Sequel
               raise(NoExistingObject, "Attempt to update object did not result in a single row modification (SQL: #{ds.update_sql(h)})") if require_modification && n != 1
             end
           end
+        end
+
+        # Don't allow use of prepared statements.
+        def use_prepared_statements_for?(type)
+          false
         end
       end
     end

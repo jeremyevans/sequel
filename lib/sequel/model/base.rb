@@ -460,47 +460,6 @@ module Sequel
         super
       end
 
-      # If possible, set the dataset for the model subclass as soon as it
-      # is created.  Also, make sure the inherited class instance variables
-      # are copied into the subclass.
-      #
-      # Sequel queries the database to get schema information as soon as
-      # a model class is created:
-      #
-      #   class Artist < Sequel::Model # Causes schema query
-      #   end
-      def inherited(subclass)
-        super
-        ivs = subclass.instance_variables
-        inherited_instance_variables.each do |iv, dup|
-          next if ivs.include?(iv)
-          if (sup_class_value = instance_variable_get(iv)) && dup
-            sup_class_value = case dup
-            when :dup
-              sup_class_value.dup
-            when :hash_dup
-              h = {}
-              sup_class_value.each{|k,v| h[k] = v.dup}
-              h
-            when Proc
-              dup.call(sup_class_value)
-            else
-              raise Error, "bad inherited instance variable type: #{dup.inspect}"
-            end
-          end
-          subclass.instance_variable_set(iv, sup_class_value)
-        end
-
-        unless ivs.include?(:@dataset)
-          if @dataset && self != Model
-            subclass.set_dataset(@dataset.clone, :inherited=>true)
-          elsif (n = subclass.name) && !n.to_s.empty?
-            db
-            subclass.set_dataset(subclass.implicit_table_name)
-          end
-        end
-      end
-
       # Returns the implicit table name for the model class, which is the demodulized,
       # underscored, pluralized name of the class.
       #
@@ -515,12 +474,6 @@ module Sequel
         call(values)
       end
 
-      # Clear the setter_methods cache when a setter method is added.
-      def method_added(meth)
-        clear_setter_methods_cache if meth.to_s.end_with?('=')
-        super
-      end
-  
       # Mark the model as not having a primary key. Not having a primary key
       # can cause issues, among which is that you won't be able to update records.
       #
@@ -854,6 +807,47 @@ module Sequel
         meths
       end
   
+      # If possible, set the dataset for the model subclass as soon as it
+      # is created.  Also, make sure the inherited class instance variables
+      # are copied into the subclass.
+      #
+      # Sequel queries the database to get schema information as soon as
+      # a model class is created:
+      #
+      #   class Artist < Sequel::Model # Causes schema query
+      #   end
+      def inherited(subclass)
+        super
+        ivs = subclass.instance_variables
+        inherited_instance_variables.each do |iv, dup|
+          next if ivs.include?(iv)
+          if (sup_class_value = instance_variable_get(iv)) && dup
+            sup_class_value = case dup
+            when :dup
+              sup_class_value.dup
+            when :hash_dup
+              h = {}
+              sup_class_value.each{|k,v| h[k] = v.dup}
+              h
+            when Proc
+              dup.call(sup_class_value)
+            else
+              raise Error, "bad inherited instance variable type: #{dup.inspect}"
+            end
+          end
+          subclass.instance_variable_set(iv, sup_class_value)
+        end
+
+        unless ivs.include?(:@dataset)
+          if @dataset && self != Model
+            subclass.set_dataset(@dataset.clone, :inherited=>true)
+          elsif (n = subclass.name) && !n.to_s.empty?
+            db
+            subclass.set_dataset(subclass.implicit_table_name)
+          end
+        end
+      end
+
       # A hash of instance variables to automatically set up in subclasses.
       # Keys are instance variable symbols, values should be:
       # nil :: Assign directly from superclass to subclass (frozen objects)
@@ -906,6 +900,12 @@ module Sequel
         end
 
         opts[:class_name] ||= '::' + ((name || '').split("::")[0..-2] + [camelize(default)]).join('::')
+      end
+  
+      # Clear the setter_methods cache when a setter method is added.
+      def method_added(meth)
+        clear_setter_methods_cache if meth.to_s.end_with?('=')
+        super
       end
   
       # Module that the class includes that holds methods the class adds for column accessors and
@@ -1718,6 +1718,7 @@ module Sequel
 
       # The values hash to use when inserting a new record.
       alias _insert_values values
+      private :_insert_values
       
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database

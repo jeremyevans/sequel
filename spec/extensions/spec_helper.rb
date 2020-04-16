@@ -14,6 +14,8 @@ require 'minitest/shared_description'
 $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
 require_relative "../../lib/sequel"
 
+require_relative "../visibility_checking_after_hook" if ENV['CHECK_METHOD_VISIBILITY']
+
 require_relative '../deprecation_helper'
 
 if ENV['SEQUEL_TZINFO_VERSION']
@@ -58,6 +60,7 @@ def db.schema(*) [[:id, {:primary_key=>true}]] end
 def db.reset() sqls end
 def db.supports_schema_parsing?() true end
 Sequel::Model.db = DB = db
+Sequel::DATABASES.clear
 
 if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel.extension :columns_introspection

@@ -54,13 +54,6 @@ module Sequel
       db.instance_variable_set(:@indexes, {})
     end
     
-    # Remove the index cache for the given schema name
-    def remove_cached_schema(table)
-      k = quote_schema_table(table)
-      Sequel.synchronize{@indexes.delete(k)}
-      super
-    end
-    
     # Dump the index cache to the filename given in Marshal format.
     def dump_index_cache(file)
       File.open(file, 'wb'){|f| f.write(Marshal.dump(@indexes))}
@@ -100,6 +93,15 @@ module Sequel
       result = super
       Sequel.synchronize{@indexes[quoted_name] = result}
       result
+    end
+
+    private
+
+    # Remove the index cache for the given schema name
+    def remove_cached_schema(table)
+      k = quote_schema_table(table)
+      Sequel.synchronize{@indexes.delete(k)}
+      super
     end
   end
 

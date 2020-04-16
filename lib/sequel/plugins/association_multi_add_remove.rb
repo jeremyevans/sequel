@@ -39,6 +39,8 @@ module Sequel
     #   Album.plugin :association_multi_add_remove
     module AssociationMultiAddRemove
       module ClassMethods
+        private
+
         # Define the methods use to add/remove/set multiple associated objects
         # in a single method call.
         def def_association_instance_methods(opts)

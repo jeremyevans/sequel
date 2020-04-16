@@ -109,6 +109,8 @@ module Sequel
 
         Plugins.inherited_instance_variables(self, :@association_proxy_to_dataset=>nil)
 
+        private
+
         # Changes the association method to return a proxy instead of the associated objects
         # directly.
         def def_association_method(opts)

@@ -19,6 +19,8 @@ gem 'minitest'
 require 'minitest/global_expectations/autorun'
 require 'minitest/hooks/default'
 
+require_relative "visibility_checking_after_hook" if ENV['CHECK_METHOD_VISIBILITY']
+
 require_relative "deprecation_helper.rb"
 
 describe "Sequel core extensions" do

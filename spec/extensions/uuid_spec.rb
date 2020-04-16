@@ -8,6 +8,7 @@ describe "Sequel::Plugins::Uuid" do
     @c.class_eval do
       columns :id, :uuid
       plugin :uuid
+      private
       def _save_refresh(*) end
       define_method(:create_uuid) do
         uuid
@@ -42,6 +43,7 @@ describe "Sequel::Plugins::Uuid" do
     c.class_eval do
       columns :id, :u
       plugin :uuid, :field=>:u
+      private
       def _save_refresh(*) end
     end
     o = c.create

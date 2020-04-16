@@ -717,15 +717,6 @@ module Sequel
         SQL::PlaceholderLiteralString.new((opts[:boolean] ? MATCH_AGAINST_BOOLEAN : MATCH_AGAINST), [Array(cols), terms])
       end
 
-      # Transforms :straight to STRAIGHT_JOIN.
-      def join_type_sql(join_type)
-        if join_type == :straight
-          'STRAIGHT_JOIN'
-        else
-          super
-        end
-      end
-      
       # Sets up the insert methods to use INSERT IGNORE.
       # Useful if you have a unique key and want to just skip
       # inserting rows that violate the unique key restriction.
@@ -956,6 +947,15 @@ module Sequel
         end
       end
 
+      # Transforms :straight to STRAIGHT_JOIN.
+      def join_type_sql(join_type)
+        if join_type == :straight
+          'STRAIGHT_JOIN'
+        else
+          super
+        end
+      end
+      
       # MySQL allows a LIMIT in DELETE and UPDATE statements.
       def limit_sql(sql)
         if l = @opts[:limit]

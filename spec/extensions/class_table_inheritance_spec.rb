@@ -26,10 +26,11 @@ describe "class_table_inheritance plugin" do
     base = Sequel::Model(@db)
     base.plugin :auto_validations if @use_auto_validations
     class ::Employee < base
-      def _save_refresh; @values[:id] = 1 end
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
       end
+      private
+      def _save_refresh; @values[:id] = 1 end
       plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     end 
     class ::Manager < Employee
@@ -394,6 +395,7 @@ describe "class_table_inheritance plugin without sti_key with :alias option" do
       end
     end
     class ::Employee < Sequel::Model(@db)
+      private
       def _save_refresh; @values[:id] = 1 end
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
@@ -524,6 +526,7 @@ describe "class_table_inheritance plugin with duplicate columns" do
       end
     end
     class ::Employee < Sequel::Model(@db)
+      private
       def _save_refresh; @values[:id] = 1 end
       def self.columns
         dataset.columns || dataset.opts[:from].first.expression.columns
@@ -553,6 +556,7 @@ describe "class_table_inheritance plugin with duplicate columns" do
         end
       end
       class ::Employee < Sequel::Model(@db)
+        private
         def _save_refresh; @values[:id] = 1 end
         def self.columns
           dataset.columns || dataset.opts[:from].first.expression.columns
@@ -621,6 +625,7 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
       ::Employee.db = @db
       ::Employee.set_dataset(Sequel[:hr][:employees])
       class ::Employee
+        private
         def _save_refresh; @values[:id] = 1 end
         def self.columns
           dataset.columns || dataset.opts[:from].first.expression.columns
@@ -667,6 +672,7 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
       ::Employee.db = @db
       ::Employee.set_dataset(Sequel[:hr][:employees])
       class ::Employee
+        private
         def _save_refresh; @values[:id] = 1 end
         def self.columns
           dataset.columns || dataset.opts[:from].first.expression.columns
@@ -687,6 +693,7 @@ describe "class_table_inheritance plugin with dataset defined with QualifiedIden
       ::Employee.db = @db
       ::Employee.set_dataset(Sequel[:hr][:employees])
       class ::Employee
+        private
         def _save_refresh; @values[:id] = 1 end
         def self.columns
           dataset.columns || dataset.opts[:from].first.expression.columns

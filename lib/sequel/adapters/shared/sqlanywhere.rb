@@ -23,15 +23,6 @@ module Sequel
         to_application_timestamp(v.to_s) if v
       end
 
-      # Convert smallint type to boolean if convert_smallint_to_bool is true
-      def schema_column_type(db_type)
-        if convert_smallint_to_bool && db_type =~ /smallint/i
-          :boolean
-        else
-          super
-        end
-      end
-
       def schema_parse_table(table, opts)
         m = output_identifier_meth(opts[:dataset])
         im = input_identifier_meth(opts[:dataset])
@@ -214,6 +205,15 @@ module Sequel
       # Use SP_RENAME to rename the table
       def rename_table_sql(name, new_name)
         "ALTER TABLE #{quote_schema_table(name)} RENAME #{quote_schema_table(new_name)}"
+      end
+
+      # Convert smallint type to boolean if convert_smallint_to_bool is true
+      def schema_column_type(db_type)
+        if convert_smallint_to_bool && db_type =~ /smallint/i
+          :boolean
+        else
+          super
+        end
       end
 
       def tables_and_views(type, opts=OPTS)

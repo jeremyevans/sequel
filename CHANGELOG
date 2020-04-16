@@ -1,5 +1,7 @@
 === master
 
+* Fix method visibility issues in model, plugin, extension, and adapter code (jeremyevans)
+
 * Avoid defining conversion procs for PostgreSQL inet/cidr types in pg_inet extension when using sequel_pg 1.13.0+ (jeremyevans)
 
 * Add run_transaction_hooks Database extension, allowing for running the transaction hooks before commit/rollback, for use with transactional testing (jeremyevans)

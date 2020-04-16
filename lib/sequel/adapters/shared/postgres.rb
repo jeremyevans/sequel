@@ -1896,6 +1896,14 @@ module Sequel
         end
       end
 
+      def to_prepared_statement(type, *a)
+        if type == :insert && !@opts.has_key?(:returning)
+          returning(insert_pk).send(:to_prepared_statement, :insert_pk, *a)
+        else
+          super
+        end
+      end
+
       private
 
       # Format TRUNCATE statement with PostgreSQL specific options.
@@ -2108,14 +2116,6 @@ module Sequel
       # PostgreSQL supports quoted function names.
       def supports_quoted_function_names?
         true
-      end
-
-      def to_prepared_statement(type, *a)
-        if type == :insert && !@opts.has_key?(:returning)
-          returning(insert_pk).send(:to_prepared_statement, :insert_pk, *a)
-        else
-          super
-        end
       end
 
       # Concatenate the expressions with a space in between

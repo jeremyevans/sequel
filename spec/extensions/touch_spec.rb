@@ -3,7 +3,7 @@ require_relative "spec_helper"
 describe "Touch plugin" do
   before do
     @c = Class.new(Sequel::Model)
-    p = proc{def touch_instance_value; touch_association_value; end}
+    p = proc{private; def touch_instance_value; touch_association_value; end}
     @Artist = Class.new(@c, &p).set_dataset(:artists)
     @Album = Class.new(@c, &p).set_dataset(:albums)
 

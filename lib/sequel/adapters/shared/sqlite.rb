@@ -14,6 +14,7 @@ module Sequel
         def schema_parse_table(*)
           []
         end
+        singleton_class.send(:private, :schema_parse_table)
       end
     end
     

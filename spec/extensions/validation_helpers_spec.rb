@@ -89,6 +89,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.wont_be :valid?
     @m.errors.must_equal(:value=>['is not present'])
     @c.class_eval do
+      private
       def default_validation_helpers_options(type)
         {:allow_missing=>true, :message=>proc{'was not entered'}}
       end

@@ -422,22 +422,6 @@ module Sequel
         end
       end
 
-      def select_limit_sql(sql)
-        return unless supports_fetch_next_rows?
-
-        if offset = @opts[:offset]
-          sql << " OFFSET "
-          literal_append(sql, offset)
-          sql << " ROWS"
-        end
-
-        if limit = @opts[:limit]
-          sql << " FETCH NEXT "
-          literal_append(sql, limit)
-          sql << " ROWS ONLY"
-        end
-      end
-
       # Oracle requires recursive CTEs to have column aliases.
       def recursive_cte_requires_column_aliases?
         true
@@ -622,6 +606,22 @@ module Sequel
       # Oracle can insert multiple rows using a UNION
       def multi_insert_sql_strategy
         :union
+      end
+
+      def select_limit_sql(sql)
+        return unless supports_fetch_next_rows?
+
+        if offset = @opts[:offset]
+          sql << " OFFSET "
+          literal_append(sql, offset)
+          sql << " ROWS"
+        end
+
+        if limit = @opts[:limit]
+          sql << " FETCH NEXT "
+          literal_append(sql, limit)
+          sql << " ROWS ONLY"
+        end
       end
 
       # Use SKIP LOCKED if skipping locked rows.

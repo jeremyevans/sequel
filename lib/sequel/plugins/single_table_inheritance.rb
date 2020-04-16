@@ -163,21 +163,6 @@ module Sequel
           super
         end
 
-        # Copy the necessary attributes to the subclasses, and filter the
-        # subclass's dataset based on the sti_kep_map entry for the class.
-        def inherited(subclass)
-          super
-          key = Array(sti_key_map[subclass]).dup
-          sti_subclass_added(key)
-          rp = dataset.row_proc
-          subclass.set_dataset(sti_subclass_dataset(key), :inherited=>true)
-          subclass.instance_exec do
-            @dataset = @dataset.with_row_proc(rp)
-            @sti_key_array = key
-            self.simple_table = nil
-          end
-        end
-
         # Return an instance of the class specified by sti_key,
         # used by the row_proc.
         def sti_load(r)
@@ -206,6 +191,21 @@ module Sequel
         def dataset_extend(mod, opts=OPTS)
           @sti_dataset = @sti_dataset.with_extend(mod)
           super
+        end
+
+        # Copy the necessary attributes to the subclasses, and filter the
+        # subclass's dataset based on the sti_kep_map entry for the class.
+        def inherited(subclass)
+          super
+          key = Array(sti_key_map[subclass]).dup
+          sti_subclass_added(key)
+          rp = dataset.row_proc
+          subclass.set_dataset(sti_subclass_dataset(key), :inherited=>true)
+          subclass.instance_exec do
+            @dataset = @dataset.with_row_proc(rp)
+            @sti_key_array = key
+            self.simple_table = nil
+          end
         end
 
         # If calling set_dataset manually, make sure to set the dataset

@@ -74,7 +74,7 @@ run_spec = proc do |file|
   ENV['RUBYLIB'] = rubylib
 end
 
-spec_task = proc do |description, name, file, coverage|
+spec_task = proc do |description, name, file, coverage, visibility|
   desc description
   task name do
     run_spec.call(file)
@@ -98,6 +98,15 @@ spec_task = proc do |description, name, file, coverage|
       ENV.delete('COVERAGE')
     end
   end
+
+  if visibility
+    desc "Run specs with method visibility checking"
+    task :"#{name}_vis" do
+      ENV['CHECK_METHOD_VISIBILITY'] = '1'
+      run_spec.call(file)
+      ENV.delete('CHECK_METHOD_VISIBILITY')
+    end
+  end
 end
 
 desc "Run the core, model, and extension/plugin specs"
@@ -105,16 +114,16 @@ task :default => :spec
 desc "Run the core, model, and extension/plugin specs"
 task :spec => [:spec_core, :spec_model, :spec_plugin]
 
-spec_task.call("Run core and model specs together", :spec_core_model, 'spec/core_model_spec.rb', true)
-spec_task.call("Run core specs", :spec_core, 'spec/core_spec.rb', false)
-spec_task.call("Run model specs", :spec_model, 'spec/model_spec.rb', false)
-spec_task.call("Run plugin/extension specs", :spec_plugin, 'spec/plugin_spec.rb', true)
-spec_task.call("Run bin/sequel specs", :spec_bin, 'spec/bin_spec.rb', false)
-spec_task.call("Run core extensions specs", :spec_core_ext, 'spec/core_extensions_spec.rb', true)
-spec_task.call("Run integration tests", :spec_integration, 'spec/adapter_spec.rb none', true)
+spec_task.call("Run core and model specs together", :spec_core_model, 'spec/core_model_spec.rb', true, false)
+spec_task.call("Run core specs", :spec_core, 'spec/core_spec.rb', false, false)
+spec_task.call("Run model specs", :spec_model, 'spec/model_spec.rb', false, false)
+spec_task.call("Run plugin/extension specs", :spec_plugin, 'spec/plugin_spec.rb', true, true)
+spec_task.call("Run bin/sequel specs", :spec_bin, 'spec/bin_spec.rb', false, false)
+spec_task.call("Run core extensions specs", :spec_core_ext, 'spec/core_extensions_spec.rb', true, true)
+spec_task.call("Run integration tests", :spec_integration, 'spec/adapter_spec.rb none', true, true)
 
 %w'postgres sqlite mysql oracle mssql db2 sqlanywhere'.each do |adapter|
-  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "spec/adapter_spec.rb #{adapter}", true)
+  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "spec/adapter_spec.rb #{adapter}", true, true)
 end
 
 spec_task.call("Run model specs without the associations code", :_spec_model_no_assoc, 'spec/model_no_assoc_spec.rb', false)

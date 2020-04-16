@@ -73,6 +73,8 @@ describe "prepared_statements plugin" do
     before do
       @c.class_eval do
         def self.use_prepared_statements_for_pk_lookup?; true end
+        singleton_class.send(:private, :use_prepared_statements_for_pk_lookup?)
+        private
         def use_prepared_statements_for?(type) true end
       end
     end
@@ -130,6 +132,7 @@ describe "prepared_statements plugin" do
     it "should correctly handle with schema type when placeholder type specifiers are required" do
       @c.dataset = @ds.with_extend do
         def requires_placeholder_type_specifiers?; true end
+        private
         def prepared_statement_modules
           [Module.new do
             def literal_symbol_append(sql, v)
@@ -153,6 +156,8 @@ describe "prepared_statements plugin" do
       @columns = "*"
       @c.class_eval do
         def self.use_prepared_statements_for_pk_lookup?; false end
+        singleton_class.send(:private, :use_prepared_statements_for_pk_lookup?)
+        private
         def use_prepared_statements_for?(type) false end
       end
     end

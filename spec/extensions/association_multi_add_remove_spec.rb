@@ -10,7 +10,6 @@ describe "association_multi_add_remove plugin - one_to_many" do
     @c2 = Class.new(Sequel::Model(:nodes)) do
       plugin :association_multi_add_remove
 
-      def _refresh(ds); end
       unrestrict_primary_key
       attr_accessor :xxx
 
@@ -18,6 +17,9 @@ describe "association_multi_add_remove plugin - one_to_many" do
       def self.to_s; 'Node'; end
 
       columns :id, :x
+
+      private
+      def _refresh(ds); end
     end
     @dataset = @c2.dataset = @c2.dataset.with_fetch({})
     @c1.dataset = @c1.dataset.with_fetch(proc { |sql| sql =~ /SELECT 1/ ? { a: 1 } : {} })
@@ -518,17 +520,18 @@ describe "association_multi_add_remove plugin - one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
       self::Foo = h
-      def _add_attribute(v)
-        model::Foo << 4
-      end
-      def _remove_attribute(v)
-        model::Foo << 5
-      end
       def blah(x)
         model::Foo << x.pk
       end
       def blahr(x)
         model::Foo << 6
+      end
+      private
+      def _add_attribute(v)
+        model::Foo << 4
+      end
+      def _remove_attribute(v)
+        model::Foo << 5
       end
     end
     p = @c2.load(:id=>10)
@@ -910,17 +913,18 @@ describe "association_multi_add_remove plugin - many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
       self::Foo = h
-      def _add_attribute(v)
-        model::Foo << 4
-      end
-      def _remove_attribute(v)
-        model::Foo << 5
-      end
       def blah(x)
         model::Foo << x.pk
       end
       def blahr(x)
         model::Foo << 6
+      end
+      private
+      def _add_attribute(v)
+        model::Foo << 4
+      end
+      def _remove_attribute(v)
+        model::Foo << 5
       end
     end
     p = @c2.load(:id=>10)
@@ -1008,7 +1012,6 @@ describe "association_multi_add_remove plugin - sharding" do
     @c2 = Class.new(Sequel::Model(@db[:nodes])) do
       plugin :association_multi_add_remove
 
-      def _refresh(ds); end
       unrestrict_primary_key
       attr_accessor :xxx
 
@@ -1016,6 +1019,9 @@ describe "association_multi_add_remove plugin - sharding" do
       def self.to_s; 'Node'; end
 
       columns :id, :x
+
+      private
+      def _refresh(ds); end
     end
     @dataset = @c2.dataset = @c2.dataset.with_fetch({})
     @c1.dataset = @c1.dataset.with_fetch(proc { |sql| sql =~ /SELECT 1/ ? { a: 1 } : {} })

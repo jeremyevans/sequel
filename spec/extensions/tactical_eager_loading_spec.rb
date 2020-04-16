@@ -65,7 +65,7 @@ describe "tactical_eager_loading plugin" do
   it "association getter methods should not eagerly load the association if the association is cached" do
     ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
     sql_match(/\ASELECT \* FROM t WHERE \(t\.id IN \(10[12], 10[12]\)\)\z/)
-    @c.dataset = @c.dataset.with_extend{def eager_load(*) raise end}
+    @c.dataset = @c.dataset.with_extend{private; def eager_load(*) raise end}
     ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
   end
 

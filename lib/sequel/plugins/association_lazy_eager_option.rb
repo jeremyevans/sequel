@@ -36,6 +36,8 @@ module Sequel
     #   Album.plugin :association_lazy_eager_option
     module AssociationLazyEagerOption
       module InstanceMethods
+        private
+
         # Return a dataset for the association after applying any dynamic callback.
         def _associated_dataset(opts, dynamic_opts)
           ds = super

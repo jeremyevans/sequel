@@ -304,6 +304,8 @@ module Sequel
       end
 
       module DatasetMethods
+        private
+
         # Handle literalization of ruby Range objects, treating them as
         # PostgreSQL ranges.
         def literal_other_append(sql, v)

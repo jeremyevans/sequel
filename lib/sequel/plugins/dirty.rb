@@ -61,6 +61,19 @@ module Sequel
         # that were used in the update statement.
         attr_reader :previous_changes
 
+        # Reset the initial values after saving.
+        def after_save
+          super
+          reset_initial_values
+        end
+
+        # Save the current changes so they are available after updating.  This happens
+        # before after_save resets them.
+        def after_update
+          super
+          @previous_changes = column_changes
+        end
+
         # An array with the initial value and the current value
         # of the column, if the column has been changed.  If the
         # column has not been changed, returns nil.
@@ -163,19 +176,6 @@ module Sequel
         def _clear_changed_columns(reason)
           reset_initial_values if reason == :initialize || reason == :refresh
           super
-        end
-
-        # Reset the initial values after saving.
-        def after_save
-          super
-          reset_initial_values
-        end
-
-        # Save the current changes so they are available after updating.  This happens
-        # before after_save resets them.
-        def after_update
-          super
-          @previous_changes = column_changes
         end
 
         # When changing the column value, save the initial column value.  If the column

@@ -40,6 +40,7 @@ module Sequel
       mod.send(:define_method, :inherited_instance_variables) do ||
         super().merge!(hash)
       end
+      mod.send(:private, :inherited_instance_variables)
     end
 
     # Add method to +mod+ that overrides set_dataset to call the method afterward.

@@ -130,6 +130,7 @@ describe "Shared caching behavior" do
 
     it "should not issue regular query if primary key lookup returns no rows" do
       def @cc.primary_key_lookup(pk); end
+      @cc.singleton_class.send(:private, :primary_key_lookup)
       @c.many_to_one :caching_model
       @c.load(:id=>3, :caching_model_id=>1).caching_model
       @db.sqls.must_equal []

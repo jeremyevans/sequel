@@ -775,11 +775,6 @@ module Sequel
         end
       end
 
-      # MSSQL does not allow ordering in sub-clauses unless TOP (limit) is specified
-      def aggregate_dataset
-        (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
-      end
-
       # If the dataset using a order without a limit or offset or custom SQL, 
       # remove the order.  Compounds on Microsoft SQL Server have undefined
       # order unless the result is specifically ordered.  Applying the current
@@ -798,6 +793,11 @@ module Sequel
       end
 
       private
+
+      # MSSQL does not allow ordering in sub-clauses unless TOP (limit) is specified
+      def aggregate_dataset
+        (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
+      end
 
       # Allow update and delete for unordered, limited datasets only.
       def check_not_limited!(type)

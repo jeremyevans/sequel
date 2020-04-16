@@ -3,7 +3,7 @@ require_relative "spec_helper"
 describe "MSSSQL optimistic locking plugin" do
   before do
     @db = Sequel.mock(:host=>'mssql')
-    @ds = @db[:items].with_quote_identifiers(false).with_extend{def input_identifier(v); v.to_s end}
+    @ds = @db[:items].with_quote_identifiers(false).with_extend{private; def input_identifier(v); v.to_s end}
     @c = Class.new(Sequel::Model(@ds))
     @c.columns :id, :name, :timestamp
     @c.plugin :mssql_optimistic_locking

@@ -450,7 +450,7 @@ describe "A model inheriting from a custom base that sets @dataset" do
     ::Feline = Class.new(Sequel::Model)
     def Feline.inherited(subclass)
       subclass.instance_variable_set(:@dataset, nil)
-      superclass.inherited(subclass)
+      super
     end
     class ::Leopard < Feline; end
   end
