@@ -162,6 +162,7 @@ SEQUEL_CONNECTION_VALIDATOR :: Use the connection validator extension when runni
 SEQUEL_DUPLICATE_COLUMNS_HANDLER :: Use the duplicate columns handler extension with value given when running the specs
 SEQUEL_ERROR_SQL :: Use the error_sql extension when running the specs
 SEQUEL_INDEX_CACHING :: Use the index_caching extension when running the specs
+SEQUEL_FIBER_CONCURRENCY :: Use the fiber_concurrency extension when running the adapter and integration specs
 SEQUEL_FREEZE_DATABASE :: Freeze the database before running the integration specs
 SEQUEL_IDENTIFIER_MANGLING :: Use the identifier_mangling extension when running the specs
 SEQUEL_INTEGER64 :: Use the integer64 extension when running the adapter or integration specs

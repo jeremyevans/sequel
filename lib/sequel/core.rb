@@ -142,6 +142,11 @@ module Sequel
       e
     end
 
+    # The current concurrency primitive, Thread.current by default.
+    def current
+      Thread.current
+    end
+
     # Load all Sequel extensions given.  Extensions are just files that exist under
     # <tt>sequel/extensions</tt> in the load path, and are just required.  
     # In some cases, requiring an extension modifies classes directly, and in others,

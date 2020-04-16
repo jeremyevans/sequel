@@ -2035,3 +2035,41 @@ describe "Dataset replace" do
     @d.all.must_equal [{:id => 111, :value => 333}]
   end
 end if DB.dataset.supports_replace?
+
+describe "Concurrent access" do
+  before do
+    @ds = DB.select(Sequel[1].as(:v)).union(DB.select 2)
+  end
+  after do
+    DB.disconnect
+  end
+
+  it "should support multiple threads" do
+    threads = 4.times.map do
+      q = Queue.new
+      q2 = Queue.new
+      [q, q2, Thread.new{@ds.each{|r| q.push(r[:v]); q2.pop}}]
+    end
+    threads.each{|q,| q.pop.must_equal 1}
+    threads.each{|_,q2| q2.push nil}
+    threads.each{|q,| q.pop.must_equal 2}
+    threads.each{|_,q2| q2.push nil}
+    threads.each{|_,_,t| t.join}
+  end
+
+  if ENV["SEQUEL_FIBER_CONCURRENCY"]
+    it "should support multiple enumerators" do
+      enums = 4.times.map{@ds.to_enum}
+      enums.each{|e| e.next[:v].must_equal 1}
+      enums.each{|e| e.next[:v].must_equal 2}
+      enums.each{|e| proc{e.next}.must_raise StopIteration}
+    end
+
+    it "should support multiple fibers" do
+      fibers = 4.times.map{Fiber.new{@ds.each{|r| Fiber.yield r[:v]}; 3}}
+      fibers.each{|f| f.resume.must_equal 1}
+      fibers.each{|f| f.resume.must_equal 2}
+      fibers.each{|f| f.resume.must_equal 3}
+    end
+  end
+end if [:threaded, :sharded_threaded].include?(DB.pool.pool_type) && DB.pool.max_size >= 4 && DB.database_type != :derby

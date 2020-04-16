@@ -29,6 +29,14 @@ describe "Sequel core extensions" do
   end
 end
 
+describe "Sequel.current" do
+  it "should be Thread.current unless fiber_concurrency extension is used" do
+    Sequel.current.must_equal Thread.current
+    Sequel.extension :fiber_concurrency
+    Sequel.current.must_equal Fiber.current
+  end
+end
+
 describe "Core extensions" do
   before do
     db = Sequel.mock

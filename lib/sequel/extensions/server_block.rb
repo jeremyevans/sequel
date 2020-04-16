@@ -143,13 +143,13 @@ module Sequel
 
     # Make the given server the new default server for the current thread.
     def set_default_server(default_server, read_only_server=default_server)
-      sync{(@default_servers[Thread.current] ||= [])} << [default_server, read_only_server]
+      sync{(@default_servers[Sequel.current] ||= [])} << [default_server, read_only_server]
     end
 
     # Remove the current default server for the current thread, restoring the
     # previous default server.
     def clear_default_server
-      t = Thread.current
+      t = Sequel.current
       a = sync{@default_servers[t]}
       a.pop
       sync{@default_servers.delete(t)} if a.empty?
@@ -157,7 +157,7 @@ module Sequel
 
     # Use the server given to with_server for the given thread, if appropriate.
     def pick_server(server)
-      a = sync{@default_servers[Thread.current]}
+      a = sync{@default_servers[Sequel.current]}
       if !a || a.empty?
         super
       else

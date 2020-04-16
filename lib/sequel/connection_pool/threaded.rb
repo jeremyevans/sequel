@@ -83,7 +83,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # is available or the timeout expires.  If the timeout expires before a
   # connection can be acquired, a Sequel::PoolTimeout is raised.
   def hold(server=nil)
-    t = Thread.current
+    t = Sequel.current
     if conn = owned_connection(t)
       return yield(conn)
     end

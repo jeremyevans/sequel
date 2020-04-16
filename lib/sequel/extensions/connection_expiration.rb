@@ -80,9 +80,9 @@ module Sequel
            Sequel.elapsed_seconds_since(cet[0]) > cet[1]
 
           if pool_type == :sharded_threaded
-            sync{allocated(a.last).delete(Thread.current)}
+            sync{allocated(a.last).delete(Sequel.current)}
           else
-            sync{@allocated.delete(Thread.current)}
+            sync{@allocated.delete(Sequel.current)}
           end
 
           disconnect_connection(conn)

@@ -14,6 +14,8 @@ begin
 rescue LoadError
 end
 
+Sequel.extension :fiber_concurrency if ENV['SEQUEL_FIBER_CONCURRENCY']
+
 Sequel::DB = nil
 Sequel.split_symbols = true if ENV['SEQUEL_SPLIT_SYMBOLS']
 Sequel::Database.extension :duplicate_column_handler if ENV['SEQUEL_DUPLICATE_COLUMN_HANDLER']

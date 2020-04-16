@@ -57,7 +57,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # it is yielding all of the connections, which means that until
   # the method's block returns, the pool is locked.
   def all_connections
-    t = Thread.current
+    t = Sequel.current
     sync do
       @allocated.values.each do |threads|
         threads.each do |thread, conn|
@@ -121,7 +121,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # connection can be acquired, a Sequel::PoolTimeout is raised.
   def hold(server=:default)
     server = pick_server(server)
-    t = Thread.current
+    t = Sequel.current
     if conn = owned_connection(t, server)
       return yield(conn)
     end

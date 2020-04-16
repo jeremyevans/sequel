@@ -17,6 +17,8 @@ rescue LoadError
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_(spec|test)\.rb/}
 
+Sequel.extension :fiber_concurrency if ENV['SEQUEL_FIBER_CONCURRENCY']
+
 Sequel::DB = nil unless Sequel.constants.include?(:DB)
 Sequel.split_symbols = true if ENV['SEQUEL_SPLIT_SYMBOLS']
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
