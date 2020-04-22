@@ -1,5 +1,7 @@
 === master
 
+* Allow Database#create_table? work with :partition_of option on PostgreSQL (jeremyevans) (#1690)
+
 * Add fiber_concurrency extension, for using Fiber.current instead of Thread.current for checking out connections (jeremyevans)
 
 * Move most Sequel singleton methods into a module that extends Sequel for easier overriding (jeremyevans)

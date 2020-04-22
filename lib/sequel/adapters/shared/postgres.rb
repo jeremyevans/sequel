@@ -459,6 +459,16 @@ module Sequel
         super
       end
 
+      # Support partitions of tables using the :partition_of option.
+      def create_table?(name, options=OPTS, &block)
+        if options[:partition_of]
+          create_table(name, options.merge!(:if_not_exists=>true), &block)
+          return
+        end
+
+        super
+      end
+
       # Create a trigger in the database.  Arguments:
       # table :: the table on which this trigger operates
       # name :: the name of this trigger
