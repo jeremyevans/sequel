@@ -2072,4 +2072,4 @@ describe "Concurrent access" do
       fibers.each{|f| f.resume.must_equal 3}
     end
   end
-end if [:threaded, :sharded_threaded].include?(DB.pool.pool_type) && DB.pool.max_size >= 4 && DB.database_type != :derby
+end if [:threaded, :sharded_threaded].include?(DB.pool.pool_type) && DB.pool.max_size >= 4 && DB.database_type != :derby && DB.database_type != :sqlanywhere
