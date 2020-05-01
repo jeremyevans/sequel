@@ -203,7 +203,7 @@ Last Update:
 </li><li>
 <p>Make to_json methods in json_serializer plugin accept blocks that are used to transform values before serializing to JSON (jeremyevans)</p>
 </li><li>
-<p>Make <a href="../../classes/Sequel.html#method-c-object_to_json"><code>Sequel.object_to_json</code></a> pass block to to_json (jeremyevans)</p>
+<p>Make Sequel.object_to_json pass block to to_json (jeremyevans)</p>
 </li><li>
 <p>Deprecate identifier_columns plugin, not needed with Sequel.split_symbols = false (jeremyevans)</p>
 </li><li>
@@ -691,7 +691,7 @@ Last Update:
 </li><li>
 <p>Add symbol_aref and symbol_aref_refinement extensions so that :<a href=":column">table</a> is treated as Sequel.qualify(:table, :column) (jeremyevans)</p>
 </li><li>
-<p>Add <a href="../../classes/Sequel.html#method-c-split_symbols-3D"><code>Sequel.split_symbols=</code></a>, to support the disabling of splitting symbols with double/triple underscores (jeremyevans)</p>
+<p>Add Sequel.split_symbols=, to support the disabling of splitting symbols with double/triple underscores (jeremyevans)</p>
 </li><li>
 <p>Make SQL::QualifiedIdentifier convert SQL::Identifier arguments to strings, fixing <a href=":schema">Sequel</a>[:table] usage in schema methods (jeremyevans)</p>
 </li><li>
@@ -992,7 +992,7 @@ Last Update:
 
 <h3 id="label-4.27.0+-282015-10-01-29">4.27.0 (2015-10-01)<span><a href="#label-4.27.0+-282015-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Don&#39;t stub <a href="../../classes/Sequel.html#method-c-synchronize"><code>Sequel.synchronize</code></a> on MRI (YorickPeterse) (#1083)</p>
+<p>Don&#39;t stub Sequel.synchronize on MRI (YorickPeterse) (#1083)</p>
 </li><li>
 <p>Make bin/sequel warn if given arguments that it doesn&#39;t use (jeremyevans)</p>
 </li><li>
@@ -1535,7 +1535,7 @@ Last Update:
 </li><li>
 <p>Speed up Dataset#literal for symbols 60% by caching results, speeding up dataset literalization up to 40% or more (jeremyevans)</p>
 </li><li>
-<p>Speed up <a href="../../classes/Sequel.html#method-c-split_symbol"><code>Sequel.split_symbol</code></a> 10-20x by caching results, speeding up dataset literalization up to 80% or more (jeremyevans)</p>
+<p>Speed up Sequel.split_symbol 10-20x by caching results, speeding up dataset literalization up to 80% or more (jeremyevans)</p>
 </li><li>
 <p>Speed up dataset literalization for simple datasets by up to 100% (jeremyevans)</p>
 </li><li>
@@ -2029,7 +2029,7 @@ Last Update:
 </li><li>
 <p>Make pg_hstore_ops extension integrate with pg_array, pg_hstore, and pg_array_ops extensions (jeremyevans)</p>
 </li><li>
-<p>Add <a href="../../classes/Sequel.html#method-c-json_parser_error_class"><code>Sequel.json_parser_error_class</code></a> and <a href="../../classes/Sequel.html#method-c-object_to_json"><code>Sequel.object_to_json</code></a> to allow the use of alternative JSON implementations (jeremyevans) (#662)</p>
+<p>Add Sequel.json_parser_error_class and Sequel.object_to_json to allow the use of alternative JSON implementations (jeremyevans) (#662)</p>
 </li><li>
 <p>Deprecate JSON.create_id usage in the json_serializer plugin (jeremyevans)</p>
 </li><li>
@@ -2963,7 +2963,7 @@ Last Update:
 </li><li>
 <p>All of Sequel&#39;s core extensions now have equivalent methods defined on the <a href="../../classes/Sequel.html"><code>Sequel</code></a> module (jeremyevans)</p>
 </li><li>
-<p>Add <a href="../../classes/Sequel.html#method-c-core_extensions-3F"><code>Sequel.core_extensions?</code></a> for checking if the core extensions are enabled (jeremyevans)</p>
+<p>Add Sequel.core_extensions? for checking if the core extensions are enabled (jeremyevans)</p>
 </li><li>
 <p>Increase speed of Model#this by about 85% (jeremyevans)</p>
 </li><li>
@@ -3324,7 +3324,7 @@ Last Update:
 </li><li>
 <p>Support opening transactions to multiple shards of the same Database object in the same Thread (jeremyevans)</p>
 </li><li>
-<p>Add <a href="../../classes/Sequel.html#method-c-transaction"><code>Sequel.transaction</code></a> for running transactions on multiple databases at the same time (jeremyevans)</p>
+<p>Add Sequel.transaction for running transactions on multiple databases at the same time (jeremyevans)</p>
 </li><li>
 <p>Support :rollback =&gt; :always option in Database#transaction to always rollback the transaction (jeremyevans)</p>
 </li><li>
@@ -4073,7 +4073,7 @@ Last Update:
 </li><li>
 <p>Add Sequel::BasicObject.remove_methods!, useful on 1.8 if libraries required after <a href="../../classes/Sequel.html"><code>Sequel</code></a> add methods to Object (jeremyevans)</p>
 </li><li>
-<p>Change <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> with a block to return the block&#39;s value (jonas11235)</p>
+<p>Change Sequel.connect with a block to return the block&#39;s value (jonas11235)</p>
 </li><li>
 <p>Add an rcte_tree plugin, which uses recursive common table expressions for loading trees stored as adjacency lists (jeremyevans)</p>
 </li><li>
@@ -4389,7 +4389,7 @@ Last Update:
 </li><li>
 <p>Pass through unsigned/elements/size and other options when altering columns on MySQL (tmm1)</p>
 </li><li>
-<p>Replace Dataset#virtual_row_block_call with <a href="../../classes/Sequel.html#method-c-virtual_row"><code>Sequel.virtual_row</code></a> (jeremyevans)</p>
+<p>Replace Dataset#virtual_row_block_call with Sequel.virtual_row (jeremyevans)</p>
 </li><li>
 <p>Allow Dataset delete, update, and insert to respect existing WITH clauses on MSSQL (dlee, jeremyevans)</p>
 </li><li>
@@ -4423,7 +4423,7 @@ Last Update:
 </li><li>
 <p>Detect more types of MySQL disconnection errors (jeremyevans)</p>
 </li><li>
-<p>Add <a href="../../classes/Sequel.html#method-c-convert_exception_class"><code>Sequel.convert_exception_class</code></a> for wrapping exceptions (jeremyevans)</p>
+<p>Add Sequel.convert_exception_class for wrapping exceptions (jeremyevans)</p>
 </li><li>
 <p>Model#modified? now always considers new records as modified (jeremyevans)</p>
 </li><li>
@@ -4498,7 +4498,7 @@ Last Update:
 </li><li>
 <p>Make postgres adapter work with a modified postgres-pr that raises PGError (jeremyevans)</p>
 </li><li>
-<p>Make ODBC adapter respect <a href="../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> (jeremyevans)</p>
+<p>Make ODBC adapter respect Sequel.datetime_class (jeremyevans)</p>
 </li><li>
 <p>Add support for generic concepts of CURRENT_{DATE,TIME,TIMESTAMP} (jeremyevans)</p>
 </li><li>
@@ -4614,7 +4614,7 @@ Last Update:
 </li><li>
 <p>Fix graphing of datasets with dataset sources (jeremyevans) (#271)</p>
 </li><li>
-<p>Raise a <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> if <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> is called with something other than a Hash or String (jeremyevans) (#272)</p>
+<p>Raise a <a href="../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> if Sequel.connect is called with something other than a Hash or String (jeremyevans) (#272)</p>
 </li><li>
 <p>Add -N option to bin/sequel to not test the database connection (jeremyevans)</p>
 </li><li>
@@ -4713,7 +4713,7 @@ Last Update:
 </li><li>
 <p>Make the schema_dumper extension dump tables in alphabetical order in migrations (jeremyevans)</p>
 </li><li>
-<p>Add <a href="../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a> method for loading extensions, so you don&#39;t have to use require (jeremyevans)</p>
+<p>Add Sequel.extension method for loading extensions, so you don&#39;t have to use require (jeremyevans)</p>
 </li><li>
 <p>Allow bin/sequel to respect multiple -L options instead of ignoring all but the last one (jeremyevans)</p>
 </li><li>
@@ -5230,7 +5230,7 @@ Last Update:
 
 <h3 id="label-2.6.0+-282008-10-11-29">2.6.0 (2008-10-11)<span><a href="#label-2.6.0+-282008-10-11-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Make the sqlite adapter respect the <a href="../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> setting, for timestamp and datetime types (jeremyevans)</p>
+<p>Make the sqlite adapter respect the Sequel.datetime_class setting, for timestamp and datetime types (jeremyevans)</p>
 </li><li>
 <p>Enhance the CASE statement support to include an optional expression (jarredholman)</p>
 </li><li>
@@ -5289,7 +5289,7 @@ Last Update:
 </li><li>
 <p>Make insert_sql, delete_sql, and update_sql respect the :sql option (jeremyevans)</p>
 </li><li>
-<p>Default to converting 2 digit years, use <a href="../../classes/Sequel.html#attribute-c-convert_two_digit_years"><code>Sequel.convert_two_digit_years</code></a> = false to get back the old behavior (jeremyevans)</p>
+<p>Default to converting 2 digit years, use Sequel.convert_two_digit_years = false to get back the old behavior (jeremyevans)</p>
 </li><li>
 <p>Make the PostgreSQL adapter with the pg driver use async_exec, so it doesn&#39;t block the entire interpreter (jeremyevans)</p>
 </li><li>
@@ -5515,7 +5515,7 @@ Last Update:
 </li><li>
 <p>No longer assume the expr argument to join_table references the primary key column (jeremyevans)</p>
 </li><li>
-<p>Rename the Sequel.time_class setting to <a href="../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> (jeremyevans)</p>
+<p>Rename the Sequel.time_class setting to Sequel.datetime_class (jeremyevans)</p>
 </li><li>
 <p>Add savepoint/nesting support to postgresql transactions (elven)</p>
 </li><li>
@@ -6233,7 +6233,7 @@ Last Update:
 </li><li>
 <p>Added experimental OpenBase adapter.</p>
 </li><li>
-<p>Fixed <a href="../../classes/Sequel.html"><code>Sequel</code></a>.&lt;xxx&gt; methods to accept options hash as well as database name. Fixed <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> to accept options hash as well as URI (Wayne).</p>
+<p>Fixed <a href="../../classes/Sequel.html"><code>Sequel</code></a>.&lt;xxx&gt; methods to accept options hash as well as database name. Fixed Sequel.connect to accept options hash as well as URI (Wayne).</p>
 </li></ul>
 
 <h3 id="label-0.4.1.2+-282007-12-04-29">0.4.1.2 (2007-12-04)<span><a href="#label-0.4.1.2+-282007-12-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -6739,7 +6739,7 @@ Last Update:
 <ul><li>
 <p>Improved robustness of MySQL::Dataset#field_name.</p>
 </li><li>
-<p>Added <a href="../../classes/Sequel.html#attribute-c-single_threaded"><code>Sequel.single_threaded=</code></a> convenience method.</p>
+<p>Added Sequel.single_threaded= convenience method.</p>
 </li></ul>
 
 <h3 id="label-0.1.9+-282007-07-21-29">0.1.9 (2007-07-21)<span><a href="#label-0.1.9+-282007-07-21-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -7126,7 +7126,7 @@ Last Update:
 
 <h3 id="label-0.0.2">0.0.2<span><a href="#label-0.0.2">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Added Sequel.open as alias to <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>.</p>
+<p>Added Sequel.open as alias to Sequel.connect.</p>
 </li><li>
 <p>Refactored Dataset#where_equal_condition into Dataset#where_condition, allowing arrays and ranges, e.g. posts.filter(:stamp =&gt; (3.days.ago)..(1.day.ago)), or posts.filter(:category =&gt; [&#39;ruby&#39;, &#39;postgres&#39;, &#39;linux&#39;]).</p>
 </li><li>

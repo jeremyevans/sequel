@@ -75,7 +75,7 @@ Last Update:
 
 <p>No <a href="../../../classes/Sequel.html"><code>Sequel</code></a> user ever reported a production error related to the previous thread-safety issues, and most of the issues fixed were so difficult to hit that even tests specifically designed to raise errors were unable to do so.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html#attribute-c-single_threaded"><code>Sequel.single_threaded</code></a> = true now disables the mutex synchronization that enforces thread safety for additional performance in single threaded mode.</p>
+<p>Sequel.single_threaded = true now disables the mutex synchronization that enforces thread safety for additional performance in single threaded mode.</p>
 </li><li>
 <p>Sequel&#39;s migrators now only attempt to use transactions by default if the underlying database supports transactional DDL. SQLite does support transactional DDL, but <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will not use transactions for SQLite migrations as it causes issues when emulating alter_table operations for tables with foreign keys.</p>
 </li><li>

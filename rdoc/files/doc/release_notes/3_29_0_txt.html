@@ -63,7 +63,7 @@ Last Update:
 </li><li>
 <p>Database#transaction now supports a :rollback =&gt; :always option to always rollback the transaction, which is mostly useful when using transaction-based testing.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html#method-c-transaction"><code>Sequel.transaction</code></a> has been added, allowing you to run simultaneous transactions on multiple Database objects:</p>
+<p>Sequel.transaction has been added, allowing you to run simultaneous transactions on multiple Database objects:</p>
 
 <pre>Sequel.transaction([DB1, DB2]){...}&#x000A;# similar to:&#x000A;DB1.transaction{DB2.transaction{...}}</pre>
 

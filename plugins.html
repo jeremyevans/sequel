@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v5.31.0</h2>
+    <h2>Sequel::Model Plugins for v5.32.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -221,6 +221,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_rb.html">pg_row</a>: Adds support for PostgreSQL row-valued/composite types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_static_cache_updater_rb.html">pg_static_cache_updater</a>: Listens for changes to underlying tables in order to automatically update models using the static_cache plugin.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_timestamptz_rb.html">pg_timestamptz</a>: Uses timestamptz (timestamp with time zone) as the generic timestamp type used for Time and DateTime classes.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/run_transaction_hooks_rb.html">run_transaction_hooks</a>: Support running after_commit and after_rollback transaction hooks before transaction commit/rollback, designed for transactional testing.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
@@ -269,6 +270,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/eval_inspect_rb.html">eval_inspect</a>: Makes inspect on Sequel's expression objects attempt to return a string suitable for eval.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/escaped_like_rb.html">escaped_like</a>: Support creation of LIKE expressions with placeholders in the pattern without access to a dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/datetime_parse_to_time_rb.html">datetime_parse_to_time</a>: Uses DateTime.parse.to_time to parse timestamp strings without offset information where such timestamps are assumed to be in UTC.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/fiber_concurrency_rb.html">fiber_concurrency</a>: Uses Fiber.current instead of Thread.current as the key for checking out connections.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>: Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/named_timezones_rb.html">named_timezones</a>: Allows you to use named timezones instead of just :local and :utc (requires <a href="http://tzinfo.github.io/">TZInfo</a>).</li>
@@ -299,10 +301,10 @@
 <li><a href='http://github.com/pusewicz/rails_sequel/'>rails_sequel</a>: Rails 2 plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='https://github.com/refile/refile-sequel'>refile-sequel</a>: Provides an extension for using Refile with Sequel.</li>
 <li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
+<li><a href='https://github.com/janko/sequel-activerecord_connection'>sequel-activerecord_connection</a>: Allows Sequel to use ActiveRecord's connection for database interaction.</li>
 <li><a href='https://github.com/jeremyevans/sequel-annotate'>sequel-annotate</a>: Generates model annotations for Sequel models, including constraint and trigger information on PostgreSQL.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
 <li><a href='https://github.com/nickgartmann/sequel-location'>sequel-location</a>: Easy setup and syntax for doing geolocation search on PostgreSQL.</li>
-<li><a href='https://github.com/janko-m/sequel-jsonapi_eager'>sequel-jsonapi_eager</a>: Helps properly eager load associations when exposing objects in a JSON API.</li>
 <li><a href='http://github.com/jeremyevans/sequel_pg'>sequel_pg</a>: Faster SELECTs when using Sequel with pg.</li>
 <li><a href='https://github.com/celsworth/sequel-pg_advisory_locking'>sequel-pg_advisory_locking</a>: Adds PostreSQL advisory locking support.</li>
 <li><a href='http://github.com/mpalmer/sequel-pg-comment'>sequel-pg-comment</a>: Document your schema by setting comments on all your PgSQL objects.</li>

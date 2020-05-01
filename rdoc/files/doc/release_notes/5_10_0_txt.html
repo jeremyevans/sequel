@@ -69,11 +69,11 @@ Last Update:
 </li><li>
 <p>When using the postgres adapter with pg-0.18+, set a type_map_for_queries for the connection to allow it to handle input type casts for Integer, Float, TrueClass, and FalseClass values without allocating strings.</p>
 </li><li>
-<p>SQLTime.parse (and therefore <a href="../../../classes/Sequel.html#method-c-string_to_time"><code>Sequel.string_to_time</code></a>) now respects the SQLTime.date and Sequel.application_timezone settings.</p>
+<p>SQLTime.parse (and therefore Sequel.string_to_time) now respects the SQLTime.date and Sequel.application_timezone settings.</p>
 </li><li>
 <p>The jdbc/postgresql adapter now correctly parses timetz types.</p>
 </li><li>
-<p>On JRuby 9.2.0.0, when handling BC timestamps without timezones in the pg_extended_date_support extension, assume local time and not UTC time if the database timezone is not specified and <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> is Time.</p>
+<p>On JRuby 9.2.0.0, when handling BC timestamps without timezones in the pg_extended_date_support extension, assume local time and not UTC time if the database timezone is not specified and Sequel.datetime_class is Time.</p>
 </li><li>
 <p>Errors indicating that a MySQL database is in read-only mode are now treated as disconnect errors in the mysql and mysql2 adapters, for better behavior in failover scenarios.</p>
 </li><li>

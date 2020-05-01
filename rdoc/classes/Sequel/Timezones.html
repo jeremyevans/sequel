@@ -28,14 +28,20 @@ Sequel::Timezones
 </h1>
 <ol class='paths'>
 <li>
+<a href="../../files/lib/sequel/core_rb.html">lib/sequel/core.rb</a>
+</li>
+<li class='other'>
 <a href="../../files/lib/sequel/timezones_rb.html">lib/sequel/timezones.rb</a>
+</li>
+<li>
+<a class='show' href='#' onclick='this.parentNode.parentNode.className += &quot; expanded&quot;; this.parentNode.removeChild(this); return false'>show all</a>
 </li>
 </ol>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
-<p><a href="../Sequel.html"><code>Sequel</code></a> doesn&#39;t pay much attention to timezones by default, but you can set it handle timezones if you want.  There are three separate timezone settings, <a href="Timezones.html#attribute-i-application_timezone"><code>application_timezone</code></a>, <a href="Timezones.html#attribute-i-database_timezone"><code>database_timezone</code></a>, and typecast_timezone.  All three timezones have getter and setter methods. You can set all three timezones to the same value at once via <code>Sequel.default_timezone=</code>.</p>
+<p><a href="../Sequel.html"><code>Sequel</code></a> doesn&#39;t pay much attention to timezones by default, but you can set it handle timezones if you want.  There are three separate timezone settings, <a href="SequelMethods.html#attribute-i-application_timezone"><code>application_timezone</code></a>, <a href="SequelMethods.html#attribute-i-database_timezone"><code>database_timezone</code></a>, and typecast_timezone.  All three timezones have getter and setter methods. You can set all three timezones to the same value at once via <code>Sequel.default_timezone=</code>.</p>
 
 <p>The only timezone values that are supported by default are <code>:utc</code> (convert to UTC), <code>:local</code> (convert to local time), and <code>nil</code> (don&#39;t convert).  If you need to convert to a specific timezone, or need the timezones being used to change based on the environment (e.g. current user), you need to use the <code>named_timezones</code> extension (and use <code>DateTime</code> as the <code>datetime_class</code>). <a href="../Sequel.html"><code>Sequel</code></a> also ships with a <code>thread_local_timezones</code> extensions which allows each thread to have its own timezone values for each of the timezones.</p>
 </div>
@@ -45,18 +51,58 @@ Sequel::Timezones
 <ol>
 <li><a href="#attribute-i-application_timezone">application_timezone</a></li>
 <li><a href="#method-i-application_to_database_timestamp">application_to_database_timestamp</a></li>
+<li><a href="#method-i-condition_specifier-3F">condition_specifier?</a></li>
+<li><a href="#method-i-connect">connect</a></li>
+<li><a href="#method-i-convert_exception_class">convert_exception_class</a></li>
 <li><a href="#method-i-convert_output_timestamp">convert_output_timestamp</a></li>
 <li><a href="#method-i-convert_timestamp">convert_timestamp</a></li>
+<li><a href="#attribute-i-convert_two_digit_years">convert_two_digit_years</a></li>
+<li><a href="#method-i-core_extensions-3F">core_extensions?</a></li>
+<li><a href="#method-i-current">current</a></li>
 <li><a href="#attribute-i-database_timezone">database_timezone</a></li>
 <li><a href="#method-i-database_to_application_timestamp">database_to_application_timestamp</a></li>
+<li><a href="#attribute-i-datetime_class">datetime_class</a></li>
 <li><a href="#method-i-default_timezone-3D">default_timezone=</a></li>
+<li><a href="#method-i-elapsed_seconds_since">elapsed_seconds_since</a></li>
+<li><a href="#method-i-extension">extension</a></li>
+<li><a href="#method-i-json_parser_error_class">json_parser_error_class</a></li>
+<li><a href="#method-i-object_to_json">object_to_json</a></li>
+<li><a href="#method-i-parse_json">parse_json</a></li>
+<li><a href="#method-i-recursive_map">recursive_map</a></li>
+<li><a href="#method-i-require">require</a></li>
+<li><a href="#attribute-i-single_threaded">single_threaded</a></li>
+<li><a href="#method-i-split_symbol">split_symbol</a></li>
+<li><a href="#method-i-split_symbols-3D">split_symbols=</a></li>
+<li><a href="#method-i-split_symbols-3F">split_symbols?</a></li>
+<li><a href="#method-i-start_timer">start_timer</a></li>
+<li><a href="#method-i-string_to_date">string_to_date</a></li>
+<li><a href="#method-i-string_to_datetime">string_to_datetime</a></li>
+<li><a href="#method-i-string_to_time">string_to_time</a></li>
+<li><a href="#method-i-synchronize">synchronize</a></li>
+<li><a href="#method-i-transaction">transaction</a></li>
 <li><a href="#attribute-i-typecast_timezone">typecast_timezone</a></li>
 <li><a href="#method-i-typecast_to_application_timestamp">typecast_to_application_timestamp</a></li>
+<li><a href="#method-i-virtual_row">virtual_row</a></li>
 </ol>
 </div>
 <div id='context'>
 </div>
 <div id='section'>
+<div id='aliases-list'>
+<h2>Public Instance Aliases</h2>
+<div class='name-list'>
+<table summary='Public Instance Aliases'>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>orig_require</td>
+<td>-&gt;</td>
+<td class='context-item-value'><a href="#method-i-require">require</a></td>
+<td class='context-item-desc'>
+<p>Alias of original require method, as Sequel.require is does a relative require for backwards compatibility.</p>
+</td>
+</tr>
+</table>
+</div>
+</div>
 <div id='attribute-list'>
 <h2 class='section-bar'>Attributes</h2>
 <div class='name-list'>
@@ -72,11 +118,46 @@ Sequel::Timezones
 </tr>
 <tr class='top-aligned-row context-row'>
 <td class='context-item-name'>
+<a name='attribute-i-convert_two_digit_years'>convert_two_digit_years</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p><a href="../Sequel.html"><code>Sequel</code></a> converts two digit years in <code>Date</code>s and <code>DateTime</code>s by default, so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted as December 13, 1999. You can override this to treat those dates as January 2nd, 0003 and December 13, 0099, respectively, by:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span> = <span class="ruby-keyword">false</span></pre>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
 <a name='attribute-i-database_timezone'>database_timezone</a>
 </td>
 <td class='context-item-value'>[R]</td>
 <td class='context-item-desc'>
 <p>The timezone for storage in the database.  This is the timezone to which <a href="../Sequel.html"><code>Sequel</code></a> will convert timestamps before literalizing them for storage in the database.  It is also the timezone that <a href="../Sequel.html"><code>Sequel</code></a> will assume database timestamp values are already in (if they don&#39;t include an offset).</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-datetime_class'>datetime_class</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p><a href="../Sequel.html"><code>Sequel</code></a> can use either <code>Time</code> or <code>DateTime</code> for times returned from the database.  It defaults to <code>Time</code>.  To change it to <code>DateTime</code>:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> = <span class="ruby-constant">DateTime</span></pre>
+
+<p>Note that <code>Time</code> and <code>DateTime</code> objects have a different API, and in cases where they implement the same methods, they often implement them differently (e.g. + using seconds on <code>Time</code> and days on <code>DateTime</code>).</p>
+</td>
+</tr>
+<tr class='top-aligned-row context-row'>
+<td class='context-item-name'>
+<a name='attribute-i-single_threaded'>single_threaded</a>
+</td>
+<td class='context-item-value'>[RW]</td>
+<td class='context-item-desc'>
+<p>Set whether <a href="../Sequel.html"><code>Sequel</code></a> is being used in single threaded mode. by default, <a href="../Sequel.html"><code>Sequel</code></a> uses a thread-safe connection pool, which isn&#39;t as fast as the single threaded connection pool, and also has some additional thread safety checks.  If your program will only have one thread, and speed is a priority, you should set this to true:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span> = <span class="ruby-keyword">true</span></pre>
 </td>
 </tr>
 <tr class='top-aligned-row context-row'>
@@ -109,7 +190,80 @@ Sequel::Timezones
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-application_to_database_timestamp-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-application_to_database_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">application_to_database_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>)&#x000A;<span class="line-num">42</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-application_to_database_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">application_to_database_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>)&#x000A;<span class="line-num">47</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-condition_specifier-3F'>
+<a name='method-i-condition_specifier-3F'></a>
+<div class='synopsis'>
+<span class='name'>condition_specifier?</span>
+<span class='arguments'>(obj)</span>
+
+</div>
+<div class='description'>
+
+<p>Returns true if the passed object could be a specifier of conditions, false otherwise. Currently, <a href="../Sequel.html"><code>Sequel</code></a> considers hashes and arrays of two element arrays as condition specifiers.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>({}) <span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]]) <span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>([]) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>([<span class="ruby-value">1</span>]) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># =&gt; false</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-condition_specifier-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-condition_specifier-3F-source'>   <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">84</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">condition_specifier?</span>(<span class="ruby-identifier">obj</span>)&#x000A;<span class="line-num">85</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">obj</span>&#x000A;<span class="line-num">86</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;<span class="line-num">87</span>     <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">88</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;<span class="line-num">89</span>     <span class="ruby-operator">!</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ValueList</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">all?</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">i</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>)}&#x000A;<span class="line-num">90</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">91</span>     <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">92</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">93</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-connect'>
+<a name='method-i-connect'></a>
+<div class='synopsis'>
+<span class='name'>connect</span>
+<span class='arguments'>(*args, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Creates a new database object based on the supplied connection string and optional arguments.  The specified scheme determines the database class used, and the rest of the string specifies the connection options. For example:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:/&#39;</span>) <span class="ruby-comment"># Memory database</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>) <span class="ruby-comment"># ./blog.db</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///blog.db&#39;</span>) <span class="ruby-comment"># /blog.db</span>&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@host:port/database_name&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///blog.db&#39;</span>, <span class="ruby-value">max_connections:</span> <span class="ruby-value">10</span>)</pre>
+
+<p>You can also pass a single options hash:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-value">adapter:</span> <span class="ruby-string">&#39;sqlite&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;./blog.db&#39;</span>)</pre>
+
+<p>If a block is given, it is passed the opened <code>Database</code> object, which is closed when the block exits.  For example:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}</pre>
+
+<p>If a block is not given, a reference to this database will be held in <code>Sequel::DATABASES</code> until it is removed manually.  This is by design, and used by <code>Sequel::Model</code> to pick the default database.  It is recommended to pass a block if you do not want the resulting <a href="Database.html"><code>Database</code></a> object to remain in memory until the process terminates, or use the <code>keep_reference: false</code> <a href="Database.html"><code>Database</code></a> option.</p>
+
+<p>For details, see the <a href="../../files/doc/opening_databases_rdoc.html">“Connecting to a Database” guide</a>. To set up a primary/replica or sharded database connection, see the <a href="../../files/doc/sharding_rdoc.html">“Primary/Replica Database Configurations and Sharding” guide</a>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-connect-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-connect-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">124</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">125</span>   <span class="ruby-constant">Database</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">126</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-convert_exception_class'>
+<a name='method-i-convert_exception_class'></a>
+<div class='synopsis'>
+<span class='name'>convert_exception_class</span>
+<span class='arguments'>(exception, klass)</span>
+
+</div>
+<div class='description'>
+
+<p>Convert the <code>exception</code> to the given class.  The given class should be <code>Sequel::Error</code> or a subclass.  Returns an instance of <code>klass</code> with the message and backtrace of <code>exception</code>.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-convert_exception_class-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-convert_exception_class-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">137</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_exception_class</span>(<span class="ruby-identifier">exception</span>, <span class="ruby-identifier">klass</span>)&#x000A;<span class="line-num">138</span>   <span class="ruby-keyword">return</span> <span class="ruby-identifier">exception</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">exception</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-identifier">klass</span>)&#x000A;<span class="line-num">139</span>   <span class="ruby-identifier">e</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{exception.class}: #{exception.message}&quot;</span>)&#x000A;<span class="line-num">140</span>   <span class="ruby-identifier">e</span>.<span class="ruby-identifier">wrapped_exception</span> = <span class="ruby-identifier">exception</span>&#x000A;<span class="line-num">141</span>   <span class="ruby-identifier">e</span>.<span class="ruby-identifier">set_backtrace</span>(<span class="ruby-identifier">exception</span>.<span class="ruby-identifier">backtrace</span>)&#x000A;<span class="line-num">142</span>   <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">143</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-convert_output_timestamp'>
@@ -128,7 +282,7 @@ Sequel::Timezones
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-convert_output_timestamp-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-convert_output_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">45</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;<span class="line-num">46</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_timezone</span>&#x000A;<span class="line-num">47</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;<span class="line-num">48</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">output_timezone</span>&#x000A;<span class="line-num">49</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:utc</span>&#x000A;<span class="line-num">50</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">new_offset</span>(<span class="ruby-value">0</span>)&#x000A;<span class="line-num">51</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:local</span>&#x000A;<span class="line-num">52</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">new_offset</span>(<span class="ruby-identifier">local_offset_for_datetime</span>(<span class="ruby-identifier">v</span>))&#x000A;<span class="line-num">53</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">54</span>         <span class="ruby-identifier">convert_output_datetime_other</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;<span class="line-num">55</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">56</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">57</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">output_timezone</span>&#x000A;<span class="line-num">58</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:utc</span>&#x000A;<span class="line-num">59</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getutc</span>&#x000A;<span class="line-num">60</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:local</span>&#x000A;<span class="line-num">61</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getlocal</span>&#x000A;<span class="line-num">62</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">63</span>         <span class="ruby-identifier">convert_output_time_other</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;<span class="line-num">64</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">65</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">66</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">67</span>     <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">68</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-convert_output_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">50</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_output_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;<span class="line-num">51</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_timezone</span>&#x000A;<span class="line-num">52</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;<span class="line-num">53</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">output_timezone</span>&#x000A;<span class="line-num">54</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:utc</span>&#x000A;<span class="line-num">55</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">new_offset</span>(<span class="ruby-value">0</span>)&#x000A;<span class="line-num">56</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:local</span>&#x000A;<span class="line-num">57</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">new_offset</span>(<span class="ruby-identifier">local_offset_for_datetime</span>(<span class="ruby-identifier">v</span>))&#x000A;<span class="line-num">58</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">59</span>         <span class="ruby-identifier">convert_output_datetime_other</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;<span class="line-num">60</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">61</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">62</span>       <span class="ruby-keyword">case</span> <span class="ruby-identifier">output_timezone</span>&#x000A;<span class="line-num">63</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:utc</span>&#x000A;<span class="line-num">64</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getutc</span>&#x000A;<span class="line-num">65</span>       <span class="ruby-keyword">when</span> <span class="ruby-value">:local</span>&#x000A;<span class="line-num">66</span>         <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getlocal</span>&#x000A;<span class="line-num">67</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">68</span>         <span class="ruby-identifier">convert_output_time_other</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">output_timezone</span>)&#x000A;<span class="line-num">69</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">70</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">72</span>     <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">73</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-convert_timestamp'>
@@ -147,7 +301,45 @@ Sequel::Timezones
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-convert_timestamp-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-convert_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">74</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">input_timezone</span>)&#x000A;<span class="line-num">75</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">76</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Date</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;<span class="line-num">77</span>       <span class="ruby-comment"># Dates handled specially as they are assumed to already be in the application_timezone</span>&#x000A;<span class="line-num">78</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>&#x000A;<span class="line-num">79</span>         <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>, <span class="ruby-value">0</span>, <span class="ruby-value">0</span>, <span class="ruby-value">0</span>, <span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:local</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Rational</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">local</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>).<span class="ruby-identifier">utc_offset</span>, <span class="ruby-value">86400</span>) <span class="ruby-operator">:</span> <span class="ruby-value">0</span>)&#x000A;<span class="line-num">80</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">81</span>         <span class="ruby-constant">Time</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>)&#x000A;<span class="line-num">82</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">83</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">84</span>       <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">convert_input_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">input_timezone</span>), <span class="ruby-identifier">application_timezone</span>)&#x000A;<span class="line-num">85</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">86</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">InvalidValue</span>&#x000A;<span class="line-num">87</span>     <span class="ruby-identifier">raise</span>&#x000A;<span class="line-num">88</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">89</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">90</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">91</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-convert_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">79</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">input_timezone</span>)&#x000A;<span class="line-num">80</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">81</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Date</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">DateTime</span>)&#x000A;<span class="line-num">82</span>       <span class="ruby-comment"># Dates handled specially as they are assumed to already be in the application_timezone</span>&#x000A;<span class="line-num">83</span>       <span class="ruby-keyword">if</span> <span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>&#x000A;<span class="line-num">84</span>         <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>, <span class="ruby-value">0</span>, <span class="ruby-value">0</span>, <span class="ruby-value">0</span>, <span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:local</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Rational</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">local</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>).<span class="ruby-identifier">utc_offset</span>, <span class="ruby-value">86400</span>) <span class="ruby-operator">:</span> <span class="ruby-value">0</span>)&#x000A;<span class="line-num">85</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">86</span>         <span class="ruby-constant">Time</span>.<span class="ruby-identifier">public_send</span>(<span class="ruby-identifier">application_timezone</span> <span class="ruby-operator">==</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">?</span> <span class="ruby-value">:utc</span> <span class="ruby-operator">:</span> <span class="ruby-value">:local</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">day</span>)&#x000A;<span class="line-num">87</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">88</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">89</span>       <span class="ruby-identifier">convert_output_timestamp</span>(<span class="ruby-identifier">convert_input_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">input_timezone</span>), <span class="ruby-identifier">application_timezone</span>)&#x000A;<span class="line-num">90</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">91</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-constant">InvalidValue</span>&#x000A;<span class="line-num">92</span>     <span class="ruby-identifier">raise</span>&#x000A;<span class="line-num">93</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">94</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">95</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">96</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-core_extensions-3F'>
+<a name='method-i-core_extensions-3F'></a>
+<div class='synopsis'>
+<span class='name'>core_extensions?</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Assume the core extensions are not loaded by default, if the <a href="../../files/doc/core_extensions_rdoc.html">core_extensions</a> extension is loaded, this will be overridden.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-core_extensions-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-core_extensions-3F-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">130</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">core_extensions?</span>&#x000A;<span class="line-num">131</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">132</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-current'>
+<a name='method-i-current'></a>
+<div class='synopsis'>
+<span class='name'>current</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The current concurrency primitive, Thread.current by default.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-current-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-current-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">146</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">current</span>&#x000A;<span class="line-num">147</span>   <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>&#x000A;<span class="line-num">148</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-database_to_application_timestamp'>
@@ -166,7 +358,7 @@ Sequel::Timezones
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-database_to_application_timestamp-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-database_to_application_timestamp-source'>   <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">96</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_to_application_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">97</span>   <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>)&#x000A;<span class="line-num">98</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-database_to_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">database_to_application_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">102</span>   <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span>)&#x000A;<span class="line-num">103</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-default_timezone-3D'>
@@ -185,7 +377,345 @@ Sequel::Timezones
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-default_timezone-3D-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-default_timezone-3D-source'>    <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">101</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_timezone=</span>(<span class="ruby-identifier">tz</span>)&#x000A;<span class="line-num">102</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="line-num">103</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="line-num">104</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">typecast_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="line-num">105</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-default_timezone-3D-source'>    <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">106</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">default_timezone=</span>(<span class="ruby-identifier">tz</span>)&#x000A;<span class="line-num">107</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="line-num">108</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="line-num">109</span>   <span class="ruby-keyword">self</span>.<span class="ruby-identifier">typecast_timezone</span> = <span class="ruby-identifier">tz</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-elapsed_seconds_since'>
+<a name='method-i-elapsed_seconds_since'></a>
+<div class='synopsis'>
+<span class='name'>elapsed_seconds_since</span>
+<span class='arguments'>(timer)</span>
+
+</div>
+<div class='description'>
+
+<p>The elapsed seconds since the given timer object was created.  The timer object should have been created via Sequel.start_timer.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-elapsed_seconds_since-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-elapsed_seconds_since-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">331</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">elapsed_seconds_since</span>(<span class="ruby-identifier">timer</span>)&#x000A;<span class="line-num">332</span>   <span class="ruby-identifier">start_timer</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">timer</span>&#x000A;<span class="line-num">333</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-extension'>
+<a name='method-i-extension'></a>
+<div class='synopsis'>
+<span class='name'>extension</span>
+<span class='arguments'>(*extensions)</span>
+
+</div>
+<div class='description'>
+
+<p>Load all <a href="../Sequel.html"><code>Sequel</code></a> extensions given.  Extensions are just files that exist under <code>sequel/extensions</code> in the load path, and are just required.</p>
+
+<p>In some cases, requiring an extension modifies classes directly, and in others, it just loads a module that you can extend other classes with.  Consult the documentation for each extension you plan on using for usage.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:blank</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(<span class="ruby-value">:core_extensions</span>, <span class="ruby-value">:named_timezones</span>)</pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-extension-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-extension-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">158</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">extension</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">extensions</span>)&#x000A;<span class="line-num">159</span>   <span class="ruby-identifier">extensions</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">orig_require</span>(<span class="ruby-node">&quot;sequel/extensions/#{e}&quot;</span>)}&#x000A;<span class="line-num">160</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-json_parser_error_class'>
+<a name='method-i-json_parser_error_class'></a>
+<div class='synopsis'>
+<span class='name'>json_parser_error_class</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>The exception classed raised if there is an error parsing JSON. This can be overridden to use an alternative json implementation.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-json_parser_error_class-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-json_parser_error_class-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">164</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">json_parser_error_class</span>&#x000A;<span class="line-num">165</span>   <span class="ruby-constant">JSON</span><span class="ruby-operator">::</span><span class="ruby-constant">ParserError</span>&#x000A;<span class="line-num">166</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-object_to_json'>
+<a name='method-i-object_to_json'></a>
+<div class='synopsis'>
+<span class='name'>object_to_json</span>
+<span class='arguments'>(obj, *args, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Convert given object to json and return the result. This can be overridden to use an alternative json implementation.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-object_to_json-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-object_to_json-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">object_to_json</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">171</span>   <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">to_json</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-parse_json'>
+<a name='method-i-parse_json'></a>
+<div class='synopsis'>
+<span class='name'>parse_json</span>
+<span class='arguments'>(json)</span>
+
+</div>
+<div class='description'>
+
+<p>Parse the string as JSON and return the result. This can be overridden to use an alternative json implementation.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-parse_json-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-parse_json-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">176</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">parse_json</span>(<span class="ruby-identifier">json</span>)&#x000A;<span class="line-num">177</span>   <span class="ruby-constant">JSON</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">json</span>, <span class="ruby-value">:create_additions</span><span class="ruby-operator">=&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-recursive_map'>
+<a name='method-i-recursive_map'></a>
+<div class='synopsis'>
+<span class='name'>recursive_map</span>
+<span class='arguments'>(array, converter)</span>
+
+</div>
+<div class='description'>
+
+<p>Convert each item in the array to the correct type, handling multi-dimensional arrays.  For each element in the array or subarrays, call the converter, unless the value is nil.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-recursive_map-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-recursive_map-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">recursive_map</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">converter</span>)&#x000A;<span class="line-num">184</span>   <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">185</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;<span class="line-num">186</span>       <span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">i</span>, <span class="ruby-identifier">converter</span>)&#x000A;<span class="line-num">187</span>     <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">i</span>.<span class="ruby-identifier">nil?</span>&#x000A;<span class="line-num">188</span>       <span class="ruby-identifier">converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;<span class="line-num">189</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">190</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">191</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-require'>
+<a name='method-i-require'></a>
+<div class='synopsis'>
+<span class='name'>require</span>
+<span class='arguments'>(files, subdir=nil)</span>
+
+</div>
+<div class='description'>
+
+<p>For backwards compatibility only.  require_relative should be used instead.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-require-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-require-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">194</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">require</span>(<span class="ruby-identifier">files</span>, <span class="ruby-identifier">subdir</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="line-num">195</span>   <span class="ruby-comment"># Use Kernel.require_relative to work around JRuby 9.0 bug</span>&#x000A;<span class="line-num">196</span>   <span class="ruby-constant">Array</span>(<span class="ruby-identifier">files</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">require_relative</span> <span class="ruby-node">&quot;#{&quot;#{subdir}/&quot; if subdir}#{f}&quot;</span>}&#x000A;<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-split_symbol'>
+<a name='method-i-split_symbol'></a>
+<div class='synopsis'>
+<span class='name'>split_symbol</span>
+<span class='arguments'>(sym)</span>
+
+</div>
+<div class='description'>
+
+<p>Splits the symbol into three parts, if symbol splitting is enabled (not the default). Each part will either be a string or nil. If symbol splitting is disabled, returns an array with the first and third parts being nil, and the second part beind a string version of the symbol.</p>
+
+<p>For columns, these parts are the table, column, and alias. For tables, these parts are the schema, table, and alias.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-split_symbol-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-split_symbol-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">206</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_symbol</span>(<span class="ruby-identifier">sym</span>)&#x000A;<span class="line-num">207</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>[<span class="ruby-identifier">sym</span>]}&#x000A;<span class="line-num">208</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">split_symbols?</span>&#x000A;<span class="line-num">209</span>       <span class="ruby-identifier">v</span> = <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span> = <span class="ruby-identifier">sym</span>.<span class="ruby-identifier">to_s</span>&#x000A;<span class="line-num">210</span>       <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/</span>&#x000A;<span class="line-num">211</span>         [<span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$3</span>.<span class="ruby-identifier">freeze</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">212</span>       <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!___).)+)___(.+)\z/</span>&#x000A;<span class="line-num">213</span>         [<span class="ruby-keyword">nil</span>, <span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">214</span>       <span class="ruby-keyword">when</span> <span class="ruby-regexp">/\A((?:(?!__).)+)__(.+)\z/</span>&#x000A;<span class="line-num">215</span>         [<span class="ruby-node">$1</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-node">$2</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">216</span>       <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">217</span>         [<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">freeze</span>, <span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">218</span>       <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">219</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">220</span>       <span class="ruby-identifier">v</span> = [<span class="ruby-keyword">nil</span>,<span class="ruby-identifier">sym</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">freeze</span>,<span class="ruby-keyword">nil</span>].<span class="ruby-identifier">freeze</span>&#x000A;<span class="line-num">221</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">222</span>     <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>[<span class="ruby-identifier">sym</span>] = <span class="ruby-identifier">v</span>}&#x000A;<span class="line-num">223</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">224</span>   <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">225</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-split_symbols-3D'>
+<a name='method-i-split_symbols-3D'></a>
+<div class='synopsis'>
+<span class='name'>split_symbols=</span>
+<span class='arguments'>(v)</span>
+
+</div>
+<div class='description'>
+
+<p>Setting this to true enables Sequel&#39;s historical behavior of splitting symbols on double or triple underscores:</p>
+
+<pre class="ruby"><span class="ruby-value">:table__column</span>         <span class="ruby-comment"># table.column</span>&#x000A;<span class="ruby-value">:column___alias</span>        <span class="ruby-comment"># column AS alias</span>&#x000A;<span class="ruby-value">:table__column___alias</span> <span class="ruby-comment"># table.column AS alias</span></pre>
+
+<p>It is only recommended to turn this on for backwards compatibility until such symbols have been converted to use newer <a href="../Sequel.html"><code>Sequel</code></a> APIs such as:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>]            <span class="ruby-comment"># table.column</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>)         <span class="ruby-comment"># column AS alias</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:table</span>][<span class="ruby-value">:column</span>].<span class="ruby-identifier">as</span>(<span class="ruby-value">:alias</span>) <span class="ruby-comment"># table.column AS alias</span></pre>
+
+<p><a href="Database.html"><code>Sequel::Database</code></a> instances do their own caching of literalized symbols, and changing this setting does not affect those caches.  It is recommended that if you want to change this setting, you do so directly after requiring <a href="../Sequel.html"><code>Sequel</code></a>, before creating any <a href="Database.html"><code>Sequel::Database</code></a> instances.</p>
+
+<p>Disabling symbol splitting will also disable the handling of double underscores in virtual row methods, causing such methods to yield regular identifers instead of qualified identifiers:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Sequel.split_symbols = true</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table__column</span>}  <span class="ruby-comment"># table.column</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]} <span class="ruby-comment"># table.column</span>&#x000A;&#x000A;<span class="ruby-comment"># Sequel.split_symbols = false</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table__column</span>}  <span class="ruby-comment"># table__column</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">table</span>[<span class="ruby-value">:column</span>]} <span class="ruby-comment"># table.column</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-split_symbols-3D-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-split_symbols-3D-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">257</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_symbols=</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">258</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">SPLIT_SYMBOL_CACHE</span>.<span class="ruby-identifier">clear</span>}&#x000A;<span class="line-num">259</span>   <span class="ruby-ivar">@split_symbols</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">260</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-split_symbols-3F'>
+<a name='method-i-split_symbols-3F'></a>
+<div class='synopsis'>
+<span class='name'>split_symbols?</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>Whether <a href="../Sequel.html"><code>Sequel</code></a> currently splits symbols into qualified/aliased identifiers.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-split_symbols-3F-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-split_symbols-3F-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">263</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">split_symbols?</span>&#x000A;<span class="line-num">264</span>   <span class="ruby-ivar">@split_symbols</span>&#x000A;<span class="line-num">265</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-start_timer'>
+<a name='method-i-start_timer'></a>
+<div class='synopsis'>
+<span class='name'>start_timer</span>
+<span class='arguments'>()</span>
+
+</div>
+<div class='description'>
+
+<p>A timer object that can be passed to Sequel.elapsed_seconds_since to return the number of seconds elapsed.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-start_timer-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-start_timer-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">318</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">start_timer</span>&#x000A;<span class="line-num">319</span>   <span class="ruby-constant">Process</span>.<span class="ruby-identifier">clock_gettime</span>(<span class="ruby-constant">Process</span><span class="ruby-operator">::</span><span class="ruby-constant">CLOCK_MONOTONIC</span>)&#x000A;<span class="line-num">320</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-string_to_date'>
+<a name='method-i-string_to_date'></a>
+<div class='synopsis'>
+<span class='name'>string_to_date</span>
+<span class='arguments'>(string)</span>
+
+</div>
+<div class='description'>
+
+<p>Converts the given <code>string</code> into a <code>Date</code> object.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_date</span>(<span class="ruby-string">&#39;2010-09-10&#39;</span>) <span class="ruby-comment"># Date.civil(2010, 09, 10)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-string_to_date-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-string_to_date-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">270</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">string_to_date</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">271</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">272</span>     <span class="ruby-constant">Date</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span>)&#x000A;<span class="line-num">273</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">274</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">275</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">276</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-string_to_datetime'>
+<a name='method-i-string_to_datetime'></a>
+<div class='synopsis'>
+<span class='name'>string_to_datetime</span>
+<span class='arguments'>(string)</span>
+
+</div>
+<div class='description'>
+
+<p>Converts the given <code>string</code> into a <code>Time</code> or <code>DateTime</code> object, depending on the value of <code>Sequel.datetime_class</code>.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_datetime</span>(<span class="ruby-string">&#39;2010-09-10 10:20:30&#39;</span>) <span class="ruby-comment"># Time.local(2010, 09, 10, 10, 20, 30)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-string_to_datetime-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-string_to_datetime-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">282</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">string_to_datetime</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">283</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">284</span>     <span class="ruby-keyword">if</span> <span class="ruby-identifier">datetime_class</span> <span class="ruby-operator">==</span> <span class="ruby-constant">DateTime</span>&#x000A;<span class="line-num">285</span>       <span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>, <span class="ruby-identifier">convert_two_digit_years</span>)&#x000A;<span class="line-num">286</span>     <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">287</span>       <span class="ruby-identifier">datetime_class</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">288</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">289</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">290</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">291</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">292</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-string_to_time'>
+<a name='method-i-string_to_time'></a>
+<div class='synopsis'>
+<span class='name'>string_to_time</span>
+<span class='arguments'>(string)</span>
+
+</div>
+<div class='description'>
+
+<p>Converts the given <code>string</code> into a <code>Sequel::SQLTime</code> object.</p>
+
+<pre class="ruby"><span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-string">&#39;10:20:30&#39;</span>) <span class="ruby-comment"># Sequel::SQLTime.parse(&#39;10:20:30&#39;)</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">v</span>) <span class="ruby-comment"># =&gt; &#39;10:20:30&#39;</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-string_to_time-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-string_to_time-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">298</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">string_to_time</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">299</span>   <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">300</span>     <span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">string</span>)&#x000A;<span class="line-num">301</span>   <span class="ruby-keyword">rescue</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">e</span>&#x000A;<span class="line-num">302</span>     <span class="ruby-identifier">raise</span> <span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">InvalidValue</span>)&#x000A;<span class="line-num">303</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">304</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-synchronize'>
+<a name='method-i-synchronize'></a>
+<div class='synopsis'>
+<span class='name'>synchronize</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>Unless in single threaded mode, protects access to any mutable global data structure in <a href="../Sequel.html"><code>Sequel</code></a>. Uses a non-reentrant mutex, so calling code should be careful. In general, this should only be used around the minimal possible code such as Hash#[], Hash#[]=, Hash#delete, Array#<<, and Array#delete.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-synchronize-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-synchronize-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">311</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">312</span>   <span class="ruby-ivar">@single_threaded</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@data_mutex</span>.<span class="ruby-identifier">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">313</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-transaction'>
+<a name='method-i-transaction'></a>
+<div class='synopsis'>
+<span class='name'>transaction</span>
+<span class='arguments'>(dbs, opts=OPTS, &block)</span>
+
+</div>
+<div class='description'>
+
+<p>Uses a transaction on all given databases with the given options. This:</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">transaction</span>([<span class="ruby-constant">DB1</span>, <span class="ruby-constant">DB2</span>, <span class="ruby-constant">DB3</span>]){}</pre>
+
+<p>is equivalent to:</p>
+
+<pre class="ruby"><span class="ruby-constant">DB1</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB2</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-constant">DB3</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+
+<p>except that if Sequel::Rollback is raised by the block, the transaction is rolled back on all databases instead of just the last one.</p>
+
+<p>Note that this method cannot guarantee that all databases will commit or rollback.  For example, if DB3 commits but attempting to commit on DB2 fails (maybe because foreign key checks are deferred), there is no way to uncommit the changes on DB3.  For that kind of support, you need to have two-phase commit/prepared transactions (which <a href="../Sequel.html"><code>Sequel</code></a> supports on some databases).</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-transaction-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-transaction-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">357</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">transaction</span>(<span class="ruby-identifier">dbs</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">358</span>   <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rollback</span>]&#x000A;<span class="line-num">359</span>     <span class="ruby-identifier">rescue_rollback</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="line-num">360</span>     <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:reraise</span>)&#x000A;<span class="line-num">361</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">362</span>   <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">dbs</span>.<span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">bl</span>, <span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">bl</span>)}}&#x000A;<span class="line-num">363</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">rescue_rollback</span>&#x000A;<span class="line-num">364</span>     <span class="ruby-keyword">begin</span>&#x000A;<span class="line-num">365</span>       <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">366</span>     <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="line-num">367</span>       <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">368</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">369</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">370</span>     <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="line-num">371</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">372</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-typecast_to_application_timestamp'>
@@ -204,7 +734,28 @@ Sequel::Timezones
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-typecast_to_application_timestamp-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-typecast_to_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">110</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast_to_application_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">111</span>   <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">typecast_timezone</span>)&#x000A;<span class="line-num">112</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-typecast_to_application_timestamp-source'>    <span class="ruby-comment"># File lib/sequel/timezones.rb</span>&#x000A;<span class="line-num">115</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">typecast_to_application_timestamp</span>(<span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">116</span>   <span class="ruby-identifier">convert_timestamp</span>(<span class="ruby-identifier">v</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">typecast_timezone</span>)&#x000A;<span class="line-num">117</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
+<div class='method public-instance' id='method-method-i-virtual_row'>
+<a name='method-i-virtual_row'></a>
+<div class='synopsis'>
+<span class='name'>virtual_row</span>
+<span class='arguments'>(&block)</span>
+
+</div>
+<div class='description'>
+
+<p>If the supplied block takes a single argument, yield an <code>SQL::VirtualRow</code> instance to the block argument.  Otherwise, evaluate the block in the context of a <code>SQL::VirtualRow</code> instance.</p>
+
+<pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">a</span>} <span class="ruby-comment"># Sequel::SQL::Identifier.new(:a)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>} <span class="ruby-comment"># Sequel::SQL::Function.new(:a)</span></pre>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-virtual_row-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-virtual_row-source'>    <span class="ruby-comment"># File lib/sequel/core.rb</span>&#x000A;<span class="line-num">381</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">virtual_row</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">382</span>   <span class="ruby-identifier">vr</span> = <span class="ruby-constant">VIRTUAL_ROW</span>&#x000A;<span class="line-num">383</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">block</span>.<span class="ruby-identifier">arity</span>&#x000A;<span class="line-num">384</span>   <span class="ruby-keyword">when</span> <span class="ruby-value">-1</span>, <span class="ruby-value">0</span>&#x000A;<span class="line-num">385</span>     <span class="ruby-identifier">vr</span>.<span class="ruby-identifier">instance_exec</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="line-num">386</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">387</span>     <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">vr</span>)&#x000A;<span class="line-num">388</span>   <span class="ruby-keyword">end</span>  &#x000A;<span class="line-num">389</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

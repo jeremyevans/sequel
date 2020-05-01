@@ -63,7 +63,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles JSON securely, specifying the :create_additions=&gt;false option when using JSON.parse.  If you really want to get the old vulnerable behavior back, override <a href="../../../classes/Sequel.html#method-c-parse_json"><code>Sequel.parse_json</code></a>.</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles JSON securely, specifying the :create_additions=&gt;false option when using JSON.parse.  If you really want to get the old vulnerable behavior back, override Sequel.parse_json.</p>
 </li><li>
 <p>The json_serializer and xml_serializer plugins are now secure by default.  Before, the default behavior of these plugins allowed for round tripping, such that:</p>
 

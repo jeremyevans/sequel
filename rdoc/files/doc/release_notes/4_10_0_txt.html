@@ -38,7 +38,7 @@ Last Update:
 <div id='description'>
 <h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Dataset literalization for simple datasets is now faster by creating a per-adapter SQL literalization method instead of having all adapters share a generic method with higher overhead. <a href="../../../classes/Sequel.html#method-c-split_symbol"><code>Sequel.split_symbol</code></a> now caches results globally. Symbol literalization is now cached per Database.</p>
+<p>Dataset literalization for simple datasets is now faster by creating a per-adapter SQL literalization method instead of having all adapters share a generic method with higher overhead. Sequel.split_symbol now caches results globally. Symbol literalization is now cached per Database.</p>
 
 <p>Combining these three optimizations, here are the performance increases compared to 4.9.0 for a couple example datasets:</p>
 

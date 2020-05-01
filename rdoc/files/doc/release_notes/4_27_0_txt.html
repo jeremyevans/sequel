@@ -55,7 +55,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html#method-c-synchronize"><code>Sequel.synchronize</code></a> is no longer a stub on MRI.  Testing has shown that relying on the global interpreter lock to protect multi-threaded access to hashes is not safe in all environments, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a mutex on MRI just as it does on other ruby interpreters.</p>
+<p>Sequel.synchronize is no longer a stub on MRI.  Testing has shown that relying on the global interpreter lock to protect multi-threaded access to hashes is not safe in all environments, so <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now uses a mutex on MRI just as it does on other ruby interpreters.</p>
 </li><li>
 <p>Database#schema now sets the :auto_increment option correctly for auto incrementing primary keys if they are not the first column in the table.</p>
 </li><li>

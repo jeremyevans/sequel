@@ -46,6 +46,7 @@ Sequel::Access::DatasetMethods
 <li><a href="#method-i-cross_join">cross_join</a></li>
 <li><a href="#method-i-escape_like">escape_like</a></li>
 <li><a href="#method-i-into">into</a></li>
+<li><a href="#method-i-quoted_identifier_append">quoted_identifier_append</a></li>
 <li><a href="#method-i-supports_derived_column_lists-3F">supports_derived_column_lists?</a></li>
 <li><a href="#method-i-supports_intersect_except-3F">supports_intersect_except?</a></li>
 <li><a href="#method-i-supports_is_true-3F">supports_is_true?</a></li>
@@ -225,6 +226,25 @@ Sequel::Access::DatasetMethods
 <pre id='method-i-into-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">170</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">into</span>(<span class="ruby-identifier">table</span>)&#x000A;<span class="line-num">171</span>   <span class="ruby-identifier">clone</span>(<span class="ruby-value">:into</span> <span class="ruby-operator">=&gt;</span> <span class="ruby-identifier">table</span>)&#x000A;<span class="line-num">172</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
+<div class='method public-instance' id='method-method-i-quoted_identifier_append'>
+<a name='method-i-quoted_identifier_append'></a>
+<div class='synopsis'>
+<span class='name'>quoted_identifier_append</span>
+<span class='arguments'>(sql, v)</span>
+
+</div>
+<div class='description'>
+
+<p><a href="../Access.html"><code>Access</code></a> uses [] for quoting identifiers, and can&#39;t handle ] inside identifiers.</p>
+
+</div>
+<div class='source'>
+<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-quoted_identifier_append-source&#39;); return false'>
+[show source]
+</a>
+<pre id='method-i-quoted_identifier_append-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">176</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">quoted_identifier_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">177</span>   <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;[&#39;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;]&#39;</span>&#x000A;<span class="line-num">178</span> <span class="ruby-keyword">end</span></pre>
+</div>
+</div>
 <div class='method public-instance' id='method-method-i-supports_derived_column_lists-3F'>
 <a name='method-i-supports_derived_column_lists-3F'></a>
 <div class='synopsis'>
@@ -241,7 +261,7 @@ Sequel::Access::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_derived_column_lists-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_derived_column_lists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">175</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>&#x000A;<span class="line-num">176</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">177</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_derived_column_lists-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">181</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_derived_column_lists?</span>&#x000A;<span class="line-num">182</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">183</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_intersect_except-3F'>
@@ -260,7 +280,7 @@ Sequel::Access::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_intersect_except-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_intersect_except-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">180</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except?</span>&#x000A;<span class="line-num">181</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">182</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_intersect_except-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">186</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_intersect_except?</span>&#x000A;<span class="line-num">187</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">188</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -279,7 +299,7 @@ Sequel::Access::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_is_true-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_is_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">185</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>&#x000A;<span class="line-num">186</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">187</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_is_true-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">191</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_is_true?</span>&#x000A;<span class="line-num">192</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">193</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_join_using-3F'>
@@ -298,7 +318,7 @@ Sequel::Access::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_join_using-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_join_using-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">190</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_join_using?</span>&#x000A;<span class="line-num">191</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">192</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_join_using-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">196</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_join_using?</span>&#x000A;<span class="line-num">197</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">198</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -317,7 +337,7 @@ Sequel::Access::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-supports_multiple_column_in-3F-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-supports_multiple_column_in-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">195</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>&#x000A;<span class="line-num">196</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-supports_multiple_column_in-3F-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">201</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">supports_multiple_column_in?</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-keyword">false</span>&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-truncate'>
@@ -336,7 +356,7 @@ Sequel::Access::DatasetMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-truncate-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-truncate-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>&#x000A;<span class="line-num">201</span>   <span class="ruby-identifier">delete</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-truncate-source'>    <span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb</span>&#x000A;<span class="line-num">206</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">truncate</span>&#x000A;<span class="line-num">207</span>   <span class="ruby-identifier">delete</span>&#x000A;<span class="line-num">208</span>   <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">209</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

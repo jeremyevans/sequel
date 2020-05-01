@@ -138,7 +138,7 @@ Last Update:
 
 <p>The Dataset#to_json method supports an :instance_block option, which should be a proc that will be passed to Model#to_json.</p>
 
-<p>In order to implement this, <a href="../../../classes/Sequel.html#method-c-object_to_json"><code>Sequel.object_to_json</code></a> now passes any block given to the to_json call on the object.  If you are overriding <a href="../../../classes/Sequel.html#method-c-object_to_json"><code>Sequel.object_to_json</code></a>, you are responsible for making sure the block is passed appropriately.</p>
+<p>In order to implement this, Sequel.object_to_json now passes any block given to the to_json call on the object.  If you are overriding Sequel.object_to_json, you are responsible for making sure the block is passed appropriately.</p>
 </li><li>
 <p>The association_pks plugin now supports a :association_pks_use_associated_table association option for many_to_many associations.  If this option is used, instead of just looking at the join table, the association_pks getter will get the primary keys from the associated table.  This can be useful if the association&#39;s right_primary_key does not match the associated model&#39;s primary key, and you are interested in the primary keys of the associated objects.  If this option is used, no association_pks setter method is created.</p>
 </li><li>

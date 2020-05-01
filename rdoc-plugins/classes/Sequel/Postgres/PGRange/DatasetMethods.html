@@ -35,38 +35,9 @@ Sequel::Postgres::PGRange::DatasetMethods
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
-<div id='method-list'>
-<h2>Methods</h2>
-<h3>Public Instance</h3>
-<ol>
-<li><a href="#method-i-literal_other_append">literal_other_append</a></li>
-</ol>
-</div>
 <div id='context'>
 </div>
 <div id='section'>
-<div id='methods'>
-<h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-literal_other_append'>
-<a name='method-i-literal_other_append'></a>
-<div class='synopsis'>
-<span class='name'>literal_other_append</span>
-<span class='arguments'>(sql, v)</span>
-
-</div>
-<div class='description'>
-
-<p>Handle literalization of ruby <a href="../../../Range.html"><code>Range</code></a> objects, treating them as PostgreSQL ranges.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-literal_other_append-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-literal_other_append-source'>    <span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb</span>&#x000A;<span class="line-num">309</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">literal_other_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">v</span>)&#x000A;<span class="line-num">310</span>   <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;<span class="line-num">311</span>   <span class="ruby-keyword">when</span> <span class="ruby-constant">Range</span>&#x000A;<span class="line-num">312</span>     <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-identifier">v</span>))&#x000A;<span class="line-num">313</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">314</span>     <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">315</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">316</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-</div>
 </div>
 
 </div>

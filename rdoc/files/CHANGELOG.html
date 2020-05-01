@@ -30,12 +30,29 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-04-01 08:28:09 -0700</span>
+<span class='datetime'>2020-05-01 07:43:18 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.32.0+-282020-05-01-29">5.32.0 (2020-05-01)<span><a href="#label-5.32.0+-282020-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Allow Database#create_table? work with :partition_of option on PostgreSQL (jeremyevans) (#1690)</p>
+</li><li>
+<p>Add fiber_concurrency extension, for using Fiber.current instead of Thread.current for checking out connections (jeremyevans)</p>
+</li><li>
+<p>Move most <a href="../classes/Sequel.html"><code>Sequel</code></a> singleton methods into a module that extends <a href="../classes/Sequel.html"><code>Sequel</code></a> for easier overriding (jeremyevans)</p>
+</li><li>
+<p>Fix method visibility issues in model, plugin, extension, and adapter code (jeremyevans)</p>
+</li><li>
+<p>Avoid defining conversion procs for PostgreSQL inet/cidr types in pg_inet extension when using sequel_pg 1.13.0+ (jeremyevans)</p>
+</li><li>
+<p>Add run_transaction_hooks Database extension, allowing for running the transaction hooks before commit/rollback, for use with transactional testing (jeremyevans)</p>
+</li><li>
+<p>Recognize timestamp(N) with time zone type (isc) (#1684)</p>
+</li></ul>
+
 <h3 id="label-5.31.0+-282020-04-01-29">5.31.0 (2020-04-01)<span><a href="#label-5.31.0+-282020-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Fix alter_table drop_constraint :primary_key option on SQLite for non-integer primary keys (jeremyevans)</p>
@@ -166,9 +183,9 @@ Last Update:
 </li><li>
 <p>Avoid possible thread-safety issue in the timezones support (jeremyevans)</p>
 </li><li>
-<p>Handle offsets when typecasting an array or hash to datetime when <a href="../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time (jeremyevans)</p>
+<p>Handle offsets when typecasting an array or hash to datetime when Sequel.datetime_class = Time (jeremyevans)</p>
 </li><li>
-<p>Support <a href="../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time when using the named_timezones extension (jeremyevans)</p>
+<p>Support Sequel.datetime_class = Time when using the named_timezones extension (jeremyevans)</p>
 </li></ul>
 
 <h3 id="label-5.22.0+-282019-07-01-29">5.22.0 (2019-07-01)<span><a href="#label-5.22.0+-282019-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
@@ -367,7 +384,7 @@ Last Update:
 <ul><li>
 <p>Make constraint_validations extension respect Database#constraint_validations_table setting (jeremyevans)</p>
 </li><li>
-<p>Make <a href="../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a> load files from gems (jeremyevans)</p>
+<p>Make Sequel.extension load files from gems (jeremyevans)</p>
 </li><li>
 <p>Map clob prepared statement argument type to OCI8::CLOB in the oracle adapter (pipistrellka) (#1534)</p>
 </li><li>
@@ -542,7 +559,7 @@ Last Update:
 
 <h3 id="label-5.7.0+-282018-04-01-29">5.7.0 (2018-04-01)<span><a href="#label-5.7.0+-282018-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
-<p>Add <a href="../classes/Sequel.html#method-c-start_timer"><code>Sequel.start_timer</code></a> and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)</p>
+<p>Add Sequel.start_timer and .elapsed_seconds_since for more accurate elapsed time calculations on ruby 2.1+ (jeremyevans)</p>
 </li><li>
 <p>Run Dataset#with_sql_{all,each,first,single_value} using a cached dataset to avoid clobbering the dataset&#39;s columns (jeremyevans)</p>
 </li><li>

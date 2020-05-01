@@ -119,11 +119,11 @@ Last Update:
 
 <p>There are three conversion methods that are called:</p>
 <ul><li>
-<p>Sequel.database_to_application_timestamp - Called on time objects coming out of the database.  If the object coming out of the database (usually a string) does not have an offset, assume it is already in the database_timezone.  Return a Time/DateTime object (depending on <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a>), in the application_timzone.</p>
+<p>Sequel.database_to_application_timestamp - Called on time objects coming out of the database.  If the object coming out of the database (usually a string) does not have an offset, assume it is already in the database_timezone.  Return a Time/DateTime object (depending on Sequel.datetime_class), in the application_timzone.</p>
 </li><li>
 <p>Sequel.application_to_database_timestamp - Used when literalizing Time/DateTime objects into an SQL string.  Converts the object to the database_timezone before literalizing them.</p>
 </li><li>
-<p>Sequel.typecast_to_application_timestamp - Called when typecasting objects for model datetime columns.  If the object being typecasted does not already have an offset, assume it is already in the typecast_timezone.  Return a Time/DateTime object (depending on <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a>), in the application_timezone.</p>
+<p>Sequel.typecast_to_application_timestamp - Called when typecasting objects for model datetime columns.  If the object being typecasted does not already have an offset, assume it is already in the typecast_timezone.  Return a Time/DateTime object (depending on Sequel.datetime_class), in the application_timezone.</p>
 </li></ul>
 
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> does not yet support named timezones or per thread modification of the timezone (for showing all timestamps in the current user&#39;s timezone).  Extensions to support both features are planned for a future version.</p>
@@ -222,7 +222,7 @@ Last Update:
 </li><li>
 <p>Database#<< now always returns nil.  Before, the return value was adapter dependent.</p>
 </li><li>
-<p>ODBC::Time and ODBC::DateTime values are now converted to the <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a>.  Before, ODBC::Time used Time and ODBC::DateTime used DateTime regardless of the <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> setting.</p>
+<p>ODBC::Time and ODBC::DateTime values are now converted to the Sequel.datetime_class.  Before, ODBC::Time used Time and ODBC::DateTime used DateTime regardless of the Sequel.datetime_class setting.</p>
 </li><li>
 <p>The default inflections were modified, fixing some obvious errors and possibly changing some existing inflections.  Further changes to the default inflections are unlikely.</p>
 </li></ul>

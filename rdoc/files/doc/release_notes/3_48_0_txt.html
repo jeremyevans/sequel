@@ -262,7 +262,7 @@ Last Update:
 </li><li>
 <p>The pg_hstore_ops extension now integrates with the pg_array, pg_hstore, and pg_array_ops extensions, allowing you to pass in arrays and hashes to be treated as PGArrays and HStores, and returning ArrayOps for PostgreSQL functions/operators that return arrays.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html#method-c-object_to_json"><code>Sequel.object_to_json</code></a> and <a href="../../../classes/Sequel.html#method-c-json_parser_error_class"><code>Sequel.json_parser_error_class</code></a> have been added and all internal json usage uses them, so you can now override these methods if you want to use an alternative json library with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
+<p>Sequel.object_to_json and Sequel.json_parser_error_class have been added and all internal json usage uses them, so you can now override these methods if you want to use an alternative json library with <a href="../../../classes/Sequel.html"><code>Sequel</code></a>.</p>
 </li><li>
 <p>The association_proxies plugin now accepts a block allowing the user control over which methods are proxied to the dataset or the cached array of instances.  You can base the decision on where to send the method using a variety of factors including the method name, the method arguments, the state of the current instance, or the related association.  Here&#39;s an example of a simple case just depending on the name of the method; </p>
 

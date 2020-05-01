@@ -168,9 +168,9 @@ Last Update:
 </li><li>
 <p>You can now require &#39;sequel/no_core_ext&#39; to load <a href="../../../classes/Sequel.html"><code>Sequel</code></a> without the core extensions.  The previous way of setting the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable before loading <a href="../../../classes/Sequel.html"><code>Sequel</code></a> still works.</p>
 </li><li>
-<p>The core extensions have been moved from Sequel&#39;s core library into an extension that is loadable with <a href="../../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a>.  This extension is still loaded by default for backwards compatibility.  However, the next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer load this extension by default (though it will still be available to load manually).</p>
+<p>The core extensions have been moved from Sequel&#39;s core library into an extension that is loadable with Sequel.extension.  This extension is still loaded by default for backwards compatibility.  However, the next major version of <a href="../../../classes/Sequel.html"><code>Sequel</code></a> will no longer load this extension by default (though it will still be available to load manually).</p>
 </li><li>
-<p>You can now check if the core extensions have been loaded by using <a href="../../../classes/Sequel.html#method-c-core_extensions-3F"><code>Sequel.core_extensions?</code></a>.</p>
+<p>You can now check if the core extensions have been loaded by using Sequel.core_extensions?.</p>
 </li></ul>
 
 <h1 id="label-Foreign+Keys+in+the+Schema+Dumper">Foreign Keys in the Schema Dumper<span><a href="#label-Foreign+Keys+in+the+Schema+Dumper">&para;</a> <a href="#top">&uarr;</a></span></h1>
@@ -286,7 +286,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p>Database#uri and url now return the connection string given to <a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>.  Previously, they tried to reconstruct the url using the database&#39;s options, but that didn&#39;t work well in corner cases.</p>
+<p>Database#uri and url now return the connection string given to Sequel.connect.  Previously, they tried to reconstruct the url using the database&#39;s options, but that didn&#39;t work well in corner cases.</p>
 </li><li>
 <p>Database#inspect now shows the URL and/or options given when connecting to the database.  Previously, it showed the URL, or all of the databases options if constructing the URL raised an error.</p>
 </li><li>

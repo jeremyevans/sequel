@@ -30,7 +30,7 @@ doc/code_order.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2017-08-01 08:12:00 -0700</span>
+<span class='datetime'>2020-05-01 07:43:18 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -42,13 +42,13 @@ Last Update:
 
 <h2 id="label-Require+Sequel">Require <a href="../../classes/Sequel.html"><code>Sequel</code></a><span><a href="#label-Require+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>This is sort of a no brainer, but you need to require the library first.  This is a strict requirement, none of the other code can be executed unless the library has been required first. Example:</p>
+<p>This is sort of a no-brainer, but you need to require the library first.  This is a strict requirement, none of the other code can be executed unless the library has been required first. Example:</p>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel&#39;</span></pre>
 
 <h2 id="label-Add+Global+Extensions">Add Global Extensions<span><a href="#label-Add+Global+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Global extensions are loaded with <a href="../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a>, and affect other parts of <a href="../../classes/Sequel.html"><code>Sequel</code></a> or the general ruby environment.  It&#39;s not necessary to load them first, but it is a recommended practice. Example:</p>
+<p>Global extensions are loaded with Sequel.extension, and affect other parts of <a href="../../classes/Sequel.html"><code>Sequel</code></a> or the general ruby environment.  It&#39;s not necessary to load them first, but it is a recommended practice. Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:blank</span></pre>
 
@@ -84,7 +84,7 @@ Last Update:
 
 <h2 id="label-Load+Model+Classes">Load Model Classes<span><a href="#label-Load+Model+Classes">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>After you have established a database connection, and configured your global model configration and global plugins, you can load your model classes.  It&#39;s recommended to have a separate file for each model class, unless the model classes are very simple.  Example:</p>
+<p>After you have established a database connection, and configured your global model configuration and global plugins, you can load your model classes.  It&#39;s recommended to have a separate file for each model class, unless the model classes are very simple.  Example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}</pre>
 
@@ -95,6 +95,10 @@ Last Update:
 <p>Additionally, in production and testing, you should freeze the model classes and Database instance, so that you can detect unsafe runtime modification of the configuration:</p>
 
 <pre class="ruby"><span class="ruby-identifier">model_classes</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>)&#x000A;<span class="ruby-identifier">model_classes</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">freeze</span></pre>
+
+<p>The `subclasses` plugin can be used to keep track of all model classes that have been setup in your application. Finalizing their associations and freezing them can easily be achieved through the plugin:</p>
+
+<pre class="ruby"><span class="ruby-comment"># Register the plugin before setting up the models</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:subclasses</span>&#x000A;<span class="ruby-comment"># ... setup models</span>&#x000A;<span class="ruby-comment"># Now finalize associations &amp; freeze models by calling the plugin:</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">freeze_descendents</span></pre>
 
 <h2 id="label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">Disconnect If Using Forking Webserver with Code Preloading<span><a href="#label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">&para;</a> <a href="#top">&uarr;</a></span></h2>
 

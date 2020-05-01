@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.32.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.32.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.32.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-05-01 07:43:18 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>A fiber_concurrency extension has been added, for using Fiber.current instead of Thread.current when checking out a connection.  This allows separate fibers of the same thread to use separate connections.  In addition to allowing direct use of fibers, this also allows concurrent use of multiple enumerators that use database connections in the same thread.</p>
+
+<p>When using this extension, you must be careful and ensure that you are not using more concurrent fibers than your connection pool size. Otherwise, all fibers will block while one fiber waits until a connection is available.  It is possible this issue will be addressed when Ruby implements a fiber scheduler (currently being discussed for inclusion in Ruby 3).</p>
+</li><li>
+<p>A run_transaction_hooks Database extension has been added, allowing for running the transaction hooks before commit/rollback, which can be helpful for testing the hooks when using transactional testing.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>Database#create_table? now works correctly with the :partition_of option on PostgreSQL.</p>
+</li><li>
+<p>The timestamp(N) with time zone type is now recognized by the schema parser.</p>
+</li><li>
+<p>Singleton methods of the <a href="../../../classes/Sequel.html"><code>Sequel</code></a> module have now been moved into a <a href="../../../classes/Sequel/SequelMethods.html"><code>Sequel::SequelMethods</code></a> module.  This allows you to extend <a href="../../../classes/Sequel.html"><code>Sequel</code></a> with a module that overrides the methods and call super to get the default behavior.</p>
+</li><li>
+<p>The pg_inet extension no longer defines inet/cidr conversion procs if sequel_pg 1.13.0+ is in use.  This is because sequel_pg 1.13.0+ will respect the conversion procs and defining them makes things slower.  sequel_pg 1.13.0+ handles the same conversion by default without needing a conversion proc.</p>
+</li><li>
+<p>Method visibility issues in the model, plugin, extension, and adapter code have been fixed.  Most cases fixed were private methods being accidentally made public when they were overridden.</p>
+
+<p>During this change, Model#_insert_values was changed from public to private, since it was originally intended to be private.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

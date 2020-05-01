@@ -75,7 +75,7 @@ Last Update:
 <p>Other Improvements</p>
 <hr>
 <ul><li>
-<p>The SQLite adapter now respects the <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> option for timestamp and datetime columns.</p>
+<p>The SQLite adapter now respects the Sequel.datetime_class option for timestamp and datetime columns.</p>
 </li><li>
 <p>Adding a unique constraint no longer explicity creates a unique index.  If you want a unique index, use index :unique=&gt;true.</p>
 </li><li>
@@ -115,7 +115,7 @@ Last Update:
 <ul><li>
 <p>The :numeric_precision and :max_chars schema entries have been removed.  Use the :db_type entry to determine this information, if available.</p>
 </li><li>
-<p>The SQLite adapter used to always return Time instances for timestamp types, even if <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> was DateTime.  For datetime types it always returned a DateTime instance.  It now returns an instance of <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> in both cases.</p>
+<p>The SQLite adapter used to always return Time instances for timestamp types, even if Sequel.datetime_class was DateTime.  For datetime types it always returned a DateTime instance.  It now returns an instance of Sequel.datetime_class in both cases.</p>
 </li><li>
 <p>It&#39;s possible that the including of associations&#39; orders when eager loading via eager_graph could cause problems.  You can use the :order_eager_graph=&gt;false option to not use the :order option when eager loading via :eager_graph.</p>
 </li><li>

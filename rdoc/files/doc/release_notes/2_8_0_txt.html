@@ -69,7 +69,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> = <span class="ruby-keyword">false</span></pre>
 
-<p>You need to do that after you call <a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> but before you use the database for anything, since that setting is set on initial connection.</p>
+<p>You need to do that after you call Sequel.connect but before you use the database for anything, since that setting is set on initial connection.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now raises an error if you attempt to use EXCEPT [ALL] or INTERSECT [ALL] on a database that doesn&#39;t support it.</p>
 </li><li>

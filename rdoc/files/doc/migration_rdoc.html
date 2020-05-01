@@ -339,7 +339,7 @@ Last Update:
 
 <p>By default, <code>sequel -m</code> operates as a well behaved command line utility should, printing out nothing if there is no error.  If you want to see the SQL being executed during a migration, as well as the amount of time that each migration takes, you can use the <code>-E</code> option to <code>sequel</code> to set up a <code>Database</code> logger that logs to <code>STDOUT</code>.  You can also log that same output to a file using the <code>-l</code> option with a log file name.</p>
 
-<p>If you want to include a logger in the rake task above, add a <code>:logger</code> option when calling <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>:</p>
+<p>If you want to include a logger in the rake task above, add a <code>:logger</code> option when calling Sequel.connect:</p>
 
 <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&quot;logger&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-constant">ENV</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;DATABASE_URL&quot;</span>), <span class="ruby-value">logger:</span> <span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stderr</span>))</pre>
 

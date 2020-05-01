@@ -74,7 +74,7 @@ Last Update:
 
 <h6 id="label-"><span><a href="#label-">&para;</a> <a href="#top">&uarr;</a></span></h6>
 
-<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has built in support for master/slave database configurations, just by setting an option in <a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>:</p>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now has built in support for master/slave database configurations, just by setting an option in Sequel.connect:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>, \&#x000A;  <span class="ruby-value">:servers</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:read_only</span><span class="ruby-operator">=&gt;</span>{<span class="ruby-value">:host</span><span class="ruby-operator">=&gt;</span><span class="ruby-string">&#39;slave_server&#39;</span>}})</pre>
 

@@ -40,7 +40,7 @@ Last Update:
 
 <p>All <a href="../../classes/Sequel.html"><code>Sequel</code></a> activity begins with connecting to a database, which creates a <a href="../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> object. The Database object is used to create datasets and execute queries. <a href="../../classes/Sequel.html"><code>Sequel</code></a> provides a powerful and flexible mechanism for connecting to databases.  There are two main ways to establish database connections:</p>
 <ol><li>
-<p>Using the <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> method</p>
+<p>Using the Sequel.connect method</p>
 </li><li>
 <p>Using the specialized adapter method (Sequel.sqlite, Sequel.postgres, etc.)</p>
 </li></ol>
@@ -49,7 +49,7 @@ Last Update:
 
 <p>If you are only connecting to a single database, it is recommended that you store the database object in a constant named DB.  This is not required, but it is the convention that most <a href="../../classes/Sequel.html"><code>Sequel</code></a> code uses.</p>
 
-<h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+the+Sequel.connect+method">Using the Sequel.connect method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <p>The connect method usually takes a well-formed URI, which is parsed into connection options needed to open the database connection.  The scheme/protocol part of the URI is used to determine the adapter to use:</p>
 
@@ -71,7 +71,7 @@ Last Update:
 
 <h2 id="label-Using+the+specialized+adapter+method">Using the specialized adapter method<span><a href="#label-Using+the+specialized+adapter+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>The specialized adapter method is similar to <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> with an options hash, except that it automatically populates the :adapter option and assumes the first argument is the :database option, unless the first argument is a hash. So the following statements are equivalent to the previous statements.</p>
+<p>The specialized adapter method is similar to Sequel.connect with an options hash, except that it automatically populates the :adapter option and assumes the first argument is the :database option, unless the first argument is a hash. So the following statements are equivalent to the previous statements.</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-string">&#39;blog&#39;</span>, <span class="ruby-value">host:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>)&#x000A;<span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">postgres</span>(<span class="ruby-value">host:</span> <span class="ruby-string">&#39;localhost&#39;</span>, <span class="ruby-value">user:</span> <span class="ruby-string">&#39;user&#39;</span>, <span class="ruby-value">password:</span> <span class="ruby-string">&#39;password&#39;</span>, <span class="ruby-value">database:</span> <span class="ruby-string">&#39;blog&#39;</span>)</pre>
 
@@ -79,13 +79,13 @@ Last Update:
 
 <h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>Both the <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> method and the specialized adapter methods take a block.  If you provide a block to the method, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will create a Database object and pass it as an argument to the block.  When the block returns, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will disconnect the database connection. For example:</p>
+<p>Both the Sequel.connect method and the specialized adapter methods take a block.  If you provide a block to the method, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will create a Database object and pass it as an argument to the block.  When the block returns, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will disconnect the database connection. For example:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[<span class="ruby-value">:users</span>].<span class="ruby-identifier">count</span>}</pre>
 
-<p>Note that if you do not pass a block to <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically retain a reference to the object in the <code>Sequel::DATABASES</code> array.  So calling <code>Sequel.connect</code> multiple times (say once per request), can result in a memory leak.  For any application where database access is needed for a long period of time, it&#39;s best to store the result of Sequel.connection in a constant, as recommended above.</p>
+<p>Note that if you do not pass a block to Sequel.connect, <a href="../../classes/Sequel.html"><code>Sequel</code></a> will automatically retain a reference to the object in the <code>Sequel::DATABASES</code> array.  So calling <code>Sequel.connect</code> multiple times (say once per request), can result in a memory leak.  For any application where database access is needed for a long period of time, it&#39;s best to store the result of Sequel.connection in a constant, as recommended above.</p>
 
-<h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
+<h2 id="label-Using+the+Sequel.connect+method">Using the Sequel.connect method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
 <h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
@@ -193,9 +193,9 @@ Last Update:
 
 <p>Requires: java</p>
 
-<p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for individual database types is done using subadapters. There are currently subadapters for DB2, Derby, H2, HSQLDB, JTDS, MySQL, Oracle, PostgreSQL, SQLAnywhere, SQLite, and SQL Server. For Derby, H2, HSQLDB, JTDS, MySQL, Postgres, SQLite3 the adapters can use the `jdbc-*` gem, for the others you need to have the `.jar` in your CLASSPATH or load the Java class manually before calling <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a>.</p>
+<p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for individual database types is done using subadapters. There are currently subadapters for DB2, Derby, H2, HSQLDB, JTDS, MySQL, Oracle, PostgreSQL, SQLAnywhere, SQLite, and SQL Server. For Derby, H2, HSQLDB, JTDS, MySQL, Postgres, SQLite3 the adapters can use the `jdbc-*` gem, for the others you need to have the `.jar` in your CLASSPATH or load the Java class manually before calling Sequel.connect.</p>
 
-<p>Note that when using a JDBC adapter, the best way to use <a href="../../classes/Sequel.html"><code>Sequel</code></a> is via <a href="../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> using a connection string, NOT Sequel.jdbc.  Use the JDBC connection string when connecting, which will be in a different format than the native connection string.  The connection string should start with &#39;jdbc:&#39;.  For PostgreSQL, use &#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding slashes for the database name (use no preceding slashes for a relative path, and one preceding slash for an absolute path).</p>
+<p>Note that when using a JDBC adapter, the best way to use <a href="../../classes/Sequel.html"><code>Sequel</code></a> is via Sequel.connect using a connection string, NOT Sequel.jdbc.  Use the JDBC connection string when connecting, which will be in a different format than the native connection string.  The connection string should start with &#39;jdbc:&#39;.  For PostgreSQL, use &#39;jdbc:postgresql:&#39;, and for SQLite you do not need 2 preceding slashes for the database name (use no preceding slashes for a relative path, and one preceding slash for an absolute path).</p>
 
 <p><a href="../../classes/Sequel.html"><code>Sequel</code></a> does no preprocessing of JDBC connection strings, it passes them directly to JDBC. So if you have problems getting a connection string to work, look up the  documentation for the JDBC driver.</p>
 

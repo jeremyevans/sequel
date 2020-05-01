@@ -35,78 +35,9 @@ Sequel::Plugins::AssociationLazyEagerOption::InstanceMethods
 <div id='content'>
 <div id='text'>
 <div id='description'></div>
-<div id='method-list'>
-<h2>Methods</h2>
-<h3>Public Instance</h3>
-<ol>
-<li><a href="#method-i-_associated_dataset">_associated_dataset</a></li>
-<li><a href="#method-i-_associated_object_loader">_associated_object_loader</a></li>
-<li><a href="#method-i-load_with_primary_key_lookup-3F">load_with_primary_key_lookup?</a></li>
-</ol>
-</div>
 <div id='context'>
 </div>
 <div id='section'>
-<div id='methods'>
-<h2>Public Instance methods</h2>
-<div class='method public-instance' id='method-method-i-_associated_dataset'>
-<a name='method-i-_associated_dataset'></a>
-<div class='synopsis'>
-<span class='name'>_associated_dataset</span>
-<span class='arguments'>(opts, dynamic_opts)</span>
-
-</div>
-<div class='description'>
-
-<p>Return a dataset for the association after applying any dynamic callback.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_associated_dataset-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-_associated_dataset-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_lazy_eager_option.rb</span>&#x000A;<span class="line-num">40</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_associated_dataset</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">dynamic_opts</span>)&#x000A;<span class="line-num">41</span>   <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">42</span> &#x000A;<span class="line-num">43</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">eager</span> = <span class="ruby-identifier">dynamic_opts</span>[<span class="ruby-value">:eager</span>]&#x000A;<span class="line-num">44</span>     <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">eager</span>(<span class="ruby-identifier">eager</span>)&#x000A;<span class="line-num">45</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">46</span> &#x000A;<span class="line-num">47</span>   <span class="ruby-identifier">ds</span>&#x000A;<span class="line-num">48</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-_associated_object_loader'>
-<a name='method-i-_associated_object_loader'></a>
-<div class='synopsis'>
-<span class='name'>_associated_object_loader</span>
-<span class='arguments'>(opts, dynamic_opts)</span>
-
-</div>
-<div class='description'>
-
-<p>A placeholder literalizer that can be used to load the association, or nil to not use one.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-_associated_object_loader-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-_associated_object_loader-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_lazy_eager_option.rb</span>&#x000A;<span class="line-num">51</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">_associated_object_loader</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">dynamic_opts</span>)&#x000A;<span class="line-num">52</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">dynamic_opts</span>[<span class="ruby-value">:eager</span>]&#x000A;<span class="line-num">53</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">54</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-load_with_primary_key_lookup-3F'>
-<a name='method-i-load_with_primary_key_lookup-3F'></a>
-<div class='synopsis'>
-<span class='name'>load_with_primary_key_lookup?</span>
-<span class='arguments'>(opts, dynamic_opts)</span>
-
-</div>
-<div class='description'>
-
-<p>Whether to use a simple primary key lookup on the associated class when loading.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-load_with_primary_key_lookup-3F-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-load_with_primary_key_lookup-3F-source'>   <span class="ruby-comment"># File lib/sequel/plugins/association_lazy_eager_option.rb</span>&#x000A;<span class="line-num">57</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">load_with_primary_key_lookup?</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">dynamic_opts</span>)&#x000A;<span class="line-num">58</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">dynamic_opts</span>[<span class="ruby-value">:eager</span>]&#x000A;<span class="line-num">59</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-</div>
 </div>
 
 </div>

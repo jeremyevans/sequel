@@ -41,7 +41,6 @@ Sequel::Plugins::Subclasses::ClassMethods
 <ol>
 <li><a href="#method-i-descendents">descendents</a></li>
 <li><a href="#method-i-freeze_descendents">freeze_descendents</a></li>
-<li><a href="#method-i-inherited">inherited</a></li>
 <li><a href="#attribute-i-on_subclass">on_subclass</a></li>
 <li><a href="#attribute-i-subclasses">subclasses</a></li>
 </ol>
@@ -112,25 +111,6 @@ Sequel::Plugins::Subclasses::ClassMethods
 [show source]
 </a>
 <pre id='method-i-freeze_descendents-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">60</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">freeze_descendents</span>&#x000A;<span class="line-num">61</span>   <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">end</span></pre>
-</div>
-</div>
-<div class='method public-instance' id='method-method-i-inherited'>
-<a name='method-i-inherited'></a>
-<div class='synopsis'>
-<span class='name'>inherited</span>
-<span class='arguments'>(subclass)</span>
-
-</div>
-<div class='description'>
-
-<p>Add the subclass to this model&#39;s current subclasses, and initialize a new subclasses instance variable in the subclass.</p>
-
-</div>
-<div class='source'>
-<a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-inherited-source&#39;); return false'>
-[show source]
-</a>
-<pre id='method-i-inherited-source'>   <span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb</span>&#x000A;<span class="line-num">69</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;<span class="line-num">70</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">71</span>   <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;<span class="line-num">72</span>   <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="line-num">73</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

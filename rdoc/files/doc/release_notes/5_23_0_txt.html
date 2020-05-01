@@ -60,7 +60,7 @@ Last Update:
 
 <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
 <ul><li>
-<p><a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time is now supported when using the named_timezones extension.  For backwards compatibility, the named_timezones extension still sets <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = DateTime.  When using Ruby 2.6+, the Time instances have the timezone set on them using Ruby 2.6+&#39;s timezone support, but basic support works correctly in earlier versions of Ruby.</p>
+<p>Sequel.datetime_class = Time is now supported when using the named_timezones extension.  For backwards compatibility, the named_timezones extension still sets Sequel.datetime_class = DateTime.  When using Ruby 2.6+, the Time instances have the timezone set on them using Ruby 2.6+&#39;s timezone support, but basic support works correctly in earlier versions of Ruby.</p>
 </li><li>
 <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html"><code>Sequel</code></a> now handles parsing schema for tables in another database on the same server or in a database on a linked server.</p>
 </li><li>
@@ -70,7 +70,7 @@ Last Update:
 </li><li>
 <p>Dataset#execute* private methods now respect an explicitly given :server option, fixing Dataset#paged_each in the postgres adapter when using sharding.</p>
 </li><li>
-<p>Timezone offsets are now handled correctly when typecasting an array or hash to datetime when <a href="../../../classes/Sequel.html#attribute-c-datetime_class"><code>Sequel.datetime_class</code></a> = Time.</p>
+<p>Timezone offsets are now handled correctly when typecasting an array or hash to datetime when Sequel.datetime_class = Time.</p>
 </li><li>
 <p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> now avoids errors when parsing schema when using the mock SQLite adapter.</p>
 </li><li>

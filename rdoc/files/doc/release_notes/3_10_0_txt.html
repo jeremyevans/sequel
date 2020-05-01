@@ -142,7 +142,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-value">:a</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">p</span>} <span class="ruby-comment"># WHERE x &gt; p</span></pre>
 </li><li>
-<p><a href="../../../classes/Sequel.html#method-c-connect"><code>Sequel.connect</code></a> with a block now returns the value of the block:</p>
+<p>Sequel.connect with a block now returns the value of the block:</p>
 
 <pre class="ruby"><span class="ruby-identifier">max_price</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://items.db&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">db</span>[<span class="ruby-value">:items</span>].<span class="ruby-identifier">max</span>(<span class="ruby-value">:price</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
 </li><li>

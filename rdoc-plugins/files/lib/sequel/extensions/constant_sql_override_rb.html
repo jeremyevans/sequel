@@ -48,7 +48,7 @@ Last Update:
 
 <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-value">released_at:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># =&gt; SELECT &quot;albums.*&quot; FROM &quot;albums&quot; WHERE (&quot;released_at&quot; = CURRENT_TIMESTAMP AT TIME ZONE &#39;UTC&#39;)</span></pre>
 
-<p>To use this extension, first load it into your Sequel::Database instance:</p>
+<p>To use this extension, first load it into your <a href="../../../../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> <span class="ruby-value">:constant_sql_override</span></pre>
 

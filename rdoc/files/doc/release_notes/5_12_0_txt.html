@@ -93,7 +93,7 @@ Last Update:
 </li><li>
 <p>Datasets now cache the EagerGraphLoader object that is generated to convert arrays of hashes into an object graph, so that subsequent eager loads on the same dataset do not need to recompute the same information.  Most EagerGraphLoader internal state is now frozen to prevent unintentional modification.</p>
 </li><li>
-<p><a href="../../../classes/Sequel.html#method-c-extension"><code>Sequel.extension</code></a> now loads files from gems.  Previously, it used Kernel.require, which does not load files from gems.</p>
+<p>Sequel.extension now loads files from gems.  Previously, it used Kernel.require, which does not load files from gems.</p>
 </li><li>
 <p>Adapters that emulate prepared statements using literalization now use a placeholder literalizer and should execute significantly faster.  More prepared statement internal metadata is now frozen to prevent unintentional modification.</p>
 </li><li>

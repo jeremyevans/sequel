@@ -30,7 +30,7 @@ doc/testing.rdoc
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-03-23 09:19:59 -0700</span>
+<span class='datetime'>2020-04-17 11:52:37 -0700</span>
 </div>
 </div>
 <div id='content'>
@@ -64,11 +64,11 @@ Last Update:
 
 <h2 id="label-Transactional+testing+with+multiple+databases">Transactional testing with multiple databases<span><a href="#label-Transactional+testing+with+multiple+databases">&para;</a> <a href="#top">&uarr;</a></span></h2>
 
-<p>You can use the <a href="../../classes/Sequel.html#method-c-transaction"><code>Sequel.transaction</code></a> method to run a transaction on multiple databases, rolling all of them back.  Instead of:</p>
+<p>You can use the Sequel.transaction method to run a transaction on multiple databases, rolling all of them back.  Instead of:</p>
 
 <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>)</pre>
 
-<p>Use <a href="../../classes/Sequel.html#method-c-transaction"><code>Sequel.transaction</code></a> with an array of databases:</p>
+<p>Use Sequel.transaction with an array of databases:</p>
 
 <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">transaction</span>([<span class="ruby-constant">DB1</span>, <span class="ruby-constant">DB2</span>, <span class="ruby-constant">DB3</span>], <span class="ruby-value">:rollback</span><span class="ruby-operator">=&gt;</span><span class="ruby-value">:always</span>)</pre>
 
@@ -149,6 +149,8 @@ Last Update:
 <p>Use the error_sql extension when running the specs</p>
 </td></tr><tr><td class='label'>SEQUEL_INDEX_CACHING </td><td>
 <p>Use the index_caching extension when running the specs</p>
+</td></tr><tr><td class='label'>SEQUEL_FIBER_CONCURRENCY </td><td>
+<p>Use the fiber_concurrency extension when running the adapter and integration specs</p>
 </td></tr><tr><td class='label'>SEQUEL_FREEZE_DATABASE </td><td>
 <p>Freeze the database before running the integration specs</p>
 </td></tr><tr><td class='label'>SEQUEL_IDENTIFIER_MANGLING </td><td>
