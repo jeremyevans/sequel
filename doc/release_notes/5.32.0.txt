@@ -1,0 +1,46 @@
+= New Features
+
+* A fiber_concurrency extension has been added, for using
+  Fiber.current instead of Thread.current when checking out a
+  connection.  This allows separate fibers of the same thread
+  to use separate connections.  In addition to allowing direct use
+  of fibers, this also allows concurrent use of multiple enumerators
+  that use database connections in the same thread.
+
+  When using this extension, you must be careful and ensure that you
+  are not using more concurrent fibers than your connection pool size.
+  Otherwise, all fibers will block while one fiber waits until a
+  connection is available.  It is possible this issue will be
+  addressed when Ruby implements a fiber scheduler (currently
+  being discussed for inclusion in Ruby 3).
+
+* A run_transaction_hooks Database extension has been added,
+  allowing for running the transaction hooks before commit/rollback,
+  which can be helpful for testing the hooks when using transactional
+  testing.
+
+= Other Improvements
+
+* Database#create_table? now works correctly with the :partition_of
+  option on PostgreSQL.
+
+* The timestamp(N) with time zone type is now recognized by the
+  schema parser.
+
+* Singleton methods of the Sequel module have now been moved into a
+  Sequel::SequelMethods module.  This allows you to extend Sequel
+  with a module that overrides the methods and call super to get
+  the default behavior.
+
+* The pg_inet extension no longer defines inet/cidr conversion procs
+  if sequel_pg 1.13.0+ is in use.  This is because sequel_pg 1.13.0+
+  will respect the conversion procs and defining them makes things
+  slower.  sequel_pg 1.13.0+ handles the same conversion by default
+  without needing a conversion proc.
+
+* Method visibility issues in the model, plugin, extension, and adapter
+  code have been fixed.  Most cases fixed were private methods being
+  accidentally made public when they were overridden.
+
+  During this change, Model#_insert_values was changed from public to
+  private, since it was originally intended to be private.
