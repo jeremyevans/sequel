@@ -25,6 +25,18 @@ describe "An SQLite database" do
     @db.sqlite_version.must_be_kind_of(Integer)
   end
   
+  it "should allow setting current_timestamp_utc to keep CURRENT_* in UTC" do
+    begin
+      v = @db.current_timestamp_utc
+      @db.current_timestamp_utc = true
+      Time.parse(@db.get(Sequel::CURRENT_TIMESTAMP)).strftime('%Y%m%d%H%M').must_equal Time.now.utc.strftime('%Y%m%d%H%M')
+      Time.parse(@db.get(Sequel::CURRENT_DATE)).strftime('%Y%m%d').must_equal Time.now.utc.strftime('%Y%m%d')
+      Time.parse(@db.get(Sequel::CURRENT_TIME)).strftime('%H%M').must_equal Time.now.utc.strftime('%H%M')
+    ensure
+      @db.current_timestamp_utc = v
+    end
+  end
+  
   it "should support a use_timestamp_timezones setting" do
     @db.use_timestamp_timezones = true
     @db.create_table!(:fk){Time :time}

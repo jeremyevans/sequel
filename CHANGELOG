@@ -1,3 +1,7 @@
+=== master
+
+* Add Database#current_timestamp_utc accessor on SQLite to keep CURRENT_* in UTC instead of converting to localtime (jeremyevans)
+
 === 5.32.0 (2020-05-01)
 
 * Allow Database#create_table? work with :partition_of option on PostgreSQL (jeremyevans) (#1690)

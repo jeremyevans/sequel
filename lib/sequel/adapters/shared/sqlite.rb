@@ -38,6 +38,10 @@ module Sequel
       # booleans be stored as integers, but historically Sequel has used 't'/'f'.
       attr_accessor :integer_booleans
 
+      # Whether to keep CURRENT_TIMESTAMP and similar expressions in UTC.  By
+      # default, the expressions are converted to localtime.
+      attr_accessor :current_timestamp_utc
+
       # A symbol signifying the value of the default transaction mode
       attr_reader :transaction_mode
 
@@ -615,7 +619,7 @@ module Sequel
       # SQLite has CURRENT_TIMESTAMP and related constants in UTC instead
       # of in localtime, so convert those constants to local time.
       def constant_sql_append(sql, constant)
-        if c = CONSTANT_MAP[constant]
+        if (c = CONSTANT_MAP[constant]) && !db.current_timestamp_utc
           sql << c
         else
           super
