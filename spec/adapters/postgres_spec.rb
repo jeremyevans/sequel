@@ -275,8 +275,8 @@ describe "PostgreSQL", '#create_table' do
     end
   end if DB.server_version >= 90000
 
-  it "should support primary_key with :type=>:serial or :type=>:bigserial" do
-    [:serial, :bigserial, 'serial', 'bigserial'].each do |type|
+  it "should support primary_key with :type=>:smallserial, :type=>:serial or :type=>:bigserial" do
+    [:smallserial, :serial, :bigserial, 'smallserial', 'serial', 'bigserial'].each do |type|
       @db.create_table!(:tmp_dolls){primary_key :id, :type=>type}
       @db[:tmp_dolls].insert
       @db[:tmp_dolls].get(:id).must_equal 1
