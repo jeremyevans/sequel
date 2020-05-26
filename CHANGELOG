@@ -1,5 +1,7 @@
 === master
 
+* Support primary_key with type: :smallserial on PostgreSQL (j-a-m-l) (#1698)
+
 * Add Database#current_timestamp_utc accessor on SQLite to keep CURRENT_* in UTC instead of converting to localtime (jeremyevans)
 
 === 5.32.0 (2020-05-01)
