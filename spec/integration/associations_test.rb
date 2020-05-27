@@ -2134,6 +2134,20 @@ describe "Sequel::Model Simple Associations" do
     a.map(&:artist).map{|artist| artist.associations[:tags]}.must_equal [[], []]
   end
 
+  it "should support using custom join types in nested associations" do
+    @album.update(:artist_id=>@artist.id)
+    ds = Artist.eager_graph(:albums=>Sequel.as(:tags, :t, :join_type=>:inner)).order{[artists[:id], albums[:id], t[:id]]}
+    ds.all.must_equal []
+
+    @db[:albums_tags].insert(:album_id=>@album.id, :tag_id=>@tag.id)
+    a = ds.all
+    a.must_equal [@artist]
+    a = a.first
+    a.associations[:albums].must_equal [@album]
+    a = a.albums.first
+    a.associations[:tags].must_equal [@tag]
+  end
+
   it "should have remove method raise an error for one_to_many records if the object isn't already associated" do
     proc{@artist.remove_album(@album.id)}.must_raise(Sequel::Error)
     proc{@artist.remove_album(@album)}.must_raise(Sequel::Error)

@@ -2966,8 +2966,8 @@ module Sequel
         # dataset.  If that association also has dependent associations, instead of a callable object,
         # use a hash with the callable object being the key, and the dependent association(s) as the value.
         # 
-        # You can specify an alias by providing a Sequel::SQL::AliasedExpression object instead of
-        # an a Symbol for the assocation name.
+        # You can specify an custom alias and/or join type on a per-association basis by providing an
+        # Sequel::SQL::AliasedExpression object instead of an a Symbol for the association name.
         #
         # Examples:
         #
@@ -2982,6 +2982,14 @@ module Sequel
         #   # SELECT ...
         #   # FROM albums
         #   # LEFT OUTER JOIN artists AS a ON (a.id = albums.artist_id)
+        #
+        #   # For each album, eager_graph load the artist, using a specified alias
+        #   # and custom join type
+        #
+        #   Album.eager_graph(Sequel[:artist].as(:a, join_type: :inner)).all
+        #   # SELECT ...
+        #   # FROM albums
+        #   # INNER JOIN artists AS a ON (a.id = albums.artist_id)
         #
         #   # For each album, eager_graph load the artist and genre
         #   Album.eager_graph(:artist, :genre).all
@@ -3125,11 +3133,16 @@ module Sequel
         # ta :: table_alias used for the parent association
         # requirements :: an array, used as a stack for requirements
         # r :: association reflection for the current association, or an SQL::AliasedExpression
-        #      with the reflection as the expression and the alias base as the aliaz.
+        #      with the reflection as the expression, the alias base as the alias (or nil to
+        #      use the default alias), and an optional hash with a :join_type entry as the columns
+        #      to use a custom join type.
         # *associations :: any associations dependent on this one
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
           if r.is_a?(SQL::AliasedExpression)
             alias_base = r.alias
+            if r.columns.is_a?(Hash)
+              join_type = r.columns[:join_type]
+            end
             r = r.expression
           else
             alias_base = r[:graph_alias_base]
@@ -3152,7 +3165,7 @@ module Sequel
             raise Error, "Cannot eager_graph association when :conditions specified and not a hash or an array of pairs.  Specify :graph_conditions, :graph_only_conditions, or :graph_block for the association.  Model: #{r[:model]}, association: #{r[:name]}"
           end
 
-          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
+          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>join_type || local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
           if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
             ds = ds.order_append(*qualified_expression(order, assoc_table_alias))
           end
@@ -3307,7 +3320,7 @@ module Sequel
               end
             end
 
-            SQL::AliasedExpression.new(check_association(model, expr), association.alias)
+            SQL::AliasedExpression.new(check_association(model, expr), association.alias || expr, association.columns)
           else
             check_association(model, association)
           end

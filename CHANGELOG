@@ -1,5 +1,7 @@
 === master
 
+* Support custom join types on a per-association basis when using eager_graph/association_join (jeremyevans)
+
 * Support primary_key with type: :smallserial on PostgreSQL (j-a-m-l) (#1698)
 
 * Add Database#current_timestamp_utc accessor on SQLite to keep CURRENT_* in UTC instead of converting to localtime (jeremyevans)

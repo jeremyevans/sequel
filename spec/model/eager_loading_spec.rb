@@ -1419,6 +1419,22 @@ describe Sequel::Model, "#eager_graph" do
     a.album.band.members.must_equal [GraphBandMember.load(:id => 5)]
   end
   
+  it "should allow manually customizing the join type per association via an AliasedExpression" do
+    ds = GraphAlbum.eager_graph(Sequel.as(:band, :b, :join_type=>:inner))
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, b.id AS b_id, b.vocalist_id FROM albums INNER JOIN bands AS b ON (b.id = albums.band_id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :b_id=>2, :vocalist_id=>3).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+  end
+  
+  it "should allow manually customizing the join type per association via an AliasedExpression while using the default alias name" do
+    ds = GraphAlbum.eager_graph(Sequel.as(:band, nil, :join_type=>:inner))
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums INNER JOIN bands AS band ON (band.id = albums.band_id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+  end
+  
   it "should set up correct inner joins when using association_join" do
     GraphAlbum.association_join(:band).sql.must_equal 'SELECT * FROM albums INNER JOIN bands AS band ON (band.id = albums.band_id)'
     GraphAlbum.association_join(:track).sql.must_equal 'SELECT * FROM albums INNER JOIN tracks AS track ON (track.album_id = albums.id)'
