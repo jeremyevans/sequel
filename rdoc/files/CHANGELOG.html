@@ -30,12 +30,21 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-05-01 07:43:18 -0700</span>
+<span class='datetime'>2020-06-01 07:26:42 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.33.0+-282020-06-01-29">5.33.0 (2020-06-01)<span><a href="#label-5.33.0+-282020-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Support custom join types on a per-association basis when using eager_graph/association_join (jeremyevans)</p>
+</li><li>
+<p>Support primary_key with type: :smallserial on PostgreSQL (j-a-m-l) (#1698)</p>
+</li><li>
+<p>Add Database#current_timestamp_utc accessor on SQLite to keep CURRENT_* in UTC instead of converting to localtime (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.32.0+-282020-05-01-29">5.32.0 (2020-05-01)<span><a href="#label-5.32.0+-282020-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Allow Database#create_table? work with :partition_of option on PostgreSQL (jeremyevans) (#1690)</p>

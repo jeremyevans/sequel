@@ -1,6 +1,6 @@
-Fri, 01 May 2020 07:51:59 -0700
+Mon, 01 Jun 2020 07:37:39 -0700
 README.rdoc	Fri, 06 Mar 2020 12:07:27 -0800
-CHANGELOG	Fri, 01 May 2020 07:43:18 -0700
+CHANGELOG	Mon, 01 Jun 2020 07:26:42 -0700
 doc/CHANGELOG.old	Fri, 28 Feb 2020 07:58:33 -0800
 MIT-LICENSE	Wed, 08 Jan 2020 19:52:18 -0800
 lib/sequel.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -14,7 +14,7 @@ lib/sequel/exceptions.rb	Tue, 24 Apr 2018 15:32:28 -0700
 lib/sequel/model.rb	Tue, 01 Aug 2017 08:12:01 -0700
 lib/sequel/sql.rb	Tue, 26 Nov 2019 11:23:52 -0800
 lib/sequel/timezones.rb	Fri, 17 Apr 2020 11:52:37 -0700
-lib/sequel/version.rb	Fri, 01 May 2020 07:43:18 -0700
+lib/sequel/version.rb	Mon, 01 Jun 2020 07:26:42 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 14 Sep 2018 07:48:03 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 17 Apr 2020 11:52:37 -0700
 lib/sequel/connection_pool/single.rb	Tue, 01 Aug 2017 08:12:00 -0700
@@ -38,7 +38,7 @@ lib/sequel/dataset/placeholder_literalizer.rb	Sun, 14 Apr 2019 11:06:43 -0700
 lib/sequel/dataset/prepared_statements.rb	Tue, 19 Mar 2019 16:51:03 -0700
 lib/sequel/dataset/query.rb	Fri, 06 Dec 2019 15:00:19 -0800
 lib/sequel/dataset/sql.rb	Mon, 18 Nov 2019 11:56:31 -0800
-lib/sequel/model/associations.rb	Tue, 23 Apr 2019 16:34:31 -0700
+lib/sequel/model/associations.rb	Wed, 27 May 2020 10:29:44 -0700
 lib/sequel/model/base.rb	Thu, 16 Apr 2020 13:01:31 -0700
 lib/sequel/model/dataset_module.rb	Thu, 06 Jul 2017 14:07:55 -0700
 lib/sequel/model/default_inflections.rb	Tue, 01 Aug 2017 08:12:01 -0700
@@ -220,6 +220,7 @@ doc/release_notes/5.3.0.txt	Fri, 01 Dec 2017 07:52:45 -0800
 doc/release_notes/5.30.0.txt	Fri, 28 Feb 2020 09:27:25 -0800
 doc/release_notes/5.31.0.txt	Wed, 01 Apr 2020 08:28:09 -0700
 doc/release_notes/5.32.0.txt	Fri, 01 May 2020 07:43:18 -0700
+doc/release_notes/5.33.0.txt	Mon, 01 Jun 2020 07:26:42 -0700
 doc/release_notes/5.4.0.txt	Thu, 04 Jan 2018 07:14:17 -0800
 doc/release_notes/5.5.0.txt	Wed, 31 Jan 2018 11:08:15 -0800
 doc/release_notes/5.6.0.txt	Thu, 01 Mar 2018 10:41:16 -0800
