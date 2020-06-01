@@ -1,4 +1,4 @@
-=== master
+=== 5.33.0 (2020-06-01)
 
 * Support custom join types on a per-association basis when using eager_graph/association_join (jeremyevans)
 

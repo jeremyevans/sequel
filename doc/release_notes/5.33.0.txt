@@ -1,0 +1,24 @@
+= New Features
+
+* Custom join types are now supported on a per-association basis when
+  using eager_graph/association_join.  This builds on the previous
+  support for custom aliases, using Sequel::SQL::AliasedExpression:
+
+    class Artist < Sequel::Model; end
+    class Album < Sequel::Model; end
+    class Track < Sequel::Model; end
+    Artist.one_to_many :albums
+    Album.one_to_many :tracks
+    Artist.eager_graph(
+      Sequel[:albums].as(:a, join_type: :inner) =>
+        Sequel[:tracks].as(:t, join_type: :left)
+    )
+
+* A Database#current_timestamp_utc accessor has been added on SQLite.
+  Setting this to true will keep CURRENT_TIMESTAMP, CURRENT_TIME, and
+  CURRENT_DATE in UTC instead of converting them to localtime.
+
+= Other Improvements
+
+* The smallserial PostgreSQL type is now recognized and Sequel will
+  not try to mark smallserial columns as identity columns.
