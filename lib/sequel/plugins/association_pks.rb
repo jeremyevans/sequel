@@ -2,13 +2,17 @@
 
 module Sequel
   module Plugins
-    # The association_pks plugin adds association_pks and association_pks=
-    # instance methods to the model class for each association added.  These
-    # methods allow for easily returning the primary keys of the associated
-    # objects, and easily modifying which objects are associated:
+    # The association_pks plugin adds association_pks, association_pks=, and
+    # association_pks_dataset instance methods to the model class for each
+    # one_to_many and many_to_many association added.  These methods allow for
+    # easily returning the primary keys of the associated objects, and easily
+    # modifying which objects are associated:
     #
     #   Artist.one_to_many :albums
     #   artist = Artist[1]
+    #   artist.album_pks_dataset
+    #   # SELECT id FROM albums WHERE (albums.artist_id = 1)
+    #
     #   artist.album_pks # [1, 2, 3]
     #   artist.album_pks = [2, 4]
     #   artist.album_pks # [2, 4]
@@ -22,7 +26,7 @@ module Sequel
     # This plugin makes modifications directly to the underlying tables,
     # it does not create or return any model objects, and therefore does
     # not call any callbacks.  If you have any association callbacks,
-    # you probably should not use the setter methods.
+    # you probably should not use the setter methods this plugin adds.
     #
     # By default, changes to the association will not happen until the object
     # is saved.  However, using the delay_pks: false option, you can have the
@@ -60,6 +64,8 @@ module Sequel
 
         # Define a association_pks method using the block for the association reflection 
         def def_association_pks_methods(opts)
+          association_module_def(opts[:pks_dataset_method], &opts[:pks_dataset])
+
           opts[:pks_getter_method] = :"#{singularize(opts[:name])}_pks_getter"
           association_module_def(opts[:pks_getter_method], &opts[:pks_getter])
           association_module_def(:"#{singularize(opts[:name])}_pks", opts){_association_pks_getter(opts)}
@@ -84,7 +90,9 @@ module Sequel
           clpk = lpk.is_a?(Array)
           crk = rk.is_a?(Array)
 
-          opts[:pks_getter] = if join_associated_table = opts[:association_pks_use_associated_table]
+          dataset_method = opts[:pks_dataset_method] = :"#{singularize(opts[:name])}_pks_dataset"
+
+          opts[:pks_dataset] = if join_associated_table = opts[:association_pks_use_associated_table]
             tname = opts[:join_table]
             lambda do
               cond = if clpk
@@ -95,16 +103,26 @@ module Sequel
               rpk = opts.associated_class.primary_key
               opts.associated_dataset.
                 naked.where(cond).
-                select_map(Sequel.public_send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
+                select(*Sequel.public_send(rpk.is_a?(Array) ? :deep_qualify : :qualify, opts.associated_class.table_name, rpk))
             end
           elsif clpk
             lambda do
               cond = lk.zip(lpk).map{|k, pk| [k, get_column_value(pk)]}
-              _join_table_dataset(opts).where(cond).select_map(rk)
+              _join_table_dataset(opts).where(cond).select(*rk)
             end
           else
             lambda do
-              _join_table_dataset(opts).where(lk=>get_column_value(lpk)).select_map(rk)
+              _join_table_dataset(opts).where(lk=>get_column_value(lpk)).select(*rk)
+            end
+          end
+
+          opts[:pks_getter] = if join_associated_table = opts[:association_pks_use_associated_table]
+            lambda do
+              public_send(dataset_method).map(opts.associated_class.primary_key)
+            end
+          else
+            lambda do
+              public_send(dataset_method).map(rk)
             end
           end
 
@@ -145,8 +163,14 @@ module Sequel
 
           key = opts[:key]
 
+          dataset_method = opts[:pks_dataset_method] = :"#{singularize(opts[:name])}_pks_dataset"
+
+          opts[:pks_dataset] = lambda do
+            public_send(opts[:dataset_method]).select(*opts.associated_class.primary_key)
+          end
+
           opts[:pks_getter] = lambda do
-            public_send(opts[:dataset_method]).select_map(opts.associated_class.primary_key)
+            public_send(dataset_method).map(opts.associated_class.primary_key)
           end
 
           unless opts[:read_only]

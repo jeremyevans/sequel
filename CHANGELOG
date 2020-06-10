@@ -1,3 +1,7 @@
+=== master
+
+* Add *_pks_dataset methods for one_to_many and many_to_many associations when using the association_pks plugin (jeremyevans)
+
 === 5.33.0 (2020-06-01)
 
 * Support custom join types on a per-association basis when using eager_graph/association_join (jeremyevans)

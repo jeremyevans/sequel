@@ -8,12 +8,17 @@ describe "Sequel::Plugins::AssociationPks" do
         {:id=>$1.to_i}
       when "SELECT id FROM albums WHERE (albums.artist_id = 1)"
         [{:id=>1}, {:id=>2}, {:id=>3}]
-      when /SELECT tag_id FROM albums_tags WHERE \(album_id = (\d)\)/,
-           /SELECT tags.id FROM tags INNER JOIN albums_tags ON \(albums_tags.tag_id = tags.id\) WHERE \(albums_tags.album_id = (\d)\)/
+      when /SELECT tag_id FROM albums_tags WHERE \(album_id = (\d)\)/
         a = []
         a << {:tag_id=>1} if $1 == '1'
         a << {:tag_id=>2} if $1 != '3'
         a << {:tag_id=>3} if $1 == '2'
+        a
+      when /SELECT tags.id FROM tags INNER JOIN albums_tags ON \(albums_tags.tag_id = tags.id\) WHERE \(albums_tags.album_id = (\d)\)/
+        a = []
+        a << {:id=>1} if $1 == '1'
+        a << {:id=>2} if $1 != '3'
+        a << {:id=>3} if $1 == '2'
         a
       when "SELECT first, last FROM vocalists WHERE (vocalists.album_id = 1)"
         [{:first=>"F1", :last=>"L1"}, {:first=>"F2", :last=>"L2"}]
@@ -88,6 +93,40 @@ describe "Sequel::Plugins::AssociationPks" do
     @db.sqls.must_equal ["SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 2)"]
     @Album.load(:id=>3).tag_pks.must_equal []
     @db.sqls.must_equal ["SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 3)"]
+  end
+
+  it "should return correct dataset for one_to_many associations" do
+    ds = @Artist.load(:id=>1).album_pks_dataset
+    ds.map(:id).must_equal [1,2,3]
+    ds.sql.must_equal "SELECT id FROM albums WHERE (albums.artist_id = 1)"
+    ds = @Artist.load(:id=>2).album_pks_dataset
+    ds.map(:id).must_equal []
+    ds.sql.must_equal "SELECT id FROM albums WHERE (albums.artist_id = 2)"
+  end
+
+  it "should return correct dataset for many_to_many associations" do
+    ds = @Album.load(:id=>1).tag_pks_dataset
+    ds.map(:tag_id).must_equal [1, 2]
+    ds.sql.must_equal "SELECT tag_id FROM albums_tags WHERE (album_id = 1)"
+    ds = @Album.load(:id=>2).tag_pks_dataset
+    ds.map(:tag_id).must_equal [2, 3]
+    ds.sql.must_equal "SELECT tag_id FROM albums_tags WHERE (album_id = 2)"
+    ds = @Album.load(:id=>3).tag_pks_dataset
+    ds.map(:tag_id).must_equal []
+    ds.sql.must_equal "SELECT tag_id FROM albums_tags WHERE (album_id = 3)"
+  end
+
+  it "should return correct dataset for many_to_many associations using :association_pks_use_associated_table" do
+    @Album.many_to_many :tags, :class=>@Tag, :join_table=>:albums_tags, :left_key=>:album_id, :delay_pks=>false, :association_pks_use_associated_table=>true
+    ds = @Album.load(:id=>1).tag_pks_dataset
+    ds.map(:id).must_equal [1, 2]
+    ds.sql.must_equal "SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1)"
+    ds = @Album.load(:id=>2).tag_pks_dataset
+    ds.map(:id).must_equal [2, 3]
+    ds.sql.must_equal "SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 2)"
+    ds = @Album.load(:id=>3).tag_pks_dataset
+    ds.map(:id).must_equal []
+    ds.sql.must_equal "SELECT tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 3)"
   end
 
   it "should set associated pks correctly for a one_to_many association" do

@@ -1281,6 +1281,14 @@ describe "AssociationPks plugin" do
     Album.order(:id).all.map{|a| a.tag_pks.sort}.must_equal [[@t1, @t2, @t3], [@t2], []]
   end
 
+  it "should return correct associated pks for one_to_many associations using dataset" do
+    Artist.order(:id).all.map{|a| a.album_pks_dataset.map(:id).sort}.must_equal [[@al1, @al2, @al3], []]
+  end
+
+  it "should return correct associated pks for many_to_many associations using" do
+    Album.order(:id).all.map{|a| a.tag_pks_dataset.map(:tag_id).sort}.must_equal [[@t1, @t2, @t3], [@t2], []]
+  end
+
   it "should return correct associated pks for many_to_many associations using :association_pks_use_associated_table" do
     Album.order(:id).all.map{|a| a.uat_tag_pks.sort}.must_equal [[@t1, @t2, @t3], [@t2], []]
   end
