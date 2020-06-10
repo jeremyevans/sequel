@@ -29,8 +29,13 @@ module Sequel
     # you probably should not use the setter methods this plugin adds.
     #
     # By default, changes to the association will not happen until the object
-    # is saved.  However, using the delay_pks: false option, you can have the
-    # changes made immediately when the association_pks setter method is called.
+    # is saved.  However, using the delay_pks: false association option, you can have
+    # the changes made immediately when the association_pks setter method is called.
+    #
+    # By default, repeated calls to the association_pks getter method will not be
+    # cached, unless the setter method has been used and the delay_pks: false
+    # association option is not used.  You can set caching of repeated calls to the
+    # association_pks getter method using the :cache_pks association option.
     #
     # By default, if you pass a nil value to the setter, an exception will be raised.
     # You can change this behavior by using the :association_pks_nil association option.
@@ -232,11 +237,17 @@ module Sequel
         # If the receiver is a new object, return any saved
         # pks, or an empty array if no pks have been saved.
         def _association_pks_getter(opts)
+          do_cache = opts[:cache_pks]
           delay = opts.fetch(:delay_pks, true)
-          if new? && delay
+          cache_or_delay = do_cache || delay
+
+          if new? && cache_or_delay
             (@_association_pks ||= {})[opts[:name]] ||= []
-          elsif delay && @_association_pks && (objs = @_association_pks[opts[:name]])
+          elsif cache_or_delay && @_association_pks && (objs = @_association_pks[opts[:name]])
             objs
+          elsif do_cache
+           # pks_getter_method is private
+            (@_association_pks ||= {})[opts[:name]] = send(opts[:pks_getter_method])
           else
            # pks_getter_method is private
             send(opts[:pks_getter_method])

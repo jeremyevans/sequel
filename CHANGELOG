@@ -1,5 +1,7 @@
 === master
 
+* Support caching of repeated calls to *_pks getter method in the association_pks plugin using :cache_pks association option (jeremyevans)
+
 * Add *_pks_dataset methods for one_to_many and many_to_many associations when using the association_pks plugin (jeremyevans)
 
 === 5.33.0 (2020-06-01)
