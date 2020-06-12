@@ -240,7 +240,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
     m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
     m.apply(@db, :up)
     error = proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
-    error.message.must_match /irreversible migration method used in .*spec\/extensions\/migration_spec.rb/
+    error.message.must_match(/irreversible migration method used in .*spec\/extensions\/migration_spec.rb/)
   end
 end
 
