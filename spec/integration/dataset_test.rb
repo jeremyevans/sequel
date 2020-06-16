@@ -1723,7 +1723,12 @@ describe "SQL Extract Function" do
     @ds.get{a.extract(:day)}.must_equal t.day
     @ds.get{a.extract(:hour)}.must_equal t.hour
     @ds.get{a.extract(:minute)}.must_equal t.min
-    @ds.get{a.extract(:second)}.to_i.must_equal t.sec
+    sec = @ds.get{a.extract(:second)}.to_i
+    if t.usec >= 999500
+      sec.must_be_close_to 1, t.sec
+    else
+      sec.to_i.must_equal t.sec
+    end
   end
 end
 
