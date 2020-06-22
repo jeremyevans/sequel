@@ -1692,7 +1692,8 @@ end
 
 describe "A broken adapter (lib is there but the class is not)" do
   before do
-    @fn = File.join(File.dirname(__FILE__), '../../lib/sequel/adapters/blah.rb')
+    @adapter = "blah#{$$}"
+    @fn = File.join(File.dirname(__FILE__), "../../lib/sequel/adapters/#{@adapter}.rb")
     File.open(@fn,'a'){}
   end
   
@@ -1701,7 +1702,7 @@ describe "A broken adapter (lib is there but the class is not)" do
   end
   
   it "should raise an error" do
-    proc {Sequel.connect('blah://blow')}.must_raise(Sequel::AdapterNotFound)
+    proc {Sequel.connect("#{@adapter}://blow")}.must_raise(Sequel::AdapterNotFound)
   end
 end
 
