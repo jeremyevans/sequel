@@ -35,7 +35,9 @@ module Sequel
     # By default, repeated calls to the association_pks getter method will not be
     # cached, unless the setter method has been used and the delay_pks: false
     # association option is not used.  You can set caching of repeated calls to the
-    # association_pks getter method using the :cache_pks association option.
+    # association_pks getter method using the :cache_pks association option.  You can
+    # pass the :refresh option when calling the getter method to ignore any existing
+    # cached values, similar to how the :refresh option works with associations.
     #
     # By default, if you pass a nil value to the setter, an exception will be raised.
     # You can change this behavior by using the :association_pks_nil association option.
@@ -73,7 +75,7 @@ module Sequel
 
           opts[:pks_getter_method] = :"#{singularize(opts[:name])}_pks_getter"
           association_module_def(opts[:pks_getter_method], &opts[:pks_getter])
-          association_module_def(:"#{singularize(opts[:name])}_pks", opts){_association_pks_getter(opts)}
+          association_module_def(:"#{singularize(opts[:name])}_pks", opts){|dynamic_opts=OPTS| _association_pks_getter(opts, dynamic_opts)}
 
           if opts[:pks_setter]
             opts[:pks_setter_method] = :"#{singularize(opts[:name])}_pks_setter"
@@ -236,10 +238,14 @@ module Sequel
         # Return the primary keys of the associated objects.
         # If the receiver is a new object, return any saved
         # pks, or an empty array if no pks have been saved.
-        def _association_pks_getter(opts)
+        def _association_pks_getter(opts, dynamic_opts=OPTS)
           do_cache = opts[:cache_pks]
           delay = opts.fetch(:delay_pks, true)
           cache_or_delay = do_cache || delay
+
+          if dynamic_opts[:refresh] && @_association_pks
+            @_association_pks.delete(opts[:name])
+          end
 
           if new? && cache_or_delay
             (@_association_pks ||= {})[opts[:name]] ||= []

@@ -464,6 +464,15 @@ describe "Sequel::Plugins::AssociationPks" do
     @db.sqls.must_equal ["SELECT id FROM albums WHERE (albums.artist_id = 1)"]
   end
 
+  it "should ignore cache in getter calls if :refresh option is used" do
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :cache_pks=>true
+    artist = @Artist.load(:id=>1)
+    artist.album_pks.must_equal [1,2,3]
+    @db.sqls.must_equal ["SELECT id FROM albums WHERE (albums.artist_id = 1)"]
+    artist.album_pks(:refresh=>true).must_equal [1,2,3]
+    @db.sqls.must_equal ["SELECT id FROM albums WHERE (albums.artist_id = 1)"]
+  end
+
   it "should remove all values if nil given to setter and :association_pks_nil=>:remove" do
     @Artist.one_to_many :albums, :clone=>:albums, :association_pks_nil=>:remove
 
