@@ -219,7 +219,18 @@ describe "Blockless Ruby Filters" do
     (DateTime.now == Sequel.expr(:x)).must_equal false
   end
 
-  it "should have coerce return array if called on a non-numeric" do
+  it "should have coerce return super if called with non-numeric when coerce is already implemented" do
+    Class.new(Sequel::SQL::Expression) do
+      include(Module.new do
+        def coerce(other)
+          [:y, other]
+        end
+      end)
+      include Sequel::SQL::NumericMethods
+    end.new.coerce(:a).must_equal [:y, :a]
+  end
+
+  it "should have coerce return array if called with a non-numeric" do
     Sequel.expr(:x).coerce(:a).must_equal [Sequel.expr(:x), :a]
   end
 
