@@ -1,5 +1,7 @@
 === master
 
+* Raise an exception if trying to disconnect a server that doesn't exist in the sharded connection pools (jeremyevans)
+
 * Support :refresh option when calling *_pks getter method in the association_pks plugin (jeremyevans)
 
 * Support caching of repeated calls to *_pks getter method in the association_pks plugin using :cache_pks association option (jeremyevans)

@@ -95,9 +95,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   #            or an array of symbols to specify multiple servers.
   def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : sync{@servers.keys}).each do |s|
-      if conns = sync{disconnect_server_connections(s)}
-        disconnect_connections(conns)
-      end
+      disconnect_connections(sync{disconnect_server_connections(s)})
     end
   end
   
@@ -278,13 +276,15 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # Mark any allocated connections to be removed when they are checked back in. The calling
   # code should already have the mutex before calling this.
   def disconnect_server_connections(server)
-    @connections_to_remove.concat(allocated(server).values)
+    remove_conns = allocated(server)
+    dis_conns = available_connections(server)
+    raise Sequel::Error, "invalid server: #{server}" unless remove_conns && dis_conns
 
-    if dis_conns = available_connections(server)
-      conns = dis_conns.dup
-      dis_conns.clear
-      @waiters[server].signal
-    end
+    @connections_to_remove.concat(remove_conns.values)
+
+    conns = dis_conns.dup
+    dis_conns.clear
+    @waiters[server].signal
     conns
   end
 

@@ -41,7 +41,10 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # :server :: Should be a symbol specifing the server to disconnect from,
   #            or an array of symbols to specify multiple servers.
   def disconnect(opts=OPTS)
-    (opts[:server] ? Array(opts[:server]) : servers).each{|s| disconnect_server(s)}
+    (opts[:server] ? Array(opts[:server]) : servers).each do |s|
+      raise Sequel::Error, "invalid server: #{s}" unless @servers.has_key?(s)
+      disconnect_server(s)
+    end
   end
 
   def freeze
