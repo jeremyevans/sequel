@@ -185,7 +185,9 @@ module Sequel
 
     # Disallow dup/clone for Database instances
     undef_method :dup, :clone, :initialize_copy
+    # :nocov:
     if RUBY_VERSION >= '1.9.3'
+    # :nocov:
       undef_method :initialize_clone, :initialize_dup
     end
 

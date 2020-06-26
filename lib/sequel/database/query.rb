@@ -344,7 +344,9 @@ module Sequel
 
     # Post process the schema values.  
     def schema_post_process(cols)
+      # :nocov:
       if RUBY_VERSION >= '2.5'
+      # :nocov:
         cols.each do |_, h|
           db_type = h[:db_type]
           if db_type.is_a?(String)

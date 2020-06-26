@@ -201,9 +201,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
 
     until conn = assign_connection(thread, server)
       elapsed = Sequel.elapsed_seconds_since(timer)
+      # :nocov:
       raise_pool_timeout(elapsed, server) if elapsed > timeout
 
-      # :nocov:
       # It's difficult to get to this point, it can only happen if there is a race condition
       # where a connection cannot be acquired even after the thread is signalled by the condition variable
       sync do
