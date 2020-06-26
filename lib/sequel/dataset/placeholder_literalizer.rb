@@ -114,10 +114,8 @@ module Sequel
             prepared_sql << sql
             prepared_sql << "$#{prepared_args[i]}"
           end
-          if final_sql
-            frags << final_sql
-            prepared_sql << final_sql
-          end
+          frags << final_sql
+          prepared_sql << final_sql
 
           [prepared_sql, frags]
         end
@@ -213,9 +211,7 @@ module Sequel
           end
           ds.literal_append(s, v)
         end
-        if sql = @final_sql
-          s << sql
-        end
+        s << @final_sql
         s
       end
     end

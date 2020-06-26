@@ -422,11 +422,10 @@ module Sequel
     end
 
     # Retrieve the savepoint hooks that should be run for the given
-    # connection and commit status.
+    # connection and commit status.  This expacts that you are
+    # already inside a savepoint when calling.
     def savepoint_hooks(conn, committed)
-      if in_savepoint?(conn)
-        _trans(conn)[:savepoints].last[committed ? :after_commit : :after_rollback]
-      end
+      _trans(conn)[:savepoints].last[committed ? :after_commit : :after_rollback]
     end
 
     # Retrieve the transaction hooks that should be run for the given
