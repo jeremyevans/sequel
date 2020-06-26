@@ -330,16 +330,17 @@ module Sequel
     #   # SELECT * FROM a WHERE ((a LIKE '%foo%' ESCAPE '\') AND (b LIKE '%foo%' ESCAPE '\')
     #   #   AND (a LIKE '%bar%' ESCAPE '\') AND (b LIKE '%bar%' ESCAPE '\'))
     def grep(columns, patterns, opts=OPTS)
+      column_op = opts[:all_columns] ? :AND : :OR
       if opts[:all_patterns]
         conds = Array(patterns).map do |pat|
-          SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *Array(columns).map{|c| SQL::StringExpression.like(c, pat, opts)})
+          SQL::BooleanExpression.new(column_op, *Array(columns).map{|c| SQL::StringExpression.like(c, pat, opts)})
         end
-        where(SQL::BooleanExpression.new(opts[:all_patterns] ? :AND : :OR, *conds))
+        where(SQL::BooleanExpression.new(:AND, *conds))
       else
         conds = Array(columns).map do |c|
           SQL::BooleanExpression.new(:OR, *Array(patterns).map{|pat| SQL::StringExpression.like(c, pat, opts)})
         end
-        where(SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *conds))
+        where(SQL::BooleanExpression.new(column_op, *conds))
       end
     end
 
