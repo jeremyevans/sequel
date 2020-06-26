@@ -153,19 +153,23 @@ module Sequel
       reset_default_dataset
       adapter_initialize
 
-      unless typecast_value_boolean(@opts[:keep_reference]) == false
-        Sequel.synchronize{::Sequel::DATABASES.push(self)}
+      keep_reference = typecast_value_boolean(@opts[:keep_reference]) != false
+      begin
+        Sequel.synchronize{::Sequel::DATABASES.push(self)} if keep_reference
+        Sequel::Database.run_after_initialize(self)
+
+        initialize_load_extensions(:preconnect_extensions)
+
+        if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
+          concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
+          @pool.send(:preconnect, concurrent)
+        end
+
+        initialize_load_extensions(:extensions)
+      rescue
+        Sequel.synchronize{::Sequel::DATABASES.delete(self)} if keep_reference
+        raise
       end
-      Sequel::Database.run_after_initialize(self)
-
-      initialize_load_extensions(:preconnect_extensions)
-
-      if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
-        concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
-        @pool.send(:preconnect, concurrent)
-      end
-
-      initialize_load_extensions(:extensions)
     end
 
     # Freeze internal data structures for the Database instance.
