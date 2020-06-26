@@ -813,23 +813,20 @@ module Sequel
     # Proxy the filter_expr call to the dataset, used for creating constraints.
     # Support passing Proc arguments as blocks, as well as treating plain strings
     # as literal strings, so that previous migrations that used this API do not break.
-    def filter_expr(*args, &block)
-      if args.length == 1
-        arg = args.first
-        if arg.is_a?(Proc) && !block
-          block = args.first
-          args = nil
-        elsif arg.is_a?(String)
-          args = [Sequel.lit(*args)]
-        elsif arg.is_a?(Array)
-          if arg.first.is_a?(String)
-            args = [Sequel.lit(*arg)]
-          elsif arg.length > 1
-            args = [Sequel.&(*arg)]
-          end
+    def filter_expr(arg=nil, &block)
+      if arg.is_a?(Proc) && !block
+        block = arg
+        arg = nil
+      elsif arg.is_a?(String)
+        arg = Sequel.lit(arg)
+      elsif arg.is_a?(Array)
+        if arg.first.is_a?(String)
+          arg = Sequel.lit(*arg)
+        elsif arg.length > 1
+          arg = Sequel.&(*arg)
         end
       end
-      schema_utility_dataset.literal(schema_utility_dataset.send(:filter_expr, *args, &block))
+      schema_utility_dataset.literal(schema_utility_dataset.send(:filter_expr, arg, &block))
     end
 
     # SQL statement for creating an index for the table with the given name
