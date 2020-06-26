@@ -38,7 +38,6 @@ module Sequel
         @constraints = []
         @primary_key = nil
         instance_exec(&block) if block
-        @columns.unshift(@primary_key) if @primary_key && !has_column?(primary_key_name)
       end
 
       # Use custom Bignum method to use :Bignum instead of Bignum class, to work
