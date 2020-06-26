@@ -212,3 +212,40 @@ describe "Sequel::Schema::CreateTableGenerator generic type methods" do
     end.columns.map{|c| c[:type]}.must_equal [String, Integer, Integer, :Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
   end
 end
+
+describe Sequel::Schema::CreateTableGenerator do
+  before do
+    @generator = Sequel::Schema::CreateTableGenerator.new(Sequel.mock)
+  end
+
+  it "should support usage without a block" do
+    @generator.columns.must_be_empty
+    @generator.indexes.must_be_empty
+    @generator.constraints.must_be_empty
+
+    @generator.column :a, String
+    @generator.columns.wont_be_empty
+  end
+
+  it "should not handle method calls without name" do
+    proc{@generator.foo123}.must_raise NoMethodError
+  end
+
+  it "should return name of the primary key" do
+    @generator.primary_key_name.must_be_nil
+    @generator.primary_key :id
+    @generator.primary_key_name.must_equal :id
+  end
+end
+
+describe Sequel::Schema::AlterTableGenerator do
+  before do
+    @generator = Sequel::Schema::AlterTableGenerator.new(Sequel.mock)
+  end
+
+  it "should support usage without a block" do
+    @generator.operations.must_be_empty
+    @generator.add_column :a, String
+    @generator.operations.wont_be_empty
+  end
+end

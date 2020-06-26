@@ -239,6 +239,11 @@ describe Sequel::Dataset do
     @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:x=>:id}, :table_alias=>:blah)
   end
 
+  it "#graph should raise an error if the table/table alias has already been used and an explicit alias is given" do
+    proc{@ds1.graph(@ds2, {:x=>:id}, :table_alias=>:points)}.must_raise(Sequel::Error)
+    proc{@ds1.graph(@ds2, :x=>:id).graph(@ds3, {:x=>:id}, :table_alias=>:lines)}.must_raise(Sequel::Error)
+  end
+
   it "#graph should handle ColumnAll values in selections" do
     @ds1.select_all(:points).graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"
     @ds1.from{points}.select_all(:points).graph(:lines, :x=>:id).sql.must_equal "SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)"

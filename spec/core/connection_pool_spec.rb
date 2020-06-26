@@ -32,6 +32,11 @@ describe "An empty ConnectionPool" do
     @cpool.size.must_equal 0
   end
 
+  it "should support specific pool class" do
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call, :pool_class=>Sequel::ShardedThreadedConnectionPool)
+    pool.must_be_instance_of Sequel::ShardedThreadedConnectionPool
+  end
+
   it "should raise Error for bad pool class" do
     proc{Sequel::ConnectionPool.get_pool(mock_db.call, :pool_class=>:foo)}.must_raise Sequel::Error
   end
@@ -583,6 +588,12 @@ describe "Threaded Unsharded Connection Pool" do
   end
   
   include ThreadedConnectionPoolSpecs
+
+  it "should work correctly if acquire raises an exception" do
+    @pool.hold{}
+    def @pool.acquire(_) raise Sequel::DatabaseDisconnectError; end
+    proc{@pool.hold{}}.must_raise(Sequel::DatabaseDisconnectError)
+  end
 end
 
 describe "Threaded Sharded Connection Pool" do
@@ -756,6 +767,25 @@ describe "A connection pool with multiple servers" do
     @pool.hold(:read_only){|c| c.must_equal 'read_only2'}
     @pool.hold{|c| c.must_equal 'default2'}
   end
+
+  it "#disconnect with :server should disconnect from specific servers" do
+    @pool.hold(:read_only){}
+    @pool.hold{}
+    conns = []
+    @pool.size.must_equal 1
+    @pool.size(:read_only).must_equal 1
+    @pool.db.define_singleton_method(:disconnect_connection){|c| conns << c}
+    @pool.disconnect(:server=>:default)
+    conns.sort.must_equal %w'default1'
+    @pool.size.must_equal 0
+    @pool.size(:read_only).must_equal 1
+    @pool.hold(:read_only){|c| c.must_equal 'read_only1'}
+    @pool.hold{|c| c.must_equal 'default2'}
+  end
+  
+  it "#disconnect with invalid :server should raise error" do
+    proc{@pool.disconnect(:server=>:foo)}.must_raise Sequel::Error
+  end
   
   it "#add_servers should add new servers to the pool" do
     pool = Sequel::ConnectionPool.get_pool(mock_db.call{|s| s}, :servers=>{:server1=>{}})
@@ -918,6 +948,13 @@ describe "SingleConnectionPool" do
     conn.must_equal 1234
     pool.disconnect
   end
+
+  it "should have #all_connections not yield if not connected" do
+    called = false
+    @pool.all_connections{called = true}
+    called.must_equal false
+  end
+
 end
 
 describe "A single threaded pool with multiple servers" do
@@ -1040,6 +1077,21 @@ describe "A single threaded pool with multiple servers" do
     @pool.conn(:read_only).must_be_nil
   end
 
+  it "#disconnect with :server should disconnect from specific servers" do
+    @pool.hold(:read_only){}
+    @pool.hold{}
+    @pool.conn.must_equal :default
+    @pool.conn(:read_only).must_equal :read_only
+    @pool.disconnect(:server=>:default)
+    @max_size.must_equal 3
+    @pool.conn.must_be_nil
+    @pool.conn(:read_only).must_equal :read_only
+  end
+
+  it "#disconnect with invalid :server should raise error" do
+    proc{@pool.disconnect(:server=>:foo)}.must_raise Sequel::Error
+  end
+  
   it ":disconnection_proc option should set the disconnection proc to use" do
     @max_size.must_equal 2
     proc{@pool.hold{raise Sequel::DatabaseDisconnectError}}.must_raise(Sequel::DatabaseDisconnectError)

@@ -70,6 +70,14 @@ describe "Blockless Ruby Filters" do
     @d.l(expr).must_equal "(b = '1')"
   end
 
+  it "should handle already frozen arrays in boolean expressions" do
+    @d.l(Sequel.expr(:b=>[1].freeze)).must_equal '(b IN (1))'
+  end
+
+  it "should handle already frozen strings in boolean expressions" do
+    @d.l(Sequel.expr(:b=>'1'.freeze)).must_equal "(b = '1')"
+  end
+
   it "should support = via Hash" do
     @d.l(:x => 100).must_equal '(x = 100)'
     @d.l(:x => 'a').must_equal '(x = \'a\')'
@@ -199,8 +207,10 @@ describe "Blockless Ruby Filters" do
     @d.lit(Sequel.expr(:x) / (Sequel.expr(:y) & :z)).must_equal '(x / (y AND z))'
     @d.lit(Sequel.expr(:x) * (Sequel.expr(:y) | :z)).must_equal '(x * (y OR z))'
     @d.lit(Sequel.expr(:x) + Sequel.expr(:y).like('a')).must_equal "(x + (y LIKE 'a' ESCAPE '\\'))"
+    @d.lit(Sequel.expr(:x) + Sequel.expr(:y).ilike('a')).must_equal "(x + (UPPER(y) LIKE UPPER('a') ESCAPE '\\'))"
     @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y).like('a')).must_equal "(x - (y NOT LIKE 'a' ESCAPE '\\'))"
     @d.lit(Sequel.join([:x, ~Sequel.expr(:y).like('a')])).must_equal "(x || (y NOT LIKE 'a' ESCAPE '\\'))"
+    @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y).ilike('a')).must_equal "(x - (UPPER(y) NOT LIKE UPPER('a') ESCAPE '\\'))"
     @d.lit(Sequel.expr(:x) ** (Sequel.expr(:y) + 1)).must_equal 'power(x, (y + 1))'
   end
 
@@ -545,6 +555,14 @@ describe "Blockless Ruby Filters" do
       end
     end
     dsc.new(@d.db).literal(Sequel.trim(:a)).must_equal 'trimFOO(lower(a))'
+  end
+
+  it "should raise error when providing the wrong arity when directly creating ComplexExpression instances" do
+    proc{Sequel::SQL::ComplexExpression.new(:IS)}.must_raise Sequel::Error
+    proc{Sequel::SQL::ComplexExpression.new(:IS, :x)}.must_raise Sequel::Error
+    proc{Sequel::SQL::ComplexExpression.new(:IS, :x, :y, :z)}.must_raise Sequel::Error
+    proc{Sequel::SQL::ComplexExpression.new(:NOT)}.must_raise Sequel::Error
+    proc{Sequel::SQL::ComplexExpression.new(:NOT, :x, :y)}.must_raise Sequel::Error
   end
 
   it "should handle endless ranges" do

@@ -100,6 +100,53 @@ describe "A new Database" do
   it 'should strip square brackets for ipv6 hosts' do
     Sequel.connect('mock://[::1]').opts[:host].must_equal "::1"
   end
+
+  it 'should ignore options for with empty key' do
+    Sequel.connect('mock:///?=foo').opts.has_key?(:"").must_equal false
+  end
+
+  it 'should translate username option into user' do
+    Sequel.connect('mock:///?username=foo').opts[:user].must_equal 'foo'
+  end
+
+  it 'should setup a shared database if servers key is given' do
+    db = Sequel.connect('mock:///?servers=t')
+    db.opts[:servers].must_equal({})
+    db.sharded?.must_equal true
+  end
+
+  it "should not keep a reference if initialization fails" do
+    length = Sequel::DATABASES.length
+    klass = Class.new(Sequel::Database.adapter_class('mock')) do
+      def initialize_load_extensions(_)
+        raise ArgumentError
+      end
+    end
+    proc{Sequel.connect(:adapter_class=>klass)}.must_raise ArgumentError
+    Sequel::DATABASES.length.must_equal length
+    proc{Sequel.connect(:adapter_class=>klass, :keep_reference=>false)}.must_raise ArgumentError
+    Sequel::DATABASES.length.must_equal length
+    proc{Sequel.connect(:adapter_class=>klass){}}.must_raise ArgumentError
+    Sequel::DATABASES.length.must_equal length
+    proc{Sequel.connect(:adapter_class=>klass, :keep_reference=>false){}}.must_raise ArgumentError
+    Sequel::DATABASES.length.must_equal length
+  end
+
+  it ".adapter_class should return the class of the adapter" do
+    klass = Sequel::Database.adapter_class('mock')
+    klass.must_be_same_as(Sequel::Database.adapter_class(klass))
+  end
+
+  it 'should log exceptions without messages correctly' do
+    logger = []
+    def logger.error(x) self << x end
+    db = Sequel::Database.new
+    db.loggers << logger
+    e = Sequel::Error.new
+    def e.message; end
+    db.log_exception(e, 'x')
+    logger.must_equal ["Sequel::Error: : x"]
+  end
 end
 
 describe "Database :connect_sqls option" do
@@ -699,6 +746,12 @@ describe "Database#table_exists?" do
     db.table_exists?(:c).must_equal true
   end
 
+  it "should work for a schema qualified table" do
+    db = Sequel.mock(:fetch=>[[{:a=>1}]])
+    db.table_exists?(Sequel[:a][:b]).must_equal true
+    db.sqls.must_equal ["SELECT NULL AS nil FROM a.b LIMIT 1"]
+  end
+
   it "should use a savepoint if inside a transaction" do
     db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
     def db.supports_savepoints?; true end
@@ -1120,6 +1173,11 @@ DatabaseTransactionSpecs = shared_description do
     @db.transaction{@db.rollback_on_exit; @db.rollback_on_exit(:cancel=>true)}.must_be_nil
     @db.sqls.must_equal ['BEGIN', 'COMMIT']
   end
+
+  it "should have rollback_on_exit raise error outside a transaction" do
+    proc{@db.rollback_on_exit}.must_raise Sequel::Error
+    @db.sqls.must_equal []
+  end
 end
 
 describe "Database#transaction with savepoint support" do
@@ -1353,6 +1411,13 @@ describe "Database#transaction with savepoint support" do
 
     @db.transaction{@db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>true); @db.transaction(:savepoint=>true){@db.rollback_on_exit(:savepoint=>4, :cancel=>true)}}}.must_be_nil
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2','RELEASE SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  it "should have rollback_on_exit raise error when using invalid :savepoint option" do
+    proc{@db.transaction{@db.rollback_on_exit(:savepoint=>Object.new)}}.must_raise Sequel::Error
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
+    proc{@db.transaction{@db.rollback_on_exit(:savepoint=>-1)}}.must_raise Sequel::Error
+    @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
   end
 end
   
@@ -1764,6 +1829,12 @@ describe "A single threaded database" do
     proc {db.pool.hold {|c|}}.must_raise(Sequel::DatabaseConnectionError)
   end
   
+  it "should not convert an DatabaseConnectionError on connection into a DatabaseConnectionError" do
+    e = Sequel::DatabaseConnectionError.new
+    db = Class.new(Sequel::Database){define_method(:connect){|*| raise e}}.new(:single_threaded => true, :servers=>{}, :test=>false)
+    (db.pool.hold {|c|} rescue $!).must_be_same_as e
+  end
+
   it "should raise a DatabaseConnectionError if the connection proc returns nil" do
     db = Class.new(Sequel::Database){def connect(*) end}.new(:single_threaded => true, :servers=>{}, :test=>false)
     proc {db.pool.hold {|c|}}.must_raise(Sequel::DatabaseConnectionError)
@@ -2345,6 +2416,8 @@ describe "Database#typecast_value" do
     begin
       @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14]).must_equal Time.local(2011, 10, 11, 12, 13, 14)
       @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, 500000000]).must_equal Time.local(2011, 10, 11, 12, 13, 14, 500000)
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, 500000000, Rational(1, 2)]).must_equal Time.parse('2011-10-11 12:13:14.5+12:00')
+      @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14, nil, Rational(1, 2)]).must_equal Time.parse('2011-10-11 12:13:14+12:00')
 
       Sequel.datetime_class = DateTime
       @db.typecast_value(:datetime, [2011, 10, 11, 12, 13, 14]).must_equal DateTime.civil(2011, 10, 11, 12, 13, 14)
@@ -2366,6 +2439,9 @@ describe "Database#typecast_value" do
       @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14, :nanos=>500000000, :offset=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14.5, 43200)
       @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'offset'=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14, 43200)
       @db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000, 'offset'=>Rational(1, 2)).must_equal Time.new(2011, 10, 11, 12, 13, 14.5, 43200)
+
+      Sequel.default_timezone = :foo
+      proc{@db.typecast_value(:datetime, 'year'=>2011, 'month'=>10, 'day'=>11, 'hour'=>12, 'minute'=>13, 'second'=>14, 'nanos'=>500000000)}.must_raise Sequel::InvalidValue
 
       Sequel.default_timezone = :utc
       @db.typecast_value(:datetime, :year=>2011, :month=>10, :day=>11, :hour=>12, :minute=>13, :second=>14).must_equal Time.utc(2011, 10, 11, 12, 13, 14)
@@ -2499,6 +2575,7 @@ describe "Database#blank_object?" do
     db.send(:blank_object?, {}).must_equal true
     db.send(:blank_object?, c[:empty?, true]).must_equal true
     db.send(:blank_object?, c[:blank?, true]).must_equal true
+    db.send(:blank_object?, c[:foo, true]).must_equal false
 
     db.send(:blank_object?, " a ").must_equal false
     db.send(:blank_object?, 1).must_equal false
@@ -2673,6 +2750,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["'a'", :blob].must_be_kind_of(Sequel::SQL::Blob)
     p["''", :string].must_equal ''
     p["'\\a''b'", :string].must_equal "\\a'b"
+    p["a", :string].must_be_nil
     p["'NULL'", :string].must_equal "NULL"
     p[Date.today, :date].must_equal Date.today
     p["'2009-10-29'", :date].must_equal Date.new(2009,10,29)
@@ -2857,6 +2935,10 @@ describe "Database specific exception classes" do
     proc{@db.get(:a)}.must_raise(Sequel::CheckConstraintViolation)
     @db.sql_state = '40001'
     proc{@db.get(:a)}.must_raise(Sequel::SerializationFailure)
+    def @db.database_specific_error_class_from_sqlstate(_) end
+    (@db.get(:a) rescue $!.class).must_equal(Sequel::DatabaseError)
+    @db.sql_state = nil
+    (@db.get(:a) rescue $!.class).must_equal(Sequel::DatabaseError)
   end
 end
 

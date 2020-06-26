@@ -308,6 +308,10 @@ describe "Dataset#unused_table_alias" do
     @ds = Sequel.mock.dataset.from(:test)
   end
   
+  it "should return given symbol if it hasn't already been used and dataset has no table" do
+    @ds.from.unused_table_alias(:blah).must_equal :blah
+  end
+
   it "should return given symbol if it hasn't already been used" do
     @ds.unused_table_alias(:blah).must_equal :blah
   end
@@ -496,6 +500,11 @@ describe "Dataset#where" do
     @dataset.filter(:owner_id => nil).sql.must_equal 'SELECT * FROM test WHERE (owner_id IS NULL)'
   end
 
+  it "should not accept unexpected value for IS operator" do
+    ds = @dataset.filter(Sequel::SQL::ComplexExpression.new(:IS, :x, :y))
+    proc{ds.sql}.must_raise Sequel::InvalidOperation
+  end
+
   it "should accept a subquery" do
     @dataset.filter{|o| o.gdp > @d1.select(Sequel.function(:avg, :gdp))}.sql.must_equal "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
   end
@@ -536,6 +545,17 @@ describe "Dataset#where" do
     @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
     @dataset.exclude([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
+    db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+  end
+
+  it "should handle IN/NOT IN queries with multiple columns and a non-array/non-dataset where the database doesn't support it" do
+    @dataset = @dataset.with_extend{def supports_multiple_column_in?; false end}
+    db = Sequel.mock(:fetch=>[{:id1=>1, :id2=>2}, {:id1=>3, :id2=>4}])
+    d1 = Class.new(Sequel::SQL::Wrapper) do
+      def to_a; @value.to_a; end
+      def columns; @value.columns; end
+    end.new(db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2))
+    @dataset.where(Sequel::SQL::ComplexExpression.new(:IN, [:id1, :id2], d1)).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   
@@ -729,8 +749,12 @@ describe "Dataset#invert" do
     @d.filter(:x).invert.sql.must_equal 'SELECT * FROM test WHERE NOT x'
   end
 
-  it "should invert both having and where if both are preset" do
+  it "should invert both having and where if both are present" do
     @d.filter(:x).group(:x).having(:x).invert.sql.must_equal 'SELECT * FROM test WHERE NOT x GROUP BY x HAVING NOT x'
+  end
+
+  it "should invert having if where not present" do
+    @d.group(:x).having(:x).invert.sql.must_equal 'SELECT * FROM test GROUP BY x HAVING NOT x'
   end
 end
 
@@ -877,10 +901,19 @@ describe "Dataset#group_append" do
 end
 
 describe "Dataset#as" do
+  before do
+    @ds = Sequel.mock.dataset.from(:test)
+  end
+
   it "should set up an alias" do
-    dataset = Sequel.mock.dataset.from(:test)
-    dataset.select(dataset.limit(1).select(:name).as(:n)).sql.must_equal 'SELECT (SELECT name FROM test LIMIT 1) AS n FROM test'
-    dataset.select(dataset.limit(1).select(:name).as(:n, [:nm])).sql.must_equal 'SELECT (SELECT name FROM test LIMIT 1) AS n(nm) FROM test'
+    @ds.select(@ds.limit(1).select(:name).as(:n)).sql.must_equal 'SELECT (SELECT name FROM test LIMIT 1) AS n FROM test'
+    @ds.select(@ds.limit(1).select(:name).as(:n, [:nm])).sql.must_equal 'SELECT (SELECT name FROM test LIMIT 1) AS n(nm) FROM test'
+  end
+
+  it "should error if the database does not support derived column lists and one is given" do
+    @ds = @ds.with_extend{def supports_derived_column_lists?; false end}
+    @ds = @ds.select(@ds.limit(1).select(:name).as(:n, [:nm]))
+    proc{@ds.sql}.must_raise Sequel::Error
   end
 end
 
@@ -1031,6 +1064,13 @@ describe "Dataset#literal" do
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500000'"
   end
   
+  it "should literalize times properly for databases not supporting fractional seconds" do
+    @dataset = @dataset.with_extend{def supports_timestamp_usecs?; false end}
+    @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05'"
+  end
+  
   it "should literalize times properly for databases supporting millisecond precision" do
     @dataset = @dataset.with_extend{def timestamp_precision; 3 end}
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500'"
@@ -1043,6 +1083,10 @@ describe "Dataset#literal" do
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500000'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500'"
+  end
+
+  it "should return 0 for timestamp precision if not supporting fractional seconds" do
+    @dataset.with_extend{def supports_timestamp_usecs?; false end}.send(:timestamp_precision).must_equal 0
   end
   
   it "should literalize Date properly" do
@@ -1412,7 +1456,7 @@ describe "Dataset#order" do
   end
   
   it "should emulate :nulls options for asc and desc if not natively supported" do
-    @dataset.with_extend{def requires_emulating_nulls_first?; true end}.order(Sequel.asc(:name, :nulls=>:last), Sequel.desc(:price, :nulls=>:first)).sql.must_equal 'SELECT * FROM test ORDER BY (CASE WHEN (name IS NULL) THEN 2 ELSE 1 END), name ASC, (CASE WHEN (price IS NULL) THEN 0 ELSE 1 END), price DESC'
+    @dataset.with_extend{def requires_emulating_nulls_first?; true end}.order(Sequel.asc(:name, :nulls=>:last), Sequel.desc(:price, :nulls=>:first), Sequel.desc(:foo, :nulls=>nil)).sql.must_equal 'SELECT * FROM test ORDER BY (CASE WHEN (name IS NULL) THEN 2 ELSE 1 END), name ASC, (CASE WHEN (price IS NULL) THEN 0 ELSE 1 END), price DESC, foo DESC'
   end
   
   it "should override a previous ordering" do
@@ -1510,7 +1554,6 @@ describe "Dataset#with_sql" do
     @dataset.with_sql(:insert_sql, :b=>1).sql.must_equal 'INSERT INTO test (b) VALUES (1)'
     @dataset.with_sql(:update_sql, :b=>1).sql.must_equal 'UPDATE test SET b = 1'
   end
-  
 end
 
 describe "Dataset#order_by" do
@@ -1612,6 +1655,8 @@ describe "Dataset#reverse" do
     3.times do
       ds1.reverse.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
       ds2.reverse.sql.must_equal 'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
+      ds1.reverse{[]}.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
+      ds2.reverse{[]}.sql.must_equal 'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
     end
   end
   
@@ -1942,6 +1987,10 @@ describe "Dataset#map" do
   it "should return the complete dataset values if nothing is given" do
     @d.map.to_a.must_equal [{:a => 1, :b => 2}, {:a => 3, :b => 4}, {:a => 5, :b => 6}]
   end
+  
+  it "should raise an error if calling with both an argument and block" do
+    proc{@d.map(:a){}}.must_raise Sequel::Error
+  end
 end
 
 describe "Dataset#as_hash" do
@@ -2247,11 +2296,14 @@ describe "Dataset#first_source_alias" do
   
   it "should be the entire first source if not aliased" do
     @ds.from(:s__t).first_source_alias.must_equal :s__t
+    @ds.clone(:from=>[:s__t]).first_source_alias.must_equal :s__t
   end
   
   with_symbol_splitting "should be the alias if aliased when using symbol splitting" do
     @ds.from(:t___a).first_source_alias.must_equal :a
     @ds.from(:s__t___a).first_source_alias.must_equal :a
+    @ds.clone(:from=>[:t___a]).first_source_alias.must_equal :a
+    @ds.clone(:from=>[:s__t___a]).first_source_alias.must_equal :a
   end
   
   with_symbol_splitting "should be aliased as first_source when using symbol splitting" do
@@ -2287,6 +2339,7 @@ describe "Dataset#first_source_table" do
   it "should be the entire first source if not aliased" do
     @ds.from(:t).first_source_table.must_equal :t
     @ds.from(:s__t).first_source_table.must_equal :s__t
+    @ds.clone(:from=>[:s__t]).first_source_table.must_equal :s__t
   end
   
   it "should be the entire first source if not aliased" do
@@ -2297,6 +2350,8 @@ describe "Dataset#first_source_table" do
   with_symbol_splitting "should be the unaliased part if aliased symbols with embedded aliasing" do
     @ds.literal(@ds.from(:t___a).first_source_table).must_equal "t"
     @ds.literal(@ds.from(:s__t___a).first_source_table).must_equal "s.t"
+    @ds.literal(@ds.clone(:from=>[:t___a]).first_source_table).must_equal "t"
+    @ds.literal(@ds.clone(:from=>[:s__t___a]).first_source_table).must_equal "s.t"
   end
   
   it "should be the unaliased part if aliased" do
@@ -2467,6 +2522,10 @@ describe "Dataset#join_table" do
     @d.from('stats').join(Sequel.expr(:players).as(:p, [:c1, :c2]), {:id => :player_id}).sql.must_equal 'SELECT * FROM "stats" INNER JOIN "players" AS "p"("c1", "c2") ON ("p"."id" = "stats"."player_id")'
   end
   
+  it "should support aliased tables with an implicit column aliases where table alias is the same" do
+    @d.from('stats').join(Sequel.expr(:players).as(Sequel[:players], [:c1, :c2]), {:id => :player_id}).sql.must_equal 'SELECT * FROM "stats" INNER JOIN "players" AS "players"("c1", "c2") ON ("players"."id" = "stats"."player_id")'
+  end
+  
   it "should support using an alias for the FROM when doing the first join with unqualified condition columns" do
     @d.from(Sequel.as(:foo, :f)).join_table(:inner, :bar, :id => :bar_id).sql.must_equal 'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
   end
@@ -2618,6 +2677,9 @@ describe "Dataset#join_table" do
       joins.length.must_equal 1
       joins.first.must_be_kind_of(Sequel::SQL::JoinClause)
       joins.first.join_type.must_equal :inner
+      joins.last.table.must_equal :blah
+      joins.last.table_alias.must_be_nil
+      joins.last.column_aliases.must_be_nil
     end
 
     @d.join_table(:natural, :blah, nil, :table_alias=>:b).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
@@ -2751,6 +2813,16 @@ describe "Dataset #first and #last" do
 
   it "should return the first/last matching record if argument is not an Integer" do
     ds = @d.order(:a)
+    5.times do
+      ds.first(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1')
+      ds.first([[:z, 15]]).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a LIMIT 1')
+      ds.last(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a DESC LIMIT 1')
+      ds.last([[:z, 15]]).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a DESC LIMIT 1')
+    end
+  end
+  
+  it "should return the first/last matching record if argument if not caching SQL" do
+    ds = @d.order(:a).clone(:no_cache_sql=>true)
     5.times do
       ds.first(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1')
       ds.first([[:z, 15]]).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a LIMIT 1')
@@ -2981,6 +3053,11 @@ describe "Dataset#[]" do
 
     @d[:id => 5..45].must_equal(1 => 2, 3 => 4)
     @db.sqls.must_equal ["SELECT * FROM items WHERE ((id >= 5) AND (id <= 45)) LIMIT 1"]
+  end
+
+  it "should raise an error for no arguments or a single integer argument" do
+    proc{@d[]}.must_raise Sequel::Error
+    proc{@d[1]}.must_raise Sequel::Error
   end
 end
 
@@ -3380,6 +3457,10 @@ describe "Dataset#import" do
       "INSERT INTO items (x, y) SELECT 5, 6 FROM foo",
       'COMMIT']
   end
+
+  it "should raise an error if columns are empty and values are not empty" do
+    proc{@ds.import([], [[]])}.must_raise Sequel::Error
+  end
 end
 
 describe "Dataset#multi_insert" do
@@ -3718,6 +3799,11 @@ describe "Dataset#grep" do
   it "should support searching against other columns" do
     @ds.grep(:title, :body).sql.must_equal "SELECT * FROM posts WHERE ((title LIKE body ESCAPE '\\'))"
   end
+
+  it "should support databases where LIKE cannot be escaped" do
+    @ds = @ds.with_extend{private; def requires_like_escape?; false end}
+    @ds.grep(:baz, 'quux%').sql.must_equal 'SELECT * FROM posts WHERE ((baz LIKE \'quux%\'))'
+  end
 end
 
 describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
@@ -3729,6 +3815,11 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
   it "#delete should execute delete SQL" do
     @ds.delete.must_equal 0
     @db.sqls.must_equal ["DELETE FROM items"]
+  end
+
+  it "#delete should execute delete SQL even without a table" do
+    @ds.from.delete.must_equal 0
+    @db.sqls.must_equal ["DELETE"]
   end
 
   it "#insert should execute insert SQL" do
@@ -4038,6 +4129,13 @@ describe "Dataset prepared statements and bound variables " do
     @db.sqls.must_equal ['SELECT * FROM items WHERE (0 AND (num IN (SELECT num FROM items WHERE (num = 1))))']
   end
 
+  it "should handle usage with Dataset.prepared_statements_module without a block" do
+    @ds = @ds.with_extend(Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, [Sequel::Dataset::ArgumentMapper, Sequel::Dataset::PreparedStatementMethods]))
+    @ds = @ds.clone(:prepared_statement_name => 'foo', :prepared_type=>:select)
+    @ds.call(:a=>1)
+    @db.sqls.must_equal ["foo"]
+  end
+
   it "should handle usage with Dataset.prepared_statements_module" do
     @ds = @ds.with_extend(Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, [Sequel::Dataset::ArgumentMapper, Sequel::Dataset::PreparedStatementMethods]){def foo; :bar; end})
     @ds.foo.must_equal :bar
@@ -4134,6 +4232,11 @@ describe "Sequel::Dataset#qualify" do
     @ds = Sequel.mock[:t]
   end
 
+  it "should return self if raw SQL is used" do
+    ds = @ds.with_sql('A')
+    ds.qualify.must_be_same_as ds
+  end
+
   it "should qualify to the table if one is given" do
     @ds.filter{a<b}.qualify(:e).sql.must_equal 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
@@ -4218,6 +4321,8 @@ describe "Sequel::Dataset#qualify" do
   it "should handle SQL::Functions with windows" do
     @ds = @ds.with_extend{def supports_window_functions?; true end}
     @ds.select{sum(:a).over(:partition=>:b, :order=>:c)}.qualify.sql.must_equal 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
+    @ds.select{sum(:a).over(:partition=>:b)}.qualify.sql.must_equal 'SELECT sum(t.a) OVER (PARTITION BY t.b) FROM t'
+    @ds.select{sum(:a).over(:order=>:c)}.qualify.sql.must_equal 'SELECT sum(t.a) OVER (ORDER BY t.c) FROM t'
   end
 
   it "should handle SQL::Functions with orders" do
@@ -5005,6 +5110,7 @@ describe "Dataset#returning" do
   it "should raise an error if RETURNING is not supported" do
     @db.extend_datasets{def supports_returning?(type) false end}
     proc{@db[:t].returning}.must_raise(Sequel::Error)
+    proc{@db[:t].returning(:id)}.must_raise(Sequel::Error)
   end
 end
 
@@ -5127,6 +5233,11 @@ describe "Dataset#schema_and_table" do
 
   it "should correctly handle qualified identifiers" do
     @ds.schema_and_table(Sequel.qualify(:t, :s)).must_equal ['t', 's']
+  end
+
+  it "should correctly handle given schema" do
+    @ds.schema_and_table(Sequel.qualify(:t, :s), 'x').must_equal ['t', 's']
+    @ds.schema_and_table(:s, 'x').must_equal ['x', 's']
   end
 end
 

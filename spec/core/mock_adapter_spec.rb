@@ -41,6 +41,8 @@ describe "Sequel Mock Adapter" do
   it "should have constructor accept no arguments" do
     Sequel.require 'adapters/mock'
     Sequel::Mock::Database.new.must_be_kind_of(Sequel::Mock::Database)
+    Sequel.require 'mock', 'adapters'
+    Sequel::Mock::Database.new.must_be_kind_of(Sequel::Mock::Database)
   end
 
   it "should each not return any rows by default" do
@@ -54,6 +56,26 @@ describe "Sequel Mock Adapter" do
     Sequel.mock[:t].delete.must_equal 0
     Sequel.mock[:t].with_sql_delete('DELETE FROM t').must_equal 0
     Sequel.mock.execute_dui('DELETE FROM t').must_equal 0
+  end
+
+  it "should handle return results for Database#execute without use of dataset" do
+    a = []
+    db = Sequel.mock(:fetch=>{:a=>1})
+    db.execute('SELECT 1') do |r|
+      a << r
+    end
+    a.must_equal [{:a=>1}]
+    db.sqls.must_equal ["SELECT 1"]
+  end
+
+  it "should handle empty columns when fetching" do
+    db = Sequel.mock(:columns=>[])
+    ds = db[:t]
+    ds.each do |r|
+      raise
+    end
+    db.sqls.must_equal ["SELECT * FROM t"]
+    ds.columns.must_equal []
   end
 
   it "should return nil for insert/execute_insert by default" do
@@ -395,9 +417,11 @@ describe "Sequel Mock Adapter" do
   end
 
   it "should correctly handle transactions when sharding" do
-    db = Sequel.mock(:servers=>{:test=>{}})
+    db = Sequel.mock(:servers=>{:test=>{}, 'test'=>{}})
     db.transaction{db.transaction(:server=>:test){db[:a].all; db[:t].server(:test).all}}
     db.sqls.must_equal ['BEGIN', 'BEGIN -- test', 'SELECT * FROM a', 'SELECT * FROM t -- test', 'COMMIT -- test', 'COMMIT']
+    db.transaction{db.transaction(:server=>'test'){db[:a].all; db[:t].server("test").all}}
+    db.sqls.must_equal ['BEGIN', 'BEGIN -- "test"', 'SELECT * FROM a', 'SELECT * FROM t -- "test"', 'COMMIT -- "test"', 'COMMIT']
   end
 
   it "should yield a mock connection object from synchronize" do
@@ -487,6 +511,11 @@ end
 describe "PostgreSQL support" do
   before do
     @db = Sequel.mock(:host=>'postgres')
+  end
+
+  it "should support savepoints" do
+    @db.transaction{@db.transaction(:savepoint=>true){}}
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
   end
 
   it "should create an unlogged table" do
@@ -718,5 +747,15 @@ describe "SQLite support" do
     exists = [true, true, true, false]
     @db.rename_column(:test3, :h, :i)
     @db.sqls.grep(/ALTER/).must_equal ["ALTER TABLE `test3` RENAME TO `test3_backup3`"]
+  end
+end
+
+describe "Oracle support" do
+  before do
+    @db = Sequel.mock(:host=>'oracle')
+  end
+
+  it "should not support savepoints" do
+    proc{@db.transaction{@db.transaction(:savepoint=>true){}}}.must_raise Sequel::InvalidOperation
   end
 end

@@ -97,6 +97,14 @@ describe "DB#create_table" do
     @db.sqls.must_equal ['CREATE TABLE cats (a varchar(50), b text, c char(40), d time, e numeric(11, 2))']
   end
 
+  it "should use clob type for String columns if database uses clob for text" do
+    @db.extend(Module.new{private; def uses_clob_for_text?; true; end})
+    @db.create_table(:cats) do
+      String :b, :text=>true
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (b clob)']
+  end
+
   it "should allow the use of modifiers with ruby class types" do
     c = Class.new
     def c.name; 'Fixnum'; end
@@ -134,6 +142,12 @@ describe "DB#create_table" do
 
     @db.create_table(:cats) do
       Integer :a
+      primary_key :id, :Bignum
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (id bigint PRIMARY KEY AUTOINCREMENT, a integer)']
+
+    @db.create_table(:cats) do
+      Integer :a
       primary_key :id, :keep_order=>true
     end
     @db.sqls.must_equal ['CREATE TABLE cats (a integer, id integer PRIMARY KEY AUTOINCREMENT)']
@@ -161,6 +175,15 @@ describe "DB#create_table" do
       primary_key [:id]
     end
     @db.sqls.must_equal ['CREATE TABLE cats (id varchar(255) NOT NULL, PRIMARY KEY (id))']
+  end
+
+  it "should handle case where the primary key column cannot be found when adding NOT NULL constraint if database doesn't do it automatically" do
+    def @db.can_add_primary_key_constraint_on_nullable_columns?; false end
+    @db.create_table(:cats) do
+      String Sequel[:id]
+      primary_key [:id]
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (id varchar(255), PRIMARY KEY (id))']
   end
 
   it "should handling splitting named column constraints into table constraints if unsupported" do
@@ -424,6 +447,13 @@ describe "DB#create_table" do
       integer :id, :index => true
     end
     @db.sqls.must_equal ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)"]
+  end
+  
+  it "should accept inline index definition for qualified table" do
+    @db.create_table(Sequel[:sch][:cats]) do
+      integer :id, :index => true
+    end
+    @db.sqls.must_equal ["CREATE TABLE sch.cats (id integer)", "CREATE INDEX sch_cats_id_index ON sch.cats (id)"]
   end
   
   it "should accept inline index definition with a hash of options" do
@@ -1344,6 +1374,27 @@ describe "DB#alter_table" do
       "ALTER TABLE cats ALTER COLUMN f SET DEFAULT 'g', ALTER COLUMN h TYPE integer, ADD CONSTRAINT i CHECK (a > 1), DROP CONSTRAINT j"]
   end
   
+  it "should handle operations that don't emit SQL when combining" do
+    @db.define_singleton_method(:supports_combining_alter_table_ops?){true}
+    @db.define_singleton_method(:combinable_alter_table_op?){|op| super(op) && (op[:op] != :rename_column || op[:name] == :d2)}
+    @db.define_singleton_method(:alter_table_op_sql){|t, op| super(t, op) unless op[:op] == :rename_column}
+    @db.alter_table(:cats) do
+      rename_column :d, :e
+      add_column :a, Integer
+      drop_column :b
+      set_column_not_null :c
+      rename_column :d2, :e2
+      add_index :e
+      set_column_default :f, 'g'
+      set_column_type :h, Integer
+      add_constraint(:i){a > 1}
+      drop_constraint :j
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats ADD COLUMN a integer, DROP COLUMN b, ALTER COLUMN c SET NOT NULL",
+      "CREATE INDEX cats_e_index ON cats (e)",
+      "ALTER TABLE cats ALTER COLUMN f SET DEFAULT 'g', ALTER COLUMN h TYPE integer, ADD CONSTRAINT i CHECK (a > 1), DROP CONSTRAINT j"]
+  end
+  
 end
 
 describe "Database#create_table" do
@@ -1660,6 +1711,17 @@ describe "Schema Parser" do
     ds = @db[Sequel[:s][:y]]
     @db.schema(ds)
     c.must_equal ["y", {:schema=>"s", :dataset=>ds}]
+  end
+
+  it "should raise error if asked to schema parse a dataset not involving a single table" do
+    c = nil
+    @db.define_singleton_method(:schema_parse_table) do |t, opts|
+      c = [t, opts]
+      [[:a, {:db_type=>t.to_s}]]
+    end
+    proc{@db.schema(@db.from)}.must_raise Sequel::Error
+    proc{@db.schema(@db.from(:x, :y))}.must_raise Sequel::Error
+    proc{@db.schema(@db.from(:x).cross_join(:y))}.must_raise Sequel::Error
   end
 
   with_symbol_splitting "should provide options if given a table name with splittable symbols" do
