@@ -494,7 +494,9 @@ module Sequel
       when :drop_index
         drop_index_sql(table, op)
       else
-        "ALTER TABLE #{quote_schema_table(table)} #{alter_table_op_sql(table, op)}"
+        if sql = alter_table_op_sql(table, op)
+          "ALTER TABLE #{quote_schema_table(table)} #{sql}"
+        end
       end
     end
 
