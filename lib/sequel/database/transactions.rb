@@ -205,6 +205,10 @@ module Sequel
             end
           end
 
+          if opts[:savepoint] && !supports_savepoints?
+            raise Sequel::InvalidOperation, "savepoints not supported on #{database_type}"
+          end
+
           if already_in_transaction?(conn, opts)
             if opts[:rollback] == :always && !opts.has_key?(:savepoint)
               if supports_savepoints? 
