@@ -1,5 +1,7 @@
 === master
 
+* Make Database#pool.all_connections not yield for a single connection pool in disconnected state (jeremyevans)
+
 * Raise an exception if trying to disconnect a server that doesn't exist in the sharded connection pools (jeremyevans)
 
 * Support :refresh option when calling *_pks getter method in the association_pks plugin (jeremyevans)

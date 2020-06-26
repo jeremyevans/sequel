@@ -11,7 +11,7 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
 
   # Yield the connection if one has been made.
   def all_connections
-    yield @conn.first if @conn
+    yield @conn.first unless @conn.empty?
   end
 
   # Disconnect the connection from the database.
