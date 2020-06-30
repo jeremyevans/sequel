@@ -164,11 +164,11 @@ module Sequel
         # range to return the object(s) at the correct offset/limit.
         def apply_ruby_eager_limit_strategy(rows, limit_and_offset = limit_and_offset())
           name = self[:name]
+          return unless range = slice_range(limit_and_offset)
           if returns_array?
-            range = slice_range(limit_and_offset)
             rows.each{|o| o.associations[name] = o.associations[name][range] || []}
-          elsif sr = slice_range(limit_and_offset)
-            offset = sr.begin
+          else
+            offset = range.begin
             rows.each{|o| o.associations[name] = o.associations[name][offset]}
           end
         end
