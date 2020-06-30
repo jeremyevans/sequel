@@ -1115,7 +1115,7 @@ module Sequel
         when nil
           return false
         when Array
-          return false if pk.any?(&:nil?)
+          return false if pkv.any?(&:nil?)
         end
 
         (obj.class == model) && (obj.pk == pkv)
