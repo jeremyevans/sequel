@@ -69,7 +69,9 @@ module Sequel
     require_relative "model/base"
     require_relative "model/exceptions"
     require_relative "model/errors"
+    # :nocov:
     if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
+    # :nocov:
       require_relative 'model/associations'
       plugin Model::Associations
     end
