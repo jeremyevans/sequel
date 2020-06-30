@@ -764,6 +764,17 @@ describe Sequel::Model, ".[] optimization" do
     @c[1].must_equal @c.load(:id=>1)
     @db.sqls.must_equal ['SELECT * FROM a WHERE (active AND (id = 1)) LIMIT 1']
   end
+
+  it "should return first matching record for hash argument" do
+    @c.set_dataset @db[:a].with_fetch(:id=>1, :a=>2)
+    @c[:a=>2].values.must_equal(:id=>1, :a=>2)
+    @db.sqls.must_equal ['SELECT * FROM a WHERE (a = 2) LIMIT 1']
+  end
+
+  it "should return nil for nil argument" do
+    @c[nil].must_be_nil
+    @db.sqls.must_equal []
+  end
 end
 
 describe "Model datasets #with_pk with #with_pk!" do

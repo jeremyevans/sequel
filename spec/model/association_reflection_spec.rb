@@ -105,6 +105,15 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal_type" 
     c.many_to_one :c, :class=>c, :key=>:c_id
     c.association_reflection(:c).send(:reciprocal_type).must_equal :one_to_many
   end
+
+  it "should work if not caching" do
+    c = Class.new(Sequel::Model(:a))
+    c.cache_associations = false
+    c.one_to_many :cs, :class=>c, :key=>:c_id
+    c.many_to_one :c, :class=>c, :key=>:c_id
+    c.association_reflection(:c).reciprocal.must_equal :cs
+    c.association_reflection(:c).send(:reciprocal_type).must_equal :one_to_many
+  end
 end
 
 describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
@@ -466,10 +475,23 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
 end
 
 describe Sequel::Model::Associations::AssociationReflection, "#apply_eager_dataset_changes" do
-  it "should apply the eager block as well as the association options to the dataset" do
+  before do
     @c = Class.new(Sequel::Model(:foo))
+  end
+
+  it "should apply the eager block as well as the association options to the dataset" do
     @c.one_to_many :cs, :class=>@c, :select=>:a, :order=>:b do |ds| ds.where(:c) end
     @c.association_reflection(:cs).apply_eager_dataset_changes(@c.dataset).sql.must_equal 'SELECT a FROM foo WHERE c ORDER BY b'
+  end
+
+  it "should handle :eager_block option" do
+    @c.one_to_many :cs, :class=>@c, :select=>:a, :order=>:b, :eager_block=>proc{|ds| ds.where(:c)}
+    @c.association_reflection(:cs).apply_eager_dataset_changes(@c.dataset).sql.must_equal 'SELECT a FROM foo WHERE c ORDER BY b'
+  end
+
+  it "should handle no block" do
+    @c.one_to_many :cs, :class=>@c, :select=>:a, :order=>:b
+    @c.association_reflection(:cs).apply_eager_dataset_changes(@c.dataset).sql.must_equal 'SELECT a FROM foo ORDER BY b'
   end
 end
 
@@ -799,5 +821,29 @@ describe "Sequel::Model.finalize_associations" do
     r[:right_primary_key_method].must_equal :oto_id
     r[:right_primary_key_methods].must_equal [:oto_id]
     r[:select].must_equal Sequel::SQL::ColumnAll.new(:oto_items)
+  end
+
+  it "should have finalize work when not caching associations" do
+    Item.cache_associations = false
+    Item.many_to_many :smtm_items, :class=>MtmItem, :reciprocal=>:items
+    Item.finalize_associations
+    r = Item.association_reflection(:smtm_items)
+    r[:cache].must_be_nil
+  end
+end
+
+describe Sequel::Model::Associations::AssociationReflection, "#assign_singular?" do
+  it "should be true unless singular association without offset" do
+    c = Class.new(Sequel::Model(:a))
+    c.many_to_one :c, :class=>c, :key=>:c_id
+    c.association_reflection(:c).assign_singular?.must_equal true
+    c.one_to_many :cs, :class=>c, :key=>:c_id
+    c.association_reflection(:cs).assign_singular?.must_equal false
+    c.one_to_one :c, :class=>c, :key=>:c_id
+    c.association_reflection(:c).assign_singular?.must_equal true
+    c.one_to_one :c, :class=>c, :key=>:c_id, :eager_limit_strategy=>:ruby
+    c.association_reflection(:c).assign_singular?.must_equal false
+    c.one_to_one :c, :class=>c, :key=>:c_id, :limit=>[nil, 1], :eager_limit_strategy=>:ruby
+    c.association_reflection(:c).assign_singular?.must_equal false
   end
 end

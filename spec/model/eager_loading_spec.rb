@@ -147,6 +147,13 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should work correctly if there are no records returned" do
+    EagerAlbum.dataset = EagerAlbum.dataset.with_fetch([])
+    a = EagerAlbum.eager(:band).all
+    DB.sqls.must_equal ['SELECT * FROM albums']
+    a.must_equal []
+  end
+  
   it "should skip eager loading for a many_to_one association with no matching keys" do
     EagerAlbum.dataset = EagerAlbum.dataset.with_fetch([{:id=>1, :band_id=>nil}])
     a = EagerAlbum.eager(:band).all
@@ -181,6 +188,18 @@ describe Sequel::Model, "#eager" do
     a = EagerAlbum.eager(:track).naked.all
     a.must_equal [{:id => 1, :band_id => 2}]
     DB.sqls.must_equal ['SELECT * FROM albums']
+  end
+  
+  it "should eagerly load a single one_to_one association with a composite key with some parts nil" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>[:album_id, :id], :primary_key=>[:id, :band_id]
+    EagerAlbum.dataset = EagerAlbum.dataset.with_fetch([{:id => 1, :band_id=>2}, {:id => 2, :band_id=>nil}])
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 2, :album_id=>1}, {:id => nil, :album_id=>2}])
+    a = EagerAlbum.eager(:track).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2), EagerAlbum.load(:id => 2, :band_id => nil)]
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT * FROM tracks WHERE ((tracks.album_id, tracks.id) IN ((1, 2)))"]
+    a.first.track.must_equal EagerTrack.load(:id => 2, :album_id=>1)
+    a.last.track.must_be_nil
+    DB.sqls.must_equal []
   end
   
   it "should eagerly load a single one_to_one association without an order" do
@@ -267,6 +286,16 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should handle :ruby eager limit stategy without a limit or offset" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :eager_limit_strategy=>:ruby
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}])
+    a = EagerAlbum.eager(:track).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.track.must_equal EagerTrack.load(:id => 3, :album_id=>1)
+    DB.sqls.must_equal []
+  end
+  
   it "should support a :subqueries_per_union option for the number of subqueries in a union" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :subqueries_per_union=>1
     EagerAlbum.dataset = EagerAlbum.dataset.with_fetch([{:id => 1, :band_id => 2}, {:id => 2, :band_id => 3}, {:id => 3, :band_id => 4}])
@@ -295,6 +324,15 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should eagerly load a single one_to_many association" do
+    a = EagerAlbum.eager(:tracks).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.tracks.must_equal [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.must_equal []
+  end
+  
+  it "should eagerly load a single one_to_many association with an :eager_loader_key" do
+    EagerAlbum.one_to_many :tracks, :eager_loader_key=>:id, :class=>:EagerTrack, :key=>:album_id
     a = EagerAlbum.eager(:tracks).all
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
@@ -367,6 +405,16 @@ describe Sequel::Model, "#eager" do
   
   it "should support using a custom :key option when eager loading many_to_one associations" do
     EagerAlbum.many_to_one :sband, :clone=>:band, :key=>:band_id3
+    EagerBand.dataset = EagerBand.dataset.with_fetch(:id=>6)
+    a = EagerAlbum.eager(:sband).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (6))']
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.sband.must_equal EagerBand.load(:id=>6)
+    DB.sqls.must_equal []
+  end
+  
+  it "should support using a custom :eager_loader_key option when eager loading many_to_one associations" do
+    EagerAlbum.many_to_one :sband, :clone=>:band, :eager_loader_key=>:band_id3, :key=>:band_id3
     EagerBand.dataset = EagerBand.dataset.with_fetch(:id=>6)
     a = EagerAlbum.eager(:sband).all
     DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (6))']
@@ -456,6 +504,26 @@ describe Sequel::Model, "#eager" do
     ds.all
     eo[:key_hash].must_equal({})
     eo[:id_map].must_be_nil
+  end
+  
+  it "should have eager_load_results work with :eager_loader_key=>nil and :initialize_rows=>false options" do
+    eo = nil
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loader_key=>nil, :eager_loader=>(proc do |eo|
+      name = eo[:name]
+      rows = eo[:rows]
+
+      EagerAlbum.eager_load_results(EagerAlbum.association_reflection(:sgenres), eo.merge(:initialize_rows=>false)) do |assoc_record|
+        hash_key = assoc_record.values.delete(:x_foreign_key_x)
+        objects = rows.filter{|x| x.id == hash_key}
+        objects.each do |object|
+          (object.associations[:sgenres] ||= []).push(assoc_record)
+        end
+      end
+    end)
+    ds = EagerAlbum.eager(:sgenres)
+    a = ds.all
+    a.must_equal [EagerAlbum.load(:id=>1, :band_id=>2)]
+    a.first.sgenres.must_equal [EagerGenre.load(:id=>4)]
   end
   
   it "should correctly handle a :select=>[] option to many_to_many" do
@@ -833,6 +901,26 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
     as.length.must_equal 1
     as.first.first_two_tracks.must_equal [EagerTrack.load(:album_id=>1, :id=>3), EagerTrack.load(:album_id=>1, :id=>4)]
+  end
+
+  it "should support :ruby strategy without limit" do
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:album_id=>1, :id=>2}, {:album_id=>1, :id=>3}, {:album_id=>1, :id=>4}])
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :eager_limit_strategy=>:ruby
+    as = EagerAlbum.eager(:first_two_tracks).all
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
+    as.length.must_equal 1
+    as.first.first_two_tracks.must_equal [EagerTrack.load(:album_id=>1, :id=>2), EagerTrack.load(:album_id=>1, :id=>3), EagerTrack.load(:album_id=>1, :id=>4)]
+  end
+
+  it "should support :ruby strategy without limit and with block" do
+    EagerTrack.dataset = EagerTrack.dataset.with_fetch([{:album_id=>1, :id=>2}, {:album_id=>1, :id=>3}, {:album_id=>1, :id=>4}])
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :eager_limit_strategy=>:ruby do |ds|
+      ds.clone(:eager_limit_strategy=>:ruby).where(:active)
+    end
+    as = EagerAlbum.eager(:first_two_tracks=>proc{|ds| ds.where(:a)}).all
+    DB.sqls.must_equal ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (active AND (tracks.album_id IN (1)) AND a)"]
+    as.length.must_equal 1
+    as.first.first_two_tracks.must_equal [EagerTrack.load(:album_id=>1, :id=>2), EagerTrack.load(:album_id=>1, :id=>3), EagerTrack.load(:album_id=>1, :id=>4)]
   end
 
   it "should respect the :limit option on a one_to_many association" do
@@ -1363,6 +1451,10 @@ describe Sequel::Model, "#eager_graph" do
     proc{GraphAlbum.eager_graph(Object.new)}.must_raise(Sequel::Error)
   end
 
+  it "should raise an error if called with invalid association" do
+    proc{GraphAlbum.eager_graph(:foo_bars)}.must_raise(Sequel::UndefinedAssociation)
+  end
+
   it "should work correctly with select_map" do
     ds = GraphAlbum.eager_graph(:band)
     ds.with_fetch([{:id=>1}, {:id=>2}]).select_map(Sequel[:albums][:id]).must_equal [1, 2]
@@ -1399,6 +1491,22 @@ describe Sequel::Model, "#eager_graph" do
     a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
   end
   
+  it "should allow manually selecting the alias base per call via an AliasedExpression containing an Identifier with a symbol" do
+    ds = GraphAlbum.eager_graph(Sequel.as(Sequel.identifier(:band), :b))
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, b.id AS b_id, b.vocalist_id FROM albums LEFT OUTER JOIN bands AS b ON (b.id = albums.band_id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :b_id=>2, :vocalist_id=>3).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+  end
+  
+  it "should support calling eager_graph with no associations" do
+    ds = GraphAlbum.eager_graph.eager_graph(Sequel.as(:band, :b)).eager_graph
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, b.id AS b_id, b.vocalist_id FROM albums LEFT OUTER JOIN bands AS b ON (b.id = albums.band_id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :b_id=>2, :vocalist_id=>3).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+  end
+  
   it "should handle multiple associations using the same alias base" do
     ds = GraphAlbum.eager_graph(Sequel.as(:genres, :b), Sequel.as(:tracks, :b), Sequel.as(:band, :b))
     ds.sql.must_equal 'SELECT albums.id, albums.band_id, b.id AS b_id, b_0.id AS b_0_id, b_0.album_id, b_1.id AS b_1_id, b_1.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS b ON (b.id = ag.genre_id) LEFT OUTER JOIN tracks AS b_0 ON (b_0.album_id = albums.id) LEFT OUTER JOIN bands AS b_1 ON (b_1.id = albums.band_id)'
@@ -1422,9 +1530,12 @@ describe Sequel::Model, "#eager_graph" do
   it "should allow manually customizing the join type per association via an AliasedExpression" do
     ds = GraphAlbum.eager_graph(Sequel.as(:band, :b, :join_type=>:inner))
     ds.sql.must_equal 'SELECT albums.id, albums.band_id, b.id AS b_id, b.vocalist_id FROM albums INNER JOIN bands AS b ON (b.id = albums.band_id)'
-    a = ds.with_fetch(:id=>1, :band_id=>2, :b_id=>2, :vocalist_id=>3).all
-    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
-    a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+    ds = ds.with_fetch(:id=>1, :band_id=>2, :b_id=>2, :vocalist_id=>3)
+    5.times do
+      a = ds.all
+      a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+      a.first.band.must_equal GraphBand.load(:id => 2, :vocalist_id=>3)
+    end
   end
   
   it "should allow manually customizing the join type per association via an AliasedExpression while using the default alias name" do
@@ -1520,6 +1631,20 @@ describe Sequel::Model, "#eager_graph" do
     a.first.ltrack.must_equal sub.load(:id => 3, :album_id=>1)
   end
   
+  it "should eagerly graph a single one_to_one association with an offset using the :window_function strategy" do
+    sub = Class.new(GraphTrack)
+    sub.dataset = sub.dataset.with_extend do
+      def supports_window_functions?; true end
+      def columns; [:id, :album_id] end
+    end
+    GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub, :limit=>[nil, 1]
+    ds = GraphAlbum.eager_graph_with_options(:ltrack, :limit_strategy=>true)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, ltrack.id AS ltrack_id, ltrack.album_id FROM albums LEFT OUTER JOIN (SELECT id, album_id FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks) AS t1 WHERE (x_sequel_row_number_x = 2)) AS ltrack ON (ltrack.album_id = albums.id)'
+    a = ds.with_fetch(:id=>1, :band_id=>2, :ltrack_id=>3, :album_id=>1).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.ltrack.must_equal sub.load(:id => 3, :album_id=>1)
+  end
+  
   it "should eagerly graph a single one_to_one association using the :correlated_subquery strategy" do
     sub = Class.new(GraphTrack)
     sub.dataset = sub.dataset.with_extend do
@@ -1564,6 +1689,48 @@ describe Sequel::Model, "#eager_graph" do
     a.first.genres.must_equal [GraphGenre.load(:id => 4)]
   end
 
+  it "should eagerly graph a single many_to_many association using the :ruby strategy" do
+    sub = Class.new(GraphGenre)
+    sub.dataset = sub.dataset.with_extend do
+      def supports_window_functions?; true end
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    end
+    GraphAlbum.many_to_many :lgenres, :clone=>:genres, :class=>sub, :limit=>2
+    ds = GraphAlbum.eager_graph_with_options(:lgenres, :limit_strategy=>:ruby)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, lgenres.id AS lgenres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS lgenres ON (lgenres.id = ag.genre_id)"
+    a = ds.with_fetch(:id=>1, :band_id=>2, :lgenres_id=>4).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.lgenres.must_equal [sub.load(:id => 4)]
+  end
+  
+  it "should eagerly graph a single many_to_many association using the :ruby strategy with an offset" do
+    sub = Class.new(GraphGenre)
+    sub.dataset = sub.dataset.with_extend do
+      def supports_window_functions?; true end
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    end
+    GraphAlbum.many_to_many :lgenres, :clone=>:genres, :class=>sub, :limit=>[2, 1]
+    ds = GraphAlbum.eager_graph_with_options(:lgenres, :limit_strategy=>:ruby)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, lgenres.id AS lgenres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS lgenres ON (lgenres.id = ag.genre_id)"
+    a = ds.with_fetch(:id=>1, :band_id=>2, :lgenres_id=>4).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.lgenres.must_equal []
+  end
+  
+  it "should eagerly graph a single many_to_many association using the :ruby strategy with only an offset" do
+    sub = Class.new(GraphGenre)
+    sub.dataset = sub.dataset.with_extend do
+      def supports_window_functions?; true end
+      def columns; literal(opts[:select]) =~ /x_foreign_key_x/ ? [:id, :x_foreign_key_x] : [:id] end
+    end
+    GraphAlbum.many_to_many :lgenres, :clone=>:genres, :class=>sub, :limit=>[nil, 1]
+    ds = GraphAlbum.eager_graph_with_options(:lgenres, :limit_strategy=>:ruby)
+    ds.sql.must_equal "SELECT albums.id, albums.band_id, lgenres.id AS lgenres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS lgenres ON (lgenres.id = ag.genre_id)"
+    a = ds.with_fetch(:id=>1, :band_id=>2, :lgenres_id=>4).all
+    a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.lgenres.must_equal []
+  end
+  
   it "should eagerly graph a single many_to_many association using the :window_function strategy" do
     sub = Class.new(GraphGenre)
     sub.dataset = sub.dataset.with_extend do
@@ -1973,6 +2140,26 @@ describe Sequel::Model, "#eager_graph" do
     as.must_equal [c1.load(:id=>3, :band_id=>2), c1.load(:id=>7, :band_id=>8)]
     as.map{|x| x.sbands}.must_equal [[c2.load(:id=>5, :vocalist_id=>6), c2.load(:id=>6, :vocalist_id=>22)], []]
     as.map{|x| x.sbands.map{|y| y.salbums}}.must_equal [[[c1.load(:id=>7, :band_id=>8), c1.load(:id=>9, :band_id=>10)], []], []]
+  end
+
+  it "should consider all row columns for primary key if any composite primary key components is NULL" do 
+    c1 = Class.new(GraphAlbum)
+    c2 = Class.new(GraphBand)
+    c1.columns(:id, :band_id, :foo)
+    c1.set_primary_key [:band_id, :id]
+    c2.set_primary_key [:vocalist_id, :id]
+    c1.many_to_many :sbands, :class=>c2, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :join_table=>:b
+    c2.one_to_many :salbums, :class=>c1, :key=>[:band_id, :id]
+    ds = c1.eager_graph(:sbands=>:salbums)
+    ds.sql.must_equal 'SELECT albums.id, albums.band_id, albums.foo, sbands.id AS sbands_id, sbands.vocalist_id, salbums.id AS salbums_id, salbums.band_id AS salbums_band_id, salbums.foo AS salbums_foo FROM albums LEFT OUTER JOIN b ON ((b.l1 = albums.band_id) AND (b.l2 = albums.id)) LEFT OUTER JOIN bands AS sbands ON ((sbands.vocalist_id = b.r1) AND (sbands.id = b.r2)) LEFT OUTER JOIN albums AS salbums ON ((salbums.band_id = sbands.vocalist_id) AND (salbums.id = sbands.id))'
+    as = ds.with_fetch([{:id=>3, :band_id=>nil, :foo=>1, :sbands_id=>5, :vocalist_id=>6, :salbums_id=>7, :salbums_band_id=>8, :salbums_foo=>9},
+      {:id=>3, :band_id=>nil, :foo=>1, :sbands_id=>5, :vocalist_id=>6, :salbums_id=>9, :salbums_band_id=>10, :salbums_foo=>9},
+      {:id=>3, :band_id=>nil, :foo=>2, :sbands_id=>5, :vocalist_id=>6, :salbums_id=>9, :salbums_band_id=>10, :salbums_foo=>9},
+      {:id=>7, :band_id=>8, :foo=>2, :sbands_id=>6, :vocalist_id=>22, :salbums_id=>nil, :salbums_band_id=>nil, :salbums_foo=>nil},
+      {:id=>7, :band_id=>8, :foo=>3, :sbands_id=>nil, :vocalist_id=>nil, :salbums_id=>nil, :salbums_band_id=>nil, :salbums_foo=>nil}]).all
+    as.must_equal [c1.load(:id=>3, :band_id=>nil, :foo=>1), c1.load(:id=>3, :band_id=>nil, :foo=>2), c1.load(:id=>7, :band_id=>8, :foo=>2)]
+    as.map{|x| x.sbands}.must_equal [[c2.load(:id=>5, :vocalist_id=>6)], [c2.load(:id=>5, :vocalist_id=>6)], [c2.load(:id=>6, :vocalist_id=>22)]]
+    as.map{|x| x.sbands.map{|y| y.salbums}}.must_equal [[[c1.load(:id=>7, :band_id=>8, :foo=>9), c1.load(:id=>9, :band_id=>10, :foo=>9)]], [[c1.load(:id=>7, :band_id=>8, :foo=>9), c1.load(:id=>9, :band_id=>10, :foo=>9)]], [[]]]
   end
 
   it "should respect the association's :graph_select option" do 

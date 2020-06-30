@@ -376,6 +376,9 @@ describe "Sequel::Plugins.def_sequel_method" do
 
     m1 = Sequel::Plugins.def_sequel_method(@m, "x", 1){|x, y| [x, y]}
     @scope.send(m1, 4).must_equal [4, nil]
+
+    m1 = Sequel::Plugins.def_sequel_method(@m, "x y", 1){2}
+    @scope.send(m1, 3).must_equal 2
   end
 
   it "should raise for unexpected expected_arity" do

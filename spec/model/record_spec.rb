@@ -184,6 +184,13 @@ describe "Model#save" do
     DB.sqls.must_equal ["UPDATE items SET x = 1 WHERE (id = 3)"]
   end
   
+  it "should include primary keys in update statement if they have changed" do
+    o = @c.load(:id => 3, :x => 1)
+    o.id = 4
+    o.save
+    DB.sqls.must_equal ["UPDATE items SET id = 4, x = 1 WHERE (id = 4)"]
+  end
+  
   it "should raise a NoExistingObject exception if the dataset update call doesn't return 1, unless require_modification is false" do
     i = 0
     @c.dataset = @c.dataset.with_extend{define_method(:numrows){i}}
@@ -1090,7 +1097,7 @@ describe Sequel::Model, "#set" do
     @o1.values.must_equal(:x => 2, :z=>3)
   end
 
-  it "#set should correctly handle cases where the object extends a module with a setter method " do
+  it "#set should correctly handle cases where the object extends a module with a setter method" do
     @o1.set(:x => 1)
     @o1.values.must_equal(:x => 1)
 
@@ -1101,6 +1108,22 @@ describe Sequel::Model, "#set" do
     end)
     @o1.set(:x => 2, :z => 3)
     @o1.values.must_equal(:x => 2, :z=>3)
+  end
+
+  it "#set should correctly handle cases where the object extends a module with a setter method and primary keys are not restricint" do
+    @c.unrestrict_primary_key
+    @o1.set(:x => 1)
+    @o1.values.must_equal(:x => 1)
+
+    @o1.extend(Module.new do
+      def z=(v)
+        self[:z] = v
+      end
+    end)
+    @o1.set(:x => 2, :z => 3)
+    @o1.values.must_equal(:x => 2, :z=>3)
+    @o1.set(:id => 8)
+    @o1.values.must_equal(:id => 8, :x => 2, :z=>3)
   end
 end
 
@@ -1460,6 +1483,16 @@ end
       a.must_be method_name, b
       a.wont_be method_name, c
       a.wont_be method_name, d
+    end
+
+    it "should handle composite primary keys" do
+      z = Class.new(Sequel::Model)
+      z.columns :id, :x
+      z.set_primary_key [:id, :x]
+      z.load(:id => 1, :x => 2).must_be method_name, z.load(:id => 1, :x => 2)
+      z.load(:id => 1, :x => 2).wont_be method_name, z.load(:id => 2, :x => 1)
+      z.load(:id => 1, :x => 2).wont_be method_name, z.load(:id => 1, :x => 1)
+      z.load(:id => 1, :x => 2).wont_be method_name, z.load(:id => 2, :x => 2)
     end
 
     it "should always be false if the primary key is nil" do
@@ -2114,5 +2147,12 @@ describe "Model#schema_type_class" do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval{@db_schema = {:id=>{:type=>:integer}}}
     @c.new.send(:schema_type_class, :id).must_equal Integer
+  end
+
+  it "should return nil for a missing column or column type" do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval{@db_schema = {:id=>{:type=>:integer}, :bar=>{}}}
+    @c.new.send(:schema_type_class, :c).must_be_nil
+    @c.new.send(:schema_type_class, :bar).must_be_nil
   end
 end

@@ -274,6 +274,11 @@ describe Sequel::Model do
     @model.primary_key.must_equal :ssn
   end
 
+  it "allow not primary key change for frozen class" do
+    @model.freeze
+    proc{@model.set_primary_key :ssn}.must_raise RuntimeError
+  end
+
   it "allows dataset change" do
     @model.set_dataset(DB[:foo])
     @model.table_name.must_equal :foo
@@ -382,6 +387,13 @@ describe Sequel::Model do
       @c.must_equal(3=>[4])
       @d.must_equal 20
     end
+  end
+
+  it "set_dataset should readd dataset method modules" do
+    m = Module.new
+    @model.dataset_module(m)
+    @model.set_dataset(@model.dataset)
+    @model.dataset.singleton_class.ancestors.must_include m
   end
 end
 
@@ -926,6 +938,10 @@ describe "Model.db_schema" do
     @c.dataset = ds
     @c.db_schema.must_equal(:x=>{:primary_key=>false}, :y=>{})
     @c.primary_key.must_equal :id
+  end
+
+  it "should return nil if the class has no dataset" do
+    Class.new(Sequel::Model).db_schema.must_be_nil
   end
 end
 

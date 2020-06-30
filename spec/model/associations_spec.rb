@@ -251,6 +251,16 @@ describe Sequel::Model, "associate" do
     o[:c_id] = nil
     o.associations.must_be_empty
   end
+
+  it "should raise error for unsupported type" do
+    klass = Class.new(Sequel::Model(:nodes))
+    proc{klass.associate(:foo, :bar)}.must_raise Sequel::Error
+  end
+
+  it "should raise error for unsupported name" do
+    klass = Class.new(Sequel::Model(:nodes))
+    proc{klass.associate(:many_to_one, "bar")}.must_raise Sequel::Error
+  end
 end
 
 describe Sequel::Model, "many_to_one" do
@@ -338,6 +348,18 @@ describe Sequel::Model, "many_to_one" do
     p.values.must_equal(:x => 1, :id => 1)
 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 567"]
+  end
+
+  it "should use explicit composite key if given" do
+    @c2.set_primary_key [:blah, :id]
+    @c2.many_to_one :parent, :class => @c2, :key => [:id, :blah], :primary_key=>[:blah, :id]
+
+    d = @c2.new(:id => 1, :blah => 567)
+    p = d.parent
+    p.class.must_equal @c2
+    p.values.must_equal(:x => 1, :id => 1)
+
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE ((blah = 1) AND (id = 567)) LIMIT 1"]
   end
 
   it "should respect :qualify => false option" do
@@ -1195,6 +1217,23 @@ describe Sequel::Model, "one_to_one" do
     assoc.must_equal({})
   end
 
+  it "should have setter method handle case where there is no reciprocal" do
+    @c2.many_to_one :parent, :class => @c2, :key=>:parent_id, :reciprocal=>nil
+    @c2.one_to_one :child, :class => @c2, :key=>:parent_id, :reciprocal=>nil
+    d = @c2.new(:id => 1)
+    e = @c2.new(:id => 2)
+    e2 = @c2.new(:id => 3)
+    e3 = @c2.new(:id => 4)
+    d.associations[:parent] = e
+    e.associations[:child] = d
+    e2.associations[:child] = d
+    e3.associations[:child] = e
+
+    def e.set_associated_object_if_same?; true; end
+    e.child = d
+    d.parent.must_equal e
+  end
+
   it "should not add associations methods directly to class" do
     @c2.one_to_one :parent, :class => @c2
     @c2.instance_methods.must_include(:parent)
@@ -1447,6 +1486,16 @@ describe Sequel::Model, "one_to_many" do
     DB.sqls.must_equal ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1"]
   end
 
+  it "should have the remove_ method raise an error if the passed object id is not already associated" do
+    @c2.one_to_many :attributes, :class => @c1
+    
+    n = @c2.new(:id => 1234)
+    a = @c1.load(:id => 2345, :node_id => 1234)
+    @c1.dataset = @c1.dataset.with_fetch([])
+    proc{n.remove_attribute(a.id)}.must_raise(Sequel::Error)
+    DB.sqls.must_equal ["SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.id = 2345)) LIMIT 1"]
+  end
+
   it "should accept a hash for the add_ method and create a new record" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
@@ -1609,6 +1658,8 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :conditions => {:a=>32}
     @c2.new(:id => 1234).attributes_dataset.sql.must_equal "SELECT * FROM attributes WHERE ((a = 32) AND (attributes.node_id = 1234))"
     @c2.one_to_many :attributes, :class => @c1, :conditions => Sequel.~(:a)
+    @c2.new(:id => 1234).attributes_dataset.sql.must_equal "SELECT * FROM attributes WHERE (NOT a AND (attributes.node_id = 1234))"
+    @c2.one_to_many :attributes, :class => @c1, :conditions => [Sequel.~(:a)]
     @c2.new(:id => 1234).attributes_dataset.sql.must_equal "SELECT * FROM attributes WHERE (NOT a AND (attributes.node_id = 1234))"
   end
   
