@@ -36,7 +36,7 @@ describe Sequel::Inflections do
     camelize("foo//bar").must_equal "Foo::/bar"
     camelize("foo///bar").must_equal "Foo::/::Bar"
 
-    s = "x"
+    s = "x".dup
     def s.camelize; "P" end
     camelize(s).must_equal "P"
   end
@@ -47,7 +47,7 @@ describe Sequel::Inflections do
     proc{constantize("BKSDDF")}.must_raise NameError
     proc{constantize("++A++")}.must_raise NameError
 
-    s = "x"
+    s = "x".dup
     def s.constantize; "P" end
     constantize(s).must_equal "P"
   end
@@ -57,7 +57,7 @@ describe Sequel::Inflections do
     demodulize("String::Inflections").must_equal "Inflections"
     demodulize("String").must_equal "String"
 
-    s = "x"
+    s = "x".dup
     def s.demodulize; "P" end
     demodulize(s).must_equal "P"
   end
@@ -69,7 +69,7 @@ describe Sequel::Inflections do
     pluralize("the blue mailman").must_equal "the blue mailmen"
     pluralize("CamelOctopus").must_equal "CamelOctopuses"
 
-    s = "x"
+    s = "x".dup
     def s.pluralize; "P" end
     pluralize(s).must_equal "P"
   end
@@ -81,7 +81,7 @@ describe Sequel::Inflections do
     singularize("the blue mailmen").must_equal "the blue mailman"
     singularize("CamelOctopuses").must_equal "CamelOctopus"
 
-    s = "x"
+    s = "x".dup
     def s.singularize; "P" end
     singularize(s).must_equal "P"
   end
@@ -90,7 +90,7 @@ describe Sequel::Inflections do
     underscore("Message").must_equal "message"
     underscore("Admin::Post").must_equal "admin/post"
 
-    s = "x"
+    s = "x".dup
     def s.underscore; "P" end
     underscore(s).must_equal "P"
   end

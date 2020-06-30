@@ -514,7 +514,7 @@ describe Sequel::Model, "#eager" do
 
       EagerAlbum.eager_load_results(EagerAlbum.association_reflection(:sgenres), eo.merge(:initialize_rows=>false)) do |assoc_record|
         hash_key = assoc_record.values.delete(:x_foreign_key_x)
-        objects = rows.filter{|x| x.id == hash_key}
+        objects = rows.select{|x| x.id == hash_key}
         objects.each do |object|
           (object.associations[:sgenres] ||= []).push(assoc_record)
         end
