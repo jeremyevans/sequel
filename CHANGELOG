@@ -1,5 +1,9 @@
 === master
 
+* Make eager_graph work correctly if called with no associations (jeremyevans)
+
+* Make :ruby eager limit strategy handle cases where there is no limit or offset (jeremyevans)
+
 * Do not keep a reference to a Sequel::Database instance that raises an exception during initialization (jeremyevans)
 
 * Make Database#pool.all_connections not yield for a single connection pool in disconnected state (jeremyevans)

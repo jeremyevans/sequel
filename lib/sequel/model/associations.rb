@@ -3062,6 +3062,8 @@ module Sequel
         #                    significantly slower in some cases (perhaps even the majority of cases), so you should
         #                    only use this if you have benchmarked that it is faster for your use cases.
         def eager_graph_with_options(associations, opts=OPTS)
+          return self if associations.empty?
+
           opts = opts.dup unless opts.frozen?
           associations = [associations] unless associations.is_a?(Array)
           ds = if eg = @opts[:eager_graph]
@@ -3188,7 +3190,6 @@ module Sequel
         # requirements :: an array, used as a stack for requirements
         # *associations :: the associations to add to the graph
         def eager_graph_associations(ds, model, ta, requirements, *associations)
-          return ds if associations.empty?
           associations.flatten.each do |association|
             ds = case association
             when Symbol, SQL::AliasedExpression
