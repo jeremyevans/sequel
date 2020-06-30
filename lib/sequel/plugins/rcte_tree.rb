@@ -192,7 +192,7 @@ module Sequel
              :args=>((key_aliases + col_aliases) if col_aliases))
           ds = r.apply_eager_dataset_changes(ds)
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
-          model.eager_load_results(r, eo.merge(:loader=>false, :initalize_rows=>false, :dataset=>ds, :id_map=>nil)) do |obj|
+          model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil)) do |obj|
             opk = prkey_conv[obj]
             if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
@@ -300,7 +300,7 @@ module Sequel
               :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases))
           ds = r.apply_eager_dataset_changes(ds)
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
-          model.eager_load_results(r, eo.merge(:loader=>false, :initalize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>OPTS)) do |obj|
+          model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>OPTS)) do |obj|
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end
