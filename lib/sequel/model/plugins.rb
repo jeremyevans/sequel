@@ -149,9 +149,8 @@ module Sequel
       required_args = arity
       arity -= 1 if keyword == :required
 
-      if callable.is_a?(Proc) && !callable.lambda?
-        optional_args -= arity
-      end
+      # callable currently is always a non-lambda Proc
+      optional_args -= arity
 
       [required_args, optional_args, rest, keyword]
     end

@@ -1244,7 +1244,9 @@ module Sequel
             else
               assoc_record.values.delete(left_key_alias)
             end
-            next unless objects = h[hash_key]
+
+            objects = h[hash_key]
+
             if assign_singular
               objects.each do |object| 
                 object.associations[name] ||= assoc_record
@@ -1948,10 +1950,8 @@ module Sequel
           if opts[:block]
             opts[:block_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_block", 1, &opts[:block])
           end
-          if opts[:dataset]
-            opts[:dataset_opt_arity] = opts[:dataset].arity == 0 ? 0 : 1
-            opts[:dataset_opt_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_dataset_opt", opts[:dataset_opt_arity], &opts[:dataset])
-          end
+          opts[:dataset_opt_arity] = opts[:dataset].arity == 0 ? 0 : 1
+          opts[:dataset_opt_method] = Plugins.def_sequel_method(association_module(opts), "#{opts[:name]}_dataset_opt", opts[:dataset_opt_arity], &opts[:dataset])
           def_association_method(opts)
 
           return if opts[:read_only]
@@ -2122,9 +2122,7 @@ module Sequel
 
             eager_load_results(opts, eo) do |assoc_record|
               hash_key = uses_cks ? pk_meths.map{|k| assoc_record.get_column_value(k)} : assoc_record.get_column_value(opts.primary_key_method)
-              if objects = h[hash_key]
-                objects.each{|object| object.associations[name] = assoc_record}
-              end
+              h[hash_key].each{|object| object.associations[name] = assoc_record}
             end
           end
       
@@ -2171,7 +2169,7 @@ module Sequel
             eager_load_results(opts, eo) do |assoc_record|
               assoc_record.values.delete(delete_rn) if delete_rn
               hash_key = uses_cks ? km.map{|k| assoc_record.get_column_value(k)} : assoc_record.get_column_value(km)
-              next unless objects = h[hash_key]
+              objects = h[hash_key]
               if assign_singular
                 objects.each do |object| 
                   unless object.associations[name]

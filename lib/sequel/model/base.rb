@@ -593,7 +593,7 @@ module Sequel
           @columns = superclass.instance_variable_get(:@columns)
           @db_schema = superclass.instance_variable_get(:@db_schema)
         else
-          @dataset = @dataset.with_extend(*@dataset_method_modules.reverse) if @dataset_method_modules
+          @dataset = @dataset.with_extend(*@dataset_method_modules.reverse)
           @db_schema = get_db_schema
         end
 
@@ -820,7 +820,6 @@ module Sequel
         super
         ivs = subclass.instance_variables
         inherited_instance_variables.each do |iv, dup|
-          next if ivs.include?(iv)
           if (sup_class_value = instance_variable_get(iv)) && dup
             sup_class_value = case dup
             when :dup
