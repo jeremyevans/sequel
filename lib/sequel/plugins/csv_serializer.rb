@@ -82,11 +82,13 @@ module Sequel
           end
         END
       else
+        # :nocov:
         # :nodoc:
         def self.csv_call(*args, opts, &block)
           CSV.send(*args, opts, &block)
         end
         # :nodoc:
+        # :nocov:
       end
 
       module ClassMethods
