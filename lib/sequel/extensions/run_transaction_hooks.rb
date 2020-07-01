@@ -48,7 +48,7 @@ class Sequel::Database
     def _run_transaction_hooks(type, opts)
       synchronize(opts[:server]) do |conn|
         unless h = _trans(conn)
-          raise Error, "Cannot call run_#{type}_hooks outside of a transaction"
+          raise Sequel::Error, "Cannot call run_#{type}_hooks outside of a transaction"
         end
 
         if hooks = h[type]

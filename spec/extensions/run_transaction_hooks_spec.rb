@@ -105,4 +105,9 @@ describe "run_transaction_hooks extension" do
     end
     @db.sqls.must_equal ["ROLLBACK"]
   end
+
+  it "should raise Error if trying to run transaction hooks outside of a transaction" do
+    proc{@db.run_after_commit_hooks}.must_raise Sequel::Error
+    proc{@db.run_after_rollback_hooks}.must_raise Sequel::Error
+  end
 end
