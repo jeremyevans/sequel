@@ -1,0 +1,40 @@
+= New Features
+
+* The association_pks plugin now creates *_pks_dataset methods for
+  each association.  These are similar to the existing *_pks getter
+  methods, but they return a dataset of the keys instead of the keys
+  themselves.
+
+* The association_pks plugin now supports a :cache_pks association
+  option, which will cache calls to the *_pks getter method. The
+  default behavior remains that the *_pks getter method only returns
+  cached values if the *_pks= setter method has been used to set the
+  values.
+
+* The *_pks getter methods supported by the association_pks plugin
+  now support a :refresh option to ignore any cached values, similar
+  to how the association getter methods work.
+
+= Other Improvements
+
+* If trying to disconnect a server that doesn't exist when using a
+  sharded connection pool, a Sequel::Error is now raised.  Previously,
+  the sharded threaded pool raised a NoMethodError and the sharded
+  single connection pool did not raise an error.
+
+* If using the :savepoint option when savepoints are not supported,
+  a Sequel::InvalidOperation exception is now raised, instead of a
+  NoMethodError.
+
+* Calling Dataset#eager_graph with no arguments now returns the
+  dataset.
+
+* If not connected to the database, the single connection pool will
+  not yield any connections to Database#pool.all_connections.
+
+* Forcing a :ruby eager limit strategy for an association without a
+  limit or offset now works correctly.
+
+* Multiple unnecessary conditionals have been removed.
+
+* Sequel core and model code now have 100% branch coverage.
