@@ -154,6 +154,11 @@ describe "Sequel::Plugins::CsvSerializer" do
     @Artist2.plugin :csv_serializer, :only=>:name
     @Artist3 = Class.new(@Artist2)
     @Artist3.from_csv(@Artist3.load(:id=>2, :name=>'YYY').to_csv).must_equal @Artist3.load(:name=>'YYY')
+
+    @Artist2 = Class.new(@Artist)
+    @Artist2.plugin :csv_serializer, :only=>[:name]
+    @Artist3 = Class.new(@Artist2)
+    @Artist3.from_csv(@Artist3.load(:id=>2, :name=>'YYY').to_csv).must_equal @Artist3.load(:name=>'YYY')
   end
 
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do
@@ -176,6 +181,7 @@ describe "Sequel::Plugins::CsvSerializer" do
 
   it "should freeze csv serializier opts when model class is frozen" do
     @Album.csv_serializer_opts[:only] = [:id]
+    @Album.csv_serializer_opts[:foo] = :bar
     @Album.freeze
     @Album.csv_serializer_opts.frozen?.must_equal true
     @Album.csv_serializer_opts[:only].frozen?.must_equal true

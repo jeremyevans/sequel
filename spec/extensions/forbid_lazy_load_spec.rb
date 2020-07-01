@@ -275,4 +275,30 @@ describe "forbid_lazy_load plugin" do
     @c.naked.all.must_equal [{:id=>2, :t_id=>3}]
     @c.naked.where_each(:id=>1){|x| break x}.must_equal(:id=>2, :t_id=>3)
   end
+
+  it "should handle datasets without row_procs" do
+    ds = @c.naked
+    ds.all.first.must_equal(:id=>2, :t_id=>3)
+    ds.each{|x| break x}.must_equal(:id=>2, :t_id=>3)
+    ds.where_each(:id=>1){|x| break x}.must_equal(:id=>2, :t_id=>3)
+    ds.first(2)[0].must_equal(:id=>2, :t_id=>3)
+    ds.first(2){id > 0}[0].must_equal(:id=>2, :t_id=>3)
+    ds.first.must_equal(:id=>2, :t_id=>3)
+    ds.first{id > 1}.must_equal(:id=>2, :t_id=>3)
+    ds.first(:id=>2).must_equal(:id=>2, :t_id=>3)
+    ds.with_pk(1).must_equal(:id=>2, :t_id=>3)
+  end
+
+  it "should handle datasets with row_procs different from the model" do
+    ds = @c.dataset.with_row_proc(proc{|x| x})
+    ds.all.first.must_equal(:id=>2, :t_id=>3)
+    ds.each{|x| break x}.must_equal(:id=>2, :t_id=>3)
+    ds.where_each(:id=>1){|x| break x}.must_equal(:id=>2, :t_id=>3)
+    ds.first(2)[0].must_equal(:id=>2, :t_id=>3)
+    ds.first(2){id > 0}[0].must_equal(:id=>2, :t_id=>3)
+    ds.first.must_equal(:id=>2, :t_id=>3)
+    ds.first{id > 1}.must_equal(:id=>2, :t_id=>3)
+    ds.first(:id=>2).must_equal(:id=>2, :t_id=>3)
+    ds.with_pk(1).must_equal(:id=>2, :t_id=>3)
+  end
 end
