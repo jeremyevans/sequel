@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+<head>
+<title>5.34.0.txt</title>
+<meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+<link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+<script type='text/javascript'>
+  function popupCode(url) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+  
+  function toggleCode(id) {
+    var code = document.getElementById(id)
+  
+    code.style.display = code.style.display != 'block' ? 'block' : 'none'
+    return true
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+</script>
+</head>
+<body class='page'>
+<div class='file' id='wrapper'>
+<div class='header'>
+<h1 class='name'>5.34.0.txt
+</h1>
+<div class='paths'>
+doc/release_notes/5.34.0.txt
+</div>
+<div class='last-update'>
+Last Update:
+<span class='datetime'>2020-07-01 07:39:06 -0700</span>
+</div>
+</div>
+<div id='content'>
+<div id='text'>
+<div id='description'>
+<h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>The association_pks plugin now creates *_pks_dataset methods for each association.  These are similar to the existing *_pks getter methods, but they return a dataset of the keys instead of the keys themselves.</p>
+</li><li>
+<p>The association_pks plugin now supports a :cache_pks association option, which will cache calls to the *_pks getter method. The default behavior remains that the *_pks getter method only returns cached values if the *_pks= setter method has been used to set the values.</p>
+</li><li>
+<p>The *_pks getter methods supported by the association_pks plugin now support a :refresh option to ignore any cached values, similar to how the association getter methods work.</p>
+</li></ul>
+
+<h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+<ul><li>
+<p>If trying to disconnect a server that doesn&#39;t exist when using a sharded connection pool, a <a href="../../../classes/Sequel/Error.html"><code>Sequel::Error</code></a> is now raised.  Previously, the sharded threaded pool raised a NoMethodError and the sharded single connection pool did not raise an error.</p>
+</li><li>
+<p>If using the :savepoint option when savepoints are not supported, a Sequel::InvalidOperation exception is now raised, instead of a NoMethodError.</p>
+</li><li>
+<p>Calling Dataset#eager_graph with no arguments now returns the dataset.</p>
+</li><li>
+<p>If not connected to the database, the single connection pool will not yield any connections to Database#pool.all_connections.</p>
+</li><li>
+<p>Forcing a :ruby eager limit strategy for an association without a limit or offset now works correctly.</p>
+</li><li>
+<p>Multiple unnecessary conditionals have been removed.</p>
+</li><li>
+<p><a href="../../../classes/Sequel.html"><code>Sequel</code></a> core and model code now have 100% branch coverage.</p>
+</li></ul>
+</div>
+<div id='context'>
+</div>
+
+</div>
+</div>
+
+<div id='footer-push'></div>
+</div>
+<div id='footer'>
+<a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+</div>
+</body>
+</html>

@@ -30,12 +30,31 @@ CHANGELOG
 </div>
 <div class='last-update'>
 Last Update:
-<span class='datetime'>2020-06-01 07:26:42 -0700</span>
+<span class='datetime'>2020-07-01 07:39:06 -0700</span>
 </div>
 </div>
 <div id='content'>
 <div id='text'>
 <div id='description'>
+<h3 id="label-5.34.0+-282020-07-01-29">5.34.0 (2020-07-01)<span><a href="#label-5.34.0+-282020-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+<ul><li>
+<p>Make eager_graph work correctly if called with no associations (jeremyevans)</p>
+</li><li>
+<p>Make :ruby eager limit strategy handle cases where there is no limit or offset (jeremyevans)</p>
+</li><li>
+<p>Do not keep a reference to a <a href="../classes/Sequel/Database.html"><code>Sequel::Database</code></a> instance that raises an exception during initialization (jeremyevans)</p>
+</li><li>
+<p>Make Database#pool.all_connections not yield for a single connection pool in disconnected state (jeremyevans)</p>
+</li><li>
+<p>Raise an exception if trying to disconnect a server that doesn&#39;t exist in the sharded connection pools (jeremyevans)</p>
+</li><li>
+<p>Support :refresh option when calling *_pks getter method in the association_pks plugin (jeremyevans)</p>
+</li><li>
+<p>Support caching of repeated calls to *_pks getter method in the association_pks plugin using :cache_pks association option (jeremyevans)</p>
+</li><li>
+<p>Add *_pks_dataset methods for one_to_many and many_to_many associations when using the association_pks plugin (jeremyevans)</p>
+</li></ul>
+
 <h3 id="label-5.33.0+-282020-06-01-29">5.33.0 (2020-06-01)<span><a href="#label-5.33.0+-282020-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
 <ul><li>
 <p>Support custom join types on a per-association basis when using eager_graph/association_join (jeremyevans)</p>

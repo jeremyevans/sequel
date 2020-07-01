@@ -51,8 +51,7 @@ Sequel::Plugins::AssociationPks::InstanceMethods
 <div class='method public-instance' id='method-method-i-after_save'>
 <a name='method-i-after_save'></a>
 <div class='synopsis'>
-<span class='name'>after_save</span>
-<span class='arguments'>()</span>
+<span class='name'>after_save</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -64,14 +63,13 @@ Sequel::Plugins::AssociationPks::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-after_save-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-after_save-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb</span>&#x000A;<span class="line-num">188</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;<span class="line-num">189</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">assoc_pks</span> = <span class="ruby-ivar">@_association_pks</span>&#x000A;<span class="line-num">190</span>     <span class="ruby-identifier">assoc_pks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">pks</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">191</span>      <span class="ruby-comment"># pks_setter_method is private</span>&#x000A;<span class="line-num">192</span>       <span class="ruby-identifier">send</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)[<span class="ruby-value">:pks_setter_method</span>], <span class="ruby-identifier">pks</span>)&#x000A;<span class="line-num">193</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">194</span>     <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">195</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">196</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">197</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-after_save-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb</span>&#x000A;<span class="line-num">219</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">after_save</span>&#x000A;<span class="line-num">220</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">assoc_pks</span> = <span class="ruby-ivar">@_association_pks</span>&#x000A;<span class="line-num">221</span>     <span class="ruby-identifier">assoc_pks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">pks</span><span class="ruby-operator">|</span>&#x000A;<span class="line-num">222</span>      <span class="ruby-comment"># pks_setter_method is private</span>&#x000A;<span class="line-num">223</span>       <span class="ruby-identifier">send</span>(<span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)[<span class="ruby-value">:pks_setter_method</span>], <span class="ruby-identifier">pks</span>)&#x000A;<span class="line-num">224</span>     <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">225</span>     <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">226</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">227</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">228</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-refresh'>
 <a name='method-i-refresh'></a>
 <div class='synopsis'>
-<span class='name'>refresh</span>
-<span class='arguments'>()</span>
+<span class='name'>refresh</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -83,7 +81,7 @@ Sequel::Plugins::AssociationPks::InstanceMethods
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-refresh-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-refresh-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb</span>&#x000A;<span class="line-num">200</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh</span>&#x000A;<span class="line-num">201</span>   <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">202</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">203</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-refresh-source'>    <span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb</span>&#x000A;<span class="line-num">231</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">refresh</span>&#x000A;<span class="line-num">232</span>   <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="line-num">233</span>   <span class="ruby-keyword">super</span>&#x000A;<span class="line-num">234</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>

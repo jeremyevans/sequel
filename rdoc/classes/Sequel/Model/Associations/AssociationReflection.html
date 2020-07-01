@@ -149,8 +149,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-_add_method'>
 <a name='method-i-_add_method'></a>
 <div class='synopsis'>
-<span class='name'>_add_method</span>
-<span class='arguments'>()</span>
+<span class='name'>_add_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -168,8 +167,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-_remove_all_method'>
 <a name='method-i-_remove_all_method'></a>
 <div class='synopsis'>
-<span class='name'>_remove_all_method</span>
-<span class='arguments'>()</span>
+<span class='name'>_remove_all_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -187,8 +185,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-_remove_method'>
 <a name='method-i-_remove_method'></a>
 <div class='synopsis'>
-<span class='name'>_remove_method</span>
-<span class='arguments'>()</span>
+<span class='name'>_remove_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -206,8 +203,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-_setter_method'>
 <a name='method-i-_setter_method'></a>
 <div class='synopsis'>
-<span class='name'>_setter_method</span>
-<span class='arguments'>()</span>
+<span class='name'>_setter_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -225,8 +221,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-add_method'>
 <a name='method-i-add_method'></a>
 <div class='synopsis'>
-<span class='name'>add_method</span>
-<span class='arguments'>()</span>
+<span class='name'>add_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -244,8 +239,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-apply_dataset_changes'>
 <a name='method-i-apply_dataset_changes'></a>
 <div class='synopsis'>
-<span class='name'>apply_dataset_changes</span>
-<span class='arguments'>(ds)</span>
+<span class='name'>apply_dataset_changes</span><span class='arguments'>(ds)</span>
 
 </div>
 <div class='description'>
@@ -263,8 +257,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-apply_distinct_on_eager_limit_strategy'>
 <a name='method-i-apply_distinct_on_eager_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>apply_distinct_on_eager_limit_strategy</span>
-<span class='arguments'>(ds)</span>
+<span class='name'>apply_distinct_on_eager_limit_strategy</span><span class='arguments'>(ds)</span>
 
 </div>
 <div class='description'>
@@ -282,8 +275,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-apply_eager_dataset_changes'>
 <a name='method-i-apply_eager_dataset_changes'></a>
 <div class='synopsis'>
-<span class='name'>apply_eager_dataset_changes</span>
-<span class='arguments'>(ds)</span>
+<span class='name'>apply_eager_dataset_changes</span><span class='arguments'>(ds)</span>
 
 </div>
 <div class='description'>
@@ -301,8 +293,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-apply_eager_graph_limit_strategy'>
 <a name='method-i-apply_eager_graph_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>apply_eager_graph_limit_strategy</span>
-<span class='arguments'>(strategy, ds)</span>
+<span class='name'>apply_eager_graph_limit_strategy</span><span class='arguments'>(strategy, ds)</span>
 
 </div>
 <div class='description'>
@@ -320,8 +311,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-apply_eager_limit_strategy'>
 <a name='method-i-apply_eager_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>apply_eager_limit_strategy</span>
-<span class='arguments'>(ds, strategy=eager_limit_strategy, limit_and_offset=limit_and_offset())</span>
+<span class='name'>apply_eager_limit_strategy</span><span class='arguments'>(ds, strategy=eager_limit_strategy, limit_and_offset=limit_and_offset())</span>
 
 </div>
 <div class='description'>
@@ -339,8 +329,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-apply_ruby_eager_limit_strategy'>
 <a name='method-i-apply_ruby_eager_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>apply_ruby_eager_limit_strategy</span>
-<span class='arguments'>(rows, limit_and_offset = limit_and_offset())</span>
+<span class='name'>apply_ruby_eager_limit_strategy</span><span class='arguments'>(rows, limit_and_offset = limit_and_offset())</span>
 
 </div>
 <div class='description'>
@@ -352,14 +341,13 @@ Superclass:
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-i-apply_ruby_eager_limit_strategy-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-i-apply_ruby_eager_limit_strategy-source'>    <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>&#x000A;<span class="line-num">165</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">apply_ruby_eager_limit_strategy</span>(<span class="ruby-identifier">rows</span>, <span class="ruby-identifier">limit_and_offset</span> = <span class="ruby-identifier">limit_and_offset</span>())&#x000A;<span class="line-num">166</span>   <span class="ruby-identifier">name</span> = <span class="ruby-keyword">self</span>[<span class="ruby-value">:name</span>]&#x000A;<span class="line-num">167</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">returns_array?</span>&#x000A;<span class="line-num">168</span>     <span class="ruby-identifier">range</span> = <span class="ruby-identifier">slice_range</span>(<span class="ruby-identifier">limit_and_offset</span>)&#x000A;<span class="line-num">169</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>][<span class="ruby-identifier">range</span>] <span class="ruby-operator">||</span> []}&#x000A;<span class="line-num">170</span>   <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">sr</span> = <span class="ruby-identifier">slice_range</span>(<span class="ruby-identifier">limit_and_offset</span>)&#x000A;<span class="line-num">171</span>     <span class="ruby-identifier">offset</span> = <span class="ruby-identifier">sr</span>.<span class="ruby-identifier">begin</span>&#x000A;<span class="line-num">172</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>][<span class="ruby-identifier">offset</span>]}&#x000A;<span class="line-num">173</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-i-apply_ruby_eager_limit_strategy-source'>    <span class="ruby-comment"># File lib/sequel/model/associations.rb</span>&#x000A;<span class="line-num">165</span> <span class="ruby-keyword">def</span> <span class="ruby-identifier ruby-title">apply_ruby_eager_limit_strategy</span>(<span class="ruby-identifier">rows</span>, <span class="ruby-identifier">limit_and_offset</span> = <span class="ruby-identifier">limit_and_offset</span>())&#x000A;<span class="line-num">166</span>   <span class="ruby-identifier">name</span> = <span class="ruby-keyword">self</span>[<span class="ruby-value">:name</span>]&#x000A;<span class="line-num">167</span>   <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">range</span> = <span class="ruby-identifier">slice_range</span>(<span class="ruby-identifier">limit_and_offset</span>)&#x000A;<span class="line-num">168</span>   <span class="ruby-keyword">if</span> <span class="ruby-identifier">returns_array?</span>&#x000A;<span class="line-num">169</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>][<span class="ruby-identifier">range</span>] <span class="ruby-operator">||</span> []}&#x000A;<span class="line-num">170</span>   <span class="ruby-keyword">else</span>&#x000A;<span class="line-num">171</span>     <span class="ruby-identifier">offset</span> = <span class="ruby-identifier">range</span>.<span class="ruby-identifier">begin</span>&#x000A;<span class="line-num">172</span>     <span class="ruby-identifier">rows</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">o</span>.<span class="ruby-identifier">associations</span>[<span class="ruby-identifier">name</span>][<span class="ruby-identifier">offset</span>]}&#x000A;<span class="line-num">173</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">174</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 <div class='method public-instance' id='method-method-i-apply_window_function_eager_limit_strategy'>
 <a name='method-i-apply_window_function_eager_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>apply_window_function_eager_limit_strategy</span>
-<span class='arguments'>(ds, limit_and_offset=limit_and_offset())</span>
+<span class='name'>apply_window_function_eager_limit_strategy</span><span class='arguments'>(ds, limit_and_offset=limit_and_offset())</span>
 
 </div>
 <div class='description'>
@@ -377,8 +365,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-assign_singular-3F'>
 <a name='method-i-assign_singular-3F'></a>
 <div class='synopsis'>
-<span class='name'>assign_singular?</span>
-<span class='arguments'>()</span>
+<span class='name'>assign_singular?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -396,8 +383,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-associated_class'>
 <a name='method-i-associated_class'></a>
 <div class='synopsis'>
-<span class='name'>associated_class</span>
-<span class='arguments'>()</span>
+<span class='name'>associated_class</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -415,8 +401,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-associated_dataset'>
 <a name='method-i-associated_dataset'></a>
 <div class='synopsis'>
-<span class='name'>associated_dataset</span>
-<span class='arguments'>()</span>
+<span class='name'>associated_dataset</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -434,8 +419,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-association_dataset_for'>
 <a name='method-i-association_dataset_for'></a>
 <div class='synopsis'>
-<span class='name'>association_dataset_for</span>
-<span class='arguments'>(object)</span>
+<span class='name'>association_dataset_for</span><span class='arguments'>(object)</span>
 
 </div>
 <div class='description'>
@@ -453,8 +437,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-association_dataset_proc'>
 <a name='method-i-association_dataset_proc'></a>
 <div class='synopsis'>
-<span class='name'>association_dataset_proc</span>
-<span class='arguments'>()</span>
+<span class='name'>association_dataset_proc</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -472,8 +455,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-association_method'>
 <a name='method-i-association_method'></a>
 <div class='synopsis'>
-<span class='name'>association_method</span>
-<span class='arguments'>()</span>
+<span class='name'>association_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -491,8 +473,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-can_have_associated_objects-3F'>
 <a name='method-i-can_have_associated_objects-3F'></a>
 <div class='synopsis'>
-<span class='name'>can_have_associated_objects?</span>
-<span class='arguments'>(obj)</span>
+<span class='name'>can_have_associated_objects?</span><span class='arguments'>(obj)</span>
 
 </div>
 <div class='description'>
@@ -510,8 +491,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-cloneable-3F'>
 <a name='method-i-cloneable-3F'></a>
 <div class='synopsis'>
-<span class='name'>cloneable?</span>
-<span class='arguments'>(ref)</span>
+<span class='name'>cloneable?</span><span class='arguments'>(ref)</span>
 
 </div>
 <div class='description'>
@@ -529,8 +509,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-dataset_method'>
 <a name='method-i-dataset_method'></a>
 <div class='synopsis'>
-<span class='name'>dataset_method</span>
-<span class='arguments'>()</span>
+<span class='name'>dataset_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -548,8 +527,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-dataset_need_primary_key-3F'>
 <a name='method-i-dataset_need_primary_key-3F'></a>
 <div class='synopsis'>
-<span class='name'>dataset_need_primary_key?</span>
-<span class='arguments'>()</span>
+<span class='name'>dataset_need_primary_key?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -567,8 +545,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-delete_row_number_column'>
 <a name='method-i-delete_row_number_column'></a>
 <div class='synopsis'>
-<span class='name'>delete_row_number_column</span>
-<span class='arguments'>(ds=associated_dataset)</span>
+<span class='name'>delete_row_number_column</span><span class='arguments'>(ds=associated_dataset)</span>
 
 </div>
 <div class='description'>
@@ -586,8 +563,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-eager_graph_lazy_dataset-3F'>
 <a name='method-i-eager_graph_lazy_dataset-3F'></a>
 <div class='synopsis'>
-<span class='name'>eager_graph_lazy_dataset?</span>
-<span class='arguments'>()</span>
+<span class='name'>eager_graph_lazy_dataset?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -605,8 +581,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-eager_graph_limit_strategy'>
 <a name='method-i-eager_graph_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>eager_graph_limit_strategy</span>
-<span class='arguments'>(strategy)</span>
+<span class='name'>eager_graph_limit_strategy</span><span class='arguments'>(strategy)</span>
 
 </div>
 <div class='description'>
@@ -624,8 +599,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-eager_limit_strategy'>
 <a name='method-i-eager_limit_strategy'></a>
 <div class='synopsis'>
-<span class='name'>eager_limit_strategy</span>
-<span class='arguments'>()</span>
+<span class='name'>eager_limit_strategy</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -643,8 +617,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-eager_load_results'>
 <a name='method-i-eager_load_results'></a>
 <div class='synopsis'>
-<span class='name'>eager_load_results</span>
-<span class='arguments'>(eo, &block)</span>
+<span class='name'>eager_load_results</span><span class='arguments'>(eo, &block)</span>
 
 </div>
 <div class='description'>
@@ -662,8 +635,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-eager_loader_key'>
 <a name='method-i-eager_loader_key'></a>
 <div class='synopsis'>
-<span class='name'>eager_loader_key</span>
-<span class='arguments'>()</span>
+<span class='name'>eager_loader_key</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -681,8 +653,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-eager_loading_use_associated_key-3F'>
 <a name='method-i-eager_loading_use_associated_key-3F'></a>
 <div class='synopsis'>
-<span class='name'>eager_loading_use_associated_key?</span>
-<span class='arguments'>()</span>
+<span class='name'>eager_loading_use_associated_key?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -700,8 +671,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-filter_by_associations_add_conditions-3F'>
 <a name='method-i-filter_by_associations_add_conditions-3F'></a>
 <div class='synopsis'>
-<span class='name'>filter_by_associations_add_conditions?</span>
-<span class='arguments'>()</span>
+<span class='name'>filter_by_associations_add_conditions?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -719,8 +689,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-filter_by_associations_conditions_expression'>
 <a name='method-i-filter_by_associations_conditions_expression'></a>
 <div class='synopsis'>
-<span class='name'>filter_by_associations_conditions_expression</span>
-<span class='arguments'>(obj)</span>
+<span class='name'>filter_by_associations_conditions_expression</span><span class='arguments'>(obj)</span>
 
 </div>
 <div class='description'>
@@ -738,8 +707,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-finalize'>
 <a name='method-i-finalize'></a>
 <div class='synopsis'>
-<span class='name'>finalize</span>
-<span class='arguments'>()</span>
+<span class='name'>finalize</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -757,8 +725,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-finalize_settings'>
 <a name='method-i-finalize_settings'></a>
 <div class='synopsis'>
-<span class='name'>finalize_settings</span>
-<span class='arguments'>()</span>
+<span class='name'>finalize_settings</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -774,8 +741,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-handle_silent_modification_failure-3F'>
 <a name='method-i-handle_silent_modification_failure-3F'></a>
 <div class='synopsis'>
-<span class='name'>handle_silent_modification_failure?</span>
-<span class='arguments'>()</span>
+<span class='name'>handle_silent_modification_failure?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -793,8 +759,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-initialize_association_cache'>
 <a name='method-i-initialize_association_cache'></a>
 <div class='synopsis'>
-<span class='name'>initialize_association_cache</span>
-<span class='arguments'>(objects)</span>
+<span class='name'>initialize_association_cache</span><span class='arguments'>(objects)</span>
 
 </div>
 <div class='description'>
@@ -812,8 +777,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-inspect'>
 <a name='method-i-inspect'></a>
 <div class='synopsis'>
-<span class='name'>inspect</span>
-<span class='arguments'>()</span>
+<span class='name'>inspect</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -831,8 +795,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-limit_and_offset'>
 <a name='method-i-limit_and_offset'></a>
 <div class='synopsis'>
-<span class='name'>limit_and_offset</span>
-<span class='arguments'>()</span>
+<span class='name'>limit_and_offset</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -850,8 +813,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-need_associated_primary_key-3F'>
 <a name='method-i-need_associated_primary_key-3F'></a>
 <div class='synopsis'>
-<span class='name'>need_associated_primary_key?</span>
-<span class='arguments'>()</span>
+<span class='name'>need_associated_primary_key?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -869,8 +831,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-placeholder_loader'>
 <a name='method-i-placeholder_loader'></a>
 <div class='synopsis'>
-<span class='name'>placeholder_loader</span>
-<span class='arguments'>()</span>
+<span class='name'>placeholder_loader</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -888,8 +849,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-predicate_key_values'>
 <a name='method-i-predicate_key_values'></a>
 <div class='synopsis'>
-<span class='name'>predicate_key_values</span>
-<span class='arguments'>(object)</span>
+<span class='name'>predicate_key_values</span><span class='arguments'>(object)</span>
 
 </div>
 <div class='description'>
@@ -907,8 +867,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-predicate_keys'>
 <a name='method-i-predicate_keys'></a>
 <div class='synopsis'>
-<span class='name'>predicate_keys</span>
-<span class='arguments'>()</span>
+<span class='name'>predicate_keys</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -926,8 +885,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-qualify'>
 <a name='method-i-qualify'></a>
 <div class='synopsis'>
-<span class='name'>qualify</span>
-<span class='arguments'>(table, col)</span>
+<span class='name'>qualify</span><span class='arguments'>(table, col)</span>
 
 </div>
 <div class='description'>
@@ -945,8 +903,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-qualify_assoc'>
 <a name='method-i-qualify_assoc'></a>
 <div class='synopsis'>
-<span class='name'>qualify_assoc</span>
-<span class='arguments'>(col)</span>
+<span class='name'>qualify_assoc</span><span class='arguments'>(col)</span>
 
 </div>
 <div class='description'>
@@ -964,8 +921,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-qualify_cur'>
 <a name='method-i-qualify_cur'></a>
 <div class='synopsis'>
-<span class='name'>qualify_cur</span>
-<span class='arguments'>(col)</span>
+<span class='name'>qualify_cur</span><span class='arguments'>(col)</span>
 
 </div>
 <div class='description'>
@@ -983,8 +939,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-reciprocal'>
 <a name='method-i-reciprocal'></a>
 <div class='synopsis'>
-<span class='name'>reciprocal</span>
-<span class='arguments'>()</span>
+<span class='name'>reciprocal</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1002,8 +957,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-reciprocal_array-3F'>
 <a name='method-i-reciprocal_array-3F'></a>
 <div class='synopsis'>
-<span class='name'>reciprocal_array?</span>
-<span class='arguments'>()</span>
+<span class='name'>reciprocal_array?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1021,8 +975,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-remove_all_method'>
 <a name='method-i-remove_all_method'></a>
 <div class='synopsis'>
-<span class='name'>remove_all_method</span>
-<span class='arguments'>()</span>
+<span class='name'>remove_all_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1040,8 +993,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-remove_before_destroy-3F'>
 <a name='method-i-remove_before_destroy-3F'></a>
 <div class='synopsis'>
-<span class='name'>remove_before_destroy?</span>
-<span class='arguments'>()</span>
+<span class='name'>remove_before_destroy?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1059,8 +1011,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-remove_method'>
 <a name='method-i-remove_method'></a>
 <div class='synopsis'>
-<span class='name'>remove_method</span>
-<span class='arguments'>()</span>
+<span class='name'>remove_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1078,8 +1029,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-remove_should_check_existing-3F'>
 <a name='method-i-remove_should_check_existing-3F'></a>
 <div class='synopsis'>
-<span class='name'>remove_should_check_existing?</span>
-<span class='arguments'>()</span>
+<span class='name'>remove_should_check_existing?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1097,8 +1047,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-returns_array-3F'>
 <a name='method-i-returns_array-3F'></a>
 <div class='synopsis'>
-<span class='name'>returns_array?</span>
-<span class='arguments'>()</span>
+<span class='name'>returns_array?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1116,8 +1065,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-select'>
 <a name='method-i-select'></a>
 <div class='synopsis'>
-<span class='name'>select</span>
-<span class='arguments'>()</span>
+<span class='name'>select</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1135,8 +1083,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-set_reciprocal_to_self-3F'>
 <a name='method-i-set_reciprocal_to_self-3F'></a>
 <div class='synopsis'>
-<span class='name'>set_reciprocal_to_self?</span>
-<span class='arguments'>()</span>
+<span class='name'>set_reciprocal_to_self?</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1154,8 +1101,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-setter_method'>
 <a name='method-i-setter_method'></a>
 <div class='synopsis'>
-<span class='name'>setter_method</span>
-<span class='arguments'>()</span>
+<span class='name'>setter_method</span><span class='arguments'>()</span>
 
 </div>
 <div class='description'>
@@ -1173,8 +1119,7 @@ Superclass:
 <div class='method public-instance' id='method-method-i-slice_range'>
 <a name='method-i-slice_range'></a>
 <div class='synopsis'>
-<span class='name'>slice_range</span>
-<span class='arguments'>(limit_and_offset = limit_and_offset())</span>
+<span class='name'>slice_range</span><span class='arguments'>(limit_and_offset = limit_and_offset())</span>
 
 </div>
 <div class='description'>

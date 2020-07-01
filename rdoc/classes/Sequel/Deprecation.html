@@ -92,8 +92,7 @@ Sequel::Deprecation
 <div class='method public-class' id='method-method-c-deprecate'>
 <a name='method-c-deprecate'></a>
 <div class='synopsis'>
-<span class='name'>deprecate</span>
-<span class='arguments'>(method, instead=nil)</span>
+<span class='name'>deprecate</span><span class='arguments'>(method, instead=nil)</span>
 
 </div>
 <div class='description'>
@@ -111,8 +110,7 @@ Sequel::Deprecation
 <div class='method public-class' id='method-method-c-deprecate_constant'>
 <a name='method-c-deprecate_constant'></a>
 <div class='synopsis'>
-<span class='name'>deprecate_constant</span>
-<span class='arguments'>(mod, constant)</span>
+<span class='name'>deprecate_constant</span><span class='arguments'>(mod, constant)</span>
 
 </div>
 <div class='description'>
@@ -124,7 +122,7 @@ Sequel::Deprecation
 <a class='source-toggle' href='#' onclick='toggleCode(&#39;method-c-deprecate_constant-source&#39;); return false'>
 [show source]
 </a>
-<pre id='method-c-deprecate_constant-source'>   <span class="ruby-comment"># File lib/sequel/deprecated.rb</span>&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">deprecate_constant</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">constant</span>)&#x000A;<span class="line-num">63</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;2.3&#39;</span>&#x000A;<span class="line-num">64</span>     <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">deprecate_constant</span>(<span class="ruby-identifier">constant</span>)&#x000A;<span class="line-num">65</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">66</span> <span class="ruby-keyword">end</span></pre>
+<pre id='method-c-deprecate_constant-source'>   <span class="ruby-comment"># File lib/sequel/deprecated.rb</span>&#x000A;<span class="line-num">62</span> <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier ruby-title">deprecate_constant</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">constant</span>)&#x000A;<span class="line-num">63</span>   <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">64</span>   <span class="ruby-keyword">if</span> <span class="ruby-constant">RUBY_VERSION</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;2.3&#39;</span>&#x000A;<span class="line-num">65</span>   <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="line-num">66</span>     <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">deprecate_constant</span>(<span class="ruby-identifier">constant</span>)&#x000A;<span class="line-num">67</span>   <span class="ruby-keyword">end</span>&#x000A;<span class="line-num">68</span> <span class="ruby-keyword">end</span></pre>
 </div>
 </div>
 </div>
