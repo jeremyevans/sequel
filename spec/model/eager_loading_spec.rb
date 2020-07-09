@@ -507,9 +507,7 @@ describe Sequel::Model, "#eager" do
   end
   
   it "should have eager_load_results work with :eager_loader_key=>nil and :initialize_rows=>false options" do
-    eo = nil
     EagerAlbum.many_to_many :sgenres, :clone=>:genres, :eager_loader_key=>nil, :eager_loader=>(proc do |eo|
-      name = eo[:name]
       rows = eo[:rows]
 
       EagerAlbum.eager_load_results(EagerAlbum.association_reflection(:sgenres), eo.merge(:initialize_rows=>false)) do |assoc_record|

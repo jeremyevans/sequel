@@ -147,7 +147,7 @@ describe "sharding plugin" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     @db.sqls
 
-    album = @Album.server(:s1).first
+    @Album.server(:s1).first
     artist = @Artist.server(:s2).first
     @db.sqls.must_equal ["SELECT * FROM albums LIMIT 1 -- s1", "SELECT * FROM artists LIMIT 1 -- s2"]
 

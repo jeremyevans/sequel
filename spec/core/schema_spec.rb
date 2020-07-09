@@ -1714,9 +1714,7 @@ describe "Schema Parser" do
   end
 
   it "should raise error if asked to schema parse a dataset not involving a single table" do
-    c = nil
     @db.define_singleton_method(:schema_parse_table) do |t, opts|
-      c = [t, opts]
       [[:a, {:db_type=>t.to_s}]]
     end
     proc{@db.schema(@db.from)}.must_raise Sequel::Error

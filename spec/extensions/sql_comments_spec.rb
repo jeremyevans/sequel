@@ -26,11 +26,11 @@ describe "sql_comments extension" do
   end
 
   it "should allow overriding comments" do
-    ds = @ds.comment("Foo").comment("Some\nComment\r\n Here").select_sql.must_equal "SELECT * FROM t -- Some Comment Here\n"
+    @ds.comment("Foo").comment("Some\nComment\r\n Here").select_sql.must_equal "SELECT * FROM t -- Some Comment Here\n"
   end
 
   it "should allow disabling comments by overridding with nil" do
-    ds = @ds.comment("Foo").comment(nil).select_sql.must_equal "SELECT * FROM t"
+    @ds.comment("Foo").comment(nil).select_sql.must_equal "SELECT * FROM t"
   end
 
   it "should handle frozen SQL strings" do
