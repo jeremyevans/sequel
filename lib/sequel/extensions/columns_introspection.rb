@@ -75,8 +75,7 @@ module Sequel
       when SQL::Identifier
         c.value.to_sym
       when SQL::QualifiedIdentifier
-        col = c.column
-        col.is_a?(SQL::Identifier) ? col.value.to_sym : col.to_sym
+        c.column.to_sym
       when SQL::AliasedExpression
         a = c.alias
         a.is_a?(SQL::Identifier) ? a.value.to_sym : a.to_sym

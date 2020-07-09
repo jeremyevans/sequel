@@ -222,7 +222,6 @@ module Sequel
         # Split the stored string into an array of strings, handling
         # the different types of quoting.
         def parse
-          return @result if @result
           values = []
           skip(/\(/)
           if skip(/\)/)

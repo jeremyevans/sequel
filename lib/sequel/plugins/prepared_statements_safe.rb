@@ -66,9 +66,7 @@ module Sequel
         # Merge the current values into the default values to reduce the number
         # of free columns.
         def before_create
-          if v = model.prepared_statements_column_defaults
-            @values = v.merge(values)
-          end
+          @values = model.prepared_statements_column_defaults.merge(@values)
           super
         end
 

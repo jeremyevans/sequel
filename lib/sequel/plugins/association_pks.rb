@@ -295,9 +295,10 @@ module Sequel
 
           if primary_key.is_a?(Array)
             if (cols = sch.values_at(*klass.primary_key)).all? && (convs = cols.map{|c| c[:type] == :integer}).all?
+              db = model.db
               pks.map do |cpk|
-                cpk.zip(convs).map do |pk, conv|
-                  conv ? model.db.typecast_value(:integer, pk) : pk
+                cpk.map do |pk|
+                  db.typecast_value(:integer, pk)
                 end
               end
             else

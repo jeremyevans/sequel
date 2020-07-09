@@ -215,12 +215,6 @@ module Sequel
 
           db_type = db_type.to_s.dup.freeze
 
-          if converter = opts[:converter]
-            raise Error, "can't provide both a block and :converter option to register" if block
-          else
-            converter = block
-          end
-
           if soid
             raise Error, "can't provide both a converter and :subtype_oid option to register" if has_converter 
             raise Error, "no conversion proc for :subtype_oid=>#{soid.inspect} in conversion_procs" unless converter = conversion_procs[soid]

@@ -98,7 +98,7 @@ module Sequel
           end
 
           if retrieved_with
-            raise(Error, "Invalid primary key column for #{model}: #{pkc.inspect}") unless primary_key = model.primary_key
+            primary_key = model.primary_key
             composite_pk = true if primary_key.is_a?(Array)
             id_map = {}
             retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}

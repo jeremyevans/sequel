@@ -1,5 +1,7 @@
 === master
 
+* Remove unneeded conditionals from plugins and extensions (jeremyevans)
+
 * Fix exception class in run_transaction_hooks extension if calling run_after_{commit,rollback}_hooks outside of a transaction (jeremyevans)
 
 === 5.34.0 (2020-07-01)

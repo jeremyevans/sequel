@@ -189,7 +189,7 @@ module Sequel
           if date < DATETIME_YEAR_1
             date <<= ((date.year) * 24 - 12)
             date = db.from_application_timestamp(date)
-            minutes = (date.is_a?(DateTime) ? date.offset * 1440 : date.utc_offset/60).to_i
+            minutes = (date.offset * 1440).to_i
             date.strftime("'%Y-%m-%d %H:%M:%S.%N#{format_timestamp_offset(*minutes.divmod(60))} BC'")
           else
             super

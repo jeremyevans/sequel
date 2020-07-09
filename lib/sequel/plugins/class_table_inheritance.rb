@@ -289,7 +289,7 @@ module Sequel
 
         # The name of the most recently joined table.
         def cti_table_name
-          cti_tables ? cti_tables.last : dataset.first_source_alias
+          cti_tables.last
         end
 
         # The model class for the given key value.
@@ -310,7 +310,7 @@ module Sequel
           # Set table if this is a class table inheritance
           table = nil
           columns = nil
-          if (n = subclass.name) && !n.empty?
+          if n = subclass.name
             if table = cti_table_map[n.to_sym]
               columns = db.schema(table).map(&:first)
             else
@@ -417,7 +417,7 @@ module Sequel
               @values[primary_key] ||= nid
             end
           end
-          db.dataset.supports_insert_select? ? nil : @values[primary_key]
+          @values[primary_key]
         end
 
         # Update rows in all backing tables, using the columns in each table.

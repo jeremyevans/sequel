@@ -41,11 +41,9 @@ module Sequel
         # Create a prepared statement, but modify the SQL used so that the model's columns are explicitly
         # selected instead of using *, assuming that the dataset selects from a single table.
         def prepare_explicit_statement(ds, type, vals=OPTS)
-          f = ds.opts[:from]
-          meth = type == :insert_select ? :returning : :select
-          s = ds.opts[meth]
-          if f && f.length == 1 && !ds.opts[:join] && (!s || s.empty?)
-            ds = ds.public_send(meth, *columns.map{|c| Sequel.identifier(c)})
+          s = ds.opts[:returning]
+          if !s || s.empty?
+            ds = ds.returning(*columns.map{|c| Sequel.identifier(c)})
           end 
           
           prepare_statement(ds, type, vals)
@@ -70,9 +68,7 @@ module Sequel
         # Return a prepared statement that can be used to insert a row using the given columns
         # and return that column values for the row created.
         def prepared_insert_select(cols)
-          if dataset.supports_insert_select?
-            cached_prepared_statement(:insert_select, prepared_columns(cols)){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)), :insert_select, prepared_statement_key_hash(cols))}
-          end
+          cached_prepared_statement(:insert_select, prepared_columns(cols)){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)), :insert_select, prepared_statement_key_hash(cols))}
         end
 
         # Return an array of two element arrays with the column symbol as the first entry and the
@@ -138,9 +134,7 @@ module Sequel
         # and return the new column values.
         def _insert_select_raw(ds)
           if use_prepared_statements_for?(:insert_select)
-            if ps = model.send(:prepared_insert_select, @values.keys)
-              _set_prepared_statement_server(ps).call(@values)
-            end
+            _set_prepared_statement_server(model.send(:prepared_insert_select, @values.keys)).call(@values)
           else
             super
           end

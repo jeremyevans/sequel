@@ -518,7 +518,6 @@ module Sequel
     def initialize(db, directory, opts=OPTS)
       super
       @current = opts[:current] || current_migration_version
-      raise(Error, "No current version available") unless current
 
       latest_version = latest_migration_version
       @target = if opts[:target]

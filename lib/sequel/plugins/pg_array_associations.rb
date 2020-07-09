@@ -341,10 +341,9 @@ module Sequel
             eo[:loader] = false
 
             eager_load_results(opts, eo) do |assoc_record|
-              if pks ||= assoc_record.get_column_value(key)
+              if pks = assoc_record.get_column_value(key)
                 pks.each do |pkv|
-                  next unless objects = id_map[pkv]
-                  objects.each do |object| 
+                  id_map[pkv].each do |object| 
                     object.associations[name].push(assoc_record)
                   end
                 end

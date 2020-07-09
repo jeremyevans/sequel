@@ -194,21 +194,17 @@ module Sequel
           ds = ds.select_append(ka) unless ds.opts[:select] == nil
           model.eager_load_results(r, eo.merge(:loader=>false, :initialize_rows=>false, :dataset=>ds, :id_map=>nil)) do |obj|
             opk = prkey_conv[obj]
-            if parent_map.has_key?(opk)
-              if idm_obj = parent_map[opk]
-                key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
-                obj = idm_obj
-              end
+            if idm_obj = parent_map[opk]
+              key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
+              obj = idm_obj
             else
               obj.associations[parent] = nil
               parent_map[opk] = obj
               (children_map[key_conv[obj]] ||= []) << obj
             end
             
-            if roots = id_map[extract_key_alias[obj]]
-              roots.each do |root|
-                root.associations[ancestors] << obj
-              end
+            id_map[extract_key_alias[obj]].each do |root|
+              root.associations[ancestors] << obj
             end
           end
           parent_map.each do |parent_id, obj|
@@ -306,11 +302,9 @@ module Sequel
             end
             
             opk = prkey_conv[obj]
-            if parent_map.has_key?(opk)
-              if idm_obj = parent_map[opk]
-                key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
-                obj = idm_obj
-              end
+            if idm_obj = parent_map[opk]
+              key_aliases.each{|ka_| idm_obj.values[ka_] = obj.values[ka_]}
+              obj = idm_obj
             else
               obj.associations[childrena] = [] unless no_cache
               parent_map[opk] = obj

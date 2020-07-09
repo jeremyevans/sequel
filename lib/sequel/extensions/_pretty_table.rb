@@ -41,8 +41,7 @@ module Sequel
     def self.column_sizes(records, columns) # :nodoc:
       sizes = Hash.new {0}
       columns.each do |c|
-        s = c.to_s.size
-        sizes[c] = s if s > sizes[c]
+        sizes[c] = c.to_s.size
       end
       records.each do |r|
         columns.each do |c|
